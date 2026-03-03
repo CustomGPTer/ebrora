@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ebrora — Professional Excel Templates for Construction & Civil Engineering</title>
+    <meta name="description" content="Download professional Excel templates built specifically for construction and civil engineering. Project planners, inspection registers, cost calculators, and more. Instant download, no signup required.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Ebrora — Professional Excel Templates for Construction & Civil Engineering">
+    <meta property="og:description" content="Download professional Excel templates built specifically for construction and civil engineering. Instant download, no signup required.">
+    <meta property="og:image" content="https://ebrora.com/og-image.jpg">
+    <meta property="og:url" content="https://ebrora.com">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ================================================================
+         NAVIGATION
+         ================================================================ -->
+    <nav class="nav" id="nav">
+        <div class="container">
+            <a href="index.html" class="nav__logo">
+                <span class="nav__logo-icon">E</span>
+                Ebrora
+            </a>
+            <div class="nav__links">
+                <a href="#products" class="nav__link">Templates</a>
+                <a href="blog.html" class="nav__link">Blog</a>
+                <a href="faq.html" class="nav__link">FAQ</a>
+                <a href="#about" class="nav__link">About</a>
+                <a href="#reviews" class="nav__link">Reviews</a>
+                <a href="#contact" class="nav__link">Contact</a>
+            </div>
+            <button class="nav__hamburger" id="hamburger" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="nav__mobile-menu" id="mobileMenu">
+        <a href="#products">Templates</a>
+        <a href="blog.html">Blog</a>
+        <a href="faq.html">FAQ</a>
+        <a href="#about">About</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <!-- ================================================================
+         HERO
+         ================================================================ -->
+    <section class="hero">
+        <div class="container">
+            <span class="hero__badge">Construction & Civil Engineering</span>
+            <h1>Professional Excel <span>Templates</span> Built by Industry Experts</h1>
+            <p class="hero__subtitle">Save hours every week with ready-to-use spreadsheets designed for site managers, engineers, and project teams. Instant download, no signup required.</p>
+            <div class="hero__search">
+                <span class="hero__search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search templates… e.g. Gantt chart, inspection, COSHH" autocomplete="off">
+                <button type="button" onclick="document.getElementById('searchInput').dispatchEvent(new Event('input'))">Search</button>
+            </div>
+            <a href="#products" class="hero__browse">Browse all templates ↓</a>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         TRUST BAR
+         ================================================================ -->
+    <div class="trust-bar">
+        <div class="container">
+            <div class="trust-bar__inner">
+                <span class="trust-bar__stars">★★★★★</span>
+                <span class="trust-bar__rating">4.9/5 average rating</span>
+                <span class="trust-bar__separator">•</span>
+                <span>Trusted by 500+ construction professionals</span>
+                <span class="trust-bar__separator">•</span>
+                <span>Instant download</span>
+                <span class="trust-bar__separator">•</span>
+                <span>Windows & Mac compatible</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         CATEGORY FILTER
+         ================================================================ -->
+    <div class="category-filter" id="products">
+        <div class="container">
+            <ul class="category-filter__inner" id="filterPills">
+                <!-- Populated by JavaScript from CATEGORIES -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         FEATURED PRODUCTS
+         ================================================================ -->
+    <section class="section" id="featuredSection">
+        <div class="container">
+            <div class="section__header">
+                <h2>Featured Templates</h2>
+            </div>
+            <div class="product-grid" id="featuredGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         ALL PRODUCTS
+         ================================================================ -->
+    <section class="section section--alt">
+        <div class="container">
+            <div class="section__header">
+                <h2>All Templates <span id="productCount" class="section__count"></span></h2>
+                <div class="sort-controls">
+                    <select id="sortSelect" class="category-filter__btn" aria-label="Sort products">
+                        <option value="featured">Featured</option>
+                        <option value="newest">Newest First</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                </div>
+            </div>
+            <div class="product-grid" id="productsGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div id="noResults" class="no-results">
+                <div class="no-results__icon">🔍</div>
+                <h3 class="no-results__title">No templates found</h3>
+                <p class="no-results__text">Try adjusting your search or filter to find what you're looking for.</p>
+                <button class="btn btn--outline" onclick="clearFilters()">Clear Filters</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         WHY CHOOSE EBRORA
+         ================================================================ -->
+    <section class="section">
+        <div class="container">
+            <div class="section__header">
+                <h2>Why Choose Ebrora</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-card__icon">🛠️</div>
+                    <h3>Built for Construction</h3>
+                    <p>Every template is designed specifically for the construction and civil engineering industry — not generic business spreadsheets repurposed with a new label.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card__icon">⚡</div>
+                    <h3>Instant Download</h3>
+                    <p>Purchase and download in seconds. No subscriptions, no signup walls, no waiting. Open in Excel and start using it on site immediately.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card__icon">🔒</div>
+                    <h3>Professional & Reliable</h3>
+                    <p>Formula-protected sheets, data validation, conditional formatting, and VBA automation — all built in and tested so nothing breaks in the field.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card__icon">💻</div>
+                    <h3>Windows & Mac</h3>
+                    <p>Compatible with Microsoft Excel on both Windows and Mac. Optimised for Excel 2016 and later, including Microsoft 365.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         ABOUT
+         ================================================================ -->
+    <section class="section section--alt" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about__visual">🏗️</div>
+                <div class="about__content">
+                    <h2>About Ebrora</h2>
+                    <p>Ebrora was created by construction professionals who were tired of spending evenings building spreadsheets from scratch for every new project. We build the tools we wish we had when we started out — professional, reliable, and ready to use on day one.</p>
+                    <p>Every template is designed with real site workflows in mind, tested by practising engineers and site managers, and refined based on customer feedback. Whether you manage earthworks, M&E installations, or full project programmes, our templates help you work smarter.</p>
+                    <div class="about__stats">
+                        <div class="about__stat">
+                            <span class="about__stat-number" id="statTemplates">0</span>
+                            <span class="about__stat-label">Templates</span>
+                        </div>
+                        <div class="about__stat">
+                            <span class="about__stat-number" id="statCategories">0</span>
+                            <span class="about__stat-label">Categories</span>
+                        </div>
+                        <div class="about__stat">
+                            <span class="about__stat-number">500+</span>
+                            <span class="about__stat-label">Customers</span>
+                        </div>
+                        <div class="about__stat">
+                            <span class="about__stat-number">4.9</span>
+                            <span class="about__stat-label">Avg Rating</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         REVIEWS
+         ================================================================ -->
+    <section class="section" id="reviews">
+        <div class="container">
+            <div class="section__header">
+                <h2>What Our Customers Say</h2>
+            </div>
+            <div class="reviews-grid" id="reviewsGrid">
+                <!-- Populated by JavaScript from REVIEWS -->
+            </div>
+            <div class="reviews__toggle">
+                <button class="btn btn--outline" id="reviewsToggle" onclick="toggleReviews()">Show More Reviews</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         NEWSLETTER
+         ================================================================ -->
+    <section class="newsletter">
+        <div class="container">
+            <h2>Stay in the Loop</h2>
+            <p>Get notified when we release new templates, updates, and exclusive discounts. No spam, unsubscribe anytime.</p>
+            <form class="newsletter__form" onsubmit="handleNewsletter(event)">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit" class="btn btn--accent">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         CONTACT
+         ================================================================ -->
+    <section class="section" id="contact">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact__info">
+                    <h2>Get in Touch</h2>
+                    <p>Have a question, suggestion, or need a custom template? We'd love to hear from you.</p>
+                    <div class="contact__item">
+                        <div class="contact__item-icon">✉️</div>
+                        <div class="contact__item-text">
+                            <strong>Email</strong>
+                            <a href="mailto:hello@ebrora.com">hello@ebrora.com</a>
+                        </div>
+                    </div>
+                    <div class="contact__item">
+                        <div class="contact__item-icon">⏰</div>
+                        <div class="contact__item-text">
+                            <strong>Response Time</strong>
+                            <span>Usually within 24 hours</span>
+                        </div>
+                    </div>
+                    <div class="contact__item">
+                        <div class="contact__item-icon">📍</div>
+                        <div class="contact__item-text">
+                            <strong>Based in</strong>
+                            <span>United Kingdom</span>
+                        </div>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="LinkedIn" title="LinkedIn">🔗</a>
+                        <a href="#" class="social-link" aria-label="Twitter" title="Twitter">💬</a>
+                        <a href="#" class="social-link" aria-label="YouTube" title="YouTube">▶️</a>
+                    </div>
+                </div>
+                <form class="contact__form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                    <div class="form-group">
+                        <label for="contactName">Name</label>
+                        <input type="text" id="contactName" name="name" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail">Email</label>
+                        <input type="email" id="contactEmail" name="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactSubject">Subject</label>
+                        <select id="contactSubject" name="subject" required>
+                            <option value="" disabled selected>Select a subject</option>
+                            <option value="general">General Enquiry</option>
+                            <option value="support">Template Support</option>
+                            <option value="custom">Custom Template Request</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactMessage">Message</label>
+                        <textarea id="contactMessage" name="message" placeholder="How can we help?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--large">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         FOOTER
+         ================================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__grid">
+                <div class="footer__brand">
+                    <a href="index.html" class="nav__logo">
+                        <span class="nav__logo-icon">E</span>
+                        Ebrora
+                    </a>
+                    <p>Professional Excel templates built specifically for construction and civil engineering professionals.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="LinkedIn">🔗</a>
+                        <a href="#" class="social-link" aria-label="Twitter">💬</a>
+                        <a href="#" class="social-link" aria-label="YouTube">▶️</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Categories</h4>
+                    <div class="footer__links" id="footerCategories">
+                        <!-- Populated by JavaScript from CATEGORIES -->
+                    </div>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <div class="footer__links">
+                        <a href="blog.html">Blog</a>
+                        <a href="faq.html">FAQ</a>
+                        <a href="#contact">Contact Us</a>
+                        <a href="#">Free PDF Previews</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Support</h4>
+                    <div class="footer__links">
+                        <a href="faq.html">Help Centre</a>
+                        <a href="mailto:hello@ebrora.com">Email Support</a>
+                        <a href="#">Refund Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <span class="footer__copyright">&copy; <span id="footerYear"></span> Ebrora. All rights reserved.</span>
+                <div class="footer__bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================================================================
+         BACK TO TOP
+         ================================================================ -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">↑</button>
+
+    <!-- ================================================================
+         COOKIE CONSENT
+         ================================================================ -->
+    <div class="cookie-consent" id="cookieConsent">
+        <div class="container">
+            <div class="cookie-consent__inner">
+                <p class="cookie-consent__text">We use cookies to analyse site traffic and improve your experience. By clicking “Accept”, you consent to the use of analytics cookies. <a href="#">Privacy Policy</a></p>
+                <div class="cookie-consent__buttons">
+                    <button class="btn btn--outline" onclick="handleCookieConsent('declined')">Decline</button>
+                    <button class="btn btn--primary" onclick="handleCookieConsent('accepted')">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         SCRIPTS
+         ================================================================ -->
+    <script src="products.js"></script>
+    <script>
+    /* =================================================================
+       EBRORA — Homepage JavaScript
+       ================================================================= */
+
+    /* -----------------------------------------------------------------
+       GLOBAL STATE
+       ----------------------------------------------------------------- */
+    let currentCategory = 'all';
+    let currentSearch = '';
+    let currentSort = 'featured';
+    let allReviewsVisible = false;
+
+    /* -----------------------------------------------------------------
+       1. RENDER PRODUCT CARD
+       ----------------------------------------------------------------- */
+    function renderCard(product) {
+        const categoryLabel = product.category && product.category.length > 0 && CATEGORIES[product.category[0]]
+            ? CATEGORIES[product.category[0]].label
+            : '';
+
+        const hasImages = product.images && product.images.length > 0;
+        const mainImage = hasImages ? product.images[0] : '';
+        const hoverImage = hasImages && product.images.length > 1 ? product.images[1] : mainImage;
+
+        let imageHTML = '';
+        if (hasImages) {
+            imageHTML = `
+                <img src="${mainImage}" alt="${product.title}" class="main-img" loading="lazy">
+                <img src="${hoverImage}" alt="${product.title} preview" class="hover-img" loading="lazy">
+            `;
+        } else {
+            imageHTML = `<div class="product-card__placeholder">${product.icon || '\u{1F4CA}'}</div>`;
+        }
+
+        const ribbonHTML = product.new ? '<span class="product-card__ribbon">NEW</span>' : '';
+        const categoryBadgeHTML = categoryLabel ? `<span class="product-card__category">${categoryLabel}</span>` : '';
+
+        const oldPriceHTML = product.oldPrice ? `<span class="was">${product.oldPrice}</span>` : '';
+
+        return `
+            <a href="product.html?id=${product.id}" class="product-card">
+                <div class="product-card__image-wrap">
+                    ${imageHTML}
+                    ${categoryBadgeHTML}
+                    ${ribbonHTML}
+                </div>
+                <div class="product-card__body">
+                    <h3 class="product-card__title">${product.title}</h3>
+                    <p class="product-card__desc">${product.desc}</p>
+                    <div class="product-card__price-row">
+                        <span class="product-card__price">${product.price} ${oldPriceHTML}</span>
+                    </div>
+                    <div class="product-card__btn-row">
+                        <span class="btn btn--outline" onclick="event.preventDefault(); window.open('${product.pdfLink}', '_blank')">Free PDF</span>
+                        <span class="btn btn--primary" onclick="event.preventDefault(); window.open('${product.buyLink}', '_blank')">Buy Now</span>
+                    </div>
+                    <p style="font-size:0.72rem; font-style:italic; color:#888; margin-top:0.5rem; margin-bottom:0;">\u{1F512} Secure checkout via Gumroad</p>
+                </div>
+            </a>
+        `;
+    }
+
+    /* -----------------------------------------------------------------
+       2. BUILD CATEGORY FILTER PILLS
+       ----------------------------------------------------------------- */
+    function buildCategoryPills() {
+        const pillsContainer = document.getElementById('filterPills');
+        if (!pillsContainer) return;
+
+        let html = '<li><button class="category-filter__btn active" data-category="all">All</button></li>';
+        for (const slug in CATEGORIES) {
+            if (CATEGORIES.hasOwnProperty(slug)) {
+                const cat = CATEGORIES[slug];
+                const count = PRODUCTS.filter(function(p) { return p.category && p.category.includes(slug); }).length;
+                html += '<li><button class="category-filter__btn" data-category="' + slug + '">' + cat.icon + ' ' + cat.label + '<span class="category-filter__count">(' + count + ')</span></button></li>';
+            }
+        }
+        pillsContainer.innerHTML = html;
+
+        /* Attach click handlers */
+        var buttons = pillsContainer.querySelectorAll('.category-filter__btn');
+        buttons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                buttons.forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentCategory = btn.getAttribute('data-category');
+                renderProducts();
+            });
+        });
+    }
+
+    /* -----------------------------------------------------------------
+       3. FILTER & SORT PRODUCTS
+       ----------------------------------------------------------------- */
+    function getFilteredProducts() {
+        var filtered = PRODUCTS.slice();
+
+        /* Category filter */
+        if (currentCategory !== 'all') {
+            filtered = filtered.filter(function(p) {
+                return p.category && p.category.includes(currentCategory);
+            });
+        }
+
+        /* Search filter */
+        if (currentSearch.trim() !== '') {
+            var query = currentSearch.toLowerCase().trim();
+            filtered = filtered.filter(function(p) {
+                var searchable = (p.title + ' ' + p.desc + ' ' + p.badge + ' ' + (p.category || []).join(' ')).toLowerCase();
+                return searchable.indexOf(query) !== -1;
+            });
+        }
+
+        /* Sorting */
+        switch (currentSort) {
+            case 'featured':
+                filtered.sort(function(a, b) {
+                    if (a.featured && !b.featured) return -1;
+                    if (!a.featured && b.featured) return 1;
+                    return (b.popularity || 0) - (a.popularity || 0);
+                });
+                break;
+            case 'newest':
+                filtered.sort(function(a, b) {
+                    if (a.new && !b.new) return -1;
+                    if (!a.new && b.new) return 1;
+                    return 0;
+                });
+                break;
+            case 'price-low':
+                filtered.sort(function(a, b) {
+                    return parsePrice(a.price) - parsePrice(b.price);
+                });
+                break;
+            case 'price-high':
+                filtered.sort(function(a, b) {
+                    return parsePrice(b.price) - parsePrice(a.price);
+                });
+                break;
+            case 'popular':
+                filtered.sort(function(a, b) {
+                    return (b.popularity || 0) - (a.popularity || 0);
+                });
+                break;
+        }
+
+        return filtered;
+    }
+
+    function parsePrice(priceStr) {
+        if (!priceStr) return 0;
+        var num = priceStr.replace(/[^0-9.]/g, '');
+        return parseFloat(num) || 0;
+    }
+
+    /* -----------------------------------------------------------------
+       4. RENDER PRODUCTS INTO GRIDS
+       ----------------------------------------------------------------- */
+    function renderProducts() {
+        var grid = document.getElementById('productsGrid');
+        var noResults = document.getElementById('noResults');
+        var countSpan = document.getElementById('productCount');
+        if (!grid) return;
+
+        var products = getFilteredProducts();
+        var html = '';
+        for (var i = 0; i < products.length; i++) {
+            html += renderCard(products[i]);
+        }
+        grid.innerHTML = html;
+
+        /* Update count */
+        if (countSpan) {
+            countSpan.textContent = '(' + products.length + ')';
+        }
+
+        /* No results toggle */
+        if (noResults) {
+            if (products.length === 0) {
+                noResults.classList.add('visible');
+            } else {
+                noResults.classList.remove('visible');
+            }
+        }
+    }
+
+    function renderFeatured() {
+        var grid = document.getElementById('featuredGrid');
+        var section = document.getElementById('featuredSection');
+        if (!grid) return;
+
+        var featured = PRODUCTS.filter(function(p) { return p.featured; });
+
+        /* Sort featured by popularity descending */
+        featured.sort(function(a, b) {
+            return (b.popularity || 0) - (a.popularity || 0);
+        });
+
+        /* Show top 4 featured products */
+        featured = featured.slice(0, 4);
+
+        if (featured.length === 0 && section) {
+            section.classList.add('hidden');
+            return;
+        }
+
+        var html = '';
+        for (var i = 0; i < featured.length; i++) {
+            html += renderCard(featured[i]);
+        }
+        grid.innerHTML = html;
+    }
+
+    /* -----------------------------------------------------------------
+       5. CLEAR FILTERS
+       ----------------------------------------------------------------- */
+    function clearFilters() {
+        currentCategory = 'all';
+        currentSearch = '';
+        document.getElementById('searchInput').value = '';
+
+        var pills = document.querySelectorAll('.category-filter__btn');
+        pills.forEach(function(btn) {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-category') === 'all') {
+                btn.classList.add('active');
+            }
+        });
+
+        var sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.value = 'featured';
+            currentSort = 'featured';
+        }
+
+        renderProducts();
+    }
+
+    /* -----------------------------------------------------------------
+       6. SEARCH INPUT HANDLER
+       ----------------------------------------------------------------- */
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        currentSearch = e.target.value;
+        renderProducts();
+    });
+
+    /* -----------------------------------------------------------------
+       7. SORT SELECT HANDLER
+       ----------------------------------------------------------------- */
+    document.getElementById('sortSelect').addEventListener('change', function(e) {
+        currentSort = e.target.value;
+        renderProducts();
+    });
+
+    /* -----------------------------------------------------------------
+       8. REVIEWS
+       ----------------------------------------------------------------- */
+    function renderReviews(showAll) {
+        var grid = document.getElementById('reviewsGrid');
+        var toggleBtn = document.getElementById('reviewsToggle');
+        if (!grid || typeof REVIEWS === 'undefined') return;
+
+        var reviews = showAll ? REVIEWS : REVIEWS.slice(0, 6);
+
+        var html = '';
+        for (var i = 0; i < reviews.length; i++) {
+            var r = reviews[i];
+            var stars = '';
+            for (var s = 0; s < r.stars; s++) {
+                stars += '\u2605';
+            }
+            html += '<div class="review-card">';
+            html += '<div class="review-card__stars">' + stars + '</div>';
+            html += '<p class="review-card__text">\u201C' + r.text + '\u201D</p>';
+            html += '<p class="review-card__author">' + r.author + '</p>';
+            html += '<p class="review-card__role">' + r.role + '</p>';
+            html += '</div>';
+        }
+        grid.innerHTML = html;
+
+        /* Toggle button visibility and text */
+        if (toggleBtn) {
+            if (REVIEWS.length <= 6) {
+                toggleBtn.classList.add('hidden');
+            } else {
+                toggleBtn.classList.remove('hidden');
+                toggleBtn.textContent = showAll ? 'Show Fewer Reviews' : 'Show More Reviews';
+            }
+        }
+    }
+
+    function toggleReviews() {
+        allReviewsVisible = !allReviewsVisible;
+        renderReviews(allReviewsVisible);
+    }
+
+    /* -----------------------------------------------------------------
+       9. FOOTER CATEGORIES
+       ----------------------------------------------------------------- */
+    function buildFooterCategories() {
+        var container = document.getElementById('footerCategories');
+        if (!container || typeof CATEGORIES === 'undefined') return;
+
+        var html = '';
+        var count = 0;
+        for (var slug in CATEGORIES) {
+            if (CATEGORIES.hasOwnProperty(slug) && count < 8) {
+                html += '<a href="index.html#products" data-category="' + slug + '">' + CATEGORIES[slug].label + '</a>';
+                count++;
+            }
+        }
+        container.innerHTML = html;
+    }
+
+    /* -----------------------------------------------------------------
+       10. STATS
+       ----------------------------------------------------------------- */
+    function populateStats() {
+        var templateCount = document.getElementById('statTemplates');
+        var categoryCount = document.getElementById('statCategories');
+
+        if (templateCount && typeof PRODUCTS !== 'undefined') {
+            templateCount.textContent = PRODUCTS.length + '+';
+        }
+        if (categoryCount && typeof CATEGORIES !== 'undefined') {
+            categoryCount.textContent = Object.keys(CATEGORIES).length;
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       11. BACK TO TOP
+       ----------------------------------------------------------------- */
+    var backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+        if (backToTopBtn) {
+            if (window.scrollY > 400) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }
+
+        /* Nav shadow on scroll */
+        var nav = document.getElementById('nav');
+        if (nav) {
+            if (window.scrollY > 10) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        }
+    });
+
+    /* -----------------------------------------------------------------
+       12. COOKIE CONSENT
+       ----------------------------------------------------------------- */
+    function getCookie(name) {
+        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+    }
+
+    function setCookie(name, value, days) {
+        var expires = '';
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = '; expires=' + date.toUTCString();
+        }
+        document.cookie = name + '=' + value + expires + '; path=/; SameSite=Lax';
+    }
+
+    function checkCookieConsent() {
+        var consent = getCookie('ebrora_cookie_consent');
+        var banner = document.getElementById('cookieConsent');
+
+        if (!consent && banner) {
+            banner.classList.add('visible');
+        } else if (consent === 'accepted') {
+            loadGoogleAnalytics();
+        }
+    }
+
+    function handleCookieConsent(choice) {
+        setCookie('ebrora_cookie_consent', choice, 365);
+        var banner = document.getElementById('cookieConsent');
+        if (banner) {
+            banner.classList.remove('visible');
+        }
+        if (choice === 'accepted') {
+            loadGoogleAnalytics();
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       13. GOOGLE ANALYTICS (GA4)
+       ----------------------------------------------------------------- */
+    function loadGoogleAnalytics() {
+        if (document.getElementById('ga4-script')) return;
+
+        var script = document.createElement('script');
+        script.id = 'ga4-script';
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX';
+        document.head.appendChild(script);
+
+        script.onload = function() {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXXXXX');
+        };
+    }
+
+    /* -----------------------------------------------------------------
+       14. CONTACT FORM
+       ----------------------------------------------------------------- */
+    var contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            var action = contactForm.getAttribute('action');
+
+            /* If Formspree is not configured, use mailto fallback */
+            if (!action || action.indexOf('YOUR_FORM_ID') !== -1) {
+                e.preventDefault();
+
+                var name = document.getElementById('contactName').value;
+                var email = document.getElementById('contactEmail').value;
+                var subject = document.getElementById('contactSubject').value;
+                var message = document.getElementById('contactMessage').value;
+
+                var mailtoBody = 'Name: ' + name + '%0D%0AEmail: ' + email + '%0D%0ASubject: ' + subject + '%0D%0A%0D%0A' + encodeURIComponent(message);
+                var mailtoLink = 'mailto:hello@ebrora.com?subject=' + encodeURIComponent('Ebrora Contact: ' + subject) + '&body=' + mailtoBody;
+
+                window.location.href = mailtoLink;
+                return;
+            }
+
+            /* Otherwise let Formspree handle it normally */
+        });
+    }
+
+    /* -----------------------------------------------------------------
+       15. NEWSLETTER FORM
+       ----------------------------------------------------------------- */
+    function handleNewsletter(e) {
+        e.preventDefault();
+        var input = e.target.querySelector('input[type="email"]');
+        if (input && input.value) {
+            alert('Thank you for subscribing! We\'ll keep you updated with new templates and offers.');
+            input.value = '';
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       16. MOBILE NAVIGATION
+       ----------------------------------------------------------------- */
+    var hamburger = document.getElementById('hamburger');
+    var mobileMenu = document.getElementById('mobileMenu');
+
+    if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+        });
+
+        /* Close menu when a link is clicked */
+        var mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+            });
+        });
+    }
+
+    /* Close mobile menu on outside click */
+    document.addEventListener('click', function(e) {
+        if (hamburger && mobileMenu && mobileMenu.classList.contains('open')) {
+            if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+            }
+        }
+    });
+
+    /* -----------------------------------------------------------------
+       17. FOOTER YEAR
+       ----------------------------------------------------------------- */
+    var footerYear = document.getElementById('footerYear');
+    if (footerYear) {
+        footerYear.textContent = new Date().getFullYear();
+    }
+
+    /* -----------------------------------------------------------------
+       18. INITIALISE
+       ----------------------------------------------------------------- */
+    buildCategoryPills();
+    renderFeatured();
+    renderProducts();
+    renderReviews(false);
+    buildFooterCategories();
+    populateStats();
+    checkCookieConsent();
+
+    </script>
+</body>
+</html>
