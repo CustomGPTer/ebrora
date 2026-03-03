@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — Ebrora | Excel Tips, Construction Guides & Template Tutorials</title>
+    <meta name="description" content="Read our latest articles on Excel tips for construction, site management guides, and step-by-step template tutorials. Free advice from industry professionals.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Blog — Ebrora">
+    <meta property="og:description" content="Excel tips, construction guides, and template tutorials from the Ebrora team.">
+    <meta property="og:image" content="https://ebrora.com/og-image.jpg">
+    <meta property="og:url" content="https://ebrora.com/blog.html">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ================================================================
+         NAVIGATION
+         ================================================================ -->
+    <nav class="nav" id="nav">
+        <div class="container">
+            <a href="index.html" class="nav__logo">
+                <span class="nav__logo-icon">E</span>
+                Ebrora
+            </a>
+            <div class="nav__links">
+                <a href="index.html#products" class="nav__link">Templates</a>
+                <a href="blog.html" class="nav__link active">Blog</a>
+                <a href="faq.html" class="nav__link">FAQ</a>
+                <a href="index.html#about" class="nav__link">About</a>
+                <a href="index.html#reviews" class="nav__link">Reviews</a>
+                <a href="index.html#contact" class="nav__link">Contact</a>
+            </div>
+            <button class="nav__hamburger" id="hamburger" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="nav__mobile-menu" id="mobileMenu">
+        <a href="index.html#products">Templates</a>
+        <a href="blog.html">Blog</a>
+        <a href="faq.html">FAQ</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#reviews">Reviews</a>
+        <a href="index.html#contact">Contact</a>
+    </div>
+
+    <!-- ================================================================
+         PAGE HEADER
+         ================================================================ -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Blog</h1>
+            <p>Excel tips, construction guides, and template tutorials</p>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         BLOG CATEGORY FILTER
+         ================================================================ -->
+    <div class="blog-filter">
+        <div class="container">
+            <div class="blog-filter__inner" id="blogFilterPills">
+                <!-- Populated by JavaScript from BLOG_CATEGORIES -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         BLOG CONTENT
+         ================================================================ -->
+    <section class="section">
+        <div class="container">
+
+            <!-- Search Bar -->
+            <div class="blog-search">
+                <span class="blog-search__icon">🔍</span>
+                <input type="text" id="blogSearchInput" placeholder="Search articles…" autocomplete="off">
+            </div>
+
+            <!-- Article Grid -->
+            <div class="article-grid" id="articleGrid">
+                <!-- Populated by JavaScript from POSTS -->
+            </div>
+
+            <!-- No Results -->
+            <div id="noResults" class="no-results">
+                <div class="no-results__icon">🔍</div>
+                <h3 class="no-results__title">No articles found</h3>
+                <p class="no-results__text">Try adjusting your search or filter to find what you're looking for.</p>
+                <button class="btn btn--outline" onclick="clearBlogFilters()">Clear Filters</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ================================================================
+         NEWSLETTER
+         ================================================================ -->
+    <section class="newsletter">
+        <div class="container">
+            <h2>Stay in the Loop</h2>
+            <p>Get notified when we publish new articles, release templates, and share exclusive discounts. No spam, unsubscribe anytime.</p>
+            <form class="newsletter__form" onsubmit="handleNewsletter(event)">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit" class="btn btn--accent">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ================================================================
+         FOOTER
+         ================================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__grid">
+                <div class="footer__brand">
+                    <a href="index.html" class="nav__logo">
+                        <span class="nav__logo-icon">E</span>
+                        Ebrora
+                    </a>
+                    <p>Professional Excel templates built specifically for construction and civil engineering professionals.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="LinkedIn">🔗</a>
+                        <a href="#" class="social-link" aria-label="Twitter">💬</a>
+                        <a href="#" class="social-link" aria-label="YouTube">▶️</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Categories</h4>
+                    <div class="footer__links" id="footerCategories">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <div class="footer__links">
+                        <a href="blog.html">Blog</a>
+                        <a href="faq.html">FAQ</a>
+                        <a href="index.html#contact">Contact Us</a>
+                        <a href="#">Free PDF Previews</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Support</h4>
+                    <div class="footer__links">
+                        <a href="faq.html">Help Centre</a>
+                        <a href="mailto:hello@ebrora.com">Email Support</a>
+                        <a href="#">Refund Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <span class="footer__copyright">&copy; <span id="footerYear"></span> Ebrora. All rights reserved.</span>
+                <div class="footer__bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================================================================
+         BACK TO TOP
+         ================================================================ -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">↑</button>
+
+    <!-- ================================================================
+         COOKIE CONSENT
+         ================================================================ -->
+    <div class="cookie-consent" id="cookieConsent">
+        <div class="container">
+            <div class="cookie-consent__inner">
+                <p class="cookie-consent__text">We use cookies to analyse site traffic and improve your experience. By clicking “Accept”, you consent to the use of analytics cookies. <a href="#">Privacy Policy</a></p>
+                <div class="cookie-consent__buttons">
+                    <button class="btn btn--outline" onclick="handleCookieConsent('declined')">Decline</button>
+                    <button class="btn btn--primary" onclick="handleCookieConsent('accepted')">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         SCRIPTS
+         ================================================================ -->
+    <script src="products.js"></script>
+    <script src="posts.js"></script>
+    <script>
+    /* =================================================================
+       EBRORA — Blog Listing Page JavaScript
+       ================================================================= */
+
+    /* -----------------------------------------------------------------
+       GLOBAL STATE
+       ----------------------------------------------------------------- */
+    var currentBlogCategory = 'all';
+    var currentBlogSearch = '';
+
+    /* -----------------------------------------------------------------
+       1. FORMAT DATE
+       ----------------------------------------------------------------- */
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        var months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        var parts = dateStr.split('-');
+        if (parts.length !== 3) return dateStr;
+        var year = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10) - 1;
+        var day = parseInt(parts[2], 10);
+        return day + ' ' + months[month] + ' ' + year;
+    }
+
+    /* -----------------------------------------------------------------
+       2. RENDER ARTICLE CARD
+       ----------------------------------------------------------------- */
+    function renderArticleCard(post) {
+        var categoryData = BLOG_CATEGORIES[post.category] || { label: 'Article', icon: '\u{1F4DD}' };
+
+        var imageHTML = '';
+        if (post.featuredImage) {
+            imageHTML = '<img src="' + post.featuredImage + '" alt="' + post.title + '" loading="lazy">';
+        } else {
+            imageHTML = '<div class="article-card__image-placeholder">' + categoryData.icon + '</div>';
+        }
+
+        var html = '';
+        html += '<a href="post.html?id=' + post.id + '" class="article-card">';
+        html += '<div class="article-card__image">';
+        html += imageHTML;
+        html += '<span class="article-card__category">' + categoryData.icon + ' ' + categoryData.label + '</span>';
+        html += '</div>';
+        html += '<div class="article-card__body">';
+        html += '<h3 class="article-card__title">' + post.title + '</h3>';
+        html += '<p class="article-card__date">' + formatDate(post.date) + '</p>';
+        html += '<p class="article-card__excerpt">' + post.excerpt + '</p>';
+        html += '<span class="article-card__read-more">Read More \u2192</span>';
+        html += '</div>';
+        html += '</a>';
+
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       3. BUILD BLOG CATEGORY PILLS
+       ----------------------------------------------------------------- */
+    function buildBlogCategoryPills() {
+        var container = document.getElementById('blogFilterPills');
+        if (!container || typeof BLOG_CATEGORIES === 'undefined') return;
+
+        var html = '<button class="blog-filter__btn active" data-category="all">All</button>';
+
+        for (var slug in BLOG_CATEGORIES) {
+            if (BLOG_CATEGORIES.hasOwnProperty(slug)) {
+                var cat = BLOG_CATEGORIES[slug];
+                var count = 0;
+                if (typeof POSTS !== 'undefined') {
+                    for (var i = 0; i < POSTS.length; i++) {
+                        if (POSTS[i].category === slug) count++;
+                    }
+                }
+                html += '<button class="blog-filter__btn" data-category="' + slug + '">' + cat.icon + ' ' + cat.label + ' <span class="category-filter__count">(' + count + ')</span></button>';
+            }
+        }
+
+        container.innerHTML = html;
+
+        /* Attach click handlers */
+        var buttons = container.querySelectorAll('.blog-filter__btn');
+        buttons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                buttons.forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentBlogCategory = btn.getAttribute('data-category');
+                renderArticles();
+            });
+        });
+    }
+
+    /* -----------------------------------------------------------------
+       4. FILTER POSTS
+       ----------------------------------------------------------------- */
+    function getFilteredPosts() {
+        if (typeof POSTS === 'undefined') return [];
+
+        var filtered = POSTS.slice();
+
+        /* Category filter */
+        if (currentBlogCategory !== 'all') {
+            filtered = filtered.filter(function(p) {
+                return p.category === currentBlogCategory;
+            });
+        }
+
+        /* Search filter */
+        if (currentBlogSearch.trim() !== '') {
+            var query = currentBlogSearch.toLowerCase().trim();
+            filtered = filtered.filter(function(p) {
+                var searchable = (p.title + ' ' + p.excerpt + ' ' + (p.tags || []).join(' ')).toLowerCase();
+                return searchable.indexOf(query) !== -1;
+            });
+        }
+
+        /* Sort by date descending (newest first) */
+        filtered.sort(function(a, b) {
+            return new Date(b.date) - new Date(a.date);
+        });
+
+        return filtered;
+    }
+
+    /* -----------------------------------------------------------------
+       5. RENDER ARTICLES INTO GRID
+       ----------------------------------------------------------------- */
+    function renderArticles() {
+        var grid = document.getElementById('articleGrid');
+        var noResults = document.getElementById('noResults');
+        if (!grid) return;
+
+        var posts = getFilteredPosts();
+
+        var html = '';
+        for (var i = 0; i < posts.length; i++) {
+            html += renderArticleCard(posts[i]);
+        }
+        grid.innerHTML = html;
+
+        /* No results toggle */
+        if (noResults) {
+            if (posts.length === 0) {
+                noResults.classList.add('visible');
+            } else {
+                noResults.classList.remove('visible');
+            }
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       6. CLEAR BLOG FILTERS
+       ----------------------------------------------------------------- */
+    function clearBlogFilters() {
+        currentBlogCategory = 'all';
+        currentBlogSearch = '';
+
+        var searchInput = document.getElementById('blogSearchInput');
+        if (searchInput) searchInput.value = '';
+
+        var pills = document.querySelectorAll('.blog-filter__btn');
+        pills.forEach(function(btn) {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-category') === 'all') {
+                btn.classList.add('active');
+            }
+        });
+
+        renderArticles();
+    }
+
+    /* -----------------------------------------------------------------
+       7. SEARCH INPUT HANDLER
+       ----------------------------------------------------------------- */
+    var blogSearchInput = document.getElementById('blogSearchInput');
+    if (blogSearchInput) {
+        blogSearchInput.addEventListener('input', function(e) {
+            currentBlogSearch = e.target.value;
+            renderArticles();
+        });
+    }
+
+    /* -----------------------------------------------------------------
+       8. NEWSLETTER FORM
+       ----------------------------------------------------------------- */
+    function handleNewsletter(e) {
+        e.preventDefault();
+        var input = e.target.querySelector('input[type="email"]');
+        if (input && input.value) {
+            alert('Thank you for subscribing! We\'ll keep you updated with new articles and offers.');
+            input.value = '';
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       9. FOOTER CATEGORIES
+       ----------------------------------------------------------------- */
+    function buildFooterCategories() {
+        var container = document.getElementById('footerCategories');
+        if (!container || typeof CATEGORIES === 'undefined') return;
+
+        var html = '';
+        var count = 0;
+        for (var slug in CATEGORIES) {
+            if (CATEGORIES.hasOwnProperty(slug) && count < 8) {
+                html += '<a href="index.html#products">' + CATEGORIES[slug].label + '</a>';
+                count++;
+            }
+        }
+        container.innerHTML = html;
+    }
+
+    /* -----------------------------------------------------------------
+       10. BACK TO TOP
+       ----------------------------------------------------------------- */
+    var backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+        if (backToTopBtn) {
+            if (window.scrollY > 400) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }
+
+        /* Nav shadow on scroll */
+        var nav = document.getElementById('nav');
+        if (nav) {
+            if (window.scrollY > 10) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        }
+    });
+
+    /* -----------------------------------------------------------------
+       11. COOKIE CONSENT
+       ----------------------------------------------------------------- */
+    function getCookie(name) {
+        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+    }
+
+    function setCookie(name, value, days) {
+        var expires = '';
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = '; expires=' + date.toUTCString();
+        }
+        document.cookie = name + '=' + value + expires + '; path=/; SameSite=Lax';
+    }
+
+    function checkCookieConsent() {
+        var consent = getCookie('ebrora_cookie_consent');
+        var banner = document.getElementById('cookieConsent');
+
+        if (!consent && banner) {
+            banner.classList.add('visible');
+        } else if (consent === 'accepted') {
+            loadGoogleAnalytics();
+        }
+    }
+
+    function handleCookieConsent(choice) {
+        setCookie('ebrora_cookie_consent', choice, 365);
+        var banner = document.getElementById('cookieConsent');
+        if (banner) {
+            banner.classList.remove('visible');
+        }
+        if (choice === 'accepted') {
+            loadGoogleAnalytics();
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       12. GOOGLE ANALYTICS (GA4)
+       ----------------------------------------------------------------- */
+    function loadGoogleAnalytics() {
+        if (document.getElementById('ga4-script')) return;
+
+        var script = document.createElement('script');
+        script.id = 'ga4-script';
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX';
+        document.head.appendChild(script);
+
+        script.onload = function() {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXXXXX');
+        };
+    }
+
+    /* -----------------------------------------------------------------
+       13. MOBILE NAVIGATION
+       ----------------------------------------------------------------- */
+    var hamburger = document.getElementById('hamburger');
+    var mobileMenu = document.getElementById('mobileMenu');
+
+    if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+        });
+
+        var mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+            });
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (hamburger && mobileMenu && mobileMenu.classList.contains('open')) {
+            if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+            }
+        }
+    });
+
+    /* -----------------------------------------------------------------
+       14. FOOTER YEAR
+       ----------------------------------------------------------------- */
+    var footerYear = document.getElementById('footerYear');
+    if (footerYear) {
+        footerYear.textContent = new Date().getFullYear();
+    }
+
+    /* -----------------------------------------------------------------
+       15. INITIALISE
+       ----------------------------------------------------------------- */
+    buildBlogCategoryPills();
+    renderArticles();
+    buildFooterCategories();
+    checkCookieConsent();
+
+    </script>
+</body>
+</html>
