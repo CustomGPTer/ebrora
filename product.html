@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ebrora — Professional Excel Templates for Construction</title>
+    <meta name="description" content="Professional Excel templates built specifically for construction and civil engineering.">
+
+    <!-- Open Graph (updated dynamically by JS) -->
+    <meta property="og:title" content="Ebrora — Professional Excel Templates">
+    <meta property="og:description" content="Professional Excel templates built specifically for construction and civil engineering.">
+    <meta property="og:image" content="https://ebrora.com/og-image.jpg">
+    <meta property="og:url" content="https://ebrora.com/product.html">
+    <meta property="og:type" content="product">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ================================================================
+         NAVIGATION
+         ================================================================ -->
+    <nav class="nav" id="nav">
+        <div class="container">
+            <a href="index.html" class="nav__logo">
+                <span class="nav__logo-icon">E</span>
+                Ebrora
+            </a>
+            <div class="nav__links">
+                <a href="index.html#products" class="nav__link">Templates</a>
+                <a href="blog.html" class="nav__link">Blog</a>
+                <a href="faq.html" class="nav__link">FAQ</a>
+                <a href="index.html#about" class="nav__link">About</a>
+                <a href="index.html#reviews" class="nav__link">Reviews</a>
+                <a href="index.html#contact" class="nav__link">Contact</a>
+            </div>
+            <button class="nav__hamburger" id="hamburger" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="nav__mobile-menu" id="mobileMenu">
+        <a href="index.html#products">Templates</a>
+        <a href="blog.html">Blog</a>
+        <a href="faq.html">FAQ</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#reviews">Reviews</a>
+        <a href="index.html#contact">Contact</a>
+    </div>
+
+    <!-- ================================================================
+         PAGE CONTENT (rendered by JavaScript)
+         ================================================================ -->
+    <div id="pageContent">
+        <!-- Loading state -->
+        <div style="text-align:center; padding:8rem 1.5rem; margin-top:var(--nav-height);">
+            <p style="color:#888;">Loading template details…</p>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         FOOTER
+         ================================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__grid">
+                <div class="footer__brand">
+                    <a href="index.html" class="nav__logo">
+                        <span class="nav__logo-icon">E</span>
+                        Ebrora
+                    </a>
+                    <p>Professional Excel templates built specifically for construction and civil engineering professionals.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="LinkedIn">🔗</a>
+                        <a href="#" class="social-link" aria-label="Twitter">💬</a>
+                        <a href="#" class="social-link" aria-label="YouTube">▶️</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Categories</h4>
+                    <div class="footer__links" id="footerCategories">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <div class="footer__links">
+                        <a href="blog.html">Blog</a>
+                        <a href="faq.html">FAQ</a>
+                        <a href="index.html#contact">Contact Us</a>
+                        <a href="#">Free PDF Previews</a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Support</h4>
+                    <div class="footer__links">
+                        <a href="faq.html">Help Centre</a>
+                        <a href="mailto:hello@ebrora.com">Email Support</a>
+                        <a href="#">Refund Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <span class="footer__copyright">&copy; <span id="footerYear"></span> Ebrora. All rights reserved.</span>
+                <div class="footer__bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================================================================
+         BACK TO TOP
+         ================================================================ -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">↑</button>
+
+    <!-- ================================================================
+         COOKIE CONSENT
+         ================================================================ -->
+    <div class="cookie-consent" id="cookieConsent">
+        <div class="container">
+            <div class="cookie-consent__inner">
+                <p class="cookie-consent__text">We use cookies to analyse site traffic and improve your experience. By clicking “Accept”, you consent to the use of analytics cookies. <a href="#">Privacy Policy</a></p>
+                <div class="cookie-consent__buttons">
+                    <button class="btn btn--outline" onclick="handleCookieConsent('declined')">Decline</button>
+                    <button class="btn btn--primary" onclick="handleCookieConsent('accepted')">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================
+         SCRIPTS
+         ================================================================ -->
+    <script src="products.js"></script>
+    <script>
+    /* =================================================================
+       EBRORA — Product Detail Page JavaScript
+       ================================================================= */
+
+    /* -----------------------------------------------------------------
+       1. GET PRODUCT ID FROM URL
+       ----------------------------------------------------------------- */
+    function getProductId() {
+        var params = new URLSearchParams(window.location.search);
+        return params.get('id');
+    }
+
+    /* -----------------------------------------------------------------
+       2. FIND PRODUCT IN PRODUCTS ARRAY
+       ----------------------------------------------------------------- */
+    function findProduct(id) {
+        if (!id || typeof PRODUCTS === 'undefined') return null;
+        for (var i = 0; i < PRODUCTS.length; i++) {
+            if (PRODUCTS[i].id === id) return PRODUCTS[i];
+        }
+        return null;
+    }
+
+    /* -----------------------------------------------------------------
+       3. CHANGE GALLERY IMAGE
+       ----------------------------------------------------------------- */
+    function changeImage(src) {
+        var mainImg = document.getElementById('galleryMainImg');
+        if (mainImg) {
+            mainImg.src = src;
+            mainImg.alt = 'Product preview';
+        }
+
+        /* Update active thumbnail */
+        var thumbs = document.querySelectorAll('.product-gallery__thumb');
+        thumbs.forEach(function(thumb) {
+            thumb.classList.remove('active');
+            var img = thumb.querySelector('img');
+            if (img && img.src === src) {
+                thumb.classList.add('active');
+            }
+        });
+    }
+
+    /* -----------------------------------------------------------------
+       4. RENDER PRODUCT CARD (for related products)
+       ----------------------------------------------------------------- */
+    function renderCard(product) {
+        var categoryLabel = product.category && product.category.length > 0 && CATEGORIES[product.category[0]]
+            ? CATEGORIES[product.category[0]].label
+            : '';
+
+        var hasImages = product.images && product.images.length > 0;
+        var mainImage = hasImages ? product.images[0] : '';
+        var hoverImage = hasImages && product.images.length > 1 ? product.images[1] : mainImage;
+
+        var imageHTML = '';
+        if (hasImages) {
+            imageHTML = '<img src="' + mainImage + '" alt="' + product.title + '" class="main-img" loading="lazy">';
+            imageHTML += '<img src="' + hoverImage + '" alt="' + product.title + ' preview" class="hover-img" loading="lazy">';
+        } else {
+            imageHTML = '<div class="product-card__placeholder">' + (product.icon || '\u{1F4CA}') + '</div>';
+        }
+
+        var ribbonHTML = product.new ? '<span class="product-card__ribbon">NEW</span>' : '';
+        var categoryBadgeHTML = categoryLabel ? '<span class="product-card__category">' + categoryLabel + '</span>' : '';
+        var oldPriceHTML = product.oldPrice ? '<span class="was">' + product.oldPrice + '</span>' : '';
+
+        return '<a href="product.html?id=' + product.id + '" class="product-card">'
+            + '<div class="product-card__image-wrap">'
+            + imageHTML
+            + categoryBadgeHTML
+            + ribbonHTML
+            + '</div>'
+            + '<div class="product-card__body">'
+            + '<h3 class="product-card__title">' + product.title + '</h3>'
+            + '<p class="product-card__desc">' + product.desc + '</p>'
+            + '<div class="product-card__price-row">'
+            + '<span class="product-card__price">' + product.price + ' ' + oldPriceHTML + '</span>'
+            + '</div>'
+            + '<div class="product-card__btn-row">'
+            + '<span class="btn btn--outline">View Details</span>'
+            + '<span class="btn btn--primary">Buy Now</span>'
+            + '</div>'
+            + '</div>'
+            + '</a>';
+    }
+
+    /* -----------------------------------------------------------------
+       5. RENDER 404 STATE
+       ----------------------------------------------------------------- */
+    function render404() {
+        var container = document.getElementById('pageContent');
+        container.innerHTML = ''
+            + '<div class="product-404">'
+            + '<div class="product-404__icon">\u{1F50D}</div>'
+            + '<h1 class="product-404__title">Template Not Found</h1>'
+            + '<p class="product-404__text">Sorry, we couldn\u2019t find the template you\u2019re looking for. It may have been moved or removed.</p>'
+            + '<a href="index.html#products" class="btn btn--primary btn--large">Browse All Templates</a>'
+            + '</div>';
+    }
+
+    /* -----------------------------------------------------------------
+       6. BUILD GALLERY HTML
+       ----------------------------------------------------------------- */
+    function buildGallery(product) {
+        var html = '<div class="product-gallery">';
+
+        var hasImages = product.images && product.images.length > 0;
+
+        /* Main Image */
+        html += '<div class="product-gallery__main">';
+        if (hasImages) {
+            html += '<img id="galleryMainImg" src="' + product.images[0] + '" alt="' + product.title + '">';
+        } else {
+            html += '<div class="product-gallery__placeholder">' + (product.icon || '\u{1F4CA}') + '</div>';
+            html += '<p style="position:absolute; bottom:1rem; left:0; right:0; text-align:center; font-size:0.8rem; color:#888;">Screenshots coming soon</p>';
+        }
+        html += '</div>';
+
+        /* Thumbnails */
+        if (hasImages && product.images.length > 1) {
+            html += '<div class="product-gallery__thumbs">';
+            for (var i = 0; i < product.images.length; i++) {
+                var activeClass = i === 0 ? ' active' : '';
+                html += '<div class="product-gallery__thumb' + activeClass + '" onclick="changeImage(\'' + product.images[i] + '\')">';
+                html += '<img src="' + product.images[i] + '" alt="Thumbnail ' + (i + 1) + '" loading="lazy">';
+                html += '</div>';
+            }
+            html += '</div>';
+        }
+
+        /* YouTube Embed */
+        if (product.youtubeId && product.youtubeId.trim() !== '') {
+            html += '<div class="product-gallery__video">';
+            html += '<iframe src="https://www.youtube.com/embed/' + product.youtubeId + '" title="' + product.title + ' video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+            html += '</div>';
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       7. BUILD PRODUCT INFO HTML
+       ----------------------------------------------------------------- */
+    function buildProductInfo(product) {
+        var html = '<div class="product-info">';
+
+        /* Category badges */
+        html += '<div class="product-info__badges">';
+        if (product.category && product.category.length > 0) {
+            for (var i = 0; i < product.category.length; i++) {
+                var slug = product.category[i];
+                var cat = CATEGORIES[slug];
+                if (cat) {
+                    html += '<a href="index.html#products" class="product-info__badge">' + cat.icon + ' ' + cat.label + '</a>';
+                }
+            }
+        }
+        if (product.new) {
+            html += '<span class="product-info__badge product-info__badge--new">NEW</span>';
+        }
+        html += '</div>';
+
+        /* Title */
+        html += '<h1 class="product-info__title">' + product.title + '</h1>';
+
+        /* Stars */
+        html += '<div class="product-info__stars">';
+        html += '<span class="product-info__stars-icons">\u2605\u2605\u2605\u2605\u2605</span>';
+        html += '<span class="product-info__stars-count">4.9 out of 5</span>';
+        html += '</div>';
+
+        /* Price */
+        html += '<div class="product-info__price-block">';
+        html += '<div class="product-info__price">' + product.price;
+        if (product.oldPrice) {
+            html += ' <span class="was">' + product.oldPrice + '</span>';
+        }
+        html += '</div>';
+        html += '<p class="product-info__vat">All prices include VAT where applicable</p>';
+        html += '</div>';
+
+        /* Buy Buttons */
+        html += '<div class="product-info__btn-row">';
+        html += '<a href="' + product.buyLink + '" target="_blank" rel="noopener" class="btn btn--primary btn--large" onclick="trackEvent(\' buy_click\', \'' + product.id + '\')">';
+        html += '\u{1F6D2} Buy Now \u2014 ' + product.price;
+        html += '</a>';
+        html += '<a href="' + product.pdfLink + '" target="_blank" rel="noopener" class="btn btn--outline btn--large" onclick="trackEvent(\'pdf_download\', \'' + product.id + '\')">';
+        html += '\u{1F4C4} Download Free PDF';
+        html += '</a>';
+        html += '</div>';
+
+        /* Gumroad Notice */
+        html += '<p class="product-info__gumroad-notice">';
+        html += '\u{1F512} You\u2019ll be taken to Gumroad.com to complete your purchase securely. Your Excel file will be delivered instantly to your email after payment.';
+        html += '</p>';
+
+        html += '</div>';
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       8. BUILD META TABLE HTML
+       ----------------------------------------------------------------- */
+    function buildMetaTable(product) {
+        var rows = [
+            ['Compatibility', product.compatible || 'Windows & Mac'],
+            ['Version', product.version || '1.0'],
+            ['File Size', product.fileSize || 'N/A'],
+            ['Last Updated', product.lastUpdate || 'N/A'],
+            ['Delivery', 'Instant digital download via email'],
+            ['Licence', 'Single user, lifetime access']
+        ];
+
+        var html = '<table class="product-meta-table">';
+        for (var i = 0; i < rows.length; i++) {
+            html += '<tr>';
+            html += '<td>' + rows[i][0] + '</td>';
+            html += '<td>' + rows[i][1] + '</td>';
+            html += '</tr>';
+        }
+        html += '</table>';
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       9. BUILD DESCRIPTION HTML
+       ----------------------------------------------------------------- */
+    function buildDescription(product) {
+        var html = '<div class="product-description">';
+        html += '<h2>Description</h2>';
+        if (product.longDesc) {
+            html += product.longDesc;
+        } else {
+            html += '<p>' + product.desc + '</p>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       10. BUILD FEATURES HTML
+       ----------------------------------------------------------------- */
+    function buildFeatures(product) {
+        if (!product.features || product.features.length === 0) return '';
+
+        var html = '<div class="product-features">';
+        html += '<h2>Key Features</h2>';
+        html += '<div class="product-features__grid">';
+        for (var i = 0; i < product.features.length; i++) {
+            html += '<div class="product-features__item">\u2713 ' + product.features[i] + '</div>';
+        }
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       11. BUILD SECOND BUY BUTTONS
+       ----------------------------------------------------------------- */
+    function buildSecondBuyButtons(product) {
+        var html = '<div style="margin-top:2rem; padding-top:2rem; border-top:1px solid var(--color-border);">';
+        html += '<div class="product-info__btn-row">';
+        html += '<a href="' + product.buyLink + '" target="_blank" rel="noopener" class="btn btn--primary btn--large" onclick="trackEvent(\'buy_click\', \'' + product.id + '\')">';
+        html += '\u{1F6D2} Buy Now \u2014 ' + product.price;
+        html += '</a>';
+        html += '<a href="' + product.pdfLink + '" target="_blank" rel="noopener" class="btn btn--outline btn--large" onclick="trackEvent(\'pdf_download\', \'' + product.id + '\')">';
+        html += '\u{1F4C4} Download Free PDF';
+        html += '</a>';
+        html += '</div>';
+        html += '<p class="product-info__gumroad-notice">';
+        html += '\u{1F512} You\u2019ll be taken to Gumroad.com to complete your purchase securely. Your Excel file will be delivered instantly to your email after payment.';
+        html += '</p>';
+        html += '</div>';
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       12. BUILD BUNDLE SECTION
+       ----------------------------------------------------------------- */
+    function buildBundleSection(product) {
+        if (!product.isBundle || !product.bundleProducts || product.bundleProducts.length === 0) return '';
+
+        var html = '<div style="margin-top:2rem;">';
+        html += '<h2>What\u2019s Included in This Bundle</h2>';
+        html += '<div style="margin-top:1rem;">';
+        for (var i = 0; i < product.bundleProducts.length; i++) {
+            var bundledId = product.bundleProducts[i];
+            var bundledProduct = findProduct(bundledId);
+            if (bundledProduct) {
+                html += '<div style="display:flex; align-items:center; gap:0.75rem; padding:0.6rem 0; border-bottom:1px solid var(--color-border);">';
+                html += '<span style="font-size:1.3rem;">' + (bundledProduct.icon || '\u{1F4CA}') + '</span>';
+                html += '<div>';
+                html += '<a href="product.html?id=' + bundledProduct.id + '" style="font-weight:600; color:var(--color-primary-dark);">' + bundledProduct.title + '</a>';
+                html += '<span style="font-size:0.8rem; color:var(--color-text-muted); margin-left:0.5rem;">' + bundledProduct.price + '</span>';
+                html += '</div>';
+                html += '</div>';
+            } else {
+                html += '<div style="padding:0.6rem 0; border-bottom:1px solid var(--color-border); color:var(--color-text-light);">';
+                html += '\u2022 ' + bundledId;
+                html += '</div>';
+            }
+        }
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       13. BUILD CTA BAR
+       ----------------------------------------------------------------- */
+    function buildCtaBar() {
+        return ''
+            + '<section class="product-cta-bar">'
+            + '<div class="container">'
+            + '<h2>Need a Custom Version?</h2>'
+            + '<p>We can adapt any template to match your company\u2019s branding, workflows, or reporting requirements.</p>'
+            + '<a href="index.html#contact" class="btn btn--accent btn--large">Get in Touch \u2192</a>'
+            + '</div>'
+            + '</section>';
+    }
+
+    /* -----------------------------------------------------------------
+       14. BUILD RELATED PRODUCTS
+       ----------------------------------------------------------------- */
+    function buildRelatedProducts(product) {
+        /* Find products in same categories, excluding current */
+        var related = [];
+        if (product.category && product.category.length > 0) {
+            for (var i = 0; i < PRODUCTS.length; i++) {
+                var p = PRODUCTS[i];
+                if (p.id === product.id) continue;
+                if (!p.category) continue;
+                var hasMatch = false;
+                for (var j = 0; j < product.category.length; j++) {
+                    if (p.category.indexOf(product.category[j]) !== -1) {
+                        hasMatch = true;
+                        break;
+                    }
+                }
+                if (hasMatch) related.push(p);
+            }
+        }
+
+        /* Sort by popularity and limit to 4 */
+        related.sort(function(a, b) { return (b.popularity || 0) - (a.popularity || 0); });
+        related = related.slice(0, 4);
+
+        if (related.length === 0) return '';
+
+        var html = '<section class="related-products">';
+        html += '<h2>You Might Also Like</h2>';
+        html += '<div class="product-grid container">';
+        for (var i = 0; i < related.length; i++) {
+            html += renderCard(related[i]);
+        }
+        html += '</div>';
+        html += '</section>';
+        return html;
+    }
+
+    /* -----------------------------------------------------------------
+       15. RENDER FULL PRODUCT PAGE
+       ----------------------------------------------------------------- */
+    function renderProductPage(product) {
+        var container = document.getElementById('pageContent');
+
+        var html = '';
+
+        /* Breadcrumb */
+        html += '<div class="breadcrumb">';
+        html += '<div class="container">';
+        html += '<a href="index.html">Home</a>';
+        html += '<span class="breadcrumb__separator">/</span>';
+        html += '<a href="index.html#products">Templates</a>';
+        html += '<span class="breadcrumb__separator">/</span>';
+        html += '<span class="breadcrumb__current">' + product.title + '</span>';
+        html += '</div>';
+        html += '</div>';
+
+        /* Product Detail Container */
+        html += '<div class="product-detail">';
+        html += '<div class="product-detail__grid">';
+
+        /* Left Column — Gallery */
+        html += buildGallery(product);
+
+        /* Right Column — Product Info + Details */
+        html += '<div>';
+        html += buildProductInfo(product);
+        html += buildMetaTable(product);
+        html += buildDescription(product);
+        html += buildFeatures(product);
+        html += buildBundleSection(product);
+        html += buildSecondBuyButtons(product);
+        html += '</div>';
+
+        html += '</div>'; /* close product-detail__grid */
+        html += '</div>'; /* close product-detail */
+
+        /* CTA Bar */
+        html += buildCtaBar();
+
+        /* Related Products */
+        html += buildRelatedProducts(product);
+
+        container.innerHTML = html;
+    }
+
+    /* -----------------------------------------------------------------
+       16. UPDATE META TAGS & SCHEMA
+       ----------------------------------------------------------------- */
+    function updateMeta(product) {
+        /* Document title */
+        document.title = product.title + ' \u2014 Ebrora';
+
+        /* Meta description */
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+            metaDesc.setAttribute('content', product.desc);
+        }
+
+        /* Open Graph */
+        var ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.setAttribute('content', product.title + ' \u2014 Ebrora');
+
+        var ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.setAttribute('content', product.desc);
+
+        var ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) ogUrl.setAttribute('content', 'https://ebrora.com/product.html?id=' + product.id);
+
+        var ogImage = document.querySelector('meta[property="og:image"]');
+        if (ogImage && product.images && product.images.length > 0) {
+            ogImage.setAttribute('content', product.images[0]);
+        }
+
+        /* Schema.org Product JSON-LD */
+        var schema = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.title,
+            "description": product.desc,
+            "image": product.images && product.images.length > 0 ? product.images[0] : 'https://ebrora.com/og-image.jpg',
+            "brand": {
+                "@type": "Brand",
+                "name": "Ebrora"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": 'https://ebrora.com/product.html?id=' + product.id,
+                "priceCurrency": "GBP",
+                "price": parsePrice(product.price),
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                    "@type": "Organization",
+                    "name": "Ebrora"
+                }
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.9",
+                "reviewCount": "50",
+                "bestRating": "5"
+            }
+        };
+
+        var scriptTag = document.createElement('script');
+        scriptTag.type = 'application/ld+json';
+        scriptTag.textContent = JSON.stringify(schema);
+        document.head.appendChild(scriptTag);
+    }
+
+    function parsePrice(priceStr) {
+        if (!priceStr) return 0;
+        var num = priceStr.replace(/[^0-9.]/g, '');
+        return parseFloat(num) || 0;
+    }
+
+    /* -----------------------------------------------------------------
+       17. GA4 ANALYTICS EVENTS
+       ----------------------------------------------------------------- */
+    function trackEvent(eventName, productId) {
+        if (typeof gtag === 'function') {
+            gtag('event', eventName, {
+                'product_id': productId
+            });
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       18. COOKIE CONSENT
+       ----------------------------------------------------------------- */
+    function getCookie(name) {
+        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+    }
+
+    function setCookie(name, value, days) {
+        var expires = '';
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = '; expires=' + date.toUTCString();
+        }
+        document.cookie = name + '=' + value + expires + '; path=/; SameSite=Lax';
+    }
+
+    function checkCookieConsent() {
+        var consent = getCookie('ebrora_cookie_consent');
+        var banner = document.getElementById('cookieConsent');
+
+        if (!consent && banner) {
+            banner.classList.add('visible');
+        } else if (consent === 'accepted') {
+            loadGoogleAnalytics();
+        }
+    }
+
+    function handleCookieConsent(choice) {
+        setCookie('ebrora_cookie_consent', choice, 365);
+        var banner = document.getElementById('cookieConsent');
+        if (banner) {
+            banner.classList.remove('visible');
+        }
+        if (choice === 'accepted') {
+            loadGoogleAnalytics();
+        }
+    }
+
+    /* -----------------------------------------------------------------
+       19. GOOGLE ANALYTICS (GA4)
+       ----------------------------------------------------------------- */
+    function loadGoogleAnalytics() {
+        if (document.getElementById('ga4-script')) return;
+
+        var script = document.createElement('script');
+        script.id = 'ga4-script';
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX';
+        document.head.appendChild(script);
+
+        script.onload = function() {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXXXXX');
+        };
+    }
+
+    /* -----------------------------------------------------------------
+       20. FOOTER CATEGORIES
+       ----------------------------------------------------------------- */
+    function buildFooterCategories() {
+        var container = document.getElementById('footerCategories');
+        if (!container || typeof CATEGORIES === 'undefined') return;
+
+        var html = '';
+        var count = 0;
+        for (var slug in CATEGORIES) {
+            if (CATEGORIES.hasOwnProperty(slug) && count < 8) {
+                html += '<a href="index.html#products">' + CATEGORIES[slug].label + '</a>';
+                count++;
+            }
+        }
+        container.innerHTML = html;
+    }
+
+    /* -----------------------------------------------------------------
+       21. BACK TO TOP
+       ----------------------------------------------------------------- */
+    var backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+        if (backToTopBtn) {
+            if (window.scrollY > 400) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }
+
+        /* Nav shadow on scroll */
+        var nav = document.getElementById('nav');
+        if (nav) {
+            if (window.scrollY > 10) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        }
+    });
+
+    /* -----------------------------------------------------------------
+       22. MOBILE NAVIGATION
+       ----------------------------------------------------------------- */
+    var hamburger = document.getElementById('hamburger');
+    var mobileMenu = document.getElementById('mobileMenu');
+
+    if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+        });
+
+        var mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+            });
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (hamburger && mobileMenu && mobileMenu.classList.contains('open')) {
+            if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                hamburger.classList.remove('open');
+                mobileMenu.classList.remove('open');
+            }
+        }
+    });
+
+    /* -----------------------------------------------------------------
+       23. FOOTER YEAR
+       ----------------------------------------------------------------- */
+    var footerYear = document.getElementById('footerYear');
+    if (footerYear) {
+        footerYear.textContent = new Date().getFullYear();
+    }
+
+    /* -----------------------------------------------------------------
+       24. INITIALISE
+       ----------------------------------------------------------------- */
+    var productId = getProductId();
+    var product = findProduct(productId);
+
+    if (product) {
+        renderProductPage(product);
+        updateMeta(product);
+        trackEvent('product_view', product.id);
+    } else {
+        render404();
+    }
+
+    buildFooterCategories();
+    checkCookieConsent();
+
+    </script>
+</body>
+</html>
