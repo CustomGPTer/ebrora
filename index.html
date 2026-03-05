@@ -119,9 +119,9 @@
                 <span class="hero__compliance-badge">UK HSE Compliant</span>
             </div>
             <p class="hero__subtitle">Save hours every week with ready-to-use spreadsheets designed for UK site managers, civil engineers, and project teams working to CDM 2015 and British Standards. Instant download, no signup required.</p>
-            <div class="hero__search">
+            <div class="hero__search" id="heroSearch" style="display:none;">
                 <span class="hero__search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Search templates… e.g. Gantt chart, inspection, COSHH" autocomplete="off">
+                <input type="text" id="searchInput" placeholder="Search templates… e.g. Gantt chart, inspection, COSHH" autocomplete="off" aria-label="Search templates">
                 <button type="button" onclick="document.getElementById('searchInput').dispatchEvent(new Event('input'))">Search</button>
             </div>
             <!-- UPDATE PRICE AS NEEDED -->
