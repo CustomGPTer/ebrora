@@ -644,6 +644,11 @@
             } else {
                 noResults.classList.remove('visible');
             }
+        /* Show search bar once products have loaded */
+        var heroSearch = document.getElementById('heroSearch');
+        if (heroSearch && products.length > 0) {
+            heroSearch.style.display = 'flex';
+        }
         }
     }
 
