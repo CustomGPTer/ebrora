@@ -125,8 +125,13 @@
         <div class="container">
             <h2>Stay in the Loop</h2>
             <p>Get notified when we publish new articles, release templates, and share exclusive discounts. No spam, unsubscribe anytime.</p>
-            <form class="newsletter__form" onsubmit="handleNewsletter(event)">
-                <input type="email" placeholder="Enter your email address" required>
+            <!-- REPLACE REPLACE_U and REPLACE_ID with values from your Mailchimp embedded form action URL -->
+            <form class="newsletter__form" action="https://ebrora.us1.list-manage.com/subscribe/post?u=REPLACE_U&amp;id=REPLACE_ID" method="post" target="_blank" novalidate>
+                <input type="email" name="EMAIL" placeholder="Enter your email address" required aria-label="Email address for newsletter">
+                <!-- Mailchimp bot protection - do not remove this div -->
+                <div style="position:absolute; left:-5000px;" aria-hidden="true">
+                    <input type="text" name="b_REPLACE_U_REPLACE_ID" tabindex="-1" value="">
+                </div>
                 <button type="submit" class="btn btn--accent">Subscribe</button>
             </form>
         </div>
