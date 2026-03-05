@@ -377,6 +377,7 @@ p {
     border-radius: var(--radius-pill);
     padding: 0.35rem 0.35rem 0.35rem 1.25rem;
     box-shadow: var(--shadow-lg);
+    position: relative;
 }
 
 .hero__search-icon {
@@ -416,6 +417,102 @@ p {
 
 .hero__search button:hover {
     background: var(--color-primary-dark);
+}
+
+/* Search Dropdown */
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.5rem;
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    max-height: 360px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    border: 1px solid var(--color-border);
+}
+
+.search-dropdown.visible {
+    display: block;
+}
+
+.search-dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    transition: background var(--transition-base);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.search-dropdown__item:last-child {
+    border-bottom: none;
+}
+
+.search-dropdown__item:hover {
+    background: var(--color-primary-light);
+}
+
+.search-dropdown__icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.search-dropdown__info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.search-dropdown__title {
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-dropdown__badge {
+    font-size: 0.75rem;
+    color: var(--color-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.search-dropdown__price {
+    font-weight: 600;
+    color: var(--color-primary);
+    flex-shrink: 0;
+    font-size: 0.9rem;
+}
+
+.search-dropdown__empty {
+    padding: 1.25rem 1rem;
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+}
+
+.search-dropdown__more {
+    padding: 0.6rem 1rem;
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: 0.8rem;
+    background: var(--color-off-white);
+    border-top: 1px solid var(--color-border-light);
 }
 
 .hero__browse {
