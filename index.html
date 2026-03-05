@@ -122,7 +122,8 @@
             <div class="hero__search" id="heroSearch" style="display:none;">
                 <span class="hero__search-icon">🔍</span>
                 <input type="text" id="searchInput" placeholder="Search templates… e.g. Gantt chart, inspection, COSHH" autocomplete="off" aria-label="Search templates">
-                <button type="button" onclick="document.getElementById('searchInput').dispatchEvent(new Event('input'))">Search</button>
+                <button type="button" id="searchBtn">Search</button>
+                <div id="searchDropdown" class="search-dropdown" role="listbox" aria-label="Search suggestions"></div>
             </div>
             <!-- UPDATE PRICE AS NEEDED -->
             <p class="hero__price">Templates from £9.99</p>
@@ -500,7 +501,7 @@
         const oldPriceHTML = product.oldPrice ? `<span class="was">${product.oldPrice}</span>` : '';
 
         return `
-            <a href="product.html?id=${product.id}" class="product-card">
+            <a href="product.html?id=${product.id}" class="product-card" data-product-id="${product.id}">
                 <div class="product-card__image-wrap">
                     ${imageHTML}
                     ${categoryBadgeHTML}
@@ -707,10 +708,141 @@
     /* -----------------------------------------------------------------
        6. SEARCH INPUT HANDLER
        ----------------------------------------------------------------- */
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-        currentSearch = e.target.value;
-        renderProducts();
-    });
+    /* --- Live Search with Dropdown --- */
+    (function() {
+        var searchInput = document.getElementById('searchInput');
+        var searchBtn = document.getElementById('searchBtn');
+        var dropdown = document.getElementById('searchDropdown');
+        if (!searchInput || !dropdown) return;
+
+        function getSearchResults(query) {
+            var q = query.toLowerCase();
+            var arr = [];
+            for (var key in PRODUCTS) {
+                if (PRODUCTS.hasOwnProperty(key)) {
+                    var p = PRODUCTS[key];
+                    var searchable = (p.title + ' ' + p.desc + ' ' + p.badge + ' ' + (p.category || []).join(' ')).toLowerCase();
+                    if (searchable.indexOf(q) !== -1) {
+                        arr.push(p);
+                    }
+                }
+            }
+            return arr;
+        }
+
+        function showDropdown(results) {
+            if (results.length === 0) {
+                dropdown.innerHTML = '<div class="search-dropdown__empty">No templates found</div>';
+                dropdown.classList.add('visible');
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < Math.min(results.length, 6); i++) {
+                var p = results[i];
+                html += '<button class="search-dropdown__item" role="option" data-id="' + p.id + '">';
+                html += '<span class="search-dropdown__icon">' + (p.icon || '') + '</span>';
+                html += '<span class="search-dropdown__info">';
+                html += '<span class="search-dropdown__title">' + p.title + '</span>';
+                html += '<span class="search-dropdown__badge">' + p.badge + '</span>';
+                html += '</span>';
+                html += '<span class="search-dropdown__price">' + p.price + '</span>';
+                html += '</button>';
+            }
+            if (results.length > 6) {
+                html += '<div class="search-dropdown__more">+ ' + (results.length - 6) + ' more — press Search to see all</div>';
+            }
+            dropdown.innerHTML = html;
+            dropdown.classList.add('visible');
+
+            /* Attach click handlers to dropdown items */
+            var items = dropdown.querySelectorAll('.search-dropdown__item');
+            items.forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var productId = this.getAttribute('data-id');
+                    dropdown.classList.remove('visible');
+                    /* Set search to this product title, filter grid, and scroll */
+                    var product = null;
+                    for (var k in PRODUCTS) {
+                        if (PRODUCTS[k].id === productId) { product = PRODUCTS[k]; break; }
+                    }
+                    if (product) {
+                        searchInput.value = product.title;
+                        currentSearch = product.title;
+                        renderProducts();
+                        setTimeout(function() {
+                            var card = document.querySelector('[data-product-id="' + productId + '"]');
+                            if (card) {
+                                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                card.style.boxShadow = '0 0 0 3px var(--color-primary)';
+                                setTimeout(function() { card.style.boxShadow = ''; }, 2000);
+                            } else {
+                                var grid = document.getElementById('productsGrid');
+                                if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }, 100);
+                    }
+                });
+            });
+        }
+
+        function hideDropdown() {
+            setTimeout(function() { dropdown.classList.remove('visible'); }, 200);
+        }
+
+        searchInput.addEventListener('input', function(e) {
+            currentSearch = e.target.value;
+            var q = currentSearch.trim();
+            if (q.length >= 3) {
+                var results = getSearchResults(q);
+                showDropdown(results);
+            } else {
+                dropdown.classList.remove('visible');
+            }
+            /* Also filter the main grid in real time */
+            renderProducts();
+        });
+
+        searchInput.addEventListener('focus', function() {
+            var q = currentSearch.trim();
+            if (q.length >= 3) {
+                var results = getSearchResults(q);
+                showDropdown(results);
+            }
+        });
+
+        searchInput.addEventListener('blur', hideDropdown);
+
+        /* Search button scrolls to filtered grid */
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function() {
+                dropdown.classList.remove('visible');
+                currentSearch = searchInput.value;
+                renderProducts();
+                setTimeout(function() {
+                    var grid = document.getElementById('productsGrid');
+                    if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            });
+        }
+
+        /* Close dropdown on Escape */
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                dropdown.classList.remove('visible');
+            }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                dropdown.classList.remove('visible');
+                currentSearch = searchInput.value;
+                renderProducts();
+                setTimeout(function() {
+                    var grid = document.getElementById('productsGrid');
+                    if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        });
+    })();
 
     /* -----------------------------------------------------------------
        7. SORT SELECT HANDLER
