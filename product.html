@@ -4,20 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ebrora — Professional Excel Templates for Construction</title>
-    <meta name="description" content="Professional Excel templates built specifically for construction and civil engineering.">
-
+    <meta name="description" content="Professional Excel templates built specifically for UK construction and civil engineering. CDM 2015 compliant. Instant download, no signup required.">
     <!-- Open Graph (updated dynamically by JS) -->
-    <meta property="og:title" content="Ebrora — Professional Excel Templates">
-    <meta property="og:description" content="Professional Excel templates built specifically for construction and civil engineering.">
+    <meta property="og:title" content="Ebrora — Professional Excel Templates for Construction">
+    <meta property="og:description" content="Professional Excel templates built specifically for UK construction and civil engineering. CDM 2015 compliant. Instant download, no signup required.">
     <meta property="og:image" content="https://ebrora.com/og-image.jpg">
     <meta property="og:url" content="https://ebrora.com/product.html">
     <meta property="og:type" content="product">
-
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ebrora — Professional Excel Templates for Construction">
+    <meta name="twitter:description" content="Professional Excel templates built specifically for UK construction and civil engineering. CDM 2015 compliant. Instant download, no signup required.">
+    <meta name="twitter:image" content="https://ebrora.com/og-image.jpg">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+    <!-- Sitemap -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
     <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -61,7 +72,7 @@
     <!-- ================================================================
          PAGE CONTENT (rendered by JavaScript)
          ================================================================ -->
-    <div id="pageContent">
+    <div id="pageContent" aria-live="polite" aria-label="Product details">
         <!-- Loading state -->
         <div style="text-align:center; padding:8rem 1.5rem; margin-top:var(--nav-height);">
             <p style="color:#888;">Loading template details…</p>
@@ -81,9 +92,12 @@
                     </a>
                     <p>Professional Excel templates built specifically for construction and civil engineering professionals.</p>
                     <div class="social-links">
-                        <a href="#" class="social-link" aria-label="LinkedIn">🔗</a>
-                        <a href="#" class="social-link" aria-label="Twitter">💬</a>
-                        <a href="#" class="social-link" aria-label="YouTube">▶️</a>
+                        <!-- REPLACE WITH LINKEDIN URL WHEN ACCOUNT CREATED -->
+                        <a href="#" class="social-link" aria-label="LinkedIn" title="LinkedIn">🔗</a>
+                        <!-- REPLACE WITH TWITTER/X URL WHEN ACCOUNT CREATED -->
+                        <a href="#" class="social-link" aria-label="Twitter/X" title="Twitter/X">💬</a>
+                        <!-- REPLACE WITH YOUTUBE URL WHEN ACCOUNT CREATED -->
+                        <a href="#" class="social-link" aria-label="YouTube" title="YouTube">▶️</a>
                     </div>
                 </div>
                 <div>
@@ -98,7 +112,8 @@
                         <a href="blog.html">Blog</a>
                         <a href="faq.html">FAQ</a>
                         <a href="index.html#contact">Contact Us</a>
-                        <a href="#">Free PDF Previews</a>
+                        <!-- PDF PREVIEW SECTION - TO BE BUILT LATER -->
+                        <a href="#previews">Free PDF Previews</a>
                     </div>
                 </div>
                 <div>
@@ -106,17 +121,17 @@
                     <div class="footer__links">
                         <a href="faq.html">Help Centre</a>
                         <a href="mailto:hello@ebrora.com">Email Support</a>
-                        <a href="#">Refund Policy</a>
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Privacy Policy</a>
+                        <a href="refund-policy.html">Refund Policy</a>
+                        <a href="terms-of-service.html">Terms of Service</a>
+                        <a href="privacy-policy.html">Privacy Policy</a>
                     </div>
                 </div>
             </div>
             <div class="footer__bottom">
                 <span class="footer__copyright">&copy; <span id="footerYear"></span> Ebrora. All rights reserved.</span>
                 <div class="footer__bottom-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="terms-of-service.html">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -133,7 +148,7 @@
     <div class="cookie-consent" id="cookieConsent">
         <div class="container">
             <div class="cookie-consent__inner">
-                <p class="cookie-consent__text">We use cookies to analyse site traffic and improve your experience. By clicking “Accept”, you consent to the use of analytics cookies. <a href="#">Privacy Policy</a></p>
+                <p class="cookie-consent__text">This site uses Google Analytics cookies to anonymously analyse site traffic and improve your experience, in accordance with UK GDPR and PECR. No personal data is collected. By clicking “Accept”, you consent to these analytics cookies. By clicking “Decline”, no analytics cookies will be set. <a href="privacy-policy.html">Privacy Policy</a></p>
                 <div class="cookie-consent__buttons">
                     <button class="btn btn--outline" onclick="handleCookieConsent('declined')">Decline</button>
                     <button class="btn btn--primary" onclick="handleCookieConsent('accepted')">Accept</button>
@@ -688,7 +703,7 @@
         var script = document.createElement('script');
         script.id = 'ga4-script';
         script.async = true;
-        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX';
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZVPRYV7LNX';
         document.head.appendChild(script);
 
         script.onload = function() {
@@ -696,7 +711,7 @@
             function gtag() { dataLayer.push(arguments); }
             window.gtag = gtag;
             gtag('js', new Date());
-            gtag('config', 'G-XXXXXXXXXX');
+            gtag('config', 'G-ZVPRYV7LNX');
         };
     }
 
