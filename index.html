@@ -623,7 +623,8 @@
         var noResults = document.getElementById('noResults');
         var countSpan = document.getElementById('productCount');
         if (!grid) return;
-
+        /* Show loading spinner while products render */
+        grid.innerHTML = '<div class="products-loading" id="productsLoading"><div class="products-loading__spinner"></div><p>Loading templates…</p></div>';
         var products = getFilteredProducts();
         var html = '';
         for (var i = 0; i < products.length; i++) {
