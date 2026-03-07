@@ -230,7 +230,7 @@
         var categoryBadgeHTML = categoryLabel ? '<span class="product-card__category">' + categoryLabel + '</span>' : '';
         var oldPriceHTML = product.oldPrice ? '<span class="was">' + product.oldPrice + '</span>' : '';
 
-        return '<a href="product.html?id=' + product.id + '" class="product-card">'
+        return '<a href="' + product.id + '.html" class="product-card">'
             + '<div class="product-card__image-wrap">'
             + imageHTML
             + categoryBadgeHTML
