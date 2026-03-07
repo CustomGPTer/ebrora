@@ -547,7 +547,7 @@
         const oldPriceHTML = product.oldPrice ? `<span class="was">${product.oldPrice}</span>` : '';
 
         return `
-            <a href="product.html?id=${product.id}" class="product-card" data-product-id="${product.id}">
+            <a href="${product.id}.html" class="product-card" data-product-id="${product.id}">
                 <div class="product-card__image-wrap">
                     ${imageHTML}
                     ${categoryBadgeHTML}
