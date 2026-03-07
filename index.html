@@ -214,6 +214,9 @@
             <div class="product-grid" id="productsGrid">
                 <!-- Populated by JavaScript -->
             </div>
+            <div class="load-more-container" id="loadMoreContainer" style="text-align:center; margin-top:2rem; display:none;">
+                <button class="btn btn--outline btn--large" id="loadMoreBtn" onclick="loadMore()">View More Templates</button>
+            </div>
             <div id="noResults" class="no-results">
                 <div class="no-results__icon">🔍</div>
                 <h3 class="no-results__title">No templates found</h3>
@@ -489,6 +492,7 @@
     let currentSearch = '';
     let currentSort = 'featured';
     let allReviewsVisible = false;
+    let visibleCount = 8;
 
     /* -----------------------------------------------------------------
        SCROLL TO RESULTS HELPER
@@ -666,33 +670,87 @@
         var grid = document.getElementById('productsGrid');
         var noResults = document.getElementById('noResults');
         var countSpan = document.getElementById('productCount');
+        var loadMoreContainer = document.getElementById('loadMoreContainer');
+        var loadMoreBtn = document.getElementById('loadMoreBtn');
         if (!grid) return;
-        /* Show loading spinner while products render */
-        grid.innerHTML = '<div class="products-loading" id="productsLoading"><div class="products-loading__spinner"></div><p>Loading templates…</p></div>';
-        var products = getFilteredProducts();
-        var html = '';
-        for (var i = 0; i < products.length; i++) {
-            html += renderCard(products[i]);
-        }
-        grid.innerHTML = html;
 
-        /* Update count */
+        grid.innerHTML = '<div class="products-loading" id="productsLoading"><div class="products-loading__spinner"></div><p>Loading templates…</p></div>';
+
+        var products = getFilteredProducts();
+        visibleCount = 8;
+
+        var visible = products.slice(0, visibleCount);
+        var cardHtml = '';
+        for (var i = 0; i < visible.length; i++) {
+            cardHtml += renderCard(visible[i]);
+        }
+        grid.innerHTML = cardHtml;
+
         if (countSpan) {
             countSpan.textContent = '(' + products.length + ')';
         }
 
-        /* No results toggle */
+        if (loadMoreContainer) {
+            if (products.length > visibleCount) {
+                loadMoreContainer.style.display = 'block';
+                if (loadMoreBtn) {
+                    var remaining = products.length - visibleCount;
+                    loadMoreBtn.textContent = 'View More Templates (' + remaining + ' remaining)';
+                }
+            } else {
+                loadMoreContainer.style.display = 'none';
+            }
+        }
+
         if (noResults) {
             if (products.length === 0) {
                 noResults.classList.add('visible');
             } else {
                 noResults.classList.remove('visible');
             }
-        /* Show search bar once products have loaded */
-        var heroSearch = document.getElementById('heroSearch');
-        if (heroSearch && products.length > 0) {
-            heroSearch.style.display = 'flex';
+            var heroSearch = document.getElementById('heroSearch');
+            if (heroSearch && products.length > 0) {
+                heroSearch.style.display = 'flex';
+            }
         }
+    }
+
+    function loadMore() {
+        var grid = document.getElementById('productsGrid');
+        var loadMoreContainer = document.getElementById('loadMoreContainer');
+        var loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (!grid) return;
+
+        var products = getFilteredProducts();
+        var prevCount = visibleCount;
+        visibleCount += 8;
+
+        var visible = products.slice(0, visibleCount);
+        var cardHtml = '';
+        for (var i = 0; i < visible.length; i++) {
+            cardHtml += renderCard(visible[i]);
+        }
+        grid.innerHTML = cardHtml;
+
+        setTimeout(function() {
+            var cards = grid.querySelectorAll('.product-card');
+            if (cards.length > prevCount) {
+                var navHeight = document.getElementById('nav') ? document.getElementById('nav').offsetHeight : 0;
+                var firstNew = cards[prevCount];
+                var cardTop = firstNew.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
+                window.scrollTo({ top: cardTop, behavior: 'smooth' });
+            }
+        }, 100);
+
+        if (loadMoreContainer) {
+            if (visibleCount >= products.length) {
+                loadMoreContainer.style.display = 'none';
+            } else {
+                var remaining = products.length - visibleCount;
+                if (loadMoreBtn) {
+                    loadMoreBtn.textContent = 'View More Templates (' + remaining + ' remaining)';
+                }
+            }
         }
     }
 
@@ -703,24 +761,34 @@
 
         var featured = PRODUCTS.filter(function(p) { return p.featured; });
 
-        /* Sort featured by popularity descending */
-        featured.sort(function(a, b) {
-            return (b.popularity || 0) - (a.popularity || 0);
-        });
-
-        /* Show top 4 featured products */
-        featured = featured.slice(0, 4);
-
         if (featured.length === 0 && section) {
             section.classList.add('hidden');
             return;
         }
 
-        var html = '';
-        for (var i = 0; i < featured.length; i++) {
-            html += renderCard(featured[i]);
+        /* Rotate featured products using a time-based seed so different
+           visitors at different times see different featured products */
+        var now = new Date();
+        var seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate() + now.getHours();
+        function seededRandom(s) {
+            var x = Math.sin(s) * 10000;
+            return x - Math.floor(x);
         }
-        grid.innerHTML = html;
+        for (var i = featured.length - 1; i > 0; i--) {
+            seed++;
+            var j = Math.floor(seededRandom(seed) * (i + 1));
+            var temp = featured[i];
+            featured[i] = featured[j];
+            featured[j] = temp;
+        }
+
+        featured = featured.slice(0, 4);
+
+        var cardHtml = '';
+        for (var i = 0; i < featured.length; i++) {
+            cardHtml += renderCard(featured[i]);
+        }
+        grid.innerHTML = cardHtml;
     }
 
     /* -----------------------------------------------------------------
