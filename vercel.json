@@ -1,0 +1,91 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["lhr1"],
+  "env": {
+    "DATABASE_URL": {
+      "description": "PostgreSQL connection string (Supabase or Neon)",
+      "required": true
+    },
+    "NEXTAUTH_URL": {
+      "description": "NextAuth callback URL",
+      "required": true
+    },
+    "NEXTAUTH_SECRET": {
+      "description": "NextAuth secret key",
+      "required": true
+    },
+    "GOOGLE_CLIENT_ID": {
+      "description": "Google OAuth Client ID",
+      "required": true
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "description": "Google OAuth Client Secret",
+      "required": true
+    },
+    "OPENAI_API_KEY": {
+      "description": "OpenAI API Key for RAMS Builder",
+      "required": false
+    },
+    "OPENAI_MODEL": {
+      "description": "OpenAI model to use (default: gpt-4-turbo)",
+      "required": false
+    },
+    "GA_MEASUREMENT_ID": {
+      "description": "Google Analytics Measurement ID",
+      "required": false
+    },
+    "SMTP_HOST": {
+      "description": "SMTP server host",
+      "required": false
+    },
+    "SMTP_PORT": {
+      "description": "SMTP server port",
+      "required": false
+    },
+    "SMTP_USER": {
+      "description": "SMTP username",
+      "required": false
+    },
+    "SMTP_PASSWORD": {
+      "description": "SMTP password",
+      "required": false
+    },
+    "EMAIL_FROM": {
+      "description": "From email address for transactional emails",
+      "required": false
+    },
+    "PAYPAL_CLIENT_ID": {
+      "description": "PayPal Client ID",
+      "required": false
+    },
+    "PAYPAL_CLIENT_SECRET": {
+      "description": "PayPal Client Secret",
+      "required": false
+    },
+    "PAYPAL_WEBHOOK_ID": {
+      "description": "PayPal Webhook ID",
+      "required": false
+    },
+    "MAILCHIMP_API_KEY": {
+      "description": "Mailchimp API Key",
+      "required": false
+    },
+    "MAILCHIMP_LIST_ID": {
+      "description": "Mailchimp List ID for newsletter",
+      "required": false
+    },
+    "NEXT_PUBLIC_SITE_URL": {
+      "description": "Public site URL",
+      "required": false
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "0 */12 * * *"
+    }
+  ]
+}
