@@ -83,9 +83,11 @@ export default async function AccountPage({ searchParams }: PageProps) {
   const savedDetails = user.saved_details
         ? {
                     companyName: user.saved_details.company_name,
-                    siteAddress: user.saved_details.site_address,
-                    supervisor: user.saved_details.supervisor,
-                    principalContractor: user.saved_details.principal_contractor,
+                    companyAddress: user.saved_details.site_address,
+                    defaultSupervisor: user.saved_details.supervisor,
+                    defaultPrincipalContractor: user.saved_details.principal_contractor,
+                    phoneNumber: null,
+                    email: null,
         }
           : null;
 
