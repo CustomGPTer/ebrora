@@ -5,7 +5,7 @@ import { getSession } from '@/lib/auth-utils';
 import AccountDashboardClient from '@/components/account/AccountDashboardClient';
 
 export const metadata: Metadata = {
-      title: 'My Account - Ebrora',
+      title: 'My Account - Ebrora',h
       description: 'Manage your account, subscription, and settings',
 };
 
@@ -97,7 +97,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
                             user={{
                                           name: user.name,
                                           email: user.email,
-                                          logo: latestLogo,
+                                          logo: latestLogo?.file_path ?? null,
                             }}
                             subscription={subscription}
                             generationCount={generationCount}
