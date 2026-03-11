@@ -5,7 +5,7 @@ import { getSession } from '@/lib/auth-utils';
 import AccountDashboardClient from '@/components/account/AccountDashboardClient';
 
 export const metadata: Metadata = {
-      title: 'My Account - Ebrora',h
+      title: 'My Account - Ebrora',
       description: 'Manage your account, subscription, and settings',
 };
 
