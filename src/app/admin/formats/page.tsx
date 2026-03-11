@@ -17,8 +17,8 @@ export default async function FormatsPage() {
     id: format.id,
     name: format.name,
     description: format.description,
-    scoringType: format.scoringType,
-    isFree: format.isFree,
+    scoringType: format.scoring_type,
+    isFree: format.is_free,
     enabled: format.enabled,
     order: format.order,
   }));
