@@ -11,38 +11,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        subscriptionTier: true,
-        subscriptionStatus: true,
-        paypalSubscriptionId: true,
-        subscriptionActivatedAt: true,
-      },
+    const subscription = await prisma.subscription.findUnique({
+      where: { user_id: session.user.id },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const tier = user.subscriptionTier || 'FREE';
-    const status = user.subscriptionStatus || 'NONE';
+    const tier = subscription?.tier || 'FREE';
+    const status = subscription?.status || 'ACTIVE';
 
     // Get usage information
     const usage = await getUserUsage(session.user.id);
 
-    // Calculate renewal date (30 days from subscription activation)
+    // Calculate renewal date from subscription period
     let renewalDate: string | null = null;
-    if (user.subscriptionActivatedAt && status === 'ACTIVE') {
-      const renewal = new Date(user.subscriptionActivatedAt);
-      renewal.setMonth(renewal.getMonth() + 1);
-      renewalDate = renewal.toISOString();
+    if (subscription?.current_period_end && status === 'ACTIVE') {
+      renewalDate = subscription.current_period_end.toISOString();
     }
 
     // Determine billing cycle
     let billing = 'MONTHLY';
-    // This would need to be stored in the database for accurate tracking
-    // For now, default to MONTHLY
 
     return NextResponse.json({
       tier,
@@ -51,7 +37,7 @@ export async function GET(request: NextRequest) {
       ramsUsed: usage.used,
       ramsLimit: usage.limit,
       renewalDate,
-      subscriptionId: user.paypalSubscriptionId || null,
+      subscriptionId: subscription?.paypal_subscription_id || null,
     });
   } catch (error) {
     console.error('Status check error:', error);
