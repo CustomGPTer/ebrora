@@ -20,8 +20,7 @@ export async function GET(req: NextRequest) {
     await requireAdmin();
 
     const promos = await prisma.promoCode.findMany({
-      include: { _count: { select: { usageRecords: true } } },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
     });
 
     return NextResponse.json(promos);
@@ -52,12 +51,12 @@ export async function POST(req: NextRequest) {
     const promo = await prisma.promoCode.create({
       data: {
         code: code.toUpperCase(),
-        discountPercent,
-        maxUses,
-        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        discount_type: 'PERCENTAGE',
+        discount_value: discountPercent,
+        usage_limit: maxUses,
+        expires_at: expiresAt ? new Date(expiresAt) : null,
         active: true,
       },
-      include: { _count: { select: { usageRecords: true } } },
     });
 
     return NextResponse.json(promo, { status: 201 });
@@ -79,7 +78,6 @@ export async function PATCH(req: NextRequest) {
     const promo = await prisma.promoCode.update({
       where: { id },
       data: { active: active !== undefined ? active : undefined },
-      include: { _count: { select: { usageRecords: true } } },
     });
 
     return NextResponse.json(promo);
