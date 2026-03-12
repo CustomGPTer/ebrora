@@ -19,21 +19,16 @@ export async function GET(request: NextRequest) {
 
     // Fetch total count
     const total = await prisma.generation.count({
-      where: { userId: session.user.id },
+      where: { user_id: session.user.id },
     });
 
     // Fetch generations
     const generations = await prisma.generation.findMany({
-      where: { userId: session.user.id },
-      select: {
-        id: true,
-        formatName: true,
-        status: true,
-        createdAt: true,
-        fileUrl: true,
-        expiresAt: true,
+      where: { user_id: session.user.id },
+      include: {
+        rams_format: { select: { name: true } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       skip,
       take: limit,
     });
@@ -41,11 +36,11 @@ export async function GET(request: NextRequest) {
     // Transform data
     const data = generations.map((gen) => ({
       id: gen.id,
-      formatName: gen.formatName,
+      formatName: gen.rams_format?.name || 'Unknown',
       status: gen.status,
-      createdAt: gen.createdAt.toISOString(),
-      fileUrl: gen.fileUrl,
-      isExpired: gen.expiresAt ? new Date() > gen.expiresAt : false,
+      createdAt: gen.created_at.toISOString(),
+      fileUrl: gen.file_path,
+      isExpired: gen.file_expires_at ? new Date() > gen.file_expires_at : false,
     }));
 
     return NextResponse.json(
