@@ -28,11 +28,11 @@ export async function POST(request: Request) {
 
     // Check user subscription and format access
     const subscription = await prisma.subscription.findFirst({
-      where: { userId: session.user.id, status: 'ACTIVE' },
+      where: { user_id: session.user.id, status: 'ACTIVE' },
     });
     const tier = subscription?.tier || 'FREE';
 
-    if (!format.isFree && tier === 'FREE') {
+    if (!format.is_free && tier === 'FREE') {
       return NextResponse.json(
         { error: 'This format requires a paid subscription' },
         { status: 403 }
@@ -44,8 +44,8 @@ export async function POST(request: Request) {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const generationsThisMonth = await prisma.generation.count({
       where: {
-        userId: session.user.id,
-        createdAt: { gte: monthStart },
+        user_id: session.user.id,
+        created_at: { gte: monthStart },
         status: { not: 'FAILED' },
       },
     });
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     const limits: Record<string, number> = {
       FREE: 1,
       STANDARD: 10,
-      PREMIUM: 25,
+      PROFESSIONAL: 25,
     };
     const monthlyLimit = limits[tier] || 1;
 
@@ -71,12 +71,12 @@ export async function POST(request: Request) {
     // Create generation record
     const generation = await prisma.generation.create({
       data: {
-        userId: session.user.id,
-        formatId: format.id,
+        user_id: session.user.id,
+        format_id: format.id,
         status: 'QUEUED',
-        activityCategory: answers.q2 || null,
+        activity_category: answers.q2 || null,
         answers: answers,
-        fileExpiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12 hours
+        file_expires_at: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12 hours
       },
     });
 
