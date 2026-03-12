@@ -14,16 +14,16 @@ export async function GET(
   const { id } = await params;
   const generation = await prisma.generation.findUnique({
     where: { id },
-    select: { status: true, fileUrl: true, error: true, userId: true },
+    select: { status: true, file_path: true, error_message: true, user_id: true },
   });
 
-  if (!generation || generation.userId !== session.user.id) {
+  if (!generation || generation.user_id !== session.user.id) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
   return NextResponse.json({
     status: generation.status,
-    fileUrl: generation.fileUrl,
-    error: generation.error,
+    fileUrl: generation.file_path,
+    error: generation.error_message,
   });
 }
