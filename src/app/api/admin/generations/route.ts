@@ -32,9 +32,9 @@ export async function GET(req: NextRequest) {
         where: filter,
         include: {
           user: { select: { name: true, email: true } },
-          format: { select: { name: true } },
+          rams_format: { select: { name: true } },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         skip,
         take: pageSize,
       }),
@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
       where: { id: generationId },
       data: {
         status: 'QUEUED',
-        errorMessage: null,
-        completedAt: null,
+        error_message: null,
+        completed_at: null,
       },
     });
 
