@@ -141,7 +141,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
   const features = getFeatures();
   const ctaText = getCtaText();
   const isDisabled =
-    tier === 'FREE' || isCurrentPlan || (tier !== 'FREE' && isLoading);
+    tier === 'FREE' || isCurrentPlan || isLoading;
   const isFeatured = tier === 'STANDARD';
 
   return (
