@@ -44,7 +44,10 @@ export default function RamsLandingClient() {
   const currentTestimonial = RAMS_TESTIMONIALS[currentTestimonialIndex];
 
   // Pricing data
-  const pricing = {
+  const pricing: {
+    monthly: Record<string, { price: string; cta: string; badgePrice?: string; badgeText?: string }>;
+    yearly: Record<string, { price: string; cta: string; badgePrice?: string; badgeText?: string }>;
+  } = {
     monthly: {
       free: { price: '£0', cta: 'Get Started Free' },
       standard: { price: '£9.99', cta: 'Start Standard' },
