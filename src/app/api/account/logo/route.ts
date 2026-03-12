@@ -55,25 +55,31 @@ export async function POST(request: NextRequest) {
     await writeFile(filepath, buffer);
 
     // Get current logo to delete old one
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { logo: true },
+    const existingLogos = await prisma.logo.findMany({
+      where: { user_id: session.user.id },
+      orderBy: { created_at: 'desc' },
+      take: 1,
     });
 
-    if (user?.logo) {
+    if (existingLogos.length > 0) {
       try {
-        const oldPath = join(process.cwd(), 'public', user.logo);
+        const oldPath = join(process.cwd(), 'public', existingLogos[0].file_path);
         await unlink(oldPath);
       } catch (err) {
         console.error('Error deleting old logo:', err);
       }
+      // Delete old logo record
+      await prisma.logo.delete({ where: { id: existingLogos[0].id } });
     }
 
-    // Update user record
+    // Create new logo record
     const logoPath = `/uploads/logos/${filename}`;
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { logo: logoPath },
+    await prisma.logo.create({
+      data: {
+        user_id: session.user.id,
+        file_path: logoPath,
+        original_filename: file.name,
+      },
     });
 
     return NextResponse.json(
@@ -100,12 +106,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { logo: true },
+    const existingLogos = await prisma.logo.findMany({
+      where: { user_id: session.user.id },
+      orderBy: { created_at: 'desc' },
+      take: 1,
     });
 
-    if (!user?.logo) {
+    if (existingLogos.length === 0) {
       return NextResponse.json(
         { message: 'No logo to delete' },
         { status: 404 }
@@ -114,17 +121,14 @@ export async function DELETE(request: NextRequest) {
 
     // Delete file from filesystem
     try {
-      const filepath = join(process.cwd(), 'public', user.logo);
+      const filepath = join(process.cwd(), 'public', existingLogos[0].file_path);
       await unlink(filepath);
     } catch (err) {
       console.error('Error deleting logo file:', err);
     }
 
-    // Update user record
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { logo: null },
-    });
+    // Delete logo record
+    await prisma.logo.delete({ where: { id: existingLogos[0].id } });
 
     return NextResponse.json(
       { message: 'Logo deleted successfully' },
