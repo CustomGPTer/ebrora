@@ -11,7 +11,7 @@ export function FooterYear() {
 
   // Return null during SSR to avoid hydration mismatch
   if (year === null) {
-    return <span>2024</span>;
+    return <span>2026</span>;
   }
 
   return <span>{year}</span>;
