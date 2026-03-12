@@ -20,17 +20,17 @@ export default async function GeneratingPage({ params }: PageProps) {
   const { id } = await params;
   const generation = await prisma.generation.findUnique({
     where: { id },
-    include: { format: true },
+    include: { rams_format: true },
   });
 
-  if (!generation || generation.userId !== session.user.id) {
+  if (!generation || generation.user_id !== session.user.id) {
     notFound();
   }
 
   return (
     <GeneratingClient
       generationId={generation.id}
-      formatName={generation.format.name}
+      formatName={generation.rams_format.name}
       status={generation.status}
     />
   );
