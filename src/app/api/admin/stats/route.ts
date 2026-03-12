@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       }),
       prisma.generation.findMany({
         where: {
-          createdAt: { gte: monthStart },
+          created_at: { gte: monthStart },
         },
         select: { id: true },
       }),
@@ -27,14 +27,14 @@ export async function GET(req: NextRequest) {
     const subscriptionsByTier = {
       FREE: activeSubscriptions.filter((s) => s.tier === 'FREE').length,
       STANDARD: activeSubscriptions.filter((s) => s.tier === 'STANDARD').length,
-      PREMIUM: activeSubscriptions.filter((s) => s.tier === 'PREMIUM').length,
+      PROFESSIONAL: activeSubscriptions.filter((s) => s.tier === 'PROFESSIONAL').length,
     };
 
     // Estimate revenue from active subscriptions
     const pricing: Record<string, number> = {
       FREE: 0,
       STANDARD: 9.99,
-      PREMIUM: 29.99,
+      PROFESSIONAL: 29.99,
     };
 
     const estimatedRevenue = activeSubscriptions.reduce((sum, sub) => {
