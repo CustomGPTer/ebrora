@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth-utils';
-import { createSubscription } from '@/lib/payments/paypal-client';
-import { getPlanConfigByKey } from '@/lib/payments/plan-config';
+import { cancelSubscription } from '@/lib/payments/paypal-client';
+import prisma from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,48 +11,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = (await request.json()) as { planKey: string };
+    const subscription = await prisma.subscription.findUnique({
+      where: { user_id: session.user.id },
+    });
 
-    if (!body.planKey) {
+    if (!subscription || !subscription.paypal_subscription_id) {
       return NextResponse.json(
-        { error: 'Missing planKey' },
-        { status: 400 }
+        { error: 'No active subscription found' },
+        { status: 404 }
       );
     }
 
-    const planConfig = getPlanConfigByKey(body.planKey);
+    const body = (await request.json()) as { reason?: string };
+    const reason = body.reason || 'User requested cancellation';
 
-    if (!planConfig) {
-      return NextResponse.json(
-        { error: 'Invalid plan key' },
-        { status: 400 }
-      );
-    }
+    // Cancel subscription with PayPal
+    const cancelled = await cancelSubscription(subscription.paypal_subscription_id, reason);
 
-    if (!planConfig.paypalPlanId) {
+    if (!cancelled) {
       return NextResponse.json(
-        { error: 'Plan not configured' },
+        { error: 'Failed to cancel subscription with PayPal' },
         { status: 500 }
       );
     }
 
-    const { subscriptionId, approvalUrl } = await createSubscription(
-      planConfig.paypalPlanId,
-      session.user.email || session.user.id
-    );
-
-    // Store the subscription ID temporarily for webhook matching
-    // In production, you might want to store this in a temporary cache
-    // or database record until the webhook confirms activation
+    // Update subscription record
+    await prisma.subscription.update({
+      where: { user_id: session.user.id },
+      data: {
+        status: 'CANCELLED',
+        tier: 'FREE',
+      },
+    });
 
     return NextResponse.json({
-      subscriptionId,
-      approvalUrl,
+      success: true,
+      message: 'Subscription cancelled successfully',
     });
   } catch (error) {
-    console.error('Subscription creation error:', error);
+    console.error('Subscription cancellation error:', error);
     return NextResponse.json(
-      { error: 'Failed to create subscription' },
+      { error: 'Failed to cancel subscription' },
       { status: 500 }
     );
   }
