@@ -254,7 +254,7 @@ export async function buildRamsDocument(data: RamsDocumentData): Promise<Buffer>
       {
         properties: {
           page: {
-            margins: DOCUMENT_MARGINS,
+            margin: DOCUMENT_MARGINS,
           },
         },
         children,
@@ -265,7 +265,7 @@ export async function buildRamsDocument(data: RamsDocumentData): Promise<Buffer>
   return Buffer.from(await Packer.toBuffer(doc));
 }
 
-export async function buildRamsDocumentStream(data: RamsDocumentData): Promise<NodeJS.ReadableStream> {
+export async function buildRamsDocumentStream(data: RamsDocumentData): Promise<any> {
   const config = FORMAT_CONFIGS[data.formatSlug];
 
   if (!config) {
@@ -388,7 +388,7 @@ export async function buildRamsDocumentStream(data: RamsDocumentData): Promise<N
       {
         properties: {
           page: {
-            margins: DOCUMENT_MARGINS,
+            margin: DOCUMENT_MARGINS,
           },
         },
         children,

@@ -33,24 +33,24 @@ export const RISK_COLORS: Record<string, string> = {
   'High (7-9)': 'E74C3C',
 };
 
-export function getDocStyles(): IStylesOptions {
+export function getDocStyles(): any {
   return {
     default: {
       document: {
-        style: 'Normal',
-        size: {
-          value: 22,
-          unit: 'halfPoints',
+        run: {
+          size: 22,
+          font: 'DM Sans',
+          color: BRAND_COLORS.darkGray,
         },
-        font: 'DM Sans',
-        color: BRAND_COLORS.darkGray,
-        lineSpacing: {
-          line: 360,
-          lineRule: 'auto',
+        paragraph: {
+          spacing: {
+            line: 360,
+            lineRule: 'auto' as any,
+          },
         },
       },
     },
-    paragraphs: [
+    paragraphStyles: [
       {
         id: 'Normal',
         name: 'Normal',
