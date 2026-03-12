@@ -97,52 +97,75 @@ async function handleSubscriptionActivated(resource: any): Promise<void> {
     const planId = resource.plan_id;
 
     // Determine tier from plan ID
-    let tier = 'STANDARD';
-    if (planId?.includes('premium')) {
-      tier = 'PREMIUM';
-    } else if (planId?.includes('standard')) {
-      tier = 'STANDARD';
+    let tier: 'STANDARD' | 'PROFESSIONAL' = 'STANDARD';
+    if (planId?.includes('professional') || planId?.includes('premium')) {
+      tier = 'PROFESSIONAL';
     }
 
-    // Update user subscription in database
-    const user = await prisma.user.update({
-      where: { id: customId },
-      data: {
-        subscriptionTier: tier,
-        subscriptionStatus: 'ACTIVE',
-        paypalSubscriptionId: subscriptionId,
-        subscriptionActivatedAt: new Date(),
+    // Update or create subscription in database
+    const subscription = await prisma.subscription.upsert({
+      where: { user_id: customId },
+      update: {
+        tier,
+        status: 'ACTIVE',
+        paypal_subscription_id: subscriptionId,
+        current_period_start: new Date(),
       },
+      create: {
+        user_id: customId,
+        tier,
+        status: 'ACTIVE',
+        paypal_subscription_id: subscriptionId,
+        current_period_start: new Date(),
+      },
+    });
+
+    // Get user email for confirmation
+    const user = await prisma.user.findUnique({
+      where: { id: customId },
+      select: { email: true },
     });
 
     // Create or update usage record for this month
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    await prisma.usageRecord.upsert({
+    // Find existing usage record for this period
+    const existingUsage = await prisma.usageRecord.findFirst({
       where: {
-        userId_month: {
-          userId: customId,
-          month: monthStart,
-        },
-      },
-      update: {
-        subscriptionId,
-      },
-      create: {
-        userId: customId,
-        month: monthStart,
-        subscriptionId,
-        generationsCount: 0,
+        user_id: customId,
+        billing_period_start: monthStart,
       },
     });
 
+    const ramsLimit = tier === 'PROFESSIONAL' ? 25 : 10;
+
+    if (existingUsage) {
+      await prisma.usageRecord.update({
+        where: { id: existingUsage.id },
+        data: { rams_limit: ramsLimit },
+      });
+    } else {
+      await prisma.usageRecord.create({
+        data: {
+          user_id: customId,
+          billing_period_start: monthStart,
+          billing_period_end: monthEnd,
+          rams_generated: 0,
+          rams_limit: ramsLimit,
+        },
+      });
+    }
+
     // Send confirmation email
-    try {
-      await sendSubscriptionConfirmationEmail(user.email, tier);
-    } catch (emailError) {
-      console.error('Failed to send confirmation email:', emailError);
-      // Don't fail the webhook if email fails
+    if (user) {
+      try {
+        await sendSubscriptionConfirmationEmail(user.email, tier);
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        // Don't fail the webhook if email fails
+      }
     }
 
     console.log(`Subscription ${subscriptionId} activated for user ${customId}`);
@@ -162,12 +185,12 @@ async function handleSubscriptionCancelled(resource: any): Promise<void> {
       return;
     }
 
-    // Update user subscription status
-    await prisma.user.update({
-      where: { id: customId },
+    // Update subscription status
+    await prisma.subscription.update({
+      where: { user_id: customId },
       data: {
-        subscriptionStatus: 'CANCELLED',
-        subscriptionTier: 'FREE',
+        status: 'CANCELLED',
+        tier: 'FREE',
       },
     });
 
@@ -188,11 +211,11 @@ async function handleSubscriptionSuspended(resource: any): Promise<void> {
       return;
     }
 
-    // Update user subscription status
-    await prisma.user.update({
-      where: { id: customId },
+    // Update subscription status
+    await prisma.subscription.update({
+      where: { user_id: customId },
       data: {
-        subscriptionStatus: 'SUSPENDED',
+        status: 'PAST_DUE',
       },
     });
 
