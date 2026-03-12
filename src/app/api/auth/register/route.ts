@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         email: email.toLowerCase(),
-        passwordHash,
-        emailVerified: null,
+        password_hash: passwordHash,
+        email_verified: false,
       },
     });
 
