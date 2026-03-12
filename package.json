@@ -7,7 +7,7 @@
               "build": "prisma generate && next build",
               "start": "next start",
               "lint": "next lint",
-              "prisma:generate": "prisma generate",
+              "prisma:generate": "prisma genehrate",
               "prisma:migrate": "prisma migrate dev",
               "prisma:seed": "npx tsx prisma/seed.ts",
               "type-check": "tsc --noEmit"
@@ -22,7 +22,7 @@
               "@prisma/client": "^5.8.0",
               "openai": "^4.47.0",
               "docx": "^8.5.0",
-              "next-mdx-remote": "^5.0.0",
+              "next-mdx-remote": "^6.0.0",
               "@next/mdx": "^14.2.0",
               "@mdx-js/loader": "^3.0.0",
               "@mdx-js/react": "^3.0.0",
