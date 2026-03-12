@@ -11,18 +11,18 @@ export default async function PromptsPage() {
 
   const prompts = await prisma.systemPrompt.findMany({
     include: {
-      format: { select: { id: true, name: true } },
+      rams_format: { select: { id: true, name: true } },
     },
-    orderBy: { createdAt: 'asc' },
+    orderBy: { created_at: 'asc' },
   });
 
   const promptsData = prompts.map((prompt) => ({
     id: prompt.id,
-    formatId: prompt.formatId,
-    formatName: prompt.format?.name || 'Unknown',
-    text: prompt.text,
-    createdAt: prompt.createdAt,
-    updatedAt: prompt.updatedAt,
+    formatId: prompt.format_id,
+    formatName: prompt.rams_format?.name || 'Unknown',
+    text: prompt.content,
+    createdAt: prompt.created_at,
+    updatedAt: prompt.updated_at,
   }));
 
   return <PromptsClient prompts={promptsData} />;
