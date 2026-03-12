@@ -2,6 +2,9 @@ import type {
   GeneratedContent,
   HazardEntry,
   MethodStep,
+  RiskMatrixEntry,
+  EnvironmentalHazard,
+  FireWorksDetail,
 } from '@/lib/docgen/types';
 
 /**
@@ -243,13 +246,13 @@ export function validateGeneratedContent(raw: unknown): GeneratedContent {
       ? String(r.additionalNotes).trim().substring(0, 2000)
       : '',
     riskMatrix: Array.isArray(r.riskMatrix)
-      ? (r.riskMatrix as unknown[]).slice(0, 100)
+      ? (r.riskMatrix as unknown[]).slice(0, 100) as RiskMatrixEntry[]
       : undefined,
     environmentalHazards: Array.isArray(r.environmentalHazards)
-      ? (r.environmentalHazards as unknown[]).slice(0, 50)
+      ? (r.environmentalHazards as unknown[]).slice(0, 50) as EnvironmentalHazard[]
       : undefined,
     fireWorksDetails: r.fireWorksDetails
-      ? (r.fireWorksDetails as unknown)
+      ? (r.fireWorksDetails as unknown) as FireWorksDetail
       : undefined,
     demolitionNotes: r.demolitionNotes
       ? String(r.demolitionNotes).trim().substring(0, 2000)
