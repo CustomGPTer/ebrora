@@ -37,9 +37,9 @@ export default async function GenerationsPage({ searchParams }: PageProps) {
       where: filter,
       include: {
         user: { select: { name: true, email: true } },
-        format: { select: { name: true } },
+        rams_format: { select: { name: true } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       skip,
       take: pageSize,
     }),
@@ -50,15 +50,15 @@ export default async function GenerationsPage({ searchParams }: PageProps) {
 
   const generationsData = generations.map((gen) => ({
     id: gen.id,
-    userId: gen.userId,
+    userId: gen.user_id,
     userName: gen.user?.name || 'Unknown',
     userEmail: gen.user?.email || '',
-    formatName: gen.format?.name || 'Unknown',
+    formatName: gen.rams_format?.name || 'Unknown',
     status: gen.status,
-    createdAt: gen.createdAt,
-    completedAt: gen.completedAt,
-    estimatedDurationSeconds: gen.estimatedDurationSeconds || 0,
-    errorMessage: gen.errorMessage,
+    createdAt: gen.created_at,
+    completedAt: gen.completed_at,
+    estimatedDurationSeconds: 0,
+    errorMessage: gen.error_message,
     answers: gen.answers,
   }));
 
