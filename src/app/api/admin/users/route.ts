@@ -6,7 +6,6 @@ import { z } from 'zod';
 const UpdateUserSchema = z.object({
   userId: z.string(),
   role: z.enum(['USER', 'ADMIN']).optional(),
-  disabled: z.boolean().optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -37,7 +36,7 @@ export async function GET(req: NextRequest) {
         include: { subscription: { select: { tier: true } } },
         skip,
         take: pageSize,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
       }),
       prisma.user.count({ where: filter }),
     ]);
@@ -53,11 +52,10 @@ export async function PATCH(req: NextRequest) {
     await requireAdmin();
 
     const body = await req.json();
-    const { userId, role, disabled } = UpdateUserSchema.parse(body);
+    const { userId, role } = UpdateUserSchema.parse(body);
 
     const updateData: any = {};
     if (role) updateData.role = role;
-    if (disabled !== undefined) updateData.disabled = disabled;
 
     const user = await prisma.user.update({
       where: { id: userId },
