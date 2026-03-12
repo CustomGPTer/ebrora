@@ -47,7 +47,7 @@ export default async function UsersPage({ searchParams }: PageProps) {
         subscription: { select: { tier: true, status: true } },
         _count: { select: { generations: true } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       skip,
       take: pageSize,
     }),
@@ -62,10 +62,10 @@ export default async function UsersPage({ searchParams }: PageProps) {
     email: user.email,
     role: user.role,
     tier: user.subscription?.tier || 'FREE',
-    status: user.subscription?.status || 'INACTIVE',
+    status: user.subscription?.status || 'ACTIVE',
     generationsCount: user._count.generations,
-    createdAt: user.createdAt,
-    disabled: user.disabled || false,
+    createdAt: user.created_at,
+    disabled: false,
   }));
 
   return (
