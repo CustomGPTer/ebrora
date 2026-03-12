@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { BlogPost, BlogCategory } from '@/data/posts';
-import { Product } from '@/data/products';
+import { Product } from '@/lib/types';
 
 interface BlogPostClientProps {
   post: BlogPost;
@@ -162,18 +162,18 @@ export default function BlogPostClient({
                         href={`/products/${product.id}`}
                         className="blog-post__related-product-card"
                       >
-                        {product.image && (
+                        {product.images[0] && (
                           <img
-                            src={`/${product.image}`}
-                            alt={product.name}
+                            src={`/${product.images[0]}`}
+                            alt={product.title}
                             className="blog-post__related-product-image"
                           />
                         )}
                         <h4 className="blog-post__related-product-name">
-                          {product.name}
+                          {product.title}
                         </h4>
                         <p className="blog-post__related-product-price">
-                          {product.pricing.oneTime ? `£${product.pricing.oneTime}` : 'Free'}
+                          {product.price !== '£0' ? product.price : 'Free'}
                         </p>
                       </Link>
                     )
