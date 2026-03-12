@@ -25,14 +25,14 @@ export async function POST(request: NextRequest) {
     // Fetch user
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, password: true },
+      select: { id: true, password_hash: true },
     });
 
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    if (!user.password) {
+    if (!user.password_hash) {
       return NextResponse.json(
         { message: 'User password not set' },
         { status: 400 }
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify current password
-    const passwordMatch = await bcryptjs.compare(validatedData.currentPassword, user.password);
+    const passwordMatch = await bcryptjs.compare(validatedData.currentPassword, user.password_hash);
 
     if (!passwordMatch) {
       return NextResponse.json(
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     // Update password
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { password: hashedPassword },
+      data: { password_hash: hashedPassword },
     });
 
     return NextResponse.json(
