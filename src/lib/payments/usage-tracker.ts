@@ -4,22 +4,11 @@ import { getRamsLimitByTier } from './plan-config';
 export async function getUserUsage(
   userId: string
 ): Promise<{ used: number; limit: number; tier: string }> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      subscriptionTier: true,
-    },
+  const subscription = await prisma.subscription.findUnique({
+    where: { user_id: userId },
   });
 
-  if (!user) {
-    return {
-      used: 0,
-      limit: getRamsLimitByTier('FREE'),
-      tier: 'FREE',
-    };
-  }
-
-  const tier = user.subscriptionTier || 'FREE';
+  const tier = subscription?.tier || 'FREE';
   const limit = getRamsLimitByTier(tier);
 
   // Count generations this month
@@ -28,18 +17,18 @@ export async function getUserUsage(
 
   const usageRecord = await prisma.usageRecord.findFirst({
     where: {
-      userId,
-      month: {
+      user_id: userId,
+      billing_period_start: {
         gte: monthStart,
         lt: new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1),
       },
     },
     select: {
-      generationsCount: true,
+      rams_generated: true,
     },
   });
 
-  const used = usageRecord?.generationsCount || 0;
+  const used = usageRecord?.rams_generated || 0;
 
   return {
     used,
@@ -51,28 +40,44 @@ export async function getUserUsage(
 export async function incrementUsage(userId: string): Promise<boolean> {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
+  const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
 
   try {
-    // Upsert usage record for this month
-    await prisma.usageRecord.upsert({
+    // Find existing usage record for this month
+    const existing = await prisma.usageRecord.findFirst({
       where: {
-        userId_month: {
-          userId,
-          month: monthStart,
-        },
-      },
-      update: {
-        generationsCount: {
-          increment: 1,
-        },
-      },
-      create: {
-        userId,
-        month: monthStart,
-        generationsCount: 1,
+        user_id: userId,
+        billing_period_start: monthStart,
       },
     });
+
+    if (existing) {
+      await prisma.usageRecord.update({
+        where: { id: existing.id },
+        data: {
+          rams_generated: {
+            increment: 1,
+          },
+        },
+      });
+    } else {
+      // Get user's subscription to determine limit
+      const subscription = await prisma.subscription.findUnique({
+        where: { user_id: userId },
+      });
+      const tier = subscription?.tier || 'FREE';
+      const ramsLimit = getRamsLimitByTier(tier);
+
+      await prisma.usageRecord.create({
+        data: {
+          user_id: userId,
+          billing_period_start: monthStart,
+          billing_period_end: monthEnd,
+          rams_generated: 1,
+          rams_limit: ramsLimit,
+        },
+      });
+    }
 
     return true;
   } catch (error) {
@@ -83,15 +88,15 @@ export async function incrementUsage(userId: string): Promise<boolean> {
 
 export async function resetMonthlyUsage(): Promise<number> {
   const now = new Date();
-  const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
   try {
     const result = await prisma.usageRecord.updateMany({
       where: {
-        month: previousMonth,
+        billing_period_start: previousMonthStart,
       },
       data: {
-        generationsCount: 0,
+        rams_generated: 0,
       },
     });
 
@@ -121,13 +126,13 @@ export async function getMonthlyUsage(userId: string): Promise<number> {
 
   const usageRecord = await prisma.usageRecord.findFirst({
     where: {
-      userId,
-      month: monthStart,
+      user_id: userId,
+      billing_period_start: monthStart,
     },
     select: {
-      generationsCount: true,
+      rams_generated: true,
     },
   });
 
-  return usageRecord?.generationsCount || 0;
+  return usageRecord?.rams_generated || 0;
 }
