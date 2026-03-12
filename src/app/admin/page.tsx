@@ -13,11 +13,11 @@ export default async function AdminDashboard() {
     }),
     prisma.generation.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
         },
       },
-      select: { id: true, estimatedDurationSeconds: true, createdAt: true },
+      select: { id: true, created_at: true },
     }),
   ]);
 
@@ -26,7 +26,7 @@ export default async function AdminDashboard() {
   const subscriptionsByTier = {
     FREE: subscriptions.filter((s) => s.tier === 'FREE').length,
     STANDARD: subscriptions.filter((s) => s.tier === 'STANDARD').length,
-    PREMIUM: subscriptions.filter((s) => s.tier === 'PREMIUM').length,
+    PROFESSIONAL: subscriptions.filter((s) => s.tier === 'PROFESSIONAL').length,
   };
 
   const totalGenerations = thisMonthGenerations.length;
@@ -35,7 +35,7 @@ export default async function AdminDashboard() {
       const prices: Record<string, number> = {
         FREE: 0,
         STANDARD: 9.99,
-        PREMIUM: 29.99,
+        PROFESSIONAL: 29.99,
       };
       return sum + (prices[sub.tier] || 0);
     }, 0) * 30; // Rough monthly estimate
@@ -43,10 +43,10 @@ export default async function AdminDashboard() {
   // Fetch recent generations
   const recentGenerations = await prisma.generation.findMany({
     take: 10,
-    orderBy: { createdAt: 'desc' },
+    orderBy: { created_at: 'desc' },
     include: {
       user: { select: { name: true, email: true } },
-      format: { select: { name: true } },
+      rams_format: { select: { name: true } },
     },
   });
 
@@ -105,9 +105,9 @@ export default async function AdminDashboard() {
           </div>
         </div>
         <div style={{ padding: '1rem', backgroundColor: '#f5f5f5', borderRadius: '0.5rem' }}>
-          <div style={{ fontSize: '0.875rem', color: '#666' }}>Premium Tier</div>
+          <div style={{ fontSize: '0.875rem', color: '#666' }}>Professional Tier</div>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1B5B50' }}>
-            {subscriptionsByTier.PREMIUM}
+            {subscriptionsByTier.PROFESSIONAL}
           </div>
         </div>
       </div>
@@ -145,7 +145,7 @@ export default async function AdminDashboard() {
                       <div style={{ fontSize: '0.875rem' }}>{gen.user?.name || 'Unknown'}</div>
                       <div style={{ fontSize: '0.75rem', color: '#999' }}>{gen.user?.email}</div>
                     </td>
-                    <td style={{ padding: '0.75rem' }}>{gen.format?.name}</td>
+                    <td style={{ padding: '0.75rem' }}>{gen.rams_format?.name}</td>
                     <td style={{ padding: '0.75rem' }}>
                       <span
                         style={{
@@ -163,7 +163,7 @@ export default async function AdminDashboard() {
                       </span>
                     </td>
                     <td style={{ padding: '0.75rem', color: '#999', fontSize: '0.875rem' }}>
-                      {formatDistanceToNow(new Date(gen.createdAt), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(gen.created_at), { addSuffix: true })}
                     </td>
                   </tr>
                 ))}
