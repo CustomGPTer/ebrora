@@ -18,13 +18,11 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/screenshot-192.png',
         sizes: '192x192',
         type: 'image/png',
-        form_factor: 'narrow',
       },
       {
         src: '/screenshot-512.png',
         sizes: '512x512',
         type: 'image/png',
-        form_factor: 'wide',
       },
     ],
     icons: [
@@ -65,13 +63,12 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     share_target: {
       action: '/api/share',
-      method: 'POST',
+      method: 'post',
       enctype: 'multipart/form-data',
       params: {
-        title: 'title',
         text: 'text',
         url: 'url',
-      },
+      } as any,
     },
   };
 }
