@@ -4,12 +4,10 @@ import { getSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 
 const savedDetailsSchema = z.object({
-  companyName: z.string().min(1).max(255).optional().nullable(),
-  companyAddress: z.string().max(1000).optional().nullable(),
-  defaultSupervisor: z.string().max(255).optional().nullable(),
-  defaultPrincipalContractor: z.string().max(255).optional().nullable(),
-  phoneNumber: z.string().max(20).optional().nullable(),
-  email: z.string().email().max(255).optional().nullable(),
+  company_name: z.string().min(1).max(255).optional().nullable(),
+  site_address: z.string().max(1000).optional().nullable(),
+  supervisor: z.string().max(255).optional().nullable(),
+  principal_contractor: z.string().max(255).optional().nullable(),
 });
 
 export async function GET() {
@@ -22,14 +20,14 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { savedDetails: true },
+      include: { saved_details: true },
     });
 
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(user.savedDetails || {});
+    return NextResponse.json(user.saved_details || {});
   } catch (error) {
     console.error('Error fetching saved details:', error);
     return NextResponse.json(
@@ -53,11 +51,11 @@ export async function POST(request: NextRequest) {
     const validatedData = savedDetailsSchema.parse(body);
 
     // Upsert saved details
-    const savedDetails = await prisma.userSavedDetails.upsert({
-      where: { userId: session.user.id },
+    const savedDetails = await prisma.savedDetails.upsert({
+      where: { user_id: session.user.id },
       update: validatedData,
       create: {
-        userId: session.user.id,
+        user_id: session.user.id,
         ...validatedData,
       },
     });
