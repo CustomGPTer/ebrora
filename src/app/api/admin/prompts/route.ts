@@ -13,8 +13,8 @@ export async function GET(req: NextRequest) {
     await requireAdmin();
 
     const prompts = await prisma.systemPrompt.findMany({
-      include: { format: { select: { name: true } } },
-      orderBy: { createdAt: 'asc' },
+      include: { rams_format: { select: { name: true } } },
+      orderBy: { created_at: 'asc' },
     });
 
     return NextResponse.json(prompts);
@@ -39,8 +39,8 @@ export async function PATCH(req: NextRequest) {
 
     const prompt = await prisma.systemPrompt.update({
       where: { id },
-      data: { text },
-      include: { format: { select: { name: true } } },
+      data: { content: text },
+      include: { rams_format: { select: { name: true } } },
     });
 
     return NextResponse.json(prompt);
