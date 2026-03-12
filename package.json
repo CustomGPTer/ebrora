@@ -4,7 +4,7 @@
       "description": "Ebrora - UK Construction Excel Templates Store with RAMS Builder",
       "scripts": {
               "dev": "next dev",
-              "build": "prisma generate && next build",
+              "build": "mkdir -p public && cp -r product-images public/ && cp -r blog-images public/ && prisma generate && next build",
               "start": "next start",
               "lint": "next lint",
               "prisma:generate": "prisma genehrate",
