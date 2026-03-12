@@ -17,7 +17,7 @@ export async function processGeneration(generationId: string): Promise<void> {
     // Fetch the generation record from database
     generation = await prisma.generation.findUnique({
       where: { id: generationId },
-      include: { questions: true },
+      include: { rams_format: true },
     });
 
     if (!generation) {
@@ -32,29 +32,34 @@ export async function processGeneration(generationId: string): Promise<void> {
 
     console.log(`[Generation Worker] Processing generation: ${generationId}`);
 
-    // Convert questions array to a key-value object
+    // Get answers from the JSON field
     const answers: Record<string, string> = {};
-    if (generation.questions && Array.isArray(generation.questions)) {
-      generation.questions.forEach((q: { questionId: string; answer: string }) => {
-        answers[q.questionId] = q.answer || '';
+    if (generation.answers && typeof generation.answers === 'object') {
+      const rawAnswers = generation.answers as Record<string, unknown>;
+      Object.entries(rawAnswers).forEach(([key, value]) => {
+        answers[key] = String(value || '');
       });
     }
 
+    const formatSlug = generation.rams_format.slug;
+
     // Generate content using AI
     console.log(
-      `[Generation Worker] Generating content for format: ${generation.formatSlug}`
+      `[Generation Worker] Generating content for format: ${formatSlug}`
     );
     const generatedContent = await generateRamsContent(
-      generation.formatSlug,
+      formatSlug,
       answers
     );
 
     // Build the Word document
     console.log(`[Generation Worker] Building RAMS document...`);
-    const docxBuffer = await buildRamsDocument(
-      generation.formatSlug,
-      generatedContent
-    );
+    const docxBuffer = await buildRamsDocument({
+      formatSlug,
+      answers,
+      generatedContent,
+      generationDate: new Date(),
+    });
 
     // Save the document to a temporary location
     const tmpDir = '/tmp/rams-docs';
@@ -71,8 +76,8 @@ export async function processGeneration(generationId: string): Promise<void> {
       where: { id: generationId },
       data: {
         status: 'COMPLETED',
-        fileUrl: filePath,
-        completedAt: new Date(),
+        file_path: filePath,
+        completed_at: new Date(),
       },
     });
 
@@ -93,7 +98,7 @@ export async function processGeneration(generationId: string): Promise<void> {
           where: { id: generationId },
           data: {
             status: 'FAILED',
-            errorMessage: errorMessage.substring(0, 500),
+            error_message: errorMessage.substring(0, 500),
           },
         });
       } catch (updateError) {
