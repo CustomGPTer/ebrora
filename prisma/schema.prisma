@@ -31,6 +31,7 @@ enum GenerationStatus {
   PROCESSING
   COMPLETED
   FAILED
+  EXPIRED
 }
 
 enum FieldType {
