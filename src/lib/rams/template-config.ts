@@ -1,0 +1,166 @@
+// =============================================================================
+// RAMS Builder — Template Configuration
+// =============================================================================
+import { TemplateConfig, TemplateSlug } from './types';
+
+export const TEMPLATE_CONFIGS: Record<TemplateSlug, TemplateConfig> = {
+  'standard-5x5': {
+    slug: 'standard-5x5',
+    displayName: 'Standard 5×5 Matrix',
+    description: 'Classic full-format RAMS with numerical likelihood × severity scoring on a 5×5 matrix. The most widely recognised layout across UK construction.',
+    pageCount: 8,
+    scoringMethod: 'L_x_S',
+    thumbnailPath: '/rams-templates/thumb-standard-5x5.jpg',
+    previewPaths: [
+      '/rams-templates/preview-standard-5x5-p1.jpg',
+      '/rams-templates/preview-standard-5x5-p2.jpg',
+      '/rams-templates/preview-standard-5x5-p3.jpg',
+    ],
+    keySections: ['5×5 Risk Matrix', '12-Column Hazard Table', '10-Section Method Statement', '15-Row Briefing Record'],
+  },
+  'simple-hml': {
+    slug: 'simple-hml',
+    displayName: 'Simple Risk Rating',
+    description: 'Streamlined format using High / Medium / Low text ratings instead of numerical scores. Fewer columns, faster to complete.',
+    pageCount: 5,
+    scoringMethod: 'HML',
+    thumbnailPath: '/rams-templates/thumb-simple-hml.jpg',
+    previewPaths: [
+      '/rams-templates/preview-simple-hml-p1.jpg',
+      '/rams-templates/preview-simple-hml-p2.jpg',
+      '/rams-templates/preview-simple-hml-p3.jpg',
+    ],
+    keySections: ['H/M/L Colour-Coded Key', '8-Column Risk Table', 'Site Set-Up & Access Section', '12-Row Briefing Record'],
+  },
+  'tier1-formal': {
+    slug: 'tier1-formal',
+    displayName: 'Formal Multi-Section',
+    description: 'Comprehensive format with revision history, roles & responsibilities matrix, COSHH register, lifting operations, and formal close-out. Built for Tier 1 governance.',
+    pageCount: 10,
+    scoringMethod: 'L_x_S',
+    thumbnailPath: '/rams-templates/thumb-tier1-formal.jpg',
+    previewPaths: [
+      '/rams-templates/preview-tier1-formal-p1.jpg',
+      '/rams-templates/preview-tier1-formal-p2.jpg',
+      '/rams-templates/preview-tier1-formal-p3.jpg',
+    ],
+    keySections: ['Revision History', 'Roles & Responsibilities Matrix', 'COSHH Summary', 'Lifting Operations', 'Permit Register', 'Review & Close-Out'],
+  },
+  'cdm-compliant': {
+    slug: 'cdm-compliant',
+    displayName: 'Regulatory Compliant',
+    description: 'CDM 2015-aligned format with duty holder register, pre-construction information, designer residual risks, and construction phase plan cross-references.',
+    pageCount: 9,
+    scoringMethod: 'L_x_S',
+    thumbnailPath: '/rams-templates/thumb-cdm-compliant.jpg',
+    previewPaths: [
+      '/rams-templates/preview-cdm-compliant-p1.jpg',
+      '/rams-templates/preview-cdm-compliant-p2.jpg',
+      '/rams-templates/preview-cdm-compliant-p3.jpg',
+    ],
+    keySections: ['CDM Duty Holders', 'Pre-Construction Information', 'CDM Risk Category Flags', 'Designer Residual Risk Schedule', 'CPP References'],
+  },
+  'narrative': {
+    slug: 'narrative',
+    displayName: 'Narrative Report',
+    description: 'Prose-based format that reads like a professional report. Flowing paragraphs with a clean, readable layout. Ideal when you need a document that tells the story of the work.',
+    pageCount: 8,
+    scoringMethod: 'HML',
+    thumbnailPath: '/rams-templates/thumb-narrative.jpg',
+    previewPaths: [
+      '/rams-templates/preview-narrative-p1.jpg',
+      '/rams-templates/preview-narrative-p2.jpg',
+      '/rams-templates/preview-narrative-p3.jpg',
+    ],
+    keySections: ['Narrative Introduction', 'Prose Descriptions', 'Key Contacts Table', 'Review Notes Column'],
+  },
+  'principal-contractor': {
+    slug: 'principal-contractor',
+    displayName: 'Contractor Governance',
+    description: 'Principal contractor oversight format with subcontractor details, competency verification, insurance register, multi-stage approval chain, and PC amendments log.',
+    pageCount: 9,
+    scoringMethod: 'L_x_S',
+    thumbnailPath: '/rams-templates/thumb-principal-contractor.jpg',
+    previewPaths: [
+      '/rams-templates/preview-principal-contractor-p1.jpg',
+      '/rams-templates/preview-principal-contractor-p2.jpg',
+      '/rams-templates/preview-principal-contractor-p3.jpg',
+    ],
+    keySections: ['PC Organisation', 'Subcontractor Details', 'Competency Verification', 'Insurance Register', '4-Stage Approval Chain', 'PC Amendments Log'],
+  },
+  'compact': {
+    slug: 'compact',
+    displayName: 'Compact Single-Sheet',
+    description: 'Minimum pages for routine, lower-risk tasks. Everything compressed into the tightest format possible with a Key Hazard Summary for toolbox talks.',
+    pageCount: 4,
+    scoringMethod: 'HML',
+    thumbnailPath: '/rams-templates/thumb-compact.jpg',
+    previewPaths: [
+      '/rams-templates/preview-compact-p1.jpg',
+      '/rams-templates/preview-compact-p2.jpg',
+      '/rams-templates/preview-compact-p3.jpg',
+    ],
+    keySections: ['Single-Page Front Cover', 'Key Hazard Summary Table', '7 Combined Sections', '10-Row Briefing Record'],
+  },
+  'rpn': {
+    slug: 'rpn',
+    displayName: 'Three-Factor Scoring',
+    description: 'Uses Likelihood × Severity × Detectability to produce a Risk Priority Number (RPN) out of 125. Includes action bands, detection methods, and controls effectiveness review.',
+    pageCount: 8,
+    scoringMethod: 'L_x_S_x_D',
+    thumbnailPath: '/rams-templates/thumb-rpn.jpg',
+    previewPaths: [
+      '/rams-templates/preview-rpn-p1.jpg',
+      '/rams-templates/preview-rpn-p2.jpg',
+      '/rams-templates/preview-rpn-p3.jpg',
+    ],
+    keySections: ['3-Factor RPN Scoring', 'Detectability Scale', 'RPN Action Bands', '15-Column Risk Table', 'Controls Effectiveness Review'],
+  },
+  'structured-checklist': {
+    slug: 'structured-checklist',
+    displayName: 'Integrated Checklists',
+    description: 'Operational working document with embedded pre-start checks, hold point verification, daily task checklists, and end-of-shift close-down checklists built into the RAMS.',
+    pageCount: 9,
+    scoringMethod: 'L_x_S',
+    thumbnailPath: '/rams-templates/thumb-structured-checklist.jpg',
+    previewPaths: [
+      '/rams-templates/preview-structured-checklist-p1.jpg',
+      '/rams-templates/preview-structured-checklist-p2.jpg',
+      '/rams-templates/preview-structured-checklist-p3.jpg',
+    ],
+    keySections: ['Pre-Start Verification Checklist', 'Hold Points & Inspection Schedule', 'Task-Specific Safety Checklist', 'Close-Down Checklist'],
+  },
+  'step-by-step': {
+    slug: 'step-by-step',
+    displayName: 'Step-by-Step Method',
+    description: 'Combined risk assessment and method statement in one unified table. Each work step has its hazards, controls, and PPE alongside the instruction. How many foremen actually brief work.',
+    pageCount: 6,
+    scoringMethod: 'HML_INTEGRATED',
+    thumbnailPath: '/rams-templates/thumb-step-by-step.jpg',
+    previewPaths: [
+      '/rams-templates/preview-step-by-step-p1.jpg',
+      '/rams-templates/preview-step-by-step-p2.jpg',
+      '/rams-templates/preview-step-by-step-p3.jpg',
+    ],
+    keySections: ['Integrated Step-by-Step Table', 'Toolbox Talk Summary', 'Permit & Isolation Log', 'Supporting Information Only'],
+  },
+};
+
+/** Ordered array for display in the template picker */
+export const TEMPLATE_ORDER: TemplateSlug[] = [
+  'standard-5x5',
+  'simple-hml',
+  'tier1-formal',
+  'cdm-compliant',
+  'narrative',
+  'principal-contractor',
+  'compact',
+  'rpn',
+  'structured-checklist',
+  'step-by-step',
+];
+
+/** Helper to get config by slug */
+export function getTemplateConfig(slug: TemplateSlug): TemplateConfig {
+  return TEMPLATE_CONFIGS[slug];
+}
