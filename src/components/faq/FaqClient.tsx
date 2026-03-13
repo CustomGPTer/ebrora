@@ -7,7 +7,7 @@ import type { FAQSection } from '@/data/faq';
 
 export default function FaqClient() {
     const [openId, setOpenId] = useState<string | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = usehState('');
     const [filteredSections, setFilteredSections] = useState<FAQSection[]>(FAQ_DATA);
 
   // Handle hash on page load
@@ -55,7 +55,7 @@ export default function FaqClient() {
         <>
           {/* Search */}
               <div className="faq-search">
-                      <span className="faq-search__icon">&#128269;</span>span>
+                      <span className="faq-search__icon">{'\u{1F50D}'}</span>span>
                       <input
                                   type="text"
                                   id="faqSearchInput"
@@ -70,7 +70,7 @@ export default function FaqClient() {
           {/* No Results */}
           {!hasResults && searchQuery && (
                   <div className="no-results visible" id="faqNoResults">
-                            <div className="no-results__icon">&#128269;</div>div>
+                            <div className="no-results__icon">{'\u{1F50D}'}</div>div>
                             <h3 className="no-results__title">No matching questions found</h3>h3>
                             <p className="no-results__text">
                                         Try a different search term, or browse the sections below.
@@ -106,7 +106,7 @@ export default function FaqClient() {
                                                                                               aria-expanded={isOpen}
                                                                                             >
                                                                             {item.question}
-                                                                                            <span className="faq-item__arrow">&#9660;</span>span>
+                                                                                            <span className="faq-item__arrow">{'\u25BC'}</span>span>
                                                                           </button>button>
                                                                           <div className="faq-item__answer">
                                                                                             <p dangerouslySetInnerHTML={{ __html: item.answer }} />
