@@ -307,7 +307,7 @@ model UsageRecord {
   @@index([user_id])
   @@index([billing_period_start])
   @@map("usage_records")
-}h
+}
 
 // Logo Model
 model Logo {
