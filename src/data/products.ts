@@ -7,7 +7,7 @@ import type { Product, Category, Review } from '@/lib/types';
  * ============================================================================
  *
  * This file contains ALL product data, category definitions, and customer
- * reviews for the Ebrora website. It is designed for a static GitHub Pages
+ * reviews for the Ebrora website. It is deshigned for a static GitHub Pages
  * site (HTML/CSS/JS only) with no server-side processing.
  *
  * ============================================================================
@@ -98,22 +98,22 @@ import type { Product, Category, Review } from '@/lib/types';
 // ============================================================================
 
 export const CATEGORIES: Record<string, Category> = {
-    hse:            { label: "HSE & Safety",              icon: "ð¦º" },
-    project:        { label: "Project Management",        icon: "ð" },
-    asset:          { label: "Asset & MEICA Tracking",    icon: "ð§" },
-    wastewater:     { label: "Wastewater & Utilities",    icon: "ð§" },
-    cost:           { label: "Cost & Carbon Calculators", icon: "ð°" },
-    planning:       { label: "Construction Planning",     icon: "ð" },
-    inspection:     { label: "Inspection & Testing",      icon: "ð" },
-    registers:      { label: "Registers & Logs",          icon: "ð" },
-    concrete:       { label: "Concrete & Materials",      icon: "ðï¸" },
-    competence:     { label: "Competence & Training",     icon: "ð" },
-    environmental:  { label: "Environmental",             icon: "ð±" },
-    plant:          { label: "Plant & Equipment",         icon: "£ï¸" },
-    daily:          { label: "Daily Operations",          icon: "ð" },
-    commissioning:  { label: "Commissioning & Handover",  icon: "£" },
-    stakeholder:    { label: "Stakeholder & Comms",       icon: "ð£" },
-    temporary:      { label: "Temporary Works",           icon: "ð§" },
+        hse:            { label: "HSE & Safety",                icon: "\uD83D\uDEE1\uFE0F" },
+        project:        { label: "Project Management",          icon: "\uD83D\uDCCA" },
+        asset:          { label: "Asset & MEICA Tracking",      icon: "\uD83C\uDFD7\uFE0F" },
+        wastewater:     { label: "Wastewater & Utilities",      icon: "\uD83D\uDCA7" },
+        cost:           { label: "Cost & Carbon Calculators",   icon: "\uD83D\uDCB0" },
+        planning:       { label: "Construction Planning",       icon: "\uD83D\uDCC5" },
+        inspection:     { label: "Inspection & Testing",        icon: "\uD83D\uDD0D" },
+        registers:      { label: "Registers & Logs",            icon: "\uD83D\uDCCB" },
+        concrete:       { label: "Concrete & Materials",        icon: "\uD83E\uDDF1" },
+        competence:     { label: "Competence & Training",       icon: "\uD83C\uDF93" },
+        environmental:  { label: "Environmental",               icon: "\uD83C\uDF3F" },
+        plant:          { label: "Plant & Equipment",           icon: "\uD83D\uDE9C" },
+        daily:          { label: "Daily Operations",            icon: "\uD83D\uDCDD" },
+        commissioning:  { label: "Commissioning & Handover",    icon: "\uD83C\uDFC1" },
+        stakeholder:    { label: "Stakeholder & Comms",         icon: "\uD83D\uDDE3\uFE0F" },
+        temporary:      { label: "Temporary Works",             icon: "\uD83C\uDFD7\uFE0F" },
 };
 
 
