@@ -7,7 +7,7 @@ import type { Product, Category } from '@/lib/types';
 interface ProductDetailClientProps {
   product: Product;
   related: Product[];
-  categories: Record<string, Category>;
+  categories: Record<string, Category>;h
 }
 
 export default function ProductDetailClient({
@@ -260,38 +260,6 @@ export default function ProductDetailClient({
                   </div>
                 </div>
               )}
-
-            {/* Second Buy Buttons */}
-            <div
-              style={{
-                marginTop: '2rem',
-                paddingTop: '2rem',
-                borderTop: '1px solid var(--color-border)',
-              }}
-            >
-              <div className="product-info__btn-row">
-                <a
-                  href={product.buyLink}
-                  target="_blank"
-                  rel="noopener"
-                  className="btn btn--primary btn--large"
-                >
-                  🛒 Buy Now — {product.price}
-                </a>
-                <a
-                  href={product.pdfLink}
-                  target="_blank"
-                  rel="noopener"
-                  className="btn btn--outline btn--large"
-                >
-                  📄 Download Free PDF
-                </a>
-              </div>
-              <p className="product-info__gumroad-notice">
-                🔒 You&apos;ll be taken to Gumroad.com to complete your purchase securely. Your
-                Excel file will be delivered instantly to your email after payment.
-              </p>
-            </div>
           </div>
         </div>
       </div>
