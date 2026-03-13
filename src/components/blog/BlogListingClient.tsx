@@ -7,7 +7,7 @@ import { BlogPost, BlogCategory } from '@/data/posts';
 interface BlogListingClientProps {
   posts: BlogPost[];
   categories: Record<string, BlogCategory>;
-}
+}h
 
 export default function BlogListingClient({ posts, categories }: BlogListingClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -40,7 +40,7 @@ export default function BlogListingClient({ posts, categories }: BlogListingClie
     <main>
       {/* Page Header */}
       <div className="page-header">
-        <h1>Blog</h1>
+        <h1>Ebrora Blog</h1>
         <p>Excel tips, construction guides, and template tutorials</p>
       </div>
 
