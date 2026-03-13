@@ -7,7 +7,7 @@ import type { Product, Category } from '@/lib/types';
 interface ProductDetailClientProps {
   product: Product;
   related: Product[];
-  categories: Record<string, Category>;h
+  categories: Record<string, Category>;
 }
 
 export default function ProductDetailClient({
