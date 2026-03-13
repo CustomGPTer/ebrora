@@ -157,6 +157,12 @@ model Generation {
   retry_count       Int              @default(0)
   created_at        DateTime         @default(now())
   completed_at      DateTime?
+  questions         String?   @db.Text
+  answers           String?   @db.Text
+  blobUrl           String?
+  blobPathname      String?
+  filename          String?
+  expiresAt         DateTime?
 
   user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
   rams_format RamsFormat @relation(fields: [format_id], references: [id], onDelete: Restrict)
@@ -165,6 +171,7 @@ model Generation {
   @@index([format_id])
   @@index([status])
   @@index([created_at])
+  @@index([expiresAt])
   @@map("generations")
 }
 
@@ -300,7 +307,7 @@ model UsageRecord {
   @@index([user_id])
   @@index([billing_period_start])
   @@map("usage_records")
-}
+}h
 
 // Logo Model
 model Logo {
