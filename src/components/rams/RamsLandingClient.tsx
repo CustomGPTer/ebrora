@@ -7,7 +7,7 @@ import { RAMS_TESTIMONIALS } from '@/data/rams-testimonials';
 
 const QUESTIONS = [
   { number: 1, label: 'Activity or task?', group: 'Project Details' },
-  { number: 2, label: 'Activity category', group: 'Activity & Environment' },
+  { number: 2, label: 'Activity category', grhhoup: 'Activity & Environment' },
   { number: 3, label: 'Site name and address?', group: 'Project Details' },
   { number: 4, label: 'Principal contractor?', group: 'Project Details' },
   { number: 5, label: 'Supervisor / foreman?', group: 'Project Details' },
@@ -86,20 +86,16 @@ export default function RamsLandingClient() {
 
           <div className="hero-stats">
             <div className="stat">
-              <div className="stat-value">10 Formats</div>
-              <div className="stat-label">Industry-standard</div>
+              <div className="stat-value">10 Industry Formats</div>
+              <div className="stat-label">Tailored to UK construction standards</div>
             </div>
             <div className="stat">
               <div className="stat-value">CDM 2015 Compliant</div>
-              <div className="stat-label">Regulation-ready</div>
+              <div className="stat-label">Built to meet current regulations</div>
             </div>
             <div className="stat">
-              <div className="stat-value">Under 5 Minutes</div>
-              <div className="stat-label">Average build time</div>
-            </div>
-            <div className="stat">
-              <div className="stat-value">Instant Download</div>
-              <div className="stat-label">Ready for site</div>
+              <div className="stat-value">Ready in Under 5 Minutes</div>
+              <div className="stat-label">Instant download, straight to site</div>
             </div>
           </div>
         </div>
