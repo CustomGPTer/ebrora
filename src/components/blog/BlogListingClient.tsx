@@ -7,7 +7,7 @@ import { BlogPost, BlogCategory } from '@/data/posts';
 interface BlogListingClientProps {
   posts: BlogPost[];
   categories: Record<string, BlogCategory>;
-}h
+}
 
 export default function BlogListingClient({ posts, categories }: BlogListingClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
