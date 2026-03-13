@@ -1,13 +1,8 @@
 {
-      "buildCommand": "npm run build",
-      "devCommand": "npm run dev",
-      "installCommand": "npm install --legacy-peer-deps",
-      "framework": "nextjs",
-      "regions": ["lhr1"],
-      "crons": [
-              {
-                        "path": "/api/cron/cleanup",
-                        "schedule": "0 */12 * * *"
-              }
-      ]
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-rams",
+      "schedule": "0 */6 * * *"
+    }
+  ]
 }
