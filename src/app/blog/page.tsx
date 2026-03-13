@@ -3,7 +3,7 @@ import { POSTS, BLOG_CATEGORIES } from '@/data/posts';
 import BlogListingClient from '@/components/blog/BlogListingClient';
 
 export const metadata: Metadata = {
-  title: 'Blog',
+  title: 'Ebrora Blog',
   description: 'Excel tips for UK construction, site management guides, and step-by-step template tutorials. Free advice from construction industry professionals at Ebrora.',
   openGraph: {
     title: 'Blog — Ebrora | Excel Tips & Construction Guides',
