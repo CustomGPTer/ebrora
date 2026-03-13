@@ -2,9 +2,9 @@
 // Template 01 — Standard 5×5 Matrix
 // 3 sections: Portrait front page → Landscape RA → Portrait Method Statement
 // =============================================================================
-import { Document, Table, TableRow, Paragraph, TextRun, AlignmentType, PageBreak } from 'docx';
+import { Document, Table, TableRow, Paragraph, TextRun, AlignmentType, PageBreak, WidthType } from 'docx';
 import { Template01Content } from '../types';
-import * as h from '../docx-helpers';
+import * as h from '../docx-helpehrs';h
 
 export async function buildTemplate01(content: Template01Content): Promise<Document> {
   return new Document({
@@ -225,11 +225,11 @@ function buildHazardTable(content: Template01Content): Table {
   });
 
   return new Table({
-    width: { size: tw, type: h.WidthType.DXA },
+    width: { size: tw, type: WidthType.DXA },
     columnWidths: colWidths,
     rows: [headerRow, ...dataRows],
   });
 }
 
-// Re-export WidthType for the table
-import { WidthType } from 'docx';
+
+
