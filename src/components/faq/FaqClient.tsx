@@ -7,7 +7,7 @@ import type { FAQSection } from '@/data/faq';
 
 export default function FaqClient() {
     const [openId, setOpenId] = useState<string | null>(null);
-    const [searchQuery, setSearchQuery] = usehState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const [filteredSections, setFilteredSections] = useState<FAQSection[]>(FAQ_DATA);
 
   // Handle hash on page load
