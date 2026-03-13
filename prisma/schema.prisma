@@ -152,7 +152,6 @@ model Generation {
   file_path         String?
   file_expires_at   DateTime?
   activity_category String?
-  answers           Json?            // JSON object containing Q&A
   error_message     String?
   retry_count       Int              @default(0)
   created_at        DateTime         @default(now())
