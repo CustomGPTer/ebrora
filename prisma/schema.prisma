@@ -325,3 +325,150 @@ model Logo {
   @@index([user_id])
   @@map("logos")
 }
+
+// ============================================================
+// CONTENT MODELS — Toolbox Talks, Free Templates, Free Tools
+// Added for /toolbox-talks, /free-templates, /tools routes
+// ============================================================
+
+// ============================================================
+// CONTENT MODELS - Append to existing prisma/schema.prisma
+// ============================================================
+
+// --- Toolbox Talks ---
+
+model ToolboxCategory {
+  id          String        @id @default(cuid())
+  code        String        @unique // e.g. "02.02.01"
+  name        String        // e.g. "Working at Height"
+  slug        String        @unique // e.g. "working-at-height"
+  description String?
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  talks       ToolboxTalk[]
+
+  @@map("toolbox_categories")
+}
+
+model ToolboxTalk {
+  id          String           @id @default(cuid())
+  categoryId  String
+  category    ToolboxCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title       String           // e.g. "Ladder Safety Essentials"
+  slug        String           // e.g. "ladder-safety-essentials"
+  description String?
+  fileName    String?          // original file name
+  blobUrl     String?          // Vercel Blob URL
+  fileSize    Int?             // bytes
+  isFree      Boolean          @default(true)
+  isPublished Boolean          @default(true)
+  order       Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  downloads   ContentDownload[]
+
+  @@unique([categoryId, slug])
+  @@map("toolbox_talks")
+}
+
+// --- Free Templates ---
+
+enum TemplateFormat {
+  EXCEL
+  WORD
+  POWERPOINT
+}
+
+model FreeTemplateCategory {
+  id          String           @id @default(cuid())
+  name        String           // e.g. "Health & Safety"
+  slug        String           // e.g. "health-and-safety"
+  format      TemplateFormat   // EXCEL, WORD, or POWERPOINT
+  description String?
+  order       Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  templates   FreeTemplate[]
+
+  @@unique([format, slug])
+  @@map("free_template_categories")
+}
+
+model FreeTemplate {
+  id          String                @id @default(cuid())
+  categoryId  String
+  category    FreeTemplateCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String
+  description String?
+  fileName    String?
+  blobUrl     String?
+  fileSize    Int?
+  isPublished Boolean               @default(true)
+  order       Int                   @default(0)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  downloads   ContentDownload[]
+
+  @@unique([categoryId, slug])
+  @@map("free_templates")
+}
+
+// --- Free Tools ---
+
+enum ToolStatus {
+  COMING_SOON
+  LIVE
+}
+
+model FreeTool {
+  id          String     @id @default(cuid())
+  name        String     // e.g. "Manual Handling Risk Score Calculator"
+  slug        String     @unique // e.g. "manual-handling-calculator"
+  description String?
+  features    String?    // comma-separated key features
+  status      ToolStatus @default(COMING_SOON)
+  route       String?    // e.g. "/tools/manual-handling-calculator"
+  gumroadUrl  String?    // link to the Excel version on Gumroad
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("free_tools")
+}
+
+// --- Tracking ---
+
+enum ContentType {
+  TOOLBOX_TALK
+  FREE_TEMPLATE
+}
+
+model ContentDownload {
+  id              String          @id @default(cuid())
+  contentType     ContentType
+  toolboxTalkId   String?
+  toolboxTalk     ToolboxTalk?    @relation(fields: [toolboxTalkId], references: [id], onDelete: SetNull)
+  freeTemplateId  String?
+  freeTemplate    FreeTemplate?   @relation(fields: [freeTemplateId], references: [id], onDelete: SetNull)
+  userId          String?
+  email           String?
+  ipAddress       String?
+  downloadedAt    DateTime        @default(now())
+
+  @@map("content_downloads")
+}
+
+model EmailCapture {
+  id        String   @id @default(cuid())
+  email     String
+  name      String?
+  source    String?  // e.g. "toolbox-talk-download", "free-template-download", "tool-notify"
+  sourceId  String?  // the content ID that triggered the capture
+  createdAt DateTime @default(now())
+
+  @@map("email_captures")
+}
