@@ -34,14 +34,12 @@ export default withAuth(
               '/rams-builder/generating',
               '/rams-builder/download',
             ];
-
-      const isProtectedRamsRoute = protectedRamsRoutes.some(
-              (route) => req.nextUrl.pathname === route
-            );
-
-      if (isProtectedRamsRoute && !req.nextauth.token) {
-              return NextResponse.redirect(new URL('/auth/signin', req.url));
-      }
+          const isProtectedRamsRoute = protectedRamsRoutes.some(
+                  (route) => req.nextUrl.pathname === route
+                );
+          if (isProtectedRamsRoute && !req.nextauth.token) {
+                  return NextResponse.redirect(new URL('/auth/signin', req.url));
+          }
 
       // Check account routes
       if (req.nextUrl.pathname.startsWith('/account') && !req.nextauth.token) {
@@ -55,8 +53,7 @@ export default withAuth(
           response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
           response.headers.set('X-XSS-Protection', '1; mode=block');
           response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-
-      return response;
+          return response;
     },
   {
         callbacks: {
@@ -92,8 +89,9 @@ export default withAuth(
                               pathname.startsWith('/blog/') ||
                               pathname.startsWith('/api/auth') ||
                               pathname.startsWith('/api/payments/webhook') ||
-                              pathname.startsWith('/auth/') ||
                               pathname.startsWith('/api/public/') ||
+                              pathname.startsWith('/api/rams/generate-questions') ||
+                              pathname.startsWith('/auth/') ||
                               pathname === '/sitemap.xml' ||
                               pathname === '/robots.txt' ||
                               /\.(ico|png|jpg|jpeg|svg|gif|webp|css|js|woff|woff2)$/.test(pathname);
