@@ -23,14 +23,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: post.title,
     description: post.excerpt,
+        alternates: {
+                canonical: `https://ebrora.com/blog/${post.id}`,
+        },
     openGraph: {
-      title: `${post.title} — Ebrora Blog`,
+            title: `${post.title} | Ebrora Blog`,
       description: post.excerpt,
       url: `https://ebrora.com/blog/${post.id}`,
       type: 'article',
       publishedTime: post.date,
       images: post.featuredImage ? [{ url: `https://ebrora.com/${post.featuredImage}` }] : [],
     },
+        twitter: {
+                card: 'summary_large_image',
+                title: `${post.title} | Ebrora Blog`,
+                description: post.excerpt,
+                images: post.featuredImage ? [`https://ebrora.com/${post.featuredImage}`] : [],
+        },
   };
 }
 
