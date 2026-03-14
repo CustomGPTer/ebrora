@@ -4927,3 +4927,18 @@ p {
      .questionnaire-label { flex-direction: column; gap: 8px; }
      .questionnaire-page-indicator { flex-direction: column; gap: 8px; align-items: flex-start; }
 }
+
+/* Button block modifier */
+.btn--block {
+       display: block;
+       width: 100%;
+}
+
+/* Auth card Google button fix */
+.auth-card__google {
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       gap: 0.5rem;
+       width: 100%;
+}
