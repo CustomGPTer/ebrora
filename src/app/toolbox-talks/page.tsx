@@ -9,16 +9,26 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 import { RAMS_BUILDER_UPSELL } from "@/data/upsell-config";
 
 export const metadata: Metadata = {
-  title: "Free Toolbox Talks for Construction | Ebrora",
+    title: "Free Toolbox Talks for Construction Sites",
   description:
     "Download free toolbox talks across 27 health and safety categories. Covering working at height, manual handling, excavations, fire safety, confined spaces and more. PDF format, ready to use on site.",
+    alternates: {
+          canonical: "https://ebrora.com/toolbox-talks",
+    },
   openGraph: {
-    title: "Free Toolbox Talks for Construction | Ebrora",
+        title: "Free Toolbox Talks for Construction Sites | Ebrora",
     description:
       "Download free toolbox talks across 27 health and safety categories. PDF format, ready to use on site.",
     url: "https://ebrora.com/toolbox-talks",
     type: "website",
+        images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
   },
+    twitter: {
+          card: "summary_large_image",
+          title: "Free Toolbox Talks for Construction Sites | Ebrora",
+          description: "Free health and safety toolbox talks for construction site teams. PDF format, ready to use on site.",
+          images: ["https://ebrora.com/og-image.jpg"],
+    },
 };
 
 export default async function ToolboxTalksPage() {
