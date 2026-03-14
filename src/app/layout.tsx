@@ -5,6 +5,7 @@ import { Footer } from '@/components/Footer';
 import { CookieBanner } from '@/components/CookieBanner';
 import { BackToTop } from '@/components/BackToTop';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+import AuthProvider from '@/components/auth/AuthProvider';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ebrora.com'),
@@ -103,12 +104,14 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <GoogleAnalytics />
-        <NavBar />
-        <main>{children}</main>
-        <Footer />
-        <BackToTop />
-        <CookieBanner />
+        <AuthProvider>
+          <GoogleAnalytics />
+          <NavBar />
+          <main>{children}</main>
+          <Footer />
+          <BackToTop />
+          <CookieBanner />
+        </AuthProvider>
       </body>
     </html>
   );
