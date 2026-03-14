@@ -31,8 +31,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: product.title,
     description: product.desc,
+        alternates: {
+                canonical: `https://ebrora.com/${product.id}`,
+        },
     openGraph: {
-      title: `${product.title} — Ebrora`,
+            title: `${product.title} | Ebrora`,
       description: product.desc,
       url: `https://ebrora.com/${product.id}`,
       type: 'website',
@@ -40,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${product.title} — Ebrora`,
+            title: `${product.title} | Ebrora`,
       description: product.desc,
       images: [image],
     },
