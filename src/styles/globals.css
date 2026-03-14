@@ -4945,3 +4945,22 @@ p {
        gap: 0.5rem;
        width: 100%;
 }
+
+/* Featured Templates Grid — single row, responsive columns */
+#featuredGrid {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr;
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  #featuredGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  #featuredGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
