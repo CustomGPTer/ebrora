@@ -10,15 +10,25 @@ import { UpsellBanner } from "@/components/shared/UpsellBanner";
 import { RAMS_BUILDER_UPSELL } from "@/data/upsell-config";
 
 export const metadata: Metadata = {
-  title: "Free Construction Tools & Calculators | Ebrora",
+    title: "Free Construction Calculators & Safety Tools",
   description:
     "Free interactive tools for construction site teams. Manual handling calculator, fire risk assessment, materials converter, and confined space category calculator.",
+    alternates: {
+          canonical: "https://ebrora.com/tools",
+    },
   openGraph: {
-    title: "Free Construction Tools & Calculators | Ebrora",
+        title: "Free Construction Calculators & Safety Tools | Ebrora",
     description: "Free interactive calculators for construction health and safety.",
     url: "https://ebrora.com/tools",
     type: "website",
+        images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
   },
+    twitter: {
+          card: "summary_large_image",
+          title: "Free Construction Calculators & Safety Tools | Ebrora",
+          description: "Free interactive construction calculators and safety tools for UK site teams.",
+          images: ["https://ebrora.com/og-image.jpg"],
+    },
 };
 
 export default async function ToolsPage() {
