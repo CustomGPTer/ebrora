@@ -96,8 +96,8 @@ export async function buildTemplate07(content: Template07Content): Promise<Docum
   });
 }
 
-// Need ShadingType for inline risk key
-import { ShadingType } from 'docx';
+
+
 
 function buildCompactInfoGrid(c: Template07Content): Table {
   const tw = h.A4_CONTENT_WIDTH_NARROW;
