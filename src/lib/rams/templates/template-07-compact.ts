@@ -1,7 +1,7 @@
 // =============================================================================
 // Template 07 — Compact (4 pages, lightweight for routine tasks)
 // =============================================================================
-import { Document, Table, TableRow, Paragraph, TextRun, AlignmentType, WidthType } from 'docx';
+import { Document, Table, TableRow, Paragraph, TextRun, AlignmentType, WidthType, ShadingType } from 'docx';
 import { Template07Content } from '../types';
 import * as h from '../docx-helpers';
 
@@ -51,11 +51,11 @@ export async function buildTemplate07(content: Template07Content): Promise<Docum
           // Inline risk key (single line)
           new Paragraph({ spacing: { after: 100 }, children: [
             new TextRun({ text: 'Risk Key:  ', size: 14, font: 'Arial', bold: true }),
-            new TextRun({ text: '  HIGH  ', size: 14, font: 'Arial', bold: true, color: h.WHITE, shading: { type: h.ShadingType.CLEAR, fill: h.HML_HIGH } }),
+            new TextRun({ text: '  HIGH  ', size: 14, font: 'Arial', bold: true, color: h.WHITE, shading: { type: ShadingType.CLEAR, fill: h.HML_HIGH } }),
             new TextRun({ text: '  ', size: 14 }),
-            new TextRun({ text: '  MEDIUM  ', size: 14, font: 'Arial', bold: true, color: h.WHITE, shading: { type: h.ShadingType.CLEAR, fill: h.HML_MEDIUM } }),
+            new TextRun({ text: '  MEDIUM  ', size: 14, font: 'Arial', bold: true, color: h.WHITE, shading: { type: ShadingType.CLEAR, fill: h.HML_MEDIUM } }),
             new TextRun({ text: '  ', size: 14 }),
-            new TextRun({ text: '  LOW  ', size: 14, font: 'Arial', bold: true, color: h.WHITE, shading: { type: h.ShadingType.CLEAR, fill: h.HML_LOW } }),
+            new TextRun({ text: '  LOW  ', size: 14, font: 'Arial', bold: true, color: h.WHITE, shading: { type: ShadingType.CLEAR, fill: h.HML_LOW } }),
           ] }),
           h.spacer(80),
           buildCompactHazardTable(content),
