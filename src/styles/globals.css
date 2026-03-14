@@ -127,9 +127,8 @@ p {
     padding: 0 1.5rem;
 }
 
-.hidden {
-    display: none !important;
-}
+/* Removed !important — was breaking Tailwind responsive overrides like lg:flex */
+/* Tailwind's own .hidden { display: none } handles this */
 
 /* ============================================================================
    3. ANIMATIONS
