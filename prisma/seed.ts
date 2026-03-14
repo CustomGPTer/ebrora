@@ -1,4 +1,5 @@
 import { PrismaClient, PromptType, FieldType, QuestionGroup, SubscriptionTier } from '@prisma/client';
+import { seedContent } from './seed-content';
 
 const prisma = new PrismaClient();
 
@@ -614,6 +615,11 @@ Ensure the document is comprehensive and audit-ready.`,
     }
 
     console.log(`Created ${crossSellTags.length} cross-sell tags`);
+
+    // ============================================
+    // 6. Seed Content (Toolbox Talks, Templates, Tools)
+    // ============================================
+    await seedContent(prisma);
 
     console.log('Database seed completed successfully!');
   } catch (error) {

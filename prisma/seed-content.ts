@@ -1,0 +1,93 @@
+// prisma/seed-content.ts
+// Seeds toolbox talk categories, free template categories, and free tool definitions
+// Exported as a function — called from seed.ts, not run standalone
+
+import { PrismaClient, TemplateFormat, ToolStatus } from "@prisma/client";
+
+const toolboxCategories = [
+  { code: "02.02.01", name: "Working at Height", slug: "working-at-height", description: "Toolbox talks covering ladder safety, scaffold use, edge protection, harness systems, roof work, and fall prevention for construction site teams.", order: 1 },
+  { code: "02.02.02", name: "Manual Handling", slug: "manual-handling", description: "Toolbox talks on safe lifting techniques, MAC and RAPP assessments, team handling, reducing musculoskeletal injuries, and mechanical handling aids.", order: 2 },
+  { code: "02.02.03", name: "Excavations", slug: "excavations", description: "Toolbox talks covering trench safety, shoring and battering, buried services, edge protection, water ingress, and excavation inspections.", order: 3 },
+  { code: "02.02.04", name: "COSHH", slug: "coshh", description: "Toolbox talks on hazardous substances, COSHH assessments, PPE for chemicals, safe storage, exposure limits, and health surveillance.", order: 4 },
+  { code: "02.02.05", name: "Electrical Safety", slug: "electrical-safety", description: "Toolbox talks covering overhead and underground cables, temporary electrics, PAT testing, isolation procedures, and 110V tool safety.", order: 5 },
+  { code: "02.02.06", name: "Fire Safety", slug: "fire-safety", description: "Toolbox talks on fire prevention, extinguisher use, hot works permits, emergency evacuation, site fire risk, and temporary accommodation fire safety.", order: 6 },
+  { code: "02.02.07", name: "Confined Spaces", slug: "confined-spaces", description: "Toolbox talks covering confined space entry procedures, gas monitoring, rescue plans, ventilation, permits to work, and City and Guilds 6160 requirements.", order: 7 },
+  { code: "02.02.08", name: "Plant & Vehicles", slug: "plant-and-vehicles", description: "Toolbox talks on plant safety, banksman procedures, vehicle marshalling, pre-use checks, exclusion zones, and site traffic management.", order: 8 },
+  { code: "02.02.09", name: "PPE", slug: "ppe", description: "Toolbox talks covering personal protective equipment selection, inspection, maintenance, RPE face-fit testing, and PPE compliance on site.", order: 9 },
+  { code: "02.02.10", name: "Slips Trips & Falls", slug: "slips-trips-and-falls", description: "Toolbox talks on housekeeping, walkway management, cable management, wet surfaces, uneven ground, and preventing common site injuries.", order: 10 },
+  { code: "02.02.11", name: "Lifting Operations", slug: "lifting-operations", description: "Toolbox talks covering lift planning, LOLER requirements, sling inspections, exclusion zones, appointed persons, and lifting equipment checks.", order: 11 },
+  { code: "02.02.12", name: "Noise & Vibration", slug: "noise-and-vibration", description: "Toolbox talks on HAVS prevention, noise exposure limits, hearing protection, vibration-reducing tools, health surveillance, and trigger time management.", order: 12 },
+  { code: "02.02.13", name: "Dust & Silica", slug: "dust-and-silica", description: "Toolbox talks covering silica dust risks, RPE selection, dust suppression methods, exposure monitoring, LEV systems, and health surveillance.", order: 13 },
+  { code: "02.02.14", name: "Environmental", slug: "environmental", description: "Toolbox talks on pollution prevention, spill response, waste management, protected species, water course protection, and environmental permits.", order: 14 },
+  { code: "02.02.15", name: "Welfare & Wellbeing", slug: "welfare-and-wellbeing", description: "Toolbox talks covering mental health awareness, fatigue management, hydration, welfare facilities, work-life balance, and site wellbeing initiatives.", order: 15 },
+  { code: "02.02.17", name: "Traffic Management", slug: "traffic-management", description: "Toolbox talks on site traffic plans, pedestrian segregation, speed limits, signage, Chapter 8 requirements, and reversing vehicle procedures.", order: 16 },
+  { code: "02.02.18", name: "Housekeeping", slug: "housekeeping", description: "Toolbox talks covering workplace tidiness, waste segregation, material storage, access route maintenance, and 5S principles on construction sites.", order: 17 },
+  { code: "02.02.19", name: "Behavioural Safety", slug: "behavioural-safety", description: "Toolbox talks on safety culture, near-miss reporting, behavioural observations, complacency, positive interventions, and personal accountability.", order: 18 },
+  { code: "02.02.20", name: "Seasonal Hazards", slug: "seasonal-hazards", description: "Toolbox talks covering winter working, ice and frost, sun exposure, heat stress, wind hazards, flooding risks, and seasonal weather preparations.", order: 19 },
+  { code: "02.02.21", name: "General & Other", slug: "general-and-other", description: "General toolbox talks covering miscellaneous safety topics, site rules, induction refreshers, safety stand-downs, and cross-cutting awareness items.", order: 20 },
+  { code: "02.02.22", name: "Power & Hand Tools", slug: "power-and-hand-tools", description: "Toolbox talks on angle grinder safety, disc cutter use, drill safety, hand tool inspections, guards, and correct tool selection for the task.", order: 21 },
+  { code: "02.02.23", name: "Water & Flooding", slug: "water-and-flooding", description: "Toolbox talks covering working near water, flood risk, dewatering, temporary dams, drowning prevention, and wet weather contingency plans.", order: 22 },
+  { code: "02.02.24", name: "Cranes & Lifting", slug: "cranes-and-lifting", description: "Toolbox talks on crane operations, outrigger setup, load charts, wind speed limits, lifting accessories, and crane exclusion zones.", order: 23 },
+  { code: "02.02.25", name: "First Aid & Emergency", slug: "first-aid-and-emergency", description: "Toolbox talks covering first aid provision, emergency procedures, AED use, incident reporting, muster points, and emergency contact arrangements.", order: 24 },
+  { code: "02.02.26", name: "Asbestos", slug: "asbestos", description: "Toolbox talks on asbestos awareness, refurbishment and demolition surveys, licensed and non-licensed work, duty to manage, and emergency procedures.", order: 25 },
+  { code: "02.02.27", name: "Site Security & Access", slug: "site-security-and-access", description: "Toolbox talks covering site security, access control, visitor management, theft prevention, perimeter fencing, and out-of-hours arrangements.", order: 26 },
+  { code: "02.02.28", name: "Welfare & Hygiene", slug: "welfare-and-hygiene", description: "Toolbox talks on hand hygiene, welfare facility standards, dermatitis prevention, food hygiene, Weil's disease awareness, and occupational health basics.", order: 27 },
+];
+
+const templateCategories = [
+  { name: "Project Management", slug: "project-management", format: TemplateFormat.EXCEL, description: "Free Excel project management templates including trackers, logs, registers, and scheduling tools for construction projects.", order: 1 },
+  { name: "Health & Safety", slug: "health-and-safety", format: TemplateFormat.EXCEL, description: "Free Excel health and safety templates including risk assessments, inspection checklists, COSHH registers, and permit trackers.", order: 2 },
+  { name: "Quality Management", slug: "quality-management", format: TemplateFormat.EXCEL, description: "Free Excel quality management templates including ITPs, NCR logs, snag lists, and inspection registers for construction.", order: 3 },
+  { name: "Environmental", slug: "environmental", format: TemplateFormat.EXCEL, description: "Free Excel environmental templates including waste transfer logs, carbon trackers, spill response records, and environmental checklists.", order: 4 },
+  { name: "Programme & Planning", slug: "programme-and-planning", format: TemplateFormat.EXCEL, description: "Free Excel planning templates including Gantt charts, lookahead programmes, milestone trackers, and resource allocation sheets.", order: 5 },
+  { name: "Commercial & QS", slug: "commercial-and-qs", format: TemplateFormat.EXCEL, description: "Free Excel commercial templates including valuation trackers, cost schedules, variation registers, and interim payment calculators.", order: 6 },
+  { name: "Site Management", slug: "site-management", format: TemplateFormat.EXCEL, description: "Free Excel site management templates including daily reports, allocation sheets, attendance logs, and delivery booking systems.", order: 7 },
+  { name: "Plant & Equipment", slug: "plant-and-equipment", format: TemplateFormat.EXCEL, description: "Free Excel plant templates including pre-use check sheets, maintenance logs, plant registers, and equipment allocation trackers.", order: 8 },
+  { name: "Training & Competence", slug: "training-and-competence", format: TemplateFormat.EXCEL, description: "Free Excel training templates including competence matrices, induction records, training needs analyses, and certification trackers.", order: 9 },
+  { name: "Temporary Works", slug: "temporary-works", format: TemplateFormat.WORD, description: "Free Word temporary works templates including TWC registers, design check requests, briefing records, and inspection checklists.", order: 10 },
+  { name: "Subcontractor Management", slug: "subcontractor-management", format: TemplateFormat.WORD, description: "Free Word subcontractor templates including performance scorecards, pre-start meeting agendas, payment certification forms, and compliance checklists.", order: 11 },
+  { name: "Document Control", slug: "document-control", format: TemplateFormat.WORD, description: "Free Word document control templates including transmittal forms, drawing registers, document review logs, and revision tracking sheets.", order: 12 },
+  { name: "Meeting & Communication", slug: "meeting-and-communication", format: TemplateFormat.WORD, description: "Free Word meeting templates including minutes formats, briefing pack structures, progress meeting agendas, and action tracking sheets.", order: 13 },
+  { name: "Reporting", slug: "reporting", format: TemplateFormat.POWERPOINT, description: "Free PowerPoint reporting templates including weekly and monthly progress reports, KPI dashboards, and management summary presentations.", order: 14 },
+  { name: "Handover & Completion", slug: "handover-and-completion", format: TemplateFormat.POWERPOINT, description: "Free PowerPoint handover templates including O&M submission checklists, practical completion packs, snagging presentations, and close-out reports.", order: 15 },
+];
+
+const freeTools = [
+  { name: "Manual Handling Risk Score Calculator", slug: "manual-handling-calculator", description: "Score manual handling tasks using HSE's MAC (lift, carry, team handling) and RAPP (push and pull) methodologies. Includes a 120+ civil engineering task library with suggested handling types, automatic risk banding, and colour-coded output.", features: "Combined MAC + RAPP scoring,120+ task library,Auto risk banding,Lift/Carry/Team/Push and Pull,Printable output", status: ToolStatus.COMING_SOON, route: "/tools/manual-handling-calculator", gumroadUrl: "https://ebrora.gumroad.com/l/manual-handling-risk-score-calculator", order: 1 },
+  { name: "Office Fire Risk Assessment", slug: "fire-risk-assessment", description: "Complete fire risk assessment system for construction site offices. 38 fire safety questions across 17 sections with automated compliance scoring, 5x5 risk matrix, live dashboard, and action plan tracker.", features: "38 questions across 17 sections,5x5 risk matrix,Live dashboard,Action plan tracker,Fire Safety Order 2005 aligned", status: ToolStatus.COMING_SOON, route: "/tools/fire-risk-assessment", gumroadUrl: "https://ebrora.gumroad.com/l/office-fire-risk-assessment", order: 2 },
+  { name: "Civil Engineering Materials Converter", slug: "materials-converter", description: "Convert between tonnes, cubic metres, kilograms, litres, square metres, bulk bags, and wagon loads for 100+ civil engineering materials. Includes loose and compacted densities, cost estimating, and embodied carbon calculations.", features: "100+ materials,7 unit types,Loose vs compacted density,Cost estimating,ICE v3 carbon factors", status: ToolStatus.COMING_SOON, route: "/tools/materials-converter", gumroadUrl: "https://ebrora.gumroad.com/l/civil-engineering-materials-converter", order: 3 },
+  { name: "Confined Space Category Calculator", slug: "confined-space-calculator", description: "Calculate the confined space risk category (NC1 Low Risk through to NC4 High Risk with Rescue) using a weighted scoring system covering specified risks, depth, access, ventilation, atmosphere, and communication.", features: "NC1 to NC4 categories,Weighted scoring,Full requirements output,C&G 6160 mapping,Equipment and permit requirements", status: ToolStatus.COMING_SOON, route: "/tools/confined-space-calculator", gumroadUrl: "https://ebrora.gumroad.com/l/confined-space-calculator", order: 4 },
+];
+
+export async function seedContent(prisma: PrismaClient) {
+  console.log("Seeding content data...");
+
+  console.log("  Seeding 27 toolbox talk categories...");
+  for (const cat of toolboxCategories) {
+    await prisma.toolboxCategory.upsert({
+      where: { code: cat.code },
+      update: { name: cat.name, slug: cat.slug, description: cat.description, order: cat.order },
+      create: cat,
+    });
+  }
+
+  console.log("  Seeding 15 free template categories...");
+  for (const cat of templateCategories) {
+    await prisma.freeTemplateCategory.upsert({
+      where: { format_slug: { format: cat.format, slug: cat.slug } },
+      update: { name: cat.name, description: cat.description, order: cat.order },
+      create: cat,
+    });
+  }
+
+  console.log("  Seeding 4 free tool definitions...");
+  for (const tool of freeTools) {
+    await prisma.freeTool.upsert({
+      where: { slug: tool.slug },
+      update: { name: tool.name, description: tool.description, features: tool.features, status: tool.status, route: tool.route, gumroadUrl: tool.gumroadUrl, order: tool.order },
+      create: tool,
+    });
+  }
+
+  console.log("  Content seed complete (27 categories + 15 templates + 4 tools).");
+}
