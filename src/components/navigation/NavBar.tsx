@@ -17,7 +17,6 @@ export function NavBar() {
   const resourcesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { data: session, status } = useSession();
 
-  // Scroll detection for sticky header
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -26,13 +25,11 @@ export function NavBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileOpen(false);
     setIsResourcesOpen(false);
   }, [pathname]);
 
-  // Close resources dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -46,7 +43,6 @@ export function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileOpen) {
       document.body.style.overflow = "hidden";
@@ -114,7 +110,7 @@ export function NavBar() {
               </span>
             </Link>
 
-            {/* Desktop nav links */}
+            {/* Desktop-only nav links (>=1024px) */}
             <div className="hidden lg:flex items-center gap-7">
               <Link
                 href="/#products"
@@ -181,7 +177,6 @@ export function NavBar() {
                     />
                   </svg>
                 </button>
-
                 <ResourcesDropdown
                   isOpen={isResourcesOpen}
                   onClose={() => setIsResourcesOpen(false)}
@@ -197,9 +192,109 @@ export function NavBar() {
               </Link>
             </div>
 
-            {/* Right side: Login/Account + Hamburger */}
-            <div className="flex items-center gap-3">
-              {/* Login / Account button — desktop only */}
+            {/* Right side: always-visible items + hamburger */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Compact nav links — visible at <1024px */}
+              <div className="flex lg:hidden items-center gap-1 sm:gap-2">
+                {/* Resources dropdown — compact */}
+                <div
+                  ref={resourcesRef}
+                  className="relative"
+                >
+                  <button
+                    onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+                    className={`flex items-center gap-0.5 text-xs sm:text-sm font-medium transition-colors duration-200 px-2 py-1.5 rounded-md ${
+                      isActive("/toolbox-talks") ||
+                      isActive("/tools") ||
+                      isActive("/free-templates")
+                        ? "text-[#1B5B50]"
+                        : "text-gray-700 hover:text-[#1B5B50]"
+                    }`}
+                    aria-expanded={isResourcesOpen}
+                    aria-haspopup="true"
+                  >
+                    Resources
+                    <svg
+                      className={`w-3 h-3 transition-transform duration-200 ${
+                        isResourcesOpen ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  <ResourcesDropdown
+                    isOpen={isResourcesOpen}
+                    onClose={() => setIsResourcesOpen(false)}
+                  />
+                </div>
+
+                {/* RAMS Builder — compact, no "New" badge below 1024px */}
+                <Link
+                  href="/rams-builder"
+                  className={`text-xs sm:text-sm font-medium transition-colors duration-200 px-2 py-1.5 rounded-md ${
+                    isActive("/rams-builder")
+                      ? "text-[#1B5B50]"
+                      : "text-gray-700 hover:text-[#1B5B50]"
+                  }`}
+                >
+                  RAMS Builder
+                </Link>
+
+                {/* Login / Account — compact */}
+                {status === "loading" ? (
+                  <div className="w-14 h-8 bg-gray-100 rounded-md animate-pulse" />
+                ) : session ? (
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs sm:text-sm font-medium text-[#1B5B50] border border-[#1B5B50]/20 rounded-md hover:bg-[#1B5B50]/5 transition-colors"
+                  >
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                      />
+                    </svg>
+                    Account
+                  </Link>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs sm:text-sm font-medium text-white bg-[#1B5B50] rounded-md hover:bg-[#144840] transition-colors"
+                  >
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+                      />
+                    </svg>
+                    Login
+                  </Link>
+                )}
+              </div>
+
+              {/* Login / Account button — desktop only (>=1024px) */}
               <div className="hidden lg:block">
                 {status === "loading" ? (
                   <div className="w-20 h-9 bg-gray-100 rounded-lg animate-pulse" />
@@ -246,7 +341,7 @@ export function NavBar() {
                 )}
               </div>
 
-              {/* Hamburger button — mobile/tablet */}
+              {/* Hamburger button — below 1024px */}
               <button
                 className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors"
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -276,7 +371,7 @@ export function NavBar() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile/tablet menu */}
       <MobileMenu isOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)} />
 
       {/* Spacer so content doesn't go under fixed nav */}
