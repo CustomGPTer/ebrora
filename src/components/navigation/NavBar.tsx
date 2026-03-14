@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { MobileMenu } from "./MobileMenu";
 import { ResourcesDropdown } from "./ResourcesDropdown";
 
@@ -14,6 +15,7 @@ export function NavBar() {
   const pathname = usePathname();
   const resourcesRef = useRef<HTMLDivElement>(null);
   const resourcesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { data: session, status } = useSession();
 
   // Scroll detection for sticky header
   useEffect(() => {
@@ -77,12 +79,12 @@ export function NavBar() {
   const navLinkClasses = (href: string) =>
     `relative text-sm font-medium transition-colors duration-200 ${
       isActive(href)
-        ? "text-[#1B5745]"
-        : "text-gray-700 hover:text-[#1B5745]"
+        ? "text-[#1B5B50]"
+        : "text-gray-700 hover:text-[#1B5B50]"
     }`;
 
   const activeUnderline = (href: string) =>
-    `absolute -bottom-1 left-0 h-0.5 bg-[#1B5745] transition-all duration-200 ${
+    `absolute -bottom-1 left-0 h-0.5 bg-[#1B5B50] transition-all duration-200 ${
       isActive(href) ? "w-full" : "w-0 group-hover:w-full"
     }`;
 
@@ -101,10 +103,11 @@ export function NavBar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <span className="w-9 h-9 rounded-lg bg-[#1B5745] flex items-center justify-center text-white text-sm font-bold">
+              <span className="w-9 h-9 rounded-lg bg-[#1B5B50] flex items-center justify-center text-white text-sm font-bold">
                 E
               </span>
-              <span className="text-[#1B5745] text-xl font-bold tracking-tight"
+              <span
+                className="text-[#1B5B50] text-xl font-bold tracking-tight"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 Ebrora
@@ -113,9 +116,33 @@ export function NavBar() {
 
             {/* Desktop nav links */}
             <div className="hidden lg:flex items-center gap-7">
-              <Link href="/#products" className={`group ${navLinkClasses("/#products")}`}>
+              <Link
+                href="/#products"
+                className={`group ${navLinkClasses("/#products")}`}
+              >
                 Templates
                 <span className={activeUnderline("/#products")} />
+              </Link>
+
+              <Link
+                href="/blog"
+                className={`group ${navLinkClasses("/blog")}`}
+              >
+                Blog
+                <span className={activeUnderline("/blog")} />
+              </Link>
+
+              <Link
+                href="/rams-builder"
+                className={`group ${navLinkClasses("/rams-builder")}`}
+              >
+                <span className="flex items-center gap-1.5">
+                  RAMS Builder
+                  <span className="text-[10px] font-semibold uppercase tracking-wider bg-[#1B5B50] text-white px-1.5 py-0.5 rounded">
+                    New
+                  </span>
+                </span>
+                <span className={activeUnderline("/rams-builder")} />
               </Link>
 
               {/* Resources dropdown */}
@@ -131,8 +158,8 @@ export function NavBar() {
                     isActive("/toolbox-talks") ||
                     isActive("/tools") ||
                     isActive("/free-templates")
-                      ? "text-[#1B5745]"
-                      : "text-gray-700 hover:text-[#1B5745]"
+                      ? "text-[#1B5B50]"
+                      : "text-gray-700 hover:text-[#1B5B50]"
                   }`}
                   aria-expanded={isResourcesOpen}
                   aria-haspopup="true"
@@ -147,7 +174,11 @@ export function NavBar() {
                     stroke="currentColor"
                     strokeWidth={2.5}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
 
@@ -157,62 +188,90 @@ export function NavBar() {
                 />
               </div>
 
-              <Link href="/blog" className={`group ${navLinkClasses("/blog")}`}>
-                Blog
-                <span className={activeUnderline("/blog")} />
-              </Link>
-
-              <Link href="/rams-builder" className={`group ${navLinkClasses("/rams-builder")}`}>
-                <span className="flex items-center gap-1.5">
-                  RAMS Builder
-                  <span className="text-[10px] font-semibold uppercase tracking-wider bg-[#1B5745] text-white px-1.5 py-0.5 rounded">
-                    New
-                  </span>
-                </span>
-                <span className={activeUnderline("/rams-builder")} />
-              </Link>
-
-              <Link href="/faq" className={`group ${navLinkClasses("/faq")}`}>
+              <Link
+                href="/faq"
+                className={`group ${navLinkClasses("/faq")}`}
+              >
                 FAQ
                 <span className={activeUnderline("/faq")} />
               </Link>
-
-              <Link href="/#about" className={`group ${navLinkClasses("/#about")}`}>
-                About
-                <span className={activeUnderline("/#about")} />
-              </Link>
-
-              <Link href="/#contact" className={`group ${navLinkClasses("/#contact")}`}>
-                Contact
-                <span className={activeUnderline("/#contact")} />
-              </Link>
             </div>
 
-            {/* Hamburger button - mobile/tablet */}
-            <button
-              className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors"
-              onClick={() => setIsMobileOpen(!isMobileOpen)}
-              aria-label={isMobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={isMobileOpen}
-            >
-              <div className="w-5 h-4 flex flex-col justify-between">
-                <span
-                  className={`block h-0.5 w-5 bg-gray-700 rounded-full transition-all duration-300 origin-center ${
-                    isMobileOpen ? "rotate-45 translate-y-[7px]" : ""
-                  }`}
-                />
-                <span
-                  className={`block h-0.5 w-5 bg-gray-700 rounded-full transition-all duration-300 ${
-                    isMobileOpen ? "opacity-0 scale-0" : ""
-                  }`}
-                />
-                <span
-                  className={`block h-0.5 w-5 bg-gray-700 rounded-full transition-all duration-300 origin-center ${
-                    isMobileOpen ? "-rotate-45 -translate-y-[7px]" : ""
-                  }`}
-                />
+            {/* Right side: Login/Account + Hamburger */}
+            <div className="flex items-center gap-3">
+              {/* Login / Account button — desktop only */}
+              <div className="hidden lg:block">
+                {status === "loading" ? (
+                  <div className="w-20 h-9 bg-gray-100 rounded-lg animate-pulse" />
+                ) : session ? (
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#1B5B50] border border-[#1B5B50]/20 rounded-lg hover:bg-[#1B5B50]/5 transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                      />
+                    </svg>
+                    Account
+                  </Link>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#1B5B50] rounded-lg hover:bg-[#144840] transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+                      />
+                    </svg>
+                    Login
+                  </Link>
+                )}
               </div>
-            </button>
+
+              {/* Hamburger button — mobile/tablet */}
+              <button
+                className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => setIsMobileOpen(!isMobileOpen)}
+                aria-label={isMobileOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isMobileOpen}
+              >
+                <div className="w-5 h-4 flex flex-col justify-between">
+                  <span
+                    className={`block h-0.5 w-5 bg-gray-700 rounded-full transition-all duration-300 origin-center ${
+                      isMobileOpen ? "rotate-45 translate-y-[7px]" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-0.5 w-5 bg-gray-700 rounded-full transition-all duration-300 ${
+                      isMobileOpen ? "opacity-0 scale-0" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-0.5 w-5 bg-gray-700 rounded-full transition-all duration-300 origin-center ${
+                      isMobileOpen ? "-rotate-45 -translate-y-[7px]" : ""
+                    }`}
+                  />
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
