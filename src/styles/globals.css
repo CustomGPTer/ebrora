@@ -4949,8 +4949,10 @@ p {
 /* Featured Templates Grid — single row, responsive columns */
 #featuredGrid {
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: 1fr;
+  grid-template-rows: auto;
+  grid-auto-rows: 0;
   overflow: hidden;
+  gap: 1.5rem;
 }
 
 @media (max-width: 1024px) {
