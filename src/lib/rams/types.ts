@@ -85,6 +85,8 @@ export interface BaseDocumentContent {
   environmentalConsiderations: string;
   wasteManagement: string;
   additionalNotes?: string;
+    approvedBy?: string;
+    reviewedBy?: string;
 }
 
 /** Standard hazard row with L×S scoring */
