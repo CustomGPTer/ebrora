@@ -8,15 +8,25 @@ import { UpsellBanner } from "@/components/shared/UpsellBanner";
 import { RAMS_BUILDER_UPSELL } from "@/data/upsell-config";
 
 export const metadata: Metadata = {
-  title: "Free Construction Templates | Excel, Word, PowerPoint | Ebrora",
+    title: "Free Construction Templates in Excel, Word & PPT",
   description:
     "Download free construction templates across 15 categories. Excel spreadsheets, Word documents, and PowerPoint presentations for site management, health and safety, quality, and more.",
+    alternates: {
+          canonical: "https://ebrora.com/free-templates",
+    },
   openGraph: {
-    title: "Free Construction Templates | Ebrora",
+        title: "Free Construction Templates in Excel, Word & PPT | Ebrora",
     description: "Free Excel, Word, and PowerPoint templates for construction teams.",
     url: "https://ebrora.com/free-templates",
     type: "website",
+        images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
   },
+    twitter: {
+          card: "summary_large_image",
+          title: "Free Construction Templates in Excel, Word & PPT | Ebrora",
+          description: "Free construction templates for site management, health and safety, quality and more.",
+          images: ["https://ebrora.com/og-image.jpg"],
+    },
 };
 
 const FORMAT_CARDS = [
