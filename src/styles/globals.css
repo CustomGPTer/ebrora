@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ============================================================================
    globals.css — Ebrora Global Stylesheet (Next.js)
    ============================================================================
