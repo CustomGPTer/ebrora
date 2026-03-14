@@ -4,7 +4,7 @@
 // =============================================================================
 import { Document, Table, TableRow, Paragraph, TextRun, AlignmentType, PageBreak, WidthType } from 'docx';
 import { Template01Content } from '../types';
-import * as h from '../docx-helpehrs';h
+import * as h from '../docx-helpers';
 
 export async function buildTemplate01(content: Template01Content): Promise<Document> {
   return new Document({
