@@ -1,24 +1,49 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Page Not Found',
-  description: 'The page you are looking for could not be found.',
+    title: '404 – Page Not Found | Ebrora',
+    description: 'Sorry, the page you were looking for could not be found.',
+    robots: {
+          index: false,
+          follow: false,
+    },
 };
 
 export default function NotFound() {
-  return (
-    <div className="not-found-container">
-      <div className="product-404">
-        <div className="product-404__icon">🔍</div>
-        <h1 className="product-404__title">Page Not Found</h1>
-        <p className="product-404__text">
-          Sorry, we couldn't find the page you're looking for. It may have been moved or removed.
-        </p>
-        <Link href="/#products" className="btn btn--primary btn--large">
-          Browse All Templates
-        </Link>
-      </div>
-    </div>
-  );
-}
+    return (
+          <div
+                  style={{
+                            minHeight: '60vh',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexDirection: 'column',
+                            gap: '1rem',
+                            padding: '2rem',
+                            textAlign: 'center',
+                  }}
+                >
+                <h1 style={{ fontSize: '3rem', fontWeight: 700, color: '#1B5745' }}>404</h1>h1>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#1a1a1a' }}>Page Not Found</h2>h2>
+                <p style={{ color: '#666', maxWidth: '420px' }}>
+                        Sorry, the page you were looking for could not be found. It may have moved or been removed.
+                </p>p>
+                <Link
+                          href="/"
+                          style={{
+                                      display: 'inline-block',
+                                      padding: '0.75rem 1.5rem',
+                                      backgroundColor: '#1B5745',
+                                      color: '#fff',
+                                      borderRadius: '0.5rem',
+                                      textDecoration: 'none',
+                                      fontWeight: 600,
+                                      marginTop: '0.5rem',
+                          }}
+                        >
+                        Return to Homepage
+                </Link>Link>
+          </div>div>
+        );
+}</div>
