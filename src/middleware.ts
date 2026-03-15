@@ -1,5 +1,6 @@
 import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import type { JWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
@@ -13,9 +14,27 @@ declare module 'next-auth' {
   }
 }
 
+// Enforce www canonical domain at middleware level.
+// ebrora.com (non-www) is flagged by Google Safe Browsing as deceptive;
+// www.ebrora.com is clean. Any request arriving on the bare domain
+// is permanently redirected to www before any auth logic runs.
+function wwwRedirect(req: NextRequest): NextResponse | null {
+    const host = req.headers.get('host') || '';
+    if (host === 'ebrora.com' || host === 'ebrora.com:443') {
+          const url = req.nextUrl.clone();
+          url.host = 'www.ebrora.com';
+          return NextResponse.redirect(url, { status: 301 });
+    }
+    return null;
+}
+
 export default withAuth(
     function middleware(req) {
-          // Redirect /index.html to / for SEO
+          // Redirect bare domain to www before anything else
+      const wwwResponse = wwwRedirect(req);
+          if (wwwResponse) return wwwResponse;
+
+      // Redirect /index.html to / for SEO
       if (req.nextUrl.pathname === '/index.html') {
               return NextResponse.redirect(new URL('/', req.url));
       }
