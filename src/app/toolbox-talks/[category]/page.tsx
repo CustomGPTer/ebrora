@@ -7,7 +7,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 import { ContentGrid } from "@/components/shared/ContentGrid";
 import { DownloadCard } from "@/components/shared/DownloadCard";
 import { UpsellBanner } from "@/components/shared/UpsellBanner";
-import {
+import {h
   TOOLBOX_UPSELLS,
   DEFAULT_PRODUCT_UPSELL,
   RAMS_BUILDER_UPSELL,
@@ -33,7 +33,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: category.description || `Free ${category.name} toolbox talks for construction.`,
       url: `https://ebrora.com/toolbox-talks/${slug}`,
       type: "website",
+            images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
     },
+        alternates: {
+                canonical: `https://ebrora.com/toolbox-talks/${slug}`,
+        },
+        twitter: {
+                card: "summary_large_image",
+                title: `${category.name} Toolbox Talks | Ebrora`,
+                description: category.description || `Free ${category.name} toolbox talks for construction site teams.`,
+                images: ["https://ebrora.com/og-image.jpg"],
+        },
   };
 }
 
