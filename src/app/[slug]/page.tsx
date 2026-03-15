@@ -8,14 +8,12 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-// Generate static params for all products
 export async function generateStaticParams() {
   return PRODUCTS.map((product) => ({
     slug: product.id,
   }));
 }
 
-// Generate metadata for each product
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = PRODUCTS.find((p) => p.id === slug);
@@ -49,7 +47,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-// Parse price string to number
 function parsePrice(priceStr: string): number {
   if (!priceStr) return 0;
   const num = priceStr.replace(/[^0-9.]/g, '');
@@ -63,7 +60,6 @@ export default async function ProductPage({ params }: PageProps) {
     notFound();
   }
 
-  // Find related products (same categories, excluding current, sorted by popularity, max 4)
   const related = PRODUCTS
     .filter(
       (p) =>
@@ -73,7 +69,6 @@ export default async function ProductPage({ params }: PageProps) {
     .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
     .slice(0, 4);
 
-  // Schema.org Product JSON-LD
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
