@@ -2,15 +2,17 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { RAMS_TEMPLATES, FREE_TEMPLATES, getTemplateAccess } from '@/lib/rams/template-config';
+import { TEMPLATE_CONFIGS, TEMPLATE_ORDER } from '@/lib/rams/template-config';
+import { TemplateSlug } from '@/lib/rams/types';
 
-interface TemplatePicker {
+// Free tier: first 2 templates only
+const FREE_TEMPLATES: TemplateSlug[] = ['standard-5x5', 'simple-hml'];
+
+interface TemplatePickerProps {
   onSelect: (templateId: string) => void;
-  monthlyUsage?: number;
-  monthlyLimit?: number;
 }
 
-export default function TemplatePicker({ onSelect }: TemplatePicker) {
+export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -18,28 +20,29 @@ export default function TemplatePicker({ onSelect }: TemplatePicker) {
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
   const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
 
-  const handleTemplateSelect = (templateId: string) => {
-    if (!isAuthenticated) {
+  const canAccessTemplate = (slug: TemplateSlug): boolean => {
+    if (!isAuthenticated) return false;
+    if (isPaid) return true;
+    return FREE_TEMPLATES.includes(slug);
+  };
+
+  const getTemplateStatus = (slug: TemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => {
+    if (!isAuthenticated) return 'locked-auth';
+    if (canAccessTemplate(slug)) return 'available';
+    return 'locked-upgrade';
+  };
+
+  const handleTemplateSelect = (slug: TemplateSlug) => {
+    const templateStatus = getTemplateStatus(slug);
+    if (templateStatus === 'locked-auth') {
       router.push('/auth/login?callbackUrl=/rams-builder');
       return;
     }
-
-    const access = getTemplateAccess(templateId, userPlan);
-    if (!access.canAccess) {
-      if (access.reason === 'upgrade') {
-        router.push('/pricing');
-      }
+    if (templateStatus === 'locked-upgrade') {
+      router.push('/pricing');
       return;
     }
-
-    onSelect(templateId);
-  };
-
-  const getTemplateStatus = (templateId: string) => {
-    if (!isAuthenticated) return 'locked-auth';
-    const access = getTemplateAccess(templateId, userPlan);
-    if (!access.canAccess) return 'locked-upgrade';
-    return 'available';
+    onSelect(slug);
   };
 
   return (
@@ -53,27 +56,28 @@ export default function TemplatePicker({ onSelect }: TemplatePicker) {
         )}
         {isAuthenticated && !isPaid && (
           <p className="template-picker__subtitle">
-            Free plan: 2 templates available. Upgrade for all templates.
+            Free plan: 2 templates available. Upgrade for all 10 templates.
           </p>
         )}
       </div>
 
       <div className="template-picker__grid">
-        {RAMS_TEMPLATES.map((template) => {
-          const status = getTemplateStatus(template.id);
-          const isLocked = status !== 'available';
-          const isFreeTemplate = FREE_TEMPLATES.includes(template.id);
+        {TEMPLATE_ORDER.map((slug) => {
+          const template = TEMPLATE_CONFIGS[slug];
+          const templateStatus = getTemplateStatus(slug);
+          const isLocked = templateStatus !== 'available';
+          const isFreeTemplate = FREE_TEMPLATES.includes(slug);
 
           return (
             <div
-              key={template.id}
+              key={slug}
               className={`template-card ${isLocked ? 'template-card--locked' : 'template-card--available'}`}
             >
               <div className="template-card__header">
-                <h3 className="template-card__title">{template.name}</h3>
+                <h3 className="template-card__title">{template.displayName}</h3>
                 {isLocked && (
                   <span className="template-card__badge">
-                    {status === 'locked-auth' ? 'Sign In' : 'Upgrade'}
+                    {templateStatus === 'locked-auth' ? 'Sign In' : 'Upgrade'}
                   </span>
                 )}
                 {!isLocked && isFreeTemplate && (
@@ -83,17 +87,21 @@ export default function TemplatePicker({ onSelect }: TemplatePicker) {
 
               <p className="template-card__description">{template.description}</p>
 
+              <div className="template-card__meta">
+                <span>{template.pageCount} pages</span>
+              </div>
+
               <div className="template-card__footer">
-                {status === 'available' && (
+                {templateStatus === 'available' && (
                   <button
                     className="btn btn--primary btn--small"
-                    onClick={() => handleTemplateSelect(template.id)}
+                    onClick={() => handleTemplateSelect(slug)}
                   >
                     Use This Template
                   </button>
                 )}
 
-                {status === 'locked-auth' && (
+                {templateStatus === 'locked-auth' && (
                   <div className="template-card__locked-actions">
                     <div className="template-card__lock-icon">
                       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -116,7 +124,7 @@ export default function TemplatePicker({ onSelect }: TemplatePicker) {
                   </div>
                 )}
 
-                {status === 'locked-upgrade' && (
+                {templateStatus === 'locked-upgrade' && (
                   <div className="template-card__locked-actions">
                     <div className="template-card__lock-icon">
                       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
