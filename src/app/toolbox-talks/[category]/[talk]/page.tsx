@@ -36,7 +36,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: talk.description || `Free toolbox talk on ${talk.title}.`,
       url: `https://ebrora.com/toolbox-talks/${catSlug}/${talkSlug}`,
       type: "article",
+            images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
     },
+        alternates: {
+                canonical: `https://ebrora.com/toolbox-talks/${catSlug}/${talkSlug}`,
+        },
+        twitter: {
+                card: "summary_large_image",
+                title: `${talk.title} | Ebrora Toolbox Talks`,
+                description: talk.description || `Free ${talk.title} toolbox talk for construction site teams.`,
+                images: ["https://ebrora.com/og-image.jpg"],
+        },
   };
 }
 
