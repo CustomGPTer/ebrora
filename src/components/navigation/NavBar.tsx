@@ -179,7 +179,7 @@ export function NavBar() {
                 </button>
               {/* Invisible bridge to prevent hover gap */}
               {isResourcesOpen && (
-                <div className="absolute top-full left-0 w-full h-2" />
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 w-72 h-2" />
               )}
                 <ResourcesDropdown
                   isOpen={isResourcesOpen}
