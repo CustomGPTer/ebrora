@@ -26,6 +26,9 @@ const nextConfig = {
     // at src/app/[slug]/page.tsx which serves URLs like /gantt-chart-project-planner
     // directly without /products/ prefix, preserving existing SEO URLs.
 
+    // Bundle @sparticuz/chromium correctly for Vercel serverless (TBT PDF generation)
+    serverExternalPackages: ['@sparticuz/chromium'],
+
     // Security headers
     async headers() {
           return [
@@ -78,8 +81,9 @@ const nextConfig = {
                       permanent: true,
             },
                   // Redirect any .html URLs to clean URLs (preserves Google rankings)
+                  // Excludes /toolbox-talks/ where static HTML TBT files are served
             {
-                      source: '/:slug((?!api|_next).*)\\.html',
+                      source: '/:slug((?!api|_next|toolbox-talks).*)\\.html',
                       destination: '/:slug',
                       permanent: true,
             },
