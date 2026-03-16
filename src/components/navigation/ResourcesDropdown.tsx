@@ -46,7 +46,7 @@ export function ResourcesDropdown({ isOpen, onClose }: ResourcesDropdownProps) {
 
   return (
     <div
-      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+      className="absolute top-full left-1/2 -translate-x-1/2 w-72 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
       role="menu"
     >
       <div className="p-2">
