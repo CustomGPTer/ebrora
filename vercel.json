@@ -4,5 +4,11 @@
       "path": "/api/cron/cleanup-rams",
       "schedule": "0 */6 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "src/app/api/tbt-download/route.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  }
 }
