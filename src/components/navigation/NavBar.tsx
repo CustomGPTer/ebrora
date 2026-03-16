@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { MobileMenu } from "./MobileMenu";
 import { ResourcesDropdown } from "./ResourcesDropdown";
-h
+
 export function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
