@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { MobileMenu } from "./MobileMenu";
 import { ResourcesDropdown } from "./ResourcesDropdown";
-
+h
 export function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -177,6 +177,10 @@ export function NavBar() {
                     />
                   </svg>
                 </button>
+              {/* Invisible bridge to prevent hover gap */}
+              {isResourcesOpen && (
+                <div className="absolute top-full left-0 w-full h-2" />
+              )}
                 <ResourcesDropdown
                   isOpen={isResourcesOpen}
                   onClose={() => setIsResourcesOpen(false)}
