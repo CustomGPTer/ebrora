@@ -10,7 +10,10 @@ export function Footer() {
           {/* Brand Column */}
           <div>
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#1B5B50] flex items-center justify-center text-white text-xs sm:text-sm font-bold shrink-0">
+              <span
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#1B5B50] flex items-center justify-center text-white text-xs sm:text-sm font-bold shrink-0"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
                 E
               </span>
               <span
