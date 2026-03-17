@@ -1,24 +1,16 @@
-// src/app/api/admin/import-talks/route.ts
+// src/app/api/public/import-talks/route.ts
 // ================================================================
-// TOOLBOX TALK AUTO-IMPORTER
+// TOOLBOX TALK AUTO-IMPORTER (v2 — no filesystem access needed)
 //
-// Visit: https://ebrora.com/api/admin/import-talks?key=YOUR_SECRET
+// Visit: https://www.ebrora.com/api/public/import-talks?key=YOUR_SECRET
 //
-// Scans public/toolbox-talks/ for HTML files and creates database
-// records for any that don't already exist. Safe to run repeatedly.
+// Reads from tbt-manifest.json and creates database records.
+// Safe to run repeatedly — skips existing records.
 // ================================================================
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import fs from "fs";
-import path from "path";
-
-// ── Security: set this in your Vercel environment variables ──
-// Go to Vercel → Settings → Environment Variables → Add:
-//   Name:  IMPORT_SECRET
-//   Value: (any random string you choose, e.g. "ebrora-import-2026")
-//
-// Then visit: /api/admin/import-talks?key=ebrora-import-2026
+import manifest from "@/data/tbt-manifest.json";
 
 const CODE_TO_CATEGORY_SLUG: Record<string, string> = {
   ENV: "environmental",
@@ -83,41 +75,16 @@ const CODE_TO_CATEGORY_SLUG: Record<string, string> = {
   SUB: "subcontractor-safety",
 };
 
-function parseFilename(filename: string) {
-  const match = filename.match(
-    /^(TBT-([A-Z]{3})-(\d{3}))-(.+)-toolbox-talk\.html$/
-  );
-  if (!match) return null;
-  return {
-    ref: match[1],
-    categoryCode: match[2],
-    num: parseInt(match[3], 10),
-    slug: match[4],
-    filename,
-  };
-}
-
-function extractTitle(filePath: string): string | null {
-  try {
-    const html = fs.readFileSync(filePath, "utf-8");
-    const h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    if (h1Match) return h1Match[1].trim();
-  } catch {
-    // fall through
-  }
-  return null;
-}
-
-function slugToTitle(slug: string): string {
-  const lower = new Set(["and", "or", "of", "at", "in", "for", "the", "to", "a", "an"]);
-  return slug
-    .split("-")
-    .map((w, i) => (i === 0 || !lower.has(w) ? w.charAt(0).toUpperCase() + w.slice(1) : w))
-    .join(" ");
+interface ManifestEntry {
+  code: string;
+  num: number;
+  slug: string;
+  title: string;
+  file: string;
 }
 
 export async function GET(request: NextRequest) {
-  // ── Auth check ──
+  // Auth check
   const key = request.nextUrl.searchParams.get("key");
   const secret = process.env.IMPORT_SECRET;
 
@@ -128,25 +95,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const tbtDir = path.join(process.cwd(), "public", "toolbox-talks");
+  const entries = manifest as ManifestEntry[];
   const results: { created: string[]; skipped: string[]; errors: string[] } = {
     created: [],
     skipped: [],
     errors: [],
   };
-
-  // Check directory exists
-  if (!fs.existsSync(tbtDir)) {
-    return NextResponse.json(
-      { error: "public/toolbox-talks/ directory not found" },
-      { status: 404 }
-    );
-  }
-
-  // Get all TBT HTML files
-  const allFiles = fs
-    .readdirSync(tbtDir)
-    .filter((f) => f.startsWith("TBT-") && f.endsWith("-toolbox-talk.html"));
 
   // Load categories from DB
   const categories = await prisma.toolboxCategory.findMany();
@@ -155,73 +109,55 @@ export async function GET(request: NextRequest) {
     catBySlug[cat.slug] = cat;
   }
 
-  // Process each file
-  for (const file of allFiles) {
-    const parsed = parseFilename(file);
-
-    if (!parsed) {
-      results.errors.push(`Bad filename: ${file}`);
-      continue;
-    }
-
-    const catSlug = CODE_TO_CATEGORY_SLUG[parsed.categoryCode];
+  // Process each manifest entry
+  for (const entry of entries) {
+    const catSlug = CODE_TO_CATEGORY_SLUG[entry.code];
     if (!catSlug) {
-      results.errors.push(`Unknown code "${parsed.categoryCode}": ${file}`);
+      results.errors.push(`Unknown code "${entry.code}": ${entry.file}`);
       continue;
     }
 
     const category = catBySlug[catSlug];
     if (!category) {
-      results.errors.push(`Category "${catSlug}" not in DB: ${file}`);
+      results.errors.push(`Category "${catSlug}" not in DB: ${entry.file}`);
       continue;
     }
 
     // Check if already exists
     const existing = await prisma.toolboxTalk.findFirst({
-      where: { categoryId: category.id, slug: parsed.slug },
+      where: { categoryId: category.id, slug: entry.slug },
     });
 
     if (existing) {
-      results.skipped.push(`${parsed.ref} — ${existing.title}`);
+      results.skipped.push(`TBT-${entry.code}-${String(entry.num).padStart(3, "0")} — ${existing.title}`);
       continue;
-    }
-
-    // Extract title from HTML
-    const htmlPath = path.join(tbtDir, file);
-    const title = extractTitle(htmlPath) || slugToTitle(parsed.slug);
-
-    let fileSize: number | null = null;
-    try {
-      fileSize = fs.statSync(htmlPath).size;
-    } catch {
-      // ignore
     }
 
     try {
       await prisma.toolboxTalk.create({
         data: {
           categoryId: category.id,
-          title,
-          slug: parsed.slug,
-          description: `${title} toolbox talk for construction site teams.`,
-          fileName: file,
+          title: entry.title,
+          slug: entry.slug,
+          description: `${entry.title} toolbox talk for construction site teams.`,
+          fileName: entry.file,
           blobUrl: null,
-          fileSize,
+          fileSize: null,
           isFree: true,
           isPublished: true,
-          order: parsed.num,
+          order: entry.num,
         },
       });
-      results.created.push(`${parsed.ref} — ${title}`);
+      results.created.push(`TBT-${entry.code}-${String(entry.num).padStart(3, "0")} — ${entry.title}`);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      results.errors.push(`Failed ${parsed.ref}: ${msg}`);
+      results.errors.push(`Failed TBT-${entry.code}-${String(entry.num).padStart(3, "0")}: ${msg}`);
     }
   }
 
   return NextResponse.json({
     summary: {
-      filesScanned: allFiles.length,
+      manifestEntries: entries.length,
       created: results.created.length,
       skipped: results.skipped.length,
       errors: results.errors.length,
