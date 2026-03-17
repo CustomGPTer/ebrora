@@ -110,6 +110,8 @@ export default withAuth(
                               pathname.startsWith('/api/payments/webhook') ||
                               pathname.startsWith('/api/public/') ||
                               pathname.startsWith('/api/rams/generate-questions') ||
+            pathname.startsWith('/toolbox-talks') ||
+            pathname.startsWith('/api/tbt-download') ||
                               pathname.startsWith('/auth/') ||
                               pathname === '/sitemap.xml' ||
                               pathname === '/robots.txt' ||
