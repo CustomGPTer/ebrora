@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atmospheric Monitoring and Gas Testing - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Atmospheric Monitoring and Gas Testing</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CSP-003 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Atmospheric monitoring is the process of testing air quality before and during confined space entry to detect invisible hazards.</li>
+      <li>A multi-gas detector typically monitors oxygen levels, flammable gases (LEL), carbon monoxide, and hydrogen sulphide simultaneously.</li>
+      <li>Normal oxygen concentration is 20.9% — below 19.5% is oxygen-deficient and above 23.5% is oxygen-enriched, both dangerous.</li>
+      <li>Flammable gas readings above 10% of the lower explosive limit require immediate evacuation and investigation.</li>
+      <li>Gas monitors must be calibrated at the manufacturer's specified intervals and bump-tested before every shift.</li>
+      <li>Pre-entry testing must be carried out from outside the confined space using extension probes at multiple levels.</li>
+      <li>Continuous monitoring must be maintained throughout the entire duration of the entry, not just at the start.</li>
+      <li>Gas conditions can change rapidly due to disturbance of sludge, chemical reactions, or changes in ventilation.</li>
+      <li>Only trained persons may interpret gas readings and make decisions about safe entry based on the results.</li>
+      <li>The gas monitoring results must be recorded on the confined space entry permit as evidence of safe conditions.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Invisible killers</td><td>Toxic gases and oxygen depletion are invisible and odourless — gas monitors are the only way to detect them.</td></tr>
+    <tr><td class="reason">Conditions change</td><td>An atmosphere that tested safe at entry can become lethal within minutes — continuous monitoring catches rapid deterioration.</td></tr>
+    <tr><td class="reason">Correct calibration</td><td>An uncalibrated gas monitor gives false readings that provide dangerous false reassurance — bump testing is essential every shift.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Bump-test your gas monitor against known gas concentrations before every shift.</li>
+          <li>Test the atmosphere at multiple levels before entry using an extension sampling probe.</li>
+          <li>Check oxygen is between 19.5% and 23.5% before permitting confined space entry.</li>
+          <li>Evacuate immediately if flammable gas readings exceed 10% of the lower explosive limit.</li>
+          <li>Maintain continuous atmospheric monitoring throughout the duration of every entry.</li>
+          <li>Record all gas test results on the confined space entry permit before authorising entry.</li>
+          <li>Ensure your gas monitor is within its calibration date and serviced at required intervals.</li>
+          <li>Understand the alarm set points on your monitor and what each alarm level means.</li>
+          <li>Re-test the atmosphere after any interruption, disturbance, or change in ventilation.</li>
+          <li>Keep the gas monitor on your person, not left at the entry point during entry.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter any confined space without testing the atmosphere with a calibrated monitor.</li>
+          <li>DON'T test from only one position — sample at high, mid, and low levels in the space.</li>
+          <li>DON'T enter if oxygen readings are outside the 19.5% to 23.5% safe range.</li>
+          <li>DON'T ignore flammable gas readings — even low levels indicate a hazard that may increase.</li>
+          <li>DON'T rely on pre-entry testing alone — conditions change and need continuous monitoring.</li>
+          <li>DON'T issue an entry permit without documenting the gas test results on the permit form.</li>
+          <li>DON'T use a gas monitor that is overdue for calibration or has failed its bump test.</li>
+          <li>DON'T dismiss an alarm as a false positive — evacuate first, then investigate from outside.</li>
+          <li>DON'T assume the atmosphere is still safe after a break — re-test before re-entering.</li>
+          <li>DON'T leave your gas monitor at the entrance — wear it on your person throughout entry.</li>
+        </ul>
+        <p class="see-also">See also: Confined Space Awareness | Confined Space Entry Procedures</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quality Hold and Witness Points - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Quality Hold and Witness Points</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-QMS-001 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Quality hold and witness points are stages in construction where work must be inspected before proceeding.</li>
+      <li>A hold point means work must stop until a formal inspection is carried out and approval is given to continue.</li>
+      <li>A witness point means the client or engineer is invited to inspect but work may continue if they do not attend.</li>
+      <li>Hold and witness points are defined in the Inspection and Test Plan for each element of work.</li>
+      <li>Skipping hold points without approval can result in costly rework, remedial works, and non-conformance reports.</li>
+      <li>Common hold points include formation checks, reinforcement inspections, concrete pre-pour checks, and pressure tests.</li>
+      <li>The person carrying out the inspection must sign off the inspection record before work can proceed past the hold point.</li>
+      <li>Non-conformances found at hold points must be rectified and re-inspected before the work is approved.</li>
+      <li>Material traceability and certification must be available at the point of inspection to demonstrate compliance.</li>
+      <li>Quality and safety are linked — poor quality work often creates safety hazards for workers and future users.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent costly rework</td><td>Catching defects at hold points prevents expensive rework — covering up poor work always costs more to fix later.</td></tr>
+    <tr><td class="reason">Client confidence</td><td>Formal inspection records demonstrate compliance with the specification and build client confidence in the finished product.</td></tr>
+    <tr><td class="reason">Safety through quality</td><td>Poor quality construction creates safety hazards — correct reinforcement, concrete, and connections protect the structure's integrity.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Check the Inspection and Test Plan to identify all hold and witness points for your work.</li>
+          <li>Notify the inspector in advance when a hold or witness point is approaching.</li>
+          <li>Prepare all required documentation, test results, and material certificates before the inspection.</li>
+          <li>Stop work at hold points until the inspection is completed and formal approval is given.</li>
+          <li>Ensure non-conformances are corrected and re-inspected before proceeding with the work.</li>
+          <li>Keep accurate records of all inspections, test results, and approvals on site.</li>
+          <li>Verify that materials have the correct certification and traceability documentation.</li>
+          <li>Communicate hold point requirements to your team so everyone understands when to stop.</li>
+          <li>Allow adequate time in the programme for hold point inspections without causing pressure.</li>
+          <li>Treat quality inspections as an opportunity to confirm good work, not as a burden.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T proceed past a hold point without formal inspection and written approval.</li>
+          <li>DON'T fail to notify the inspector in time — late notification delays the programme.</li>
+          <li>DON'T present work for inspection without the required supporting documentation.</li>
+          <li>DON'T cover, backfill, or build over work before the hold point inspection is complete.</li>
+          <li>DON'T leave non-conformances unresolved — they must be corrected before approval.</li>
+          <li>DON'T lose or misplace inspection records — they are required for handover and the H&S file.</li>
+          <li>DON'T use materials without proper certification — unverified materials may not meet specification.</li>
+          <li>DON'T rush past quality checks to save time — poor quality always costs more in the end.</li>
+          <li>DON'T pressure inspectors to approve substandard work — request the correct resolution.</li>
+          <li>DON'T treat quality as separate from safety — good construction protects everyone.</li>
+        </ul>
+        <p class="see-also">See also: Non-Conformance Reporting | Inspection & Test Plan (ITP) Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>
