@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fragile Surfaces - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Fragile Surfaces</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WAH-004 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Fragile surfaces are materials that cannot support the weight of a person and any load they carry, causing a fall through.</li>
+      <li>Falls through fragile roofs are one of the most common causes of fatal falls from height in UK construction.</li>
+      <li>Common fragile materials include roof lights, fibre cement sheets, liner panels, corroded metal sheeting, and glass panels.</li>
+      <li>A surface that appears solid from above may be critically weakened by age, corrosion, UV damage, or impact.</li>
+      <li>The Work at Height Regulations 2005 require that no one passes across or near a fragile surface without proper controls.</li>
+      <li>Warning signs and barriers must be placed at all access points to areas containing fragile surfaces.</li>
+      <li>Crawling boards, staging, or purpose-built platforms must be used to spread load when working on or near fragile roofs.</li>
+      <li>Safety nets installed below fragile surfaces provide collective fall protection if a person falls through despite other controls.</li>
+      <li>Existing buildings being refurbished may contain unknown fragile surfaces not identified in original construction drawings.</li>
+      <li>Many fragile surface fatalities involve experienced workers who believed the surface would take their weight.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Leading cause of fatal falls</td><td>Falls through fragile roofs kill more workers than almost any other type of fall from height — the surface gives way without warning.</td></tr>
+    <tr><td class="reason">Invisible danger</td><td>A roof that looks solid from above may be a single sheet of fibre cement that shatters under body weight.</td></tr>
+    <tr><td class="reason">Experience is no protection</td><td>Many victims of fragile roof falls were experienced workers who misjudged the strength of the material beneath their feet.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Assume any roof surface is fragile until a competent person has confirmed otherwise.</li>
+          <li>Use crawling boards, staging, or platforms to spread your weight on fragile roofs.</li>
+          <li>Install safety nets below fragile surfaces to arrest falls if other controls fail.</li>
+          <li>Place warning signs and barriers at all access points to areas with fragile surfaces.</li>
+          <li>Follow the method statement and never deviate from the planned safe access route.</li>
+          <li>Cover or guard roof lights and fragile panels with fixed, clearly marked protection.</li>
+          <li>Inspect existing roofs for deterioration before carrying out maintenance or repair work.</li>
+          <li>Brief all workers on the location of fragile surfaces in their work area.</li>
+          <li>Use harness and lanyard systems where crawling boards or nets cannot be installed.</li>
+          <li>Report any cracking, flexing, or deterioration of roof surfaces to your supervisor.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T walk on any roof surface unless it has been confirmed as non-fragile.</li>
+          <li>DON'T step on roof lights, liner panels, or fibre cement sheets under any circumstances.</li>
+          <li>DON'T work near fragile surfaces without safety nets or alternative fall protection below.</li>
+          <li>DON'T ignore warning signs or bypass barriers around fragile surface areas.</li>
+          <li>DON'T take shortcuts across roofs — always follow the designated safe access route.</li>
+          <li>DON'T remove or fail to replace fragile surface covers and guard protection.</li>
+          <li>DON'T assume an existing roof is safe because it was built recently.</li>
+          <li>DON'T allow anyone onto a roof without briefing them on fragile surface locations.</li>
+          <li>DON'T rely on harnesses alone — use collective protection wherever possible.</li>
+          <li>DON'T test a surface by stepping on it — fragile materials collapse instantly under load.</li>
+        </ul>
+        <p class="see-also">See also: Falls From Height Awareness | Roof Light & Skylight Protection</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

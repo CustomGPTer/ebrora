@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reinforcement Fixing Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Reinforcement Fixing Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CON-002 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Reinforcement fixing involves cutting, bending, placing, and tying steel reinforcement bars for concrete structures.</li>
+      <li>Rebar impalement is a serious hazard — exposed vertical starter bars can penetrate the body in a fall, causing fatal injuries.</li>
+      <li>All exposed vertical reinforcement must be capped with mushroom caps or protective covers to prevent impalement.</li>
+      <li>Manual handling of steel reinforcement is physically demanding — rebar bundles are heavy, awkward, and have sharp cut ends.</li>
+      <li>Wire tying reinforcement causes repetitive strain injuries in hands and wrists from sustained gripping and twisting movements.</li>
+      <li>Working at height on reinforcement cages, walls, and columns requires fall protection to be in place before access.</li>
+      <li>Cutting rebar with disc cutters and hydraulic croppers produces noise, sparks, and flying fragments requiring PPE.</li>
+      <li>Reinforcement projecting from completed works creates a trip and snag hazard throughout the construction area.</li>
+      <li>Steel fixers must hold valid CSCS cards confirming their occupational competence for the work being carried out.</li>
+      <li>Reinforcement must be inspected and approved at the hold point before concrete is poured to ensure structural integrity.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent impalement</td><td>A fall onto exposed vertical rebar is almost always fatal — mushroom caps cost pence and save lives.</td></tr>
+    <tr><td class="reason">Manual handling injuries</td><td>Steel reinforcement is heavy with sharp edges — proper handling, mechanical aids, and gloves prevent cuts and strains.</td></tr>
+    <tr><td class="reason">Repetitive strain</td><td>Constant wire tying causes hand and wrist injuries over time — tool rotation and power tying tools reduce the risk.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Cap all exposed vertical reinforcement with mushroom caps or protective covers immediately.</li>
+          <li>Use mechanical lifting aids for moving heavy rebar bundles and cages wherever possible.</li>
+          <li>Wear cut-resistant gloves and safety boots when handling reinforcement steel.</li>
+          <li>Install fall protection before accessing elevated reinforcement cages or columns.</li>
+          <li>Use hearing protection and eye protection when cutting rebar with disc cutters.</li>
+          <li>Rotate tasks to reduce repetitive strain from prolonged wire tying activities.</li>
+          <li>Keep reinforcement storage areas tidy with bundles stacked safely on bearers.</li>
+          <li>Ensure rebar projecting from completed work is clearly marked as a trip hazard.</li>
+          <li>Hold a valid CSCS steel fixer card before carrying out reinforcement fixing.</li>
+          <li>Present reinforcement for inspection at the hold point before any concrete is poured.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T leave vertical starter bars uncapped — fit mushroom caps immediately after fixing.</li>
+          <li>DON'T carry heavy rebar bundles manually when a crane or excavator can lift them.</li>
+          <li>DON'T handle cut rebar without gloves — freshly cut ends are razor sharp.</li>
+          <li>DON'T climb reinforcement cages without fall protection in place first.</li>
+          <li>DON'T cut rebar without hearing and eye protection — fragments and noise are hazardous.</li>
+          <li>DON'T tie wire for extended periods without breaks — rotate to other tasks regularly.</li>
+          <li>DON'T leave rebar bundles stacked unsafely where they could roll or collapse.</li>
+          <li>DON'T walk through areas with projecting rebar without watching your footing carefully.</li>
+          <li>DON'T fix reinforcement without the correct CSCS trade card for the work.</li>
+          <li>DON'T pour concrete over reinforcement that has not been formally inspected and approved.</li>
+        </ul>
+        <p class="see-also">See also: Concrete Pour Safety | Rebar Impalement Prevention</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>
