@@ -62,7 +62,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 h-16 border-b border-gray-100">
           <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-lg bg-[#1B5B50] flex items-center justify-center text-white text-xs font-bold">
+            <span
+              className="w-8 h-8 rounded-lg bg-[#1B5B50] flex items-center justify-center text-white text-xs font-bold"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
               E
             </span>
             <span
