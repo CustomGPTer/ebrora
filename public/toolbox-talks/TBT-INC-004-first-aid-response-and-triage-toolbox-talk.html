@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First Aid Response and Triage - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>First Aid Response and Triage</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-INC-004 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>First aid on construction sites saves lives by providing immediate treatment before emergency services arrive.</li>
+      <li>The Health and Safety (First Aid) Regulations 1981 require employers to provide adequate first aid arrangements.</li>
+      <li>The number of first aiders required depends on the number of workers, hazard level, and site remoteness.</li>
+      <li>First aiders must hold a valid First Aid at Work certificate renewed every three years with annual refresher training.</li>
+      <li>Triage means assessing multiple casualties to prioritise treatment — the most life-threatening conditions are treated first.</li>
+      <li>The primary survey follows the DRABC sequence: Danger, Response, Airway, Breathing, Circulation.</li>
+      <li>Severe bleeding, unconsciousness, choking, and cardiac arrest are immediately life-threatening and require urgent intervention.</li>
+      <li>First aid kits must be stocked, checked regularly, and located in accessible positions throughout the construction site.</li>
+      <li>Emergency services must be called immediately for serious injuries — first aid is initial treatment, not a substitute for medical care.</li>
+      <li>Recording every first aid treatment in the site accident book creates a legal record and helps identify trends.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Save lives</td><td>Immediate first aid for cardiac arrest, severe bleeding, and choking dramatically improves survival rates before paramedics arrive.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>The First Aid Regulations 1981 require adequate provision — sites without trained first aiders and stocked kits face enforcement action.</td></tr>
+    <tr><td class="reason">Time critical</td><td>For cardiac arrest, brain damage begins within 4 minutes — every second of delay reduces the chance of survival.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Ensure adequate trained first aiders are on site during all working hours.</li>
+          <li>Check first aid kit contents regularly and restock after any use.</li>
+          <li>Call emergency services immediately for any serious or life-threatening injury.</li>
+          <li>Follow the DRABC sequence when assessing any casualty on site.</li>
+          <li>Treat life-threatening conditions first: severe bleeding, unconsciousness, breathing failure.</li>
+          <li>Know the location of the nearest first aid kit and AED to your work area.</li>
+          <li>Record every first aid treatment in the site accident book accurately.</li>
+          <li>Attend first aid training and keep your certificate current with refresher courses.</li>
+          <li>Direct emergency services to the casualty by sending someone to meet them at the gate.</li>
+          <li>Provide reassurance and comfort to the casualty while waiting for professional help.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T leave the site without adequate first aid cover during working hours.</li>
+          <li>DON'T allow first aid kits to become empty or out of date — check them regularly.</li>
+          <li>DON'T delay calling 999 for serious injuries — call first, then provide first aid.</li>
+          <li>DON'T skip the danger check — ensure the area is safe before approaching the casualty.</li>
+          <li>DON'T ignore minor injuries — treat and record them to prevent complications.</li>
+          <li>DON'T assume you will remember first aid — attend regular refresher training.</li>
+          <li>DON'T let the casualty move if spinal injury is suspected — keep them still.</li>
+          <li>DON'T forget to record the treatment in the accident book — it is a legal record.</li>
+          <li>DON'T assume emergency services will find the site — send someone to direct them in.</li>
+          <li>DON'T leave the casualty alone — maintain reassurance until professional help arrives.</li>
+        </ul>
+        <p class="see-also">See also: Accident and Incident Reporting (RIDDOR) | Emergency Plan Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

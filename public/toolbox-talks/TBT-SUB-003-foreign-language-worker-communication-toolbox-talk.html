@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foreign Language Worker Communication - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Foreign Language Worker Communication</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SUB-003 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Construction sites in the UK employ workers from many countries who may not speak or read English fluently.</li>
+      <li>Language barriers prevent workers from understanding safety briefings, signs, instructions, and emergency procedures.</li>
+      <li>CDM 2015 requires information and instruction to be provided in a form that workers can understand and act upon.</li>
+      <li>Site inductions, toolbox talks, and method statement briefings must be adapted for workers with limited English.</li>
+      <li>Visual aids including photographs, diagrams, pictograms, and colour coding communicate hazards without relying on text.</li>
+      <li>Translated safety documents in the worker's first language should be provided for critical procedures and emergency plans.</li>
+      <li>Bilingual supervisors or buddy systems pair experienced English-speaking workers with colleagues who need language support.</li>
+      <li>Understanding must be verified — nodding does not confirm comprehension, so ask workers to explain back in their own words.</li>
+      <li>Emergency procedures must be understood by everyone — a worker who does not understand the fire alarm cannot evacuate safely.</li>
+      <li>Investing in communication removes the language barrier that contributes to the higher injury rate among migrant construction workers.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent misunderstanding</td><td>A worker who does not understand the method statement cannot follow it safely — communication prevents the incidents caused by confusion.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>CDM 2015 requires comprehensible information — delivering briefings only in English to non-English speakers fails this duty.</td></tr>
+    <tr><td class="reason">Higher injury rates</td><td>Research shows migrant workers have higher injury rates partly due to language barriers — effective communication closes this gap.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Assess the language needs of the workforce at the start of every project.</li>
+          <li>Provide site inductions with visual aids, diagrams, and translated key information.</li>
+          <li>Use pictograms, photographs, and colour coding on site signs and safety notices.</li>
+          <li>Translate critical documents including emergency procedures into workers' first languages.</li>
+          <li>Assign bilingual buddies or supervisors to support workers with limited English.</li>
+          <li>Verify understanding by asking workers to explain instructions back in their own words.</li>
+          <li>Ensure emergency procedures are understood by every worker regardless of language.</li>
+          <li>Use toolbox talk materials that include visual content for non-English speakers.</li>
+          <li>Provide language training opportunities to help workers improve their English over time.</li>
+          <li>Treat language support as a safety investment, not an administrative burden.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T deliver safety briefings only in English to a multilingual workforce.</li>
+          <li>DON'T assume workers understand because they nod — verify comprehension actively.</li>
+          <li>DON'T rely on text-only signs when the workforce includes non-English readers.</li>
+          <li>DON'T withhold translated documents — critical safety information must be understood.</li>
+          <li>DON'T leave non-English-speaking workers without a bilingual buddy or supervisor.</li>
+          <li>DON'T accept a head nod as proof of understanding — ask them to explain it back.</li>
+          <li>DON'T allow workers to start work if they have not understood the emergency procedure.</li>
+          <li>DON'T use complex technical language in briefings when simpler words will communicate clearly.</li>
+          <li>DON'T dismiss language support as unnecessary — it directly reduces injury rates.</li>
+          <li>DON'T isolate workers with language difficulties — include them in team safety conversations.</li>
+        </ul>
+        <p class="see-also">See also: Subcontractor Safety Management | Site Induction Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

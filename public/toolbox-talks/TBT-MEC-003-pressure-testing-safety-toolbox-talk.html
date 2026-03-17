@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pressure Testing Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Pressure Testing Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-MEC-003 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Pressure testing verifies the integrity of pipework, vessels, and systems by applying pressures above normal operating conditions.</li>
+      <li>Hydrostatic testing uses water as the test medium — it is preferred because water is nearly incompressible and stores less energy.</li>
+      <li>Pneumatic testing uses air or nitrogen and is far more dangerous because compressed gas stores enormous explosive energy.</li>
+      <li>A joint, fitting, or component failing under test pressure releases the medium with potentially lethal force.</li>
+      <li>Exclusion zones must be established around all equipment under test — no person may enter the zone during pressurisation.</li>
+      <li>The test pressure, hold duration, and acceptance criteria must follow the approved test specification exactly.</li>
+      <li>All test equipment including pumps, gauges, hoses, and safety valves must be rated for the test pressure being applied.</li>
+      <li>End caps, blank flanges, and thrust blocks must be designed to resist the test pressure without displacement or failure.</li>
+      <li>Pressure must be raised gradually in stages, with hold points to check for leaks before proceeding to the next increment.</li>
+      <li>A competent person must supervise every pressure test, controlling the process and making all pass/fail decisions.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Explosive failure</td><td>A fitting failing under pneumatic test pressure releases energy equivalent to an explosion — exclusion zones are non-negotiable.</td></tr>
+    <tr><td class="reason">Hydrostatic preferred</td><td>Water stores far less energy than gas at the same pressure — hydrostatic testing is always safer when the system allows it.</td></tr>
+    <tr><td class="reason">Gradual pressurisation</td><td>Applying full pressure in one step can cause sudden catastrophic failure — staged pressure build-up catches leaks early.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use hydrostatic testing in preference to pneumatic testing wherever the system allows.</li>
+          <li>Establish exclusion zones around all equipment before applying any test pressure.</li>
+          <li>Follow the approved test specification for pressure, duration, and acceptance criteria.</li>
+          <li>Ensure all test equipment is rated for the maximum test pressure being applied.</li>
+          <li>Verify end caps, flanges, and thrust blocks are designed for the test pressure load.</li>
+          <li>Raise pressure gradually in stages with hold points to check for leaks at each step.</li>
+          <li>Ensure a competent person supervises the test and controls the pressurisation process.</li>
+          <li>Record all test data including pressures, times, temperatures, and pass/fail results.</li>
+          <li>Vent pressure safely through designated relief points after the test is complete.</li>
+          <li>Brief all nearby workers on the exclusion zones and the test schedule before starting.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T use pneumatic testing when hydrostatic testing is feasible and permitted.</li>
+          <li>DON'T allow anyone within the exclusion zone while the system is under test pressure.</li>
+          <li>DON'T deviate from the approved test specification for pressure or duration.</li>
+          <li>DON'T use hoses, gauges, or pumps rated below the maximum test pressure.</li>
+          <li>DON'T rely on temporary end caps that are not designed for the test pressure load.</li>
+          <li>DON'T apply full test pressure in a single step — increase gradually with leak checks.</li>
+          <li>DON'T carry out a pressure test without a competent person supervising the process.</li>
+          <li>DON'T accept a test result without documented records of all parameters.</li>
+          <li>DON'T release test pressure suddenly — vent gradually through controlled relief points.</li>
+          <li>DON'T enter the exclusion zone until pressure is fully released and the system is depressurised.</li>
+        </ul>
+        <p class="see-also">See also: Pipe Fitting and Flange Safety | Hydrostatic Pressure Testing</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanical Isolation - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Mechanical Isolation</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LOT-003 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Mechanical isolation disconnects equipment from its mechanical energy source to prevent unexpected movement during maintenance.</li>
+      <li>Mechanical energy sources include rotating shafts, gears, belts, chains, hydraulic rams, pneumatic cylinders, and springs.</li>
+      <li>Unexpected start-up or release of stored mechanical energy causes crushing, trapping, and amputation injuries.</li>
+      <li>The isolation procedure must identify every mechanical energy source connected to the equipment before work begins.</li>
+      <li>Physical locks must be applied to isolation points — warning tags alone cannot prevent accidental re-energisation.</li>
+      <li>Stored energy such as pressurised hydraulic accumulators, compressed springs, and raised loads must be released after isolation.</li>
+      <li>Each person working on the isolated equipment must apply their own personal lock to the isolation point.</li>
+      <li>Gravity is a mechanical energy source — raised loads, counterweights, and suspended components must be blocked or lowered.</li>
+      <li>Trial operation after isolation confirms the equipment cannot move — attempt to start it to verify the isolation is effective.</li>
+      <li>Only the person who applied a lock may remove it — the equipment must not be restarted until all locks are removed.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Crushing and amputation</td><td>Unexpected movement of mechanical equipment traps, crushes, and amputates — physical isolation prevents the machine from moving.</td></tr>
+    <tr><td class="reason">Stored energy</td><td>Pressurised hydraulics, loaded springs, and raised masses remain dangerous after the power source is disconnected — they must be discharged.</td></tr>
+    <tr><td class="reason">Personal lock</td><td>Your lock guarantees the machine stays isolated while you are working on it — no one else may remove your lock.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Identify all mechanical energy sources before starting the isolation procedure.</li>
+          <li>Apply physical locks to every isolation point on the equipment being maintained.</li>
+          <li>Release stored energy in hydraulics, pneumatics, springs, and raised loads after isolation.</li>
+          <li>Lower or block all suspended loads and counterweights before starting work.</li>
+          <li>Apply your own personal padlock and tag to the isolation point before starting.</li>
+          <li>Attempt to start the equipment after isolation to verify it cannot move.</li>
+          <li>Use a multi-lock hasp when more than one person works on the same equipment.</li>
+          <li>Follow the site-specific LOTO procedure for each piece of mechanical equipment.</li>
+          <li>Keep your lock key on your person throughout the duration of the isolation.</li>
+          <li>Remove your lock only when your work is complete and the area is confirmed safe.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T work on mechanical equipment without completing the full isolation procedure.</li>
+          <li>DON'T rely on tags alone — physical locks must prevent the equipment from restarting.</li>
+          <li>DON'T forget stored energy — hydraulic pressure and raised loads remain dangerous after isolation.</li>
+          <li>DON'T work beneath raised loads without lowering them or installing physical blocks.</li>
+          <li>DON'T allow anyone else to lock off on your behalf — apply your own personal lock.</li>
+          <li>DON'T skip the trial start — it is the only way to confirm isolation is effective.</li>
+          <li>DON'T share locks between workers — each person must have their own individual lock.</li>
+          <li>DON'T improvise the isolation procedure — follow the site-specific LOTO process.</li>
+          <li>DON'T leave your lock key unattended or hand it to someone else during the isolation.</li>
+          <li>DON'T remove another person's lock under any circumstances — only they may remove it.</li>
+        </ul>
+        <p class="see-also">See also: Lock Out Tag Out (LOTO) Awareness | Electrical Isolation</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>
