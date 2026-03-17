@@ -44,7 +44,7 @@ export default function ToolboxTalksPage() {
           <span className="inline-block text-xs font-semibold tracking-widest uppercase text-emerald-300 mb-3">
             Free Resources
           </span>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3" style={{ color: '#ffffff' }}>
             Construction Toolbox Talks
           </h1>
           <p className="text-base sm:text-lg text-emerald-100/80 max-w-2xl mx-auto">
