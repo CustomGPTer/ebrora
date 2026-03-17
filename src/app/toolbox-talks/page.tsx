@@ -48,7 +48,7 @@ export default function ToolboxTalksPage() {
             Construction Toolbox Talks
           </h1>
           <p className="text-base sm:text-lg text-emerald-100/80 max-w-2xl mx-auto">
-            {totalExpected.toLocaleString()} toolbox talks across {categories.length} categories.
+            Toolbox Talks across {categories.length} categories.
             Download as PDF, ready to brief your site team.
           </p>
         </div>
@@ -78,7 +78,6 @@ export default function ToolboxTalksPage() {
             </span>
             <span className="text-sm text-gray-600">
               <strong className="text-gray-900">{availableCount}</strong> available
-              <span className="text-gray-400 ml-1">/ {totalExpected.toLocaleString()} planned</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
