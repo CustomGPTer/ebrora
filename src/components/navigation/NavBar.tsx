@@ -100,7 +100,10 @@ export function NavBar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 shrink-0">
-              <span className="w-9 h-9 rounded-lg bg-[#1B5B50] flex items-center justify-center text-white text-sm font-bold">
+              <span
+                className="w-9 h-9 rounded-lg bg-[#1B5B50] flex items-center justify-center text-white text-sm font-bold"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
                 E
               </span>
               <span
