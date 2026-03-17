@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temporary Bracing and Stability - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Temporary Bracing and Stability</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-STE-004 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Temporary bracing provides stability to steel, timber, and precast concrete structures during the construction phase.</li>
+      <li>Without temporary bracing, newly erected structural members can collapse from wind loading, eccentric loads, or construction activity.</li>
+      <li>The temporary bracing design must be prepared by a competent engineer and form part of the erection method statement.</li>
+      <li>Bracing must be installed immediately after structural members are positioned — leaving members unbraced is never acceptable.</li>
+      <li>The bracing must remain in place until the permanent structure is complete enough to be self-supporting as confirmed by the designer.</li>
+      <li>Common bracing types include diagonal ties, plan bracing, tubular props, wire ropes, and proprietary bracing systems.</li>
+      <li>Bracing connections must be made using the specified fixings — substituting lighter fixings reduces the bracing effectiveness.</li>
+      <li>Removal of temporary bracing must be authorised by the temporary works coordinator following the designed removal sequence.</li>
+      <li>Wind forces during construction can be higher than in the permanent condition due to exposed framework and lack of cladding.</li>
+      <li>Monitoring for deflection, movement, or distress in temporary bracing must take place regularly throughout the construction phase.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent structural collapse</td><td>A steel frame without temporary bracing can collapse under its own weight or from moderate wind — bracing prevents catastrophe.</td></tr>
+    <tr><td class="reason">Immediate installation</td><td>Every minute a structural member stands without bracing is a minute it could fall — there is no safe period without bracing.</td></tr>
+    <tr><td class="reason">Designed removal</td><td>Removing bracing before the permanent structure can support itself causes progressive collapse — only the designer decides when it is safe.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Install temporary bracing immediately after each structural member is positioned.</li>
+          <li>Follow the bracing design exactly — positions, sizes, and connection details all matter.</li>
+          <li>Use the specified fixings for all bracing connections — do not substitute lighter alternatives.</li>
+          <li>Keep bracing in place until the TW coordinator authorises removal based on designer advice.</li>
+          <li>Monitor bracing for deflection, loosening, or signs of overload during construction.</li>
+          <li>Follow the designed bracing removal sequence — do not remove bracing in random order.</li>
+          <li>Account for wind forces on the exposed frame when planning bracing requirements.</li>
+          <li>Brief the erection team on the bracing plan at the start of each phase.</li>
+          <li>Report any damaged, displaced, or missing bracing to the supervisor immediately.</li>
+          <li>Check that the permanent structure is sufficiently complete before requesting bracing removal.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T leave any structural member standing without temporary bracing, even briefly.</li>
+          <li>DON'T deviate from the bracing design — every element is calculated for the construction loads.</li>
+          <li>DON'T use weaker fixings than specified — they may fail under the applied forces.</li>
+          <li>DON'T remove bracing without written authorisation from the temporary works coordinator.</li>
+          <li>DON'T ignore bracing deflection or loosening — it indicates the system is under stress.</li>
+          <li>DON'T remove bracing out of sequence — it concentrates forces on the remaining elements.</li>
+          <li>DON'T underestimate wind on an exposed frame — construction-phase loads can exceed permanent loads.</li>
+          <li>DON'T start erection without a bracing plan briefed and understood by the team.</li>
+          <li>DON'T leave damaged bracing in place without reporting and replacing it.</li>
+          <li>DON'T assume the permanent structure is ready — the designer must confirm before bracing removal.</li>
+        </ul>
+        <p class="see-also">See also: Steel Erection Safety | Temporary Works Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

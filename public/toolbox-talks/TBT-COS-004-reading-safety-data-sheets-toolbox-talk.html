@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Safety Data Sheets - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Reading Safety Data Sheets</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-COS-004 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>A Safety Data Sheet is a legally required document providing detailed hazard and handling information for every chemical product.</li>
+      <li>SDS documents follow a standard 16-section format under the REACH Regulations, making them consistent across all products.</li>
+      <li>Section 2 identifies the hazards, including GHS hazard pictograms, signal words, and hazard and precautionary statements.</li>
+      <li>Section 4 describes first aid measures for inhalation, skin contact, eye contact, and ingestion of the substance.</li>
+      <li>Section 7 covers safe handling and storage, including ventilation requirements and incompatible materials to avoid.</li>
+      <li>Section 8 specifies the exposure controls and personal protective equipment required when using the product.</li>
+      <li>The SDS must be available on site before any hazardous substance is used — not locked in the office or filed away.</li>
+      <li>Workers must be trained to understand the key sections of the SDS relevant to their task before using the product.</li>
+      <li>COSHH assessments are based on the information in the SDS — without reading it, the assessment cannot be accurate.</li>
+      <li>SDS documents are provided free of charge by the manufacturer or supplier and must be kept up to date on site.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Know the hazard</td><td>The SDS tells you exactly what can harm you and how — without reading it, you are handling chemicals blind.</td></tr>
+    <tr><td class="reason">Correct PPE</td><td>Section 8 specifies the exact PPE required — using the wrong gloves or mask because you did not read the SDS gives false protection.</td></tr>
+    <tr><td class="reason">Emergency response</td><td>If someone is splashed or inhales fumes, Section 4 tells you the correct first aid — the wrong response can make it worse.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Read the relevant SDS sections before using any hazardous substance on site.</li>
+          <li>Check Section 2 for hazard identification and the GHS pictograms on the label.</li>
+          <li>Follow the PPE requirements specified in Section 8 for your specific task.</li>
+          <li>Know the first aid measures in Section 4 before starting work with the product.</li>
+          <li>Ensure the SDS is readily accessible at the point of use, not locked in an office.</li>
+          <li>Check storage requirements in Section 7 and store the product accordingly.</li>
+          <li>Verify the SDS is current and matches the product version being used on site.</li>
+          <li>Ask your supervisor to explain any SDS information you do not understand.</li>
+          <li>Use the SDS information to complete or review the site COSHH assessment.</li>
+          <li>Report any product that arrives on site without an accompanying SDS document.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T use any chemical product without first checking the Safety Data Sheet.</li>
+          <li>DON'T ignore the GHS pictograms — they indicate the type and severity of the hazard.</li>
+          <li>DON'T substitute different PPE from what Section 8 specifies for the product.</li>
+          <li>DON'T guess at first aid treatment — Section 4 gives the correct response for each route.</li>
+          <li>DON'T file the SDS in the office — it must be available where the product is used.</li>
+          <li>DON'T store incompatible chemicals together — Section 7 identifies dangerous combinations.</li>
+          <li>DON'T use products with outdated SDS documents — request the current version from the supplier.</li>
+          <li>DON'T dismiss SDS information as irrelevant — every section exists for your protection.</li>
+          <li>DON'T prepare COSHH assessments without referring to the SDS for each substance.</li>
+          <li>DON'T accept chemical deliveries on site without a valid SDS accompanying the product.</li>
+        </ul>
+        <p class="see-also">See also: COSHH Awareness | Storage & Labelling Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

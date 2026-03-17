@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bored Pile Installation (CFA) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Bored Pile Installation (CFA)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PIL-002 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>CFA (Continuous Flight Auger) piling involves drilling into the ground with a hollow-stemmed auger while injecting concrete on withdrawal.</li>
+      <li>CFA rigs are large, heavy machines that require a designed and approved piling platform to operate safely.</li>
+      <li>Concrete is pumped under pressure through the auger stem during extraction — the pipeline and pump create pressure hazards.</li>
+      <li>Reinforcement cages are installed into the fresh concrete immediately after the auger is withdrawn from the pile bore.</li>
+      <li>Spoil from the auger flights accumulates rapidly around the rig and must be cleared regularly to maintain safe access.</li>
+      <li>The piling rig must be level and stable throughout the boring and concreting cycle to produce a structurally sound pile.</li>
+      <li>Noise levels from CFA rigs are high — hearing protection zones must be established and maintained around the operation.</li>
+      <li>Concrete delivery wagons accessing the pump require banksman control to prevent collision with the rig and workforce.</li>
+      <li>Buried services along the pile line must be located and confirmed clear before any auger penetrates the ground.</li>
+      <li>Only trained, competent CFA rig operators with valid CPCS or equivalent certification may carry out piling operations.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Rig stability</td><td>A CFA rig overturning during boring or lifting a cage causes catastrophic crushing injuries — the piling platform is the foundation of safety.</td></tr>
+    <tr><td class="reason">Pressure hazards</td><td>Concrete pumped under high pressure through the auger stem can cause explosive pipeline failures if not properly controlled.</td></tr>
+    <tr><td class="reason">Spoil management</td><td>Auger spoil accumulates rapidly and creates trip hazards, buries services, and destabilises the rig if not cleared continuously.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Confirm the piling platform is designed, approved, and adequate before the rig arrives.</li>
+          <li>Scan for and confirm the absence of buried services along the pile line before boring.</li>
+          <li>Ensure the rig is level and stable before starting each pile bore.</li>
+          <li>Maintain exclusion zones around the operating rig and concrete pump at all times.</li>
+          <li>Clear auger spoil regularly to maintain safe access and rig stability.</li>
+          <li>Use a banksman to guide concrete wagons approaching the pump and rig area.</li>
+          <li>Install reinforcement cages into wet concrete immediately using the approved method.</li>
+          <li>Wear hearing protection within the designated noise zone around the piling rig.</li>
+          <li>Follow the concrete pump pressure procedures and maintain pipeline integrity.</li>
+          <li>Hold valid CPCS or equivalent certification before operating the CFA piling rig.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T allow a CFA rig onto an unapproved or inadequately constructed piling platform.</li>
+          <li>DON'T bore piles without confirming buried services are clear along the pile line.</li>
+          <li>DON'T operate the rig on an unlevel or unstable surface — reposition before boring.</li>
+          <li>DON'T enter the exclusion zone around the rig or pump during piling operations.</li>
+          <li>DON'T let spoil accumulate around the rig — clear it continuously during boring.</li>
+          <li>DON'T allow concrete wagons near the rig without banksman control.</li>
+          <li>DON'T delay cage installation — reinforcement must be placed while concrete is fresh.</li>
+          <li>DON'T work near the CFA rig without hearing protection in the noise zone.</li>
+          <li>DON'T ignore pump pressure readings — abnormal values indicate a blockage or failure.</li>
+          <li>DON'T operate a CFA rig without the required CPCS or equivalent competency card.</li>
+        </ul>
+        <p class="see-also">See also: Piling Safety Awareness | Piling Platform Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

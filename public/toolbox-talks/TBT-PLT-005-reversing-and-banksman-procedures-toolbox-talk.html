@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reversing and Banksman Procedures - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Reversing and Banksman Procedures</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PLT-005 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Reversing vehicles and plant are involved in a disproportionate number of fatal struck-by incidents on UK construction sites.</li>
+      <li>The most effective control is to eliminate reversing through one-way systems and drive-through loading arrangements.</li>
+      <li>Where reversing cannot be eliminated, a trained banksman must be used to guide the vehicle throughout the manoeuvre.</li>
+      <li>The banksman must be visible to the driver at all times — if eye contact or mirror visibility is lost, the vehicle must stop.</li>
+      <li>Standard banksman hand signals must be used as defined in the site traffic management plan and understood by both parties.</li>
+      <li>Reversing alarms alone are not sufficient protection — background noise on site often masks the warning sound.</li>
+      <li>Reversing cameras and radar proximity sensors assist the driver but do not replace the need for a trained banksman.</li>
+      <li>The banksman must maintain a safe position clear of the vehicle's path and never walk directly behind the reversing vehicle.</li>
+      <li>All banksmen must hold a valid CPCS or equivalent competency card confirming their training in vehicle marshalling.</li>
+      <li>A pre-start briefing between the driver and banksman must agree signals, route, and stopping positions before the manoeuvre.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Blind spot fatalities</td><td>Drivers cannot see directly behind plant and HGVs — a banksman provides the eyes where the driver is blind.</td></tr>
+    <tr><td class="reason">Eliminate first</td><td>The safest reversal is the one that does not happen — one-way systems and drive-through layouts remove the hazard entirely.</td></tr>
+    <tr><td class="reason">Communication failure</td><td>Misunderstood signals between driver and banksman cause collisions — agreed signals and eye contact prevent fatal miscommunication.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Eliminate reversing wherever possible using one-way systems and drive-through layouts.</li>
+          <li>Use a trained banksman for all essential reversing manoeuvres near work areas.</li>
+          <li>Agree hand signals, route, and stopping position before starting the manoeuvre.</li>
+          <li>Maintain eye contact or mirror visibility between the banksman and driver at all times.</li>
+          <li>Stop the vehicle immediately if eye contact with the banksman is lost.</li>
+          <li>Position yourself clear of the vehicle's reversing path at all times as banksman.</li>
+          <li>Hold a valid CPCS or equivalent card before acting as a banksman on site.</li>
+          <li>Use radios in addition to hand signals when noise or distance limits visibility.</li>
+          <li>Ensure reversing alarms are working during the daily plant pre-use check.</li>
+          <li>Brief all pedestrians to stay clear of the reversing zone during the manoeuvre.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T reverse vehicles or plant without a trained banksman in areas with pedestrians.</li>
+          <li>DON'T accept reversing as normal — look for ways to eliminate it from operations.</li>
+          <li>DON'T start reversing without agreeing signals and the intended route with the banksman.</li>
+          <li>DON'T continue reversing if you lose sight of the banksman — stop immediately.</li>
+          <li>DON'T walk directly behind a reversing vehicle, even as the banksman guiding it.</li>
+          <li>DON'T act as a banksman without valid training and a competency card.</li>
+          <li>DON'T rely on reversing alarms or cameras alone — they are aids, not substitutes.</li>
+          <li>DON'T use non-standard signals — stick to the agreed set to avoid confusion.</li>
+          <li>DON'T operate plant with a non-functioning reversing alarm — report and repair it.</li>
+          <li>DON'T allow pedestrians to walk through an active reversing zone on site.</li>
+        </ul>
+        <p class="see-also">See also: Plant and Pedestrian Segregation | Site Speed Limits and Route Planning</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>
