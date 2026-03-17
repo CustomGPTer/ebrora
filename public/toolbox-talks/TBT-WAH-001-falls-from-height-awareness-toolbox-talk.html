@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Falls From Height Awareness - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .screen-footer { display: none; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Falls From Height Awareness</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WAH-001 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Falls from height remain the single largest cause of fatal injuries in UK construction.</li>
+      <li>The Work at Height Regulations 2005 apply to all work where a person could fall and be injured.</li>
+      <li>There is no minimum height threshold — a fall from any level can cause serious harm.</li>
+      <li>Common fall locations include roofs, scaffolds, ladders, open edges, and floor openings.</li>
+      <li>HSE statistics show around 40 construction workers die each year from falls in the UK.</li>
+      <li>Many fall incidents involve workers who were experienced but took shortcuts or ignored controls.</li>
+      <li>Employers must follow the hierarchy: avoid work at height, prevent falls, then minimise consequences.</li>
+      <li>A fall from as little as two metres can result in life-changing spinal or head injuries.</li>
+      <li>Fragile surfaces such as roof lights, fibre cement sheets, and liner panels are a hidden killer.</li>
+      <li>Every person working at height must be competent, properly equipped, and supervised.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent fatalities</td><td>Falls from height kill more construction workers than any other single cause — every incident is preventable with the right controls.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>The Work at Height Regulations 2005 place strict duties on employers and workers; breaches can lead to prosecution and unlimited fines.</td></tr>
+    <tr><td class="reason">Life-changing injuries</td><td>Survivors of falls often suffer permanent spinal damage, brain injuries, or fractures that end careers and change families forever.</td></tr>
+    <tr><td class="reason">Moral responsibility</td><td>Everyone deserves to go home safe at the end of every shift — no task is worth risking a life.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Check the risk assessment and method statement before starting any work at height.</li>
+          <li>Use collective protection such as guardrails and edge protection wherever possible.</li>
+          <li>Inspect all access equipment before every use and report defects immediately.</li>
+          <li>Ensure scaffold tags are current and platforms are fully boarded with toe boards.</li>
+          <li>Wear a harness and lanyard when required and clip on before reaching the edge.</li>
+          <li>Keep work platforms clear of materials, tools, and trip hazards at all times.</li>
+          <li>Cover or guard all floor openings and voids with fixed, marked protection.</li>
+          <li>Report any missing or damaged edge protection to your supervisor straight away.</li>
+          <li>Stop work if conditions change, such as high winds, rain, or poor lighting.</li>
+          <li>Attend all required training and never work at height beyond your competence.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T work at height without reading and understanding the risk assessment first.</li>
+          <li>DON'T remove or alter guardrails, edge protection, or void covers for any reason.</li>
+          <li>DON'T use damaged ladders, scaffolds, or platforms — take them out of service.</li>
+          <li>DON'T access scaffolds that have a do-not-use tag or are incomplete.</li>
+          <li>DON'T work without a harness where one is specified in the method statement.</li>
+          <li>DON'T throw tools or materials from height — use controlled lowering methods.</li>
+          <li>DON'T stand on fragile surfaces such as roof lights, liner panels, or asbestos sheets.</li>
+          <li>DON'T assume someone else has reported a hazard — report it yourself every time.</li>
+          <li>DON'T continue working in high winds or storms without supervisor authorisation.</li>
+          <li>DON'T take shortcuts — a few minutes saved is not worth a life-changing fall.</li>
+        </ul>
+        <p class="see-also">See also: Working at Height Hierarchy of Control | Edge Protection Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
