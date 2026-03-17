@@ -13,7 +13,7 @@ export function NavBar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const pathname = usePathname();
-  const resourcesRef = useRef<HTMLDivElement>(null);h
+  const resourcesRef = useRef<HTMLDivElement>(null);
   const resourcesRefCompact = useRef<HTMLDivElement>(null);
   const resourcesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { data: session, status } = useSession();
