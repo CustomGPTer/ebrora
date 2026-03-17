@@ -9,11 +9,12 @@ import { MobileMenu } from "./MobileMenu";
 import { ResourcesDropdown } from "./ResourcesDropdown";
 
 export function NavBar() {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrholled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const pathname = usePathname();
-  const resourcesRef = useRef<HTMLDivElement>(null);
+  const resourcesRef = useRef<HTMLDivElement>(null);h
+  const resourcesRefCompact = useRef<HTMLDivElement>(null);
   const resourcesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { data: session, status } = useSession();
 
@@ -32,10 +33,10 @@ export function NavBar() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        resourcesRef.current &&
-        !resourcesRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      const isOutsideDesktop = !resourcesRef.current?.contains(target);
+      const isOutsideCompact = !resourcesRefCompact.current?.contains(target);
+      if (isOutsideDesktop && isOutsideCompact) {
         setIsResourcesOpen(false);
       }
     }
@@ -202,7 +203,7 @@ export function NavBar() {
               <div className="flex lg:hidden items-center gap-1 sm:gap-2">
                 {/* Resources dropdown — compact */}
                 <div
-                  ref={resourcesRef}
+                  ref={resourcesRefCompact}
                   className="relative"
                 >
                   <button
