@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lessons Learned and Safety Alerts - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Lessons Learned and Safety Alerts</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-INC-006 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Lessons learned capture the knowledge gained from incidents, near misses, and successful practices to prevent future harm.</li>
+      <li>A safety alert is a communication issued after an incident to warn other projects and teams about a hazard or failure.</li>
+      <li>The purpose of lessons learned is improvement, not blame — focusing on what can be changed rather than who was at fault.</li>
+      <li>Lessons must be specific, actionable, and communicated to the people who need them — vague observations change nothing.</li>
+      <li>Safety alerts should be issued quickly after an incident — delays allow the same conditions to cause another event elsewhere.</li>
+      <li>Toolbox talks are the most effective method for communicating lessons learned directly to operatives on the front line.</li>
+      <li>Lessons from one project must be shared across the organisation — the same hazard exists on every similar project.</li>
+      <li>Industry safety alerts from the HSE, CITB, and client organisations provide lessons from incidents on other companies' sites.</li>
+      <li>A lessons learned register tracks what was identified, what action was taken, and whether the action prevented recurrence.</li>
+      <li>Reviewing lessons learned at the start of new projects applies past experience to prevent repeating the same mistakes.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent recurrence</td><td>A lesson identified but not communicated allows the exact same incident to happen again on the next project.</td></tr>
+    <tr><td class="reason">Speed matters</td><td>A safety alert issued within hours reaches other sites before the same conditions cause another casualty.</td></tr>
+    <tr><td class="reason">Industry learning</td><td>The HSE and industry bodies share lessons from incidents across the sector — reading and acting on them protects your site.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Issue safety alerts promptly after any significant incident or near miss.</li>
+          <li>Write lessons in specific, actionable language that tells people what to change.</li>
+          <li>Communicate lessons to the workforce through toolbox talks and team briefings.</li>
+          <li>Share lessons across all projects in the organisation, not just the affected site.</li>
+          <li>Read and act on industry safety alerts from the HSE, CITB, and client bodies.</li>
+          <li>Maintain a lessons learned register tracking issues, actions, and outcomes.</li>
+          <li>Review relevant lessons learned at the start of every new project.</li>
+          <li>Include lessons from successful practices, not only from incidents and failures.</li>
+          <li>Follow up to confirm that actions taken from lessons are actually preventing recurrence.</li>
+          <li>Create a culture where sharing lessons is valued as a contribution to everyone's safety.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T delay issuing safety alerts — other sites need the warning now, not next week.</li>
+          <li>DON'T write vague lessons — be specific about what happened and what must change.</li>
+          <li>DON'T keep lessons in management reports — communicate them to the front line.</li>
+          <li>DON'T limit lessons to the affected project — share them across the entire organisation.</li>
+          <li>DON'T ignore industry safety alerts — other companies' incidents can happen on your site.</li>
+          <li>DON'T let the lessons learned register become a filing cabinet — track actions and results.</li>
+          <li>DON'T start new projects without reviewing lessons from previous similar work.</li>
+          <li>DON'T only learn from failures — capture what went well and share good practices.</li>
+          <li>DON'T assume issuing a lesson means it was effective — check if it changed behaviour.</li>
+          <li>DON'T treat lessons learned as a blame exercise — focus on what can be improved.</li>
+        </ul>
+        <p class="see-also">See also: Near Miss Reporting and Learning | Incident Investigation Process</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

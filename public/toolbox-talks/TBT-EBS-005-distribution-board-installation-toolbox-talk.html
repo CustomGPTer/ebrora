@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distribution Board Installation - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Distribution Board Installation</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-EBS-005 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Distribution boards divide the incoming electrical supply into individual circuits protected by circuit breakers or fuses.</li>
+      <li>Incorrect installation of distribution boards causes electrical fires, shock hazards, and nuisance tripping affecting building services.</li>
+      <li>Installation must comply with BS 7671 (IET Wiring Regulations) and be carried out by qualified, competent electricians.</li>
+      <li>Circuit identification and labelling must be accurate — mislabelled circuits prevent correct isolation during maintenance and emergencies.</li>
+      <li>Cable termination quality directly affects safety — loose connections generate heat, arc, and eventually cause fire.</li>
+      <li>Adequate cable entry space and bending radii must be maintained to prevent cable damage during installation.</li>
+      <li>Isolation of the incoming supply must be confirmed dead before working inside any energised distribution board.</li>
+      <li>Arc flash risk exists when working on or near energised distribution boards — appropriate PPE must be worn.</li>
+      <li>Testing and verification of the completed installation must confirm correct polarity, insulation resistance, and earth continuity.</li>
+      <li>IP ratings for distribution board enclosures must match the environment — boards in wet or dusty locations need higher ratings.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fire from loose connections</td><td>A loose cable termination in a distribution board generates heat that ignites surrounding materials — precision termination prevents fire.</td></tr>
+    <tr><td class="reason">Mislabelled circuits</td><td>A mislabelled circuit breaker causes an electrician to isolate the wrong circuit — they work on a live circuit believing it is dead.</td></tr>
+    <tr><td class="reason">Arc flash</td><td>Distribution boards contain concentrated electrical energy — a fault during work produces arc flash temperatures exceeding 19,000°C.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Install distribution boards in compliance with BS 7671 Wiring Regulations.</li>
+          <li>Confirm the incoming supply is isolated and proved dead before starting work.</li>
+          <li>Terminate all cables carefully — tighten connections and check for secure contact.</li>
+          <li>Label every circuit accurately with its destination and function.</li>
+          <li>Maintain adequate cable entry space and bending radii during installation.</li>
+          <li>Wear arc flash rated PPE when working on or near energised distribution equipment.</li>
+          <li>Test polarity, insulation resistance, and earth continuity on the completed installation.</li>
+          <li>Select an enclosure IP rating appropriate for the installation environment.</li>
+          <li>Complete all installation and testing documentation for certification and handover.</li>
+          <li>Hand over the board with a complete circuit schedule accessible to future users.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T install distribution boards without BS 7671 compliance and qualified electricians.</li>
+          <li>DON'T open or work inside a live distribution board without confirmed isolation.</li>
+          <li>DON'T leave any cable termination loose — tighten and verify every connection.</li>
+          <li>DON'T mislabel circuits — incorrect identification causes dangerous isolation errors.</li>
+          <li>DON'T force cables into tight spaces that damage insulation and create fault paths.</li>
+          <li>DON'T approach energised boards without arc flash rated PPE appropriate to the risk.</li>
+          <li>DON'T commission without testing polarity, insulation, and earth on every circuit.</li>
+          <li>DON'T use indoor-rated enclosures in wet or dusty environments without adequate IP rating.</li>
+          <li>DON'T hand over without complete documentation of installation and test results.</li>
+          <li>DON'T leave the circuit schedule blank — every circuit must be clearly identified.</li>
+        </ul>
+        <p class="see-also">See also: Electrical Building Services Safety | Arc Flash Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

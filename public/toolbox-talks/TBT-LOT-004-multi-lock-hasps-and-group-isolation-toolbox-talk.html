@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Lock Hasps and Group Isolation - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Multi-Lock Hasps and Group Isolation</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LOT-004 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Multi-lock hasps allow multiple workers to apply their own personal padlocks to a single isolation point simultaneously.</li>
+      <li>Each worker applies their own lock — the equipment cannot be restarted until every individual lock has been removed.</li>
+      <li>This ensures that no single person can re-energise the equipment while any other worker is still working on it.</li>
+      <li>Group isolation is used when multiple people work on the same equipment during maintenance, modification, or commissioning.</li>
+      <li>The isolation sequence must be completed and verified before any lock is applied to the multi-lock hasp.</li>
+      <li>Each lock must be individually identifiable — typically by colour, number, or the worker's name tag attached.</li>
+      <li>Only the person who applied a lock may remove it — transferring lock removal authority to another person is prohibited.</li>
+      <li>A group isolation log records who has applied locks, when they were applied, and when each is removed.</li>
+      <li>The last person to remove their lock must verify the area is clear before the equipment is re-energised.</li>
+      <li>Multi-lock hasps must be large enough to accommodate all the locks required for the maximum number of workers.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Individual protection</td><td>Each worker's lock guarantees the isolation remains in place while they are working — no one can override their personal protection.</td></tr>
+    <tr><td class="reason">Last lock safety</td><td>The equipment cannot restart until every lock is removed — this prevents premature re-energisation while anyone is still at risk.</td></tr>
+    <tr><td class="reason">Prohibited transfer</td><td>Only you can remove your lock — if someone else could remove it, your personal protection is compromised.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Apply your own personal padlock to the multi-lock hasp before starting work.</li>
+          <li>Use a uniquely identifiable lock with your name or number clearly visible.</li>
+          <li>Verify the isolation is complete and effective before applying your lock.</li>
+          <li>Record your name, lock number, and time in the group isolation log.</li>
+          <li>Remove your lock only when your work is complete and the area is confirmed safe.</li>
+          <li>Verify the area is clear of all personnel before removing the final lock.</li>
+          <li>Use a hasp large enough to accommodate all locks needed for the work team.</li>
+          <li>Brief all workers on the group isolation procedure before applying locks.</li>
+          <li>Keep your lock key on your person at all times during the isolation period.</li>
+          <li>Follow the site-specific LOTO procedure for group isolation on each item.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T work on isolated equipment without applying your own personal lock first.</li>
+          <li>DON'T use unmarked or unidentifiable locks on the multi-lock hasp.</li>
+          <li>DON'T apply your lock before the isolation is confirmed complete and verified.</li>
+          <li>DON'T skip signing the group isolation log when applying or removing your lock.</li>
+          <li>DON'T remove your lock until your work is finished and the area is safe.</li>
+          <li>DON'T re-energise the equipment until every lock has been removed from the hasp.</li>
+          <li>DON'T use a hasp that cannot accommodate all the locks required for the team.</li>
+          <li>DON'T allow anyone to start without understanding the group isolation procedure.</li>
+          <li>DON'T leave your lock key unattended or give it to another person.</li>
+          <li>DON'T allow anyone else to remove your lock under any circumstances.</li>
+        </ul>
+        <p class="see-also">See also: Lock Out Tag Out (LOTO) Awareness | Electrical Isolation</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

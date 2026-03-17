@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safe Digging Practices (HSG47) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Safe Digging Practices (HSG47)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BUR-005 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>HSG47 is the HSE guidance document setting out safe digging practices to prevent damage to underground services during excavation.</li>
+      <li>The safe digging process has three stages: plan the work using service records, detect using scanning equipment, then dig carefully.</li>
+      <li>Service plans from all utility companies must be obtained and reviewed before any ground disturbance work begins.</li>
+      <li>Plans show approximate positions only — actual positions can vary by up to 500mm from the recorded location.</li>
+      <li>CAT and Genny scanning must be carried out across the full dig area in multiple directions to detect buried services.</li>
+      <li>Within 500mm of a detected or known service, only careful hand digging with appropriate tools is permitted.</li>
+      <li>Mechanical excavation may be used outside the 500mm hand-dig zone but must still proceed with care and awareness.</li>
+      <li>Vacuum excavation using suction equipment is a safe method for exposing buried services without risk of damage.</li>
+      <li>Service strikes must be reported immediately — do not attempt to repair damaged gas mains or electricity cables yourself.</li>
+      <li>The permit to dig must record the service detection results and confirm all precautions before excavation begins.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fatal strikes</td><td>Striking a live electricity cable or gas main during excavation kills operators and nearby workers without warning.</td></tr>
+    <tr><td class="reason">Plans are approximate</td><td>Utility records show approximate positions — actual cables and pipes may be up to half a metre from the recorded line.</td></tr>
+    <tr><td class="reason">Three-stage process</td><td>Plan, detect, dig: skipping any stage removes a layer of protection that prevents the next service strike fatality.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Obtain utility service plans from all providers before any ground disturbance.</li>
+          <li>Scan the full dig area with a CAT and Genny in all modes and directions.</li>
+          <li>Hand dig carefully within 500mm of any known or detected buried service.</li>
+          <li>Use insulated hand tools when digging near known electricity cable positions.</li>
+          <li>Consider vacuum excavation for safely exposing buried services without damage.</li>
+          <li>Complete the permit to dig recording all detection results before excavation starts.</li>
+          <li>Brief the excavation team on known service locations and the hand-dig zones.</li>
+          <li>Proceed cautiously with machine excavation outside the hand-dig zone.</li>
+          <li>Report any service strike immediately — do not attempt your own repair.</li>
+          <li>Support and protect exposed services to prevent damage from ground movement.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T start digging without obtaining and reviewing service plans from all utilities.</li>
+          <li>DON'T skip the CAT and Genny scan — plans alone cannot confirm exact positions.</li>
+          <li>DON'T machine dig within 500mm of a known or detected buried service.</li>
+          <li>DON'T use metal tools near electricity cables — use insulated digging equipment.</li>
+          <li>DON'T dismiss vacuum excavation — it is the safest way to expose buried services.</li>
+          <li>DON'T excavate without a completed permit to dig with detection results recorded.</li>
+          <li>DON'T allow excavation workers to start without a briefing on service locations.</li>
+          <li>DON'T assume the absence of a CAT signal means no services are present below.</li>
+          <li>DON'T touch or attempt to repair a damaged service — call the utility operator.</li>
+          <li>DON'T leave exposed services unsupported in the open trench.</li>
+        </ul>
+        <p class="see-also">See also: CAT & Genny Safe Use | Working Near Electricity Cables</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reservoir Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Reservoir Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-DAM-004 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>The Reservoirs Act 1975 applies to raised reservoirs holding more than 25,000 cubic metres of water above natural ground level.</li>
+      <li>Reservoir failure releases catastrophic volumes of water downstream, threatening communities, infrastructure, and lives.</li>
+      <li>Construction work on or near reservoirs must be coordinated with the reservoir owner and their supervising engineer.</li>
+      <li>Drowning risk is the primary hazard for all workers on reservoir structures, embankments, and adjacent areas.</li>
+      <li>Personal flotation devices must be worn by everyone working within two metres of the reservoir water surface.</li>
+      <li>Reservoir embankments must not be excavated, loaded, or altered without the supervising engineer's written approval.</li>
+      <li>Instrumentation including piezometers, settlement gauges, and seepage monitors must not be damaged during construction.</li>
+      <li>Vehicle movements on reservoir embankments must be controlled to prevent loading that exceeds the dam's design capacity.</li>
+      <li>Emergency drawdown procedures must be understood by all workers in case water levels rise to dangerous levels.</li>
+      <li>Spillway channels must remain clear and functional throughout all construction activities on the reservoir.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Catastrophic failure</td><td>A reservoir embankment failure releases thousands of tonnes of water into the valley below, destroying everything in its path.</td></tr>
+    <tr><td class="reason">Engineering sensitivity</td><td>Excavation, loading, or vibration on reservoir embankments changes the stress conditions the dam was designed for — engineer control is mandatory.</td></tr>
+    <tr><td class="reason">Drowning proximity</td><td>Reservoirs contain deep, cold water with steep sides — falling in without a PFD is often fatal due to cold water shock.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Coordinate all work with the reservoir owner and their supervising engineer.</li>
+          <li>Wear a PFD within two metres of the reservoir water surface at all times.</li>
+          <li>Obtain the supervising engineer's approval before any excavation on the embankment.</li>
+          <li>Protect reservoir instrumentation from damage during all construction activities.</li>
+          <li>Control vehicle movements on the embankment to prevent excessive loading.</li>
+          <li>Ensure rescue equipment is available at all waterside working locations.</li>
+          <li>Keep spillway channels clear and functional throughout the construction works.</li>
+          <li>Understand the emergency drawdown procedure before starting work on the reservoir.</li>
+          <li>Monitor weather forecasts for heavy rainfall that could raise water levels rapidly.</li>
+          <li>Brief all workers on the reservoir-specific hazards and emergency procedures.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T carry out work on reservoir structures without the supervising engineer's approval.</li>
+          <li>DON'T work near reservoir water without wearing a personal flotation device.</li>
+          <li>DON'T excavate, load, or vibrate the embankment without the engineer's written consent.</li>
+          <li>DON'T damage piezometers, gauges, or monitoring instruments during construction work.</li>
+          <li>DON'T drive heavy vehicles on embankments without permission and load assessment.</li>
+          <li>DON'T work near deep water without rescue equipment available at the location.</li>
+          <li>DON'T block or obstruct spillway channels — they must remain operational at all times.</li>
+          <li>DON'T ignore rising water levels — follow the emergency drawdown procedure immediately.</li>
+          <li>DON'T remain on the embankment during severe weather without monitoring water levels.</li>
+          <li>DON'T treat reservoir work as routine — the consequences of failure are catastrophic.</li>
+        </ul>
+        <p class="see-also">See also: Dam and Reservoir Safety Awareness | Drowning Prevention and Water Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

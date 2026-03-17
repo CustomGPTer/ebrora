@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Night Lifting Operations - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Night Lifting Operations</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-NIG-004 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Night lifting operations combine the hazards of crane and heavy lifting with reduced visibility, fatigue, and communication challenges.</li>
+      <li>Adequate artificial lighting must illuminate the load, landing area, slinging point, exclusion zone, and access routes.</li>
+      <li>The crane boom and load must be visible to the operator throughout the lift — shadows and glare must be managed.</li>
+      <li>Communication between the operator, slinger, and banksman must use radios supplemented by illuminated wands and signals.</li>
+      <li>Fatigue management is critical for crane operators performing lifts during night shifts requiring sustained concentration.</li>
+      <li>The lift plan must address the additional night-specific risks including lighting, visibility, and communication arrangements.</li>
+      <li>Exclusion zones must be clearly marked with illuminated barriers and lighting visible to approaching pedestrians and plant.</li>
+      <li>Wind conditions at night may differ from daytime forecasts — continuous monitoring with an anemometer is essential.</li>
+      <li>Noise restrictions in residential areas may affect the timing of night lifts and the use of audible warning signals.</li>
+      <li>Emergency procedures must account for darkness — rescue routes, first aid points, and muster areas must all be illuminated.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Operator visibility</td><td>A crane operator who cannot see the load or landing area in darkness loses control of the lift — lighting is critical.</td></tr>
+    <tr><td class="reason">Communication failure</td><td>Hand signals are invisible at night — radios and illuminated wands replace visual signals that darkness makes useless.</td></tr>
+    <tr><td class="reason">Fatigue and concentration</td><td>Crane operations demand sustained concentration that deteriorates faster at night — fatigue management prevents the errors that drop loads.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Install adequate lighting covering the load, landing area, boom, and exclusion zones.</li>
+          <li>Use radios for all communication between crane operator, slinger, and banksman.</li>
+          <li>Provide illuminated wands and signals for banksmen working in darkness.</li>
+          <li>Monitor wind speed continuously with an anemometer during all night lifts.</li>
+          <li>Manage operator fatigue with breaks and shift limits during night lifting.</li>
+          <li>Address night-specific risks in the lift plan including lighting and communication.</li>
+          <li>Mark exclusion zones with illuminated barriers visible to approaching workers.</li>
+          <li>Check noise restrictions before scheduling night lifts near residential areas.</li>
+          <li>Illuminate emergency routes, first aid points, and muster areas for night operations.</li>
+          <li>Brief the full lifting team on the night-specific plan before the first lift.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T carry out night lifts without adequate lighting on the load and landing area.</li>
+          <li>DON'T rely on hand signals at night — use radios and illuminated wands instead.</li>
+          <li>DON'T continue night lifting if the operator cannot clearly see the load and landing.</li>
+          <li>DON'T ignore wind monitoring at night — conditions can differ from daytime forecasts.</li>
+          <li>DON'T push crane operators through fatigue — enforce rest breaks during night shifts.</li>
+          <li>DON'T use a daytime lift plan for night operations — update it for night-specific risks.</li>
+          <li>DON'T leave exclusion zones unmarked in darkness — illuminate all barriers and boundaries.</li>
+          <li>DON'T breach noise restrictions with night lifting in residential areas without approval.</li>
+          <li>DON'T leave emergency routes and muster areas unlit during night operations.</li>
+          <li>DON'T start night lifting without a specific briefing for the night team.</li>
+        </ul>
+        <p class="see-also">See also: Night Working Safety Awareness | Crane Safety and Signals</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>
