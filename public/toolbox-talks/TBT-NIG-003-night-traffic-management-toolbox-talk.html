@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Night Traffic Management - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Night Traffic Management</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-NIG-003 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Night traffic management involves installing, maintaining, and removing temporary signing and guarding during darkness.</li>
+      <li>Reduced driver visibility at night means traffic management must be more conspicuous with enhanced lighting and reflective materials.</li>
+      <li>All traffic management operatives working at night must wear Class 3 hi-vis clothing with enhanced reflective strips.</li>
+      <li>Illuminated signs, retroreflective cones, and lit arrow boards are essential components of night traffic management layouts.</li>
+      <li>Vehicle-mounted crash cushions and impact protection vehicles are critical on high-speed roads during night operations.</li>
+      <li>Installation and removal of traffic management at night is the highest-risk phase — operatives are exposed to traffic in darkness.</li>
+      <li>Driver behaviour changes at night — reduced traffic volumes lead to higher speeds, and impaired or fatigued drivers are more common.</li>
+      <li>Lighting of the work area must be sufficient for workers to carry out tasks safely without creating glare for approaching drivers.</li>
+      <li>Communication between the traffic management team and the works crew must use radios — verbal signals are unreliable in darkness.</li>
+      <li>Fatigue management is essential for night TM operatives who carry out physically demanding work during unsocial hours.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Invisible workers</td><td>Workers without enhanced reflective clothing are invisible to drivers at night — Class 3 hi-vis with reflective strips is mandatory.</td></tr>
+    <tr><td class="reason">Higher speeds</td><td>Quieter roads at night encourage faster driving — a vehicle striking a worker at higher speed is more likely to cause a fatality.</td></tr>
+    <tr><td class="reason">Installation exposure</td><td>Setting up and removing TM at night exposes operatives to live traffic in the dark — it is the most dangerous moment of the shift.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear Class 3 hi-vis clothing with enhanced reflective strips for all night TM work.</li>
+          <li>Use illuminated signs, retroreflective cones, and lit arrow boards in all layouts.</li>
+          <li>Deploy impact protection vehicles on high-speed roads before night works begin.</li>
+          <li>Install and remove traffic management using the safest sequence to minimise exposure.</li>
+          <li>Light the work area sufficiently without creating glare for approaching drivers.</li>
+          <li>Use radios for all communication between the TM team and the works crew.</li>
+          <li>Monitor driver behaviour and report any concerns about speeding or near misses.</li>
+          <li>Follow fatigue management procedures for night shift traffic management operations.</li>
+          <li>Check all TM equipment is correctly positioned and visible throughout the shift.</li>
+          <li>Brief the team on the night-specific risks and enhanced precautions before starting.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T work at night without Class 3 hi-vis with reflective strips at all times.</li>
+          <li>DON'T use non-illuminated signs or standard cones for night traffic management.</li>
+          <li>DON'T work on high-speed roads at night without impact protection vehicles deployed.</li>
+          <li>DON'T expose yourself to live traffic unnecessarily during TM setup and removal.</li>
+          <li>DON'T create driver glare from work area lighting aimed towards approaching traffic.</li>
+          <li>DON'T rely on shouting or hand signals — use radios for all night communication.</li>
+          <li>DON'T assume drivers can see you at night — enhanced visibility is the minimum standard.</li>
+          <li>DON'T work through fatigue — night shift TM requires alertness for personal survival.</li>
+          <li>DON'T leave displaced or damaged TM equipment in place — replace it immediately.</li>
+          <li>DON'T skip the night-specific briefing — darkness changes every aspect of the risk.</li>
+        </ul>
+        <p class="see-also">See also: Night Working Safety Awareness | Chapter 8 Signing and Guarding</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

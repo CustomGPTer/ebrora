@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evidence Preservation at Scene - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Evidence Preservation at Scene</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-INC-005 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Evidence preservation means protecting the incident scene and all related information from disturbance or contamination.</li>
+      <li>The scene of a serious incident must not be disturbed until the investigation team has completed evidence collection.</li>
+      <li>Photographs, measurements, witness locations, and the position of equipment and materials must be documented before anything is moved.</li>
+      <li>Physical evidence includes damaged equipment, failed components, PPE, tools, and the ground conditions at the time of the incident.</li>
+      <li>CCTV footage, access records, permit documents, and risk assessments are documentary evidence that must be secured immediately.</li>
+      <li>Witness statements should be taken individually and as soon as possible while memories are fresh and uninfluenced by others.</li>
+      <li>The HSE may investigate serious incidents and will expect the scene to be preserved for their inspector's examination.</li>
+      <li>Cordon the scene using barrier tape and assign a responsible person to control access and prevent unauthorised disturbance.</li>
+      <li>Weather conditions can degrade evidence rapidly — protect the scene from rain, wind, and foot traffic as soon as possible.</li>
+      <li>The incident scene may need to be preserved for days in serious cases — the HSE or police will advise when it can be released.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Investigation integrity</td><td>Disturbing the scene before evidence is collected destroys the information needed to understand what happened and prevent recurrence.</td></tr>
+    <tr><td class="reason">HSE prosecution</td><td>The HSE expects preserved scenes for serious incidents — disturbing evidence can constitute obstruction and lead to additional charges.</td></tr>
+    <tr><td class="reason">Accurate root cause</td><td>Without preserved physical evidence, the investigation relies on memory alone — physical evidence provides the facts that memory cannot.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Cordon the incident scene immediately and prevent anyone from entering.</li>
+          <li>Assign a responsible person to control access to the scene at all times.</li>
+          <li>Photograph the scene from multiple angles before anything is moved or cleaned.</li>
+          <li>Record the positions of equipment, tools, materials, and any failed components.</li>
+          <li>Secure CCTV footage, access records, and all relevant documentation immediately.</li>
+          <li>Take witness statements individually while memories are fresh and uninfluenced.</li>
+          <li>Protect the scene from weather, foot traffic, and accidental disturbance.</li>
+          <li>Preserve the PPE and clothing worn by the injured person as physical evidence.</li>
+          <li>Notify the HSE for RIDDOR-reportable incidents and follow their scene guidance.</li>
+          <li>Maintain the cordon until the investigation team authorises release of the scene.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter or disturb the incident scene before the investigation team has attended.</li>
+          <li>DON'T leave the scene uncontrolled — assign someone to manage access immediately.</li>
+          <li>DON'T move equipment, tools, or materials before they are photographed and documented.</li>
+          <li>DON'T fail to record the exact positions of everything at the scene before any cleanup.</li>
+          <li>DON'T allow CCTV to be overwritten — secure the footage as soon as the incident occurs.</li>
+          <li>DON'T take group witness statements — each person must give their account individually.</li>
+          <li>DON'T let rain, wind, or foot traffic destroy evidence — protect the scene immediately.</li>
+          <li>DON'T discard or wash the injured person's PPE — it may contain critical evidence.</li>
+          <li>DON'T clean up a RIDDOR-reportable scene without HSE guidance on when it can be released.</li>
+          <li>DON'T rush to reopen the area — the investigation must be thorough before work resumes.</li>
+        </ul>
+        <p class="see-also">See also: Accident and Incident Reporting (RIDDOR) | Incident Investigation Process</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

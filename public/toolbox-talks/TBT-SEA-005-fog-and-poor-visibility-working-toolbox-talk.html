@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fog and Poor Visibility Working - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Fog and Poor Visibility Working</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SEA-005 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Fog, mist, heavy rain, and low cloud reduce visibility on construction sites, increasing the risk of collisions and falls.</li>
+      <li>Reduced visibility affects plant operators who cannot see pedestrians, banksmen who cannot see vehicles, and all site movements.</li>
+      <li>Crane operations must be assessed and potentially suspended when the operator cannot clearly see the load and landing area.</li>
+      <li>Vehicle speed must be reduced and additional lighting used when visibility drops below safe levels for the road speed.</li>
+      <li>Pedestrian routes must be adequately lit — workers walking in fog without reflective clothing are invisible to plant operators.</li>
+      <li>Working at height in fog reduces the ability to judge distances and see edge protection, increasing the risk of falls.</li>
+      <li>Banksmen and signallers must use illuminated wands and enhanced signals when hand signals are no longer clearly visible.</li>
+      <li>A stop-work trigger should be defined in the site procedures for visibility below which certain operations must cease.</li>
+      <li>Fog can occur suddenly, particularly on low-lying sites near rivers, canals, and bodies of water — monitoring is essential.</li>
+      <li>All workers must wear hi-vis clothing with reflective strips to maximise their visibility to others in poor conditions.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Invisible pedestrians</td><td>A worker without reflective clothing in fog is invisible to plant operators — struck-by incidents occur because people cannot be seen.</td></tr>
+    <tr><td class="reason">Crane visibility</td><td>A crane operator who cannot see the load or landing area loses control of the operation — lifts must stop in poor visibility.</td></tr>
+    <tr><td class="reason">Sudden onset</td><td>Fog forms rapidly on low-lying and waterside sites — conditions can change from clear to zero visibility within minutes.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Reduce vehicle and plant speed when visibility deteriorates below safe levels.</li>
+          <li>Increase lighting on access routes and work areas during fog and poor visibility.</li>
+          <li>Wear hi-vis clothing with reflective strips at all times in reduced visibility.</li>
+          <li>Assess crane operations and suspend them if the operator cannot see the load clearly.</li>
+          <li>Use illuminated wands and enhanced signals when hand signals are not clearly visible.</li>
+          <li>Define and follow the site stop-work visibility trigger for high-risk operations.</li>
+          <li>Monitor weather conditions for fog warnings, especially on low-lying or waterside sites.</li>
+          <li>Ensure banksmen maintain visual contact with both the plant and nearby pedestrians.</li>
+          <li>Increase communication between plant operators and ground workers using radios.</li>
+          <li>Brief the team on reduced visibility procedures at the start of any affected shift.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T drive at normal speed when visibility is significantly reduced by fog or mist.</li>
+          <li>DON'T work in fog without adequate lighting on access routes and work areas.</li>
+          <li>DON'T move around site without hi-vis clothing and reflective strips in poor visibility.</li>
+          <li>DON'T continue crane operations if the operator cannot clearly see the load and landing.</li>
+          <li>DON'T rely on standard hand signals when they cannot be seen clearly at distance.</li>
+          <li>DON'T ignore the visibility stop-work trigger — some operations must cease in fog.</li>
+          <li>DON'T assume fog will lift quickly — it can persist for hours on low-lying sites.</li>
+          <li>DON'T allow banksmen to operate if they cannot maintain sight of plant and pedestrians.</li>
+          <li>DON'T rely on shouting for communication — use radios when visibility reduces sight lines.</li>
+          <li>DON'T start work without briefing the team on fog procedures and enhanced precautions.</li>
+        </ul>
+        <p class="see-also">See also: Winter Working Safety | Night Working Safety Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rebar Impalement Prevention - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Rebar Impalement Prevention</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CON-007 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Exposed vertical reinforcement bars projecting from concrete create an impalement hazard for anyone who falls onto them.</li>
+      <li>Impalement injuries from rebar are almost always fatal or life-changing — the bars penetrate the torso, head, or limbs on impact.</li>
+      <li>Mushroom caps or rebar safety caps must be fitted to every exposed vertical bar immediately after installation.</li>
+      <li>Standard mushroom caps made of high-visibility plastic are designed to spread the impact force over a wider area.</li>
+      <li>Timber boards placed over groups of starter bars provide additional protection but are not a substitute for individual caps.</li>
+      <li>The risk is greatest during foundation and ground slab works where starter bars project upward from newly poured concrete.</li>
+      <li>Workers walking across rebar mats or near starter bars are at risk of tripping and falling directly onto exposed bar ends.</li>
+      <li>Housekeeping around rebar areas must be maintained to reduce the trip hazards that lead to falls onto exposed bars.</li>
+      <li>The CDM Regulations and HSE guidance require protection of exposed rebar — failure to protect is an enforcement priority.</li>
+      <li>Responsibility for fitting caps lies with the steel fixer, but every person on site should report unprotected bars immediately.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fatal impalement</td><td>A worker falling onto an uncapped rebar stub is impaled — the bar penetrates the body with the person's full weight behind it.</td></tr>
+    <tr><td class="reason">Simple prevention</td><td>Mushroom caps cost pennies each and take seconds to fit — there is no excuse for any exposed vertical bar on any site.</td></tr>
+    <tr><td class="reason">HSE priority</td><td>Unprotected starter bars are an HSE enforcement priority — inspectors issue prohibition notices on sight for this hazard.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Fit mushroom caps to every exposed vertical reinforcement bar immediately after placing.</li>
+          <li>Use high-visibility caps so protected bars are clearly visible across the work area.</li>
+          <li>Place timber boards over groups of starter bars for additional protection where needed.</li>
+          <li>Maintain housekeeping around rebar areas to reduce trip hazards near exposed bars.</li>
+          <li>Report any unprotected starter bars to your supervisor immediately upon discovery.</li>
+          <li>Replace caps that have been dislodged, damaged, or removed during subsequent work.</li>
+          <li>Include rebar protection in the method statement for all foundation and slab work.</li>
+          <li>Brief the steel fixing team on their responsibility to cap bars as they are placed.</li>
+          <li>Check that caps are in place before other trades access areas with exposed rebar.</li>
+          <li>Install edge protection and walkways to prevent trips onto capped bar areas.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T leave any vertical rebar stub uncapped — fit a mushroom cap immediately.</li>
+          <li>DON'T use the wrong cap type — it must spread impact force, not just cover the end.</li>
+          <li>DON'T rely on boards alone — individual caps on each bar are the primary protection.</li>
+          <li>DON'T leave debris and trip hazards near areas with exposed vertical starter bars.</li>
+          <li>DON'T walk past unprotected rebar without reporting it or capping it yourself.</li>
+          <li>DON'T remove caps for access and forget to replace them when the task is complete.</li>
+          <li>DON'T omit rebar protection from the method statement — it is a specified requirement.</li>
+          <li>DON'T assume the steel fixers have capped everything — check before your team enters.</li>
+          <li>DON'T allow other trades into rebar areas until all bars are confirmed capped.</li>
+          <li>DON'T dismiss impalement risk as unlikely — it kills construction workers every year.</li>
+        </ul>
+        <p class="see-also">See also: Reinforcement Fixing Safety | Falls From Height Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structural Collapse Response - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Structural Collapse Response</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-EMG-005 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Structural collapse on a construction site can trap, crush, and bury workers under tonnes of debris with little or no warning.</li>
+      <li>The first priority after a collapse is to prevent further collapse — secondary collapse kills rescuers who rush into the debris.</li>
+      <li>Do not enter the collapse zone until a competent structural assessment confirms the remaining structure is stable.</li>
+      <li>Call 999 immediately and request fire and rescue service attendance — they have specialist urban search and rescue capability.</li>
+      <li>Account for all workers who may have been in the collapse area using the site register and any access control records.</li>
+      <li>Casualties who are visible and accessible may be helped if it is safe to do so — do not move rubble that may be supporting structure.</li>
+      <li>Maintain communication with any trapped persons — talking to them provides reassurance and allows their condition to be monitored.</li>
+      <li>Establish an inner cordon preventing entry and an outer cordon for staging emergency services and site management.</li>
+      <li>Preserve the collapse scene for investigation by the HSE, police, and structural engineers after rescue operations conclude.</li>
+      <li>Post-incident welfare support must be provided for everyone on site — witnessing a collapse is a traumatic experience.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Secondary collapse</td><td>The remaining structure may be unstable — rushing in to help causes secondary collapse that kills rescuers as well as casualties.</td></tr>
+    <tr><td class="reason">Specialist rescue</td><td>Urban search and rescue teams have equipment and training for structural collapse — site workers do not and should not attempt it.</td></tr>
+    <tr><td class="reason">Account for everyone</td><td>The site register is the only way to know who may be trapped — a missing name on the roll call tells rescuers who to search for.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Call 999 immediately and request fire and rescue service specialist teams.</li>
+          <li>Do not enter the collapse zone until structural stability is confirmed.</li>
+          <li>Account for all personnel using the site register and access control records.</li>
+          <li>Establish inner and outer cordons to control access to the collapse area.</li>
+          <li>Help visible, accessible casualties only if it is safe to approach them.</li>
+          <li>Communicate with trapped persons to reassure them and monitor their condition.</li>
+          <li>Prevent further collapse by keeping everyone clear and not disturbing debris.</li>
+          <li>Preserve the scene for investigation after rescue operations are completed.</li>
+          <li>Provide welfare support for everyone on site affected by the incident.</li>
+          <li>Brief emergency services on site layout, casualty numbers, and structural type.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T rush into the collapse zone — secondary collapse kills rescuers.</li>
+          <li>DON'T attempt structural collapse rescue without specialist equipment and training.</li>
+          <li>DON'T assume everyone is accounted for — check the register for every name.</li>
+          <li>DON'T allow unauthorised persons near the collapse — maintain strict cordons.</li>
+          <li>DON'T move rubble that may be supporting the remaining structure above casualties.</li>
+          <li>DON'T stop communicating with trapped persons — your voice keeps them calm.</li>
+          <li>DON'T disturb the debris unnecessarily — further movement risks additional collapse.</li>
+          <li>DON'T clean up or disturb the scene before investigators have attended.</li>
+          <li>DON'T neglect the wellbeing of witnesses — arrange welfare support immediately.</li>
+          <li>DON'T delay briefing emergency services — they need site information to plan rescue.</li>
+        </ul>
+        <p class="see-also">See also: Emergency Plan Awareness | Incident Investigation Process</p>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>
