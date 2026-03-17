@@ -101,7 +101,7 @@ export default async function SlugPage({ params }: PageProps) {
               <span className="text-emerald-300/50">/</span>
               <span className="text-xs font-semibold text-emerald-200">{sub.name}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2" style={{ color: '#ffffff' }}>
               {sub.name}
             </h1>
             <p className="text-sm text-emerald-100/70">
