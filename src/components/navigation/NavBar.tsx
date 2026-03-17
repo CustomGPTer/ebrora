@@ -9,7 +9,7 @@ import { MobileMenu } from "./MobileMenu";
 import { ResourcesDropdown } from "./ResourcesDropdown";
 
 export function NavBar() {
-  const [isScrolled, setIsScrholled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const pathname = usePathname();
