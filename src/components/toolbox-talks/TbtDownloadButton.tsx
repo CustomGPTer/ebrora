@@ -8,67 +8,105 @@ interface TbtDownloadButtonProps {
 }
 
 export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
-  const [status, setStatus] = useState<"idle" | "loading" | "limited" | "error">("idle");
-  const [remaining, setRemaining] = useState<number | null>(null);
+  const [status, setStatus] = useState<"idle" | "loading">("idle");
 
   async function handleDownload() {
     setStatus("loading");
 
     try {
-      const res = await fetch("/api/tbt-download", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ htmlFile, title }),
+      // Fetch the HTML content
+      const res = await fetch(`/toolbox-talks/${htmlFile}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      const html = await res.text();
+
+      // Create a hidden iframe to render the HTML with its full CSS
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.left = "-9999px";
+      iframe.style.top = "0";
+      iframe.style.width = "210mm";
+      iframe.style.height = "297mm";
+      iframe.style.border = "none";
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc) throw new Error("Could not access iframe");
+
+      doc.open();
+      doc.write(html);
+      doc.close();
+
+      // Wait for fonts and content to load
+      await new Promise<void>((resolve) => {
+        if (iframe.contentWindow) {
+          iframe.contentWindow.onload = () => resolve();
+          setTimeout(resolve, 3000);
+        } else {
+          setTimeout(resolve, 3000);
+        }
       });
 
-      if (res.status === 429) {
-        setStatus("limited");
-        const data = await res.json();
-        setRemaining(data.remaining ?? 0);
-        return;
-      }
+      // Extra time for web fonts to render
+      await new Promise((r) => setTimeout(r, 500));
 
-      if (!res.ok) {
-        setStatus("error");
-        return;
-      }
+      // Load html2canvas and jsPDF dynamically
+      const [html2canvasModule, jsPDFModule] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      const html2canvas = html2canvasModule.default;
+      const { jsPDF } = jsPDFModule;
 
-      // Get remaining count from header
-      const rem = res.headers.get("X-Downloads-Remaining");
-      if (rem) setRemaining(parseInt(rem, 10));
+      // Render the iframe body to canvas
+      const canvas = await html2canvas(doc.body, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        width: 794,
+        height: 1123,
+        windowWidth: 794,
+        windowHeight: 1123,
+        backgroundColor: "#ffffff",
+      });
 
-      // Download the PDF blob
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${title.replace(/[^a-zA-Z0-9 -]/g, "").replace(/\s+/g, "-")}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Create A4 PDF from canvas
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+
+      // Save
+      const safeTitle = title
+        .replace(/[^a-zA-Z0-9 -]/g, "")
+        .replace(/\s+/g, "-");
+      pdf.save(`${safeTitle}.pdf`);
+
+      // Clean up
+      document.body.removeChild(iframe);
       setStatus("idle");
-    } catch {
-      setStatus("error");
+    } catch (err) {
+      console.error("PDF generation error:", err);
+      window.open(`/toolbox-talks/${htmlFile}`, "_blank");
+      setStatus("idle");
     }
   }
 
   function handlePrint() {
-    // Client-side fallback: open HTML in new tab for printing
     window.open(`/toolbox-talks/${htmlFile}`, "_blank");
   }
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-3">
-        {/* Download PDF button */}
         <button
           onClick={handleDownload}
-          disabled={status === "loading" || status === "limited"}
+          disabled={status === "loading"}
           className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-all ${
-            status === "limited"
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : status === "loading"
+            status === "loading"
               ? "bg-[#1B5745]/80 text-white cursor-wait"
               : "bg-[#1B5745] text-white hover:bg-[#164a3b] active:scale-[0.98]"
           }`}
@@ -77,13 +115,6 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
             <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               Generating PDF&hellip;
-            </>
-          ) : status === "limited" ? (
-            <>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-              </svg>
-              Daily limit reached
             </>
           ) : (
             <>
@@ -95,7 +126,6 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
           )}
         </button>
 
-        {/* Print fallback */}
         <button
           onClick={handlePrint}
           className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
@@ -106,21 +136,6 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
           Print
         </button>
       </div>
-
-      {/* Status messages */}
-      {status === "limited" && (
-        <p className="text-xs text-amber-600">
-          You&apos;ve reached the limit of 5 free downloads per day. Downloads reset at midnight.
-        </p>
-      )}
-      {status === "error" && (
-        <p className="text-xs text-red-500">
-          Something went wrong generating the PDF. Try the print button instead.
-        </p>
-      )}
-      {remaining !== null && status !== "limited" && (
-        <p className="text-xs text-gray-400">{remaining} download{remaining !== 1 ? "s" : ""} remaining today</p>
-      )}
     </div>
   );
 }
