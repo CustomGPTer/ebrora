@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { TEMPLATE_CONFIGS, TEMPLATE_ORDER } from '@/lib/rams/template-config';
 import { TemplateSlug } from '@/lib/rams/types';
 
@@ -32,36 +33,37 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
     return 'locked-upgrade';
   };
 
-  const handleTemplateSelect = (slug: TemplateSlug) => {
+  const handleTemplateClick = (slug: TemplateSlug) => {
     const templateStatus = getTemplateStatus(slug);
     if (templateStatus === 'locked-auth') {
       router.push('/auth/login?callbackUrl=/rams-builder');
       return;
     }
     if (templateStatus === 'locked-upgrade') {
-      router.push('/pricing');
+      router.push('/rams-builder/pricing');
       return;
     }
     onSelect(slug);
   };
 
   return (
-    <div className="template-picker">
-      <div className="template-picker__header">
-        <h2 className="template-picker__title">Choose a RAMS Template</h2>
+    <div className="template-picker-section">
+      {/* Header */}
+      <div className="template-picker-header">
+        <h2>Choose a RAMS Template</h2>
         {!isAuthenticated && (
-          <p className="template-picker__subtitle">
-            Sign in to access templates and create your RAMS documents
-          </p>
+          <p>Sign in to access templates and start building your RAMS documents</p>
         )}
         {isAuthenticated && !isPaid && (
-          <p className="template-picker__subtitle">
-            Free plan: 2 templates available. Upgrade for all 10 templates.
-          </p>
+          <p>Free plan: 2 templates available &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">Upgrade for all 10</a></p>
+        )}
+        {isAuthenticated && isPaid && (
+          <p>All 10 templates available on your plan</p>
         )}
       </div>
 
-      <div className="template-picker__grid">
+      {/* 5-wide grid */}
+      <div className="template-grid-5">
         {TEMPLATE_ORDER.map((slug) => {
           const template = TEMPLATE_CONFIGS[slug];
           const templateStatus = getTemplateStatus(slug);
@@ -69,79 +71,62 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
           const isFreeTemplate = FREE_TEMPLATES.includes(slug);
 
           return (
-            <div
+            <button
               key={slug}
-              className={`template-card ${isLocked ? 'template-card--locked' : 'template-card--available'}`}
+              type="button"
+              className={`tpl-card ${isLocked ? 'tpl-card--locked' : ''}`}
+              onClick={() => handleTemplateClick(slug)}
             >
-              <div className="template-card__header">
-                <h3 className="template-card__title">{template.displayName}</h3>
+              {/* A4 ratio thumbnail */}
+              <div className="tpl-card-thumb">
+                <Image
+                  src={template.thumbnailPath}
+                  alt={`${template.displayName} preview`}
+                  fill
+                  sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                  style={{ objectFit: 'cover', objectPosition: 'top' }}
+                />
+
+                {/* Page count pill */}
+                <span className="tpl-card-pages">{template.pageCount} pages</span>
+
+                {/* Free badge */}
+                {isFreeTemplate && (
+                  <span className="tpl-card-badge tpl-card-badge--free">Free</span>
+                )}
+
+                {/* Lock overlay */}
                 {isLocked && (
-                  <span className="template-card__badge">
-                    {templateStatus === 'locked-auth' ? 'Sign In' : 'Upgrade'}
-                  </span>
-                )}
-                {!isLocked && isFreeTemplate && (
-                  <span className="template-card__badge template-card__badge--free">Free</span>
+                  <div className="tpl-card-lock-overlay">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" className="tpl-card-lock-icon">
+                      <path d="M12 1C8.676 1 6 3.676 6 7v1H4v15h16V8h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 0 1 2 2c0 .738-.405 1.376-1 1.723V17h-2v-2.277A1.993 1.993 0 0 1 10 13a2 2 0 0 1 2-2z"/>
+                    </svg>
+                    <span className="tpl-card-lock-label">
+                      {templateStatus === 'locked-auth' ? 'Sign In' : 'Upgrade'}
+                    </span>
+                  </div>
                 )}
               </div>
 
-              <p className="template-card__description">{template.description}</p>
-
-              <div className="template-card__meta">
-                <span>{template.pageCount} pages</span>
+              {/* Card body */}
+              <div className="tpl-card-body">
+                <h3 className="tpl-card-title">{template.displayName}</h3>
+                <p className="tpl-card-desc">{template.description}</p>
               </div>
 
-              <div className="template-card__footer">
+              {/* Footer */}
+              <div className="tpl-card-footer">
                 {templateStatus === 'available' && (
-                  <button
-                    className="btn btn--primary btn--small"
-                    onClick={() => handleTemplateSelect(slug)}
-                  >
-                    Use This Template
-                  </button>
+                  <span className="tpl-card-cta">Use Template &rarr;</span>
                 )}
-
                 {templateStatus === 'locked-auth' && (
-                  <div className="template-card__locked-actions">
-                    <div className="template-card__lock-icon">
-                      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M12 1C8.676 1 6 3.676 6 7v1H4v15h16V8h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 0 1 2 2c0 .738-.405 1.376-1 1.723V17h-2v-2.277A1.993 1.993 0 0 1 10 13a2 2 0 0 1 2-2z"/>
-                      </svg>
-                    </div>
-                    <p className="template-card__lock-message">Sign in to access this template</p>
-                    <button
-                      className="btn btn--primary btn--small"
-                      onClick={() => router.push('/auth/login?callbackUrl=/rams-builder')}
-                    >
-                      Sign In
-                    </button>
-                    <button
-                      className="btn btn--secondary btn--small"
-                      onClick={() => router.push('/auth/register')}
-                    >
-                      Create Account
-                    </button>
-                  </div>
+                  <span className="tpl-card-cta tpl-card-cta--locked">Sign In to Access</span>
                 )}
-
                 {templateStatus === 'locked-upgrade' && (
-                  <div className="template-card__locked-actions">
-                    <div className="template-card__lock-icon">
-                      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M12 1C8.676 1 6 3.676 6 7v1H4v15h16V8h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 0 1 2 2c0 .738-.405 1.376-1 1.723V17h-2v-2.277A1.993 1.993 0 0 1 10 13a2 2 0 0 1 2-2z"/>
-                      </svg>
-                    </div>
-                    <p className="template-card__lock-message">Upgrade to access this template</p>
-                    <button
-                      className="btn btn--primary btn--small"
-                      onClick={() => router.push('/pricing')}
-                    >
-                      Upgrade Plan
-                    </button>
-                  </div>
+                  <span className="tpl-card-cta tpl-card-cta--upgrade">Upgrade Plan</span>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
