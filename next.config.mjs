@@ -27,7 +27,7 @@ const nextConfig = {
     // directly without /products/ prefix, preserving existing SEO URLs.
 
     // Bundle @sparticuz/chromium correctly for Vercel serverless (TBT PDF generation)
-    serverExternalPackages: ['@sparticuz/chromium'],
+        serverExternalPackages: ['@sparticuz/chromium', '@prisma/client', '.prisma/client'],
 
     // Security headers
     async headers() {
@@ -98,7 +98,7 @@ const nextConfig = {
 
     // Vercel-specific optimizations
     experimental: {
-          optimizePackageImports: ['@prisma/client'],
+                  optimizePackageImports: [],
     },
 
     // Environment variables that should be available in the browser (must be prefixed with NEXT_PUBLIC_)
