@@ -6,7 +6,7 @@ A modern Next.js application for Ebrora, converting the existing static HTML sit
 
 - **Stack**: Next.js 14+ (App Router), TypeScript, React 18
 - **Database**: PostgreSQL (Supabase or Neon) with Prisma ORM
-- **Authentication**: NextAuth.js with Google OAuth + email/password
+- **Authentication**: NextAuth.js with Googleh OAuth + email/password
 - **AI**: OpenAI API for intelligent RAMS document generation
 - **Deployment**: Vercel (London region)
 - **Styling**: Custom CSS with Ebrora brand colors and typography
@@ -78,6 +78,7 @@ All environment variables must be set in `.env.local`. See `.env.example` for al
 
 ### Optional Variables
 - `OPENAI_API_KEY` - For RAMS Builder functionality
+- `BLOB_READ_WRITE_TOKEN` - Vercel Blob storage token for RAMS document uploads (create via Vercel Dashboard > Storage > Blob)
 - `OPENAI_MODEL` - OpenAI model (default: gpt-4-turbo)
 - `SMTP_*` - Email configuration
 - `PAYPAL_*` - PayPal integration
