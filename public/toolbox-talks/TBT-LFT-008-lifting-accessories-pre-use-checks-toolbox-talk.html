@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lifting Accessories Pre-Use Checks - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lifting Accessories Pre-Use Checks</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LFT-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Lifting accessories include slings, shackles, eyebolts, spreader beams, and chains for attaching loads.</li>
+      <li>Defective accessories are a leading cause of dropped loads and fatal crushing injuries.</li>
+      <li>Every accessory must be visually inspected before each use by the person using it.</li>
+      <li>LOLER 1998 requires thorough examination of all lifting accessories at least every 6 months.</li>
+      <li>Each accessory must have a unique ID number linked to its examination record.</li>
+      <li>Damaged, worn, or unmarked accessories must be removed from service immediately.</li>
+      <li>The safe working load must be clearly marked and must never be exceeded.</li>
+      <li>Webbing slings are vulnerable to cuts, UV degradation, and chemical damage.</li>
+      <li>Chain slings must be checked for stretch, deformation, cracks, and wear at links.</li>
+      <li>Wire rope slings must be inspected for broken wires, corrosion, kinking, and bird-caging.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent dropped loads</td><td>Failed accessories cause loads to fall, killing people below.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>LOLER requires pre-use checks and 6-monthly examinations of all accessories.</td></tr>
+    <tr><td class="reason">Early defect detection</td><td>Regular checks identify damage before it leads to failure under load.</td></tr>
+    <tr><td class="reason">Accountability</td><td>Only identified and examined accessories can be traced after an incident.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Visually inspect every lifting accessory before each use.</li>
+          <li>Check that the SWL marking is legible and appropriate for the lift.</li>
+          <li>Confirm the accessory has a unique ID and is within its examination date.</li>
+          <li>Inspect webbing slings for cuts, fraying, stitching damage, and UV degradation.</li>
+          <li>Check chain slings for stretch, twisted links, cracks, and wear marks.</li>
+          <li>Examine wire rope slings for broken wires, corrosion, and kinking.</li>
+          <li>Remove any defective accessory from service immediately and quarantine it.</li>
+          <li>Store accessories off the ground, dry, and away from chemicals.</li>
+          <li>Report any accessory without an ID tag or examination record.</li>
+          <li>Use the correct type and capacity of accessory for each lift.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T use a lifting accessory that has no identification or SWL marking.</li>
+          <li>DON'T exceed the safe working load marked on any accessory.</li>
+          <li>DON'T use webbing slings that are cut, frayed, or chemically contaminated.</li>
+          <li>DON'T use chain slings with stretched, cracked, or deformed links.</li>
+          <li>DON'T tie knots in slings to shorten them or create lifting points.</li>
+          <li>DON'T use wire rope slings with visible broken wires or corrosion.</li>
+          <li>DON'T use an accessory past its thorough examination due date.</li>
+          <li>DON'T drag slings along the ground or leave them lying in mud.</li>
+          <li>DON'T repair damaged lifting accessories — they must be replaced.</li>
+          <li>DON'T assume an accessory is safe because it looks in good condition.</li>
+        </ul>
+        <p class="see-also">See also: Lifting Operations Awareness (LOLER) | Chain Slings and Shackles Inspection</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

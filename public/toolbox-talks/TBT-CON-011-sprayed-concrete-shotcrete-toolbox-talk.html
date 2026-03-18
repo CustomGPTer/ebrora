@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprayed Concrete (Shotcrete) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sprayed Concrete (Shotcrete)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CON-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Shotcrete is concrete pneumatically projected at high velocity onto a surface to form structural linings.</li>
+      <li>It is used in tunnels, retaining walls, slope stabilisation, and swimming pool construction.</li>
+      <li>The spraying process creates significant rebound — concrete particles bounce back at high speed.</li>
+      <li>Rebound material hits exposed skin, eyes, and the body, causing abrasion and concrete burns.</li>
+      <li>Cement dust and concrete mist in the spray zone require RPE with a minimum APF of 20.</li>
+      <li>The nozzle pressure and velocity make the spray hose difficult to control and hazardous if released.</li>
+      <li>Alkaline accelerators added to shotcrete are corrosive to skin and eyes on contact.</li>
+      <li>COSHH 2002 applies to exposure from cement dust, accelerators, and concrete mist during spraying.</li>
+      <li>The spray zone must be cleared of unnecessary personnel — only the nozzle operator and assistant remain.</li>
+      <li>Noise levels during shotcreting typically exceed 90 dB, requiring hearing protection for all nearby workers.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Rebound injuries</td><td>High-velocity concrete rebound strikes exposed skin and eyes causing serious injury.</td></tr>
+    <tr><td class="reason">Chemical burns</td><td>Wet concrete and alkaline accelerators cause deep skin burns on prolonged contact.</td></tr>
+    <tr><td class="reason">Respiratory hazard</td><td>Cement dust and concrete mist in the spray zone damage lungs without RPE.</td></tr>
+    <tr><td class="reason">Hose control</td><td>An uncontrolled high-pressure spray hose whips violently and can injure the operator.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear full face protection, RPE, waterproof coveralls, and gloves during spraying.</li>
+          <li>Clear all unnecessary personnel from the spray zone before starting work.</li>
+          <li>Secure the spray hose and maintain control of the nozzle at all times.</li>
+          <li>Wear hearing protection — shotcreting noise exceeds safe exposure limits.</li>
+          <li>Read the safety data sheet for all accelerators and admixtures before use.</li>
+          <li>Wash any concrete or accelerator splash off skin immediately with clean water.</li>
+          <li>Inspect the spray pump, hoses, and nozzle before every spraying session.</li>
+          <li>Brief the team on the spray sequence, exclusion zone, and emergency procedures.</li>
+          <li>Use dust suppression and ventilation when spraying in enclosed or confined areas.</li>
+          <li>Ensure eyewash stations are available near the spraying work area.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T spray without full face protection, RPE, and waterproof clothing.</li>
+          <li>DON'T allow personnel into the spray zone who are not directly involved.</li>
+          <li>DON'T release the nozzle while the pump is operating — the hose whips violently.</li>
+          <li>DON'T handle accelerators or admixtures without chemical-resistant gloves.</li>
+          <li>DON'T spray in confined spaces without forced ventilation and gas monitoring.</li>
+          <li>DON'T ignore rebound build-up — it reduces bond strength and must be removed.</li>
+          <li>DON'T eat, drink, or smoke in the spraying area without washing hands first.</li>
+          <li>DON'T stand directly in front of the spray direction when working as assistant.</li>
+          <li>DON'T skip pre-use checks on spray equipment — blockages cause pressure surges.</li>
+          <li>DON'T point the nozzle at people even when the pump is not running.</li>
+        </ul>
+        <p class="see-also">See also: Concrete Pour Safety | Concrete Burns Prevention</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

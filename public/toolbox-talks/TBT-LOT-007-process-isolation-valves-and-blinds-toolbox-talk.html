@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Process Isolation (Valves and Blinds) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Process Isolation (Valves and Blinds)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LOT-007 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Process isolation uses valves and blind flanges to isolate sections of pipework containing fluids or gases.</li>
+      <li>It is essential before maintenance, modification, or inspection of pipework systems on process sites.</li>
+      <li>Valves alone may not provide positive isolation — they can leak, be incorrectly positioned, or pass through.</li>
+      <li>Spectacle blinds and spades provide positive mechanical isolation by physically blocking the pipe bore.</li>
+      <li>Double block and bleed arrangements use two valves with a vent between them for confirmed isolation.</li>
+      <li>The process fluid may be hazardous — chemicals, sewage, gas, or water under pressure.</li>
+      <li>A permit to work must be issued defining the isolation points and confirming zero energy before work starts.</li>
+      <li>Residual pressure and trapped fluid in isolated sections can cause injury when flanges are broken.</li>
+      <li>Only competent persons should carry out process isolation — incorrect valve operation can be fatal.</li>
+      <li>The isolation must be tested by venting or draining the isolated section to confirm zero pressure.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent chemical exposure</td><td>Failed isolation releases hazardous process fluids onto workers.</td></tr>
+    <tr><td class="reason">Pressure danger</td><td>Residual pressure in isolated sections causes violent release when joints are broken.</td></tr>
+    <tr><td class="reason">Positive isolation</td><td>Valves alone can leak — blinds and spades provide absolute mechanical isolation.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>PUWER and COSHH require confirmed isolation before maintenance on process systems.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Identify all isolation points from the piping and instrumentation diagrams (P&IDs).</li>
+          <li>Use spectacle blinds or spades for positive isolation on high-hazard systems.</li>
+          <li>Vent or drain the isolated section to confirm zero pressure before breaking joints.</li>
+          <li>Apply lock out tag out devices to all valves used for isolation.</li>
+          <li>Record all isolation points on the permit to work before starting maintenance.</li>
+          <li>Wear appropriate PPE for the process fluid — chemical suits, RPE, or face shields.</li>
+          <li>Check valve positions physically — do not rely on control room indications alone.</li>
+          <li>Use double block and bleed where single valve isolation is insufficient.</li>
+          <li>Brief all workers on the isolation arrangement and permit conditions.</li>
+          <li>Test the isolation integrity before anyone enters the isolated section.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T rely on a single valve for isolation on hazardous process systems.</li>
+          <li>DON'T break flanges without first confirming the section is depressurised and drained.</li>
+          <li>DON'T remove blinds or spades until the permit is formally cancelled.</li>
+          <li>DON'T operate valves without confirming you have the correct one from the P&ID.</li>
+          <li>DON'T assume the system is empty because it has been shut down.</li>
+          <li>DON'T carry out process isolation without proper training and authorisation.</li>
+          <li>DON'T leave isolation valves unlocked or untagged during maintenance.</li>
+          <li>DON'T re-pressurise the system before confirming all workers and tools are clear.</li>
+          <li>DON'T skip the vent or drain test — it is the only way to confirm safe isolation.</li>
+          <li>DON'T ignore unusual smells or fluid weeps — they indicate isolation is not complete.</li>
+        </ul>
+        <p class="see-also">See also: Lock Out Tag Out Awareness | Permit to Work Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working Near Telecoms and Fibre - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Working Near Telecoms and Fibre</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BUR-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Telecoms and fibre optic cables are buried beneath roads, footpaths, and verges across the UK.</li>
+      <li>Fibre cables carry laser light that can cause permanent eye damage if a damaged fibre is viewed directly.</li>
+      <li>Telecoms ducts are often shallow — typically 350mm to 450mm below the surface in footways.</li>
+      <li>Damage to fibre optic cables can disrupt critical services including emergency communications and hospitals.</li>
+      <li>Telecoms cables may be bundled with power cables — treat all cables as potentially live.</li>
+      <li>HSG47 requires detection using a CAT and Genny and hand digging within 500mm of indicated positions.</li>
+      <li>Telecoms providers including Openreach, Virgin Media, and CityFibre each have their own duct networks.</li>
+      <li>Chamber covers and draw pits along the route help identify the presence of telecoms infrastructure.</li>
+      <li>Repair costs for damaged fibre cables run into tens of thousands of pounds per incident.</li>
+      <li>The New Roads and Street Works Act 1991 requires notification before excavating near telecoms assets.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Eye safety</td><td>Damaged fibre optic cables emit laser light that causes irreversible eye damage.</td></tr>
+    <tr><td class="reason">Service disruption</td><td>Fibre damage can disable emergency services, hospitals, and financial systems.</td></tr>
+    <tr><td class="reason">Financial liability</td><td>Repair costs and compensation for fibre damage are substantial for the contractor.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>NRSWA and HSG47 mandate detection and safe digging near all buried services.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Obtain telecoms service plans from all providers before excavating in the area.</li>
+          <li>Scan with a CAT and Genny before breaking ground in any location.</li>
+          <li>Hand dig within 500mm of indicated telecoms cable and duct positions.</li>
+          <li>Treat all exposed cables as active — do not touch, cut, or pull them.</li>
+          <li>Protect exposed telecoms cables with sand surround and marker tape before backfilling.</li>
+          <li>Report any damage to telecoms cables immediately to the asset owner.</li>
+          <li>Wear safety glasses if a fibre optic cable is exposed or suspected damaged.</li>
+          <li>Identify telecoms chambers and draw pits on the route before starting work.</li>
+          <li>Brief all excavation operatives on telecoms hazard positions and safe digging methods.</li>
+          <li>Notify the telecoms provider before starting work near their infrastructure.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T look into the end of a damaged fibre optic cable — laser light causes blindness.</li>
+          <li>DON'T excavate with a machine within 500mm of a known telecoms duct position.</li>
+          <li>DON'T assume shallow cables are unimportant — fibre carries critical national infrastructure.</li>
+          <li>DON'T pull, bend, or stand on exposed telecoms cables or ducts.</li>
+          <li>DON'T backfill over damaged telecoms cables without reporting to the asset owner.</li>
+          <li>DON'T use a breaker or pneumatic tool directly above a telecoms duct route.</li>
+          <li>DON'T ignore chamber covers — they indicate buried telecoms infrastructure below.</li>
+          <li>DON'T rely solely on plans — cables may have been installed since the plans were drawn.</li>
+          <li>DON'T cut into unknown cables assuming they are disused or abandoned.</li>
+          <li>DON'T start work near telecoms assets without notifying the provider first.</li>
+        </ul>
+        <p class="see-also">See also: CAT and Genny Safe Use | Safe Digging Practices (HSG47)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
