@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toolbox Talk Delivery Best Practice - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Toolbox Talk Delivery Best Practice</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WEL-007 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Toolbox talks are short safety briefings delivered to work teams at the point of work.</li>
+      <li>They are one of the most effective methods for raising safety awareness on construction sites.</li>
+      <li>A good toolbox talk lasts 10 to 15 minutes and focuses on a single, relevant safety topic.</li>
+      <li>The presenter must prepare in advance — reading the topic and thinking about site-specific examples.</li>
+      <li>Engagement is critical — asking questions and encouraging discussion improves retention significantly.</li>
+      <li>Talks should be delivered at a time and location where the team can concentrate without distraction.</li>
+      <li>Attendance must be recorded — the register is evidence of safety communication under CDM 2015.</li>
+      <li>Topics should be selected based on current site activities, recent incidents, or seasonal hazards.</li>
+      <li>Visual aids, photos, and real-site examples make toolbox talks more memorable and impactful.</li>
+      <li>Follow-up is essential — checking that the message has been understood and acted upon on site.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Accident prevention</td><td>Regular toolbox talks keep safety front of mind and reduce at-risk behaviour.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>CDM 2015 requires employers to provide information, instruction, and training to workers.</td></tr>
+    <tr><td class="reason">Worker engagement</td><td>Interactive talks build a safety culture where workers feel involved and valued.</td></tr>
+    <tr><td class="reason">Incident learning</td><td>Talks allow rapid sharing of lessons from incidents and near misses across the team.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Prepare by reading the topic and noting site-specific examples before delivery.</li>
+          <li>Choose a quiet location where the team can hear and concentrate without distraction.</li>
+          <li>Keep the talk focused on a single topic for 10 to 15 minutes maximum.</li>
+          <li>Ask open questions to encourage discussion and check understanding.</li>
+          <li>Use photos, props, or real examples from site to make the message memorable.</li>
+          <li>Record attendance on the register and file it for project records.</li>
+          <li>Select topics based on current activities, recent incidents, or seasonal risks.</li>
+          <li>Follow up on site to check the key messages are being put into practice.</li>
+          <li>Encourage team members to suggest topics they want covered in future talks.</li>
+          <li>Deliver talks regularly — weekly is the recommended minimum frequency.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T read the toolbox talk word-for-word without making eye contact.</li>
+          <li>DON'T deliver talks in noisy areas where the team cannot hear properly.</li>
+          <li>DON'T rush through the talk to get back to work — the time is invested in safety.</li>
+          <li>DON'T talk for more than 15 minutes — attention drops sharply after that.</li>
+          <li>DON'T skip the attendance register — it is required evidence under CDM.</li>
+          <li>DON'T deliver generic talks unrelated to the work happening on site that week.</li>
+          <li>DON'T ignore questions or shut down discussion — engagement is the whole point.</li>
+          <li>DON'T assume the team understood the message without checking afterwards.</li>
+          <li>DON'T treat toolbox talks as a tick-box exercise — they save lives when done well.</li>
+          <li>DON'T deliver the same talk repeatedly without varying the topic and content.</li>
+        </ul>
+        <p class="see-also">See also: Site Induction Requirements | Pre-Task Briefing Best Practice</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

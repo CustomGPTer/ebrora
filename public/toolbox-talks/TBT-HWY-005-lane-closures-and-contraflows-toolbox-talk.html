@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lane Closures and Contraflows - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lane Closures and Contraflows</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-HWY-005 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Lane closures and contraflows create safe working space on dual carriageways and motorways.</li>
+      <li>Traffic management must comply with Chapter 8 of the Traffic Signs Manual.</li>
+      <li>The safety zone between work and live traffic is the most critical element.</li>
+      <li>Impact protection vehicles (IPVs) are required on high-speed roads.</li>
+      <li>Contraflow systems redirect traffic to the opposite carriageway for two-way flow.</li>
+      <li>Cone taper lengths and sign positions are calculated based on the speed limit.</li>
+      <li>The New Roads and Street Works Act 1991 requires permits for works on highways.</li>
+      <li>All operatives in lane closures must hold appropriate NRSWA competence cards.</li>
+      <li>Entering and exiting must only be through designated access points, never across live lanes.</li>
+      <li>Temporary speed reductions must be legally authorised with advance warning signs.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Protect workers</td><td>Workers in lane closures are separated from high-speed traffic by only cones.</td></tr>
+    <tr><td class="reason">Public safety</td><td>Poorly set up closures confuse drivers and cause collisions.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>Chapter 8 and NRSWA impose strict requirements for highway closures.</td></tr>
+    <tr><td class="reason">Incident prevention</td><td>IPVs and buffer zones absorb the impact of errant vehicles.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Follow the approved traffic management plan for every lane closure.</li>
+          <li>Install signs, cones, and barriers in the correct sequence and spacing.</li>
+          <li>Position the IPV at the required distance behind the work area.</li>
+          <li>Wear hi-vis PPE compliant with Chapter 8 requirements at all times.</li>
+          <li>Enter and exit the work area only through designated safe access points.</li>
+          <li>Check the traffic management layout is correct before starting work.</li>
+          <li>Hold a valid NRSWA or sector scheme competence card for the work.</li>
+          <li>Monitor traffic flow and report signs of confusion or near misses.</li>
+          <li>Maintain communication between the traffic management team and work gang.</li>
+          <li>Remove temporary traffic management in the correct reverse sequence.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T cross live traffic lanes to enter or leave the work area.</li>
+          <li>DON'T start work before the traffic management layout is fully installed.</li>
+          <li>DON'T move or remove cones, signs, or barriers without authorisation.</li>
+          <li>DON'T work outside the protected safety zone at any time.</li>
+          <li>DON'T set up lane closures without an approved traffic management plan.</li>
+          <li>DON'T allow the IPV to be moved without authorisation.</li>
+          <li>DON'T turn your back on approaching traffic while near the live lane.</li>
+          <li>DON'T reduce sign spacing or taper lengths to save time.</li>
+          <li>DON'T assume drivers will obey the temporary speed limit.</li>
+          <li>DON'T work in a lane closure without the required competency cards.</li>
+        </ul>
+        <p class="see-also">See also: Chapter 8 Signing and Guarding | Working in Live Carriageways</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

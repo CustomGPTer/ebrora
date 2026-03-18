@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hand Laying Asphalt Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Hand Laying Asphalt Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ROA-006 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Hand laying asphalt involves spreading, raking, and compacting hot asphalt material by hand tools.</li>
+      <li>Asphalt is delivered to site at temperatures between 130°C and 180°C — severe burn risk on contact.</li>
+      <li>The work is physically demanding, combining heavy manual handling with exposure to heat and fumes.</li>
+      <li>Bitumen fumes released from hot asphalt are a respiratory irritant and potential carcinogen.</li>
+      <li>COSHH 2002 requires assessment and control of exposure to bitumen fumes during laying operations.</li>
+      <li>Workers face traffic risks when hand laying asphalt in live carriageways or adjacent to traffic.</li>
+      <li>UV exposure is increased by working outdoors for extended periods during summer asphalt seasons.</li>
+      <li>The Manual Handling Operations Regulations 1992 apply to shovelling, raking, and carrying operations.</li>
+      <li>Burns to knees from kneeling on freshly laid asphalt are common and require heat-resistant knee pads.</li>
+      <li>Hand tools including rakes, lutes, and shovels must be maintained to reduce unnecessary physical effort.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Burn prevention</td><td>Contact with asphalt at 150°C+ causes immediate deep burns requiring hospital treatment.</td></tr>
+    <tr><td class="reason">Fume exposure</td><td>Bitumen fumes cause respiratory irritation and are linked to long-term health effects.</td></tr>
+    <tr><td class="reason">Manual handling</td><td>Repetitive shovelling and raking causes back, shoulder, and arm injuries.</td></tr>
+    <tr><td class="reason">Traffic danger</td><td>Hand layers working near live traffic face the constant risk of vehicle strike.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear heat-resistant gloves, boots, and trousers when handling hot asphalt material.</li>
+          <li>Use heat-resistant knee pads if kneeling near freshly laid or compacted asphalt.</li>
+          <li>Work upwind of the hot material to minimise inhalation of bitumen fumes.</li>
+          <li>Ensure traffic management is in place before working near any live carriageway.</li>
+          <li>Stay hydrated — heat from the asphalt combined with sun increases dehydration risk.</li>
+          <li>Rotate personnel on raking and shovelling tasks to manage physical fatigue.</li>
+          <li>Apply sunscreen and wear UV-protective clothing during prolonged outdoor work.</li>
+          <li>Inspect hand tools before use — damaged rakes and lutes increase physical strain.</li>
+          <li>Report any respiratory symptoms, skin irritation, or burns to your supervisor.</li>
+          <li>Wear high-visibility clothing compliant with Chapter 8 when working on highways.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T handle hot asphalt without heat-resistant gloves and protective clothing.</li>
+          <li>DON'T stand or kneel on freshly laid hot material without heat-resistant protection.</li>
+          <li>DON'T breathe in bitumen fumes — position yourself upwind of the work.</li>
+          <li>DON'T work near live traffic without full traffic management in place.</li>
+          <li>DON'T skip hydration breaks during hot weather asphalt laying operations.</li>
+          <li>DON'T use worn or broken hand tools — they increase strain and injury risk.</li>
+          <li>DON'T allow hot material to contact bare skin — burns develop instantly.</li>
+          <li>DON'T rush the compaction process — uneven surfaces require rework and more effort.</li>
+          <li>DON'T ignore skin irritation from contact with bitumen products — report it.</li>
+          <li>DON'T throw or flick hot asphalt material — it can strike and burn nearby workers.</li>
+        </ul>
+        <p class="see-also">See also: Asphalt Laying Safety | Manual Handling Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
