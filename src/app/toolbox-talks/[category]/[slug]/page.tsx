@@ -3,8 +3,8 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
-  tbtCategories,
-  type TbtSubcategory,
+  TBT_CATEGORIES,
+  type TbtSubfolder,
   type TbtTalk,
 } from "@/data/tbt-structure";
 import { TbtA5Viewer } from "@/components/toolbox-talks/TbtA5Viewer";
@@ -18,12 +18,12 @@ function findCategoryAndSub(
   categorySlug: string,
   subSlug: string
 ): {
-  category: (typeof tbtCategories)[number];
-  sub: TbtSubcategory;
+  category: (typeof TBT_CATEGORIES)[number];
+  sub: TbtSubfolder;
 } | null {
-  const category = tbtCategories.find((c) => c.slug === categorySlug);
+  const category = TBT_CATEGORIES.find((c) => c.slug === categorySlug);
   if (!category) return null;
-  const sub = category.subcategories.find((s) => s.slug === subSlug);
+  const sub = category.subfolders.find((s) => s.slug === subSlug);
   if (!sub) return null;
   return { category, sub };
 }
