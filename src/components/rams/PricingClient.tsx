@@ -9,7 +9,7 @@ import Link from 'next/link';
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type BillingPeriod = 'monthly' | 'yearly';
-type Tier = 'FREE' | 'STANDARD' | 'PREMIUM';
+type Tier = 'FREE' | 'STANDARD' | 'PROFESSIONAL';
 
 interface TierData {
   tier: Tier;
@@ -64,7 +64,7 @@ const TIERS: TierData[] = [
     cta: 'Start Standard Plan',
   },
   {
-    tier: 'PREMIUM',
+    tier: 'PROFESSIONAL',
     name: 'Professional',
     tagline: 'For busy project teams and contractors',
     monthlyPrice: 19.99,
@@ -373,7 +373,7 @@ function PricingCard({
         {/* CTA */}
         {data.tier === 'FREE' && !isCurrentPlan ? (
           <Link
-            href={session ? '/rams-builder/generate' : '/auth/register'}
+            href={session ? '/rams-builder' : '/auth/register'}
             className="block w-full py-3.5 text-center text-[0.875rem] font-semibold rounded-lg border-2 transition-all duration-200 hover:shadow-md"
             style={{
               borderColor: 'var(--color-primary)',
@@ -603,7 +603,7 @@ export default function PricingClient() {
               </p>
             </div>
             <Link
-              href={session ? '/rams-builder/generate' : '/auth/register'}
+              href={session ? '/rams-builder' : '/auth/register'}
               className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-lg text-[0.85rem] font-semibold transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
               style={{ background: '#FFFFFF', color: 'var(--color-primary-dark)' }}
             >
@@ -795,7 +795,7 @@ export default function PricingClient() {
             and method statements in minutes, not hours.
           </p>
           <Link
-            href={session ? '/rams-builder/generate' : '/auth/register'}
+            href={session ? '/rams-builder' : '/auth/register'}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg text-[0.9rem] font-semibold transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
             style={{ background: 'var(--color-primary)', color: '#FFFFFF' }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-primary-dark)')}
