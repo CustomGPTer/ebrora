@@ -14,7 +14,7 @@ export async function GET(
   const { id } = await params;
   const generation = await prisma.generation.findUnique({
     where: { id },
-    select: { status: true, file_path: true, error_message: true, user_id: true },
+    select: { status: true, blobUrl: true, error_message: true, user_id: true },
   });
 
   if (!generation || generation.user_id !== session.user.id) {
@@ -23,7 +23,7 @@ export async function GET(
 
   return NextResponse.json({
     status: generation.status,
-    fileUrl: generation.file_path,
+    fileUrl: generation.blobUrl,
     error: generation.error_message,
   });
 }
