@@ -322,7 +322,6 @@ p {
    5. HERO
    ============================================================================ */
 .hero {
-    margin-top: var(--nav-height);
     padding: clamp(1.5rem, 3vw, 2.5rem) 0;
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-mid) 50%, var(--color-primary-dark) 100%);
     color: var(--color-white);
