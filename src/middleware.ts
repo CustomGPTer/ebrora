@@ -49,7 +49,7 @@ export default withAuth(
 
       // Check protected RAMS builder routes
       const protectedRamsRoutes = [
-              '/rams-builder/generate',
+              '/rams-builder',
               '/rams-builder/generating',
               '/rams-builder/download',
             ];
