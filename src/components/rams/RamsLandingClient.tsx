@@ -76,7 +76,7 @@ export default function RamsLandingClient() {
           </p>
 
           <div className="hero-ctas">
-            <Link href="/rams-builder/generate" className="btn btn--primary btn--large">
+            <Link href="/rams-builder" className="btn btn--primary btn--large">
               Build Your First RAMS — Free
             </Link>
             <a href="#pricing" className="btn btn--outline btn--large">
