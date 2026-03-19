@@ -49,7 +49,7 @@ export const TIER_LIMITS = {
     maxLogoSize: 2 * 1024 * 1024, // 2MB
     storageHours: 7 * 24, // 7 days
   },
-  PREMIUM: {
+  PROFESSIONAL: {
     ramsPerMonth: 25,
     formats: 10,
     maxLogoSize: 5 * 1024 * 1024, // 5MB
