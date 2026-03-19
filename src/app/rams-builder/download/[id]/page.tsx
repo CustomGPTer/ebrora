@@ -27,8 +27,8 @@ export default async function DownloadPage({ params }: PageProps) {
     notFound();
   }
 
-  const isExpired = generation.file_expires_at
-    ? new Date(generation.file_expires_at) < new Date()
+  const isExpired = generation.expiresAt
+    ? new Date(generation.expiresAt) < new Date()
     : false;
 
   return (
@@ -36,7 +36,6 @@ export default async function DownloadPage({ params }: PageProps) {
       generationId={generation.id}
       formatName={generation.rams_format.name}
       status={generation.status}
-      fileUrl={generation.file_path}
       isExpired={isExpired}
       createdAt={generation.created_at.toISOString()}
     />
