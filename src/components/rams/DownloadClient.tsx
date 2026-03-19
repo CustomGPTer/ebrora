@@ -60,7 +60,7 @@ export default function DownloadClient({
           <div className="download__meta">
             This download link has expired. Please generate a new RAMS document.
           </div>
-          <a href="/rams-builder/generate" className="btn btn--primary">
+          <a href="/rams-builder" className="btn btn--primary">
             Generate Again
           </a>
         </div>
@@ -113,7 +113,7 @@ export default function DownloadClient({
             {isDownloading ? 'Downloading...' : 'Download .docx'}
           </button>
 
-          <a href="/rams-builder/generate" className="btn btn--outline">
+          <a href="/rams-builder" className="btn btn--outline">
             Generate Another
           </a>
         </div>
