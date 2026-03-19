@@ -126,7 +126,7 @@ export function UsersClient({
             <option value="ALL">All Tiers</option>
             <option value="FREE">Free</option>
             <option value="STANDARD">Standard</option>
-            <option value="PREMIUM">Premium</option>
+            <option value="PROFESSIONAL">Professional</option>
           </select>
           <button
             type="submit"
@@ -220,12 +220,12 @@ export function UsersClient({
                       fontSize: '0.75rem',
                       fontWeight: 'bold',
                       backgroundColor:
-                        user.tier === 'PREMIUM'
+                        user.tier === 'PROFESSIONAL'
                           ? '#fce4ec'
                           : user.tier === 'STANDARD'
                             ? '#e3f2fd'
                             : '#f5f5f5',
-                      color: user.tier === 'PREMIUM' ? '#c2185b' : user.tier === 'STANDARD' ? '#1565c0' : '#666',
+                      color: user.tier === 'PROFESSIONAL' ? '#c2185b' : user.tier === 'STANDARD' ? '#1565c0' : '#666',
                     }}
                   >
                     {user.tier}
