@@ -17,8 +17,8 @@ export const PLAN_CONFIG = {
     ramsLimit: 10,
     formatsAccess: 'ALL',
   },
-  PREMIUM_MONTHLY: {
-    tier: 'PREMIUM',
+  PROFESSIONAL_MONTHLY: {
+    tier: 'PROFESSIONAL',
     billing: 'MONTHLY',
     price: '19.99',
     currency: 'GBP',
@@ -26,8 +26,8 @@ export const PLAN_CONFIG = {
     ramsLimit: 25,
     formatsAccess: 'ALL',
   },
-  PREMIUM_YEARLY: {
-    tier: 'PREMIUM',
+  PROFESSIONAL_YEARLY: {
+    tier: 'PROFESSIONAL',
     billing: 'YEARLY',
     price: '199.99',
     currency: 'GBP',
@@ -63,7 +63,7 @@ export const FREE_TIER = {
 
 export function getRamsLimitByTier(tier: string): number {
   switch (tier) {
-    case 'PREMIUM':
+    case 'PROFESSIONAL':
       return 25;
     case 'STANDARD':
       return 10;
@@ -75,7 +75,7 @@ export function getRamsLimitByTier(tier: string): number {
 
 export function getFormatsAccessByTier(tier: string): 'LIMITED' | 'ALL' {
   switch (tier) {
-    case 'PREMIUM':
+    case 'PROFESSIONAL':
     case 'STANDARD':
       return 'ALL';
     case 'FREE':
