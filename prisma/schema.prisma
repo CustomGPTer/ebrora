@@ -151,8 +151,6 @@ model Generation {
   user_id           String
   format_id         String
   status            GenerationStatus @default(QUEUED)
-  file_path         String?
-  file_expires_at   DateTime?
   activity_category String?
   error_message     String?
   retry_count       Int              @default(0)
