@@ -48,7 +48,7 @@ export function WelcomeBanner() {
         </div>
 
         <div className="welcome-banner__actions">
-          <a href="/rams-builder/generate" className="welcome-banner__button">
+          <a href="/rams-builder" className="welcome-banner__button">
             Get Started
           </a>
           <button
