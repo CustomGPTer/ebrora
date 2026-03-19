@@ -8,7 +8,7 @@ import { RAMS_FORMATS } from '@/data/rams-formats';
 
 interface QuestionnaireClientProps {
   userId: string;
-  userTier: 'FREE' | 'STANDARD' | 'PREMIUM';
+  userTier: 'FREE' | 'STANDARD' | 'PROFESSIONAL';
 }
 
 interface Question {
