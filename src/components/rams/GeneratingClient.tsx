@@ -79,7 +79,7 @@ export default function GeneratingClient({
             {error}
           </div>
           <a
-            href="/rams-builder/generate"
+            href="/rams-builder"
             className="btn btn--primary"
             style={{ marginTop: '2rem' }}
           >
