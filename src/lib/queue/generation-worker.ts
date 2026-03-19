@@ -1,13 +1,12 @@
 import prisma from '@/lib/prisma';
 import { generateRamsContent } from '@/lib/ai/generate-content';
 import { buildRamsDocument } from '@/lib/docgen/builder';
-import fs from 'fs/promises';
-import path from 'path';
+import { put } from '@vercel/blob';
 
 /**
  * Processes a RAMS generation job.
  * Fetches the generation record, generates content via AI, builds the Word document,
- * and updates the record with the result.
+ * uploads to Vercel Blob, and updates the record with the result.
  * @param generationId - The ID of the generation record to process
  */
 export async function processGeneration(generationId: string): Promise<void> {
@@ -61,22 +60,26 @@ export async function processGeneration(generationId: string): Promise<void> {
       generationDate: new Date(),
     });
 
-    // Save the document to a temporary location
-    const tmpDir = '/tmp/rams-docs';
-    await fs.mkdir(tmpDir, { recursive: true });
-
+    // Upload to Vercel Blob
     const filename = `rams-${generationId}-${Date.now()}.docx`;
-    const filePath = path.join(tmpDir, filename);
-    await fs.writeFile(filePath, docxBuffer);
+    const blob = await put(`rams/${filename}`, docxBuffer, {
+      access: 'public',
+      contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    });
 
-    console.log(`[Generation Worker] Document saved to: ${filePath}`);
+    console.log(`[Generation Worker] Document uploaded to: ${blob.url}`);
+
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     // Update generation record with success
     await prisma.generation.update({
       where: { id: generationId },
       data: {
         status: 'COMPLETED',
-        file_path: filePath,
+        blobUrl: blob.url,
+        blobPathname: blob.pathname,
+        filename,
+        expiresAt,
         completed_at: new Date(),
       },
     });
