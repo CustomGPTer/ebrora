@@ -39,8 +39,8 @@ export async function GET(request: NextRequest) {
       formatName: gen.rams_format?.name || 'Unknown',
       status: gen.status,
       createdAt: gen.created_at.toISOString(),
-      fileUrl: gen.file_path,
-      isExpired: gen.file_expires_at ? new Date() > gen.file_expires_at : false,
+      fileUrl: gen.blobUrl,
+      isExpired: gen.expiresAt ? new Date() > gen.expiresAt : false,
     }));
 
     return NextResponse.json(
