@@ -176,7 +176,7 @@ export default async function ToolboxCategoryPage({ params }: PageProps) {
                   </div>
                 </div>
 
-                <h2 className="text-sm font-bold text-gray-900 group-hover:text-[#1B5745] transition-colors mb-1 leading-tight">
+                <h2 className="text-[15px] font-bold text-gray-900 group-hover:text-[#1B5745] transition-colors mb-1 leading-tight">
                   {sub.name}
                 </h2>
 
