@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hand Digging Techniques and Tools - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Hand Digging Techniques and Tools</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BUR-017 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Hand digging is required when excavating near buried services to prevent cable strikes and pipe damage.</li>
+      <li>HSG47 (Avoiding Danger from Underground Services) mandates hand digging within the influence zone of detected services.</li>
+      <li>Spades, forks, and hand tools must be used instead of picks and mechanical breakers near confirmed service positions.</li>
+      <li>Insulated hand tools are recommended when digging near suspected electrical cables to reduce shock risk.</li>
+      <li>Hand digging is physically demanding work causing back injuries, blisters, and fatigue without proper technique.</li>
+      <li>The influence zone around a detected service is typically 500mm either side of the indicated position.</li>
+      <li>Service positions indicated by CAT scans are approximate — the actual position may vary by 500mm or more.</li>
+      <li>Trial holes dug by hand confirm the exact depth, position, and type of buried service before machine excavation.</li>
+      <li>Ground conditions including clay, gravel, and made ground affect the difficulty and speed of hand digging.</li>
+      <li>Sharp spade edges and picks create laceration and puncture hazards to hands and feet during use.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent service strikes</td><td>Machine excavation near buried services causes gas leaks, electrocution, and water mains bursts — hand digging avoids this.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>HSG47 requires hand or mechanical alternative methods near buried services — breaking this rule risks prosecution.</td></tr>
+    <tr><td class="reason">Worker safety</td><td>Even hand tools can damage services — proper technique and tool selection reduce the remaining risk.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use spades and forks, not picks or mattocks, when digging within 500mm of a detected service</li>
+          <li>Dig trial holes by hand to confirm exact service positions before allowing machine excavation</li>
+          <li>Use insulated hand tools when excavating near suspected electricity cables in the ground</li>
+          <li>Adopt correct manual handling posture — bend knees, keep back straight, and take regular breaks</li>
+          <li>Wear steel-toe-capped boots and gloves to protect feet and hands during digging operations</li>
+          <li>Mark the confirmed service position clearly once exposed in the trial hole for all to see</li>
+          <li>Rotate hand digging tasks between workers to reduce fatigue and prevent back strain</li>
+          <li>Report immediately if a service is exposed that does not match the utility plan records</li>
+          <li>Support the sides of trial holes deeper than 1.2 metres to prevent collapse onto workers</li>
+          <li>Backfill and protect exposed services carefully using hand-placed surround material</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T use picks, mattocks, or mechanical breakers within 500mm of a detected service position</li>
+          <li>DON&#x27;T machine excavate until hand-dug trial holes confirm the exact service location and depth</li>
+          <li>DON&#x27;T assume CAT scan positions are exact — services may be 500mm or more from the indication</li>
+          <li>DON&#x27;T drive spades forcefully into the ground near electricity cables — use a gentle probing action</li>
+          <li>DON&#x27;T continue digging if you strike something unexpected — stop and investigate carefully</li>
+          <li>DON&#x27;T leave exposed services unsupported in open trial holes where they could be damaged</li>
+          <li>DON&#x27;T dig for extended periods without breaks — hand digging causes significant physical fatigue</li>
+          <li>DON&#x27;T use worn or damaged hand tools with loose handles or blunt edges on site</li>
+          <li>DON&#x27;T enter trial holes deeper than 1.2 metres without trench support in place</li>
+          <li>DON&#x27;T backfill over exposed services without recording their confirmed position on the plans</li>
+        </ul>
+        <p class="see-also">See also: Safe Digging Practices (HSG47) | CAT and Genny Safe Use</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

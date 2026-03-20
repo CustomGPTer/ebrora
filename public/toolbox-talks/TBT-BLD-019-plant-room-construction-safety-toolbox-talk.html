@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plant Room Construction Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Plant Room Construction Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BLD-019 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Plant rooms house mechanical and electrical equipment including boilers, chillers, pumps, switchgear, and generators.</li>
+      <li>Construction in plant rooms involves heavy equipment installation, complex pipework, and electrical terminations.</li>
+      <li>Access is often restricted by narrow doorways, low headroom, and congested layouts with multiple trades working together.</li>
+      <li>Noise levels in operational plant rooms commonly exceed 85 dB(A), requiring hearing protection for all personnel.</li>
+      <li>Heavy equipment deliveries through restricted openings require detailed lift plans and specialist rigging.</li>
+      <li>Hot works for pipework brazing and welding in enclosed plant rooms create fire and fume hazards.</li>
+      <li>Electrical commissioning and energisation in plant rooms introduces electrocution and arc flash risks.</li>
+      <li>Floor penetrations for pipework and cables create fall and trip hazards throughout the construction period.</li>
+      <li>Coordination between mechanical, electrical, and controls trades is essential to prevent clashes and rework.</li>
+      <li>Ventilation may be limited during construction, creating exposure risks from welding fume, dust, and solvents.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Multi-trade coordination</td><td>Congested plant rooms with multiple trades create collision, dropped object, and access conflict risks.</td></tr>
+    <tr><td class="reason">Fire and fume risk</td><td>Hot works in enclosed plant rooms without ventilation cause fume accumulation and fire risk from combustibles.</td></tr>
+    <tr><td class="reason">Heavy lifting hazards</td><td>Moving large equipment through restricted access creates crush and rigging failure risks in tight spaces.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Coordinate all trades working in the plant room through daily briefings and sequencing plans</li>
+          <li>Plan equipment delivery routes and lifting operations before mobilising heavy items to site</li>
+          <li>Ensure mechanical ventilation is running before hot works or solvent use inside plant rooms</li>
+          <li>Wear hearing protection in plant rooms where noise levels exceed 85 dB(A) during operation</li>
+          <li>Guard or cover all floor penetrations to prevent falls and trips throughout construction</li>
+          <li>Use hot works permits and fire watches for all brazing, welding, and cutting activities</li>
+          <li>Maintain clear escape routes from the plant room to the nearest exit at all times</li>
+          <li>Brief all personnel on electrical isolation zones during commissioning and energisation</li>
+          <li>Keep the plant room clean and free from combustible waste during all construction phases</li>
+          <li>Use temporary lighting to ensure adequate visibility in enclosed or windowless plant rooms</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T allow multiple uncoordinated trades to work in the same plant room simultaneously</li>
+          <li>DON&#x27;T carry out hot works in enclosed plant rooms without ventilation and fire watch</li>
+          <li>DON&#x27;T store flammable materials, solvents, or gas cylinders inside operating plant rooms</li>
+          <li>DON&#x27;T leave floor penetrations uncovered or unguarded in the plant room during works</li>
+          <li>DON&#x27;T attempt to move heavy equipment without a planned lifting or rigging operation</li>
+          <li>DON&#x27;T work near energised switchgear during commissioning without arc-rated PPE and authority</li>
+          <li>DON&#x27;T block emergency exits or access routes with equipment, materials, or waste</li>
+          <li>DON&#x27;T use solvent-based products in unventilated plant rooms — fumes accumulate rapidly</li>
+          <li>DON&#x27;T enter the plant room without hearing protection if equipment is running above 85 dB(A)</li>
+          <li>DON&#x27;T ignore trade coordination — clashes in congested spaces lead to damage and injuries</li>
+        </ul>
+        <p class="see-also">See also: Mechanical Building Services Safety | Electrical Building Services Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

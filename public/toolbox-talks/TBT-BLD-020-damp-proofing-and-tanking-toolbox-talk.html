@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Damp Proofing and Tanking - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Damp Proofing and Tanking</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BLD-020 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Damp proofing and tanking protect below-ground structures from water ingress using membranes, coatings, and drainage systems.</li>
+      <li>Tanking products include bituminous coatings, cementitious slurries, liquid-applied membranes, and sheet membranes.</li>
+      <li>Many tanking products contain solvents, bitumen, or chemical compounds that are hazardous to health when inhaled.</li>
+      <li>Application in enclosed basement areas creates high vapour concentrations requiring forced ventilation and RPE.</li>
+      <li>The COSHH Regulations 2002 require assessment of all tanking chemicals before application work begins.</li>
+      <li>Hot-applied tanking systems involving heated bitumen create burn hazards and flammable vapour risks.</li>
+      <li>Surface preparation using grinding, chasing, and grit blasting generates dust requiring extraction and RPE.</li>
+      <li>Tanking membranes must be applied to clean, dry surfaces — contamination causes adhesion failure and water ingress.</li>
+      <li>Working in confined basement spaces combines chemical exposure with restricted access and poor ventilation.</li>
+      <li>BS 8102 provides the UK code of practice for protection of below-ground structures against water from the ground.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Chemical exposure</td><td>Solvent-based tanking products cause respiratory damage and central nervous system effects in enclosed spaces.</td></tr>
+    <tr><td class="reason">Fire risk</td><td>Hot-applied bitumen and solvent-based products are flammable — fire risk is high in confined basement areas.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>COSHH 2002 requires exposure assessment and ventilation controls for all tanking chemical application work.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a COSHH assessment for every tanking product before application work begins</li>
+          <li>Ensure forced mechanical ventilation is running in basements before starting application</li>
+          <li>Wear RPE with organic vapour cartridges when applying solvent-based tanking products</li>
+          <li>Provide fire extinguishers at the work location when using hot-applied or solvent-based systems</li>
+          <li>Monitor air quality in enclosed areas for VOCs and ensure levels remain below exposure limits</li>
+          <li>Prepare surfaces by removing contamination and ensuring they are clean and dry before application</li>
+          <li>Wear chemical-resistant gloves and coveralls to prevent skin contact with tanking chemicals</li>
+          <li>Allow adequate curing and ventilation time before follow-on trades enter tanked areas</li>
+          <li>Brief all workers on the chemical hazards and emergency procedures before each application</li>
+          <li>Inspect completed tanking for defects and carry out water testing where specified</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T apply solvent-based tanking products in basements without forced mechanical ventilation</li>
+          <li>DON&#x27;T work with tanking chemicals without RPE specified in the COSHH assessment</li>
+          <li>DON&#x27;T use naked flames or hot works near solvent-based tanking products during application</li>
+          <li>DON&#x27;T eat, drink, or smoke in areas where tanking chemicals are being applied or curing</li>
+          <li>DON&#x27;T allow other trades into freshly tanked areas until ventilation has cleared all vapours</li>
+          <li>DON&#x27;T apply tanking membranes to damp, dirty, or contaminated surfaces — adhesion will fail</li>
+          <li>DON&#x27;T heat bitumen beyond the manufacturer&#x27;s recommended temperature during hot application</li>
+          <li>DON&#x27;T store tanking chemicals in basements overnight where vapours can accumulate</li>
+          <li>DON&#x27;T ignore headaches, dizziness, or nausea during application — these indicate overexposure</li>
+          <li>DON&#x27;T puncture completed tanking membranes with fixings without approved detail and repair</li>
+        </ul>
+        <p class="see-also">See also: Basement Waterproofing Safety | COSHH Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
