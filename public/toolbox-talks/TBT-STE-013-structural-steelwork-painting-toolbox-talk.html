@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structural Steelwork Painting - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Structural Steelwork Painting</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-STE-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Structural steelwork painting applies protective coatings to prevent corrosion of steel frames and connections.</li>
+      <li>Coatings include primer, intermediate, and finish coats using epoxy, polyurethane, or zinc-based systems.</li>
+      <li>Many structural paints contain solvents, isocyanates, or zinc dust that are harmful by inhalation and skin contact.</li>
+      <li>Spray application generates a fine mist that increases inhalation exposure compared to brush or roller methods.</li>
+      <li>Surface preparation by blast cleaning or power tool cleaning generates metallic dust and noise.</li>
+      <li>Working at height on steel structures requires safe access platforms or rope access for painting.</li>
+      <li>Enclosed or partially enclosed areas trap solvent vapour, creating explosion risk and health hazards.</li>
+      <li>Intumescent fire protection coatings applied to steelwork have their own specific COSHH requirements.</li>
+      <li>Wet and cold conditions affect coating adhesion — application must occur within specified temperature ranges.</li>
+      <li>Overspray and drips from painting operations can affect workers and activities on lower levels.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Chemical exposure</td><td>Solvents, isocyanates, and zinc dust in structural paints cause respiratory sensitisation, dermatitis, and metal fume fever.</td></tr>
+    <tr><td class="reason">Explosion risk</td><td>Solvent vapour accumulation in enclosed areas creates a flammable atmosphere with potential for explosion.</td></tr>
+    <tr><td class="reason">Working at height</td><td>Painting elevated steelwork exposes workers to fall hazards in positions that are difficult to protect.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a COSHH assessment for every coating product used in the painting system</li>
+          <li>Wear RPE with appropriate filters for the specific paint type and application method</li>
+          <li>Provide forced ventilation when spraying coatings in enclosed or partially enclosed areas</li>
+          <li>Monitor solvent vapour levels in enclosed spaces to prevent explosive concentrations</li>
+          <li>Use safe working platforms for painting at height — avoid overreaching from ladders</li>
+          <li>Protect workers on lower levels from overspray and drips with sheeting or exclusion zones</li>
+          <li>Apply coatings within the temperature and humidity range specified by the manufacturer</li>
+          <li>Wear chemical-resistant gloves and coveralls to prevent skin contact with paints</li>
+          <li>Inspect blast-cleaned surfaces and apply primer within the time limit before re-rusting</li>
+          <li>Store paints and solvents in designated bunded areas away from ignition sources</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T spray coatings in enclosed areas without forced ventilation and vapour monitoring</li>
+          <li>DON'T ignore isocyanate warnings — exposure causes permanent occupational asthma</li>
+          <li>DON'T apply coatings outside the specified temperature and humidity range</li>
+          <li>DON'T smoke or use naked flames near painting operations or solvent storage areas</li>
+          <li>DON'T allow blast-cleaned surfaces to rust before primer application — work within the limit</li>
+          <li>DON'T mix coating products from different manufacturers without engineer approval</li>
+          <li>DON'T remove RPE while spray mist or solvent vapour is still present in the area</li>
+          <li>DON'T paint at height without fall protection appropriate for the access method used</li>
+          <li>DON'T allow untrained workers to apply intumescent fire protection coatings</li>
+          <li>DON'T pour waste paint or solvents down drains — dispose through licensed waste routes</li>
+        </ul>
+        <p class="see-also">See also: Steel Erection Safety | Spray Painting Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pneumatic Pressure Testing - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Pneumatic Pressure Testing</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PIP-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Pneumatic pressure testing uses compressed air or nitrogen to verify the integrity of pipework and vessels.</li>
+      <li>Pneumatic tests store significantly more energy than hydrostatic tests at the same pressure due to gas compressibility.</li>
+      <li>A failure during pneumatic testing can cause a violent explosion with lethal blast and fragment hazards.</li>
+      <li>Exclusion zones during pneumatic testing must be much larger than for equivalent hydrostatic tests.</li>
+      <li>The test pressure, hold time, and acceptable leakage rate must be specified in the test procedure.</li>
+      <li>All personnel must be evacuated from the exclusion zone before the test pressure is applied.</li>
+      <li>Pressure must be raised in incremental stages with checks at each stage before proceeding.</li>
+      <li>The Pressure Systems Safety Regulations 2000 apply to pneumatic testing of pressure systems.</li>
+      <li>Soap solution or gas detection is used to find leaks once the system is pressurised.</li>
+      <li>The test medium must be suitable — oxygen must never be used for pneumatic testing.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Explosion risk</td><td>Compressed gas stores enormous energy — a pneumatic test failure produces an explosion far more violent than a hydraulic failure.</td></tr>
+    <tr><td class="reason">Lethal fragments</td><td>Pipe and fitting fragments from a pneumatic burst travel at high velocity, causing fatal impact injuries at distance.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>The Pressure Systems Safety Regulations 2000 require safe systems of work for all pressure testing activities.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Follow a written test procedure specifying pressure, hold time, and acceptance criteria</li>
+          <li>Establish exclusion zones that account for the stored energy of the compressed gas</li>
+          <li>Evacuate all personnel from the exclusion zone before pressurising the system</li>
+          <li>Raise pressure in controlled incremental stages with visual and audible checks at each step</li>
+          <li>Use dry nitrogen or oil-free compressed air as the test medium — never oxygen</li>
+          <li>Ensure all connections, joints, and end caps are rated for the test pressure</li>
+          <li>Use calibrated pressure gauges to monitor the test and confirm the hold period</li>
+          <li>Check for leaks using soap solution or gas detection once the test pressure is achieved</li>
+          <li>Depressurise the system fully before approaching to investigate any anomalies</li>
+          <li>Record the test results including pressure, duration, temperature, and any leaks found</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T allow anyone inside the exclusion zone during pneumatic pressurisation</li>
+          <li>DON'T use oxygen for pneumatic testing under any circumstances — it creates fire risk</li>
+          <li>DON'T raise pressure rapidly — use controlled incremental stages with checks</li>
+          <li>DON'T approach the system to investigate leaks while it remains pressurised</li>
+          <li>DON'T use fittings, valves, or end caps not rated for the pneumatic test pressure</li>
+          <li>DON'T conduct a pneumatic test where a hydrostatic test is practicable and safer</li>
+          <li>DON'T leave a pressurised system unattended without continuous monitoring</li>
+          <li>DON'T apply the full test pressure without first holding at intermediate stages</li>
+          <li>DON'T ignore small leaks — depressurise, repair, and retest before acceptance</li>
+          <li>DON'T underestimate the stored energy — pneumatic failures are far more violent than hydraulic</li>
+        </ul>
+        <p class="see-also">See also: Hydrostatic Pressure Testing | Pressure Testing Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

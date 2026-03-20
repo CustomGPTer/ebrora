@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pathogen and Infection Risk - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Pathogen and Infection Risk</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WWT-018 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Workers at wastewater treatment works are exposed to bacteria, viruses, and parasites in sewage.</li>
+      <li>Common pathogens include E. coli, Salmonella, Hepatitis A, Cryptosporidium, and Leptospira.</li>
+      <li>Infection routes include ingestion, inhalation of aerosols, skin contact, and entry through cuts or wounds.</li>
+      <li>Aeration processes, inlet works screening, and sludge handling generate bioaerosols that can be inhaled.</li>
+      <li>Leptospirosis (Weil's disease) is contracted through contact with water contaminated by rat urine.</li>
+      <li>Hepatitis A vaccination is recommended for all workers with regular sewage contact.</li>
+      <li>Personal hygiene is the single most effective control — handwashing before eating prevents most infections.</li>
+      <li>Cuts and abrasions must be covered with waterproof dressings before entering sewage work areas.</li>
+      <li>COSHH 2002 requires biological hazard assessment for all work involving contact with sewage or sludge.</li>
+      <li>Contaminated work clothing must not be worn in rest areas or taken home for domestic laundering.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Serious illness</td><td>Sewage pathogens cause diseases ranging from gastroenteritis to potentially fatal leptospirosis and hepatitis.</td></tr>
+    <tr><td class="reason">Aerosol exposure</td><td>Bioaerosols from aeration and screening are inhaled unknowingly, delivering pathogens deep into the lungs.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>COSHH 2002 requires employers to assess and control biological hazards in wastewater work environments.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wash hands thoroughly with soap and water before eating, drinking, or smoking</li>
+          <li>Cover all cuts, grazes, and open wounds with waterproof dressings before entering site</li>
+          <li>Ensure hepatitis A and tetanus vaccinations are current before starting sewage work</li>
+          <li>Wear waterproof gloves, coveralls, and eye protection when handling sewage or sludge</li>
+          <li>Change out of contaminated work clothing before entering the rest area or canteen</li>
+          <li>Complete a COSHH assessment covering biological hazards for each work activity</li>
+          <li>Use RPE where bioaerosol exposure from aeration or screening is significant</li>
+          <li>Report any symptoms of illness including fever, vomiting, or jaundice promptly</li>
+          <li>Shower after prolonged sewage contact before leaving the treatment works site</li>
+          <li>Launder contaminated work clothing separately from personal clothing</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T eat, drink, or smoke before washing your hands after sewage contact</li>
+          <li>DON'T enter sewage work areas with uncovered cuts or wounds on your skin</li>
+          <li>DON'T take contaminated work clothing home or wear it in the canteen</li>
+          <li>DON'T touch your face, eyes, or mouth while working in sewage environments</li>
+          <li>DON'T work at wastewater sites without current hepatitis A and tetanus vaccinations</li>
+          <li>DON'T ignore flu-like symptoms after sewage exposure — seek medical advice promptly</li>
+          <li>DON'T use compressed air to clean sewage splashes from surfaces or equipment</li>
+          <li>DON'T enter aeration areas without assessing the bioaerosol inhalation risk</li>
+          <li>DON'T dismiss gastrointestinal illness as unrelated — report it for investigation</li>
+          <li>DON'T underestimate the infection risk from dilute or apparently clean sewage</li>
+        </ul>
+        <p class="see-also">See also: Leptospirosis (Weil's Disease) | Wastewater Treatment Works Safety Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

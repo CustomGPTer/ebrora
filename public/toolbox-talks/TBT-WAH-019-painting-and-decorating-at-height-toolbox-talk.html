@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painting and Decorating at Height - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Painting and Decorating at Height</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WAH-019 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Painting and decorating at height accounts for a significant number of fall-from-height injuries each year.</li>
+      <li>Many painting tasks are short duration, leading workers to use inappropriate access such as chairs or boxes.</li>
+      <li>The Work at Height Regulations 2005 require a hierarchy of control even for brief tasks above ground.</li>
+      <li>Podium steps, tower scaffolds, and MEWPs are safer alternatives to ladders for painting work.</li>
+      <li>Ladders may be used for light, short-duration work only where a risk assessment supports their use.</li>
+      <li>Overreaching from any access equipment is a primary cause of falls during painting activities.</li>
+      <li>Solvent-based paints and primers used at height can cause dizziness, increasing fall risk.</li>
+      <li>Roller extension poles and long-handled tools reduce the need to work at height for some tasks.</li>
+      <li>External painting on scaffolds requires edge protection and toe boards to prevent falls and drops.</li>
+      <li>Wet paint on platforms and step treads creates slip hazards that must be managed during the work.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fall injuries</td><td>Falls during painting and decorating are common and often result from overreaching, makeshift platforms, or ladder misuse.</td></tr>
+    <tr><td class="reason">Fume effects</td><td>Solvent fumes at height cause dizziness and disorientation, significantly increasing the risk of falling.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>The Work at Height Regulations 2005 apply to all work at height including short-duration painting tasks.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Select the safest access equipment for the height and duration of the painting task</li>
+          <li>Use podium steps or tower scaffolds instead of ladders where practicable</li>
+          <li>Move access equipment rather than overreaching from a fixed position</li>
+          <li>Use roller extension poles to reduce the need to work above ground level</li>
+          <li>Ventilate the area when using solvent-based paints, especially at height</li>
+          <li>Secure all paint pots and tools on platforms to prevent them falling</li>
+          <li>Check platforms and step treads for wet paint before standing on them</li>
+          <li>Ensure scaffolds have guardrails, toeboards, and full boarding in place</li>
+          <li>Complete a risk assessment for every painting task carried out at height</li>
+          <li>Wear non-slip footwear suitable for working on platforms and ladders</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T use chairs, boxes, or buckets as makeshift platforms for painting</li>
+          <li>DON'T overreach from ladders, platforms, or MEWPs while painting</li>
+          <li>DON'T use ladders for painting tasks where a safer alternative is available</li>
+          <li>DON'T ignore dizziness from solvent fumes while working at height — descend</li>
+          <li>DON'T leave paint tins balanced on scaffold boards where they can be knocked off</li>
+          <li>DON'T stand on the top three rungs of a stepladder while painting</li>
+          <li>DON'T carry large containers of paint up a ladder — use a hoist or rope line</li>
+          <li>DON'T paint in areas with inadequate ventilation using solvent-based products</li>
+          <li>DON'T remove scaffold edge protection to reach areas behind guardrails</li>
+          <li>DON'T skip the risk assessment because the painting task seems simple or quick</li>
+        </ul>
+        <p class="see-also">See also: Painting and Decorating Safety | Working at Height Hierarchy of Control</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

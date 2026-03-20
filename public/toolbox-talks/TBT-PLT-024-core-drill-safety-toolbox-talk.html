@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Drill Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Core Drill Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PLT-024 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Core drills cut cylindrical holes through concrete, masonry, and stone using diamond-tipped barrels.</li>
+      <li>The drill rig must be securely fixed to the surface using anchor bolts or a vacuum pad system.</li>
+      <li>Water supply is essential for cooling the diamond barrel and suppressing concrete dust during drilling.</li>
+      <li>Slurry water from the drilling operation is highly alkaline and must be contained and disposed of properly.</li>
+      <li>Drilling through reinforcement can snag the barrel, causing violent rotation of the rig and operator injury.</li>
+      <li>Hidden services including electrical cables and water pipes behind the wall or in the slab must be located.</li>
+      <li>The core plug at the far side of the hole can fall uncontrolled when the barrel breaks through.</li>
+      <li>Noise levels during core drilling typically exceed 85 dB, requiring mandatory hearing protection.</li>
+      <li>Wet drilling on walls creates slippery floor surfaces from water and slurry runoff.</li>
+      <li>Operators must be trained in core drill setup, operation, and emergency shutdown procedures.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Rig rotation</td><td>A snagged barrel causes the rig to spin violently, throwing or injuring the operator in an instant.</td></tr>
+    <tr><td class="reason">Service strikes</td><td>Drilling through hidden electrical cables or gas pipes causes electrocution, fire, and explosion.</td></tr>
+    <tr><td class="reason">Silica dust</td><td>Dry core drilling generates extremely high concentrations of respirable crystalline silica.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Fix the drill rig securely to the surface using anchor bolts or a rated vacuum pad</li>
+          <li>Locate hidden services using a cover meter and CAT scanner before drilling</li>
+          <li>Use a continuous water supply to cool the barrel and suppress silica dust</li>
+          <li>Contain and collect slurry water for proper disposal — do not let it enter drains</li>
+          <li>Wear hearing protection throughout the core drilling operation</li>
+          <li>Support the far side of the hole to catch the core plug when breakthrough occurs</li>
+          <li>Wear eye protection and waterproof clothing during wet drilling operations</li>
+          <li>Ensure the operator is trained in core drill setup and emergency shutdown</li>
+          <li>Clean up water and slurry from the floor to prevent slip hazards for other workers</li>
+          <li>Inspect the diamond barrel and rig components before each drilling session</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T operate the core drill without securing the rig firmly to the surface</li>
+          <li>DON'T drill into walls, floors, or slabs without locating hidden services first</li>
+          <li>DON'T dry drill concrete — always use water supply for cooling and dust control</li>
+          <li>DON'T allow slurry water to run into surface water drains or watercourses</li>
+          <li>DON'T force the drill into reinforcement — withdraw and reassess if the barrel snags</li>
+          <li>DON'T stand in the rotation plane of the rig in case of barrel snag and spin</li>
+          <li>DON'T leave the far side of the hole unprotected where falling core plugs could injure</li>
+          <li>DON'T operate without hearing protection — noise levels are consistently high</li>
+          <li>DON'T use a worn diamond barrel — it overheats and reduces drilling control</li>
+          <li>DON'T leave wet slurry on floor surfaces where others could slip and fall</li>
+        </ul>
+        <p class="see-also">See also: Cutting Concrete and Block | Disc Cutter and Cut-Off Saw Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

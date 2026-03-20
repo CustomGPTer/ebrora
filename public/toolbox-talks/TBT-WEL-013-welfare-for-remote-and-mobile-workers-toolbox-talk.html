@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welfare for Remote and Mobile Workers - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Welfare for Remote and Mobile Workers</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WEL-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Remote and mobile workers include surveyors, inspectors, operatives on pipeline routes, and highway patrols.</li>
+      <li>CDM 2015 requires welfare provision for all workers, including those who are not based at a fixed site.</li>
+      <li>Mobile welfare units, client premises, and public facilities may be used where fixed provision is impracticable.</li>
+      <li>At minimum, workers need access to toilet facilities, drinking water, washing facilities, and a place to rest.</li>
+      <li>Planning welfare for mobile workers requires knowledge of the daily route and work locations.</li>
+      <li>Portaloo-style units and welfare vans can be deployed along pipeline routes and linear work sites.</li>
+      <li>Meal and hydration needs must be met — carrying food and water is acceptable only for short durations.</li>
+      <li>Hand washing after handling contaminated materials or using the toilet is a basic health requirement.</li>
+      <li>The employer must plan welfare provision in advance — workers should not need to find their own facilities.</li>
+      <li>Welfare provision is part of the construction phase plan under CDM 2015.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Legal requirement</td><td>CDM 2015 Schedule 2 requires suitable welfare facilities for all workers including remote and mobile operatives.</td></tr>
+    <tr><td class="reason">Worker health</td><td>Lack of toilet, water, and rest facilities causes dehydration, infection risk, and reduced alertness.</td></tr>
+    <tr><td class="reason">Dignity</td><td>All workers deserve basic welfare — failure to provide it is a clear indicator of poor site management.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Plan welfare provision for remote and mobile workers as part of the construction phase plan</li>
+          <li>Deploy mobile welfare units along linear work routes at accessible locations</li>
+          <li>Provide drinking water, either bottled or through vehicle-mounted supply, for every shift</li>
+          <li>Ensure toilet facilities are available within reasonable distance of every work location</li>
+          <li>Provide hand washing facilities or antibacterial hand gel as a minimum for mobile workers</li>
+          <li>Include a heated rest area or vehicle cab for meal breaks and shelter from weather</li>
+          <li>Brief mobile workers on the planned welfare locations before they start each shift</li>
+          <li>Maintain mobile welfare units to the same standard as fixed site facilities</li>
+          <li>Agree use of client premises or public facilities in advance where mobile units are not feasible</li>
+          <li>Review welfare arrangements whenever the work location or route changes</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T send workers to remote locations without planned welfare arrangements in place</li>
+          <li>DON'T rely on workers finding their own toilet and rest facilities during the shift</li>
+          <li>DON'T allow dehydration — provide adequate drinking water for the full working day</li>
+          <li>DON'T leave mobile welfare units dirty, unstocked, or with broken heating</li>
+          <li>DON'T assume a short task duration means welfare is unnecessary — it always applies</li>
+          <li>DON'T expect workers to eat meals in the cab of a dirty work vehicle as standard</li>
+          <li>DON'T ignore hand washing — workers handling contaminated materials must be able to wash</li>
+          <li>DON'T delay welfare planning until workers complain — it must be arranged in advance</li>
+          <li>DON'T reduce welfare provision as a cost-saving measure on remote work locations</li>
+          <li>DON'T forget that welfare requirements apply equally to subcontractor mobile workers</li>
+        </ul>
+        <p class="see-also">See also: Welfare Facilities Standards | Welfare for Pipeline Workers</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

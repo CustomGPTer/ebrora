@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tier 2 and Tier 3 Supply Chain Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Tier 2 and Tier 3 Supply Chain Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SUB-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Tier 2 and Tier 3 subcontractors are companies engaged by the main subcontractor, not directly by the principal contractor.</li>
+      <li>Safety management of lower-tier subcontractors is often weaker due to reduced direct oversight.</li>
+      <li>The principal contractor retains overall responsibility for coordinating all contractors under CDM 2015.</li>
+      <li>Lower-tier workers may arrive on site without the main contractor knowing their competence or training.</li>
+      <li>Language barriers are more common in lower supply chain tiers, affecting safety communication.</li>
+      <li>RAMS from Tier 2 and 3 contractors must be reviewed with the same rigour as direct subcontractors.</li>
+      <li>Incidents involving lower-tier subcontractors damage the principal contractor's safety record and reputation.</li>
+      <li>Pre-qualification checks should cascade through the supply chain, not stop at Tier 1 level.</li>
+      <li>Smaller companies in the lower supply chain may have less robust safety management systems.</li>
+      <li>CDM 2015 requires every contractor, regardless of tier, to plan, manage, and monitor their own work safely.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Legal duty</td><td>CDM 2015 places duties on the principal contractor to coordinate ALL contractors, including those engaged by others.</td></tr>
+    <tr><td class="reason">Incident risk</td><td>Lower-tier subcontractors with weaker safety management cause a disproportionate number of site incidents.</td></tr>
+    <tr><td class="reason">Accountability</td><td>The principal contractor cannot delegate responsibility for site safety by pushing it down the supply chain.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Require Tier 1 subcontractors to declare and pre-qualify their own supply chain</li>
+          <li>Review RAMS from Tier 2 and 3 contractors with the same rigour as direct subcontractors</li>
+          <li>Ensure all lower-tier workers receive the full site induction before starting work</li>
+          <li>Verify competence cards and qualifications for Tier 2 and 3 operatives on site</li>
+          <li>Include lower-tier workers in toolbox talks, briefings, and safety communications</li>
+          <li>Monitor Tier 2 and 3 working practices through regular site inspections</li>
+          <li>Address language barriers with translated materials or multilingual briefings</li>
+          <li>Require Tier 1 contractors to supervise their supply chain's safety performance</li>
+          <li>Include Tier 2 and 3 incidents in the site safety statistics and investigation process</li>
+          <li>Cascade the site safety rules and standards to every level of the supply chain</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T assume Tier 1 subcontractors are managing their supply chain's safety adequately</li>
+          <li>DON'T allow Tier 2 or 3 workers on site without completing the site induction</li>
+          <li>DON'T accept RAMS from lower-tier contractors without reviewing them for adequacy</li>
+          <li>DON'T ignore competence verification because the workers are not your direct employees</li>
+          <li>DON'T exclude lower-tier workers from safety briefings and toolbox talks</li>
+          <li>DON'T tolerate lower safety standards from any part of the supply chain</li>
+          <li>DON'T wait for an incident to discover who is working for whom on your site</li>
+          <li>DON'T delegate your CDM coordination duties by claiming lower tiers are not your concern</li>
+          <li>DON'T overlook language barriers that prevent lower-tier workers understanding safety rules</li>
+          <li>DON'T stop safety pre-qualification checks at Tier 1 — cascade them through the chain</li>
+        </ul>
+        <p class="see-also">See also: Subcontractor Safety Management | Subcontractor Induction Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
