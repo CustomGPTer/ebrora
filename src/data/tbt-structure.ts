@@ -1,6 +1,6 @@
 // src/data/tbt-structure.ts
 // AUTO-GENERATED from TBT-FILING-STRUCTURE-2.md
-// 60 categories | ~1,556+ toolbox talks (610 HTML files)
+// 60 categories | ~1,556+ toolbox talks (611 HTML files)
 //
 // TO ADD A NEW TALK:
 // 1. Place the HTML file in /public/toolbox-talks/
@@ -98,8 +98,8 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-ENV-005", title: "Noise Management (Community Impact)", slug: "noise-management-community-impact", htmlFile: "TBT-ENV-005-noise-management-community-impact-toolbox-talk.html" },
         { ref: "TBT-ENV-013", title: "Carbon Footprint Awareness on Site", slug: "carbon-footprint-awareness-on-site", htmlFile: "TBT-ENV-013-carbon-footprint-awareness-on-site-toolbox-talk.html" },
         { ref: "TBT-ENV-014", title: "Groundwater Contamination Prevention", slug: "groundwater-contamination-prevention", htmlFile: "TBT-ENV-014-groundwater-contamination-prevention-toolbox-talk.html" },
-        { ref: "TBT-ENV-015", title: "Invasive Species Japanese Knotweed Giant Hogweed", slug: "invasive-species-japanese-knotweed-giant-hogweed", htmlFile: "TBT-ENV-015-invasive-species-japanese-knotweed-giant-hogweed-toolbox-talk.html" },
-        { ref: "TBT-ENV-016", title: "Chemical Storage near Watercourses", slug: "chemical-storage-near-watercourses", htmlFile: "TBT-ENV-016-chemical-storage-near-watercourses-toolbox-talk.html" },
+        { ref: "TBT-ENV-015", title: "Invasive Species (Japanese Knotweed, Giant Hogweed)", slug: "invasive-species-japanese-knotweed-giant-hogweed", htmlFile: "TBT-ENV-015-invasive-species-japanese-knotweed-giant-hogweed-toolbox-talk.html" },
+        { ref: "TBT-ENV-016", title: "Chemical Storage Near Watercourses", slug: "chemical-storage-near-watercourses", htmlFile: "TBT-ENV-016-chemical-storage-near-watercourses-toolbox-talk.html" },
       ] },
       { name: "Carbon Sustainability", slug: "carbon-sustainability", expectedTalks: [
         "Carbon Footprint Awareness on Site",
@@ -242,7 +242,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-EXC-004", title: "Contaminated Ground Awareness", slug: "contaminated-ground-awareness", htmlFile: "TBT-EXC-004-contaminated-ground-awareness-toolbox-talk.html" },
         { ref: "TBT-EXC-005", title: "Excavation Near Structures", slug: "excavation-near-structures", htmlFile: "TBT-EXC-005-excavation-near-structures-toolbox-talk.html" },
         { ref: "TBT-EXC-010", title: "Trench Sheeting and Shoring", slug: "trench-sheeting-and-shoring", htmlFile: "TBT-EXC-010-trench-sheeting-and-shoring-toolbox-talk.html" },
-        { ref: "TBT-EXC-011", title: "Excavation near Railways", slug: "excavation-near-railways", htmlFile: "TBT-EXC-011-excavation-near-railways-toolbox-talk.html" },
+        { ref: "TBT-EXC-011", title: "Excavation Near Railways", slug: "excavation-near-railways", htmlFile: "TBT-EXC-011-excavation-near-railways-toolbox-talk.html" },
         { ref: "TBT-EXC-012", title: "Adjacent Structure Monitoring", slug: "adjacent-structure-monitoring", htmlFile: "TBT-EXC-012-adjacent-structure-monitoring-toolbox-talk.html" },
         { ref: "TBT-EXC-013", title: "Ground Conditions Assessment", slug: "ground-conditions-assessment", htmlFile: "TBT-EXC-013-ground-conditions-assessment-toolbox-talk.html" },
       ] },
@@ -309,9 +309,9 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-BUR-005", title: "Safe Digging Practices (HSG47)", slug: "safe-digging-practices-hsg47", htmlFile: "TBT-BUR-005-safe-digging-practices-hsg47-toolbox-talk.html" },
       
         { ref: "TBT-BUR-007", title: "Service Strike Emergency Procedure", slug: "service-strike-emergency-procedure", htmlFile: "TBT-BUR-007-service-strike-emergency-procedure-toolbox-talk.html" },
-        { ref: "TBT-BUR-009", title: "Working near Sewers and Drains", slug: "working-near-sewers-and-drains", htmlFile: "TBT-BUR-009-working-near-sewers-and-drains-toolbox-talk.html" },
-        { ref: "TBT-BUR-010", title: "Working near High Voltage Cables", slug: "working-near-high-voltage-cables", htmlFile: "TBT-BUR-010-working-near-high-voltage-cables-toolbox-talk.html" },
-        { ref: "TBT-BUR-011", title: "Working near Fuel Pipelines", slug: "working-near-fuel-pipelines", htmlFile: "TBT-BUR-011-working-near-fuel-pipelines-toolbox-talk.html" },] },
+        { ref: "TBT-BUR-009", title: "Working Near Sewers and Drains", slug: "working-near-sewers-and-drains", htmlFile: "TBT-BUR-009-working-near-sewers-and-drains-toolbox-talk.html" },
+        { ref: "TBT-BUR-010", title: "Working Near High Voltage Cables", slug: "working-near-high-voltage-cables", htmlFile: "TBT-BUR-010-working-near-high-voltage-cables-toolbox-talk.html" },
+        { ref: "TBT-BUR-011", title: "Working Near Fuel Pipelines", slug: "working-near-fuel-pipelines", htmlFile: "TBT-BUR-011-working-near-fuel-pipelines-toolbox-talk.html" },] },
     ],
   },
   {
@@ -422,7 +422,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       
         { ref: "TBT-LFT-010", title: "Tandem Lifts", slug: "tandem-lifts", htmlFile: "TBT-LFT-010-tandem-lifts-toolbox-talk.html" },
         { ref: "TBT-LFT-011", title: "Lift Plan Requirements", slug: "lift-plan-requirements", htmlFile: "TBT-LFT-011-lift-plan-requirements-toolbox-talk.html" },
-        { ref: "TBT-LFT-012", title: "Lifting near Overhead Power Lines", slug: "lifting-near-overhead-power-lines", htmlFile: "TBT-LFT-012-lifting-near-overhead-power-lines-toolbox-talk.html" },
+        { ref: "TBT-LFT-012", title: "Lifting Near Overhead Power Lines", slug: "lifting-near-overhead-power-lines", htmlFile: "TBT-LFT-012-lifting-near-overhead-power-lines-toolbox-talk.html" },
         { ref: "TBT-LFT-013", title: "Lifting Pipes and Ducting", slug: "lifting-pipes-and-ducting", htmlFile: "TBT-LFT-013-lifting-pipes-and-ducting-toolbox-talk.html" },
         { ref: "TBT-LFT-014", title: "Lifting Steel Beams and Columns", slug: "lifting-steel-beams-and-columns", htmlFile: "TBT-LFT-014-lifting-steel-beams-and-columns-toolbox-talk.html" },] },
     ],
@@ -497,7 +497,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-PLT-008", title: "Quick Hitch Safety", slug: "quick-hitch-safety", htmlFile: "TBT-PLT-008-quick-hitch-safety-toolbox-talk.html" },
         { ref: "TBT-PLT-016", title: "Breaker and Drill Safety", slug: "breaker-and-drill-safety", htmlFile: "TBT-PLT-016-breaker-and-drill-safety-toolbox-talk.html" },
         { ref: "TBT-PLT-017", title: "Piling Rig Safety", slug: "piling-rig-safety", htmlFile: "TBT-PLT-017-piling-rig-safety-toolbox-talk.html" },
-        { ref: "TBT-PLT-018", title: "Chainsaw Safety Non Forestry", slug: "chainsaw-safety-non-forestry", htmlFile: "TBT-PLT-018-chainsaw-safety-non-forestry-toolbox-talk.html" },
+        { ref: "TBT-PLT-018", title: "Chainsaw Safety (Non-Forestry)", slug: "chainsaw-safety-non-forestry", htmlFile: "TBT-PLT-018-chainsaw-safety-non-forestry-toolbox-talk.html" },
         { ref: "TBT-PLT-019", title: "Bulldozer Safety", slug: "bulldozer-safety", htmlFile: "TBT-PLT-019-bulldozer-safety-toolbox-talk.html" },
       ] },
       { name: "Specialist Plant", slug: "specialist-plant", expectedTalks: [
@@ -673,7 +673,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-COS-010", title: "Chlorine and Water Treatment Chemicals", slug: "chlorine-and-water-treatment-chemicals", htmlFile: "TBT-COS-010-chlorine-and-water-treatment-chemicals-toolbox-talk.html" },
         { ref: "TBT-COS-008", title: "Solvents and Degreasers", slug: "solvents-and-degreasers", htmlFile: "TBT-COS-008-solvents-and-degreasers-toolbox-talk.html" },
         { ref: "TBT-COS-011", title: "Skin Protection and Dermatitis", slug: "skin-protection-and-dermatitis", htmlFile: "TBT-COS-011-skin-protection-and-dermatitis-toolbox-talk.html" },
-        { ref: "TBT-COS-012", title: "Diesel Exhaust Emissions DEE", slug: "diesel-exhaust-emissions-dee", htmlFile: "TBT-COS-012-diesel-exhaust-emissions-dee-toolbox-talk.html" },
+        { ref: "TBT-COS-012", title: "Diesel Exhaust Emissions (DEE)", slug: "diesel-exhaust-emissions-dee", htmlFile: "TBT-COS-012-diesel-exhaust-emissions-dee-toolbox-talk.html" },
         { ref: "TBT-COS-013", title: "RPE Selection and Face Fit Testing", slug: "rpe-selection-and-face-fit-testing", htmlFile: "TBT-COS-013-rpe-selection-and-face-fit-testing-toolbox-talk.html" },
         { ref: "TBT-COS-014", title: "Bitumen and Tar Products", slug: "bitumen-and-tar-products", htmlFile: "TBT-COS-014-bitumen-and-tar-products-toolbox-talk.html" },] },
       { name: "Controls", slug: "controls", expectedTalks: [
@@ -737,7 +737,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       
         { ref: "TBT-ELE-008", title: "High Voltage (HV) Safety", slug: "high-voltage-hv-safety", htmlFile: "TBT-ELE-008-high-voltage-hv-safety-toolbox-talk.html" },
         { ref: "TBT-ELE-007", title: "Underground Cables", slug: "underground-cables", htmlFile: "TBT-ELE-007-underground-cables-toolbox-talk.html" },
-        { ref: "TBT-ELE-009", title: "Portable Appliance Testing PAT", slug: "portable-appliance-testing-pat", htmlFile: "TBT-ELE-009-portable-appliance-testing-pat-toolbox-talk.html" },
+        { ref: "TBT-ELE-009", title: "Portable Appliance Testing (PAT)", slug: "portable-appliance-testing-pat", htmlFile: "TBT-ELE-009-portable-appliance-testing-pat-toolbox-talk.html" },
         { ref: "TBT-ELE-010", title: "Generator Connection and Backfeed Risk", slug: "generator-connection-and-backfeed-risk", htmlFile: "TBT-ELE-010-generator-connection-and-backfeed-risk-toolbox-talk.html" },
         { ref: "TBT-ELE-011", title: "Temporary Lighting Installations", slug: "temporary-lighting-installations", htmlFile: "TBT-ELE-011-temporary-lighting-installations-toolbox-talk.html" },] },
       { name: "Cable Work", slug: "cable-work", expectedTalks: [
@@ -841,7 +841,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         "Lead Burning & Wiping",
       ], talks: [
         { ref: "TBT-HOT-004", title: "Oxy-Acetylene Cutting Safety", slug: "oxy-acetylene-cutting-safety", htmlFile: "TBT-HOT-004-oxy-acetylene-cutting-safety-toolbox-talk.html" },
-        { ref: "TBT-HOT-008", title: "Hot Works near Flammable Materials", slug: "hot-works-near-flammable-materials", htmlFile: "TBT-HOT-008-hot-works-near-flammable-materials-toolbox-talk.html" },
+        { ref: "TBT-HOT-008", title: "Hot Works Near Flammable Materials", slug: "hot-works-near-flammable-materials", htmlFile: "TBT-HOT-008-hot-works-near-flammable-materials-toolbox-talk.html" },
         { ref: "TBT-HOT-009", title: "Hot Works in Confined Spaces", slug: "hot-works-in-confined-spaces", htmlFile: "TBT-HOT-009-hot-works-in-confined-spaces-toolbox-talk.html" },
         { ref: "TBT-HOT-010", title: "Brazing and Soldering", slug: "brazing-and-soldering", htmlFile: "TBT-HOT-010-brazing-and-soldering-toolbox-talk.html" },
         { ref: "TBT-HOT-011", title: "Stud Welding Safety", slug: "stud-welding-safety", htmlFile: "TBT-HOT-011-stud-welding-safety-toolbox-talk.html" },
@@ -1079,7 +1079,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-DEM-008", title: "Demolition Adjacent to Occupied Buildings", slug: "demolition-adjacent-to-occupied-buildings", htmlFile: "TBT-DEM-008-demolition-adjacent-to-occupied-buildings-toolbox-talk.html" },
         { ref: "TBT-DEM-009", title: "Structural Stability During Demolition", slug: "structural-stability-during-demolition", htmlFile: "TBT-DEM-009-structural-stability-during-demolition-toolbox-talk.html" },
         { ref: "TBT-DEM-010", title: "Hand Demolition Safety", slug: "hand-demolition-safety", htmlFile: "TBT-DEM-010-hand-demolition-safety-toolbox-talk.html" },
-        { ref: "TBT-DEM-011", title: "Demolition near Live Services", slug: "demolition-near-live-services", htmlFile: "TBT-DEM-011-demolition-near-live-services-toolbox-talk.html" },] },
+        { ref: "TBT-DEM-011", title: "Demolition Near Live Services", slug: "demolition-near-live-services", htmlFile: "TBT-DEM-011-demolition-near-live-services-toolbox-talk.html" },] },
     ],
   },
   {
@@ -1158,7 +1158,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       
         { ref: "TBT-LOT-007", title: "Process Isolation (Valves and Blinds)", slug: "process-isolation-valves-and-blinds", htmlFile: "TBT-LOT-007-process-isolation-valves-and-blinds-toolbox-talk.html" },
         { ref: "TBT-LOT-005", title: "Hydraulic and Pneumatic Isolation", slug: "hydraulic-and-pneumatic-isolation", htmlFile: "TBT-LOT-005-hydraulic-and-pneumatic-isolation-toolbox-talk.html" },
-        { ref: "TBT-LOT-008", title: "Verification of Isolation Proving Dead", slug: "verification-of-isolation-proving-dead", htmlFile: "TBT-LOT-008-verification-of-isolation-proving-dead-toolbox-talk.html" },
+        { ref: "TBT-LOT-008", title: "Verification of Isolation (Proving Dead)", slug: "verification-of-isolation-proving-dead", htmlFile: "TBT-LOT-008-verification-of-isolation-proving-dead-toolbox-talk.html" },
         { ref: "TBT-LOT-009", title: "Stored Energy Isolation", slug: "stored-energy-isolation", htmlFile: "TBT-LOT-009-stored-energy-isolation-toolbox-talk.html" },
         { ref: "TBT-LOT-010", title: "LOTO for Pumping Stations", slug: "loto-for-pumping-stations", htmlFile: "TBT-LOT-010-loto-for-pumping-stations-toolbox-talk.html" },] },
       { name: "Advanced", slug: "advanced", expectedTalks: [
@@ -1208,7 +1208,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-PTW-005", title: "Electrical Permits", slug: "electrical-permits", htmlFile: "TBT-PTW-005-electrical-permits-toolbox-talk.html" },
         { ref: "TBT-PTW-008", title: "Lifting Permits", slug: "lifting-permits", htmlFile: "TBT-PTW-008-lifting-permits-toolbox-talk.html" },
         { ref: "TBT-PTW-009", title: "Ground Disturbance Permits", slug: "ground-disturbance-permits", htmlFile: "TBT-PTW-009-ground-disturbance-permits-toolbox-talk.html" },
-        { ref: "TBT-PTW-010", title: "Simultaneous Operations SIMOPS Permits", slug: "simultaneous-operations-simops-permits", htmlFile: "TBT-PTW-010-simultaneous-operations-simops-permits-toolbox-talk.html" },] },
+        { ref: "TBT-PTW-010", title: "Simultaneous Operations (SIMOPS) Permits", slug: "simultaneous-operations-simops-permits", htmlFile: "TBT-PTW-010-simultaneous-operations-simops-permits-toolbox-talk.html" },] },
       { name: "Advanced", slug: "advanced", expectedTalks: [
         "Simultaneous Operations (SIMOPS) Permits",
         "Diving Permits",
@@ -1304,7 +1304,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         "Air Monitoring During Asbestos Work",
       ], talks: [
         { ref: "TBT-ASB-007", title: "Asbestos Cement Products", slug: "asbestos-cement-products", htmlFile: "TBT-ASB-007-asbestos-cement-products-toolbox-talk.html" },
-        { ref: "TBT-ASB-008", title: "Non Licensed Asbestos Work NNLW", slug: "non-licensed-asbestos-work-nnlw", htmlFile: "TBT-ASB-008-non-licensed-asbestos-work-nnlw-toolbox-talk.html" },
+        { ref: "TBT-ASB-008", title: "Non-Licensed Asbestos Work (NNLW)", slug: "non-licensed-asbestos-work-nnlw", htmlFile: "TBT-ASB-008-non-licensed-asbestos-work-nnlw-toolbox-talk.html" },
         { ref: "TBT-ASB-009", title: "Asbestos in Floor Tiles and Adhesives", slug: "asbestos-in-floor-tiles-and-adhesives", htmlFile: "TBT-ASB-009-asbestos-in-floor-tiles-and-adhesives-toolbox-talk.html" },
         { ref: "TBT-ASB-010", title: "Asbestos Analyst and Surveyor Roles", slug: "asbestos-analyst-and-surveyor-roles", htmlFile: "TBT-ASB-010-asbestos-analyst-and-surveyor-roles-toolbox-talk.html" },] },
       { name: "Advanced", slug: "advanced", expectedTalks: [
@@ -1406,7 +1406,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-OCC-004", title: "Noise Induced Hearing Loss", slug: "noise-induced-hearing-loss", htmlFile: "TBT-OCC-004-noise-induced-hearing-loss-toolbox-talk.html" },
         { ref: "TBT-OCC-005", title: "Dermatitis Prevention", slug: "dermatitis-prevention", htmlFile: "TBT-OCC-005-dermatitis-prevention-toolbox-talk.html" },
         { ref: "TBT-OCC-007", title: "Sun and UV Exposure", slug: "sun-and-uv-exposure", htmlFile: "TBT-OCC-007-sun-and-uv-exposure-toolbox-talk.html" },
-        { ref: "TBT-OCC-009", title: "Leptospirosis Weil's Disease", slug: "leptospirosis-weils-disease", htmlFile: "TBT-OCC-009-leptospirosis-weils-disease-toolbox-talk.html" },
+        { ref: "TBT-OCC-009", title: "Leptospirosis (Weil's Disease)", slug: "leptospirosis-weils-disease", htmlFile: "TBT-OCC-009-leptospirosis-weils-disease-toolbox-talk.html" },
         { ref: "TBT-OCC-010", title: "Heat Exhaustion and Heat Stroke", slug: "heat-exhaustion-and-heat-stroke", htmlFile: "TBT-OCC-010-heat-exhaustion-and-heat-stroke-toolbox-talk.html" },
         { ref: "TBT-OCC-011", title: "Musculoskeletal Disorders", slug: "musculoskeletal-disorders", htmlFile: "TBT-OCC-011-musculoskeletal-disorders-toolbox-talk.html" },
         { ref: "TBT-OCC-012", title: "Carbon Monoxide Poisoning", slug: "carbon-monoxide-poisoning", htmlFile: "TBT-OCC-012-carbon-monoxide-poisoning-toolbox-talk.html" },
@@ -1555,7 +1555,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-LON-004", title: "Communication and Check-In Procedures", slug: "communication-and-check-in-procedures", htmlFile: "TBT-LON-004-communication-and-check-in-procedures-toolbox-talk.html" },
         { ref: "TBT-LON-007", title: "Lone Working at Night", slug: "lone-working-at-night", htmlFile: "TBT-LON-007-lone-working-at-night-toolbox-talk.html" },
         { ref: "TBT-LON-008", title: "Lone Working in Remote Locations", slug: "lone-working-in-remote-locations", htmlFile: "TBT-LON-008-lone-working-in-remote-locations-toolbox-talk.html" },
-        { ref: "TBT-LON-009", title: "Violence and Aggression Lone Workers", slug: "violence-and-aggression-lone-workers", htmlFile: "TBT-LON-009-violence-and-aggression-lone-workers-toolbox-talk.html" },] },
+        { ref: "TBT-LON-009", title: "Violence and Aggression (Lone Workers)", slug: "violence-and-aggression-lone-workers", htmlFile: "TBT-LON-009-violence-and-aggression-lone-workers-toolbox-talk.html" },] },
       { name: "Specific Roles", slug: "specific-roles", expectedTalks: [
         "Lone Security Guard Safety",
         "Lone Surveyor Safety",
@@ -1728,7 +1728,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       ], talks: [
         { ref: "TBT-HWY-005", title: "Lane Closures and Contraflows", slug: "lane-closures-and-contraflows", htmlFile: "TBT-HWY-005-lane-closures-and-contraflows-toolbox-talk.html" },
         { ref: "TBT-HWY-006", title: "Pedestrian Walkway Diversions", slug: "pedestrian-walkway-diversions", htmlFile: "TBT-HWY-006-pedestrian-walkway-diversions-toolbox-talk.html" },
-        { ref: "TBT-HWY-007", title: "IPV Impact Protection Vehicle Use", slug: "ipv-impact-protection-vehicle-use", htmlFile: "TBT-HWY-007-ipv-impact-protection-vehicle-use-toolbox-talk.html" },
+        { ref: "TBT-HWY-007", title: "IPV (Impact Protection Vehicle) Use", slug: "ipv-impact-protection-vehicle-use", htmlFile: "TBT-HWY-007-ipv-impact-protection-vehicle-use-toolbox-talk.html" },
         { ref: "TBT-HWY-008", title: "Road Closure Procedures", slug: "road-closure-procedures", htmlFile: "TBT-HWY-008-road-closure-procedures-toolbox-talk.html" },] },
     ],
   },
@@ -1783,7 +1783,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-RAI-003", title: "Overhead Line Equipment (OLE) Safety", slug: "overhead-line-equipment-ole-safety", htmlFile: "TBT-RAI-003-overhead-line-equipment-ole-safety-toolbox-talk.html" },
       
         { ref: "TBT-RAI-007", title: "Third Rail Safety (DC Electrification)", slug: "third-rail-safety-dc-electrification", htmlFile: "TBT-RAI-007-third-rail-safety-dc-electrification-toolbox-talk.html" },
-        { ref: "TBT-RAI-008", title: "COSS Controller of Site Safety Role", slug: "coss-controller-of-site-safety-role", htmlFile: "TBT-RAI-008-coss-controller-of-site-safety-role-toolbox-talk.html" },
+        { ref: "TBT-RAI-008", title: "COSS (Controller of Site Safety) Role", slug: "coss-controller-of-site-safety-role", htmlFile: "TBT-RAI-008-coss-controller-of-site-safety-role-toolbox-talk.html" },
         { ref: "TBT-RAI-009", title: "Signalling Equipment Safety", slug: "signalling-equipment-safety", htmlFile: "TBT-RAI-009-signalling-equipment-safety-toolbox-talk.html" },
         { ref: "TBT-RAI-010", title: "Level Crossing Work Safety", slug: "level-crossing-work-safety", htmlFile: "TBT-RAI-010-level-crossing-work-safety-toolbox-talk.html" },
         { ref: "TBT-RAI-011", title: "Ballast and Formation Work", slug: "ballast-and-formation-work", htmlFile: "TBT-RAI-011-ballast-and-formation-work-toolbox-talk.html" },] },
@@ -1856,7 +1856,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       ], talks: [
         { ref: "TBT-WWT-002", title: "Hydrogen Sulphide (H2S) on Wastewater Treatment Works", slug: "hydrogen-sulphide-h2s-on-wastewater-treatment-works", htmlFile: "TBT-WWT-002-hydrogen-sulphide-h2s-on-wastewater-treatment-works-toolbox-talk.html" },
         { ref: "TBT-WWT-007", title: "Methane and Biogas Hazards", slug: "methane-and-biogas-hazards", htmlFile: "TBT-WWT-007-methane-and-biogas-hazards-toolbox-talk.html" },
-        { ref: "TBT-WWT-009", title: "Digester Safety Anaerobic", slug: "digester-safety-anaerobic", htmlFile: "TBT-WWT-009-digester-safety-anaerobic-toolbox-talk.html" },
+        { ref: "TBT-WWT-009", title: "Digester Safety (Anaerobic)", slug: "digester-safety-anaerobic", htmlFile: "TBT-WWT-009-digester-safety-anaerobic-toolbox-talk.html" },
         { ref: "TBT-WWT-010", title: "Needlestick and Sharps in Sewage", slug: "needlestick-and-sharps-in-sewage", htmlFile: "TBT-WWT-010-needlestick-and-sharps-in-sewage-toolbox-talk.html" },
         { ref: "TBT-WWT-011", title: "Trickling Filter Safety", slug: "trickling-filter-safety", htmlFile: "TBT-WWT-011-trickling-filter-safety-toolbox-talk.html" },
         { ref: "TBT-WWT-012", title: "Final Settlement Tank Safety", slug: "final-settlement-tank-safety", htmlFile: "TBT-WWT-012-final-settlement-tank-safety-toolbox-talk.html" },
@@ -1932,7 +1932,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       ], talks: [
         { ref: "TBT-UTL-004", title: "HV Cable Installation Safety", slug: "hv-cable-installation-safety", htmlFile: "TBT-UTL-004-hv-cable-installation-safety-toolbox-talk.html" },
         { ref: "TBT-UTL-005", title: "Cable Jointing Safety (HV and LV)", slug: "cable-jointing-safety-hv-and-lv", htmlFile: "TBT-UTL-005-cable-jointing-safety-hv-and-lv-toolbox-talk.html" },
-        { ref: "TBT-UTL-008", title: "Gas Mains Replacement PE Pipe", slug: "gas-mains-replacement-pe-pipe", htmlFile: "TBT-UTL-008-gas-mains-replacement-pe-pipe-toolbox-talk.html" },
+        { ref: "TBT-UTL-008", title: "Gas Mains Replacement (PE Pipe)", slug: "gas-mains-replacement-pe-pipe", htmlFile: "TBT-UTL-008-gas-mains-replacement-pe-pipe-toolbox-talk.html" },
         { ref: "TBT-UTL-009", title: "Chlorination and Flushing Procedures", slug: "chlorination-and-flushing-procedures", htmlFile: "TBT-UTL-009-chlorination-and-flushing-procedures-toolbox-talk.html" },
         { ref: "TBT-UTL-010", title: "Fibre Optic Cable Installation", slug: "fibre-optic-cable-installation", htmlFile: "TBT-UTL-010-fibre-optic-cable-installation-toolbox-talk.html" },
         { ref: "TBT-UTL-011", title: "Water Main Repair Under Pressure", slug: "water-main-repair-under-pressure", htmlFile: "TBT-UTL-011-water-main-repair-under-pressure-toolbox-talk.html" },
@@ -2020,7 +2020,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       ], talks: [
         { ref: "TBT-GRW-004", title: "Soil Nailing Safety", slug: "soil-nailing-safety", htmlFile: "TBT-GRW-004-soil-nailing-safety-toolbox-talk.html" },
         { ref: "TBT-GRW-011", title: "Attenuation Tank Installation", slug: "attenuation-tank-installation", htmlFile: "TBT-GRW-011-attenuation-tank-installation-toolbox-talk.html" },
-        { ref: "TBT-GRW-012", title: "Dewatering Wellpoints and Sumps", slug: "dewatering-wellpoints-and-sumps", htmlFile: "TBT-GRW-012-dewatering-wellpoints-and-sumps-toolbox-talk.html" },
+        { ref: "TBT-GRW-012", title: "Dewatering (Wellpoints and Sumps)", slug: "dewatering-wellpoints-and-sumps", htmlFile: "TBT-GRW-012-dewatering-wellpoints-and-sumps-toolbox-talk.html" },
         { ref: "TBT-GRW-013", title: "CCTV Drainage Survey Safety", slug: "cctv-drainage-survey-safety", htmlFile: "TBT-GRW-013-cctv-drainage-survey-safety-toolbox-talk.html" },
         { ref: "TBT-GRW-014", title: "Geotextile and Geogrid Installation", slug: "geotextile-and-geogrid-installation", htmlFile: "TBT-GRW-014-geotextile-and-geogrid-installation-toolbox-talk.html" },
         { ref: "TBT-GRW-015", title: "Soakaway Construction", slug: "soakaway-construction", htmlFile: "TBT-GRW-015-soakaway-construction-toolbox-talk.html" },
@@ -2060,7 +2060,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-PIL-003", title: "Sheet Piling Installation", slug: "sheet-piling-installation", htmlFile: "TBT-PIL-003-sheet-piling-installation-toolbox-talk.html" },
       
         { ref: "TBT-PIL-006", title: "Bored Pile Installation (Rotary)", slug: "bored-pile-installation-rotary", htmlFile: "TBT-PIL-006-bored-pile-installation-rotary-toolbox-talk.html" },
-        { ref: "TBT-PIL-007", title: "Driven Pile Installation Steel", slug: "driven-pile-installation-steel", htmlFile: "TBT-PIL-007-driven-pile-installation-steel-toolbox-talk.html" },
+        { ref: "TBT-PIL-007", title: "Driven Pile Installation (Steel)", slug: "driven-pile-installation-steel", htmlFile: "TBT-PIL-007-driven-pile-installation-steel-toolbox-talk.html" },
         { ref: "TBT-PIL-008", title: "Mini Piling Safety", slug: "mini-piling-safety", htmlFile: "TBT-PIL-008-mini-piling-safety-toolbox-talk.html" },
         { ref: "TBT-PIL-009", title: "Pile Cropping Safety", slug: "pile-cropping-safety", htmlFile: "TBT-PIL-009-pile-cropping-safety-toolbox-talk.html" },] },
       { name: "Foundations", slug: "foundations", expectedTalks: [
@@ -2110,7 +2110,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-TUN-003", title: "Microtunnelling Safety", slug: "microtunnelling-safety", htmlFile: "TBT-TUN-003-microtunnelling-safety-toolbox-talk.html" },
         { ref: "TBT-TUN-007", title: "Tunnel Ventilation Requirements", slug: "tunnel-ventilation-requirements", htmlFile: "TBT-TUN-007-tunnel-ventilation-requirements-toolbox-talk.html" },
         { ref: "TBT-TUN-008", title: "Tunnel Fire Prevention", slug: "tunnel-fire-prevention", htmlFile: "TBT-TUN-008-tunnel-fire-prevention-toolbox-talk.html" },
-        { ref: "TBT-TUN-009", title: "Compressed Air Working Tunnels", slug: "compressed-air-working-tunnels", htmlFile: "TBT-TUN-009-compressed-air-working-tunnels-toolbox-talk.html" },
+        { ref: "TBT-TUN-009", title: "Compressed Air Working (Tunnels)", slug: "compressed-air-working-tunnels", htmlFile: "TBT-TUN-009-compressed-air-working-tunnels-toolbox-talk.html" },
       ] },
       { name: "Advanced", slug: "advanced", expectedTalks: [
         "Tunnel Waterproofing Installation",
@@ -2155,7 +2155,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         "Pontoon Construction & Use",
       ], talks: [
         { ref: "TBT-MAR-004", title: "Floating Plant Operations", slug: "floating-plant-operations", htmlFile: "TBT-MAR-004-floating-plant-operations-toolbox-talk.html" },
-        { ref: "TBT-MAR-007", title: "Piling in Water Marine", slug: "piling-in-water-marine", htmlFile: "TBT-MAR-007-piling-in-water-marine-toolbox-talk.html" },
+        { ref: "TBT-MAR-007", title: "Piling in Water (Marine)", slug: "piling-in-water-marine", htmlFile: "TBT-MAR-007-piling-in-water-marine-toolbox-talk.html" },
         { ref: "TBT-MAR-008", title: "Dredging Operations Safety", slug: "dredging-operations-safety", htmlFile: "TBT-MAR-008-dredging-operations-safety-toolbox-talk.html" },
       ] },
       { name: "Advanced", slug: "advanced", expectedTalks: [
@@ -2254,7 +2254,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-BLD-008", title: "Fire Stopping Installation", slug: "fire-stopping-installation", htmlFile: "TBT-BLD-008-fire-stopping-installation-toolbox-talk.html" },
         { ref: "TBT-BLD-010", title: "Structural Frame Sequence and Stability", slug: "structural-frame-sequence-and-stability", htmlFile: "TBT-BLD-010-structural-frame-sequence-and-stability-toolbox-talk.html" },
         { ref: "TBT-BLD-011", title: "Glazing Safety", slug: "glazing-safety", htmlFile: "TBT-BLD-011-glazing-safety-toolbox-talk.html" },
-        { ref: "TBT-BLD-012", title: "Refurbishment and Fit Out Safety", slug: "refurbishment-and-fit-out-safety", htmlFile: "TBT-BLD-012-refurbishment-and-fit-out-safety-toolbox-talk.html" },
+        { ref: "TBT-BLD-012", title: "Refurbishment and Fit-Out Safety", slug: "refurbishment-and-fit-out-safety", htmlFile: "TBT-BLD-012-refurbishment-and-fit-out-safety-toolbox-talk.html" },
       ] },
     ],
   },
@@ -2308,7 +2308,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-INT-005", title: "Raised Access Floor Installation", slug: "raised-access-floor-installation", htmlFile: "TBT-INT-005-raised-access-floor-installation-toolbox-talk.html" },
         { ref: "TBT-INT-008", title: "Spray Painting Safety", slug: "spray-painting-safety", htmlFile: "TBT-INT-008-spray-painting-safety-toolbox-talk.html" },
         { ref: "TBT-INT-009", title: "Resin Floor Application", slug: "resin-floor-application", htmlFile: "TBT-INT-009-resin-floor-application-toolbox-talk.html" },
-        { ref: "TBT-INT-010", title: "Metal Framing MF and GL Systems", slug: "metal-framing-mf-and-gl-systems", htmlFile: "TBT-INT-010-metal-framing-mf-and-gl-systems-toolbox-talk.html" },
+        { ref: "TBT-INT-010", title: "Metal Framing (MF and GL Systems)", slug: "metal-framing-mf-and-gl-systems", htmlFile: "TBT-INT-010-metal-framing-mf-and-gl-systems-toolbox-talk.html" },
       ] },
       { name: "Other", slug: "other", expectedTalks: [
         "Kitchen & Bathroom Fitting",
@@ -2605,7 +2605,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       
         { ref: "TBT-QMS-006", title: "Concrete Cube Testing Safety", slug: "concrete-cube-testing-safety", htmlFile: "TBT-QMS-006-concrete-cube-testing-safety-toolbox-talk.html" },
         { ref: "TBT-QMS-007", title: "Pressure Testing and Leak Testing Safety", slug: "pressure-testing-and-leak-testing-safety", htmlFile: "TBT-QMS-007-pressure-testing-and-leak-testing-safety-toolbox-talk.html" },
-        { ref: "TBT-QMS-008", title: "Inspection and Test Plan ITP Awareness", slug: "inspection-and-test-plan-itp-awareness", htmlFile: "TBT-QMS-008-inspection-and-test-plan-itp-awareness-toolbox-talk.html" },
+        { ref: "TBT-QMS-008", title: "Inspection and Test Plan (ITP) Awareness", slug: "inspection-and-test-plan-itp-awareness", htmlFile: "TBT-QMS-008-inspection-and-test-plan-itp-awareness-toolbox-talk.html" },
         { ref: "TBT-QMS-009", title: "Coating and Lining Inspection Safety", slug: "coating-and-lining-inspection-safety", htmlFile: "TBT-QMS-009-coating-and-lining-inspection-safety-toolbox-talk.html" },] },
       { name: "Specific", slug: "specific", expectedTalks: [
         "Compaction Testing Safety",
@@ -2656,7 +2656,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       ], talks: [
         { ref: "TBT-INC-006", title: "Lessons Learned and Safety Alerts", slug: "lessons-learned-and-safety-alerts", htmlFile: "TBT-INC-006-lessons-learned-and-safety-alerts-toolbox-talk.html" },
         { ref: "TBT-INC-009", title: "Root Cause Analysis Methods", slug: "root-cause-analysis-methods", htmlFile: "TBT-INC-009-root-cause-analysis-methods-toolbox-talk.html" },
-        { ref: "TBT-INC-010", title: "Post Incident Welfare and Support", slug: "post-incident-welfare-and-support", htmlFile: "TBT-INC-010-post-incident-welfare-and-support-toolbox-talk.html" },
+        { ref: "TBT-INC-010", title: "Post-Incident Welfare and Support", slug: "post-incident-welfare-and-support", htmlFile: "TBT-INC-010-post-incident-welfare-and-support-toolbox-talk.html" },
         { ref: "TBT-INC-011", title: "HSE Inspector Visit Procedures", slug: "hse-inspector-visit-procedures", htmlFile: "TBT-INC-011-hse-inspector-visit-procedures-toolbox-talk.html" },
       ] },
     ],
@@ -2702,7 +2702,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-BEH-005", title: "Dynamic Risk Assessment in Practice", slug: "dynamic-risk-assessment-in-practice", htmlFile: "TBT-BEH-005-dynamic-risk-assessment-in-practice-toolbox-talk.html" },
         { ref: "TBT-BEH-009", title: "Situational Awareness on Site", slug: "situational-awareness-on-site", htmlFile: "TBT-BEH-009-situational-awareness-on-site-toolbox-talk.html" },
         { ref: "TBT-BEH-010", title: "Safety Observations and Conversations", slug: "safety-observations-and-conversations", htmlFile: "TBT-BEH-010-safety-observations-and-conversations-toolbox-talk.html" },
-        { ref: "TBT-BEH-011", title: "Peer to Peer Safety Coaching", slug: "peer-to-peer-safety-coaching", htmlFile: "TBT-BEH-011-peer-to-peer-safety-coaching-toolbox-talk.html" },
+        { ref: "TBT-BEH-011", title: "Peer-to-Peer Safety Coaching", slug: "peer-to-peer-safety-coaching", htmlFile: "TBT-BEH-011-peer-to-peer-safety-coaching-toolbox-talk.html" },
       ] },
     ],
   },
@@ -2747,7 +2747,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         "Electricity at Work Regulations 1989 Awareness",
       ], talks: [
         { ref: "TBT-CDM-008", title: "PUWER 1998 Awareness", slug: "puwer-1998-awareness", htmlFile: "TBT-CDM-008-puwer-1998-awareness-toolbox-talk.html" },
-        { ref: "TBT-CDM-009", title: "Pre Construction Information", slug: "pre-construction-information", htmlFile: "TBT-CDM-009-pre-construction-information-toolbox-talk.html" },
+        { ref: "TBT-CDM-009", title: "Pre-Construction Information", slug: "pre-construction-information", htmlFile: "TBT-CDM-009-pre-construction-information-toolbox-talk.html" },
         { ref: "TBT-CDM-010", title: "LOLER 1998 Awareness", slug: "loler-1998-awareness", htmlFile: "TBT-CDM-010-loler-1998-awareness-toolbox-talk.html" },
         { ref: "TBT-CDM-011", title: "Confined Spaces Regulations 1997 Awareness", slug: "confined-spaces-regulations-1997-awareness", htmlFile: "TBT-CDM-011-confined-spaces-regulations-1997-awareness-toolbox-talk.html" },
         { ref: "TBT-CDM-012", title: "HSWA 1974 Awareness", slug: "hswa-1974-awareness", htmlFile: "TBT-CDM-012-hswa-1974-awareness-toolbox-talk.html" },] },
@@ -2913,10 +2913,10 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         "Flow Testing & Commissioning",
       ], talks: [
         { ref: "TBT-PIP-003", title: "Hydrostatic Pressure Testing", slug: "hydrostatic-pressure-testing", htmlFile: "TBT-PIP-003-hydrostatic-pressure-testing-toolbox-talk.html" },
-        { ref: "TBT-PIP-008", title: "Ductile Iron DI Pipe Safety", slug: "ductile-iron-di-pipe-safety", htmlFile: "TBT-PIP-008-ductile-iron-di-pipe-safety-toolbox-talk.html" },
+        { ref: "TBT-PIP-008", title: "Ductile Iron (DI) Pipe Safety", slug: "ductile-iron-di-pipe-safety", htmlFile: "TBT-PIP-008-ductile-iron-di-pipe-safety-toolbox-talk.html" },
         { ref: "TBT-PIP-009", title: "Pipe Support and Bracket Installation", slug: "pipe-support-and-bracket-installation", htmlFile: "TBT-PIP-009-pipe-support-and-bracket-installation-toolbox-talk.html" },
-        { ref: "TBT-PIP-010", title: "Under Road Pipe Crossings", slug: "under-road-pipe-crossings", htmlFile: "TBT-PIP-010-under-road-pipe-crossings-toolbox-talk.html" },
-        { ref: "TBT-PIP-011", title: "Pipe Bending Cold and Hot", slug: "pipe-bending-cold-and-hot", htmlFile: "TBT-PIP-011-pipe-bending-cold-and-hot-toolbox-talk.html" },
+        { ref: "TBT-PIP-010", title: "Under-Road Pipe Crossings", slug: "under-road-pipe-crossings", htmlFile: "TBT-PIP-010-under-road-pipe-crossings-toolbox-talk.html" },
+        { ref: "TBT-PIP-011", title: "Pipe Bending (Cold and Hot)", slug: "pipe-bending-cold-and-hot", htmlFile: "TBT-PIP-011-pipe-bending-cold-and-hot-toolbox-talk.html" },
       ] },
     ],
   },
@@ -2955,7 +2955,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       
         { ref: "TBT-REM-006", title: "Heavy Metals in Soil", slug: "heavy-metals-in-soil", htmlFile: "TBT-REM-006-heavy-metals-in-soil-toolbox-talk.html" },
         { ref: "TBT-REM-007", title: "Site Investigation Safety", slug: "site-investigation-safety", htmlFile: "TBT-REM-007-site-investigation-safety-toolbox-talk.html" },
-        { ref: "TBT-REM-008", title: "In Situ Chemical Treatment", slug: "in-situ-chemical-treatment", htmlFile: "TBT-REM-008-in-situ-chemical-treatment-toolbox-talk.html" },
+        { ref: "TBT-REM-008", title: "In-Situ Chemical Treatment", slug: "in-situ-chemical-treatment", htmlFile: "TBT-REM-008-in-situ-chemical-treatment-toolbox-talk.html" },
         { ref: "TBT-REM-009", title: "Made Ground and Unknown Fill Hazards", slug: "made-ground-and-unknown-fill-hazards", htmlFile: "TBT-REM-009-made-ground-and-unknown-fill-hazards-toolbox-talk.html" },] },
     ],
   },
@@ -3003,7 +3003,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         "Substation Upgrade for EV Loading",
       ], talks: [
         { ref: "TBT-ENE-004", title: "EV Charging Station Construction", slug: "ev-charging-station-construction", htmlFile: "TBT-ENE-004-ev-charging-station-construction-toolbox-talk.html" },
-        { ref: "TBT-ENE-007", title: "DC Electrical Safety Solar", slug: "dc-electrical-safety-solar", htmlFile: "TBT-ENE-007-dc-electrical-safety-solar-toolbox-talk.html" },
+        { ref: "TBT-ENE-007", title: "DC Electrical Safety (Solar)", slug: "dc-electrical-safety-solar", htmlFile: "TBT-ENE-007-dc-electrical-safety-solar-toolbox-talk.html" },
         { ref: "TBT-ENE-008", title: "Solar Farm Cable Trenching", slug: "solar-farm-cable-trenching", htmlFile: "TBT-ENE-008-solar-farm-cable-trenching-toolbox-talk.html" },
         { ref: "TBT-ENE-009", title: "Wind Turbine Foundation Construction", slug: "wind-turbine-foundation-construction", htmlFile: "TBT-ENE-009-wind-turbine-foundation-construction-toolbox-talk.html" },
         { ref: "TBT-ENE-010", title: "Inverter Installation and Commissioning", slug: "inverter-installation-and-commissioning", htmlFile: "TBT-ENE-010-inverter-installation-and-commissioning-toolbox-talk.html" },
@@ -3142,7 +3142,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
         { ref: "TBT-WLD-007", title: "Welding Fume Extraction and LEV", slug: "welding-fume-extraction-and-lev", htmlFile: "TBT-WLD-007-welding-fume-extraction-and-lev-toolbox-talk.html" },
         { ref: "TBT-WLD-008", title: "UV Radiation and Arc Eye Prevention", slug: "uv-radiation-and-arc-eye-prevention", htmlFile: "TBT-WLD-008-uv-radiation-and-arc-eye-prevention-toolbox-talk.html" },
         { ref: "TBT-WLD-009", title: "Welding on Coated or Painted Steel", slug: "welding-on-coated-or-painted-steel", htmlFile: "TBT-WLD-009-welding-on-coated-or-painted-steel-toolbox-talk.html" },
-        { ref: "TBT-WLD-010", title: "Welding Procedure Specification WPS Awareness", slug: "welding-procedure-specification-wps-awareness", htmlFile: "TBT-WLD-010-welding-procedure-specification-wps-awareness-toolbox-talk.html" },] },
+        { ref: "TBT-WLD-010", title: "Welding Procedure Specification (WPS) Awareness", slug: "welding-procedure-specification-wps-awareness", htmlFile: "TBT-WLD-010-welding-procedure-specification-wps-awareness-toolbox-talk.html" },] },
       { name: "Hazards", slug: "hazards", expectedTalks: [
         "Welding Fume Extraction & LEV",
         "UV Radiation & Arc Eye Prevention",
@@ -3275,7 +3275,7 @@ export const TBT_CATEGORIES: TbtCategory[] = [
       
         { ref: "TBT-SUB-007", title: "Subcontractor Incident Reporting", slug: "subcontractor-incident-reporting", htmlFile: "TBT-SUB-007-subcontractor-incident-reporting-toolbox-talk.html" },
         { ref: "TBT-SUB-006", title: "Subcontractor Pre-Qualification", slug: "subcontractor-pre-qualification", htmlFile: "TBT-SUB-006-subcontractor-pre-qualification-toolbox-talk.html" },
-        { ref: "TBT-SUB-008", title: "Multi Trade Coordination Safety", slug: "multi-trade-coordination-safety", htmlFile: "TBT-SUB-008-multi-trade-coordination-safety-toolbox-talk.html" },
+        { ref: "TBT-SUB-008", title: "Multi-Trade Coordination Safety", slug: "multi-trade-coordination-safety", htmlFile: "TBT-SUB-008-multi-trade-coordination-safety-toolbox-talk.html" },
         { ref: "TBT-SUB-009", title: "Foreign Language Worker Communication", slug: "foreign-language-worker-communication", htmlFile: "TBT-SUB-009-foreign-language-worker-communication-toolbox-talk.html" },
         { ref: "TBT-SUB-010", title: "Subcontractor Performance Monitoring", slug: "subcontractor-performance-monitoring", htmlFile: "TBT-SUB-010-subcontractor-performance-monitoring-toolbox-talk.html" },
         { ref: "TBT-SUB-011", title: "Agency Worker Induction", slug: "agency-worker-induction", htmlFile: "TBT-SUB-011-agency-worker-induction-toolbox-talk.html" },] },
