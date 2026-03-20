@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sludge Dewatering Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sludge Dewatering Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WWT-015 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Sludge dewatering removes water from waste sludge using belt presses, centrifuges, or filter presses.</li>
+      <li>Dewatering equipment has rotating parts, nip points, and pressurised systems creating mechanical hazards.</li>
+      <li>Sludge contains biological pathogens, heavy metals, and chemical residues that pose health risks.</li>
+      <li>Polyelectrolyte dosing chemicals used in the dewatering process can cause severe eye and skin irritation.</li>
+      <li>Belt press rollers and centrifuge bowls operate at high speed — entanglement causes fatal injuries.</li>
+      <li>H2S and methane can be released from sludge during mixing, pumping, and pressing operations.</li>
+      <li>Noise levels from centrifuges and associated pumps typically exceed 85 dB, requiring hearing protection.</li>
+      <li>Slippery floors from sludge spillage around dewatering equipment create constant slip and fall hazards.</li>
+      <li>LOTO procedures must be followed before any maintenance, cleaning, or adjustment of dewatering equipment.</li>
+      <li>Sludge cake handling and disposal creates manual handling and vehicle interaction hazards.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Entanglement</td><td>Belt press rollers and centrifuge components rotating at speed cause fatal entanglement and crushing injuries.</td></tr>
+    <tr><td class="reason">Biological hazards</td><td>Sludge contains harmful bacteria, viruses, and parasites that cause serious illness through skin contact or ingestion.</td></tr>
+    <tr><td class="reason">Chemical exposure</td><td>Polyelectrolyte chemicals and released gases including H2S pose respiratory and skin health risks.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Follow LOTO procedures before any maintenance or adjustment of dewatering equipment</li>
+          <li>Wear RPE, chemical goggles, and waterproof clothing when working near dewatering plant</li>
+          <li>Monitor for H2S and methane in enclosed sludge dewatering buildings</li>
+          <li>Wear hearing protection where noise levels from centrifuges exceed 85 dB</li>
+          <li>Keep floors around dewatering equipment clean and free from sludge spillage</li>
+          <li>Handle polyelectrolyte chemicals with gloves and eye protection as per the COSHH assessment</li>
+          <li>Ensure guards are fitted and interlocked on all belt press rollers and moving parts</li>
+          <li>Wash hands and face thoroughly before eating, drinking, or leaving the work area</li>
+          <li>Ensure hepatitis A and tetanus vaccinations are up to date for all sludge workers</li>
+          <li>Brief the team on the biological, chemical, and mechanical hazards daily</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T reach into or near rotating belt press rollers without full LOTO isolation</li>
+          <li>DON'T open centrifuge covers until the bowl has come to a complete stop</li>
+          <li>DON'T handle polyelectrolyte chemicals without gloves and eye protection</li>
+          <li>DON'T eat, drink, or smoke in the dewatering building without washing first</li>
+          <li>DON'T ignore H2S alarm activations in enclosed sludge handling areas</li>
+          <li>DON'T walk through sludge spillage on floors — clean it up or report it immediately</li>
+          <li>DON'T bypass interlocked guards on dewatering equipment for any reason</li>
+          <li>DON'T handle sludge cake without appropriate gloves and waterproof clothing</li>
+          <li>DON'T skip vaccinations required for workers exposed to sewage sludge</li>
+          <li>DON'T allow untrained personnel to operate or maintain sludge dewatering equipment</li>
+        </ul>
+        <p class="see-also">See also: Sludge Handling and Thickening Safety | LOTO Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heat Stress Action Plan - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Heat Stress Action Plan</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SEA-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>A heat stress action plan sets out the triggers and responses for managing extreme heat on construction sites.</li>
+      <li>Heat stress occurs when the body cannot cool itself sufficiently, leading to heat exhaustion and heat stroke.</li>
+      <li>UK heatwaves are becoming more frequent and intense, with construction workers among the most exposed groups.</li>
+      <li>Trigger temperatures should be defined — typically 25°C ambient temperature initiates additional controls.</li>
+      <li>The plan should include rest schedules, hydration targets, shade provision, and work rescheduling options.</li>
+      <li>Workers in direct sunlight wearing PPE can experience effective temperatures 10–15°C higher than ambient.</li>
+      <li>Acclimatisation takes 7–14 days — new workers and those returning from leave are at higher risk.</li>
+      <li>Heat stroke is a medical emergency — core body temperature exceeds 40°C with confusion and collapse.</li>
+      <li>Supervisors must be trained to recognise heat illness symptoms and take immediate action.</li>
+      <li>The MHSWR 1999 requires employers to assess and manage temperature-related risks in the workplace.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent fatalities</td><td>Heat stroke is a medical emergency that can be fatal if not recognised and treated within minutes.</td></tr>
+    <tr><td class="reason">Worker performance</td><td>Heat stress reduces concentration, coordination, and decision-making — increasing the risk of accidents.</td></tr>
+    <tr><td class="reason">Employer duty</td><td>MHSWR 1999 requires assessment and control of heat-related risks for outdoor construction workers.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Establish temperature triggers that activate additional heat stress controls on site</li>
+          <li>Provide free cold drinking water at multiple accessible locations around the site</li>
+          <li>Schedule the heaviest physical work for cooler parts of the day where possible</li>
+          <li>Provide shaded rest areas where workers can cool down during breaks</li>
+          <li>Increase the frequency and duration of rest breaks as temperatures rise</li>
+          <li>Train supervisors to recognise heat exhaustion and heat stroke symptoms</li>
+          <li>Allow new workers 7–14 days to acclimatise before full physical workloads</li>
+          <li>Monitor workers for signs of heat illness including confusion and excessive sweating</li>
+          <li>Apply sunscreen and wear lightweight breathable clothing under PPE where permitted</li>
+          <li>Call emergency services immediately for any worker showing heat stroke symptoms</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T wait for workers to collapse before activating the heat stress plan</li>
+          <li>DON'T rely on workers self-managing hydration — provide water and enforce breaks</li>
+          <li>DON'T schedule heavy manual tasks during the hottest afternoon hours in summer</li>
+          <li>DON'T ignore early symptoms of heat exhaustion such as headache and nausea</li>
+          <li>DON'T assume fit workers are immune — heat stroke can affect anyone</li>
+          <li>DON'T restrict water intake or skip rest breaks to meet production targets</li>
+          <li>DON'T give a heat stroke casualty cold water to drink if they are confused</li>
+          <li>DON'T allow new or returning workers to work at full pace without acclimatisation</li>
+          <li>DON'T dismiss heat stress as minor discomfort — it can escalate rapidly to emergency</li>
+          <li>DON'T remove the action plan triggers because the forecast looks mild for tomorrow</li>
+        </ul>
+        <p class="see-also">See also: Summer Heat and Hydration | Heat Exhaustion and Heat Stroke</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

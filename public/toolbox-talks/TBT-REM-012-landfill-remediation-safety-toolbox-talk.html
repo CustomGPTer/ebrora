@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landfill Remediation Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Landfill Remediation Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-REM-012 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Landfill remediation involves the investigation, treatment, or removal of waste from former landfill sites.</li>
+      <li>Landfill gas, primarily methane and carbon dioxide, poses explosion, asphyxiation, and fire hazards.</li>
+      <li>Leachate — contaminated liquid draining from waste — contains heavy metals, ammonia, and organic pollutants.</li>
+      <li>Unknown waste types including hazardous chemicals, asbestos, and clinical waste may be encountered.</li>
+      <li>Ground stability on former landfills is unpredictable — voids, soft spots, and settlement are common.</li>
+      <li>Continuous gas monitoring with personal detectors is mandatory for all work on or near landfill sites.</li>
+      <li>COSHH assessments must cover all potential contaminants identified in the site investigation.</li>
+      <li>Environmental permits from the Environment Agency govern all remediation activities on landfill sites.</li>
+      <li>Workers must be trained in the specific hazards of landfill environments before accessing the site.</li>
+      <li>Unexploded ordnance (UXO) may be present in landfills that accepted demolition waste from wartime periods.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Explosion risk</td><td>Methane from landfill gas is explosive at 5–15% concentration in air — ignition sources must be strictly controlled.</td></tr>
+    <tr><td class="reason">Toxic exposure</td><td>Landfill waste and leachate contain a wide range of toxic substances that harm health through inhalation and skin contact.</td></tr>
+    <tr><td class="reason">Ground instability</td><td>Former landfill ground is unpredictable — plant and workers can sink into voids and soft waste material.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear a personal gas monitor calibrated for methane, CO2, H2S, and oxygen at all times</li>
+          <li>Complete a COSHH assessment covering all contaminants identified in the site investigation</li>
+          <li>Assess ground conditions before positioning plant — use tracked machines on soft areas</li>
+          <li>Obtain all required environmental permits before starting any remediation work</li>
+          <li>Use intrinsically safe equipment in areas where landfill gas concentrations may be explosive</li>
+          <li>Wear RPE, chemical gloves, and coveralls when handling waste or contaminated material</li>
+          <li>Brief all workers on the specific landfill hazards and emergency procedures before entry</li>
+          <li>Decontaminate fully before eating, drinking, or leaving the remediation work area</li>
+          <li>Monitor for UXO where the site investigation identifies the risk of buried ordnance</li>
+          <li>Maintain environmental monitoring of air, leachate, and groundwater throughout the works</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter a landfill remediation site without a calibrated personal gas monitor</li>
+          <li>DON'T use non-intrinsically safe electrical equipment in potential explosive gas zones</li>
+          <li>DON'T smoke, use naked flames, or create sparks on or near the landfill site</li>
+          <li>DON'T position heavy plant on unassessed landfill ground — it may not support the weight</li>
+          <li>DON'T handle unknown waste materials without full PPE and COSHH assessment</li>
+          <li>DON'T eat, drink, or smoke before decontaminating after landfill work</li>
+          <li>DON'T ignore gas monitor alarms — evacuate and reassess the situation immediately</li>
+          <li>DON'T excavate without considering the possibility of buried asbestos or UXO</li>
+          <li>DON'T discharge leachate or contaminated water without environmental permit compliance</li>
+          <li>DON'T allow untrained workers to access the landfill remediation work area</li>
+        </ul>
+        <p class="see-also">See also: Contaminated Land Safety Awareness | Ground Gas Monitoring</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
