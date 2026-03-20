@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embankment Dam Construction - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Embankment Dam Construction</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-DAM-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Embankment dams are earth and rockfill structures that impound water by forming a barrier across a valley.</li>
+      <li>Construction involves placing millions of tonnes of fill in thin layers with precise moisture and compaction control.</li>
+      <li>The clay core or upstream membrane must be placed and compacted to specification to prevent seepage.</li>
+      <li>Haul roads on the embankment carry the heaviest construction traffic: loaded dump trucks and compaction plant.</li>
+      <li>Slopes on the dam embankment create vehicle overturn risk for plant operating on the face.</li>
+      <li>Working near the reservoir impoundment during construction creates drowning risk from rising water levels.</li>
+      <li>Filter and drainage zones within the dam must be placed in the exact sequence to function correctly.</li>
+      <li>Weather disruption halts fill placement; rain on exposed clay core material causes specification failures.</li>
+      <li>The Reservoirs Act 1975 requires a supervising engineer to oversee all dam construction in the UK.</li>
+      <li>Quality control testing of moisture content, density, and permeability is continuous throughout construction.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Dam failure</td><td>Construction defects in the clay core or drainage zones cause seepage that leads to catastrophic dam failure.</td></tr>
+    <tr><td class="reason">Plant overturn</td><td>Heavy dump trucks and compactors operating on steep embankment slopes overturn, crushing operators.</td></tr>
+    <tr><td class="reason">Drowning risk</td><td>Rising reservoir levels during construction and proximity to deep water create drowning hazards for the workforce.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Follow the fill placement specification exactly for layer thickness and moisture content.</li>
+          <li>Compact each layer to the required density and test before placing the next layer.</li>
+          <li>Maintain safe gradients on haul roads and restrict plant to approved routes on slopes.</li>
+          <li>Wear a personal flotation device when working near the impounding reservoir.</li>
+          <li>Place filter and drainage zones in the exact sequence shown on the design drawings.</li>
+          <li>Protect exposed clay core from rainfall with sheeting when work stops.</li>
+          <li>Report any seepage, wet patches, or unusual conditions on the embankment face.</li>
+          <li>Follow the supervising engineer instructions for all construction stage inspections.</li>
+          <li>Record all compaction test results and layer placement data for the dam safety file.</li>
+          <li>Maintain rescue equipment at the reservoir edge throughout the construction period.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T place fill material that does not meet the specified moisture content range.</li>
+          <li>DON'T skip compaction testing on any layer before placing the next one above.</li>
+          <li>DON'T operate heavy plant on embankment slopes steeper than the approved gradient.</li>
+          <li>DON'T work near the reservoir without a personal flotation device.</li>
+          <li>DON'T place filter or drainage material out of the designed sequence.</li>
+          <li>DON'T leave the clay core exposed to rain without protective covering.</li>
+          <li>DON'T ignore seepage, wet patches, or soft areas appearing on the embankment.</li>
+          <li>DON'T deviate from the supervising engineer instructions without formal approval.</li>
+          <li>DON'T use unsuitable fill material that has not been tested and approved.</li>
+          <li>DON'T rush construction to meet programme at the expense of specification compliance.</li>
+        </ul>
+        <p class="see-also">See also: Dam and Reservoir Safety Awareness | Earthworks Compaction</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

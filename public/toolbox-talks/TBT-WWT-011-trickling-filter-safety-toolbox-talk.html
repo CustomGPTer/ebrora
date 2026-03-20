@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trickling Filter Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Trickling Filter Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WWT-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Trickling filters are biological treatment units where wastewater is distributed over a bed of media.</li>
+      <li>The filter surface is wet, slimy, and extremely slippery, creating a serious slip and fall hazard.</li>
+      <li>Rotating distributor arms sweep across the filter surface and can strike workers without warning.</li>
+      <li>The filter media bed may be several metres deep; falling into an uncovered filter is potentially fatal.</li>
+      <li>Hydrogen sulphide and other odorous gases accumulate around trickling filters, especially in warm weather.</li>
+      <li>Filter flies (Psychoda) breed in the media and can cause respiratory irritation in large numbers.</li>
+      <li>Access onto the filter surface requires a permit and must only be done when the distributor arm is isolated.</li>
+      <li>Guardrails and covers protect the filter perimeter, but these are sometimes removed for maintenance access.</li>
+      <li>Working on filter media involves biological hazards from sewage contact requiring appropriate PPE and hygiene.</li>
+      <li>The Confined Spaces Regulations 1997 may apply if the filter has restricted access and poor ventilation.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Slip and fall</td><td>The wet, slimy filter surface and rotating arms cause slips, trips, and falls resulting in fractures and head injuries.</td></tr>
+    <tr><td class="reason">Rotating arm strike</td><td>Distributor arms rotate continuously and silently. Being struck causes serious injuries including broken bones.</td></tr>
+    <tr><td class="reason">Biological hazards</td><td>Sewage contact on trickling filters exposes workers to bacteria, viruses, and parasites causing serious illness.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Isolate and lock off the rotating distributor arm before accessing the filter surface.</li>
+          <li>Wear non-slip footwear with aggressive tread pattern when walking on filter surrounds.</li>
+          <li>Use a permit to work system before anyone accesses the trickling filter surface.</li>
+          <li>Monitor for hydrogen sulphide gas around the filter, especially in warm weather.</li>
+          <li>Wear waterproof gloves and wash hands thoroughly after any sewage contact.</li>
+          <li>Maintain guardrails and covers around the filter perimeter at all times.</li>
+          <li>Brief the team on the biological hazards and hygiene requirements before access.</li>
+          <li>Ensure the distributor arm isolation is verified before anyone steps onto the filter.</li>
+          <li>Use temporary barriers to prevent falls into open sections during maintenance.</li>
+          <li>Report any missing or damaged guardrails around the filter immediately.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T step onto the filter surface while the distributor arm is rotating.</li>
+          <li>DON'T walk on the slippery filter surround without appropriate non-slip footwear.</li>
+          <li>DON'T remove perimeter guardrails without installing temporary edge protection.</li>
+          <li>DON'T ignore hydrogen sulphide odour around filters; monitor gas levels.</li>
+          <li>DON'T eat, drink, or smoke near the trickling filter work area.</li>
+          <li>DON'T lean over the filter edge without fall protection in place.</li>
+          <li>DON'T access the filter without a completed permit to work.</li>
+          <li>DON'T touch your face while working on or near the filter without clean hands.</li>
+          <li>DON'T assume the distributor arm has stopped; verify isolation before access.</li>
+          <li>DON'T work on filter media without waterproof PPE and biological hazard controls.</li>
+        </ul>
+        <p class="see-also">See also: Wastewater Treatment Works Safety Awareness | Slips, Trips and Falls Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

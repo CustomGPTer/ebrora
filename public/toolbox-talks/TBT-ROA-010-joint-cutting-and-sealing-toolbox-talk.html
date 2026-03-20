@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joint Cutting and Sealing - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Joint Cutting and Sealing</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ROA-010 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Joint cutting forms controlled cracks in concrete roads and pavements to prevent random shrinkage cracking.</li>
+      <li>Diamond-bladed floor saws are used to cut joints at specified depths and spacings in the concrete surface.</li>
+      <li>Joint cutting generates high levels of silica dust from the concrete and significant noise from the saw.</li>
+      <li>Water-cooled cutting reduces dust but creates silica-laden slurry that must be contained and disposed of.</li>
+      <li>Hot-pour sealant is applied at temperatures around 190°C into the finished joint to prevent water ingress.</li>
+      <li>Joint sealant fume contains hydrocarbons that irritate the respiratory tract and require ventilation control.</li>
+      <li>Timing of joint cutting is critical; too early damages the concrete, too late allows random cracking.</li>
+      <li>The floor saw blade rotates at high speed; contact causes instant severe laceration and amputation.</li>
+      <li>Working on live carriageways during joint cutting requires full traffic management protection.</li>
+      <li>COSHH 2002, the Control of Noise at Work Regulations 2005, and PUWER 1998 all apply.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Silica dust</td><td>Cutting concrete generates respirable crystalline silica dust that causes silicosis, lung cancer, and COPD.</td></tr>
+    <tr><td class="reason">Severe laceration</td><td>Diamond saw blades rotating at high speed amputate fingers and hands on contact in a fraction of a second.</td></tr>
+    <tr><td class="reason">Burn risk</td><td>Hot-pour sealant at 190°C causes instant severe burns; it sticks to skin prolonging the injury.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use water cooling on the saw blade to suppress silica dust during cutting.</li>
+          <li>Contain and dispose of cutting slurry properly; do not allow it to enter drains.</li>
+          <li>Wear hearing protection, eye protection, and RPE during all cutting operations.</li>
+          <li>Keep hands and body clear of the rotating diamond saw blade at all times.</li>
+          <li>Wear thermal gloves and face protection when handling hot-pour sealant.</li>
+          <li>Set up traffic management before cutting or sealing joints on live roads.</li>
+          <li>Cut joints at the time specified by the concrete mix designer to prevent cracking.</li>
+          <li>Stand upwind of sealant fume and use RPE where ventilation is inadequate.</li>
+          <li>Inspect the floor saw blade, guards, and water supply before each use.</li>
+          <li>Brief the team on the cutting sequence, traffic plan, and burn first aid.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T cut concrete without water suppression to control silica dust generation.</li>
+          <li>DON'T allow silica slurry to enter surface water drains or watercourses.</li>
+          <li>DON'T touch or reach near the rotating diamond saw blade under any circumstances.</li>
+          <li>DON'T handle hot-pour sealant equipment without thermal gloves and face protection.</li>
+          <li>DON'T cut joints too early while concrete is soft or too late after cracking starts.</li>
+          <li>DON'T work on live carriageways without full traffic management protection in place.</li>
+          <li>DON'T remove the saw blade guard for any reason during cutting operations.</li>
+          <li>DON'T inhale sealant fume; stand upwind or use RPE in still conditions.</li>
+          <li>DON'T leave the floor saw running unattended on the concrete surface.</li>
+          <li>DON'T ignore burns from hot sealant; cool with running water for 20 minutes.</li>
+        </ul>
+        <p class="see-also">See also: Road Construction Safety Awareness | Respirable Crystalline Silica (RCS)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

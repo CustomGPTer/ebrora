@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPE Selection and Face Fit Testing - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>RPE Selection and Face Fit Testing</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-COS-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Respiratory protective equipment protects workers from inhaling dust, fume, vapour, and biological hazards.</li>
+      <li>RPE is a last resort under COSHH; use it only when other controls cannot adequately reduce exposure.</li>
+      <li>Disposable FFP3 masks, half-face respirators, and powered air units are the most common types on site.</li>
+      <li>Every tight-fitting RPE must be face fit tested to the individual wearer to confirm an adequate seal.</li>
+      <li>Facial hair including beards, stubble, and sideburns prevents a seal and makes tight-fitting RPE ineffective.</li>
+      <li>Qualitative fit testing uses a taste test; quantitative testing uses a particle counter for numerical results.</li>
+      <li>Face fit tests must be repeated if the wearer changes RPE model or has significant facial changes.</li>
+      <li>Powered air purifying respirators do not require face fit testing and suit workers who cannot achieve a seal.</li>
+      <li>RPE filter types must match the hazard: P3 for particles, A for organic vapour, K for ammonia.</li>
+      <li>COSHH 2002 and HSE guidance HSG53 set the legal framework for RPE selection and use.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Ineffective protection</td><td>RPE that does not fit lets contaminated air leak around the seal, giving a false sense of protection.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>COSHH 2002 requires face fit testing for all tight-fitting RPE. Failure to test is enforceable by HSE.</td></tr>
+    <tr><td class="reason">Correct filter selection</td><td>Using the wrong filter provides no protection against the specific hazard, exposing workers to serious health risks.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a face fit test before using any tight-fitting RPE for the first time.</li>
+          <li>Select the RPE filter type matching the specific hazard in the COSHH assessment.</li>
+          <li>Be clean-shaven in the area where the RPE seals against the face.</li>
+          <li>Carry out a user seal check every time you put on tight-fitting RPE.</li>
+          <li>Repeat the face fit test if you change RPE model or have facial changes.</li>
+          <li>Replace disposable RPE after each use or shift as the manufacturer recommends.</li>
+          <li>Store RPE in a clean, dry place away from dust and contamination.</li>
+          <li>Use powered air RPE if you cannot achieve a seal with tight-fitting masks.</li>
+          <li>Attend RPE training to understand fitting, use, and maintenance requirements.</li>
+          <li>Report any difficulty breathing or discomfort while wearing RPE immediately.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T wear tight-fitting RPE if you have a beard, stubble, or facial hair.</li>
+          <li>DON'T use RPE without completing a face fit test for that specific model.</li>
+          <li>DON'T assume one RPE model fits everyone; individual face shapes vary greatly.</li>
+          <li>DON'T use a dust mask for vapour or gas hazards; select the correct filter.</li>
+          <li>DON'T reuse disposable RPE beyond the manufacturer recommended service life.</li>
+          <li>DON'T store RPE loose in a toolbox where it gets crushed and contaminated.</li>
+          <li>DON'T modify RPE by cutting, bending, or adding tape to improve the fit.</li>
+          <li>DON'T skip the user seal check when putting on tight-fitting RPE each time.</li>
+          <li>DON'T rely on RPE alone; use it alongside other COSHH controls where possible.</li>
+          <li>DON'T ignore breathing difficulty; it may indicate a poor fit or blocked filter.</li>
+        </ul>
+        <p class="see-also">See also: COSHH Awareness | Respiratory Protective Equipment (RPE)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thunderstorm Safety Protocol - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Thunderstorm Safety Protocol</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SEA-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Lightning strikes kill and seriously injure construction workers exposed on open sites every year.</li>
+      <li>Workers at height on scaffolds, cranes, steel frames, and roof structures are most at risk.</li>
+      <li>The 30/30 rule: if lightning follows thunder by less than 30 seconds, seek shelter immediately.</li>
+      <li>Metal structures, cranes, and equipment attract lightning and conduct the strike to ground level.</li>
+      <li>Workers holding metal tools, survey poles, or scaffolding tubes become part of the lightning path.</li>
+      <li>Ground current from a nearby lightning strike can electrocute workers standing on wet ground.</li>
+      <li>Work at height, crane operations, and external scaffolding must stop when thunderstorms approach.</li>
+      <li>The 30-minute rule: wait at least 30 minutes after the last thunder before resuming outdoor work.</li>
+      <li>Lightning can strike from a storm several miles away; blue sky overhead does not mean safety.</li>
+      <li>A site-specific thunderstorm protocol should define trigger points, shelter locations, and resumption criteria.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fatal strikes</td><td>Lightning delivers up to 300 million volts. Direct and indirect strikes cause cardiac arrest, burns, and death.</td></tr>
+    <tr><td class="reason">Height exposure</td><td>Workers on scaffolds, cranes, and steel frames are the highest points on site, attracting lightning directly.</td></tr>
+    <tr><td class="reason">Ground current</td><td>Lightning striking the ground spreads current that electrocutes workers standing nearby on wet or conductive surfaces.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Monitor weather forecasts for thunderstorm warnings before and during each shift.</li>
+          <li>Stop all work at height and crane operations when thunderstorms approach the site.</li>
+          <li>Apply the 30/30 rule: shelter if thunder follows lightning by less than 30 seconds.</li>
+          <li>Shelter in substantial buildings or enclosed vehicles, not under trees or open structures.</li>
+          <li>Wait at least 30 minutes after the last thunder before resuming outdoor work.</li>
+          <li>Put down metal tools, survey poles, and scaffolding tubes when seeking shelter.</li>
+          <li>Descend from scaffolds, steel frames, and elevated positions as storms approach.</li>
+          <li>Avoid standing near metal fences, plant, or tall isolated structures during storms.</li>
+          <li>Brief the team on shelter locations and the thunderstorm stop-work procedure.</li>
+          <li>Crouch low with feet together if caught in the open with no shelter available.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T continue working at height when thunderstorms are within 10 miles of site.</li>
+          <li>DON'T shelter under trees, scaffolds, or open-sided structures during lightning.</li>
+          <li>DON'T hold metal tools, poles, or scaffolding tubes when lightning is nearby.</li>
+          <li>DON'T resume work until 30 minutes after the last thunder is heard.</li>
+          <li>DON'T assume the storm has passed because rain stops; lightning can persist.</li>
+          <li>DON'T lie flat on the ground during a storm; crouch low with feet together.</li>
+          <li>DON'T remain in or on crane cabs during thunderstorms; descend to ground level.</li>
+          <li>DON'T stand on wet ground near tall metal structures when lightning is active.</li>
+          <li>DON'T use mobile phones or radios in exposed positions during active lightning.</li>
+          <li>DON'T ignore distant thunder; storms move quickly and lightning reaches far ahead.</li>
+        </ul>
+        <p class="see-also">See also: Working in High Winds | Lightning Strike Procedures</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

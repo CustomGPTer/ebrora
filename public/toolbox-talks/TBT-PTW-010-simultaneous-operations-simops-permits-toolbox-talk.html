@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simultaneous Operations (SIMOPS) Permits - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Simultaneous Operations (SIMOPS) Permits</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PTW-010 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>SIMOPS permits control the interaction between two or more high-risk activities happening in the same area.</li>
+      <li>Examples include hot works near confined space entry, lifting over live pipework, and excavation near cranes.</li>
+      <li>Without SIMOPS control, one activity creates hazards that the other activity team is not aware of.</li>
+      <li>The SIMOPS permit cross-references the individual permits for each activity and identifies the interactions.</li>
+      <li>A SIMOPS coordinator ensures that all parties understand the combined risks and agreed controls.</li>
+      <li>Common interactions include sparks from hot works reaching a space with flammable atmosphere testing.</li>
+      <li>Time sequencing may be required: one activity must finish before the other can safely begin.</li>
+      <li>The SIMOPS permit must be displayed where all affected teams can see the combined arrangements.</li>
+      <li>CDM 2015 requires the principal contractor to coordinate activities that could affect each other.</li>
+      <li>SIMOPS permits are common on process plant shutdowns, MEICA installations, and multi-trade fit-outs.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent interaction incidents</td><td>Activities that are safe individually become dangerous when combined in the same area without coordination.</td></tr>
+    <tr><td class="reason">Communication gaps</td><td>Separate permit systems for each activity miss the interaction risks that only a SIMOPS review identifies.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>CDM 2015 Regulation 13 requires the principal contractor to coordinate work that affects the safety of others.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Identify all activities that will occur simultaneously in the same area.</li>
+          <li>Issue a SIMOPS permit cross-referencing the individual permits for each activity.</li>
+          <li>Appoint a SIMOPS coordinator to manage the interaction between activity teams.</li>
+          <li>Brief all affected teams together on the combined risks and agreed controls.</li>
+          <li>Display the SIMOPS permit where all parties can see it during the work.</li>
+          <li>Define time sequencing where one activity must finish before another can start.</li>
+          <li>Review the SIMOPS arrangement if conditions, scope, or timing change during the shift.</li>
+          <li>Ensure each team knows who is responsible for coordination and communication.</li>
+          <li>Close the SIMOPS permit formally when all simultaneous activities are complete.</li>
+          <li>Record the SIMOPS coordination as part of the project safety documentation.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T allow multiple high-risk activities in the same area without a SIMOPS permit.</li>
+          <li>DON'T assume individual permits cover the interaction risks between activities.</li>
+          <li>DON'T start a second activity without briefing the first activity team on the risks.</li>
+          <li>DON'T proceed without a named SIMOPS coordinator managing the combined operations.</li>
+          <li>DON'T keep SIMOPS information in one permit; all affected teams must see it.</li>
+          <li>DON'T ignore changes in scope or timing that affect the SIMOPS arrangement.</li>
+          <li>DON'T allow hot works to proceed near confined space entry without joint assessment.</li>
+          <li>DON'T operate cranes over workers carrying out excavation without SIMOPS controls.</li>
+          <li>DON'T close individual permits without also closing the SIMOPS coordination permit.</li>
+          <li>DON'T assume teams from different companies will coordinate without formal systems.</li>
+        </ul>
+        <p class="see-also">See also: Permit to Work Awareness | Multi-Trade Coordination Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

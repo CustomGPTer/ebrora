@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inverter Installation and Commissioning - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Inverter Installation and Commissioning</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ENE-010 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Solar inverters convert DC electricity from photovoltaic panels into AC electricity for the grid or building.</li>
+      <li>Inverters can be string type, central type, or micro-inverters depending on the system design.</li>
+      <li>Central inverters on solar farms weigh several hundred kilograms and require crane or forklift installation.</li>
+      <li>DC input voltages to string and central inverters can exceed 1,000 volts, creating lethal shock risk.</li>
+      <li>Commissioning involves energising the inverter with live DC and AC connections for the first time.</li>
+      <li>Arc flash energy at the inverter terminals can cause severe burns and blast injuries during faults.</li>
+      <li>Inverters generate heat during operation; adequate ventilation and clearance space must be maintained.</li>
+      <li>The AC output connects to the distribution network, requiring DNO approval and G99 compliance.</li>
+      <li>The Electricity at Work Regulations 1989 apply to all inverter installation and commissioning activities.</li>
+      <li>Only qualified electrical engineers should commission inverters and connect them to the grid.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Lethal DC voltage</td><td>DC voltages exceeding 1,000V at inverter inputs cause fatal electrocution with no circuit breaker to interrupt the supply.</td></tr>
+    <tr><td class="reason">Arc flash</td><td>Faults at inverter terminals produce arc flash with extreme heat and blast energy, causing severe burns.</td></tr>
+    <tr><td class="reason">Grid connection</td><td>Incorrect inverter commissioning can backfeed the distribution network, endangering linesmen and the public.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Isolate both DC and AC supplies before working on inverter connections.</li>
+          <li>Treat all DC inputs as live during daylight; they cannot be fully de-energised.</li>
+          <li>Use DC-rated isolation switches and test equipment for all inverter DC work.</li>
+          <li>Wear arc-flash-rated PPE when working near live inverter terminals.</li>
+          <li>Ensure adequate ventilation and clearance space around the installed inverter.</li>
+          <li>Obtain DNO approval and G99 compliance before connecting to the grid.</li>
+          <li>Use a crane or forklift with a lift plan for installing heavy central inverters.</li>
+          <li>Commission inverters only with qualified electrical engineers supervising the process.</li>
+          <li>Test protection systems including anti-islanding before declaring the inverter operational.</li>
+          <li>Label all DC and AC isolators clearly at the inverter and at remote locations.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T open inverter covers without isolating both DC and AC supplies first.</li>
+          <li>DON'T assume DC circuits are safe because the AC side has been isolated.</li>
+          <li>DON'T use AC-rated switches, fuses, or test equipment on DC inverter circuits.</li>
+          <li>DON'T commission the inverter without DNO approval and G99 compliance confirmed.</li>
+          <li>DON'T restrict ventilation around operating inverters; they generate significant heat.</li>
+          <li>DON'T lift heavy central inverters without a lift plan and mechanical handling.</li>
+          <li>DON'T allow unqualified persons to commission or energise inverter equipment.</li>
+          <li>DON'T touch inverter terminals without confirming isolation and proving dead.</li>
+          <li>DON'T connect to the grid without testing anti-islanding protection systems.</li>
+          <li>DON'T leave inverter isolators unlabelled; clear identification prevents errors.</li>
+        </ul>
+        <p class="see-also">See also: DC Electrical Safety (Solar) | Ground Mounted Solar Farm Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
