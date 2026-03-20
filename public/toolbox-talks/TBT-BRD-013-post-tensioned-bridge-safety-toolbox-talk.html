@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post-Tensioned Bridge Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Post-Tensioned Bridge Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BRD-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Post-tensioning applies compressive force to concrete bridge elements using high-strength steel tendons.</li>
+      <li>Tendons are stressed to forces of hundreds of tonnes using hydraulic jacks after the concrete has hardened.</li>
+      <li>A tendon failure or anchor blowout during stressing releases stored energy with explosive force.</li>
+      <li>Exclusion zones behind the stressing jack and anchor must be maintained during every stressing operation.</li>
+      <li>Only trained and certified operatives should operate stressing jacks and monitor the stressing procedure.</li>
+      <li>The stressing sequence must follow the design specification to avoid eccentric loading and cracking.</li>
+      <li>Grout injection into ducts after stressing protects tendons from corrosion — voids compromise durability.</li>
+      <li>Cutting into post-tensioned elements during future maintenance risks severing a live tendon.</li>
+      <li>Tendon elongation measurements during stressing must match the predicted values within tolerance.</li>
+      <li>Post-tensioning equipment including jacks, pumps, and gauges must be calibrated and certified.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Explosive energy</td><td>A tendon at stressing load stores enormous energy — failure causes anchor ejection at lethal velocity.</td></tr>
+    <tr><td class="reason">Structural integrity</td><td>Incorrect stressing sequence or grout voids compromise the bridge's structural capacity and long-term durability.</td></tr>
+    <tr><td class="reason">Future hazard</td><td>Live tendons hidden in concrete create a permanent hazard for anyone cutting into the structure in future.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Maintain exclusion zones behind the stressing jack and at the dead-end anchor during stressing</li>
+          <li>Ensure only certified PT operatives operate the stressing jacks and monitor the procedure</li>
+          <li>Follow the designed stressing sequence exactly to prevent eccentric loading and cracking</li>
+          <li>Measure tendon elongation at each stressing stage and compare with predicted values</li>
+          <li>Verify that all stressing equipment is calibrated and within its certification period</li>
+          <li>Grout ducts fully after stressing to protect tendons from corrosion</li>
+          <li>Record all stressing data including force, elongation, and any anomalies for the quality file</li>
+          <li>Brief the stressing team on the specific tendon layout, sequence, and exclusion zones</li>
+          <li>Mark post-tensioned elements permanently so future workers know tendons are present</li>
+          <li>Inspect anchor zones and concrete surfaces for cracking during and after stressing</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T stand behind or near the stressing jack during the tensioning operation</li>
+          <li>DON'T deviate from the approved stressing sequence without structural engineer approval</li>
+          <li>DON'T use stressing equipment that is overdue for calibration or shows signs of damage</li>
+          <li>DON'T stress tendons if elongation readings are outside the specified tolerance range</li>
+          <li>DON'T leave grout voids in post-tensioning ducts — they compromise long-term durability</li>
+          <li>DON'T allow unqualified persons to operate stressing jacks or monitor the procedure</li>
+          <li>DON'T ignore cracking in the anchor zone — it may indicate overstress or design issues</li>
+          <li>DON'T cut, drill, or break into post-tensioned concrete without knowing the tendon layout</li>
+          <li>DON'T release the stressing load suddenly — controlled de-tensioning is required</li>
+          <li>DON'T skip quality records — stressing data is essential for the bridge's lifetime management</li>
+        </ul>
+        <p class="see-also">See also: Post-Tensioning Safety | Bridge Construction Safety Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

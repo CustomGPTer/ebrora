@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointed Person and Lift Supervisor Roles - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Appointed Person and Lift Supervisor Roles</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LFT-015 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>The Appointed Person (AP) is responsible for planning lifting operations and preparing lift plans.</li>
+      <li>The Lift Supervisor manages the lifting operation on the ground to ensure it follows the lift plan.</li>
+      <li>LOLER 1998 requires every lifting operation to be planned by a competent person.</li>
+      <li>The AP must have detailed knowledge of crane capacities, rigging, and lifting regulations.</li>
+      <li>The Lift Supervisor ensures the exclusion zone is maintained and communications are clear.</li>
+      <li>BS 7121 defines the duties and competence requirements for both roles in crane operations.</li>
+      <li>On complex or high-risk lifts, the AP and Lift Supervisor may be different individuals.</li>
+      <li>The AP must assess ground conditions, overhead hazards, and environmental factors before each lift.</li>
+      <li>The Lift Supervisor briefs the crane operator, slinger, and banksman before operations begin.</li>
+      <li>Both roles carry personal accountability — competence and authority must be clearly assigned.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent incidents</td><td>Poorly planned or supervised lifting operations are a leading cause of fatal and serious injuries in construction.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>LOLER 1998 requires lifting operations to be planned and supervised by competent persons at all times.</td></tr>
+    <tr><td class="reason">Clear accountability</td><td>Defined roles ensure someone has authority and responsibility for safety at every stage of the lift.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Ensure an Appointed Person prepares or reviews the lift plan for every lift</li>
+          <li>Confirm the Lift Supervisor is present and in control before the lift begins</li>
+          <li>Verify that both the AP and Lift Supervisor hold recognised competence certificates</li>
+          <li>Brief all lifting team members on the plan, signals, and emergency procedures</li>
+          <li>Check that the crane, accessories, and rigging match the lift plan requirements</li>
+          <li>Maintain the exclusion zone throughout the lifting operation without exception</li>
+          <li>Record the lift plan and any amendments in the site lifting file</li>
+          <li>Ensure the Lift Supervisor has authority to stop the lift if conditions change</li>
+          <li>Review the lift plan if wind, ground conditions, or loads differ from those planned</li>
+          <li>Carry out a post-lift debrief to capture lessons learned for future operations</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T proceed with any lift without a documented lift plan</li>
+          <li>DON'T allow unqualified persons to act as Appointed Person or Lift Supervisor</li>
+          <li>DON'T deviate from the lift plan without formal review and approval</li>
+          <li>DON'T start lifting before the Lift Supervisor has completed the team briefing</li>
+          <li>DON'T reduce the exclusion zone to suit other site activities</li>
+          <li>DON'T ignore changing weather conditions that affect the planned lift</li>
+          <li>DON'T combine the AP and Lift Supervisor roles unless competence allows it</li>
+          <li>DON'T allow crane operators to self-plan lifts without AP involvement</li>
+          <li>DON'T skip the lift briefing because the team has done similar lifts before</li>
+          <li>DON'T continue a lift if any team member raises a safety concern</li>
+        </ul>
+        <p class="see-also">See also: Lifting Operations Awareness (LOLER) | Lift Plan Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

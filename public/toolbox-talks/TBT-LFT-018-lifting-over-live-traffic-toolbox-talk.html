@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lifting Over Live Traffic - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lifting Over Live Traffic</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LFT-018 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Lifting operations over live traffic routes create extreme hazards from dropped loads striking vehicles and occupants.</li>
+      <li>LOLER 1998 requires all lifting operations to be planned and carried out to avoid danger to persons.</li>
+      <li>The preferred control is to close the road during the lift — this eliminates the risk entirely.</li>
+      <li>Where road closure is not possible, traffic must be stopped during each lift cycle using stop-go control.</li>
+      <li>The lift plan must specifically address the risk to road users and define the traffic management measures.</li>
+      <li>Wind conditions are critical — gusts can swing a suspended load into the path of passing vehicles.</li>
+      <li>The crane must be positioned so the load path minimises or eliminates time spent over the live carriageway.</li>
+      <li>Communication between the crane operator, lift supervisor, and traffic management team must be continuous.</li>
+      <li>Night lifts may be preferred to reduce the number of road users exposed during the operation.</li>
+      <li>Highways authority approval is required before any lifting operation takes place over a public road.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fatal consequences</td><td>A load dropped onto a moving vehicle causes catastrophic injury or death to the vehicle occupants.</td></tr>
+    <tr><td class="reason">Public exposure</td><td>Road users have no control over the lifting operation — the duty to protect them is absolute.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>LOLER 1998 and the Highways Act require lifts over roads to be planned and authorised with traffic controls.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Close the road during the lift as the preferred and safest option</li>
+          <li>Stop traffic using controlled stop-go marshals if full closure is not possible</li>
+          <li>Obtain highways authority approval before lifting over any public road</li>
+          <li>Prepare a lift plan that specifically addresses the risk to road users below</li>
+          <li>Monitor wind speed continuously and halt lifts if conditions threaten load control</li>
+          <li>Position the crane to minimise the load path over the live carriageway</li>
+          <li>Maintain continuous communication between the crane, lift supervisor, and traffic team</li>
+          <li>Consider night lifts to reduce the number of road users exposed during the operation</li>
+          <li>Brief the entire team including traffic marshals on the lift plan and abort procedure</li>
+          <li>Use taglines to control the load and prevent it swinging over traffic lanes</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T lift loads over live traffic without road closure or stop-go traffic control</li>
+          <li>DON'T proceed without highways authority approval for lifts over public roads</li>
+          <li>DON'T lift in wind conditions that could swing the load into the traffic path</li>
+          <li>DON'T allow traffic to pass beneath a suspended load at any time during the lift</li>
+          <li>DON'T rely on traffic lights alone — use manned stop-go control for each lift cycle</li>
+          <li>DON'T position the crane where the load must travel the maximum distance over the road</li>
+          <li>DON'T lift without taglines to control load swing and rotation</li>
+          <li>DON'T skip the lift plan review addressing road user protection measures</li>
+          <li>DON'T assume road users will see and avoid the crane — protect them with active controls</li>
+          <li>DON'T continue a lift if the traffic management team reports any control breakdown</li>
+        </ul>
+        <p class="see-also">See also: Lifting Operations Awareness (LOLER) | Lift Plan Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
