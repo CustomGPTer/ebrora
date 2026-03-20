@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EML (Electromagnetic Locator) Techniques - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>EML (Electromagnetic Locator) Techniques</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BUR-016 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Electromagnetic locators (EMLs) detect buried metallic services by sensing electromagnetic fields around cables and pipes.</li>
+      <li>EMLs work in two modes: passive mode detects signals from live cables, and active mode uses a signal transmitter.</li>
+      <li>A CAT (cable avoidance tool) is the most common EML used on UK construction sites for service detection.</li>
+      <li>The Genny (signal generator) is connected to a service at an access point to apply a traceable signal.</li>
+      <li>EMLs cannot detect non-metallic pipes such as plastic water mains, clay drains, or fibre optic ducts.</li>
+      <li>HSG47 (Avoiding Danger from Underground Services) sets out the UK guidance for safe detection and excavation.</li>
+      <li>All operatives using EMLs must hold a valid competency card and have received refresher training.</li>
+      <li>False readings can occur from reinforcement, metallic fences, nearby vehicles, and parallel services.</li>
+      <li>EML detection must always be supplemented by reference to utility plans and trial hole investigation.</li>
+      <li>Equipment must be checked for correct function using a known signal source before each use.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent service strikes</td><td>Failing to detect buried services leads to cable strikes causing electrocution, explosions, and gas leaks.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>HSG47 and CDM 2015 require competent use of detection equipment before any ground disturbance.</td></tr>
+    <tr><td class="reason">Protect workers and the public</td><td>Gas main strikes and HV cable strikes endanger workers and nearby residents with immediate life-threatening hazards.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Check the EML is functioning correctly using a known signal source before every use</li>
+          <li>Use both passive and active (with Genny) modes to maximise detection of buried services</li>
+          <li>Scan the full work area systematically in a grid pattern, not just the planned dig line</li>
+          <li>Cross-reference EML readings with up-to-date utility plans for the area</li>
+          <li>Mark all detected services clearly on the ground with paint or markers before excavation</li>
+          <li>Dig trial holes by hand to confirm the exact position and depth of detected services</li>
+          <li>Hold a valid EML competency card and attend refresher training as required</li>
+          <li>Record the scan results and service positions in the site records before excavation begins</li>
+          <li>Report any unexpected readings or anomalies to the supervisor before proceeding</li>
+          <li>Keep the EML away from vehicles, generators, and steel structures that cause interference</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T rely solely on EML detection — always cross-check with utility record plans</li>
+          <li>DON&#x27;T assume no signal means no service — plastic pipes and fibre are not detectable by EML</li>
+          <li>DON&#x27;T use an EML without testing it on a known source to confirm it is working</li>
+          <li>DON&#x27;T scan in one direction only — services at angles to the scan line may be missed</li>
+          <li>DON&#x27;T excavate with machines until EML scanning and trial holes confirm service positions</li>
+          <li>DON&#x27;T use the equipment near running engines or steel structures that distort signals</li>
+          <li>DON&#x27;T allow unqualified persons to operate EML equipment for service detection</li>
+          <li>DON&#x27;T ignore weak or intermittent signals — they may indicate deep or partially shielded services</li>
+          <li>DON&#x27;T skip the Genny mode — passive mode alone does not detect all metallic services</li>
+          <li>DON&#x27;T treat EML results as definitive — they indicate probable positions requiring confirmation</li>
+        </ul>
+        <p class="see-also">See also: CAT and Genny Safe Use | Safe Digging Practices (HSG47)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

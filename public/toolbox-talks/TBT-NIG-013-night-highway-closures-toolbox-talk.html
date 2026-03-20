@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Night Highway Closures - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Night Highway Closures</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-NIG-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Night highway closures are used for major works that cannot be carried out with traffic running during the day.</li>
+      <li>Closures typically operate between 2000 and 0600 hours and require formal approval from the highway authority.</li>
+      <li>Diversion routes must be signed, inspected, and capable of handling diverted traffic volumes safely.</li>
+      <li>Setting up and removing closure signs and barriers is the highest risk phase, as traffic is still present.</li>
+      <li>Driver fatigue and reduced visibility at night increase the risk of vehicles breaching closure barriers.</li>
+      <li>IPVs (Impact Protection Vehicles) must be used during setup and removal phases on high-speed roads.</li>
+      <li>All workers must wear EN ISO 20471 Class 3 high-visibility clothing with retroreflective elements at night.</li>
+      <li>Artificial lighting must illuminate the work area to a level that allows safe working and hazard identification.</li>
+      <li>The Safety at Street Works and Road Works Code of Practice and Chapter 8 govern night closure procedures.</li>
+      <li>Communication between the traffic management team, works crew, and control room must be maintained throughout.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent fatalities</td><td>Workers are struck and killed during night closure setup and removal when exposed to approaching traffic.</td></tr>
+    <tr><td class="reason">Driver behaviour</td><td>Fatigued and distracted drivers at night are more likely to breach closures and enter the work zone.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>Chapter 8, the Code of Practice, and highway authority approval conditions set strict legal requirements for night closures.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Obtain highway authority approval for the closure, diversion route, and permitted working hours</li>
+          <li>Use IPVs during closure setup and removal phases on high-speed and dual carriageway roads</li>
+          <li>Wear EN ISO 20471 Class 3 high-visibility clothing with retroreflective elements throughout</li>
+          <li>Install and check all diversion signs before implementing the closure on the main carriageway</li>
+          <li>Ensure artificial lighting illuminates the full work area to a safe working standard</li>
+          <li>Maintain continuous radio communication between the TM crew and the site supervisor</li>
+          <li>Brief all workers on the closure layout, escape routes, and emergency procedures each night</li>
+          <li>Inspect all signs, cones, and barriers after setup and at regular intervals during the shift</li>
+          <li>Remove the closure in the approved sequence under supervision with IPV protection</li>
+          <li>Monitor for driver incursions and report any breaches of the closure to the control room</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T set up or remove night closures without IPV protection on high-speed roads</li>
+          <li>DON&#x27;T work outside the approved closure hours without highway authority agreement</li>
+          <li>DON&#x27;T rely on standard daytime high-visibility clothing — use retroreflective Class 3 at night</li>
+          <li>DON&#x27;T open the road to traffic until all workers, plant, and materials are clear of the carriageway</li>
+          <li>DON&#x27;T leave gaps in the closure signing that could allow drivers to enter the work zone</li>
+          <li>DON&#x27;T assume drivers can see you — visibility at night is severely reduced even with lighting</li>
+          <li>DON&#x27;T work in unlit areas of the closure — ensure lighting covers the full work extent</li>
+          <li>DON&#x27;T leave the closure unmanned without monitoring for displaced signs or driver breaches</li>
+          <li>DON&#x27;T implement a diversion route without inspecting it for suitability and signing it correctly</li>
+          <li>DON&#x27;T rush closure removal at the end of the shift — follow the approved sequence safely</li>
+        </ul>
+        <p class="see-also">See also: Night Working Safety Awareness | Chapter 8 Signing, Lighting and Guarding</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

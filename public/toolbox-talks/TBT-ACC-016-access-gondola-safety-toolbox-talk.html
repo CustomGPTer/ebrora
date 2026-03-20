@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Access Gondola Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Access Gondola Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ACC-016 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Access gondolas are permanent or temporary suspended platforms used for building facade maintenance and construction.</li>
+      <li>Gondolas travel vertically on wire ropes attached to roof-mounted davit arms or parapet-mounted beams.</li>
+      <li>Workers in gondolas are exposed to fall hazards, wind loading, and entrapment between the platform and the building.</li>
+      <li>All gondola systems must comply with BS EN 1808 and require LOLER thorough examination before use.</li>
+      <li>An independent safety line with an inertia reel must protect each occupant in addition to the main suspension.</li>
+      <li>Roof anchors and davit bases must be structurally verified for the combined load of the gondola and occupants.</li>
+      <li>Wind is the primary environmental hazard — gondolas swing and can impact the building facade in gusty conditions.</li>
+      <li>Rescue from a stranded or malfunctioning gondola at height requires a pre-planned and rehearsed procedure.</li>
+      <li>Only trained and competent operators should operate gondola controls including raise, lower, and tilt functions.</li>
+      <li>Overloading with tools, materials, and personnel beyond the rated capacity causes wire rope failure.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent fatal falls</td><td>Gondola suspension failure or overloading drops the platform and occupants from height — independent safety lines are critical.</td></tr>
+    <tr><td class="reason">Structural anchors</td><td>Inadequate roof fixings cause davit arm failure, detaching the entire gondola system from the building.</td></tr>
+    <tr><td class="reason">Rescue requirement</td><td>A stranded gondola at height with an incapacitated worker requires immediate rescue capability.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Ensure the gondola has a current LOLER thorough examination certificate before each use</li>
+          <li>Verify roof anchors and davit bases are structurally certified for the required loading</li>
+          <li>Wear a full body harness connected to an independent safety line with inertia reel</li>
+          <li>Check wire ropes for corrosion, broken strands, and kinking during the daily pre-use check</li>
+          <li>Monitor wind speed and stop operations when gusting exceeds the safe working limit</li>
+          <li>Brief all occupants on the rescue plan before ascending in the gondola each shift</li>
+          <li>Display the safe working load clearly and never exceed it with personnel and materials</li>
+          <li>Test emergency descent and communication systems before the start of each working day</li>
+          <li>Maintain clear communication between gondola occupants and a ground-level attendant</li>
+          <li>Report any unusual vibration, noise, or movement from the suspension system immediately</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T use a gondola without confirming a current LOLER thorough examination is in place</li>
+          <li>DON&#x27;T operate without an independent safety line attached to each occupant&#x27;s harness</li>
+          <li>DON&#x27;T overload the gondola beyond the rated safe working load with people or materials</li>
+          <li>DON&#x27;T operate in high winds or when the platform is swinging against the building</li>
+          <li>DON&#x27;T use wire ropes with visible corrosion, broken strands, or deformation</li>
+          <li>DON&#x27;T allow untrained operators to control the gondola raise, lower, or tilt functions</li>
+          <li>DON&#x27;T lean over the gondola edge to reach the building face beyond arm&#x27;s length</li>
+          <li>DON&#x27;T leave the gondola unattended at height with tools or materials left on board</li>
+          <li>DON&#x27;T bypass safety limit switches or override emergency stop functions on the system</li>
+          <li>DON&#x27;T ascend without confirming the rescue plan and emergency descent procedure are ready</li>
+        </ul>
+        <p class="see-also">See also: Suspended Access Platform Safety | Rope Access Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

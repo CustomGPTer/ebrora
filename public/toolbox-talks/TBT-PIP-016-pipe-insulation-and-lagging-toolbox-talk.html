@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipe Insulation and Lagging - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Pipe Insulation and Lagging</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PIP-016 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Pipe insulation and lagging prevent heat loss, condensation, and freezing on pipework systems in buildings and process plant.</li>
+      <li>Insulation materials include mineral wool, phenolic foam, PIR, elastomeric rubber, and calcium silicate.</li>
+      <li>Cutting insulation materials generates dust and fibres that irritate the skin, eyes, and respiratory system.</li>
+      <li>Some insulation adhesives and sealants contain solvents and isocyanates requiring COSHH assessment.</li>
+      <li>Working overhead and in confined plant rooms to insulate pipework creates fatigue and awkward posture risks.</li>
+      <li>Existing pipe lagging on older buildings may contain asbestos — it must be tested before disturbing.</li>
+      <li>The COSHH Regulations 2002 require assessment of all insulation materials and adhesives used on site.</li>
+      <li>Hot pipework must be isolated and cooled before insulation work to prevent thermal burns to installers.</li>
+      <li>Cladding over insulation with aluminium or stainless steel sheeting involves sharp edges and cutting hazards.</li>
+      <li>Repetitive overhead work installing insulation causes shoulder, neck, and upper limb musculoskeletal disorders.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Respiratory protection</td><td>Insulation dust and fibres cause respiratory irritation and ceramic fibre types may cause cancer.</td></tr>
+    <tr><td class="reason">Asbestos risk</td><td>Disturbing existing lagging without testing may release asbestos fibres, causing fatal disease.</td></tr>
+    <tr><td class="reason">Chemical exposure</td><td>Adhesives and sealants contain harmful solvents and isocyanates requiring ventilation and RPE controls.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Test existing pipe lagging for asbestos before removing or disturbing it on any project</li>
+          <li>Wear RPE with a P2 filter when cutting mineral wool, phenolic, or fibrous insulation</li>
+          <li>Complete a COSHH assessment for all insulation adhesives and sealants before first use</li>
+          <li>Ensure hot pipework is isolated and cooled before starting insulation installation work</li>
+          <li>Wear cut-resistant gloves when handling aluminium or stainless steel cladding sheeting</li>
+          <li>Use sharp tools to cut insulation cleanly and minimise dust and fibre generation</li>
+          <li>Ensure ventilation is adequate when using solvent-based adhesives in enclosed plant rooms</li>
+          <li>Rotate tasks to reduce prolonged overhead work that causes shoulder and neck strain</li>
+          <li>Dispose of insulation offcuts in sealed bags to prevent fibre release during waste handling</li>
+          <li>Wear safety goggles to protect eyes from airborne fibres during insulation cutting</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T disturb existing pipe lagging without confirming it does not contain asbestos</li>
+          <li>DON&#x27;T cut insulation materials without RPE — fibres cause respiratory irritation and disease</li>
+          <li>DON&#x27;T apply solvent-based adhesives in enclosed spaces without mechanical ventilation running</li>
+          <li>DON&#x27;T insulate hot pipework before it is isolated and cooled to a safe temperature</li>
+          <li>DON&#x27;T handle metal cladding sheeting without cut-resistant gloves — edges are razor sharp</li>
+          <li>DON&#x27;T dry sweep insulation dust and offcuts — use vacuum extraction with HEPA filtration</li>
+          <li>DON&#x27;T ignore shoulder or neck pain from overhead insulation work — report symptoms early</li>
+          <li>DON&#x27;T use adhesives containing isocyanates without specific COSHH controls and RPE in place</li>
+          <li>DON&#x27;T leave insulation offcuts scattered in plant rooms creating trip and fire hazards</li>
+          <li>DON&#x27;T assume all insulation products are low risk — check the SDS for each material</li>
+        </ul>
+        <p class="see-also">See also: Fibrous Insulation Dust | Asbestos Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

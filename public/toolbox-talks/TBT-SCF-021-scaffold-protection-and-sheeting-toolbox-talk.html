@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scaffold Protection and Sheeting - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Scaffold Protection and Sheeting</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SCF-021 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Scaffold sheeting, netting, and debris fans protect the public and workers from falling materials and debris.</li>
+      <li>Sheeting acts as a wind sail, significantly increasing the load on the scaffold structure and its ties.</li>
+      <li>The scaffold design must account for the additional wind loading before any sheeting or netting is installed.</li>
+      <li>Monofilament netting reduces wind loading compared to solid sheeting while still containing falling debris.</li>
+      <li>Brick guards and toe boards prevent small items falling from working platforms onto people below.</li>
+      <li>Debris fans (fans boards) are angled platforms that catch falling materials on scaffolds over public areas.</li>
+      <li>TG20 compliance notes and the scaffold design must specify whether sheeting or netting is permitted.</li>
+      <li>Unauthorized sheeting added without engineering approval has caused scaffold collapses in the UK.</li>
+      <li>Regular inspection is required after high winds to check for torn sheeting and displaced netting.</li>
+      <li>Scaffold sheeting and netting must be properly secured with approved fixings, not cable ties or string.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent scaffold collapse</td><td>Sheeting turns the scaffold into a wind sail — without design approval, the additional load can cause total collapse.</td></tr>
+    <tr><td class="reason">Protect the public</td><td>Falling debris from scaffolds strikes pedestrians below — netting, fans, and toe boards prevent this.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>CDM 2015 and the Work at Height Regulations require falling object protection on scaffolds over public areas.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Confirm the scaffold design accounts for wind loading before installing any sheeting or netting</li>
+          <li>Use monofilament netting where debris containment is needed with lower wind loading impact</li>
+          <li>Install brick guards and toe boards on all working platforms to prevent small items falling</li>
+          <li>Secure sheeting and netting with approved fixings as specified by the scaffold designer</li>
+          <li>Install debris fans over public walkways and entrances below scaffold working platforms</li>
+          <li>Inspect sheeting, netting, and fixings after high winds and repair any damage promptly</li>
+          <li>Check the TG20 compliance note to confirm what protection the scaffold is designed to carry</li>
+          <li>Coordinate with the scaffolding contractor before adding any protection to the scaffold</li>
+          <li>Maintain clear access behind sheeting for scaffold inspections and fire escape routes</li>
+          <li>Remove torn or damaged sheeting promptly to prevent it flapping and increasing wind loads</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T add sheeting or solid protection to a scaffold without confirming the design allows it</li>
+          <li>DON&#x27;T use solid sheeting where monofilament netting would provide adequate debris protection</li>
+          <li>DON&#x27;T secure sheeting with cable ties, string, or unapproved fixings that can fail</li>
+          <li>DON&#x27;T ignore torn or displaced sheeting after storms — it increases wind load unpredictably</li>
+          <li>DON&#x27;T remove brick guards or toe boards from working platforms for convenience</li>
+          <li>DON&#x27;T leave gaps in debris netting where materials could fall through onto people below</li>
+          <li>DON&#x27;T block scaffold access or fire escape routes with sheeting or netting fixings</li>
+          <li>DON&#x27;T allow sheeting to accumulate water that adds significant unplanned weight to the scaffold</li>
+          <li>DON&#x27;T assume netting alone protects the public — debris fans are needed over high-risk areas</li>
+          <li>DON&#x27;T install protection without the scaffolding contractor&#x27;s knowledge and approval</li>
+        </ul>
+        <p class="see-also">See also: Scaffold Safety Awareness | Scaffold Ties and Stability</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

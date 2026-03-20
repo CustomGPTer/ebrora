@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suspended Scaffolds - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Suspended Scaffolds</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SCF-020 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Suspended scaffolds hang from the building structure above using wire ropes, chains, or proprietary suspension systems.</li>
+      <li>They are used for facade work, painting, cladding, and maintenance where ground-based scaffolding is not practicable.</li>
+      <li>All suspended scaffolds must be designed by a structural engineer and erected by CISRS-qualified scaffolders.</li>
+      <li>The suspension points on the building structure must be verified for load capacity by a competent engineer.</li>
+      <li>Wire rope condition is critical — corrosion, broken wires, and kinking can cause catastrophic failure.</li>
+      <li>The Work at Height Regulations 2005 and BS EN 1808 set the requirements for suspended access platforms.</li>
+      <li>Workers on suspended scaffolds must wear a full body harness attached to an independent safety line.</li>
+      <li>Wind loading can cause dangerous swinging and impact against the building facade, injuring workers.</li>
+      <li>A thorough examination under LOLER is required before first use and every six months during service.</li>
+      <li>Overloading is a major risk — the safe working load must be clearly displayed and never exceeded.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent fatal falls</td><td>Suspension system failure drops the scaffold and all workers on it — independent safety lines are the last defence.</td></tr>
+    <tr><td class="reason">Structural integrity</td><td>The building structure must support the full loaded weight — inadequate fixings cause the scaffold to detach.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>LOLER 1998, Work at Height Regulations 2005, and BS EN 1808 require design, inspection, and safe use controls.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Ensure the suspended scaffold is designed by a structural engineer with approved drawings</li>
+          <li>Verify suspension points are structurally adequate before loading the scaffold</li>
+          <li>Wear a full body harness attached to an independent safety line at all times</li>
+          <li>Check wire ropes for corrosion, broken wires, and kinking before every use</li>
+          <li>Display the safe working load clearly and never exceed it with workers or materials</li>
+          <li>Arrange LOLER thorough examination before first use and every six months thereafter</li>
+          <li>Use CISRS-qualified scaffolders for all erection, modification, and dismantling activities</li>
+          <li>Monitor wind conditions and stop work when swinging or impact risk becomes unsafe</li>
+          <li>Inspect all connections, clamps, and suspension hardware before each work shift begins</li>
+          <li>Brief all workers on the safe working load, harness use, and emergency lowering procedure</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T use a suspended scaffold without an approved structural design and load calculations</li>
+          <li>DON&#x27;T work on a suspended scaffold without a harness attached to an independent safety line</li>
+          <li>DON&#x27;T overload the platform beyond the displayed safe working load at any time</li>
+          <li>DON&#x27;T use wire ropes with visible corrosion, broken strands, or deformation</li>
+          <li>DON&#x27;T suspend the scaffold from building elements not verified for the required load</li>
+          <li>DON&#x27;T work in high winds that cause the platform to swing or impact the facade</li>
+          <li>DON&#x27;T modify or alter the scaffold without the designer and scaffolding contractor&#x27;s approval</li>
+          <li>DON&#x27;T skip the LOLER thorough examination — it is a legal requirement before use</li>
+          <li>DON&#x27;T stand on guardrails or lean beyond the platform edge to reach the work face</li>
+          <li>DON&#x27;T store excessive materials on the platform — load it only for the immediate task</li>
+        </ul>
+        <p class="see-also">See also: Scaffold Safety Awareness | Harness and Lanyard Use</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

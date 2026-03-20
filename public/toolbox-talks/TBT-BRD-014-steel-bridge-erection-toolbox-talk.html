@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Steel Bridge Erection - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Steel Bridge Erection</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BRD-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Steel bridge erection involves lifting and connecting heavy fabricated steel sections over roads, railways, or rivers.</li>
+      <li>Bridge steelwork is typically erected using mobile cranes, crawler cranes, or specialist launching equipment.</li>
+      <li>Each steel section must be temporarily supported and braced until permanent connections are completed.</li>
+      <li>Erection sequence planning is critical — installing sections out of order can cause structural instability.</li>
+      <li>Working over live traffic, railways, or waterways adds complexity requiring possessions, closures, or protection.</li>
+      <li>Wind loading on large bridge sections during lifting can make loads uncontrollable and endanger workers.</li>
+      <li>Bolted and welded connections must be completed to specification before temporary supports are removed.</li>
+      <li>LOLER 1998 requires a detailed lift plan for every steel bridge section placed by crane.</li>
+      <li>Temporary works designs for propping, jacking, and bracing must be approved before erection begins.</li>
+      <li>Night erection over live roads is common, requiring enhanced lighting and strict traffic management.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent collapse</td><td>Incorrect erection sequence or inadequate temporary bracing can cause catastrophic structural collapse.</td></tr>
+    <tr><td class="reason">Protect the public</td><td>Steel bridge erection over roads, railways, and waterways puts the travelling public at risk.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>LOLER 1998, CDM 2015, and Work at Height Regulations require formal planning for all bridge erection work.</td></tr>
+    <tr><td class="reason">Worker safety</td><td>Falls from height, crush injuries from heavy sections, and crane incidents are primary risks during erection.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Follow the approved erection sequence precisely — do not change the order without engineering approval</li>
+          <li>Ensure every crane lift has a specific lift plan approved by the appointed person</li>
+          <li>Install temporary bracing and supports immediately after each section is landed</li>
+          <li>Complete all bolted connections to the specified torque before removing temporary supports</li>
+          <li>Establish exclusion zones beneath all lifting operations and on adjacent roads or tracks</li>
+          <li>Monitor wind speed and stop lifts when conditions exceed the plan&#x27;s specified limit</li>
+          <li>Use tag lines on all suspended steel sections to control swing during placement</li>
+          <li>Coordinate road or rail possessions and closures well in advance of erection dates</li>
+          <li>Ensure fall protection is in place for all workers on the bridge structure at height</li>
+          <li>Brief the full team on the erection plan, lift sequence, and emergency procedures</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T erect steel sections out of the approved sequence without engineer authorisation</li>
+          <li>DON&#x27;T remove temporary bracing until permanent connections are fully torqued and checked</li>
+          <li>DON&#x27;T lift bridge steelwork in wind speeds exceeding the crane&#x27;s rated limits for the load</li>
+          <li>DON&#x27;T allow traffic or trains to pass beneath active lifting operations without protection</li>
+          <li>DON&#x27;T stand beneath suspended loads or within the crane&#x27;s swing radius during lifts</li>
+          <li>DON&#x27;T use bolts, washers, or connections that do not match the design specification</li>
+          <li>DON&#x27;T carry out erection at night without adequate artificial lighting at the work zone</li>
+          <li>DON&#x27;T skip the lift plan — every bridge section placement requires a specific plan</li>
+          <li>DON&#x27;T walk on unconnected steelwork without a harness attached to a secure anchor</li>
+          <li>DON&#x27;T leave partially connected sections unbraced overnight or during weather breaks</li>
+        </ul>
+        <p class="see-also">See also: Steel Erection Safety | Bridge Construction Safety Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

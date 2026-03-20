@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ride-On Mower Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Ride-On Mower Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PLT-026 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Ride-on mowers are used on construction sites for maintaining landscaped areas, embankments, and verges.</li>
+      <li>Rollover on slopes is the most common cause of serious injury and death involving ride-on mowers.</li>
+      <li>Mower blades rotate at high speed, creating severe laceration and amputation hazards from contact or ejected objects.</li>
+      <li>Objects such as stones, wire, and debris can be ejected at speed by the blade, striking bystanders.</li>
+      <li>PUWER 1998 requires ride-on mowers to be maintained, inspected, and operated by trained and competent persons.</li>
+      <li>Noise levels from ride-on mowers typically exceed 85 dB(A), requiring hearing protection for the operator.</li>
+      <li>Operating on wet grass, slopes, and uneven ground significantly increases the risk of loss of control.</li>
+      <li>Rollover protection structures (ROPS) and seatbelts must be fitted and used on all ride-on mowers.</li>
+      <li>Refuelling must be carried out with the engine off and away from hot exhaust components.</li>
+      <li>Pedestrians and other workers must be kept clear of the mowing area during operation.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent rollover deaths</td><td>Ride-on mowers overturn on slopes and uneven ground, crushing operators who are not wearing seatbelts.</td></tr>
+    <tr><td class="reason">Blade contact injuries</td><td>High-speed rotating blades cause amputations, and ejected objects strike bystanders at lethal velocity.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>PUWER 1998 requires safe maintenance, competent operation, and guarding of all ride-on mowing equipment.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear the seatbelt and ensure the ROPS is in the raised and locked position before mowing</li>
+          <li>Inspect the mowing area for stones, wire, debris, and hidden hazards before starting</li>
+          <li>Mow up and down slopes, not across them, to reduce the risk of lateral rollover</li>
+          <li>Keep all guards, shields, and deflectors in place during mowing operations</li>
+          <li>Wear hearing protection when operating the mower as noise exceeds 85 dB(A)</li>
+          <li>Maintain a safe exclusion zone around the mower to protect pedestrians from ejected objects</li>
+          <li>Switch off the engine and remove the key before carrying out any maintenance or clearing</li>
+          <li>Check tyre pressures and blade condition as part of the daily pre-use inspection</li>
+          <li>Reduce speed on slopes, wet grass, and uneven ground to maintain control at all times</li>
+          <li>Refuel with the engine off and cool, away from ignition sources and in a ventilated area</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T operate a ride-on mower without the seatbelt fastened and ROPS in position</li>
+          <li>DON&#x27;T mow across slopes — always travel up and down the gradient to prevent rollover</li>
+          <li>DON&#x27;T remove guards, blade shields, or debris deflectors while the mower is in use</li>
+          <li>DON&#x27;T allow passengers to ride on the mower at any time during operation</li>
+          <li>DON&#x27;T mow near pedestrians without maintaining a safe exclusion zone for ejected objects</li>
+          <li>DON&#x27;T reach under the deck or near blades without the engine stopped and key removed</li>
+          <li>DON&#x27;T operate the mower on wet slopes where traction and control are significantly reduced</li>
+          <li>DON&#x27;T refuel with the engine running or near hot exhaust components</li>
+          <li>DON&#x27;T mow over ground you have not inspected for hidden hazards and debris</li>
+          <li>DON&#x27;T allow untrained or unauthorised persons to operate the ride-on mower</li>
+        </ul>
+        <p class="see-also">See also: Landscaping Safety Awareness | Plant Pre-Use Inspections</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
