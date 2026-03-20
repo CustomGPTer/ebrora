@@ -138,7 +138,7 @@ export default async function SlugPage({ params }: PageProps) {
                     <p className="text-[11px] font-mono text-gray-400 mt-0.5">{talk.ref}</p>
                   </div>
                   <Link href={`/toolbox-talks/${catSlug}/${talk.slug}`} className="text-xs font-medium text-[#1B5745] hover:text-[#143f33] transition-colors">
-                    Full view \u2192
+                    Full view
                   </Link>
                 </div>
                 <TbtA5Viewer htmlFile={talk.htmlFile} title={talk.title} />
