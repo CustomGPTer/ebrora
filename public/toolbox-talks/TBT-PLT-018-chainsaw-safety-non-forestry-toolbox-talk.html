@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chainsaw Safety (Non-Forestry) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Chainsaw Safety (Non-Forestry)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PLT-018 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Chainsaws on construction sites are used for cutting timber, clearing vegetation, and occasional demolition tasks.</li>
+      <li>Chainsaw injuries are among the most severe in construction: deep lacerations, amputations, and fatal wounds.</li>
+      <li>Kickback occurs when the chain tip contacts an object, throwing the saw violently upward toward the operator.</li>
+      <li>All chainsaw operators must be trained and hold a relevant certificate of competence for the tasks performed.</li>
+      <li>Full chainsaw PPE includes helmet with visor and ear defenders, chainsaw trousers, gloves, and safety boots.</li>
+      <li>Chainsaw trousers contain fibres that clog the chain on contact, stopping it before it reaches the skin.</li>
+      <li>The chain brake must be engaged when carrying the saw and whenever it is not actively cutting.</li>
+      <li>Refuelling must be done with the engine stopped and cooled to prevent fuel ignition on hot components.</li>
+      <li>PUWER 1998 requires that chainsaws are maintained, inspected, and used only by competent trained persons.</li>
+      <li>A first aid kit with large wound dressings and a tourniquet must be immediately available during chainsaw use.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Severe laceration</td><td>Chainsaw cuts penetrate deeply, severing arteries, tendons, and bone in fractions of a second.</td></tr>
+    <tr><td class="reason">Kickback danger</td><td>Kickback throws the running saw toward the operator head and body faster than human reaction time.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>PUWER 1998 requires trained, competent operators and appropriate PPE for all chainsaw operations.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear full chainsaw PPE: helmet, visor, ear defenders, trousers, gloves, and boots.</li>
+          <li>Check the chain brake, chain tension, and bar condition before each use.</li>
+          <li>Engage the chain brake when carrying the saw and between cuts.</li>
+          <li>Maintain a clear work area and escape route before starting any cut.</li>
+          <li>Keep a first aid kit with large dressings and a tourniquet within immediate reach.</li>
+          <li>Refuel with the engine stopped and the saw cooled away from ignition sources.</li>
+          <li>Hold the saw firmly with both hands at all times during cutting.</li>
+          <li>Ensure you hold a valid certificate of competence for the tasks being performed.</li>
+          <li>Work with a buddy present who can summon help in an emergency.</li>
+          <li>Inspect the chain for damage, sharpness, and correct tension before each use.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T operate a chainsaw without full chainsaw PPE including protective trousers.</li>
+          <li>DON'T cut with the tip of the bar; this is the kickback danger zone.</li>
+          <li>DON'T use a chainsaw above shoulder height from ground level.</li>
+          <li>DON'T operate a chainsaw without holding a valid competence certificate.</li>
+          <li>DON'T carry a running chainsaw with the chain brake disengaged.</li>
+          <li>DON'T refuel while the engine is running or the saw is still hot.</li>
+          <li>DON'T use a chainsaw with a dull, loose, or damaged chain.</li>
+          <li>DON'T work alone with a chainsaw; always have someone nearby.</li>
+          <li>DON'T drop-start a chainsaw; use the ground or leg-lock starting method.</li>
+          <li>DON'T cut into ground, nails, or wire which damages the chain instantly.</li>
+        </ul>
+        <p class="see-also">See also: Chainsaw Operations Safety | Tree Surgery and Arboriculture Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

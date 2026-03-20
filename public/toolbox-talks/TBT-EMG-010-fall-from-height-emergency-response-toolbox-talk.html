@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fall From Height Emergency Response - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Fall From Height Emergency Response</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-EMG-010 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Falls from height are the most common cause of fatal injuries on UK construction sites.</li>
+      <li>Casualties may have spinal injuries, head injuries, fractures, and internal bleeding requiring specialist care.</li>
+      <li>The first responder must call 999 immediately and not attempt to move a casualty with suspected spinal injury.</li>
+      <li>Suspension trauma (harness hang syndrome) affects workers left suspended in a harness after a fall arrest.</li>
+      <li>Blood pools in the legs during suspension, and the heart cannot circulate it, causing cardiac arrest within minutes.</li>
+      <li>A rescue plan for harness suspension must enable recovery within 10 to 15 minutes maximum.</li>
+      <li>Casualties found unconscious after a fall must be placed in the recovery position only if no spinal injury.</li>
+      <li>Bleeding from open fractures must be controlled with direct pressure and wound dressings.</li>
+      <li>The location of the fall, height fallen, and the surface landed on must be reported to emergency services.</li>
+      <li>CDM 2015 requires that emergency procedures including fall rescue are planned before work at height begins.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Save lives</td><td>Correct first response after a fall prevents secondary injury and keeps the casualty alive until paramedics arrive.</td></tr>
+    <tr><td class="reason">Suspension trauma</td><td>Workers in harnesses after fall arrest die from suspension trauma within minutes without prompt rescue and treatment.</td></tr>
+    <tr><td class="reason">Spinal injury</td><td>Moving a casualty with an undetected spinal injury causes permanent paralysis. Keeping them still saves their mobility.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Call 999 immediately and describe the fall height, injuries, and exact location.</li>
+          <li>Keep the casualty still and calm; do not move them if spinal injury is possible.</li>
+          <li>Control bleeding from open wounds with direct pressure and clean dressings.</li>
+          <li>Rescue a suspended harness casualty within 10 to 15 minutes to prevent trauma.</li>
+          <li>Place an unconscious breathing casualty in the recovery position if spine is clear.</li>
+          <li>Cover the casualty with a blanket to prevent hypothermia while waiting for help.</li>
+          <li>Keep bystanders clear and preserve the scene for incident investigation.</li>
+          <li>Guide the ambulance to the exact location using a designated meet-and-greet person.</li>
+          <li>Record what happened, the time of the fall, and all first aid provided.</li>
+          <li>Support witnesses and first responders after the incident with welfare follow-up.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T move a fall casualty unless they are in immediate danger from further harm.</li>
+          <li>DON'T remove a helmet from a head injury casualty; leave it for paramedics.</li>
+          <li>DON'T leave a worker suspended in a harness; initiate rescue within minutes.</li>
+          <li>DON'T straighten broken limbs or push bones back into wounds.</li>
+          <li>DON'T give the casualty food, drink, or medication while waiting for emergency services.</li>
+          <li>DON'T crowd around the casualty; keep the area clear for the paramedic team.</li>
+          <li>DON'T delay calling 999 to assess the situation; call first, then assist.</li>
+          <li>DON'T sit a harness suspension casualty upright immediately after rescue.</li>
+          <li>DON'T disturb the fall scene until the investigation team has examined it.</li>
+          <li>DON'T forget to support the first responders and witnesses after a serious fall.</li>
+        </ul>
+        <p class="see-also">See also: Falls From Height Awareness | Rescue Plan Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

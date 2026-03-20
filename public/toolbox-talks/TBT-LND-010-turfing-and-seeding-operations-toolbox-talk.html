@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turfing and Seeding Operations - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Turfing and Seeding Operations</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LND-010 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Turfing and seeding create grassed areas on construction sites for landscaping, erosion control, and amenity use.</li>
+      <li>Turf rolls weigh 15 to 25 kilograms each; laying hundreds per day causes significant back and knee strain.</li>
+      <li>Repetitive bending, kneeling, and carrying during turfing is one of the most demanding manual handling tasks.</li>
+      <li>Hydroseeding uses pressurised spray equipment to apply seed, mulch, and fertiliser to prepared surfaces.</li>
+      <li>Fertilisers and soil conditioners are irritants; skin and eye contact causes redness and chemical burns.</li>
+      <li>Working on steep slopes during turfing and seeding creates slip and fall hazards, especially when wet.</li>
+      <li>Ride-on equipment for large-scale seeding creates struck-by risks for ground workers in the same area.</li>
+      <li>Turf delivery vehicles require banksmen and safe unloading areas near the laying zone.</li>
+      <li>The Manual Handling Operations Regulations 1992 require controls for the repetitive heavy work of turfing.</li>
+      <li>Knee pads, mechanical turf layers, and task rotation reduce the physical impact on operatives.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Back and knee injury</td><td>Repetitive lifting, bending, and kneeling during turfing causes chronic back pain and knee damage.</td></tr>
+    <tr><td class="reason">Chemical irritation</td><td>Fertilisers and hydroseeding chemicals irritate skin, eyes, and respiratory passages on contact.</td></tr>
+    <tr><td class="reason">Slope hazards</td><td>Wet grass and prepared surfaces on slopes cause slips that result in falls and injuries.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use knee pads and rotate tasks regularly to reduce strain from repetitive turfing.</li>
+          <li>Carry turf rolls close to your body and avoid twisting while lifting.</li>
+          <li>Wear gloves and wash hands after handling fertilisers and soil conditioners.</li>
+          <li>Wear eye protection when using hydroseeding spray equipment under pressure.</li>
+          <li>Use mechanical turf laying equipment for large areas to reduce manual handling.</li>
+          <li>Assess slope stability and use safe access methods on steep banks during turfing.</li>
+          <li>Take regular breaks from kneeling and bending to prevent back and knee strain.</li>
+          <li>Use a banksman when unloading turf deliveries near the laying area.</li>
+          <li>Keep the turfing area clear of trip hazards from tools, rolls, and packaging.</li>
+          <li>Brief the team on the manual handling controls and rotation schedule each morning.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T lay turf for extended periods without breaks and task rotation.</li>
+          <li>DON'T lift turf rolls while twisting your body; move your feet instead.</li>
+          <li>DON'T handle fertilisers and chemicals without gloves and eye protection.</li>
+          <li>DON'T walk on wet steep slopes in smooth-soled footwear during turfing.</li>
+          <li>DON'T ignore knee pain or back stiffness; report early symptoms promptly.</li>
+          <li>DON'T spray hydroseeding chemicals without checking the wind direction first.</li>
+          <li>DON'T allow ride-on seeders and ground workers in the same area without separation.</li>
+          <li>DON'T leave turf roll packaging and debris scattered across the work area.</li>
+          <li>DON'T operate hydroseeding equipment without reading the chemical safety data sheet.</li>
+          <li>DON'T refuse mechanical aids or task rotation offered to reduce manual handling.</li>
+        </ul>
+        <p class="see-also">See also: Landscaping Safety Awareness | Manual Handling Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

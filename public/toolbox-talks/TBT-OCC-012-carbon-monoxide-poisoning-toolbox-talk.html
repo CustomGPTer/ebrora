@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Monoxide Poisoning - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Carbon Monoxide Poisoning</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-OCC-012 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Carbon monoxide (CO) is a colourless, odourless, tasteless gas that kills without any warning to the victim.</li>
+      <li>CO is produced by incomplete combustion of fuels in petrol generators, diesel plant, gas heaters, and engines.</li>
+      <li>Using fuel-burning equipment in enclosed or poorly ventilated spaces causes dangerous CO accumulation.</li>
+      <li>Symptoms include headache, dizziness, nausea, confusion, and drowsiness progressing to unconsciousness and death.</li>
+      <li>CO binds to haemoglobin 200 times more strongly than oxygen, starving organs of the oxygen they need.</li>
+      <li>Portable generators and petrol-powered tools are the most common source of CO on construction sites.</li>
+      <li>CO alarms and detectors provide early warning but must be positioned correctly and maintained regularly.</li>
+      <li>Multiple construction workers have died in the UK from CO produced by generators used inside buildings.</li>
+      <li>COSHH 2002 requires employers to assess and control CO exposure in all work activities.</li>
+      <li>Fresh air is the immediate treatment; anyone exposed to CO must be moved outside and given oxygen.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Silent killer</td><td>CO is undetectable by human senses. Workers lose consciousness and die without ever knowing they were being poisoned.</td></tr>
+    <tr><td class="reason">Common hazard</td><td>Portable generators and fuel-burning tools are used daily on construction sites, creating a constant CO exposure risk.</td></tr>
+    <tr><td class="reason">Rapid onset</td><td>CO poisoning causes confusion and drowsiness that prevent workers from recognising the danger and escaping in time.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Operate all generators and petrol tools outdoors in well-ventilated areas only.</li>
+          <li>Use CO detectors in any enclosed or semi-enclosed area where fuel-burning equipment operates.</li>
+          <li>Ensure adequate ventilation before and during use of any combustion equipment indoors.</li>
+          <li>Recognise the symptoms: headache, dizziness, nausea, and confusion indicate CO exposure.</li>
+          <li>Move anyone showing CO symptoms to fresh air immediately and call 999.</li>
+          <li>Position generator exhausts away from building openings, doors, and windows.</li>
+          <li>Maintain fuel-burning equipment to ensure efficient combustion and minimal CO output.</li>
+          <li>Test CO alarms regularly and replace batteries according to the manufacturer schedule.</li>
+          <li>Brief all workers on CO hazards, symptoms, and the location of CO detectors.</li>
+          <li>Use electric-powered alternatives to petrol and diesel tools wherever available.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T run generators, engines, or petrol tools inside buildings or enclosed spaces.</li>
+          <li>DON'T ignore headaches, dizziness, or nausea when fuel-burning equipment is nearby.</li>
+          <li>DON'T position generator exhausts near windows, doors, or air intake points.</li>
+          <li>DON'T use fuel-burning heaters in site cabins without adequate permanent ventilation.</li>
+          <li>DON'T assume you will smell CO; it is completely odourless and undetectable.</li>
+          <li>DON'T re-enter an area where CO has been detected without confirming it is clear.</li>
+          <li>DON'T leave generators running unattended inside or near occupied spaces overnight.</li>
+          <li>DON'T block ventilation openings in spaces where combustion equipment is operating.</li>
+          <li>DON'T ignore CO detector alarms; evacuate immediately and investigate the source.</li>
+          <li>DON'T delay calling 999 for anyone showing CO poisoning symptoms.</li>
+        </ul>
+        <p class="see-also">See also: Occupational Health Awareness | Portable Generator Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

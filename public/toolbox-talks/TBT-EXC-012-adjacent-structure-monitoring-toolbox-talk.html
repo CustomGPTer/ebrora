@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adjacent Structure Monitoring - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Adjacent Structure Monitoring</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-EXC-012 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Adjacent structure monitoring tracks buildings, walls, and services near excavations for signs of movement.</li>
+      <li>Excavation removes ground support from neighbouring structures, potentially causing settlement and cracking.</li>
+      <li>Monitoring methods include precise levelling, crack gauges, tilt sensors, and automated prism systems.</li>
+      <li>Trigger levels define when movement readings require action such as additional support or work stoppage.</li>
+      <li>A pre-condition survey records the existing state of adjacent structures before excavation begins.</li>
+      <li>Vibration monitoring measures the impact of piling, compaction, and heavy plant on nearby buildings.</li>
+      <li>Settlement typically increases with excavation depth and proximity to the neighbouring structure.</li>
+      <li>Party wall agreements under the Party Wall etc. Act 1996 may require monitoring as a legal condition.</li>
+      <li>Monitoring data must be reviewed promptly by a competent engineer who can authorise corrective action.</li>
+      <li>CDM 2015 requires that risks to adjacent structures from construction work are assessed and managed.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent structural damage</td><td>Unmonitored excavations have caused adjacent buildings to crack, settle, and partially collapse, endangering occupants.</td></tr>
+    <tr><td class="reason">Early warning</td><td>Monitoring detects the first signs of movement, allowing corrective action before damage becomes irreversible.</td></tr>
+    <tr><td class="reason">Legal obligation</td><td>Party wall awards and planning conditions frequently require monitoring as a legal obligation on the contractor.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a pre-condition survey of all adjacent structures before excavation starts.</li>
+          <li>Install monitoring points before any ground is disturbed near the structure.</li>
+          <li>Define trigger levels with the structural engineer before excavation begins.</li>
+          <li>Review monitoring data promptly after each reading and compare against triggers.</li>
+          <li>Increase monitoring frequency as the excavation gets deeper or closer.</li>
+          <li>Stop work and notify the engineer immediately if a trigger level is exceeded.</li>
+          <li>Monitor for vibration when using piling, compaction, or heavy breaking equipment.</li>
+          <li>Record all monitoring data with dates, readings, and weather conditions.</li>
+          <li>Brief the excavation team on trigger levels and who to contact if exceeded.</li>
+          <li>Continue monitoring until permanent works are complete and readings stabilise.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T start excavating near structures without a pre-condition survey on record.</li>
+          <li>DON'T delay installing monitoring points until after excavation has begun.</li>
+          <li>DON'T ignore readings that approach or exceed the defined trigger levels.</li>
+          <li>DON'T reduce monitoring frequency as excavation deepens without engineer approval.</li>
+          <li>DON'T continue excavation if the engineer has called a stop on monitoring grounds.</li>
+          <li>DON'T assume an adjacent building is unaffected because no cracks are visible.</li>
+          <li>DON'T leave monitoring data unreviewed for days; prompt analysis detects trends.</li>
+          <li>DON'T rely on visual inspection alone when precise instruments are required.</li>
+          <li>DON'T remove monitoring points before the engineer confirms readings have stabilised.</li>
+          <li>DON'T forget to include underground services in the monitoring scope.</li>
+        </ul>
+        <p class="see-also">See also: Excavation Safety Awareness | Excavation Near Structures</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

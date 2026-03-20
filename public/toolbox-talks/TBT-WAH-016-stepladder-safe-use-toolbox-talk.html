@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stepladder Safe Use - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Stepladder Safe Use</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WAH-016 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Stepladders are one of the most commonly misused pieces of access equipment on construction sites.</li>
+      <li>They are only suitable for short-duration, light-duty tasks that can be completed in a few minutes.</li>
+      <li>Falls from stepladders cause more injuries than falls from scaffolds due to widespread incorrect use.</li>
+      <li>The Work at Height Regulations 2005 allow stepladders only where a risk assessment justifies their use.</li>
+      <li>Stepladders must be fully opened with all four feet on firm, level ground and spreaders locked.</li>
+      <li>The top two steps must not be stood on unless the stepladder is designed with a safe platform.</li>
+      <li>Overreaching is the most common cause of falls; keep your belt buckle within the stile width.</li>
+      <li>Stepladders must be inspected before each use for damaged stiles, bent rungs, and faulty hinges.</li>
+      <li>A stepladder should not be used as a leaning ladder or positioned against a wall for access.</li>
+      <li>BS EN 131 sets the standards; only industrial-rated stepladders are suitable for construction sites.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Most common fall</td><td>Stepladder falls cause more workplace injuries than any other access equipment due to widespread misuse.</td></tr>
+    <tr><td class="reason">Overreaching</td><td>Workers lean sideways beyond the safe reach envelope, toppling the stepladder and falling onto hard surfaces.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>The Work at Height Regulations 2005 require a risk assessment justifying stepladder use over safer alternatives.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Open the stepladder fully and lock the spreader bars before climbing.</li>
+          <li>Place all four feet on firm, level ground before use.</li>
+          <li>Keep your belt buckle within the stile width to avoid overreaching.</li>
+          <li>Inspect the stepladder for damage, loose rivets, and bent steps before use.</li>
+          <li>Use industrial-rated stepladders complying with BS EN 131 on construction sites.</li>
+          <li>Maintain three points of contact when climbing up and down.</li>
+          <li>Face the stepladder when climbing and working; do not turn your back.</li>
+          <li>Use a stepladder only for short-duration tasks lasting a few minutes.</li>
+          <li>Choose a safer alternative such as a podium step for longer tasks.</li>
+          <li>Tag defective stepladders and remove them from service immediately.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T stand on the top two steps unless there is a safe working platform.</li>
+          <li>DON'T lean sideways beyond the width of the stepladder stiles.</li>
+          <li>DON'T use a stepladder on soft, sloping, or uneven ground.</li>
+          <li>DON'T use a folded stepladder as a leaning ladder against a wall.</li>
+          <li>DON'T use domestic-rated stepladders on construction sites.</li>
+          <li>DON'T carry heavy tools or materials while climbing a stepladder.</li>
+          <li>DON'T use a stepladder near open edges, excavations, or traffic routes.</li>
+          <li>DON'T use a stepladder in windy conditions where it could blow over.</li>
+          <li>DON'T modify or repair a damaged stepladder; replace it with a new one.</li>
+          <li>DON'T use a stepladder for tasks that require a scaffold or MEWP.</li>
+        </ul>
+        <p class="see-also">See also: Ladder Safety | Working at Height Hierarchy of Control</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setting Out in Live Traffic - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Setting Out in Live Traffic</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SUR-007 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Setting out in live traffic involves surveyors working on or near carriageways with moving vehicles.</li>
+      <li>Surveyors are particularly vulnerable because the task demands concentration on instruments, not traffic.</li>
+      <li>Being struck by a vehicle is the primary risk, especially at speeds above 30 mph.</li>
+      <li>Chapter 8 of the Traffic Signs Manual sets requirements for signing and guarding at roadworks.</li>
+      <li>A traffic management plan must be agreed before any surveying takes place on live highways.</li>
+      <li>Surveyors often need to stand in fixed positions for extended periods, limiting their ability to move.</li>
+      <li>Hi-vis clothing must comply with BS EN ISO 20471 Class 3 as a minimum on live carriageways.</li>
+      <li>A banksman or lookout may be required to warn the surveyor of approaching vehicles.</li>
+      <li>Night-time setting out on live roads requires enhanced lighting, signing, and personal visibility.</li>
+      <li>The New Roads and Street Works Act 1991 requires NRSWA cards for those working in the highway.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent fatal strikes</td><td>Surveyors struck by vehicles on live roads suffer fatal or life-changing injuries. Focused instrument work reduces their awareness.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>The Safety at Street Works Code of Practice and Chapter 8 require protective measures for all highway workers.</td></tr>
+    <tr><td class="reason">Duty of care</td><td>Employers must provide safe systems of work and adequate traffic management before sending surveyors onto live carriageways.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Agree a traffic management plan before setting out on any live road.</li>
+          <li>Wear Class 3 hi-vis clothing complying with BS EN ISO 20471 at all times.</li>
+          <li>Use a lookout or banksman to warn you of approaching vehicles.</li>
+          <li>Position survey instruments away from live traffic lanes wherever possible.</li>
+          <li>Ensure Chapter 8 signing and guarding is in place before starting work.</li>
+          <li>Hold a valid NRSWA card if working within the public highway.</li>
+          <li>Plan the task to minimise time spent in or near live carriageways.</li>
+          <li>Use temporary lane closures where the speed or volume of traffic demands it.</li>
+          <li>Maintain full awareness of traffic movements while operating instruments.</li>
+          <li>Carry out a dynamic risk assessment before each setup position.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter a live carriageway without traffic management measures in place.</li>
+          <li>DON'T wear anything less than Class 3 hi-vis on a live highway.</li>
+          <li>DON'T become so focused on the instrument that you lose traffic awareness.</li>
+          <li>DON'T set up survey equipment in a live lane without a lane closure.</li>
+          <li>DON'T work on live roads at night without enhanced lighting and signing.</li>
+          <li>DON'T assume drivers can see you, especially at bends or crests.</li>
+          <li>DON'T work alone on high-speed roads without a lookout present.</li>
+          <li>DON'T place tripods or targets where they obstruct visibility for drivers.</li>
+          <li>DON'T walk along a live carriageway to reach your survey position.</li>
+          <li>DON'T ignore changes in traffic speed, volume, or weather conditions.</li>
+        </ul>
+        <p class="see-also">See also: Chapter 8 Signing and Guarding | Working in Live Carriageways</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

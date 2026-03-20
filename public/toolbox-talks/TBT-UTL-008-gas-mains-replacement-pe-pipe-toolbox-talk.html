@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gas Mains Replacement (PE Pipe) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Gas Mains Replacement (PE Pipe)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-UTL-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Gas mains replacement involves decommissioning old iron or steel mains and installing new PE (polyethylene) pipe.</li>
+      <li>PE pipe is the standard replacement material for gas distribution networks operating at low and medium pressure.</li>
+      <li>The old metallic main may still contain live gas during the replacement works until transfer is completed.</li>
+      <li>Electrofusion and butt fusion are the primary jointing methods for PE gas pipe on site.</li>
+      <li>Gas escapes from old mains or new connections create immediate explosion and asphyxiation risks.</li>
+      <li>All gas operatives must hold current gas competency cards registered on the relevant industry scheme.</li>
+      <li>Live gas working requires strict compliance with safe working practices and permit systems.</li>
+      <li>Pipe squeeze-off equipment is used to control gas flow in PE pipes during connections and repairs.</li>
+      <li>Excavations for gas mains must comply with HSG47 and include measures to prevent third-party damage.</li>
+      <li>The Gas Safety (Management) Regulations 1996 and IGEM standards govern all gas network work.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Explosion risk</td><td>Gas leaks from damaged mains or poor joints can cause explosions that kill workers and members of the public.</td></tr>
+    <tr><td class="reason">Asphyxiation</td><td>Natural gas displaces oxygen in excavations and confined spaces, creating immediate suffocation risk for anyone below ground.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>The Gas Safety (Management) Regulations 1996 and HSE enforcement require strict controls on all gas network operations.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Confirm all operatives hold current gas competency cards before work starts.</li>
+          <li>Follow the approved safe working practice for every live gas procedure.</li>
+          <li>Monitor for gas continuously using calibrated portable gas detectors in excavations.</li>
+          <li>Use only approved PE pipe, fittings, and fusion equipment for gas installations.</li>
+          <li>Squeeze off PE pipe using approved equipment before making cuts or connections.</li>
+          <li>Ensure electrofusion joints are made in clean, dry conditions per IGEM standards.</li>
+          <li>Purge and test all new pipework before commissioning and putting it into service.</li>
+          <li>Maintain fire extinguishers and no-smoking zones around all gas working areas.</li>
+          <li>Report any gas escape immediately and follow the gas escape emergency procedure.</li>
+          <li>Protect completed PE pipe from UV exposure and mechanical damage during backfill.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T allow unqualified personnel to work on live or decommissioned gas mains.</li>
+          <li>DON'T make electrofusion joints in wet or contaminated conditions on PE pipe.</li>
+          <li>DON'T use any ignition source within the gas safety zone around open pipework.</li>
+          <li>DON'T enter an excavation with a gas reading above the lower explosive limit.</li>
+          <li>DON'T squeeze off PE pipe without approved equipment and trained operators.</li>
+          <li>DON'T leave exposed PE gas pipe unprotected from UV sunlight on site.</li>
+          <li>DON'T backfill over gas pipe without confirming joint integrity test results.</li>
+          <li>DON'T bypass the permit system for any live gas working operation.</li>
+          <li>DON'T use metallic tools that could create sparks near open gas pipework.</li>
+          <li>DON'T assume old mains are gas-free; treat all pipework as live until proven.</li>
+        </ul>
+        <p class="see-also">See also: Gas Main Installation Safety | Gas Escape and Emergency Procedures</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

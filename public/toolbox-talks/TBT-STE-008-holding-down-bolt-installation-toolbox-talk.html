@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holding Down Bolt Installation - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Holding Down Bolt Installation</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-STE-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Holding down bolts (HD bolts) anchor steel columns, base plates, and equipment to concrete foundations.</li>
+      <li>Bolt positions must be set to very tight tolerances, typically within 3mm, to align with the steelwork above.</li>
+      <li>Cast-in HD bolts are placed in the formwork before the concrete pour and set using a template.</li>
+      <li>Post-fixed HD bolts are drilled and chemically or mechanically anchored into hardened concrete.</li>
+      <li>Incorrectly positioned bolts mean the steelwork will not fit, causing costly delays and rework.</li>
+      <li>HD bolt groups projecting from foundations create serious impalement and trip hazards on site.</li>
+      <li>Protection caps or covers must be fitted to all exposed bolt groups until the steelwork is erected.</li>
+      <li>Bolt threads must be protected from damage during the concrete pour and subsequent construction work.</li>
+      <li>Grouting beneath base plates after steel erection transfers loads and requires careful quality control.</li>
+      <li>CDM 2015 requires that impalement hazards from projecting reinforcement and bolts are managed on site.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent impalement</td><td>Projecting HD bolts cause impalement injuries when workers fall or trip onto unprotected bolt groups.</td></tr>
+    <tr><td class="reason">Tolerance critical</td><td>Even small positioning errors in HD bolts prevent steel erection, causing programme delays and expensive remedial work.</td></tr>
+    <tr><td class="reason">Structural integrity</td><td>Incorrectly installed, damaged, or under-grouted HD bolts compromise the structural connection and building safety.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use bolt setting templates to achieve the required positional tolerances.</li>
+          <li>Check bolt positions against the steelwork drawing before the concrete pour.</li>
+          <li>Protect all projecting bolt groups with impalement caps immediately after pouring.</li>
+          <li>Guard bolt threads against damage from concrete, plant, and foot traffic.</li>
+          <li>Survey bolt positions after the pour and record any deviations from design.</li>
+          <li>Report positional errors immediately so remedial action can be planned early.</li>
+          <li>Use approved chemical or mechanical anchors for post-fixed bolt installations.</li>
+          <li>Grout beneath base plates to the specification using non-shrink grout products.</li>
+          <li>Remove impalement caps only when the steelwork is ready to be erected.</li>
+          <li>Torque HD bolts to the design requirement and record the results.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T leave projecting HD bolts unprotected at any time during construction.</li>
+          <li>DON'T skip checking bolt positions before the concrete pour is carried out.</li>
+          <li>DON'T allow concrete vibration to displace bolt groups from their set positions.</li>
+          <li>DON'T force steelwork onto misaligned bolts; report the error for assessment.</li>
+          <li>DON'T damage bolt threads by allowing concrete splatter or impact from plant.</li>
+          <li>DON'T drill post-fixed bolts without confirming reinforcement positions with a scanner.</li>
+          <li>DON'T grout base plates until the steelwork alignment has been approved.</li>
+          <li>DON'T use non-approved anchor systems for post-fixed HD bolt installations.</li>
+          <li>DON'T ignore bolt group trip hazards on foundations during general site access.</li>
+          <li>DON'T assume bolt positions are correct without surveyed verification after pouring.</li>
+        </ul>
+        <p class="see-also">See also: Steel Erection Safety | Rebar Impalement Prevention</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
