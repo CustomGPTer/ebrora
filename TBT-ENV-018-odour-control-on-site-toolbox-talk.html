@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odour Control on Site - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Odour Control on Site</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ENV-018 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Construction activities can generate significant odours from excavation of contaminated land, sewage work, and chemical use.</li>
+      <li>Odour complaints from neighbours and the public can result in statutory nuisance action by local authorities.</li>
+      <li>The Environmental Protection Act 1990 gives local authorities power to serve abatement notices for odour nuisance.</li>
+      <li>Common odour sources include exposed sewage, peat and organic soils, asphalt, bitumen, and painting operations.</li>
+      <li>Odour intensity increases in warm, still weather when air movement is limited.</li>
+      <li>Wind direction determines which receptors are affected — monitoring wind conditions helps manage complaints.</li>
+      <li>Covering exposed contaminated soil, sewage tanks, and stockpiles reduces odour release significantly.</li>
+      <li>Misting systems and odour neutralising sprays can suppress odours at the source or site boundary.</li>
+      <li>A community liaison plan should include procedures for responding to odour complaints promptly.</li>
+      <li>Some odorous substances such as hydrogen sulphide are also toxic, requiring health monitoring as well.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Legal compliance</td><td>Odour nuisance under the Environmental Protection Act 1990 can lead to abatement notices and prosecution.</td></tr>
+    <tr><td class="reason">Community relations</td><td>Persistent odour complaints damage relationships with neighbours and can result in project delays and restrictions.</td></tr>
+    <tr><td class="reason">Worker health</td><td>Some odorous substances are toxic at high concentrations, posing health risks to site workers as well.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Identify potential odour sources in the site environmental management plan</li>
+          <li>Cover exposed contaminated soil, open sewage tanks, and organic stockpiles</li>
+          <li>Monitor wind direction and plan odour-generating activities for favourable conditions</li>
+          <li>Use misting systems or odour neutralising sprays where odour complaints are likely</li>
+          <li>Respond to community odour complaints promptly and record all actions taken</li>
+          <li>Brief site workers on the odour management plan and their responsibilities</li>
+          <li>Schedule the most odorous activities during periods of higher wind dispersal</li>
+          <li>Monitor H2S and other toxic odorous gases where concentrations may be harmful</li>
+          <li>Maintain records of odour management activities for regulatory compliance</li>
+          <li>Communicate planned odorous activities to neighbours in advance where possible</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T leave contaminated or organic soil exposed for longer than necessary</li>
+          <li>DON'T ignore odour complaints — investigate the source and act on them promptly</li>
+          <li>DON'T carry out highly odorous activities in still, warm weather without controls</li>
+          <li>DON'T assume odours are only a nuisance — some are toxic and require monitoring</li>
+          <li>DON'T discharge sewage or contaminated water without proper containment and treatment</li>
+          <li>DON'T rely on distance alone to prevent odour reaching nearby properties</li>
+          <li>DON'T store odorous chemicals or materials upwind of residential areas</li>
+          <li>DON'T allow waste skips containing organic materials to remain uncovered on site</li>
+          <li>DON'T dismiss community liaison complaints as unreasonable — address them seriously</li>
+          <li>DON'T continue odorous activities after an abatement notice without legal advice</li>
+        </ul>
+        <p class="see-also">See also: Noise Management (Community Impact) | Pollution Incident Reporting</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

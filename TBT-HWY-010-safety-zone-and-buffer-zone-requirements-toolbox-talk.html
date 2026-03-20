@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safety Zone and Buffer Zone Requirements - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Safety Zone and Buffer Zone Requirements</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-HWY-010 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Safety zones and buffer zones separate highway workers from live traffic within a road works layout.</li>
+      <li>The safety zone is the minimum clear area between the traffic lane and the working space.</li>
+      <li>Buffer zones provide additional protection at the start and end of the works to absorb vehicle incursions.</li>
+      <li>Zone dimensions depend on road speed, traffic volume, and the type of road being worked on.</li>
+      <li>GD 308 and Chapter 8 specify minimum safety zone widths for different speed categories.</li>
+      <li>Lateral safety zones must be maintained between live traffic lanes and the edge of the working space.</li>
+      <li>Longitudinal buffer zones at the upstream and downstream ends absorb vehicle intrusion impacts.</li>
+      <li>An Impact Protection Vehicle (IPV) is typically positioned in the longitudinal buffer zone.</li>
+      <li>Workers must remain within the designated working space at all times and never enter the safety zone.</li>
+      <li>Inadequate safety zones have been a factor in multiple fatal incidents involving road workers in the UK.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent fatalities</td><td>Safety and buffer zones are the physical space between workers and errant vehicles — reducing them costs lives.</td></tr>
+    <tr><td class="reason">Legal standard</td><td>GD 308 and Chapter 8 set mandatory minimum dimensions that must not be compromised on site.</td></tr>
+    <tr><td class="reason">Incursion protection</td><td>Vehicles leaving the carriageway need distance to decelerate before reaching workers — buffer zones provide this.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Confirm safety zone and buffer zone dimensions from the approved TM layout</li>
+          <li>Measure and mark zone boundaries before work begins in the traffic management</li>
+          <li>Position the IPV in the longitudinal buffer zone as specified in the layout plan</li>
+          <li>Remain within the designated working space at all times during the shift</li>
+          <li>Report any encroachment of traffic into the safety zone immediately</li>
+          <li>Attend the pre-work briefing covering zone dimensions and escape routes</li>
+          <li>Check that cones and barriers defining the zone edges are correctly spaced</li>
+          <li>Inspect zone integrity after any sign strike, cone displacement, or high wind</li>
+          <li>Use the escape route identified in the briefing if a vehicle breaches the zone</li>
+          <li>Ensure all operatives understand which areas are working space and which are zones</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter the safety zone for any reason during live working operations</li>
+          <li>DON'T reduce zone dimensions to create more working space without approval</li>
+          <li>DON'T store materials, plant, or equipment in the safety or buffer zones</li>
+          <li>DON'T position yourself between live traffic and the IPV at any time</li>
+          <li>DON'T assume zone sizes are the same for every road — they vary by speed</li>
+          <li>DON'T start work until the full TM layout including zones is verified in place</li>
+          <li>DON'T remove or reposition cones defining zone edges without authorisation</li>
+          <li>DON'T ignore displaced cones or signs that compromise zone integrity</li>
+          <li>DON'T stand in the buffer zone area ahead of or behind the IPV</li>
+          <li>DON'T become complacent about zones on long-duration highway works operations</li>
+        </ul>
+        <p class="see-also">See also: Chapter 8 Signing and Guarding | IPV (Impact Protection Vehicle) Use</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

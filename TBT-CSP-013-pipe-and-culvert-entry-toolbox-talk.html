@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipe and Culvert Entry - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Pipe and Culvert Entry</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CSP-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Entry into pipes and culverts is a confined space operation under the Confined Spaces Regulations 1997.</li>
+      <li>Pipes and culverts restrict movement severely — crawling or stooping is often the only way to progress.</li>
+      <li>Atmospheric hazards include oxygen depletion, methane, hydrogen sulphide, and carbon dioxide accumulation.</li>
+      <li>Water levels in culverts can rise rapidly during rainfall upstream, flooding the space without warning.</li>
+      <li>Rescue from a long pipe or culvert is extremely difficult due to the restricted diameter and distance.</li>
+      <li>A standby person must be stationed at the entry point with communication to the entrant at all times.</li>
+      <li>Forced ventilation using flexible ducting must supply fresh air to the furthest point of entry.</li>
+      <li>The entrant should wear a harness with a retrieval line where the pipe geometry allows it.</li>
+      <li>Lighting must be intrinsically safe where flammable gas may be present in the pipe or culvert.</li>
+      <li>The distance an entrant may travel from the entry point must be defined and limited by the rescue plan.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Extreme confinement</td><td>Pipes and culverts offer the most restricted confined spaces — movement, rescue, and ventilation are severely limited.</td></tr>
+    <tr><td class="reason">Flooding risk</td><td>Upstream rainfall can flood a culvert in minutes, trapping and drowning anyone inside.</td></tr>
+    <tr><td class="reason">Rescue difficulty</td><td>Extracting a casualty from a narrow pipe over a long distance is one of the most challenging rescue scenarios.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Obtain a confined space entry permit before anyone enters a pipe or culvert</li>
+          <li>Monitor the atmosphere continuously for oxygen, flammable, and toxic gases</li>
+          <li>Check weather forecasts and upstream catchment conditions before culvert entry</li>
+          <li>Provide forced ventilation with flexible ducting to the furthest point of penetration</li>
+          <li>Station a standby person at the entry with continuous communication to the entrant</li>
+          <li>Attach a retrieval line to the entrant where the pipe diameter allows it</li>
+          <li>Define the maximum penetration distance based on the rescue plan capabilities</li>
+          <li>Use intrinsically safe lighting and equipment inside the pipe or culvert</li>
+          <li>Brief the entrant on the specific hazards, communication signals, and escape procedure</li>
+          <li>Have a trained rescue team on standby with appropriate equipment before entry begins</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter any pipe or culvert without a confined space permit and rescue plan</li>
+          <li>DON'T enter a culvert during or after heavy rainfall without confirming it is safe</li>
+          <li>DON'T travel further into a pipe than the rescue plan can recover you from</li>
+          <li>DON'T rely on natural ventilation in a long pipe — forced air supply is essential</li>
+          <li>DON'T enter without a standby person maintaining continuous communication at the portal</li>
+          <li>DON'T ignore gas monitor alarms — exit immediately using the planned withdrawal route</li>
+          <li>DON'T use non-intrinsically safe electrical equipment where flammable gas may be present</li>
+          <li>DON'T attempt to enter pipes where the diameter does not allow safe movement or rescue</li>
+          <li>DON'T remove the retrieval line harness because it is uncomfortable in the confined space</li>
+          <li>DON'T enter to rescue a casualty without breathing apparatus and a coordinated rescue team</li>
+        </ul>
+        <p class="see-also">See also: Confined Space Entry Procedures | Emergency Rescue Plans</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

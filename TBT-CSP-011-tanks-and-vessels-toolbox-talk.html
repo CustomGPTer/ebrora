@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanks and Vessels - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Tanks and Vessels</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CSP-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Tanks and vessels on construction and process sites are classified as confined spaces under the 1997 Regulations.</li>
+      <li>They may have contained flammable liquids, toxic chemicals, or biological material that leaves residual hazards.</li>
+      <li>Oxygen levels inside tanks can be depleted by rusting, biological activity, or displacement by inert gases.</li>
+      <li>Access into tanks is often through small manholes, limiting movement and complicating emergency rescue.</li>
+      <li>Atmospheric testing for oxygen, flammable gases, and toxic substances must precede every entry.</li>
+      <li>A permit to enter, rescue plan, and standby person are mandatory before anyone enters a tank.</li>
+      <li>Welding, grinding, or painting inside tanks amplifies fume and fire hazards in the enclosed volume.</li>
+      <li>Sludge and residues at the bottom of tanks can release toxic gases when disturbed.</li>
+      <li>Static charges can build up in empty tanks during cleaning, creating ignition risk for flammable vapours.</li>
+      <li>Multiple fatalities have occurred when workers entered tanks without following confined space procedures.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Toxic atmosphere</td><td>Residual chemicals and oxygen depletion inside tanks can cause unconsciousness and death within a single breath.</td></tr>
+    <tr><td class="reason">Rescue difficulty</td><td>Restricted access through small manholes makes casualty extraction extremely difficult and time-consuming.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>The Confined Spaces Regulations 1997 impose strict duties for risk assessment, safe systems, and emergency arrangements.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Treat every tank and vessel as a confined space until proven otherwise</li>
+          <li>Obtain a confined space entry permit before anyone enters the tank</li>
+          <li>Test the atmosphere for oxygen, flammable gases, and toxics before and during entry</li>
+          <li>Ensure a trained standby person is stationed at the entry point throughout</li>
+          <li>Isolate all feeds, drains, and connections to prevent unexpected inflow</li>
+          <li>Ventilate the tank continuously using forced mechanical ventilation</li>
+          <li>Have a rescue plan and trained rescue team ready before entry begins</li>
+          <li>Clean and purge the tank of residues before internal work commences</li>
+          <li>Use intrinsically safe lighting and equipment inside potentially flammable tanks</li>
+          <li>Brief all entrants on the specific hazards, emergency signals, and exit procedures</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter any tank without a valid confined space permit in place</li>
+          <li>DON'T rely on a single atmospheric test — monitor continuously during entry</li>
+          <li>DON'T assume the tank is safe because it was cleaned or drained previously</li>
+          <li>DON'T leave the standby person's position unattended for any reason</li>
+          <li>DON'T use non-intrinsically safe electrical equipment in tanks with flammable residues</li>
+          <li>DON'T disturb sludge or residues without reassessing the atmospheric conditions</li>
+          <li>DON'T weld or grind inside a tank without additional hot works controls and ventilation</li>
+          <li>DON'T enter to rescue a casualty without breathing apparatus and a trained team</li>
+          <li>DON'T forget to isolate all pipework connections — even capped valves can leak</li>
+          <li>DON'T re-enter after an alarm without retesting the atmosphere and getting clearance</li>
+        </ul>
+        <p class="see-also">See also: Confined Space Entry Procedures | Atmospheric Monitoring and Gas Testing</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earthing and Bonding Awareness - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Earthing and Bonding Awareness</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ELE-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Earthing provides a safe path for fault current to flow to ground, enabling protective devices to operate.</li>
+      <li>Bonding connects exposed metalwork and extraneous conductive parts to ensure they remain at the same potential.</li>
+      <li>Without proper earthing, a fault on equipment can make its metal casing live at mains voltage.</li>
+      <li>Main protective bonding connects incoming services such as gas, water, and oil to the main earthing terminal.</li>
+      <li>Supplementary bonding provides additional protection in high-risk areas such as bathrooms and swimming pools.</li>
+      <li>BS 7671 (IET Wiring Regulations) sets out the requirements for earthing and bonding in the UK.</li>
+      <li>Construction sites use TN-S, TN-C-S, or TT earthing systems depending on the supply arrangement.</li>
+      <li>Temporary electrical installations must have earthing verified before the supply is energised.</li>
+      <li>Damaged or disconnected earthing and bonding conductors create hidden lethal hazards.</li>
+      <li>Earth fault loop impedance testing confirms the earthing system will operate protective devices quickly enough.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Electric shock prevention</td><td>Earthing and bonding ensure fault current triggers protective devices rapidly, preventing fatal electric shock.</td></tr>
+    <tr><td class="reason">Fire prevention</td><td>Inadequate earthing allows fault currents to flow through unintended paths, generating heat and causing fires.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>BS 7671 and the Electricity at Work Regulations 1989 require adequate earthing for all electrical installations.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Verify earthing arrangements are in place before energising any temporary supply</li>
+          <li>Ensure main bonding conductors are connected to gas, water, and oil services</li>
+          <li>Test earth fault loop impedance to confirm protective devices will operate correctly</li>
+          <li>Use correctly sized earthing and bonding conductors as specified in BS 7671</li>
+          <li>Inspect earthing connections during routine maintenance and after alterations</li>
+          <li>Label main earthing terminals and bonding connections clearly for identification</li>
+          <li>Install supplementary bonding in bathrooms and other special locations as required</li>
+          <li>Report any disconnected or damaged earthing conductors immediately</li>
+          <li>Ensure temporary site supplies have earth electrodes tested and recorded</li>
+          <li>Brief electricians on the earthing system type before starting installation work</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T energise any circuit without confirming the earthing system is connected</li>
+          <li>DON'T remove or disconnect bonding conductors during other trade activities</li>
+          <li>DON'T use undersized earthing conductors that cannot carry fault current safely</li>
+          <li>DON'T assume plastic water pipes mean bonding is not required — check BS 7671</li>
+          <li>DON'T paint over or conceal earthing connection points where they cannot be inspected</li>
+          <li>DON'T connect earth conductors to structural steelwork without engineer approval</li>
+          <li>DON'T ignore earth fault loop test results that exceed maximum permitted values</li>
+          <li>DON'T bypass RCD protection because nuisance tripping suggests an earthing problem</li>
+          <li>DON'T work on earthing systems without appropriate electrical competence</li>
+          <li>DON'T leave earth electrodes unprotected where they could be damaged by excavation</li>
+        </ul>
+        <p class="see-also">See also: Electrical Safety Awareness | RCD Protection and 110 Volt Use</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

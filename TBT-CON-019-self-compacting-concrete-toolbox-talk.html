@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Compacting Concrete - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Self-Compacting Concrete</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CON-019 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Self-compacting concrete (SCC) flows under its own weight to fill formwork without vibration.</li>
+      <li>SCC develops significantly higher formwork pressures than conventional concrete — up to full hydrostatic head.</li>
+      <li>Formwork must be designed for full liquid head pressure, not the reduced pressure assumed for vibrated concrete.</li>
+      <li>The high fluidity means SCC will leak rapidly through any gaps, joints, or tie holes in the formwork.</li>
+      <li>SCC contains higher cement and fines content, increasing the alkalinity and skin burn risk from contact.</li>
+      <li>The absence of vibration reduces noise but the pour itself requires careful monitoring of fill levels.</li>
+      <li>Overfilling formwork with SCC can cause burst panels, blow-outs, and sudden concrete release.</li>
+      <li>SCC requires strict quality control — slump flow, V-funnel, and L-box tests verify workability on delivery.</li>
+      <li>Mix design is more sensitive than conventional concrete — small changes affect flowability dramatically.</li>
+      <li>Finishing SCC surfaces requires different techniques because the material self-levels.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Formwork failure</td><td>SCC exerts full hydrostatic pressure — formwork designed for conventional concrete can burst catastrophically.</td></tr>
+    <tr><td class="reason">Concrete burns</td><td>Higher cement content in SCC makes it more alkaline, increasing the severity of skin burns on contact.</td></tr>
+    <tr><td class="reason">Quality sensitivity</td><td>SCC mix design is less forgiving — variations in water, admixtures, or aggregates cause segregation and defects.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Design and check formwork for full hydrostatic pressure when using SCC</li>
+          <li>Seal all formwork joints, tie holes, and gaps to prevent SCC leakage</li>
+          <li>Monitor the fill level carefully during pouring to prevent overfilling and blow-outs</li>
+          <li>Test every SCC delivery for slump flow and other specified workability parameters</li>
+          <li>Wear waterproof gloves and eye protection when working near flowing SCC</li>
+          <li>Brief the pour team on the specific formwork pressure and leakage risks of SCC</li>
+          <li>Inspect formwork ties and bracing are at the design capacity before starting the pour</li>
+          <li>Reject SCC loads that do not meet the specified workability criteria on delivery</li>
+          <li>Control the pour rate to avoid exceeding the formwork design pressure at any level</li>
+          <li>Clean any SCC contact from skin immediately with clean water to prevent alkaline burns</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T pour SCC into formwork designed only for conventional vibrated concrete pressures</li>
+          <li>DON'T assume SCC will behave like conventional concrete — the pressures are much higher</li>
+          <li>DON'T leave gaps or unsealed joints in the formwork — SCC will exploit every opening</li>
+          <li>DON'T overfill formwork sections — monitor the fill height against planned levels</li>
+          <li>DON'T add water to SCC on site to adjust flowability — it destroys the mix design</li>
+          <li>DON'T vibrate SCC unless specifically instructed — it is designed to flow without vibration</li>
+          <li>DON'T ignore skin contact with SCC — its higher alkalinity burns faster than normal concrete</li>
+          <li>DON'T pour at a rate faster than the formwork is designed to resist</li>
+          <li>DON'T skip workability testing — SCC that does not flow correctly causes voids and defects</li>
+          <li>DON'T stand near formwork during the early stages of an SCC pour in case of blow-out</li>
+        </ul>
+        <p class="see-also">See also: Concrete Pour Safety | Formwork Erection and Striking</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

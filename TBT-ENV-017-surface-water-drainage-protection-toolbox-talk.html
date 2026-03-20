@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surface Water Drainage Protection - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Surface Water Drainage Protection</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ENV-017 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Surface water drains on and around construction sites often discharge directly into rivers and streams.</li>
+      <li>Unlike foul sewers, surface water drains have no treatment — pollutants reach watercourses untreated.</li>
+      <li>Silt, cement, fuel, and chemicals entering surface water drains cause serious environmental pollution.</li>
+      <li>The Environmental Permitting Regulations 2016 make it an offence to pollute controlled waters.</li>
+      <li>Drain covers must be identified and protected to prevent pollutants entering the surface water system.</li>
+      <li>Construction sites should have a drainage plan showing which drains are surface water and which are foul.</li>
+      <li>Silt fences, straw bales, and settlement ponds help prevent sediment reaching surface water drains.</li>
+      <li>Concrete washout water is highly alkaline and must never be discharged to surface water drains.</li>
+      <li>A single pollution incident can result in unlimited fines and criminal prosecution.</li>
+      <li>Protecting surface water drainage is a condition of most planning permissions and environmental permits.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Protect watercourses</td><td>Surface water drains flow directly to rivers and streams — any pollutant entering them causes immediate environmental harm.</td></tr>
+    <tr><td class="reason">Legal consequences</td><td>Polluting controlled waters is a criminal offence carrying unlimited fines and potential imprisonment.</td></tr>
+    <tr><td class="reason">Ecological damage</td><td>Silt, cement, and chemicals kill fish, invertebrates, and plants, sometimes taking years for ecosystems to recover.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Identify all surface water drains on site and mark them on the drainage plan</li>
+          <li>Protect surface water drain inlets with covers, neoprene mats, or drain guards</li>
+          <li>Install silt fences and settlement ponds to intercept sediment before it reaches drains</li>
+          <li>Direct concrete washout water to designated containment areas only</li>
+          <li>Store fuel, oil, and chemicals on bunded hard standings away from drains</li>
+          <li>Brief all site workers on the location of surface water drains and protection measures</li>
+          <li>Inspect drain protection measures daily and after heavy rainfall events</li>
+          <li>Report any spill or discharge to a surface water drain immediately</li>
+          <li>Use spill kits promptly to contain and clean up any accidental releases</li>
+          <li>Keep a site drainage plan in the site office for reference by all personnel</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T discharge any liquid into surface water drains without authorisation</li>
+          <li>DON'T wash out concrete, mortar, or plaster into surface water drains</li>
+          <li>DON'T store chemicals or fuels where spills could reach surface water inlets</li>
+          <li>DON'T remove drain protection measures without replacing them immediately</li>
+          <li>DON'T assume a drain goes to foul sewer — check the drainage plan first</li>
+          <li>DON'T allow site vehicles to track mud and silt into surface water gullies</li>
+          <li>DON'T pour paint, solvents, or cleaning agents into any drain on site</li>
+          <li>DON'T ignore blocked or damaged drain protection — repair it straight away</li>
+          <li>DON'T pump silty water from excavations directly into surface water drains</li>
+          <li>DON'T wait to report a pollution incident — early response limits the damage</li>
+        </ul>
+        <p class="see-also">See also: Pollution Incident Reporting | Silt and Sediment Control</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

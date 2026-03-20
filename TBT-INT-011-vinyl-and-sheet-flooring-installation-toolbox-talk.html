@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vinyl and Sheet Flooring Installation - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Vinyl and Sheet Flooring Installation</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-INT-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Vinyl and sheet flooring installation involves adhesive application, cutting, and welding of joints.</li>
+      <li>Many flooring adhesives contain solvents or isocyanates that require COSHH assessment.</li>
+      <li>Working at floor level for prolonged periods causes musculoskeletal strain on knees and back.</li>
+      <li>Sharp trimming knives are the most common cause of injury during flooring installation.</li>
+      <li>Subfloor preparation may involve grinding or sanding, generating respirable dust.</li>
+      <li>Hot air welding of vinyl joints creates localised fume that requires ventilation.</li>
+      <li>Newly applied adhesives can make the floor slippery, creating a hazard for other trades.</li>
+      <li>Heavy rolls of sheet vinyl require manual handling assessment and mechanical aids where possible.</li>
+      <li>Asbestos-containing floor tiles may be present in refurbishment projects beneath existing coverings.</li>
+      <li>Knee pads or kneeling mats are essential to prevent bursitis and long-term knee damage.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Musculoskeletal health</td><td>Prolonged kneeling and bending causes chronic knee, hip, and back problems that can end careers.</td></tr>
+    <tr><td class="reason">Cut injuries</td><td>Flooring knives are extremely sharp and cause deep lacerations, often to the non-dominant hand.</td></tr>
+    <tr><td class="reason">Chemical exposure</td><td>Adhesive fumes in enclosed rooms can exceed workplace exposure limits without adequate ventilation.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear knee pads or use kneeling mats throughout all floor-level work</li>
+          <li>Use a safety knife with a retractable blade for cutting vinyl materials</li>
+          <li>Complete a COSHH assessment for all adhesives and primers before use</li>
+          <li>Ventilate the room during and after adhesive application</li>
+          <li>Check for asbestos-containing tiles before lifting any existing floor covering</li>
+          <li>Use mechanical aids to move heavy rolls of sheet vinyl</li>
+          <li>Wear RPE during subfloor preparation if grinding or sanding is needed</li>
+          <li>Take regular breaks from kneeling to relieve pressure on joints</li>
+          <li>Keep the work area clean and warn other trades about wet adhesive</li>
+          <li>Store and dispose of adhesive containers in line with COSHH requirements</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T use a fixed-blade knife where a retractable safety knife will work</li>
+          <li>DON'T cut towards your body or supporting hand at any time</li>
+          <li>DON'T apply adhesives in unventilated rooms — open windows or use fans</li>
+          <li>DON'T kneel directly on hard floors without knee protection</li>
+          <li>DON'T lift or carry heavy vinyl rolls manually without assessing the risk</li>
+          <li>DON'T sand or grind subfloors without dust extraction and RPE</li>
+          <li>DON'T ignore old floor tiles — they may contain asbestos materials</li>
+          <li>DON'T leave open adhesive containers unattended in the work area</li>
+          <li>DON'T allow other trades to walk on wet adhesive or freshly laid flooring</li>
+          <li>DON'T continue working through pain in knees, back, or wrists</li>
+        </ul>
+        <p class="see-also">See also: Manual Handling Awareness | COSHH Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
