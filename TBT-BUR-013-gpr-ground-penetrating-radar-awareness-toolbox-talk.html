@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPR (Ground Penetrating Radar) Awareness - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>GPR (Ground Penetrating Radar) Awareness</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-BUR-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Ground penetrating radar (GPR) uses electromagnetic pulses to detect buried objects, voids, and services.</li>
+      <li>GPR complements CAT and Genny surveys by detecting non-metallic services such as plastic pipes and ducts.</li>
+      <li>The equipment is pushed or dragged across the ground surface, scanning beneath without any excavation.</li>
+      <li>GPR interpretation requires specialist training — results are displayed as radargrams that need expert analysis.</li>
+      <li>GPR performance is affected by soil type, moisture content, surface material, and the depth of the target.</li>
+      <li>Clay soils and waterlogged ground significantly reduce GPR penetration depth and data quality.</li>
+      <li>GPR does not replace the need for service plans, CAT and Genny surveys, or trial holes.</li>
+      <li>The survey must be carried out by a competent operator certified to PAS 128 standards where required.</li>
+      <li>GPR is also used for structural surveys, void detection beneath roads, and locating reinforcement in concrete.</li>
+      <li>Survey results should be recorded, marked on site, and included in the excavation permit documentation.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Detect non-metallic services</td><td>CAT and Genny cannot detect plastic pipes or non-metallic ducts — GPR provides additional detection capability.</td></tr>
+    <tr><td class="reason">Reduce service strikes</td><td>Using GPR alongside other methods reduces the risk of striking buried services during excavation.</td></tr>
+    <tr><td class="reason">Informed decisions</td><td>GPR data helps engineers and operatives make safer decisions about where and how to dig.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use GPR surveys as part of a combined approach with CAT, Genny, and service plans</li>
+          <li>Ensure the GPR operator is trained and certified to the appropriate PAS 128 level</li>
+          <li>Mark GPR-detected services and anomalies on site using spray paint or markers</li>
+          <li>Include GPR survey results in the permit to dig documentation for the excavation</li>
+          <li>Request GPR surveys on sites where non-metallic services are known or suspected</li>
+          <li>Brief the excavation team on the GPR findings including any uncertainties</li>
+          <li>Use GPR in combination with trial holes to confirm the identity of detected features</li>
+          <li>Consider ground conditions — request GPR early before wet weather reduces performance</li>
+          <li>Record the GPR survey coverage area, date, and operator on the survey report</li>
+          <li>Retain GPR survey records for future reference when further works are planned</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T rely on GPR alone — always use it alongside CAT, Genny, and service plans</li>
+          <li>DON'T assume GPR will detect everything — soil conditions affect its performance</li>
+          <li>DON'T interpret GPR data without specialist training — radargrams require expertise</li>
+          <li>DON'T excavate without marking GPR findings on the ground surface clearly</li>
+          <li>DON'T skip GPR on sites with known non-metallic utilities such as plastic gas pipes</li>
+          <li>DON'T treat a clean GPR result as a guarantee that no services are present below</li>
+          <li>DON'T use GPR equipment that has not been calibrated and maintained correctly</li>
+          <li>DON'T carry out GPR surveys on heavily reinforced concrete without adjusting settings</li>
+          <li>DON'T ignore anomalies in the GPR data — investigate with trial holes if uncertain</li>
+          <li>DON'T allow untrained operators to perform or interpret GPR survey results</li>
+        </ul>
+        <p class="see-also">See also: CAT and Genny Safe Use | Permit to Dig Process</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

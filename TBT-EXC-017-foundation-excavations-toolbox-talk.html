@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundation Excavations - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Foundation Excavations</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-EXC-017 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Foundation excavations create the formation for strip footings, pad bases, raft foundations, and pile caps.</li>
+      <li>Depths vary from 600mm for shallow footings to several metres for deep pad bases and pile caps.</li>
+      <li>Trench collapse risk increases with depth, soft ground, surcharge loading, and proximity to existing structures.</li>
+      <li>Concrete is poured directly after excavation — workers must exit before the concrete delivery arrives.</li>
+      <li>Reinforcement fixing in foundation excavations requires safe access and protection from trench collapse.</li>
+      <li>Formation inspection by the engineer must confirm adequate bearing before concrete is placed.</li>
+      <li>Groundwater ingress into foundation excavations requires dewatering before workers enter safely.</li>
+      <li>Adjacent structures and roads impose surcharge loads that reduce the stability of excavation walls.</li>
+      <li>Spoil must be stored well back from the excavation edge to prevent overloading the sides.</li>
+      <li>Foundation excavations in contaminated ground require additional COSHH and environmental controls.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Burial risk</td><td>Trench collapse in foundation excavations buries workers under tonnes of soil, often fatally, within seconds.</td></tr>
+    <tr><td class="reason">Multiple hazards</td><td>Foundation work combines excavation, reinforcement, concrete, lifting, and groundwater hazards simultaneously.</td></tr>
+    <tr><td class="reason">Structural importance</td><td>Foundation formation must be correct — placing concrete on inadequate bearing ground causes building failure.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Support or batter excavation sides for any foundation trench deeper than 1.2 metres</li>
+          <li>Inspect the excavation at the start of each shift and after rainfall before entry</li>
+          <li>Request the engineer to inspect the formation before concrete is placed</li>
+          <li>Dewater the excavation and confirm it is stable before workers enter</li>
+          <li>Keep spoil at least 1.5 metres from the excavation edge to prevent overloading</li>
+          <li>Provide safe access and egress using ladders or steps at regular intervals</li>
+          <li>Clear all workers from the excavation before concrete is discharged</li>
+          <li>Locate buried services before excavating, especially near existing buildings</li>
+          <li>Brief the team on the foundation layout, depths, and specific ground hazards</li>
+          <li>Apply COSHH controls where foundation excavations are in contaminated ground</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter an unsupported foundation trench deeper than 1.2 metres</li>
+          <li>DON'T allow workers to remain in the excavation during concrete pouring</li>
+          <li>DON'T place concrete on the formation before the engineer has inspected and approved it</li>
+          <li>DON'T stockpile spoil, materials, or plant close to the excavation edge</li>
+          <li>DON'T work in a waterlogged excavation without dewatering and stability assessment</li>
+          <li>DON'T ignore signs of ground instability such as cracking, bulging, or seepage</li>
+          <li>DON'T skip the daily excavation inspection even for shallow strip footings</li>
+          <li>DON'T dig adjacent to existing structures without assessing the impact on their foundations</li>
+          <li>DON'T excavate without checking for buried services along the foundation layout</li>
+          <li>DON'T fix reinforcement in deep excavations without safe access and trench support in place</li>
+        </ul>
+        <p class="see-also">See also: Excavation Safety Awareness | Trench Collapse Prevention</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

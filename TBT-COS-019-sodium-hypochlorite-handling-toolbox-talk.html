@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sodium Hypochlorite Handling - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sodium Hypochlorite Handling</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-COS-019 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Sodium hypochlorite (NaOCl) is a strong oxidising disinfectant used in water treatment and swimming pools.</li>
+      <li>It is corrosive to skin, eyes, and the respiratory system — even dilute solutions cause irritation.</li>
+      <li>Concentrated solutions (10–15% available chlorine) can cause severe chemical burns on contact.</li>
+      <li>Mixing sodium hypochlorite with acids produces toxic chlorine gas that can be fatal in enclosed spaces.</li>
+      <li>The workplace exposure limit for chlorine gas is 0.5 ppm short-term — an extremely low threshold.</li>
+      <li>Deliveries arrive by tanker or in IBCs — transfer to bulk storage creates splash and spill hazards.</li>
+      <li>Storage tanks must be bunded to 110% capacity and made from compatible materials such as GRP or HDPE.</li>
+      <li>UV degradation reduces the strength of sodium hypochlorite — storage should be in shaded cool locations.</li>
+      <li>Emergency eyewash stations must be within 10 seconds travel of any handling location.</li>
+      <li>COSHH 2002 requires a specific assessment for sodium hypochlorite covering all handling and dosing activities.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Chemical burns</td><td>Concentrated sodium hypochlorite causes severe burns to skin and eyes on contact — speed of decontamination is critical.</td></tr>
+    <tr><td class="reason">Chlorine gas</td><td>Mixing with acid releases chlorine gas that causes respiratory failure and death in enclosed spaces.</td></tr>
+    <tr><td class="reason">Environmental harm</td><td>Hypochlorite spilled into watercourses kills aquatic life — bunding and spill containment are essential.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a COSHH assessment for sodium hypochlorite before any handling or dosing activity</li>
+          <li>Wear chemical splash goggles, face shield, chemical gloves, and apron during handling</li>
+          <li>Ensure emergency eyewash stations are accessible within 10 seconds of the handling area</li>
+          <li>Store in bunded areas made from compatible materials away from heat and direct sunlight</li>
+          <li>Check that the storage bund holds at least 110% of the largest container volume</li>
+          <li>Flush any skin or eye contact immediately with copious clean water for at least 20 minutes</li>
+          <li>Ventilate enclosed areas where sodium hypochlorite is stored or dosed to prevent gas build-up</li>
+          <li>Supervise tanker deliveries and IBC transfers to contain any splashes or spills</li>
+          <li>Label all storage tanks, IBCs, and dosing lines clearly with the chemical identity</li>
+          <li>Train all handlers on the specific hazards and emergency procedures for hypochlorite</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T mix sodium hypochlorite with acid or acid-based cleaners under any circumstances</li>
+          <li>DON'T handle concentrated hypochlorite without chemical goggles and face shield</li>
+          <li>DON'T store hypochlorite in direct sunlight or near heat sources — it degrades rapidly</li>
+          <li>DON'T allow spillage to enter surface water drains, rivers, or groundwater</li>
+          <li>DON'T use metal containers or fittings that are incompatible with hypochlorite</li>
+          <li>DON'T enter a space where chlorine gas may be present without atmospheric monitoring</li>
+          <li>DON'T delay washing eyes or skin after hypochlorite contact — seconds matter</li>
+          <li>DON'T leave empty IBCs or drums open where residual vapour can escape</li>
+          <li>DON'T store hypochlorite near incompatible chemicals including acids and ammonia</li>
+          <li>DON'T assume dilute solutions are harmless — they still cause irritation and burns</li>
+        </ul>
+        <p class="see-also">See also: COSHH Awareness | Chemical Spill Clean-Up Procedures</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

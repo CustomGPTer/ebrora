@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slip Forming Operations - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Slip Forming Operations</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CON-017 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Slip forming is a continuous concrete construction method where the formwork rises as concrete is poured.</li>
+      <li>It is used for tower structures, silos, bridge piers, and core walls requiring rapid vertical construction.</li>
+      <li>The operation runs 24 hours a day without stopping until the full height is reached.</li>
+      <li>Workers stand on the rising platform which moves upward at approximately 200–300mm per hour.</li>
+      <li>Fall protection at the platform edge is critical as the structure rises to significant heights.</li>
+      <li>Concrete supply must be continuous — any interruption risks the formwork bonding to the hardening concrete.</li>
+      <li>Rebar fixing, insert placement, and finishing all happen simultaneously on the moving platform.</li>
+      <li>Fatigue management is essential due to the continuous 24-hour operation requiring shift rotations.</li>
+      <li>The hydraulic jacking system that raises the formwork must be monitored for level and alignment.</li>
+      <li>Access between the ground and the rising platform changes constantly as the structure grows.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fall hazard</td><td>Workers on a continuously rising platform at increasing height face severe fall risks at every stage.</td></tr>
+    <tr><td class="reason">Continuous operation</td><td>24-hour non-stop operations create extreme fatigue risk that impairs judgement and reaction times.</td></tr>
+    <tr><td class="reason">Structural integrity</td><td>Interruptions, poor concrete, or misaligned formwork cause structural defects in the continuous pour.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Install guardrails and toeboards at all edges of the slip form platform</li>
+          <li>Wear a harness when working at unprotected edges or during access transitions</li>
+          <li>Rotate shift teams to manage fatigue during the continuous 24-hour operation</li>
+          <li>Monitor the hydraulic jacking system for level, rate, and alignment continuously</li>
+          <li>Maintain a continuous concrete supply — coordinate with the batching plant in advance</li>
+          <li>Brief each shift on the current height, sequence, and hazards before they start</li>
+          <li>Provide safe access between the ground and the platform using enclosed stairways or lifts</li>
+          <li>Keep the platform clean and free from concrete build-up that creates slip hazards</li>
+          <li>Ensure adequate lighting on the platform for night working shifts</li>
+          <li>Record all pour data including jacking rates, concrete volumes, and shift personnel</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T work at the platform edge without guardrails or fall arrest equipment</li>
+          <li>DON'T allow workers to exceed safe shift durations during the continuous operation</li>
+          <li>DON'T interrupt the concrete supply without engineer assessment of the consequences</li>
+          <li>DON'T climb the outside of the rising structure to access the platform</li>
+          <li>DON'T ignore misalignment or uneven jacking — it affects the structural geometry</li>
+          <li>DON'T throw tools or materials from the platform to the ground below</li>
+          <li>DON'T continue the pour if concrete quality or workability is not within specification</li>
+          <li>DON'T allow debris to accumulate on the platform creating trip and slip hazards</li>
+          <li>DON'T skip the shift briefing — conditions change continuously as the structure rises</li>
+          <li>DON'T leave the jacking system unmonitored at any point during the operation</li>
+        </ul>
+        <p class="see-also">See also: Concrete Pour Safety | Formwork Erection and Striking</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motorway Working (Smart Motorways) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Motorway Working (Smart Motorways)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-HWY-009 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Smart motorways use technology to manage traffic flow and may have no permanent hard shoulder.</li>
+      <li>Working on smart motorways carries extreme risk due to high-speed traffic and variable lane use.</li>
+      <li>All works must comply with Chapter 8 of the Traffic Signs Manual and GD 308 standards.</li>
+      <li>An Impact Protection Vehicle (IPV) is mandatory for most works on high-speed roads.</li>
+      <li>Lane closures require coordination with National Highways regional operations centres.</li>
+      <li>Emergency refuge areas (ERAs) replace the hard shoulder on all-lane-running sections.</li>
+      <li>Workers face risks from live traffic, especially during setup and removal of traffic management.</li>
+      <li>Speed compliance and driver attention reduce significantly during long motorway work zones.</li>
+      <li>All operatives must hold the correct Highways England sector scheme qualifications.</li>
+      <li>Fatalities among road workers on smart motorways have prompted major safety reviews.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Extreme danger</td><td>High-speed traffic passing within metres of operatives creates a constant risk of fatal vehicle incursion into work areas.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>Chapter 8 and GD 308 set mandatory requirements — non-compliance can result in prosecution and contract termination.</td></tr>
+    <tr><td class="reason">Worker protection</td><td>Correct signing, guarding, and IPV deployment are the only barriers between workers and vehicles travelling at up to 70 mph.</td></tr>
+    <tr><td class="reason">Public safety</td><td>Poorly managed motorway works increase the risk of serious collisions affecting road users and workers alike.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Follow Chapter 8 and GD 308 requirements for all motorway works</li>
+          <li>Deploy an IPV with a crash cushion before setting out cones or signs</li>
+          <li>Attend the pre-work briefing covering traffic management and escape routes</li>
+          <li>Wear full hi-vis clothing compliant with Chapter 8 standards at all times</li>
+          <li>Maintain awareness of live traffic lanes and variable speed limits</li>
+          <li>Communicate with the regional operations centre before starting any closure</li>
+          <li>Use vehicle-mounted arrow signs and LED warning beacons as specified</li>
+          <li>Keep all plant and materials inside the protected working area</li>
+          <li>Follow the planned sequence for setting out and removing traffic management</li>
+          <li>Report any incursion, near miss, or sign damage immediately</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T enter a live carriageway lane on foot without traffic management in place</li>
+          <li>DON'T work ahead of the IPV during setup or removal operations</li>
+          <li>DON'T stand between the IPV and oncoming traffic at any time</li>
+          <li>DON'T assume the hard shoulder is available — it may be a live lane</li>
+          <li>DON'T alter traffic management arrangements without authorisation</li>
+          <li>DON'T remove signs or cones in a different order to the approved plan</li>
+          <li>DON'T park personal vehicles outside designated safe areas on motorways</li>
+          <li>DON'T allow pedestrian crossings of live lanes under any circumstances</li>
+          <li>DON'T ignore variable message sign settings that affect your work area</li>
+          <li>DON'T become complacent — most incidents happen during routine operations</li>
+        </ul>
+        <p class="see-also">See also: Chapter 8 Signing and Guarding | IPV (Impact Protection Vehicle) Use</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

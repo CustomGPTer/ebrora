@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safety Stand-Down Procedures - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Safety Stand-Down Procedures</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-INC-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>A safety stand-down halts all work on site to address a serious safety concern or following a significant incident.</li>
+      <li>Stand-downs demonstrate that safety takes absolute priority over production and programme.</li>
+      <li>They may be triggered by a fatality, serious near miss, recurring unsafe behaviour, or an industry alert.</li>
+      <li>During a stand-down, all workers gather for a briefing on the issue, the lessons, and the required changes.</li>
+      <li>The stand-down should be led by the most senior manager on site to demonstrate leadership commitment.</li>
+      <li>The briefing must be clear, honest, and specific about what happened and what will change.</li>
+      <li>Workers should be encouraged to ask questions and raise their own concerns during the stand-down.</li>
+      <li>Actions agreed during the stand-down must be implemented and tracked to completion.</li>
+      <li>A stand-down is not a punishment — it is a proactive intervention to prevent harm.</li>
+      <li>Frequency should be judged by need — too many stand-downs lose impact; too few miss critical moments.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent recurrence</td><td>Stand-downs after serious incidents ensure the entire workforce understands what went wrong and how to prevent it.</td></tr>
+    <tr><td class="reason">Cultural signal</td><td>Stopping all work for safety sends an unmistakable message that safety comes before production on this site.</td></tr>
+    <tr><td class="reason">Workforce engagement</td><td>Stand-downs give every worker a voice and a shared understanding of the safety challenge being addressed.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Stop all work on site when a safety stand-down is called — no exceptions</li>
+          <li>Gather all workers in a safe location for the briefing, including subcontractors</li>
+          <li>Have the most senior manager on site lead and present the stand-down briefing</li>
+          <li>Explain clearly and honestly what triggered the stand-down and the lessons learned</li>
+          <li>Allow time for workers to ask questions and raise their own safety concerns</li>
+          <li>Agree specific actions arising from the stand-down and assign responsibility for each</li>
+          <li>Track all actions to completion and communicate progress to the workforce</li>
+          <li>Record the stand-down including attendance, content, and actions agreed</li>
+          <li>Resume work only when the team has been briefed and any immediate hazards addressed</li>
+          <li>Use stand-downs proportionately — reserve them for genuinely significant safety matters</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T allow any work to continue during a safety stand-down — everyone must attend</li>
+          <li>DON'T delegate the stand-down briefing to junior staff — senior leadership must be visible</li>
+          <li>DON'T blame individuals during the stand-down — focus on the system and the learning</li>
+          <li>DON'T rush the briefing to get back to work quickly — take the time the issue deserves</li>
+          <li>DON'T hold a stand-down without clear actions and follow-through afterwards</li>
+          <li>DON'T use stand-downs so frequently that they lose their impact and significance</li>
+          <li>DON'T dismiss questions or concerns raised by workers during the stand-down</li>
+          <li>DON'T resume work until immediate hazards identified in the stand-down are resolved</li>
+          <li>DON'T forget subcontractors and visiting workers — they must attend too</li>
+          <li>DON'T treat a stand-down as a box-ticking exercise — it must drive genuine change</li>
+        </ul>
+        <p class="see-also">See also: Lessons Learned and Safety Alerts | Positive Safety Culture</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

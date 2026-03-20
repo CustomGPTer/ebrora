@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nacelle and Blade Installation - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Nacelle and Blade Installation</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ENE-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Nacelle and blade installation is the most hazardous phase of wind turbine construction.</li>
+      <li>Nacelles typically weigh between 50 and 300 tonnes and are lifted to heights exceeding 80 metres.</li>
+      <li>Individual turbine blades can exceed 60 metres in length and are extremely sensitive to wind.</li>
+      <li>Lifts of this scale require detailed lift plans prepared by an Appointed Person under LOLER 1998.</li>
+      <li>Wind speed limits for blade lifts are typically set at 7–10 m/s due to the sail effect.</li>
+      <li>Large mobile cranes or specialist tower cranes with capacities over 500 tonnes are used.</li>
+      <li>Exclusion zones must cover the full radius of the crane boom plus the blade overhang.</li>
+      <li>Working at height during bolt-up and connection takes place in exposed and elevated positions.</li>
+      <li>Lightning risk increases significantly at nacelle height — weather monitoring is essential.</li>
+      <li>Communication between the crane operator, riggers, and nacelle team must be continuous and clear.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fatal consequences</td><td>Dropping a nacelle or blade from 80+ metres would destroy the turbine and could kill anyone within the exclusion zone.</td></tr>
+    <tr><td class="reason">Extreme wind sensitivity</td><td>Turbine blades act as sails — even moderate gusts can make a suspended blade uncontrollable.</td></tr>
+    <tr><td class="reason">Working at height</td><td>Personnel connecting components at nacelle height face severe fall risks in exposed, windy conditions.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Prepare a detailed lift plan for each nacelle and blade lift operation</li>
+          <li>Monitor wind speed continuously and halt lifts if limits are exceeded</li>
+          <li>Establish and enforce exclusion zones for the full crane and load radius</li>
+          <li>Ensure all riggers and installers wear full fall arrest harnesses at height</li>
+          <li>Use continuous radio communication between the crane team and nacelle crew</li>
+          <li>Verify crane ground conditions and outrigger pad capacity before each lift</li>
+          <li>Brief the entire lifting team on the sequence, signals, and abort procedures</li>
+          <li>Check weather forecasts for wind, lightning, and precipitation before starting</li>
+          <li>Ensure a rescue plan is in place for personnel working at nacelle height</li>
+          <li>Record all lift data including wind speeds, loads, and any deviations</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T attempt blade lifts in wind speeds above the approved limit</li>
+          <li>DON'T allow personnel inside the exclusion zone during heavy lifts</li>
+          <li>DON'T proceed with lifts if lightning is forecast within the work period</li>
+          <li>DON'T work at nacelle height without a full harness and anchor point</li>
+          <li>DON'T continue a lift if the load starts to spin or become uncontrollable</li>
+          <li>DON'T skip the pre-lift briefing — every team member must understand the plan</li>
+          <li>DON'T position tagline operatives where they could be struck by swinging loads</li>
+          <li>DON'T assume yesterday's ground assessment is valid today after rainfall</li>
+          <li>DON'T use communication methods that could be affected by wind noise</li>
+          <li>DON'T rush bolt-up connections at height to save time during weather windows</li>
+        </ul>
+        <p class="see-also">See also: Wind Turbine Construction Safety | Lifting Operations Awareness (LOLER)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
