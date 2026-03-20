@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gratings and Floor Openings - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Gratings and Floor Openings</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SLP-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Floor openings and gratings are common on construction sites, treatment works, and industrial buildings.</li>
+      <li>Unsecured or missing gratings cause falls into voids, tanks, channels, and basement areas.</li>
+      <li>Gratings that are incorrectly seated can tip or slide when walked on or loaded with equipment.</li>
+      <li>Falls through floor openings are reportable under RIDDOR and can result in fatal injuries.</li>
+      <li>The Workplace (Health, Safety and Welfare) Regulations 1992 require openings to be securely covered or fenced.</li>
+      <li>Temporary covers must be clearly marked, secured against displacement, and strong enough for expected loads.</li>
+      <li>Gratings on process sites may be removed for maintenance — the opening must be barriered immediately.</li>
+      <li>Glass reinforced plastic (GRP) and steel gratings have different load ratings and fixing requirements.</li>
+      <li>Poor lighting around floor openings significantly increases the risk of trips and falls.</li>
+      <li>Several serious injuries each year are caused by workers stepping onto unsecured or underrated gratings.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent serious falls</td><td>An uncovered floor opening can result in a fatal fall, even from relatively low heights.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>The Workplace Regulations 1992 and CDM 2015 require all openings to be securely covered or guarded.</td></tr>
+    <tr><td class="reason">Protect everyone on site</td><td>Visitors, other trades, and operatives unfamiliar with the area may not notice unguarded openings.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Check all gratings are correctly seated and secured before walking on them</li>
+          <li>Barrier off any opening immediately when a grating or cover is removed for work</li>
+          <li>Mark temporary covers clearly with warning signs such as HOLE BELOW or DANGER</li>
+          <li>Ensure temporary covers can support the maximum expected load including plant</li>
+          <li>Fix covers in place so they cannot slide or be dislodged by wind or foot traffic</li>
+          <li>Report any missing, damaged, or loose gratings to the site supervisor immediately</li>
+          <li>Maintain adequate lighting around all floor openings and grating areas at all times</li>
+          <li>Reinstate gratings as soon as the work requiring their removal is complete</li>
+          <li>Use edge protection and toe boards around large openings that cannot be covered</li>
+          <li>Include floor openings and gratings in daily site safety inspections</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T walk on gratings that appear loose, corroded, damaged, or incorrectly seated</li>
+          <li>DON&#x27;T remove a grating without immediately placing a barrier around the opening</li>
+          <li>DON&#x27;T use plywood or boards as covers unless rated for the expected load</li>
+          <li>DON&#x27;T leave temporary covers unsecured where they can be moved accidentally</li>
+          <li>DON&#x27;T stack materials or equipment on gratings beyond their rated load capacity</li>
+          <li>DON&#x27;T assume others know an opening exists — always sign and barrier it</li>
+          <li>DON&#x27;T step over barriers placed around openings to take a shortcut</li>
+          <li>DON&#x27;T remove warning signs or barriers placed by others without authorisation</li>
+          <li>DON&#x27;T ignore a report of a missing grating — treat it as an immediate hazard</li>
+          <li>DON&#x27;T work near unprotected edges of large floor openings without fall protection</li>
+        </ul>
+        <p class="see-also">See also: Slips, Trips and Falls Awareness | Good Housekeeping Standards</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Footway Reconstruction Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Footway Reconstruction Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-HWY-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Footway reconstruction involves breaking out existing surfaces, preparing sub-base, and laying new paving or asphalt.</li>
+      <li>Work takes place adjacent to live pedestrian routes, shops, and residential properties with constant public interaction.</li>
+      <li>Buried services including gas, water, electric, and telecoms are commonly found at shallow depth beneath footways.</li>
+      <li>Hand-held breaking equipment generates noise, vibration, and dust affecting workers and the public nearby.</li>
+      <li>The Safety at Street Works and Road Works Code of Practice governs signing and guarding of footway works.</li>
+      <li>Pedestrian diversions must be accessible, clearly signed, and maintained for wheelchair and pushchair users.</li>
+      <li>Mini excavators and dumpers operating on footways create pedestrian strike hazards in tight spaces.</li>
+      <li>Silica dust from cutting paving slabs and concrete kerbs requires on-tool water suppression or extraction.</li>
+      <li>Material deliveries and skip collections on residential streets need careful traffic management coordination.</li>
+      <li>The New Roads and Street Works Act 1991 requires proper reinstatement to SROH standards.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Protect the public</td><td>Pedestrians walk close to footway works — barriers, signs, and diversions prevent injuries to the public.</td></tr>
+    <tr><td class="reason">Service strike prevention</td><td>Shallow buried services under footways are easily damaged, causing gas leaks, electrocution, and water mains bursts.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>The Safety at Street Works Code of Practice and NRSWA require proper signing, guarding, and reinstatement.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Set up pedestrian barriers and signed diversions before starting any footway work</li>
+          <li>Locate and mark all buried services using EML detection and reference plans before breaking out</li>
+          <li>Use water suppression when cutting paving slabs or concrete to control silica dust</li>
+          <li>Maintain accessible pedestrian routes for wheelchair users and pushchairs at all times</li>
+          <li>Brief all operatives on the locations of buried services beneath the footway</li>
+          <li>Wear hearing protection when using pneumatic breakers and cutting equipment on footways</li>
+          <li>Keep the work area tidy and free from trip hazards for workers and nearby pedestrians</li>
+          <li>Use banksmen when plant operates on footways where pedestrian visibility is limited</li>
+          <li>Reinstate the footway surface to SROH standards before reopening to pedestrian traffic</li>
+          <li>Monitor vibration exposure for operatives using hand-held breakers and compaction equipment</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T start breaking out footways without locating and marking all buried services first</li>
+          <li>DON&#x27;T leave excavations or uneven surfaces open without barriers and warning signs</li>
+          <li>DON&#x27;T block pedestrian routes without providing a signed and accessible diversion</li>
+          <li>DON&#x27;T dry cut paving slabs or kerbs — silica dust is a serious respiratory hazard</li>
+          <li>DON&#x27;T operate mini excavators on footways without a banksman managing pedestrian safety</li>
+          <li>DON&#x27;T stack materials or park plant where it blocks access for residents or businesses</li>
+          <li>DON&#x27;T ignore public complaints — address access and safety concerns promptly</li>
+          <li>DON&#x27;T leave trip hazards such as raised slabs or loose kerbs at the end of each shift</li>
+          <li>DON&#x27;T carry out noisy work outside the permitted hours set by the local authority</li>
+          <li>DON&#x27;T reinstate footway surfaces without compaction testing where the specification requires it</li>
+        </ul>
+        <p class="see-also">See also: Highway Works Safety Awareness | Kerb Laying on Highways</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

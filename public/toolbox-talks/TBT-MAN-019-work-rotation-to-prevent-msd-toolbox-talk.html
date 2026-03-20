@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work Rotation to Prevent MSD - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Work Rotation to Prevent MSD</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-MAN-019 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Musculoskeletal disorders (MSDs) are the most common cause of occupational ill health in UK construction.</li>
+      <li>Repetitive tasks such as bricklaying, plastering, drilling, and cable pulling cause cumulative tissue damage.</li>
+      <li>Work rotation involves alternating workers between physically demanding and lighter tasks during a shift.</li>
+      <li>The Manual Handling Operations Regulations 1992 require employers to reduce MSD risk so far as reasonably practicable.</li>
+      <li>Fatigue from sustained repetitive work reduces reaction time and increases the risk of acute injuries.</li>
+      <li>Effective rotation schedules consider the muscle groups used, task duration, and individual worker capability.</li>
+      <li>Early symptoms of MSDs include persistent aching, stiffness, numbness, and reduced grip strength.</li>
+      <li>Construction workers are twice as likely to suffer from back disorders as the general working population.</li>
+      <li>Supervisors must plan task rotation into the daily programme rather than relying on workers to self-manage.</li>
+      <li>Combining rotation with mechanical aids and ergonomic tool selection provides the most effective MSD prevention.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent long-term injury</td><td>Repetitive construction tasks cause permanent damage to muscles, tendons, and joints without rotation breaks.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>The Manual Handling Operations Regulations 1992 require employers to reduce repetitive strain risks.</td></tr>
+    <tr><td class="reason">Maintain productivity</td><td>Fatigued workers make more mistakes and work slower — rotation keeps the team effective throughout the shift.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Plan task rotation into the daily work programme for all repetitive manual activities</li>
+          <li>Alternate workers between heavy and light tasks every one to two hours during shifts</li>
+          <li>Identify which tasks use the same muscle groups and avoid scheduling them consecutively</li>
+          <li>Use mechanical aids alongside rotation to further reduce the load on workers&#x27; bodies</li>
+          <li>Brief the team on the rotation schedule at the start of each shift or activity</li>
+          <li>Monitor workers for early signs of fatigue, discomfort, or repetitive strain during tasks</li>
+          <li>Encourage workers to report aches, stiffness, or numbness before symptoms become chronic</li>
+          <li>Select ergonomic tools designed to reduce grip force and awkward posture where available</li>
+          <li>Record rotation schedules and MSD reports to track effectiveness and improve planning</li>
+          <li>Provide warm-up and stretching guidance for workers starting physically demanding tasks</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T leave the same worker on a heavy repetitive task for an entire shift</li>
+          <li>DON&#x27;T ignore early signs of MSD such as persistent aching, stiffness, or tingling</li>
+          <li>DON&#x27;T rely on workers to manage their own rotation — supervisors must plan and enforce it</li>
+          <li>DON&#x27;T rotate workers between two tasks that load the same muscle groups consecutively</li>
+          <li>DON&#x27;T treat MSD prevention as less important than other safety hazards on site</li>
+          <li>DON&#x27;T assume younger workers are immune to MSDs — cumulative damage starts immediately</li>
+          <li>DON&#x27;T skip rotation because of time pressure or programme deadlines on the project</li>
+          <li>DON&#x27;T use rotation as a substitute for providing proper mechanical handling aids</li>
+          <li>DON&#x27;T dismiss worker complaints of pain or discomfort as minor or unavoidable</li>
+          <li>DON&#x27;T wait until workers are injured before implementing rotation and ergonomic measures</li>
+        </ul>
+        <p class="see-also">See also: Manual Handling Awareness | Musculoskeletal Disorders</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

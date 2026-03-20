@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Basement Excavations - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Deep Basement Excavations</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-EXC-020 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Deep basement excavations extend several metres below ground level to create underground car parks, plant rooms, and storage.</li>
+      <li>The risk of catastrophic wall failure increases with depth due to rising earth and water pressure on retaining structures.</li>
+      <li>Adjacent buildings, roads, and services are at risk of settlement and damage from deep excavation activities.</li>
+      <li>Groundwater management is critical — high water tables can flood deep excavations rapidly if dewatering fails.</li>
+      <li>Access and egress from deep excavations must be planned with multiple escape routes at all times.</li>
+      <li>Cranes and material hoists are needed to move materials in and out of deep excavations safely.</li>
+      <li>Temporary propping and bracing of retaining walls must be designed, approved, and monitored as temporary works.</li>
+      <li>Noise, vibration, and dust from deep excavation activities impact neighbours and require environmental controls.</li>
+      <li>CDM 2015 requires a specific method statement covering the full excavation sequence including monitoring.</li>
+      <li>Instrumentation such as inclinometers and settlement monitoring must track ground and wall movement throughout.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent collapse</td><td>Retaining wall failure in deep excavations can bury workers and cause catastrophic damage to adjacent structures.</td></tr>
+    <tr><td class="reason">Groundwater risk</td><td>Dewatering failure floods deep excavations rapidly, creating drowning hazards and undermining wall stability.</td></tr>
+    <tr><td class="reason">Protect neighbours</td><td>Settlement from deep excavations damages buildings, roads, and buried services surrounding the site.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>CDM 2015 requires temporary works design, monitoring, and competent supervision for all deep excavations.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Ensure the retaining wall and propping design is approved before excavation below any level</li>
+          <li>Install and monitor instrumentation for wall deflection and ground settlement continuously</li>
+          <li>Maintain backup dewatering pumps and standby power to prevent excavation flooding</li>
+          <li>Provide multiple access and egress routes from the deepest working level at all times</li>
+          <li>Install temporary propping at each excavation level before digging to the next stage</li>
+          <li>Brief all workers on the emergency evacuation plan for sudden water ingress or wall movement</li>
+          <li>Use cranes or hoists for moving materials and equipment in and out of the excavation</li>
+          <li>Monitor adjacent buildings and services for settlement using pre-installed survey points</li>
+          <li>Control noise, vibration, and dust to comply with environmental permits and planning conditions</li>
+          <li>Record all monitoring data and review against trigger levels daily with the design engineer</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T excavate deeper than the current propping level without installing the next frame</li>
+          <li>DON&#x27;T ignore monitoring data showing wall movement or settlement beyond trigger levels</li>
+          <li>DON&#x27;T work in deep excavations without confirmed backup dewatering and standby power</li>
+          <li>DON&#x27;T allow single-point access — always maintain alternative escape routes from depth</li>
+          <li>DON&#x27;T store heavy materials or plant near the excavation edge where surcharge loads apply</li>
+          <li>DON&#x27;T remove temporary propping until the permanent structure provides equivalent support</li>
+          <li>DON&#x27;T carry out deep excavation without a designed and approved temporary works sequence</li>
+          <li>DON&#x27;T dismiss neighbour complaints about vibration or cracking without investigating promptly</li>
+          <li>DON&#x27;T enter deep excavations without checking atmospheric conditions for gas and oxygen levels</li>
+          <li>DON&#x27;T rely on visual inspection alone — use instrumentation to detect hidden ground movement</li>
+        </ul>
+        <p class="see-also">See also: Excavation Safety Awareness | Trench Collapse Prevention</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

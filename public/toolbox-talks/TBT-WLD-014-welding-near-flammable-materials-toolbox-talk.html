@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welding Near Flammable Materials - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Welding Near Flammable Materials</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WLD-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Welding near flammable materials is one of the most common causes of fire on construction sites.</li>
+      <li>Sparks, spatter, and hot slag from welding can travel up to 10 metres and ignite combustible materials.</li>
+      <li>Flammable materials include timber, insulation, solvents, paint, plastic sheeting, and accumulated dust.</li>
+      <li>A hot works permit is mandatory before any welding takes place near combustible or flammable materials.</li>
+      <li>A fire watch must be maintained during welding and for a minimum of 60 minutes after work stops.</li>
+      <li>Timber frame buildings, occupied buildings, and roofing projects are particularly high-risk environments.</li>
+      <li>Fire blankets and spark-proof screens should be used to contain sparks and protect adjacent materials.</li>
+      <li>A suitable fire extinguisher must be positioned within arm&#x27;s reach of the welding operation at all times.</li>
+      <li>The Regulatory Reform (Fire Safety) Order 2005 requires fire risk management for all hot works activities.</li>
+      <li>Insurers typically impose specific hot works conditions — non-compliance can void fire insurance cover.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent site fires</td><td>Welding sparks ignite flammable materials causing devastating fires that destroy buildings and kill workers.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>The Fire Safety Order 2005 and site fire risk assessments require formal hot works controls and permits.</td></tr>
+    <tr><td class="reason">Insurance compliance</td><td>Most insurers require hot works permits and fire watch procedures — breach can void the site fire insurance.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Obtain a hot works permit before welding anywhere near flammable or combustible materials</li>
+          <li>Remove or cover all flammable materials within 10 metres of the welding operation</li>
+          <li>Position fire blankets or spark-proof screens to contain sparks and hot spatter</li>
+          <li>Keep a suitable fire extinguisher within immediate reach during all welding activities</li>
+          <li>Maintain a fire watch during welding and for at least 60 minutes after completion</li>
+          <li>Check below, behind, and above the work area for hidden combustible materials</li>
+          <li>Seal gaps in floors, walls, and penetrations where sparks could reach concealed spaces</li>
+          <li>Brief the fire watch person on their duties and the location of firefighting equipment</li>
+          <li>Inspect the hot works area again at the end of the shift for any signs of smouldering</li>
+          <li>Record all hot works on the permit including the fire watch completion time</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T weld near flammable materials without a valid hot works permit in place</li>
+          <li>DON&#x27;T assume sparks will not reach flammable materials — they travel up to 10 metres</li>
+          <li>DON&#x27;T leave the fire watch post early — maintain for the full 60 minutes minimum</li>
+          <li>DON&#x27;T rely on nearby fire extinguishers — bring one to the immediate work area</li>
+          <li>DON&#x27;T weld above open containers of solvents, paints, adhesives, or flammable liquids</li>
+          <li>DON&#x27;T forget to check behind walls and under floors where sparks can reach unseen</li>
+          <li>DON&#x27;T allow accumulations of sawdust, packaging, or plastic near welding operations</li>
+          <li>DON&#x27;T carry out welding on timber frame structures without a site-specific fire plan</li>
+          <li>DON&#x27;T leave hot slag or spatter on the floor where it can smoulder unnoticed</li>
+          <li>DON&#x27;T treat the fire watch as optional — it is a permit condition and insurance requirement</li>
+        </ul>
+        <p class="see-also">See also: Hot Works Fire Prevention | Fire Safety Awareness on Site</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

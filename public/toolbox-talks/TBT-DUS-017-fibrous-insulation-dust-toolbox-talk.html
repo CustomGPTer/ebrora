@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fibrous Insulation Dust - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Fibrous Insulation Dust</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-DUS-017 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Fibrous insulation materials include mineral wool, glass wool, rock wool, and ceramic fibre products.</li>
+      <li>Cutting, handling, and installing these materials releases fine fibres that irritate skin, eyes, and lungs.</li>
+      <li>Man-made mineral fibres (MMMF) have a workplace exposure limit of 2 fibres/ml for refractory ceramic fibres.</li>
+      <li>MMMF dust causes skin irritation, upper respiratory irritation, and eye discomfort on contact.</li>
+      <li>Refractory ceramic fibres (RCF) used in high-temperature applications are classified as possibly carcinogenic.</li>
+      <li>The COSHH Regulations 2002 require risk assessment and control measures for all fibrous insulation work.</li>
+      <li>Insulation work in confined plant rooms and ceiling voids concentrates fibre exposure significantly.</li>
+      <li>Loose-fill insulation disturbed during refurbishment creates high airborne fibre levels requiring RPE.</li>
+      <li>Disposable coveralls prevent fibres embedding in clothing and being carried home to families.</li>
+      <li>On-tool extraction and damping down reduce airborne fibre concentrations during cutting operations.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Protect your lungs</td><td>Inhaled insulation fibres cause respiratory irritation and refractory ceramic fibres may cause cancer.</td></tr>
+    <tr><td class="reason">Prevent skin disease</td><td>Fibrous insulation causes intense skin irritation and dermatitis with prolonged or repeated contact.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>COSHH 2002 requires employers to assess and control exposure to MMMF and ceramic fibre dust.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a COSHH assessment before handling or cutting any fibrous insulation materials</li>
+          <li>Wear RPE with a P2 or P3 filter when cutting or disturbing fibrous insulation products</li>
+          <li>Use disposable coveralls to prevent fibres embedding in personal clothing during work</li>
+          <li>Wear safety goggles to protect eyes from airborne fibres during cutting and installation</li>
+          <li>Use sharp tools for clean cuts that minimise fibre release from insulation materials</li>
+          <li>Dampen insulation before cutting where the material and application allow moisture use</li>
+          <li>Ensure adequate ventilation in enclosed spaces before starting insulation installation work</li>
+          <li>Wash exposed skin with cool water after handling — hot water opens pores and traps fibres</li>
+          <li>Dispose of insulation offcuts in sealed bags to prevent fibre release in waste handling</li>
+          <li>Report persistent skin irritation, coughing, or eye discomfort to your supervisor promptly</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T handle or cut fibrous insulation without RPE, gloves, goggles, and coveralls</li>
+          <li>DON&#x27;T use power tools to cut insulation without on-tool extraction or dust suppression</li>
+          <li>DON&#x27;T rub or scratch itchy skin caused by insulation fibres — wash with cool water instead</li>
+          <li>DON&#x27;T shake out contaminated clothing — this disperses fibres into the surrounding air</li>
+          <li>DON&#x27;T eat, drink, or smoke until hands and face are washed after handling insulation</li>
+          <li>DON&#x27;T work in confined spaces with insulation without confirmed ventilation running</li>
+          <li>DON&#x27;T sweep up insulation offcuts with a broom — use a vacuum with HEPA filtration</li>
+          <li>DON&#x27;T take contaminated coveralls or work clothing home — dispose of them on site</li>
+          <li>DON&#x27;T ignore persistent respiratory symptoms after working with insulation materials</li>
+          <li>DON&#x27;T assume all insulation fibres are low risk — ceramic fibre is potentially carcinogenic</li>
+        </ul>
+        <p class="see-also">See also: Man-Made Mineral Fibres (MMMF) | RPE Selection and Face Fit Testing</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

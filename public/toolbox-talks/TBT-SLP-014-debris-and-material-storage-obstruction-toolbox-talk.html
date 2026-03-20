@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debris and Material Storage Obstruction - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Debris and Material Storage Obstruction</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SLP-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Debris and poorly stored materials on construction sites are a leading cause of trips, slips, and blocked access.</li>
+      <li>The Workplace (Health, Safety and Welfare) Regulations 1992 require work areas to be kept clean and orderly.</li>
+      <li>Common obstructions include offcuts, packaging, surplus materials, damaged goods, and general construction waste.</li>
+      <li>Blocked access routes prevent emergency evacuation and delay rescue in the event of a site incident.</li>
+      <li>Materials stored on walkways force workers to take detours or climb over obstacles, increasing injury risk.</li>
+      <li>Fire escape routes must be kept clear at all times — blocking them is a serious breach of fire safety law.</li>
+      <li>Poor housekeeping also attracts vermin, creates fire loading, and gives an unprofessional site appearance.</li>
+      <li>Designated storage areas, skip positioning, and regular clean-ups prevent debris accumulation.</li>
+      <li>CDM 2015 requires the principal contractor to ensure good order and housekeeping across the site.</li>
+      <li>Daily housekeeping inspections should identify and remove obstructions before they cause incidents.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent trips and falls</td><td>Debris on walkways and in work areas is the most common cause of trip injuries on construction sites.</td></tr>
+    <tr><td class="reason">Emergency access</td><td>Blocked routes prevent evacuation and rescue — this can turn a minor incident into a fatality.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>The Workplace Regulations 1992, CDM 2015, and the Fire Safety Order require clear, orderly work areas.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Clear your work area of debris and offcuts at the end of every task and shift</li>
+          <li>Store materials in designated areas away from walkways, access routes, and fire exits</li>
+          <li>Position skips and waste containers close to work areas to encourage regular disposal</li>
+          <li>Carry out daily housekeeping inspections and address obstructions before work starts</li>
+          <li>Keep emergency escape routes and fire exits clear of all materials and equipment</li>
+          <li>Use designated material storage zones with clear labelling and stacking limits</li>
+          <li>Brief all trades on their responsibility to maintain housekeeping in shared work areas</li>
+          <li>Arrange regular waste collections so skips and bins do not overflow onto walkways</li>
+          <li>Report blocked access routes or obstructed fire exits to the supervisor immediately</li>
+          <li>Include housekeeping standards as a standing item in daily briefings and inspections</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T leave offcuts, packaging, or waste materials on walkways or in access routes</li>
+          <li>DON&#x27;T block fire escape routes with stored materials, plant, or construction waste</li>
+          <li>DON&#x27;T stack materials higher than the designated limit or beyond the storage zone boundary</li>
+          <li>DON&#x27;T assume someone else will clean up debris from your work area at the end of shift</li>
+          <li>DON&#x27;T allow waste to accumulate to the point where it creates a fire loading hazard</li>
+          <li>DON&#x27;T store materials on stairways, landings, or in front of emergency equipment</li>
+          <li>DON&#x27;T climb over obstructions instead of clearing them or finding a safe alternative route</li>
+          <li>DON&#x27;T leave protruding nails, screws, or sharp edges in discarded timber or materials</li>
+          <li>DON&#x27;T ignore poor housekeeping by other trades — raise it with the site supervisor</li>
+          <li>DON&#x27;T treat housekeeping as a low priority — it prevents the most common site injuries</li>
+        </ul>
+        <p class="see-also">See also: Good Housekeeping Standards | Slips, Trips and Falls Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

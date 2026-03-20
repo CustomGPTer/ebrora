@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Great Crested Newt Protection - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Great Crested Newt Protection</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ENV-023 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Great crested newts are strictly protected under the Conservation of Habitats and Species Regulations 2017.</li>
+      <li>It is a criminal offence to kill, injure, capture, or disturb great crested newts or damage their habitat.</li>
+      <li>Newts use ponds for breeding in spring but spend most of the year in terrestrial habitats up to 500 metres away.</li>
+      <li>Log piles, rubble, grassland, hedgerows, and compost heaps near ponds are key terrestrial newt habitats.</li>
+      <li>A Natural England European Protected Species licence is required before any work that may affect newt habitat.</li>
+      <li>Newt surveys must be carried out by licensed ecologists during the appropriate survey season (March to June).</li>
+      <li>Newt exclusion fencing and pitfall trapping may be required to clear a site before construction can begin.</li>
+      <li>Penalties for offences include unlimited fines and up to six months imprisonment per offence.</li>
+      <li>Construction sites near ponds or wetland features have a high probability of great crested newt presence.</li>
+      <li>District Level Licensing (DLL) schemes now operate in some areas as an alternative to individual site licences.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Legal protection</td><td>Great crested newts have the highest level of legal protection — offences carry unlimited fines and imprisonment.</td></tr>
+    <tr><td class="reason">Prevent prosecution</td><td>Killing or disturbing newts without a licence results in prosecution of individuals and companies.</td></tr>
+    <tr><td class="reason">Habitat dependency</td><td>Newts rely on both aquatic and terrestrial habitats — construction can destroy both without proper mitigation.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Commission a great crested newt survey before any work near ponds or wetland features</li>
+          <li>Obtain a Natural England licence before starting any work that may affect newt habitat</li>
+          <li>Install newt exclusion fencing to the ecologist&#x27;s specification before site clearance begins</li>
+          <li>Brief all site personnel on what great crested newts look like and what to do if found</li>
+          <li>Stop work immediately and contact the ecological advisor if a newt is found during works</li>
+          <li>Protect ponds and terrestrial habitat within 500 metres of known breeding sites</li>
+          <li>Use an ecological clerk of works to supervise site clearance in newt habitat areas</li>
+          <li>Maintain exclusion fencing in good repair for the full duration of the construction works</li>
+          <li>Check beneath stored materials and log piles before moving them in newt habitat areas</li>
+          <li>Create replacement newt habitat as required by the licence conditions before work begins</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T clear vegetation or excavate near ponds without completing a newt survey first</li>
+          <li>DON&#x27;T start construction in newt habitat without a valid Natural England licence in place</li>
+          <li>DON&#x27;T handle, capture, or move great crested newts without a personal handling licence</li>
+          <li>DON&#x27;T damage or drain ponds within 500 metres of the site without ecological assessment</li>
+          <li>DON&#x27;T remove log piles or rubble near ponds without checking for sheltering newts first</li>
+          <li>DON&#x27;T drive vehicles or store materials over known newt terrestrial habitat areas</li>
+          <li>DON&#x27;T breach newt exclusion fencing or allow gaps that let newts back onto the site</li>
+          <li>DON&#x27;T carry out site clearance during breeding season without licensed supervision</li>
+          <li>DON&#x27;T ignore the requirement to create replacement habitat as a licence condition</li>
+          <li>DON&#x27;T assume fish-free ponds lack newts — great crested newts prefer fish-free water</li>
+        </ul>
+        <p class="see-also">See also: Protected Species Awareness | Ecological Clerk of Works Role</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

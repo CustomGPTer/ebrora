@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dam Core and Cutoff Construction - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Dam Core and Cutoff Construction</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-DAM-018 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>The dam core is the central impermeable zone that prevents water seeping through the embankment body.</li>
+      <li>Cutoff walls extend below the dam into impermeable strata to prevent water bypassing under the embankment.</li>
+      <li>Core materials such as puddle clay, bentonite, and concrete must be placed and compacted to strict specifications.</li>
+      <li>Cutoff construction methods include sheet piling, slurry trench, jet grouting, and deep soil mixing.</li>
+      <li>The quality of the core and cutoff determines the long-term safety and integrity of the entire dam.</li>
+      <li>Working in deep trenches for cutoff walls creates excavation collapse and confined space hazards.</li>
+      <li>Bentonite slurry used in cutoff trench construction is slippery and creates significant slip hazards on site.</li>
+      <li>Compaction testing of core material must verify density and moisture content at specified frequencies.</li>
+      <li>The Reservoirs Act 1975 requires dam construction to be supervised by a qualified civil engineer (Panel Engineer).</li>
+      <li>Weather conditions significantly affect core material placement — rain can render clay cores unsuitable.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Dam safety</td><td>A defective core or cutoff allows uncontrolled seepage that can lead to catastrophic dam failure and flooding.</td></tr>
+    <tr><td class="reason">Excavation hazards</td><td>Deep cutoff trenches create collapse, drowning, and confined space risks for workers below ground.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>The Reservoirs Act 1975 and CDM 2015 require competent supervision and strict quality control throughout.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Place and compact core material in layers to the specification overseen by the Panel Engineer</li>
+          <li>Test core material density and moisture content at the frequencies specified in the design</li>
+          <li>Support deep cutoff trenches with sheet piling or slurry stabilisation before entry</li>
+          <li>Wear slip-resistant footwear when working near bentonite slurry operations on site</li>
+          <li>Monitor weather conditions and stop core placement when rain makes material unsuitable</li>
+          <li>Record all compaction test results, material sources, and layer depths for the dam record</li>
+          <li>Ensure the Panel Engineer inspects and approves each critical stage of core construction</li>
+          <li>Contain all bentonite slurry within bunded areas to prevent it reaching watercourses</li>
+          <li>Brief workers on the specific excavation, slurry, and quality control hazards each shift</li>
+          <li>Maintain safe access and egress from cutoff trench excavations at all times during work</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T place core material in conditions the Panel Engineer has not approved for compaction</li>
+          <li>DON&#x27;T enter deep cutoff trenches without excavation support and confined space controls</li>
+          <li>DON&#x27;T skip compaction testing — unverified layers may allow seepage through the dam core</li>
+          <li>DON&#x27;T allow bentonite slurry to spill onto walkways or enter surface water drains</li>
+          <li>DON&#x27;T continue core placement during rainfall that raises moisture above specification limits</li>
+          <li>DON&#x27;T use unapproved fill material in the core zone without the engineer&#x27;s written consent</li>
+          <li>DON&#x27;T stand near the edge of open cutoff trenches filled with bentonite slurry</li>
+          <li>DON&#x27;T proceed past any hold point without the Panel Engineer&#x27;s formal inspection and approval</li>
+          <li>DON&#x27;T compact with equipment that does not meet the specification for the core material type</li>
+          <li>DON&#x27;T treat dam core construction as routine earthworks — the quality standards are critical</li>
+        </ul>
+        <p class="see-also">See also: Dam and Reservoir Safety Awareness | Embankment Dam Construction</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

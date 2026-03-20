@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Burns Emergency Response - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Burns Emergency Response</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-EMG-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Burns on construction sites result from hot works, chemical contact, electrical incidents, and steam or hot water.</li>
+      <li>Burns are classified by depth: superficial (first degree), partial thickness (second), and full thickness (third).</li>
+      <li>Chemical burns from cement, lime, acids, and solvents require different first aid treatment than thermal burns.</li>
+      <li>Electrical burns often cause deep internal tissue damage that is not visible on the skin surface.</li>
+      <li>Immediate cooling with clean running water for a minimum of 20 minutes is critical for thermal burns.</li>
+      <li>Burns covering more than 1% of body area (roughly the size of the casualty&#x27;s palm) require hospital treatment.</li>
+      <li>Airway burns from inhaling hot gases or fumes are life-threatening and require immediate emergency services.</li>
+      <li>The Health and Safety (First Aid) Regulations 1981 require adequate first aid provision including burns treatment.</li>
+      <li>Burns first aiders must not apply creams, ointments, ice, or adhesive dressings to burn injuries.</li>
+      <li>Shock is a serious secondary risk with major burns — keep the casualty warm and monitor vital signs.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Save lives</td><td>Correct immediate first aid for burns significantly reduces tissue damage, infection risk, and long-term scarring.</td></tr>
+    <tr><td class="reason">Time critical</td><td>Cooling within the first 20 minutes dramatically improves burn outcomes — delayed treatment worsens injury.</td></tr>
+    <tr><td class="reason">Multiple burn types</td><td>Construction sites produce thermal, chemical, and electrical burns, each requiring specific first aid responses.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Cool thermal burns immediately with clean running water for a minimum of 20 minutes</li>
+          <li>Call emergency services for burns larger than the casualty&#x27;s palm or to face and airway</li>
+          <li>Remove clothing and jewellery near the burn unless stuck to the skin surface</li>
+          <li>Cover the cooled burn loosely with cling film or a sterile non-adhesive dressing</li>
+          <li>Flush chemical burns with large volumes of clean water for at least 20 minutes</li>
+          <li>Monitor the casualty for signs of shock including pale skin and rapid breathing</li>
+          <li>Keep the casualty warm using a blanket or foil sheet while cooling the burn area</li>
+          <li>Note the time, cause, and area of the burn to relay to emergency medical services</li>
+          <li>Check the casualty&#x27;s airway if they were in a fire or exposed to hot fumes</li>
+          <li>Ensure first aid kits include burns dressings and cling film for immediate treatment</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T apply ice, butter, creams, or toothpaste to any burn injury on site</li>
+          <li>DON&#x27;T burst blisters — they protect the underlying tissue from infection</li>
+          <li>DON&#x27;T remove clothing that is stuck to the burn — leave it for medical professionals</li>
+          <li>DON&#x27;T use adhesive plasters or fluffy dressings directly on burn surfaces</li>
+          <li>DON&#x27;T delay cooling — start running water on the burn within seconds of the injury</li>
+          <li>DON&#x27;T underestimate electrical burns — internal damage is often far worse than visible</li>
+          <li>DON&#x27;T give the casualty anything to eat or drink if the burn may require surgery</li>
+          <li>DON&#x27;T wrap burns tightly — use loose cling film to avoid restricting swelling</li>
+          <li>DON&#x27;T ignore airway burns — hoarseness, soot around the nose, or difficulty breathing are emergencies</li>
+          <li>DON&#x27;T move a severely burned casualty unnecessarily — wait for emergency services to arrive</li>
+        </ul>
+        <p class="see-also">See also: Medical Emergency Response | Chemical Spill Response</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
