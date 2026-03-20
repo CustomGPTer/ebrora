@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lone Surveyor Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lone Surveyor Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LON-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Surveyors frequently work alone in remote locations, near highways, on rooftops, and adjacent to excavations.</li>
+      <li>Lone working risk assessments must identify the specific hazards for each survey location and task.</li>
+      <li>Communication is the primary control — surveyors must have reliable contact with their office or base.</li>
+      <li>Mobile phone signal cannot be guaranteed at all locations, so backup communication may be needed.</li>
+      <li>Personal safety devices that detect falls, impact, or non-movement can automatically raise an alarm.</li>
+      <li>Setting out near live traffic requires traffic management or at minimum high-visibility clothing and awareness.</li>
+      <li>Surveyors accessing roofs, confined spaces, or deep excavations alone face specific fall and entrapment risks.</li>
+      <li>Violence and confrontation from landowners or the public is a recognised risk for surveyors in the field.</li>
+      <li>Medical emergencies while working alone in isolated areas can become life-threatening without rapid response.</li>
+      <li>A check-in schedule must be agreed before the surveyor departs, with defined actions if a check-in is missed.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Delayed rescue</td><td>A lone surveyor who is injured or incapacitated may not be found for hours without a check-in system.</td></tr>
+    <tr><td class="reason">Diverse hazards</td><td>Surveyors encounter traffic, heights, water, confined spaces, and hostile encounters across varied locations.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>MHSWR 1999 requires employers to assess lone working risks and implement controls specific to the task.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a lone working risk assessment for each survey location before departure</li>
+          <li>Carry a charged mobile phone and a backup communication device or lone worker app</li>
+          <li>Agree a check-in schedule with your office including times and escalation procedure</li>
+          <li>Share your planned locations, route, and expected return time with a colleague</li>
+          <li>Carry a personal first aid kit suitable for the terrain and task</li>
+          <li>Wear high-visibility clothing when surveying near traffic or on construction sites</li>
+          <li>Assess each location on arrival for hazards not identified in the desk-top assessment</li>
+          <li>Avoid confrontation — withdraw from any situation where you feel threatened</li>
+          <li>Carry appropriate PPE for the locations you will visit including hard hat and boots</li>
+          <li>Report any incidents, near misses, or safety concerns on return to the office</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T depart without telling someone your planned locations and return time</li>
+          <li>DON'T work alone at height, in confined spaces, or near deep water without cover</li>
+          <li>DON'T skip the check-in schedule — missed check-ins trigger the escalation procedure</li>
+          <li>DON'T rely solely on a mobile phone — signal is unavailable in many rural areas</li>
+          <li>DON'T enter unfamiliar or remote sites without a risk assessment for that location</li>
+          <li>DON'T confront hostile landowners or members of the public — leave and report</li>
+          <li>DON'T access live highways on foot for surveying without traffic management or escort</li>
+          <li>DON'T work alone at night in isolated locations without specific authorisation</li>
+          <li>DON'T assume your vehicle will start — keep breakdown assistance details to hand</li>
+          <li>DON'T continue working if you feel unwell — return to base and seek medical help</li>
+        </ul>
+        <p class="see-also">See also: Lone Working Awareness | Surveying Safety Awareness</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

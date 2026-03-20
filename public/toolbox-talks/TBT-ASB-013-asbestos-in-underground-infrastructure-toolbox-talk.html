@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asbestos in Underground Infrastructure - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Asbestos in Underground Infrastructure</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ASB-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Asbestos cement (AC) pipes were widely used for water mains, sewers, and drainage from the 1950s to 1990s.</li>
+      <li>AC pipes, ducts, and linings may be encountered during excavation, pipe replacement, and maintenance work.</li>
+      <li>Cutting, breaking, or drilling AC pipes releases asbestos fibres that cause mesothelioma and lung cancer.</li>
+      <li>AC pipes in good condition are relatively low risk, but damaged or deteriorated pipes release fibres more readily.</li>
+      <li>Asbestos lagging and gaskets may be found in underground valve chambers and older pumping stations.</li>
+      <li>The Control of Asbestos Regulations 2012 apply to all work that could disturb asbestos in any form.</li>
+      <li>AC pipe removal is usually non-licensed work (NNLW) but must follow the specific NNLW notification and control procedures.</li>
+      <li>Workers must be trained in asbestos awareness and specific AC pipe handling before carrying out any work.</li>
+      <li>Wet cutting methods and enclosure techniques significantly reduce fibre release during AC pipe work.</li>
+      <li>AC pipe waste must be double-bagged, labelled, and disposed of through licensed hazardous waste routes.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fatal disease</td><td>Asbestos fibres from AC pipes cause mesothelioma and lung cancer — diseases that kill decades after exposure.</td></tr>
+    <tr><td class="reason">Common encounter</td><td>AC pipes are extremely common in underground infrastructure — encountering them during excavation is routine.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>The Control of Asbestos Regulations 2012 require specific controls for any work disturbing asbestos materials.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Check utility records for the presence of AC pipes before any excavation work</li>
+          <li>Train all workers in asbestos awareness before they work on underground infrastructure</li>
+          <li>Use wet cutting methods to minimise fibre release when cutting AC pipes</li>
+          <li>Wear RPE with a P3 filter and disposable coveralls when handling or breaking AC pipes</li>
+          <li>Notify the enforcing authority of NNLW before starting AC pipe removal</li>
+          <li>Double-bag AC pipe waste in labelled asbestos waste bags for licensed disposal</li>
+          <li>Dampen AC pipes before handling to reduce fibre release from damaged surfaces</li>
+          <li>Decontaminate tools and equipment after working with AC pipe materials</li>
+          <li>Record all AC pipe encounters and disposal in the project asbestos register</li>
+          <li>Stop work and reassess if unexpected suspect materials are found during excavation</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T break, snap, or dry-cut AC pipes — this releases maximum fibre concentrations</li>
+          <li>DON'T use power tools on AC pipes without wet suppression and RPE controls</li>
+          <li>DON'T handle AC pipe sections without gloves, RPE, and disposable coveralls</li>
+          <li>DON'T dispose of AC pipe waste with general construction waste</li>
+          <li>DON'T assume modern-looking pipework is not AC — it can look similar to concrete or plastic</li>
+          <li>DON'T carry out AC pipe work without completing the NNLW notification requirements</li>
+          <li>DON'T allow untrained workers to handle, cut, or remove AC pipe materials</li>
+          <li>DON'T use compressed air to clean out AC pipe trenches or chambers</li>
+          <li>DON'T leave AC pipe debris exposed in the trench for other workers to disturb</li>
+          <li>DON'T ignore damaged or deteriorated AC pipes encountered during excavation — report them</li>
+        </ul>
+        <p class="see-also">See also: Asbestos Awareness | Non-Licensed Asbestos Work (NNLW)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

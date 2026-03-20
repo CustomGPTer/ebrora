@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Handling Valves and Heavy Fittings - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Handling Valves and Heavy Fittings</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-MAN-015 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Valves and heavy fittings used in water, gas, and process pipelines can weigh from 25 kg to several tonnes.</li>
+      <li>Manual handling of these items causes back injuries, crushed fingers, and dropped-object incidents.</li>
+      <li>The Manual Handling Operations Regulations 1992 require employers to eliminate or reduce manual handling risk.</li>
+      <li>Mechanical aids including chain blocks, lever hoists, trolleys, and mini cranes should be used where possible.</li>
+      <li>Valve handwheels and actuators create awkward lifting positions due to protruding components.</li>
+      <li>Installation in trenches and confined plant rooms restricts movement and limits the use of large lifting equipment.</li>
+      <li>Cast iron valves are brittle — dropping them can cause fracture, rendering them unsafe for use.</li>
+      <li>Team lifting should follow an agreed plan with one person coordinating the lift and movement.</li>
+      <li>Storage areas must keep heavy valves and fittings at waist height to avoid floor-to-height lifting.</li>
+      <li>Pre-positioning valves near the installation point before lowering into trenches reduces handling stages.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Back injuries</td><td>Heavy and awkward valve components cause frequent back injuries when lifted, carried, or positioned manually.</td></tr>
+    <tr><td class="reason">Crush hazards</td><td>Dropped valves weighing 25 kg or more cause serious crush injuries to feet, hands, and limbs.</td></tr>
+    <tr><td class="reason">Legal duty</td><td>The Manual Handling Operations Regulations 1992 require mechanical alternatives where reasonably practicable.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use mechanical lifting aids for valves and fittings weighing more than 25 kg</li>
+          <li>Pre-position valves at the installation point before lowering into trenches</li>
+          <li>Store heavy items at waist height on racking to avoid floor-level lifting</li>
+          <li>Plan team lifts with one person coordinating the lift command and movement</li>
+          <li>Use trolleys and skates to move heavy valves across flat surfaces</li>
+          <li>Wear safety boots with metatarsal protection when handling heavy fittings</li>
+          <li>Clear the route and installation area of trip hazards before moving heavy items</li>
+          <li>Check the weight of each valve and fitting before deciding the handling method</li>
+          <li>Use chain blocks or lever hoists for positioning in confined plant rooms</li>
+          <li>Brief the team on the handling method and individual responsibilities before lifting</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T lift heavy valves manually when a mechanical aid is available</li>
+          <li>DON'T carry valves across uneven ground or through congested work areas</li>
+          <li>DON'T lift from a stooped position — bend your knees and keep your back straight</li>
+          <li>DON'T attempt team lifts without an agreed plan and a designated coordinator</li>
+          <li>DON'T drop or throw valves — cast iron components fracture on impact</li>
+          <li>DON'T store heavy fittings at floor level where they must be lifted from ground height</li>
+          <li>DON'T handle valves with oily or greasy gloves — a secure grip is essential</li>
+          <li>DON'T ignore hand and finger positions — crushing between valve and pipe is common</li>
+          <li>DON'T rush the installation — take time to position and secure heavy fittings safely</li>
+          <li>DON'T continue lifting through pain — stop and report musculoskeletal symptoms</li>
+        </ul>
+        <p class="see-also">See also: Manual Handling Awareness | Team Lifting and Mechanical Aids</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
