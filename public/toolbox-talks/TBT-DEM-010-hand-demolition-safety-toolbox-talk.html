@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hand Demolition Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Hand Demolition Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-DEM-010 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Hand demolition involves manually breaking out concrete, masonry, and finishes using hand and power tools.</li>
+      <li>It is used in confined areas, near sensitive structures, and where machine demolition is not practical.</li>
+      <li>Silica dust from breaking concrete and masonry is the primary health hazard during hand demolition.</li>
+      <li>Hand-arm vibration from breakers and drills causes HAVS with prolonged and repeated exposure.</li>
+      <li>Falling debris from overhead hand demolition strikes workers below if exclusion zones are not maintained.</li>
+      <li>Structural stability must be assessed before removing any load-bearing element by hand methods.</li>
+      <li>Hidden services including electrical cables, gas pipes, and water mains may be embedded in walls and floors.</li>
+      <li>Noise levels from breakers and percussion tools in enclosed spaces regularly exceed safe exposure limits.</li>
+      <li>Manual handling of rubble and debris creates back injuries if mechanical removal is not available.</li>
+      <li>CDM 2015, COSHH 2002, and the Control of Vibration at Work Regulations 2005 all apply.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Silica exposure</td><td>Breaking concrete by hand without dust control exposes workers to silica dust causing silicosis and lung cancer.</td></tr>
+    <tr><td class="reason">Structural collapse</td><td>Removing load-bearing elements by hand without structural assessment causes sudden collapse onto the demolition team.</td></tr>
+    <tr><td class="reason">Vibration injury</td><td>Extended breaker use causes permanent hand-arm vibration syndrome that ends construction careers.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use water suppression or extraction to control dust during all breaking work.</li>
+          <li>Assess structural stability before removing any load-bearing element by hand.</li>
+          <li>Scan walls and floors for hidden services before starting demolition in each area.</li>
+          <li>Limit breaker use time to stay below daily vibration exposure action values.</li>
+          <li>Establish exclusion zones below overhead hand demolition work areas.</li>
+          <li>Wear RPE, hearing protection, eye protection, and safety boots at all times.</li>
+          <li>Remove rubble regularly using mechanical means to prevent manual handling overload.</li>
+          <li>Follow the demolition method statement sequence for each area of work.</li>
+          <li>Rotate tasks between operatives to reduce individual vibration exposure.</li>
+          <li>Inspect tools and equipment before each shift for damage and wear.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T break concrete or masonry without dust suppression or extraction running.</li>
+          <li>DON'T remove load-bearing walls, beams, or columns without structural assessment.</li>
+          <li>DON'T exceed the daily vibration exposure limit for breaker and drill operations.</li>
+          <li>DON'T work below overhead demolition without exclusion zones and debris netting.</li>
+          <li>DON'T demolish walls without scanning for hidden electrical cables and pipes.</li>
+          <li>DON'T remove RPE or hearing protection while demolition dust and noise are present.</li>
+          <li>DON'T shovel and carry heavy rubble manually when mechanical removal is available.</li>
+          <li>DON'T deviate from the approved demolition method statement sequence.</li>
+          <li>DON'T use worn chisel points; they increase vibration without improving performance.</li>
+          <li>DON'T ignore tingling or numbness in hands; report HAVS symptoms immediately.</li>
+        </ul>
+        <p class="see-also">See also: Demolition Safety Awareness | Respirable Crystalline Silica (RCS)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

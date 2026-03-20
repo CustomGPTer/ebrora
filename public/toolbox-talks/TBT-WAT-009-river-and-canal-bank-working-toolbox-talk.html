@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>River and Canal Bank Working - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>River and Canal Bank Working</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WAT-009 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>River and canal banks are often soft, slippery, and undercut, making them unstable for workers and plant.</li>
+      <li>Drowning is the primary risk; a worker falling into flowing water may be swept away within seconds.</li>
+      <li>Bank edges can collapse under the weight of workers, materials, or plant positioned too close to the edge.</li>
+      <li>Water levels change with rainfall, tidal influence, and upstream dam or lock operations without warning.</li>
+      <li>Vegetation hides the true bank edge; the solid ground may be further back than it appears.</li>
+      <li>Personal flotation devices must be worn by all workers within 2 metres of the water edge.</li>
+      <li>Rescue equipment including throw lines, lifebuoys, and reaching aids must be positioned along the bank.</li>
+      <li>Plant operating near banks creates vibration that destabilises soft ground and can trigger bank collapse.</li>
+      <li>Cold water shock from falling into UK rivers and canals incapacitates swimmers within minutes.</li>
+      <li>CDM 2015 and HSE guidance require specific risk assessment and controls for work near open water.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent drowning</td><td>Workers falling from unstable or slippery banks into rivers and canals drown every year in the UK construction industry.</td></tr>
+    <tr><td class="reason">Bank collapse</td><td>Soft, undercut banks collapse under load without warning, dropping workers, plant, and materials into the water.</td></tr>
+    <tr><td class="reason">Cold water shock</td><td>Even strong swimmers lose muscle control within minutes of entering cold UK waterways, preventing self-rescue.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear a personal flotation device within 2 metres of the water edge.</li>
+          <li>Assess bank stability before positioning workers or plant near the edge.</li>
+          <li>Position rescue equipment including throw lines at regular intervals along the bank.</li>
+          <li>Keep plant and heavy materials back from the bank edge at a safe distance.</li>
+          <li>Monitor water levels throughout the shift for unexpected rises or flow changes.</li>
+          <li>Clear vegetation to identify the true bank edge before working near it.</li>
+          <li>Use barriers and edge protection to prevent accidental falls into the water.</li>
+          <li>Brief all workers on the rescue plan and location of rescue equipment.</li>
+          <li>Check upstream conditions including dam releases and lock operations before work.</li>
+          <li>Ensure at least two people are present when working adjacent to water.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T work within 2 metres of a bank edge without a personal flotation device.</li>
+          <li>DON'T position plant or heavy loads on soft ground near the bank edge.</li>
+          <li>DON'T assume the bank is stable because it looks firm on the surface.</li>
+          <li>DON'T work alone near rivers or canals; always have a buddy present.</li>
+          <li>DON'T ignore rising water levels or increasing flow speed during the shift.</li>
+          <li>DON'T jump into water to rescue someone unless you are trained and equipped.</li>
+          <li>DON'T store materials on bank edges where they could fall or roll into the water.</li>
+          <li>DON'T rely on vegetation to indicate where the solid ground ends.</li>
+          <li>DON'T remove barriers or edge protection along the bank during work activities.</li>
+          <li>DON'T underestimate cold water shock risk, even in summer months.</li>
+        </ul>
+        <p class="see-also">See also: Drowning Prevention and Water Safety | Water Rescue Training Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

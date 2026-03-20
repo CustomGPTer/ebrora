@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ground Disturbance Permits - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Ground Disturbance Permits</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PTW-009 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>A ground disturbance permit authorises excavation, drilling, piling, or any activity that breaks the ground surface.</li>
+      <li>The permit confirms that buried service checks, ground condition assessments, and risk controls are in place.</li>
+      <li>All ground disturbance activities require a permit before work begins, regardless of depth or duration.</li>
+      <li>The permit cross-references service plans, CAT scans, trial hole results, and any exclusion zones.</li>
+      <li>A competent person must issue the permit after verifying that all pre-dig checks have been completed.</li>
+      <li>The permit specifies the exact location, depth, method of excavation, and the responsible person.</li>
+      <li>Permits are typically valid for a defined area and period; work outside these limits requires a new permit.</li>
+      <li>The permit must be displayed at the work location so all workers can see it is authorised.</li>
+      <li>HSG47 guidance on avoiding danger from underground services underpins the ground disturbance permit system.</li>
+      <li>Ground disturbance permits are a contractual requirement on most major construction and infrastructure projects.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Service strike prevention</td><td>Ground disturbance without proper checks causes gas explosions, electrocutions, and water main bursts every year.</td></tr>
+    <tr><td class="reason">Systematic check</td><td>The permit ensures that every pre-dig check is completed before the ground is broken, preventing dangerous omissions.</td></tr>
+    <tr><td class="reason">Accountability</td><td>The permit system creates clear accountability for who authorised the dig and what checks were completed.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Obtain a signed ground disturbance permit before any digging or drilling starts.</li>
+          <li>Complete all pre-dig checks including service plans and CAT scans before issue.</li>
+          <li>Display the permit at the work location for all operatives to see.</li>
+          <li>Specify the exact area, depth, and excavation method on the permit.</li>
+          <li>Hand back the permit at the end of the work period or when the task changes.</li>
+          <li>Re-issue the permit if the work area, depth, or method changes from the original.</li>
+          <li>Brief the excavation team on the buried services identified on the permit.</li>
+          <li>Mark buried service positions on the ground before the permit is issued.</li>
+          <li>Retain completed permits as part of the project safety documentation.</li>
+          <li>Stop work and re-assess if unexpected services or ground conditions are found.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T break ground without a valid, signed ground disturbance permit in place.</li>
+          <li>DON'T issue a permit without confirming all pre-dig checks are completed.</li>
+          <li>DON'T extend the work area beyond the limits specified on the permit.</li>
+          <li>DON'T excavate deeper than the depth authorised on the ground disturbance permit.</li>
+          <li>DON'T skip the CAT and Genny scan because service plans show nothing nearby.</li>
+          <li>DON'T allow the permit to carry over to a different area or task.</li>
+          <li>DON'T start digging based on a verbal instruction without the signed permit.</li>
+          <li>DON'T ignore unexpected services or conditions; stop and re-assess the permit.</li>
+          <li>DON'T remove the permit from display while the ground disturbance is active.</li>
+          <li>DON'T delegate permit issuing to someone not authorised as a competent person.</li>
+        </ul>
+        <p class="see-also">See also: Permit to Work Awareness | Safe Digging Practices (HSG47)</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

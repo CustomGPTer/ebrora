@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resin Floor Application - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Resin Floor Application</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-INT-009 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Resin flooring systems include epoxy, polyurethane, and MMA-based products applied as liquid coatings or screeds.</li>
+      <li>These products contain chemical hardeners, solvents, and sensitisers that require COSHH assessment and controls.</li>
+      <li>Epoxy resin components cause allergic contact dermatitis that becomes permanent after sensitisation occurs.</li>
+      <li>Solvent-based and MMA resin systems produce flammable vapours requiring DSEAR assessment and ventilation.</li>
+      <li>Strong odours from resin flooring can cause headaches, nausea, and respiratory irritation in poorly ventilated areas.</li>
+      <li>Mixing two-component systems generates an exothermic reaction; incorrect ratios cause product failure and increased fume.</li>
+      <li>Floor preparation using grinding, shot blasting, or acid etching generates dust and chemical exposure risks.</li>
+      <li>COSHH 2002, DSEAR 2002, and the PPE at Work Regulations 2022 all apply to resin flooring operations.</li>
+      <li>Adequate ventilation must be maintained during application and until the resin has fully cured.</li>
+      <li>Adjacent trades must be excluded from the area during application due to fume and contamination risks.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Sensitisation</td><td>Epoxy hardeners cause permanent allergic dermatitis. Once sensitised, even trace contact triggers severe skin reactions for life.</td></tr>
+    <tr><td class="reason">Fire and explosion</td><td>Solvent and MMA resin vapours are highly flammable. Ignition sources in poorly ventilated areas cause flash fires.</td></tr>
+    <tr><td class="reason">Fume exposure</td><td>Inhaling resin fumes without adequate ventilation causes respiratory irritation, headaches, and long-term lung damage.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Read the safety data sheet for every resin component before mixing or applying.</li>
+          <li>Wear chemical-resistant gloves, coveralls, and eye protection during all application.</li>
+          <li>Provide forced ventilation during application and maintain it until the resin cures.</li>
+          <li>Mix two-component systems at the exact ratio specified by the manufacturer.</li>
+          <li>Eliminate all ignition sources from the work area during solvent-based application.</li>
+          <li>Exclude other trades from the resin application area until curing is complete.</li>
+          <li>Use dust extraction during floor preparation by grinding or shot blasting.</li>
+          <li>Attend health surveillance for dermatitis if you regularly work with resin products.</li>
+          <li>Store resin components in designated chemical storage away from heat sources.</li>
+          <li>Dispose of mixing containers and waste resin through approved waste procedures.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T handle epoxy resin hardeners without chemical-resistant gloves at all times.</li>
+          <li>DON'T apply solvent-based or MMA resins without forced ventilation running.</li>
+          <li>DON'T use ignition sources including grinders and heaters in the application area.</li>
+          <li>DON'T deviate from the manufacturer mixing ratio for two-component systems.</li>
+          <li>DON'T allow other trades into the area until the resin has fully cured.</li>
+          <li>DON'T ignore skin redness, itching, or rash after handling resin products.</li>
+          <li>DON'T eat, drink, or smoke in areas where resin products are being used.</li>
+          <li>DON'T pour waste resin or solvents down drains or into general waste skips.</li>
+          <li>DON'T apply resin to damp or contaminated substrates; it causes product failure.</li>
+          <li>DON'T rely on general ventilation alone; forced mechanical extraction is required.</li>
+        </ul>
+        <p class="see-also">See also: Epoxy Resin and Adhesives | Skin Protection and Dermatitis</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

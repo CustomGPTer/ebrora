@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COSS (Controller of Site Safety) Role - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>COSS (Controller of Site Safety) Role</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-RAI-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>The COSS is the person responsible for implementing the safe system of work on or near the railway.</li>
+      <li>They control the safety of a worksite, ensuring all workers are protected from train movements.</li>
+      <li>A COSS must hold a valid PTS card and the COSS competency, verified through the Sentinel system.</li>
+      <li>The COSS briefs all workers before they go on or near the line, covering the safe system in use.</li>
+      <li>Safe systems include lookout warning, separated protection, possession, and line blockage arrangements.</li>
+      <li>The COSS must establish the limits of the worksite and ensure everyone remains within the safe zone.</li>
+      <li>They are responsible for warning workers and ensuring everyone moves to a position of safety when required.</li>
+      <li>A COSS cannot also act as a lookout; these must be separate people with separate duties.</li>
+      <li>Before work begins, the COSS must confirm the safe system is in place and brief all personnel.</li>
+      <li>Network Rail standards and the Rule Book govern all COSS duties and responsibilities on the railway.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent train strikes</td><td>Workers struck by trains on the railway suffer fatal injuries. The COSS is the front line of defence against this risk.</td></tr>
+    <tr><td class="reason">Legal and regulatory</td><td>Network Rail standards mandate that a competent COSS controls every worksite on or near the running line.</td></tr>
+    <tr><td class="reason">Clear accountability</td><td>The COSS role ensures one named person is accountable for the safety of every worker at the site.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Confirm your COSS competency and Sentinel card are valid before each shift.</li>
+          <li>Brief every worker on the safe system of work before going on track.</li>
+          <li>Establish and clearly mark the limits of the safe zone before work starts.</li>
+          <li>Maintain awareness of train movements and approach times at all times.</li>
+          <li>Ensure a separate lookout is appointed where lookout warning is the safe system.</li>
+          <li>Conduct a site-specific risk assessment before implementing the safe system.</li>
+          <li>Account for every person entering and leaving the worksite throughout the shift.</li>
+          <li>Give clear, timely warnings so all workers reach safety before a train passes.</li>
+          <li>Stop work immediately if the safe system is compromised for any reason.</li>
+          <li>Record the safe system details and briefing attendance for each work period.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T act as both COSS and lookout simultaneously; these are separate roles.</li>
+          <li>DON'T allow anyone on or near the track without a valid PTS card.</li>
+          <li>DON'T permit work to start until the safe system briefing is complete.</li>
+          <li>DON'T exceed the agreed worksite limits defined in the safe system.</li>
+          <li>DON'T allow distractions to compromise your awareness of train movements.</li>
+          <li>DON'T continue work if the safe system of work has been breached.</li>
+          <li>DON'T assume the line is blocked without confirmation from the signaller.</li>
+          <li>DON'T leave the worksite without ensuring all personnel are accounted for.</li>
+          <li>DON'T let workers return to the track after a warning until it is safe.</li>
+          <li>DON'T take on more workers than you can safely control and warn.</li>
+        </ul>
+        <p class="see-also">See also: Rail Safety Awareness | Safe System of Work on Track</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

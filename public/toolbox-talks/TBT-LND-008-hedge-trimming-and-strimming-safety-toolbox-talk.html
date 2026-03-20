@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hedge Trimming and Strimming Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Hedge Trimming and Strimming Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-LND-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Hedge trimmers and strimmers are widely used on construction sites for vegetation clearance and landscaping.</li>
+      <li>These tools project debris including stones, glass, and wood fragments at high speed over several metres.</li>
+      <li>Contact with the cutting head causes severe lacerations and amputations of fingers and hands.</li>
+      <li>Strimmers create high noise levels typically exceeding 95 dB, requiring hearing protection for operators.</li>
+      <li>Vibration from prolonged strimmer and hedge trimmer use contributes to hand-arm vibration syndrome.</li>
+      <li>Nesting birds are protected under the Wildlife and Countryside Act 1981; cutting seasons are restricted.</li>
+      <li>Hidden hazards in hedgerows include fencing wire, bottles, cans, and buried cables close to the surface.</li>
+      <li>Fatigue from operating heavy machinery at arm height or overhead increases injury risk significantly.</li>
+      <li>PUWER 1998 requires that equipment is suitable, maintained, and used by trained competent operators.</li>
+      <li>Refuelling petrol-powered tools requires the engine to be stopped and cooled to prevent ignition.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent lacerations</td><td>Contact with exposed cutting blades and heads causes deep lacerations and finger amputations that are life-changing injuries.</td></tr>
+    <tr><td class="reason">Projectile debris</td><td>Stones and debris thrown by strimmers cause serious eye injuries, facial cuts, and injuries to bystanders nearby.</td></tr>
+    <tr><td class="reason">Wildlife law</td><td>Destroying bird nests during the breeding season is a criminal offence under the Wildlife and Countryside Act 1981.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear a visor, ear defenders, gloves, and leg protection during all operations.</li>
+          <li>Check the work area for hidden debris, wire, and cables before starting.</li>
+          <li>Maintain a safe exclusion zone around the operator to protect bystanders.</li>
+          <li>Check for nesting birds before cutting hedges between March and August.</li>
+          <li>Use anti-vibration gloves and limit daily use to stay below exposure limits.</li>
+          <li>Ensure the blade guard and safety features are intact before starting work.</li>
+          <li>Stop the engine and let equipment cool before refuelling with petrol.</li>
+          <li>Take regular rest breaks to manage fatigue from sustained overhead work.</li>
+          <li>Inspect cutting heads, blades, and line spools for damage before each use.</li>
+          <li>Store fuel in approved containers away from the cutting area.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T operate trimmers or strimmers without a full face visor in place.</li>
+          <li>DON'T allow bystanders within the debris throw zone during cutting operations.</li>
+          <li>DON'T cut hedgerows during nesting season without a prior ecology check.</li>
+          <li>DON'T refuel while the engine is running or still hot from use.</li>
+          <li>DON'T remove blade guards or safety devices from trimming equipment.</li>
+          <li>DON'T strim near windows, vehicles, or pedestrians without debris shielding.</li>
+          <li>DON'T use damaged cutting line or blades; replace them before starting work.</li>
+          <li>DON'T operate hedge trimmers above shoulder height without a safe platform.</li>
+          <li>DON'T ignore vibration symptoms; report tingling or numbness in your hands.</li>
+          <li>DON'T leave running equipment unattended, even briefly during refuelling breaks.</li>
+        </ul>
+        <p class="see-also">See also: Landscaping Safety Awareness | Chainsaw Operations Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

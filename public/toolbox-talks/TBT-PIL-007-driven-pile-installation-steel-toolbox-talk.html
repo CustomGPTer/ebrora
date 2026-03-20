@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Driven Pile Installation (Steel) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Driven Pile Installation (Steel)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PIL-007 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Steel driven piles are hammered into the ground using impact or vibratory hammers mounted on piling rigs.</li>
+      <li>Pile types include H-piles, tubular steel piles, and steel box piles for various load conditions.</li>
+      <li>The piling rig must be set up on a level, stable platform designed to support its full working load.</li>
+      <li>Noise levels during impact driving regularly exceed 100 dB, requiring hearing protection zones.</li>
+      <li>Vibration from driven piles can damage nearby structures and underground services.</li>
+      <li>Steel piles are heavy — a typical 12m H-pile weighs over one tonne and requires crane handling.</li>
+      <li>The piling rig hammer contains stored energy and must never be worked on while raised.</li>
+      <li>Flying debris from the pile head can cause serious injury; exclusion zones are essential.</li>
+      <li>Pre-condition surveys of adjacent buildings should be completed before driving begins.</li>
+      <li>PUWER 1998 and LOLER 1998 both apply to piling rig operations and lifting of piles.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent crush injuries</td><td>Steel piles and piling rigs involve massive forces and heavy loads. Contact with moving parts or falling piles causes fatal crush injuries.</td></tr>
+    <tr><td class="reason">Noise and vibration harm</td><td>Prolonged exposure to impact driving causes permanent hearing loss and hand-arm vibration syndrome in operatives.</td></tr>
+    <tr><td class="reason">Protect nearby structures</td><td>Ground vibrations from driven piles can crack walls, fracture services, and destabilise adjacent foundations if not controlled.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>Piling operations must comply with PUWER, LOLER, CDM 2015, and the Control of Noise at Work Regulations 2005.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Ensure the piling platform is designed, approved, and level before rig setup.</li>
+          <li>Establish exclusion zones around the rig and enforce them with barriers.</li>
+          <li>Wear hearing protection within the designated noise zone at all times.</li>
+          <li>Use a planned lifting method for handling and pitching each steel pile.</li>
+          <li>Complete pre-condition surveys on adjacent buildings before driving starts.</li>
+          <li>Check underground service locations before driving any pile position.</li>
+          <li>Monitor vibration levels at nearby structures throughout the driving works.</li>
+          <li>Inspect the piling rig and hammer daily before starting operations.</li>
+          <li>Follow the pile driving sequence set out in the method statement.</li>
+          <li>Keep clear of the pile head during driving due to flying debris risk.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T set up a piling rig on ground that has not been formally approved.</li>
+          <li>DON'T enter the exclusion zone while the hammer is raised or operating.</li>
+          <li>DON'T stand under a pile being lifted, pitched, or guided into position.</li>
+          <li>DON'T operate the rig without confirmed underground service clearance.</li>
+          <li>DON'T ignore vibration monitoring alarms or exceed agreed trigger levels.</li>
+          <li>DON'T remove hearing protection inside the designated noise zone.</li>
+          <li>DON'T attempt to free a stuck pile without an approved recovery method.</li>
+          <li>DON'T carry out maintenance on the hammer while it is in the raised position.</li>
+          <li>DON'T allow untrained personnel to operate or signal to the piling rig.</li>
+          <li>DON'T continue driving if the rig shows signs of instability or settlement.</li>
+        </ul>
+        <p class="see-also">See also: Piling Safety Awareness | Piling Platform Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

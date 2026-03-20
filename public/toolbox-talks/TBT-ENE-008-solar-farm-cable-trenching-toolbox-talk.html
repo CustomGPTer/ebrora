@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar Farm Cable Trenching - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Solar Farm Cable Trenching</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ENE-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Solar farm cable trenching installs DC and AC cabling between panel arrays, inverters, and the grid connection.</li>
+      <li>Trenches are typically 600mm to 1200mm deep and may extend over several kilometres across the site.</li>
+      <li>DC cables from solar arrays carry live voltage during daylight and cannot be fully de-energised.</li>
+      <li>Multiple cable circuits may share the same trench, requiring careful separation and identification.</li>
+      <li>Agricultural land used for solar farms may contain field drains, water pipes, and unrecorded services.</li>
+      <li>Trenching in clay soils creates collapse risk; deeper trenches require battering or temporary support.</li>
+      <li>Cable laying involves repetitive manual handling of heavy cable drums and pulling equipment.</li>
+      <li>Warning tape, marker boards, and sand surround must be installed to protect buried cables from future damage.</li>
+      <li>The Electricity at Work Regulations 1989 apply to all cable installation and connection activities.</li>
+      <li>Backfilling must follow the cable manufacturer specification for bedding material and compaction layers.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Electrocution risk</td><td>DC cables from solar panels are live in daylight. Contact with damaged or exposed conductors causes fatal electrocution.</td></tr>
+    <tr><td class="reason">Trench collapse</td><td>Long, continuous trenches across open ground collapse without warning, burying workers in unsupported sections.</td></tr>
+    <tr><td class="reason">Future cable strikes</td><td>Without proper marking and protection, buried cables will be struck by future agricultural or construction excavations.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Scan for existing services before trenching across any part of the solar farm.</li>
+          <li>Support or batter trench sides where depth exceeds 1.2 metres in any soil.</li>
+          <li>Treat all DC cables as live during daylight hours and use DC-rated tools.</li>
+          <li>Install warning tape and marker boards above all buried cable routes.</li>
+          <li>Use correct cable bedding material and compaction as specified by the manufacturer.</li>
+          <li>Separate DC and AC circuits within shared trenches according to the design.</li>
+          <li>Provide safe access and egress points at regular intervals along long trenches.</li>
+          <li>Use mechanical handling for heavy cable drums to reduce manual handling injuries.</li>
+          <li>Test all cable circuits for insulation resistance before backfilling the trench.</li>
+          <li>Record as-built cable positions accurately for the operations and maintenance manual.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T assume agricultural land is free from buried services or field drains.</li>
+          <li>DON'T enter unsupported trenches deeper than 1.2 metres in any soil type.</li>
+          <li>DON'T handle or cut DC solar cables without treating them as live.</li>
+          <li>DON'T backfill over cables without installing warning tape and marker boards.</li>
+          <li>DON'T mix DC and AC cables in the same trench without designed separation.</li>
+          <li>DON'T compact backfill directly onto cables without the specified bedding layer.</li>
+          <li>DON'T leave long trench sections open unattended without barriers and signage.</li>
+          <li>DON'T pull cables with excessive force that exceeds the manufacturer bend radius.</li>
+          <li>DON'T skip insulation resistance testing before burying newly installed cables.</li>
+          <li>DON'T deviate from the designed cable route without engineering approval.</li>
+        </ul>
+        <p class="see-also">See also: DC Electrical Safety (Solar) | Ground Mounted Solar Farm Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

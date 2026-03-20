@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandblasting and Abrasive Blasting - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sandblasting and Abrasive Blasting</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-DUS-009 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Abrasive blasting uses compressed air to propel grit, shot, or other media against surfaces to clean or profile them.</li>
+      <li>Silica sand must never be used as a blasting medium because it generates lethal respirable crystalline silica dust.</li>
+      <li>Alternative media include aluminium oxide, garnet, steel shot, glass bead, and crusite slag.</li>
+      <li>Dust clouds from blasting spread over large distances and affect workers, the public, and neighbouring properties.</li>
+      <li>Noise levels during blasting regularly exceed 110 dB, requiring double hearing protection for operators.</li>
+      <li>The blast operator must wear an air-fed helmet with full respiratory, eye, and head protection.</li>
+      <li>Ricochet from blasting media can cause severe eye injuries and skin lacerations to bystanders.</li>
+      <li>Blasting spent media may contain lead, chromium, or other contaminants from the surface being cleaned.</li>
+      <li>COSHH 2002, the Control of Noise at Work Regulations 2005, and PUWER 1998 all apply to blasting operations.</li>
+      <li>Containment using blast enclosures, sheeting, or vacuum recovery reduces dust and media escape.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Silicosis and cancer</td><td>Inhaling dust from abrasive blasting causes silicosis, lung cancer, and COPD. Silica sand blasting is prohibited for this reason.</td></tr>
+    <tr><td class="reason">Noise damage</td><td>Sustained noise above 110 dB from blasting causes permanent hearing loss even with single hearing protection.</td></tr>
+    <tr><td class="reason">Bystander injury</td><td>Ricocheting blast media and dust clouds injure workers and the public far from the blasting point.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use approved non-silica blasting media such as garnet, aluminium oxide, or steel shot.</li>
+          <li>Wear an air-fed blasting helmet providing full respiratory and face protection.</li>
+          <li>Use double hearing protection: ear plugs inside the helmet plus the helmet itself.</li>
+          <li>Enclose the blasting area with sheeting or blast enclosures to contain dust.</li>
+          <li>Establish exclusion zones around the blasting operation with warning signs and barriers.</li>
+          <li>Monitor air quality in adjacent areas to confirm dust is not affecting others.</li>
+          <li>Collect and dispose of spent blasting media as controlled waste if contaminated.</li>
+          <li>Inspect blast hoses, nozzles, and couplings before each use for wear and damage.</li>
+          <li>Use a deadman handle on the blast nozzle so it shuts off if dropped.</li>
+          <li>Brief all nearby workers on the blasting schedule, exclusion zones, and hazards.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T use silica sand as a blasting medium under any circumstances.</li>
+          <li>DON'T blast without an air-fed helmet and full protective equipment in place.</li>
+          <li>DON'T allow bystanders within the exclusion zone during blasting operations.</li>
+          <li>DON'T operate without containment in areas where dust will affect others.</li>
+          <li>DON'T reuse spent media without checking for lead or chromium contamination.</li>
+          <li>DON'T disconnect the deadman handle from the blast nozzle control system.</li>
+          <li>DON'T blast in high winds that carry dust beyond the containment boundary.</li>
+          <li>DON'T use damaged or worn blast hoses; they can rupture under pressure.</li>
+          <li>DON'T ignore noise exposure; wear double hearing protection at all times.</li>
+          <li>DON'T point the blast nozzle at anyone, even when the system is shut down.</li>
+        </ul>
+        <p class="see-also">See also: Respirable Crystalline Silica (RCS) | RPE Selection and Face Fit Testing</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

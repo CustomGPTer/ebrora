@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bearing Installation and Removal - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Bearing Installation and Removal</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-MEC-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Bearings are precision components that support rotating shafts in pumps, motors, gearboxes, and conveyors.</li>
+      <li>Incorrect installation is the leading cause of premature bearing failure, causing unplanned shutdowns.</li>
+      <li>Bearing installation methods include press fitting, heating, hydraulic injection, and shrink fitting techniques.</li>
+      <li>Induction heaters safely expand bearings for interference-fit installation onto shafts without flame damage.</li>
+      <li>Bearing pullers and hydraulic extraction tools are required for safe removal without damaging the shaft.</li>
+      <li>Contamination from dirt, moisture, and metal particles during installation drastically shortens bearing life.</li>
+      <li>Applying force to the wrong bearing ring during installation damages the rolling elements and raceways.</li>
+      <li>Heavy bearings on large industrial equipment require lifting aids and careful alignment during fitting.</li>
+      <li>PUWER 1998 requires that maintenance work including bearing replacement follows safe systems of work.</li>
+      <li>Electrical and mechanical isolation must be confirmed before starting any bearing replacement task.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Equipment reliability</td><td>Poorly installed bearings fail prematurely, causing expensive breakdowns, production loss, and emergency maintenance.</td></tr>
+    <tr><td class="reason">Injury prevention</td><td>Bearing removal with improvised tools causes hand injuries, burns from seized components, and crush risks.</td></tr>
+    <tr><td class="reason">Contamination damage</td><td>A single particle of grit in a bearing causes surface pitting that leads to accelerated wear and failure.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Clean the shaft, housing, and new bearing thoroughly before installation.</li>
+          <li>Use an induction heater to expand bearings for interference-fit installation safely.</li>
+          <li>Apply installation force to the correct ring matching the interference fit.</li>
+          <li>Use bearing pullers or hydraulic tools for removal; never use hammers directly.</li>
+          <li>Confirm electrical and mechanical isolation before starting any bearing work.</li>
+          <li>Wear clean gloves to prevent contamination when handling new bearings.</li>
+          <li>Follow the manufacturer torque and clearance specifications during installation.</li>
+          <li>Use lifting aids for heavy bearings to prevent manual handling injuries.</li>
+          <li>Record bearing type, installation date, and alignment readings for maintenance records.</li>
+          <li>Dispose of old bearings and packaging to prevent contamination of the work area.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T hammer bearings directly onto shafts; this damages rolling elements instantly.</li>
+          <li>DON'T apply force through the wrong ring during press-fit installation.</li>
+          <li>DON'T use oxy-acetylene torches to heat bearings for installation; use induction heaters.</li>
+          <li>DON'T remove bearings with chisels, screwdrivers, or improvised pry bars.</li>
+          <li>DON'T handle new bearings with dirty or greasy hands without clean gloves.</li>
+          <li>DON'T reuse bearings that have been removed unless inspected and approved.</li>
+          <li>DON'T leave bearing packaging open where dirt and moisture can contaminate them.</li>
+          <li>DON'T work on rotating equipment without confirming LOTO isolation is in place.</li>
+          <li>DON'T force a misaligned bearing; check the shaft and housing for damage first.</li>
+          <li>DON'T skip lubrication steps specified by the bearing manufacturer during installation.</li>
+        </ul>
+        <p class="see-also">See also: MEICA Safety Awareness | Pump Installation and Alignment</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
