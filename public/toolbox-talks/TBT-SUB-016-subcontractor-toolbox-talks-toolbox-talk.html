@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subcontractor Toolbox Talks - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Subcontractor Toolbox Talks</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SUB-016 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Subcontractors are required to deliver toolbox talks to their own workforce on relevant site-specific hazards.</li>
+      <li>The principal contractor must coordinate toolbox talk topics to ensure all key hazards are covered across trades.</li>
+      <li>CDM 2015 requires the principal contractor to ensure effective communication of safety information to all workers.</li>
+      <li>Subcontractor toolbox talks should supplement, not replace, the principal contractor&#x27;s site-wide briefings.</li>
+      <li>Topics should be relevant to the subcontractor&#x27;s specific scope, such as trade-specific hazards and task risks.</li>
+      <li>Attendance records must be maintained by the subcontractor and made available for audit by the principal contractor.</li>
+      <li>Toolbox talks must be delivered in a language understood by the workforce, using translators if necessary.</li>
+      <li>Quality of delivery matters — reading a sheet without engagement does not achieve meaningful safety communication.</li>
+      <li>The principal contractor may provide standard toolbox talk materials for subcontractors to use and adapt.</li>
+      <li>Regular auditing of subcontractor toolbox talk delivery confirms compliance and identifies areas for improvement.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Legal duty</td><td>CDM 2015 requires safety information to reach every worker — subcontractor toolbox talks are a key mechanism.</td></tr>
+    <tr><td class="reason">Trade-specific hazards</td><td>Generic site talks do not cover trade-specific risks — subcontractors must address hazards unique to their scope.</td></tr>
+    <tr><td class="reason">Consistent standards</td><td>Coordinated toolbox talks across all subcontractors ensure consistent safety messaging and reduce communication gaps.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Deliver toolbox talks to your workforce at least weekly on relevant site and task hazards</li>
+          <li>Coordinate talk topics with the principal contractor to avoid duplication and fill gaps</li>
+          <li>Record attendance for every toolbox talk and retain records for audit and inspection</li>
+          <li>Deliver talks in the language understood by your workforce, using translators where needed</li>
+          <li>Use site-specific examples and recent near misses to make the talk relevant and engaging</li>
+          <li>Encourage questions and discussion to confirm the workforce understands the key messages</li>
+          <li>Adapt materials provided by the principal contractor to your specific trade activities</li>
+          <li>Include seasonal, weather, and task-specific topics as conditions change through the project</li>
+          <li>Follow up on actions or concerns raised during the toolbox talk before the next session</li>
+          <li>Submit attendance records and talk topics to the principal contractor as required</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T skip toolbox talks because of time pressure or programme demands on the project</li>
+          <li>DON&#x27;T deliver talks in English only when your workforce includes non-English speakers</li>
+          <li>DON&#x27;T read the toolbox talk sheet without engagement — make eye contact and involve the team</li>
+          <li>DON&#x27;T rely solely on the principal contractor&#x27;s site-wide briefings for your trade&#x27;s hazards</li>
+          <li>DON&#x27;T forge attendance records — this is a serious breach of trust and compliance duty</li>
+          <li>DON&#x27;T repeat the same talk every week — vary topics to cover the range of relevant hazards</li>
+          <li>DON&#x27;T deliver talks in noisy areas where workers cannot hear the safety messages clearly</li>
+          <li>DON&#x27;T dismiss questions or concerns raised by workers during the toolbox talk discussion</li>
+          <li>DON&#x27;T treat toolbox talks as a paperwork exercise — they exist to prevent injuries and deaths</li>
+          <li>DON&#x27;T ignore the principal contractor&#x27;s coordinated topic schedule for the project</li>
+        </ul>
+        <p class="see-also">See also: Toolbox Talk Engagement Techniques | Supply Chain Safety Communication</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUDS Installation Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SUDS Installation Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-GRW-024 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Sustainable Drainage Systems (SUDS) manage surface water using swales, permeable paving, ponds, and attenuation features.</li>
+      <li>SUDS installation involves excavation, liner placement, aggregate filling, pipe laying, and landscaping work.</li>
+      <li>Excavations for attenuation tanks, swales, and ponds create trench collapse and fall hazards during construction.</li>
+      <li>Ponds and basins designed to hold water become drowning hazards during and after construction.</li>
+      <li>Permeable paving systems require handling heavy concrete blocks and sub-base aggregate materials.</li>
+      <li>Geomembrane and liner installation involves working in excavations with slippery surfaces and restricted access.</li>
+      <li>Some SUDS components are installed beneath car parks and roads, involving traffic management during construction.</li>
+      <li>Geocellular storage crates used for underground attenuation are supplied in large units requiring mechanical handling.</li>
+      <li>Connection to existing drainage networks may require working near live sewers and buried services.</li>
+      <li>CIRIA guidance (C753 — The SUDS Manual) sets the design and construction standards for SUDS in the UK.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Excavation hazards</td><td>SUDS features require extensive excavation creating collapse, fall, and buried service strike risks.</td></tr>
+    <tr><td class="reason">Drowning risk</td><td>Ponds, basins, and attenuation features fill with water, creating drowning hazards during and after construction.</td></tr>
+    <tr><td class="reason">Manual handling</td><td>Heavy paving blocks, aggregate, and geocellular crates cause musculoskeletal injuries without mechanical aids.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Support or batter all excavations for SUDS features to prevent trench and pit collapse</li>
+          <li>Fence or barrier open ponds and basins during construction to prevent falls into water</li>
+          <li>Use mechanical handling for geocellular crates, paving blocks, and heavy aggregate deliveries</li>
+          <li>Locate and mark all buried services along SUDS installation routes before excavation begins</li>
+          <li>Wear slip-resistant footwear when working on geomembrane liners in excavations</li>
+          <li>Ensure safe access and egress from excavations for ponds, swales, and attenuation tanks</li>
+          <li>Install edge protection around open water features until permanent fencing is in place</li>
+          <li>Carry out a manual handling assessment for repetitive block laying and aggregate spreading</li>
+          <li>Connect to live drainage networks under a permit with appropriate isolation and support</li>
+          <li>Brief all workers on the drowning risk once any SUDS feature begins to retain water</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T enter unsupported excavations for swales, ponds, or attenuation tank construction</li>
+          <li>DON&#x27;T leave open water features unbarriered where workers or the public could fall in</li>
+          <li>DON&#x27;T manually handle heavy geocellular crates without mechanical lifting equipment</li>
+          <li>DON&#x27;T excavate for SUDS features without locating buried services along the route first</li>
+          <li>DON&#x27;T walk on geomembrane liners without slip-resistant footwear — they are extremely slippery</li>
+          <li>DON&#x27;T connect to live sewers without a permit and confirmed isolation of the connection point</li>
+          <li>DON&#x27;T allow children or the public near SUDS construction areas containing open water</li>
+          <li>DON&#x27;T backfill over permeable paving sub-base without compaction testing where specified</li>
+          <li>DON&#x27;T stack paving blocks too high on pallets where they could topple onto workers</li>
+          <li>DON&#x27;T ignore drowning risk at shallow ponds — even small depths are dangerous</li>
+        </ul>
+        <p class="see-also">See also: Below Ground Drainage Installation | Attenuation Tank Installation</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

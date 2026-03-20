@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wind Farm Cable Route Installation - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Wind Farm Cable Route Installation</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ENE-015 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Wind farm cable routes carry power from individual turbines to the substation via buried HV cable circuits.</li>
+      <li>Cable routes can extend several kilometres across agricultural land, roads, and watercourse crossings.</li>
+      <li>Trenching for cable installation creates significant excavation hazards including trench collapse and service strikes.</li>
+      <li>HV cables (typically 33kV or 66kV) must be handled, laid, and jointed by qualified HV cable engineers.</li>
+      <li>Cable drums are extremely heavy — safe lifting, transport, and drum handling procedures are essential.</li>
+      <li>Route crossings beneath roads, railways, and rivers often require directional drilling or thrust boring.</li>
+      <li>Buried services along the cable route must be identified and located before any excavation begins.</li>
+      <li>Environmental constraints including protected habitats, watercourses, and archaeological finds affect route construction.</li>
+      <li>Cable jointing involves working in excavations with heat sources, requiring confined space and hot works controls.</li>
+      <li>Reinstatement of agricultural land, roads, and field drainage must be completed to the required standard.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent electrocution</td><td>HV cables carry lethal voltages — incorrect handling or working near energised circuits causes fatal electrocution.</td></tr>
+    <tr><td class="reason">Excavation safety</td><td>Long trench runs across open land create collapse, service strike, and vehicle interaction hazards.</td></tr>
+    <tr><td class="reason">Environmental protection</td><td>Cable routes cross sensitive habitats and watercourses requiring strict environmental controls throughout.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>CDM 2015, Electricity at Work Regulations, and environmental permits impose duties on cable route construction.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Locate and mark all buried services along the cable route before excavation begins</li>
+          <li>Use trench support or battered excavations to prevent collapse on all cable trenches</li>
+          <li>Ensure only qualified HV cable engineers handle, lay, and joint high voltage cables</li>
+          <li>Use planned lifting operations for cable drum handling with certified lifting equipment</li>
+          <li>Obtain all required environmental permits and consents before starting route construction</li>
+          <li>Brief all operatives on the emergency procedure for cable damage or service strikes</li>
+          <li>Maintain separation between the cable trench and adjacent vehicle traffic with barriers</li>
+          <li>Protect watercourse crossings with silt control measures during trenching and reinstatement</li>
+          <li>Carry out cable jointing under controlled conditions with hot works permits where needed</li>
+          <li>Reinstate land drainage, field surfaces, and road crossings to the agreed specification</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T excavate the cable route without completing buried service detection and marking</li>
+          <li>DON&#x27;T handle or pull HV cables without proper training and HV cable engineer supervision</li>
+          <li>DON&#x27;T enter unsupported cable trenches deeper than 1.2 metres without shoring in place</li>
+          <li>DON&#x27;T allow vehicles to track along or across open cable trenches without crossing points</li>
+          <li>DON&#x27;T damage field drainage, hedgerows, or watercourse banks without agreed mitigation</li>
+          <li>DON&#x27;T store cable drums on slopes or soft ground where they could roll or sink</li>
+          <li>DON&#x27;T leave cable joints exposed to weather before protective enclosures are completed</li>
+          <li>DON&#x27;T connect or energise cables until all testing and commissioning is signed off</li>
+          <li>DON&#x27;T ignore archaeological finds during trenching — stop work and report immediately</li>
+          <li>DON&#x27;T carry out directional drilling crossings without a designed and approved method statement</li>
+        </ul>
+        <p class="see-also">See also: HV Cable Installation Safety | Wind Turbine Construction Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

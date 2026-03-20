@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demolition Near Live Services - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Demolition Near Live Services</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-DEM-019 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Live services including gas, electricity, water, telecoms, and sewers may run through or adjacent to demolition sites.</li>
+      <li>Striking a live gas main during demolition can cause explosion, fire, and fatalities on the site and beyond.</li>
+      <li>High voltage electricity cables within or beneath demolition structures carry lethal voltages at all times.</li>
+      <li>A full services survey and utility disconnection plan must be completed before any demolition work starts.</li>
+      <li>Not all services can be disconnected before demolition — some must remain live to serve adjacent properties.</li>
+      <li>Services shown on record plans may not match actual positions — verification on site is essential.</li>
+      <li>HSG47 guidance on avoiding underground services applies fully to all demolition excavation and breaking work.</li>
+      <li>Overhead power lines adjacent to demolition sites create electrocution risk from crane jibs and falling structures.</li>
+      <li>Water mains struck during demolition cause flooding, undermining, and loss of supply to surrounding areas.</li>
+      <li>The pre-demolition survey must identify all services and specify isolation, protection, or diversion methods.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent explosion</td><td>Striking a live gas main causes explosion and fire that can kill workers and members of the public nearby.</td></tr>
+    <tr><td class="reason">Electrocution risk</td><td>Contact with live HV cables during demolition is nearly always fatal — identification and isolation are critical.</td></tr>
+    <tr><td class="reason">Service continuity</td><td>Damaging live services to adjacent properties causes supply loss, flooding, and significant public disruption.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a full services survey before demolition and identify all live services on and near the site</li>
+          <li>Arrange disconnection of all services that can be isolated before demolition work begins</li>
+          <li>Mark the positions of all live services that must remain operational during demolition work</li>
+          <li>Use CAT and Genny detection and hand digging to confirm service positions near demolition areas</li>
+          <li>Brief all operatives on the location of live services and the emergency procedures for strikes</li>
+          <li>Maintain safe clearance distances from overhead power lines for all cranes and tall plant</li>
+          <li>Protect live services that cannot be disconnected with physical barriers and marker posts</li>
+          <li>Contact the utility company emergency number immediately if any live service is struck</li>
+          <li>Monitor for gas leaks using portable gas detectors when demolishing near gas infrastructure</li>
+          <li>Include service protection and isolation details in the demolition method statement</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T start demolition without a complete services survey and isolation plan in place</li>
+          <li>DON&#x27;T assume all services have been disconnected without verification on the day of work</li>
+          <li>DON&#x27;T use mechanical breakers near live electricity cables — hand dig within the safe zone</li>
+          <li>DON&#x27;T allow crane jibs or falling debris to encroach on overhead power line clearance zones</li>
+          <li>DON&#x27;T ignore the smell of gas during demolition — evacuate and call the gas emergency number</li>
+          <li>DON&#x27;T demolish structures containing live services without confirming their exact positions</li>
+          <li>DON&#x27;T remove service protection barriers to improve access for demolition plant</li>
+          <li>DON&#x27;T rely solely on record plans for service positions — verify on site with detection equipment</li>
+          <li>DON&#x27;T attempt to repair struck live services yourself — call the utility company immediately</li>
+          <li>DON&#x27;T store demolition materials on or near the marked positions of live buried services</li>
+        </ul>
+        <p class="see-also">See also: Demolition Safety Awareness | Service Strike Emergency Procedure</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

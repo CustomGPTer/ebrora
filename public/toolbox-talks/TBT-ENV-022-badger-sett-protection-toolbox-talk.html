@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Badger Sett Protection - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Badger Sett Protection</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ENV-022 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Badgers and their setts are protected under the Protection of Badgers Act 1992 in the UK.</li>
+      <li>It is a criminal offence to kill, injure, or take a badger, or to interfere with a sett.</li>
+      <li>Interfering with a sett includes blocking entrances, digging near, or causing disturbance from noise or vibration.</li>
+      <li>A sett is any structure or place which a badger uses for living — including disused setts that may be reoccupied.</li>
+      <li>Natural England must issue a licence before any work that may disturb a badger sett can proceed.</li>
+      <li>A typical exclusion zone of 30 metres around active setts is recommended during construction.</li>
+      <li>Badger surveys are usually required before construction begins in rural or semi-rural areas.</li>
+      <li>Badgers are nocturnal — setts may appear inactive during daytime site inspections.</li>
+      <li>Penalties for offences include unlimited fines and up to six months imprisonment per offence.</li>
+      <li>Ecological clerk of works (ECoW) supervision may be required for works near confirmed setts.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Legal protection</td><td>The Protection of Badgers Act 1992 makes it a criminal offence to damage setts or disturb badgers.</td></tr>
+    <tr><td class="reason">Prevent prosecution</td><td>Individuals and companies face unlimited fines and imprisonment for breaching badger protection laws.</td></tr>
+    <tr><td class="reason">Environmental duty</td><td>Protecting badgers and their habitats is a legal and ethical obligation on all UK construction projects.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Commission a badger survey before starting works in rural or edge-of-town locations</li>
+          <li>Establish and clearly mark exclusion zones around all identified badger setts</li>
+          <li>Apply to Natural England for a licence if works will disturb or close a sett</li>
+          <li>Brief all site personnel on the location of setts and the legal protection in place</li>
+          <li>Stop work and contact the ecological advisor if a new sett is discovered during works</li>
+          <li>Use an ecological clerk of works to supervise activities near confirmed setts</li>
+          <li>Avoid night working near setts as badgers are most active after dark</li>
+          <li>Keep heavy plant and vibration-generating activities outside the exclusion zone</li>
+          <li>Maintain fencing around exclusion zones for the full duration of the project</li>
+          <li>Report any evidence of badger activity such as latrines, paths, or fresh digging</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T excavate, drive plant, or store materials within 30 metres of an active sett</li>
+          <li>DON&#x27;T block or obstruct any badger sett entrance with soil, materials, or equipment</li>
+          <li>DON&#x27;T carry out noisy or vibration-heavy work near setts without ecological advice</li>
+          <li>DON&#x27;T assume a sett is abandoned — badgers reoccupy setts seasonally</li>
+          <li>DON&#x27;T proceed with works near setts without a valid Natural England licence</li>
+          <li>DON&#x27;T remove or relocate badger fencing or exclusion zone markers</li>
+          <li>DON&#x27;T use lighting that illuminates sett entrances during night working operations</li>
+          <li>DON&#x27;T ignore newly dug holes or paths on site — they may indicate badger activity</li>
+          <li>DON&#x27;T attempt to handle, trap, or move badgers without specialist licensed assistance</li>
+          <li>DON&#x27;T allow dogs onto site areas where badger setts have been identified</li>
+        </ul>
+        <p class="see-also">See also: Protected Species Awareness | Ecological Clerk of Works Role</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

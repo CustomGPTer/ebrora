@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Crane and Spider Crane - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Mini Crane and Spider Crane</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-MAN-018 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Mini cranes and spider cranes are compact lifting machines used where full-size cranes cannot access.</li>
+      <li>They are commonly used inside buildings, on rooftops, in restricted areas, and on sensitive floor surfaces.</li>
+      <li>Despite their small size, mini cranes can lift loads from 1 to 10 tonnes depending on the model.</li>
+      <li>All mini crane operations are subject to LOLER 1998 and require a lift plan for every lift.</li>
+      <li>Spider cranes have extending legs (outriggers) that must be fully deployed on firm, level ground.</li>
+      <li>Floor loading must be checked before operating a mini crane inside a building or on a suspended slab.</li>
+      <li>The crane must have a current LOLER thorough examination certificate before use on any site.</li>
+      <li>Operators must be trained and competent — CPCS or manufacturer certification is typically required.</li>
+      <li>The small footprint of spider cranes can give a false sense of security regarding stability.</li>
+      <li>Wind loading affects mini cranes significantly due to their lighter weight and shorter boom length.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent overturning</td><td>Mini cranes overturn if outriggers are not deployed correctly or floor loading is exceeded.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>LOLER 1998 requires a lift plan, thorough examination, and competent operator for all lifting operations.</td></tr>
+    <tr><td class="reason">Protect workers</td><td>Loads dropped from mini cranes in confined spaces cause serious crush injuries in areas with limited escape room.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Prepare a lift plan for every mini crane lift, no matter how simple it appears</li>
+          <li>Check the crane has a current LOLER thorough examination certificate before use</li>
+          <li>Verify floor loading capacity before operating a mini crane inside any building</li>
+          <li>Deploy all outriggers fully onto firm, level ground with spreader plates beneath</li>
+          <li>Ensure the operator holds valid CPCS or equivalent certification for the crane type</li>
+          <li>Establish an exclusion zone around the crane and load during all lifting operations</li>
+          <li>Check wind conditions before lifting — mini cranes are more affected than larger machines</li>
+          <li>Use the crane&#x27;s load moment indicator and do not exceed the rated capacity at any radius</li>
+          <li>Brief all personnel in the work area on the lift plan and exclusion zone before lifting</li>
+          <li>Inspect all slings, shackles, and lifting accessories before attaching them to the load</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T operate a mini crane without a specific lift plan approved for the task</li>
+          <li>DON&#x27;T set up on floors or surfaces without confirming they can support the crane and load</li>
+          <li>DON&#x27;T operate with outriggers only partially extended or without spreader plates in place</li>
+          <li>DON&#x27;T exceed the rated load capacity at any boom radius shown in the load chart</li>
+          <li>DON&#x27;T allow untrained or uncertified personnel to operate the mini crane</li>
+          <li>DON&#x27;T lift loads over people — enforce the exclusion zone at all times during lifts</li>
+          <li>DON&#x27;T assume the crane is stable because it looks small — overturning risk is real</li>
+          <li>DON&#x27;T use a mini crane with an expired or missing thorough examination certificate</li>
+          <li>DON&#x27;T travel the crane with a suspended load unless the manufacturer permits it</li>
+          <li>DON&#x27;T ignore the load moment indicator alarm — lower the load and reassess immediately</li>
+        </ul>
+        <p class="see-also">See also: Lifting Operations Awareness (LOLER) | Lifting Accessories Pre-Use Checks</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

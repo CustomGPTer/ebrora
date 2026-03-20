@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shaft Construction (Caisson) - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Shaft Construction (Caisson)</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-TUN-014 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Caisson shafts are deep vertical structures sunk into the ground under their own weight with excavation from inside.</li>
+      <li>Caisson sinking combines confined space, excavation, lifting, and working at height risks in a single activity.</li>
+      <li>The shaft sinks as material is excavated from beneath the cutting edge, requiring precise control to maintain verticality.</li>
+      <li>Groundwater ingress during sinking creates drowning risk and can cause sudden uncontrolled sinking of the caisson.</li>
+      <li>All entry into caisson shafts is classified as confined space work under the Confined Spaces Regulations 1997.</li>
+      <li>Excavated material must be lifted from the shaft by crane or winch with exclusion zones at the shaft head.</li>
+      <li>Atmosphere inside caisson shafts can become oxygen-depleted or contaminated with ground gases during sinking.</li>
+      <li>Workers descend by ladder or personnel winch, with fall arrest systems required for all vertical access.</li>
+      <li>The caisson structure must be designed as temporary works until the permanent shaft lining is complete.</li>
+      <li>Emergency rescue from deep caisson shafts is extremely challenging and must be pre-planned and rehearsed.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent burial and drowning</td><td>Uncontrolled sinking, groundwater ingress, and material collapse inside the shaft can bury or drown workers.</td></tr>
+    <tr><td class="reason">Confined space hazards</td><td>Deep shafts have restricted access, poor ventilation, and potential toxic atmosphere requiring strict entry controls.</td></tr>
+    <tr><td class="reason">Rescue difficulty</td><td>Extracting an incapacitated worker from a deep caisson shaft takes significant time without a rehearsed rescue plan.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Treat every entry into the caisson shaft as confined space work with a valid permit</li>
+          <li>Test the atmosphere for oxygen, toxic gases, and flammable gases before each entry</li>
+          <li>Use a fall arrest system when descending ladders or being lowered by personnel winch</li>
+          <li>Ensure a trained rescue team with shaft rescue equipment is on standby throughout work</li>
+          <li>Monitor groundwater levels and have pumps ready to manage water ingress during sinking</li>
+          <li>Establish exclusion zones at the shaft head during all material lifting and crane operations</li>
+          <li>Maintain continuous communication between workers inside the shaft and the top man</li>
+          <li>Control the sinking rate carefully to maintain verticality and prevent sudden settlement</li>
+          <li>Ensure ventilation systems deliver fresh air to the bottom of the shaft at all times</li>
+          <li>Brief all workers on the emergency evacuation and rescue plan before each shift</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T enter the caisson shaft without a confined space permit and atmospheric test results</li>
+          <li>DON&#x27;T descend the shaft without a fall arrest system connected throughout the climb</li>
+          <li>DON&#x27;T ignore signs of groundwater ingress — it can cause sudden uncontrolled sinking</li>
+          <li>DON&#x27;T stand beneath material being lifted from the shaft by crane or winch</li>
+          <li>DON&#x27;T work inside the shaft without continuous ventilation and gas monitoring running</li>
+          <li>DON&#x27;T allow more workers inside than the rescue plan and access system can accommodate</li>
+          <li>DON&#x27;T excavate ahead of the designed sinking sequence without engineer approval</li>
+          <li>DON&#x27;T leave the shaft unguarded and open at the surface when not being worked on</li>
+          <li>DON&#x27;T use petrol or diesel-powered equipment inside the shaft due to fume accumulation</li>
+          <li>DON&#x27;T attempt rescue without the pre-planned procedure and proper shaft rescue equipment</li>
+        </ul>
+        <p class="see-also">See also: Shaft Sinking Safety | Confined Space Entry Procedures</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

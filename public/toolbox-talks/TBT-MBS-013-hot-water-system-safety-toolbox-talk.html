@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot Water System Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Hot Water System Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-MBS-013 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Hot water systems in buildings operate at temperatures from 55°C to over 80°C, causing scald burns on contact.</li>
+      <li>Legionella bacteria grow in water systems between 20°C and 45°C — systems must be stored above 60°C.</li>
+      <li>Unvented hot water systems operate under pressure and require specific safety devices to prevent explosion.</li>
+      <li>The Building Regulations Part G and BS 6700 set the standards for hot water system installation in the UK.</li>
+      <li>Incorrect installation of expansion vessels, temperature relief valves, or discharge pipes creates explosion risk.</li>
+      <li>Working on live hot water systems exposes installers to scald burns from pressurised hot water release.</li>
+      <li>G3 qualification is required for any person installing or working on unvented hot water systems.</li>
+      <li>Legionella risk assessments under the HSE L8 guidance (ACoP) apply to all hot water installations.</li>
+      <li>Commissioning must verify temperature, flow rates, and safety valve operation before handover.</li>
+      <li>Thermostatic mixing valves (TMVs) at outlets protect building users from scald injury.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent scalding</td><td>Hot water above 55°C causes severe scald burns within seconds — correct TMV installation protects users.</td></tr>
+    <tr><td class="reason">Prevent explosion</td><td>Unvented systems under pressure can fail catastrophically if safety devices are incorrectly installed or missing.</td></tr>
+    <tr><td class="reason">Legionella prevention</td><td>Incorrect temperature settings allow deadly Legionella bacteria to colonise the system and infect building occupants.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>Building Regulations Part G and the G3 qualification scheme require competent installation of hot water systems.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Ensure only G3-qualified installers work on unvented hot water systems and cylinders</li>
+          <li>Install temperature and pressure relief valves in accordance with manufacturer instructions</li>
+          <li>Set hot water storage temperature to 60°C minimum to prevent Legionella growth</li>
+          <li>Install TMVs at all outlets serving vulnerable users to limit delivery temperature</li>
+          <li>Drain down and isolate hot water systems before carrying out maintenance or modifications</li>
+          <li>Test all safety valves and discharge pipework during commissioning before handover</li>
+          <li>Carry out a Legionella risk assessment for the hot water system under HSE L8 guidance</li>
+          <li>Label all hot water pipework clearly to prevent confusion with cold water services</li>
+          <li>Commission the system fully and record temperatures and flow rates for the O&amp;M manual</li>
+          <li>Wear gloves and use caution when working near hot pipework and pressurised components</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON&#x27;T install or modify unvented hot water systems without a valid G3 qualification</li>
+          <li>DON&#x27;T omit temperature or pressure relief valves from unvented hot water installations</li>
+          <li>DON&#x27;T set storage temperature below 60°C as this allows Legionella bacteria to multiply</li>
+          <li>DON&#x27;T work on pressurised hot water systems without draining down and isolating first</li>
+          <li>DON&#x27;T discharge safety valve outlets into locations where scalding water could injure people</li>
+          <li>DON&#x27;T bypass or remove TMVs from outlets serving care homes, schools, or hospitals</li>
+          <li>DON&#x27;T commission the system without testing every safety device and recording the results</li>
+          <li>DON&#x27;T leave dead legs in pipework where stagnant water allows bacteria to proliferate</li>
+          <li>DON&#x27;T ignore dripping safety valves — they indicate a system fault requiring investigation</li>
+          <li>DON&#x27;T hand over hot water systems without a complete Legionella risk assessment in place</li>
+        </ul>
+        <p class="see-also">See also: Legionella Awareness | Pipework Installation Safety</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
