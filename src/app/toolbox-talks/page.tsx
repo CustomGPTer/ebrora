@@ -116,7 +116,7 @@ export default function ToolboxTalksPage() {
                   </span>
                 </div>
 
-                <h2 className="text-sm font-bold text-gray-900 group-hover:text-[#1B5745] transition-colors mb-1 leading-tight">
+                <h2 className="text-[15px] font-bold text-gray-900 group-hover:text-[#1B5745] transition-colors mb-1 leading-tight">
                   {cat.name}
                 </h2>
                 <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-3">
