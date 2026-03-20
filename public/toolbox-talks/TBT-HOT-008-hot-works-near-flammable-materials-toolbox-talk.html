@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot Works Near Flammable Materials - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Hot Works Near Flammable Materials</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-HOT-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Hot works include welding, cutting, grinding, brazing, and any task producing sparks, flames, or intense heat.</li>
+      <li>Sparks from grinding can travel up to 10 metres and remain hot enough to ignite flammable materials.</li>
+      <li>Flammable materials on construction sites include timber, insulation, solvents, paints, gas cylinders, and fuels.</li>
+      <li>A hot works permit is mandatory wherever hot works take place near combustible or flammable materials.</li>
+      <li>A fire watch must be maintained during hot works and for a minimum of 60 minutes after completion.</li>
+      <li>The fire watch person must have a suitable fire extinguisher and know how to use it.</li>
+      <li>All flammable materials within 10 metres of the hot works point must be removed or protected.</li>
+      <li>Fire blankets and non-combustible screens should be used to shield materials that cannot be moved.</li>
+      <li>Hot works in occupied buildings, roof spaces, and ceiling voids present the highest fire risk scenarios.</li>
+      <li>The Joint Code of Practice on the Protection from Fire of Construction Sites applies to all UK projects.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent site fires</td><td>Hot works are the leading cause of fire on construction sites, causing millions of pounds of damage every year in the UK.</td></tr>
+    <tr><td class="reason">Save lives</td><td>Construction site fires have killed workers and members of the public, particularly in occupied buildings during refurbishment.</td></tr>
+    <tr><td class="reason">Insurance requirement</td><td>Insurers require compliance with the Joint Code of Practice; non-compliance can void your site insurance policy.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Obtain a signed hot works permit before starting any hot work activity.</li>
+          <li>Remove all flammable materials within 10 metres of the hot works point.</li>
+          <li>Use fire blankets or non-combustible screens to protect materials that cannot be moved.</li>
+          <li>Maintain a fire watch during the work and for 60 minutes after completion.</li>
+          <li>Ensure the fire watch person has a suitable, charged fire extinguisher available.</li>
+          <li>Check for hidden combustibles behind walls, above ceilings, and below floors.</li>
+          <li>Dampen combustible surfaces near the work area where removal is not possible.</li>
+          <li>Inspect the area thoroughly after the fire watch period before leaving the site.</li>
+          <li>Keep fire escape routes clear and accessible throughout the hot works period.</li>
+          <li>Brief all nearby workers about the hot works and fire watch arrangements.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T start hot works without a valid, signed hot works permit in place.</li>
+          <li>DON'T grind, weld, or cut within 10 metres of unprotected flammable materials.</li>
+          <li>DON'T leave the fire watch position before the minimum 60-minute period expires.</li>
+          <li>DON'T rely on fire extinguishers alone; prevention by removal is always better.</li>
+          <li>DON'T carry out hot works in roof spaces without clearing all combustibles.</li>
+          <li>DON'T allow sparks to fall through gaps in floors, walls, or ceiling voids.</li>
+          <li>DON'T use compressed air to blow away debris near hot works; it spreads sparks.</li>
+          <li>DON'T carry out hot works near paint stores, fuel tanks, or solvent containers.</li>
+          <li>DON'T assume the area is safe because no visible flames or smoke are present.</li>
+          <li>DON'T leave hot works equipment unattended while gas valves are still open.</li>
+        </ul>
+        <p class="see-also">See also: Hot Works Fire Prevention | Hot Works Permit Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sheet Pile Flood Defence - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sheet Pile Flood Defence</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-DAM-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Sheet pile flood defences are interlocking steel sections driven into the ground to form permanent water barriers.</li>
+      <li>They are used along river banks, coastal frontages, and canal edges to prevent flood water overtopping.</li>
+      <li>Sheet piles are installed using vibratory hammers or impact hammers mounted on crawler cranes or piling rigs.</li>
+      <li>Each pile section weighs several hundred kilograms and requires crane handling with rated lifting accessories.</li>
+      <li>Noise and vibration from sheet piling can exceed exposure limits, requiring zones and monitoring.</li>
+      <li>Working near water during flood defence construction creates drowning risks requiring PFD use.</li>
+      <li>Ground conditions including boulders, rock, and buried obstructions can cause pile deviation or refusal.</li>
+      <li>Adjacent structures, services, and embankments may be affected by vibration during pile driving.</li>
+      <li>The interlocking clutch between piles must engage correctly to maintain the watertight seal of the wall.</li>
+      <li>PUWER 1998, LOLER 1998, and the Control of Vibration at Work Regulations 2005 apply to these works.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent drowning</td><td>Flood defence work takes place directly beside rivers and coastal edges, creating immediate drowning risk if workers fall in.</td></tr>
+    <tr><td class="reason">Crush and strike risk</td><td>Heavy sheet piles handled by cranes can swing, drop, or trap workers, causing fatal crush injuries.</td></tr>
+    <tr><td class="reason">Vibration damage</td><td>Driving sheet piles near buildings, embankments, or services can cause structural cracking and service damage.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>PUWER, LOLER, noise and vibration regulations, and CDM 2015 all apply to sheet pile flood defence construction.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear a personal flotation device at all times when working near water.</li>
+          <li>Use a lift plan and rated accessories for handling every sheet pile section.</li>
+          <li>Establish exclusion zones around the piling rig and pile pitching area.</li>
+          <li>Monitor noise levels and enforce hearing protection zones during driving.</li>
+          <li>Survey adjacent structures before driving and monitor for vibration damage.</li>
+          <li>Check underground service locations before driving any pile position.</li>
+          <li>Inspect interlocking clutches as each pile is driven to confirm engagement.</li>
+          <li>Ensure rescue equipment including throw lines and lifebuoys are positioned nearby.</li>
+          <li>Brief all operatives on the emergency plan for man overboard incidents.</li>
+          <li>Plan pile delivery and storage to avoid loads near the water edge.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T work near the water edge without wearing a personal flotation device.</li>
+          <li>DON'T stand under sheet piles being lifted, swung, or guided into position.</li>
+          <li>DON'T enter the exclusion zone while the piling hammer is operating.</li>
+          <li>DON'T drive piles without confirmed underground service clearance in place.</li>
+          <li>DON'T ignore vibration monitoring alarms or exceed agreed trigger levels.</li>
+          <li>DON'T remove hearing protection within the designated noise zone.</li>
+          <li>DON'T store sheet piles where they could slide or roll toward the water.</li>
+          <li>DON'T continue driving if a pile refuses or deviates from alignment.</li>
+          <li>DON'T work from unstable river banks without assessing edge stability first.</li>
+          <li>DON'T begin piling without checking the tide or water level forecast.</li>
+        </ul>
+        <p class="see-also">See also: Flood Defence Construction Safety | Sheet Piling Installation</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

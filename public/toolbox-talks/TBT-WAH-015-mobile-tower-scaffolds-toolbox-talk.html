@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Tower Scaffolds - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Mobile Tower Scaffolds</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WAH-015 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Mobile tower scaffolds are lightweight aluminium structures on wheels used for short-duration work at height.</li>
+      <li>They must be erected following the manufacturer instructions, typically using the through-the-trap or advance guardrail method.</li>
+      <li>The maximum safe height depends on whether the tower is used indoors or outdoors and whether it is tied.</li>
+      <li>Outriggers and stabilisers must be deployed on all four corners before the tower is used.</li>
+      <li>Castors must be locked before anyone climbs the tower and remain locked during all work.</li>
+      <li>The platform must have guardrails, toe boards, and a close-boarded deck with no gaps.</li>
+      <li>Only trained and competent persons should erect, alter, or dismantle mobile tower scaffolds.</li>
+      <li>The PASMA training scheme is the industry standard for mobile tower scaffold competency.</li>
+      <li>Towers must be inspected before each use and after any event that could affect stability.</li>
+      <li>The Work at Height Regulations 2005 require that towers are suitable for the task and conditions.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent tower collapse</td><td>Mobile towers overturn when moved with people on the platform, used without stabilisers, or erected beyond safe height.</td></tr>
+    <tr><td class="reason">Falls from height</td><td>Falling from mobile tower platforms causes serious injuries and deaths. Guardrails and proper access prevent these falls.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>The Work at Height Regulations 2005 require towers to be erected by competent persons and inspected before use.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Erect the tower following manufacturer instructions and the safe build method.</li>
+          <li>Deploy all outriggers and stabilisers before anyone climbs the tower.</li>
+          <li>Lock all four castors before ascending and keep them locked during work.</li>
+          <li>Ensure full guardrails, toe boards, and close-boarded platform are in place.</li>
+          <li>Use only PASMA-trained persons to erect, alter, or dismantle the tower.</li>
+          <li>Inspect the tower before first use and after any event affecting stability.</li>
+          <li>Check the tower height does not exceed the safe limit for the conditions.</li>
+          <li>Climb using the internal ladder; never climb the outside of the framework.</li>
+          <li>Move the tower only at ground level with no persons or loose materials on top.</li>
+          <li>Apply the brakes and check level after repositioning the tower.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T move the tower with anyone standing on the platform.</li>
+          <li>DON'T use the tower without all outriggers and stabilisers deployed.</li>
+          <li>DON'T climb the outside of the tower frame to access the platform.</li>
+          <li>DON'T exceed the manufacturer's maximum height for indoor or outdoor use.</li>
+          <li>DON'T use the tower in high winds without tying it to a structure.</li>
+          <li>DON'T leave tools or materials on the platform when moving the tower.</li>
+          <li>DON'T erect a tower on soft, uneven, or sloping ground without levelling.</li>
+          <li>DON'T use a tower near overhead power lines without a risk assessment.</li>
+          <li>DON'T allow untrained persons to erect or modify mobile tower scaffolds.</li>
+          <li>DON'T lean ladders against the tower or use it as an anchor point.</li>
+        </ul>
+        <p class="see-also">See also: Scaffold Safety Awareness | Working at Height Hierarchy of Control</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

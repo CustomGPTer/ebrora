@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scaffold Dismantling Procedures - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Scaffold Dismantling Procedures</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-SCF-011 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Scaffold dismantling is as hazardous as erection and must be carried out by CISRS-qualified scaffolders.</li>
+      <li>Dismantling must follow a planned sequence, typically the reverse of the erection procedure, from the top down.</li>
+      <li>Partial dismantling creates instability if ties, braces, or standards are removed in the wrong order.</li>
+      <li>Materials must be lowered safely using hoists, chutes, or by hand to a designated landing area below.</li>
+      <li>Throwing or dropping scaffold components from height creates fatal struck-by hazards for people below.</li>
+      <li>Exclusion zones must be established and maintained below the scaffold throughout the dismantling operation.</li>
+      <li>Scaffold ties must be the last items removed at each lift level to maintain stability until the end.</li>
+      <li>Incomplete dismantling at the end of a shift leaves an unstable structure that can collapse overnight.</li>
+      <li>Adjacent scaffold bays still in use must be protected and assessed for stability during partial dismantling.</li>
+      <li>The Work at Height Regulations 2005 and TG20 guidance apply to all scaffold dismantling activities.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent collapse</td><td>Removing ties, braces, or standards in the wrong order has caused scaffold collapses that killed workers and the public.</td></tr>
+    <tr><td class="reason">Falling materials</td><td>Scaffold components dropped or thrown from height strike and kill workers on the ground.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>The Work at Height Regulations 2005 require dismantling by competent persons following a planned procedure.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Follow the planned dismantling sequence from the top down at all times.</li>
+          <li>Ensure only CISRS-qualified scaffolders carry out the dismantling work.</li>
+          <li>Establish and maintain exclusion zones below the scaffold during dismantling.</li>
+          <li>Lower materials safely using hoists or by hand to the designated area.</li>
+          <li>Remove ties as the last items at each lift level to maintain stability.</li>
+          <li>Complete each lift level fully before starting dismantling of the next level.</li>
+          <li>Inspect adjacent bays for stability when partially dismantling a connected scaffold.</li>
+          <li>Tag the scaffold as unsafe and barricade access once dismantling begins.</li>
+          <li>Brief the team on the sequence, material handling, and exclusion zones each day.</li>
+          <li>Ensure the scaffold is left in a safe condition if work stops before completion.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T remove ties, braces, or standards out of the planned dismantling sequence.</li>
+          <li>DON'T throw or drop scaffold components from any height during dismantling.</li>
+          <li>DON'T allow non-CISRS personnel to dismantle any part of the scaffold.</li>
+          <li>DON'T leave a half-dismantled scaffold overnight without making it safe and stable.</li>
+          <li>DON'T allow access to the scaffold by other trades during dismantling operations.</li>
+          <li>DON'T remove boards from the platform you are standing on during dismantling.</li>
+          <li>DON'T dismantle in high winds that could dislodge loosened components.</li>
+          <li>DON'T stack dismantled components at the base where they block escape routes.</li>
+          <li>DON'T ignore exclusion zones; falling fittings and tubes are lethal from height.</li>
+          <li>DON'T start dismantling without confirming adjacent bays will remain stable.</li>
+        </ul>
+        <p class="see-also">See also: Scaffold Safety Awareness | Scaffold Ties and Stability</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

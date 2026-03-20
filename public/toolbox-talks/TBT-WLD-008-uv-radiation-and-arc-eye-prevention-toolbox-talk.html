@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UV Radiation and Arc Eye Prevention - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>UV Radiation and Arc Eye Prevention</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WLD-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Welding arcs emit intense ultraviolet, visible, and infrared radiation that damages eyes and skin.</li>
+      <li>Arc eye (photokeratitis) is a painful burn to the cornea caused by UV exposure from the welding arc.</li>
+      <li>Symptoms include severe pain, watering eyes, gritty sensation, and sensitivity to light appearing 6-12 hours after exposure.</li>
+      <li>Even brief unprotected exposure to a welding arc can cause arc eye — a single flash is enough.</li>
+      <li>Bystanders and passers-by are also at risk; welding screens and barriers must protect everyone nearby.</li>
+      <li>UV radiation from welding also causes sunburn-like skin burns on exposed forearms, necks, and faces.</li>
+      <li>Welding helmets with the correct shade filter are essential; shade 10-13 is typical for arc welding.</li>
+      <li>Auto-darkening helmets must be tested before use; if the sensor fails, the welder is unprotected.</li>
+      <li>Reflective surfaces including metal, concrete, and water can bounce UV radiation around barriers.</li>
+      <li>The Personal Protective Equipment at Work Regulations 2022 require employers to provide suitable eye protection.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent arc eye</td><td>Arc eye causes intense pain and temporary vision loss. Repeated exposure can lead to permanent corneal damage and cataracts.</td></tr>
+    <tr><td class="reason">Protect bystanders</td><td>Workers walking past unscreened welding operations suffer arc eye without realising it until hours later when symptoms appear.</td></tr>
+    <tr><td class="reason">Skin cancer risk</td><td>Chronic UV exposure from welding increases the risk of skin cancer on exposed areas, particularly the face and forearms.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Wear a welding helmet with the correct shade filter for the process being used.</li>
+          <li>Test auto-darkening helmets before each use to confirm the sensor is working.</li>
+          <li>Erect welding screens or curtains to protect bystanders from arc radiation.</li>
+          <li>Cover all exposed skin with flame-resistant clothing to prevent UV skin burns.</li>
+          <li>Warn nearby workers before striking an arc so they can look away.</li>
+          <li>Use welding curtains that block UV even if they allow visible light through.</li>
+          <li>Position screens to account for UV reflection from nearby metal and concrete surfaces.</li>
+          <li>Seek medical advice if you develop arc eye symptoms after any welding exposure.</li>
+          <li>Replace cracked or damaged filter lenses in helmets immediately before welding.</li>
+          <li>Provide safety glasses with side shields as minimum protection for grinding between welds.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T look at a welding arc without the correct shade filter, even briefly.</li>
+          <li>DON'T weld without screens or curtains protecting other workers in the area.</li>
+          <li>DON'T use an auto-darkening helmet without testing the sensor function first.</li>
+          <li>DON'T leave skin exposed while welding; UV burns develop on forearms and neck.</li>
+          <li>DON'T assume being around a corner protects you; UV reflects off surfaces.</li>
+          <li>DON'T strike an arc without warning workers nearby to look away.</li>
+          <li>DON'T continue welding with a cracked or damaged filter lens in your helmet.</li>
+          <li>DON'T ignore arc eye symptoms; seek medical advice for pain or vision changes.</li>
+          <li>DON'T use sunglasses as a substitute for proper welding filter protection.</li>
+          <li>DON'T position welding screens so gaps allow UV to reach unprotected workers.</li>
+        </ul>
+        <p class="see-also">See also: Welding Safety Awareness (Comprehensive) | Welding Fume Extraction and LEV</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

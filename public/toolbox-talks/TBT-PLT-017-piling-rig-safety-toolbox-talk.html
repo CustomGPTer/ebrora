@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piling Rig Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Piling Rig Safety</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-PLT-017 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Piling rigs are large, heavy machines used to install bored, driven, and CFA piles on construction sites.</li>
+      <li>Rigs weigh from 20 tonnes for mini pilers to over 200 tonnes for large rotary bored pile rigs.</li>
+      <li>The mast or leader can exceed 30 metres in height, creating overhead hazards and wind loading concerns.</li>
+      <li>Rig setup requires a stable, level piling platform designed by a competent engineer for the rig weight.</li>
+      <li>The kelly bar, auger, and casing are suspended at height and can fall if retaining mechanisms fail.</li>
+      <li>Rotating augers and drill strings create severe entanglement hazards for anyone within reach.</li>
+      <li>Rig movement between pile positions must be controlled with a banksman and clear route planning.</li>
+      <li>Overhead power lines and underground services are both critical hazards for piling rig operations.</li>
+      <li>PUWER 1998, LOLER 1998, and CDM 2015 all apply to piling rig selection, operation, and maintenance.</li>
+      <li>Only CPCS or NPORS qualified operators may operate piling rigs on UK construction sites.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Fatal entanglement</td><td>Contact with rotating augers and drill strings causes fatal entanglement injuries that occur in seconds.</td></tr>
+    <tr><td class="reason">Rig overturn</td><td>Piling rigs overturning from inadequate platforms, soft ground, or slope have crushed operators and nearby workers.</td></tr>
+    <tr><td class="reason">Falling components</td><td>Kelly bars, augers, and casings weigh several tonnes. Failure of retaining systems drops them without warning.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Ensure the piling platform is designed and approved for the rig being used.</li>
+          <li>Establish exclusion zones around the rig and enforce them with barriers.</li>
+          <li>Use a banksman to guide all rig movements between pile positions.</li>
+          <li>Guard all rotating components and maintain guards in position during operations.</li>
+          <li>Check for overhead power lines and underground services before each pile position.</li>
+          <li>Inspect the rig daily including mast, hydraulics, winches, and safety devices.</li>
+          <li>Wear hearing protection within the designated noise zone around the rig.</li>
+          <li>Ensure the operator holds a current CPCS or NPORS card for the rig type.</li>
+          <li>Monitor wind speed and stop mast operations when limits are exceeded.</li>
+          <li>Brief all ground workers on exclusion zones and rig movement signals.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T set up the rig on ground that has not been approved as a piling platform.</li>
+          <li>DON'T enter the exclusion zone while the rig is drilling or extracting.</li>
+          <li>DON'T reach near rotating augers, kelly bars, or drill string components.</li>
+          <li>DON'T move the rig without a banksman guiding the route and direction.</li>
+          <li>DON'T operate the rig near overhead power lines without a clearance assessment.</li>
+          <li>DON'T wear loose clothing that could be caught by rotating rig components.</li>
+          <li>DON'T allow unqualified persons to operate or control the piling rig.</li>
+          <li>DON'T continue operations if the rig shows signs of instability or settlement.</li>
+          <li>DON'T stand under the mast or suspended components during rig operations.</li>
+          <li>DON'T ignore hydraulic leaks, unusual noises, or warning light activations.</li>
+        </ul>
+        <p class="see-also">See also: Piling Safety Awareness | Piling Platform Requirements</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

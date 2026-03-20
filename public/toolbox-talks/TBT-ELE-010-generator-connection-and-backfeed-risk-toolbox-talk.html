@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generator Connection and Backfeed Risk - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Generator Connection and Backfeed Risk</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-ELE-010 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Backfeed occurs when a generator energises a circuit thought to be dead, putting workers at risk of electrocution.</li>
+      <li>Connecting a generator directly to a building electrical system without a transfer switch causes backfeed.</li>
+      <li>Backfed electricity can travel through transformers and energise the public supply network at lethal voltages.</li>
+      <li>Network engineers and linesmen have been killed by backfed generators connected by untrained persons.</li>
+      <li>A properly installed changeover switch prevents simultaneous connection of the generator and mains supply.</li>
+      <li>Portable generators on construction sites must be connected through distribution boards with RCD protection.</li>
+      <li>The Electricity at Work Regulations 1989 require all electrical connections to be safe and properly made.</li>
+      <li>Only competent electricians should connect generators to any fixed electrical installation or distribution system.</li>
+      <li>Generator earthing is critical; incorrect earthing causes the frame to become live during a fault.</li>
+      <li>Fuel storage for generators must comply with fire safety requirements and be properly bunded.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Kill remote workers</td><td>Backfed generators energise circuits that linesmen believe are dead, causing fatal electrocution miles from the generator.</td></tr>
+    <tr><td class="reason">Electrocution on site</td><td>Incorrectly connected generators energise exposed metalwork and cables, electrocuting workers who touch them.</td></tr>
+    <tr><td class="reason">Legal compliance</td><td>The Electricity at Work Regulations 1989 make it a criminal offence to create dangerous electrical conditions.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Use a properly installed changeover switch to prevent generator backfeed.</li>
+          <li>Have all generator connections made by a competent qualified electrician only.</li>
+          <li>Connect portable generators through distribution boards with RCD protection.</li>
+          <li>Earth the generator correctly following the manufacturer instructions.</li>
+          <li>Isolate the mains supply before connecting a generator to any building circuit.</li>
+          <li>Test the installation after connection to verify correct polarity and earthing.</li>
+          <li>Position generators outdoors in ventilated areas to prevent carbon monoxide buildup.</li>
+          <li>Store generator fuel in bunded containers away from the exhaust and ignition sources.</li>
+          <li>Label the changeover switch clearly showing mains and generator positions.</li>
+          <li>Inspect generator connections, cables, and earthing before each use.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T connect a generator directly to a building socket or consumer unit.</li>
+          <li>DON'T energise a generator without confirming the mains supply is isolated first.</li>
+          <li>DON'T allow unqualified persons to make generator electrical connections.</li>
+          <li>DON'T operate a generator indoors or in poorly ventilated enclosed spaces.</li>
+          <li>DON'T use a generator without proper earthing connected and verified.</li>
+          <li>DON'T bypass the changeover switch to connect generator and mains simultaneously.</li>
+          <li>DON'T refuel a running generator; shut it down and let it cool first.</li>
+          <li>DON'T assume a portable generator is safe because it is small and temporary.</li>
+          <li>DON'T ignore RCD protection requirements for generator-fed distribution boards.</li>
+          <li>DON'T leave generator cables trailing across walkways without cable protection.</li>
+        </ul>
+        <p class="see-also">See also: Electrical Safety Awareness | Temporary Electrical Installations</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In-Situ Chemical Treatment - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #e5e7eb; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1e293b;
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 10mm 12mm 12mm 12mm;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 10mm 12mm 12mm 12mm;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+
+  /* ── Meta Fields ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+
+  /* ── What ── */
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '•'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  /* ── Why ── */
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+
+  /* ── Do / Don't ── */
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '✓'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '✗'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+  /* ── Footer ── */
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>In-Situ Chemical Treatment</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-REM-008 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> March 2026</div>
+</div>
+
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>In-situ chemical treatment injects or mixes reagents into contaminated ground to neutralise pollutants.</li>
+      <li>Methods include chemical oxidation, reduction, stabilisation, solidification, and pH adjustment.</li>
+      <li>Reagents used can include hydrogen peroxide, sodium permanganate, zero-valent iron, and lime-based products.</li>
+      <li>Many treatment reagents are themselves hazardous, requiring COSHH assessment and specialist handling controls.</li>
+      <li>Exothermic reactions during chemical oxidation generate heat and can produce toxic or explosive gases.</li>
+      <li>Injection under pressure creates risks of ground heave, reagent surfacing, and injection injuries.</li>
+      <li>Workers must wear full chemical PPE including face shields, chemical suits, and appropriate RPE.</li>
+      <li>Environmental monitoring is required to confirm the treatment is working and not causing secondary contamination.</li>
+      <li>Emergency spill response equipment must be immediately available whenever chemical treatment is in progress.</li>
+      <li>The Environmental Permitting Regulations and COSHH 2002 both apply to in-situ chemical treatment operations.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Chemical hazards</td><td>Treatment reagents including strong oxidisers and acids cause severe burns, respiratory injury, and eye damage on contact.</td></tr>
+    <tr><td class="reason">Uncontrolled reactions</td><td>Exothermic reactions in the ground can generate toxic gas, explosive atmospheres, and sudden ground heave.</td></tr>
+    <tr><td class="reason">Environmental protection</td><td>Incorrect application can mobilise contaminants, spread pollution, and create secondary contamination of groundwater.</td></tr>
+    </table>
+</div>
+
+<div class="section">
+  <table class="do-dont-table">
+    <tr>
+      <td class="col-header do-h">Do</td>
+      <td class="col-header dont-h">Don't</td>
+    </tr>
+    <tr>
+      <td>
+        <ul class="do-items">
+          <li>Complete a COSHH assessment for every treatment reagent before it is used on site.</li>
+          <li>Wear full chemical PPE including face shield, chemical suit, and appropriate RPE.</li>
+          <li>Monitor for toxic and explosive gases continuously during chemical injection operations.</li>
+          <li>Have emergency spill response equipment positioned at the treatment work area.</li>
+          <li>Follow the treatment design specification for reagent type, concentration, and injection rate.</li>
+          <li>Monitor groundwater quality to confirm treatment effectiveness and detect migration.</li>
+          <li>Train all operatives in chemical handling, first aid, and emergency decontamination.</li>
+          <li>Maintain emergency eyewash and shower stations within immediate reach of the work area.</li>
+          <li>Record all treatment volumes, injection pressures, and monitoring results accurately.</li>
+          <li>Obtain environmental permits before starting any in-situ chemical treatment works.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="dont-items">
+          <li>DON'T handle treatment reagents without completing the COSHH assessment first.</li>
+          <li>DON'T mix chemicals without following the exact design specification and sequence.</li>
+          <li>DON'T inject reagents at pressures exceeding the design limits for the ground conditions.</li>
+          <li>DON'T ignore exothermic reactions; monitor temperatures and gas generation continuously.</li>
+          <li>DON'T allow unprotected workers near the injection area during treatment operations.</li>
+          <li>DON'T discharge treatment water or reagent residues without environmental permit approval.</li>
+          <li>DON'T store incompatible chemicals in the same area or secondary containment.</li>
+          <li>DON'T begin treatment without emergency decontamination facilities in place.</li>
+          <li>DON'T assume the treatment is working without groundwater monitoring confirmation.</li>
+          <li>DON'T skip first aid training for chemical burns and reagent splash injuries.</li>
+        </ul>
+        <p class="see-also">See also: Contaminated Land Safety Awareness | Chemical Spill Response</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  ebrora.com
+</div>
+
+</body>
+</html>
