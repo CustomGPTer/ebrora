@@ -19,9 +19,9 @@ export function UpsellBanner({
   if (variant === "bottom") {
     return (
       <div className="mt-12 bg-gradient-to-r from-[#1B5745] to-[#236b55] rounded-2xl p-6 sm:p-8 text-white">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-          <div className="flex-1">
-            <h3 className="font-bold text-white" style={{ fontSize: '20px' }}>{title}</h3>
+        <div className="flex flex-col items-center text-center gap-4 sm:gap-5">
+          <div>
+            <h3 className="font-bold text-white" style={{ fontSize: '22px' }}>{title}</h3>
             <p className="text-sm text-white/80 mt-1 leading-relaxed">{description}</p>
           </div>
           <Link
