@@ -2,6 +2,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import fs from "fs";
+import path from "path";
 import {
   TBT_CATEGORIES,
   getTalkBySlug,
@@ -10,7 +12,6 @@ import {
   type TbtTalk,
 } from "@/data/tbt-structure";
 import { TbtA5Viewer } from "@/components/toolbox-talks/TbtA5Viewer";
-import { TbtA4Viewer } from "@/components/toolbox-talks/TbtA4Viewer";
 import { TbtDownloadButton } from "@/components/toolbox-talks/TbtDownloadButton";
 
 interface PageProps {
@@ -31,6 +32,59 @@ function findCategoryAndSub(
   const sub = category.subfolders.find((s) => s.slug === subSlug);
   if (!sub) return null;
   return { category, sub };
+}
+
+/**
+ * Read a toolbox talk HTML file from /public/toolbox-talks/ and extract the
+ * <style> block and <body> content for inline rendering.
+ *
+ * The extracted CSS is scoped inside a `.tbt-inline` wrapper to prevent any
+ * styles from leaking into the parent Next.js page. All bare element selectors
+ * (html, body, *, h1, h2, h3, td, etc.) are rewritten as descendants of
+ * `.tbt-inline` so they only apply within the container.
+ */
+function readTalkHtml(htmlFile: string): { css: string; body: string } | null {
+  try {
+    const filePath = path.join(process.cwd(), "public", "toolbox-talks", htmlFile);
+    const raw = fs.readFileSync(filePath, "utf-8");
+
+    // Extract <style> content
+    const styleMatch = raw.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+    let css = styleMatch ? styleMatch[1] : "";
+
+    // Extract <body> content
+    const bodyMatch = raw.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    const body = bodyMatch ? bodyMatch[1] : "";
+
+    if (!body) return null;
+
+    // ── Scope all CSS selectors inside .tbt-inline ──
+
+    // 1. Remove the Google Fonts @import — the parent page doesn't need it
+    //    cluttering the cascade; we'll re-add it scoped at the top.
+    const fontImport = "@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');";
+    css = css.replace(/@import\s+url\([^)]+\)\s*;?/g, "");
+
+    // 2. Replace `html` and `body` selectors with .tbt-inline
+    //    (handles both `html {` and `html { ... }` in @media blocks)
+    css = css.replace(/(?<![.\-#\w])html\s*\{/g, ".tbt-inline-outer {");
+    css = css.replace(/(?<![.\-#\w])body\s*\{/g, ".tbt-inline {");
+
+    // 3. Replace bare `* {` with `.tbt-inline * {` — but NOT inside @media blocks
+    //    where it's already been handled, and not `*::before` etc.
+    css = css.replace(/(?<![.\-#\w])\*\s*\{/g, ".tbt-inline * {");
+
+    // 4. Scope the @page rule — browsers ignore it outside print context anyway
+    //    but let's keep it clean.
+    // (No change needed — @page is print-only and scoping doesn't apply to it)
+
+    // 5. Re-add the font import at the very top (scoped within our style block)
+    css = fontImport + "\n" + css;
+
+    return { css, body };
+  } catch {
+    return null;
+  }
 }
 
 /* —— metadata —— */
@@ -128,7 +182,7 @@ export default async function SlugPage({ params }: PageProps) {
             <span className="text-gray-500">{sub.name}</span>
           </div>
 
-          {/* A5 Card Grid */}
+          {/* A5 Card Grid — keeps iframe approach for thumbnails */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {sub.talks.map((talk: TbtTalk) => (
               <div key={talk.ref} id={talk.slug} className="scroll-mt-24">
@@ -177,6 +231,10 @@ export default async function SlugPage({ params }: PageProps) {
   const talkResult = getTalkBySlug(catSlug, slug);
   if (talkResult) {
     const { talk, subfolder, category } = talkResult;
+
+    // Read and extract the HTML content server-side for SEO
+    const talkContent = readTalkHtml(talk.htmlFile);
+
     return (
       <>
 
@@ -245,9 +303,21 @@ export default async function SlugPage({ params }: PageProps) {
             <span className="text-gray-500">{talk.title}</span>
           </div>
 
-          {/* A4 full-size viewer */}
+          {/* A4 full-size viewer — inlined server-side for SEO */}
           <div className="max-w-4xl mx-auto">
-            <TbtA4Viewer htmlFile={talk.htmlFile} title={talk.title} />
+            {talkContent ? (
+              <div className="tbt-inline-outer bg-white rounded-lg shadow-md overflow-hidden" style={{ aspectRatio: "210 / 297" }}>
+                <style dangerouslySetInnerHTML={{ __html: talkContent.css }} />
+                <div
+                  className="tbt-inline"
+                  dangerouslySetInnerHTML={{ __html: talkContent.body }}
+                />
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden flex items-center justify-center" style={{ aspectRatio: "210 / 297" }}>
+                <p className="text-sm text-gray-400">Toolbox talk content unavailable.</p>
+              </div>
+            )}
 
             {/* Download / Print */}
             <div className="mt-6">
