@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import type { Product, Category } from '@/lib/types';
@@ -45,10 +47,12 @@ export default function ProductDetailClient({
             {/* Main Image */}
             <div className="product-gallery__main">
               {hasImages ? (
-                <img
+                <Image
                   id="galleryMainImg"
                   src={`/${mainImage}`}
                   alt={product.altText || product.title}
+                  width={600}
+                  height={400}
                 />
               ) : (
                 <>
@@ -81,10 +85,11 @@ export default function ProductDetailClient({
                     className={`product-gallery__thumb${i === activeImage ? ' active' : ''}`}
                     onClick={() => changeImage(i)}
                   >
-                    <img
+                    <Image
                       src={`/${img}`}
                       alt={`Thumbnail ${i + 1}`}
-                      loading="lazy"
+                      width={100}
+                      height={75}
                     />
                   </div>
                 ))}
@@ -300,17 +305,19 @@ export default function ProductDetailClient({
                   <div className="product-card__image-wrap">
                     {relHasImages ? (
                       <>
-                        <img
+                        <Image
                           src={`/${relMainImage}`}
-                          alt={p.title}
+                          alt={p.altText || p.title}
+                          width={600}
+                          height={400}
                           className="main-img"
-                          loading="lazy"
                         />
-                        <img
+                        <Image
                           src={`/${relHoverImage}`}
                           alt={`${p.title} preview`}
+                          width={600}
+                          height={400}
                           className="hover-img"
-                          loading="lazy"
                         />
                       </>
                     ) : (
