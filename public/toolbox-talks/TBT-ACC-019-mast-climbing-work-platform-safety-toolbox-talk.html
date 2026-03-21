@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mast Climbing Work Platform Safety - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --warn: #F59E0B;
+    --danger: #DC2626;
+    --safe: #059669;
+    --ink: #1E293B;
+    --muted: #64748B;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --accent-gradient: linear-gradient(135deg, #F59E0B 0%, #DC2626 100%);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #CBD5E1; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: var(--ink);
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @page { size: A4 portrait; margin: 0; }
+
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      min-height: 0;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none !important; }
+  }
+
+  /* ─── PAGE SECTIONS ─── */
+  .page {
+    width: 100%;
+    min-height: 297mm;
+    padding: 10mm 13mm 12mm 13mm;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-break {
+    page-break-before: always;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  @media print {
+    .page { min-height: auto; overflow: visible; }
+    .page-break { border-top: none; }
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--accent-gradient);
+    margin: -10mm -13mm 0 -13mm;
+    padding: 8mm 13mm 3.5mm;
+    position: relative;
+  }
+  .header-badge {
+    display: block; background: rgba(255,255,255,0.22); color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 12px; border-radius: 4px; margin-bottom: 5px;
+    text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
+  }
+  .header h1 {
+    font-family: 'DM Sans', sans-serif; font-size: 22px; color: #fff;
+    font-weight: 700; line-height: 1.15; margin-bottom: 6px; text-align: center;
+    letter-spacing: -0.3px;
+  }
+  .header-meta {
+    display: flex; gap: 12px; font-size: 10px; color: rgba(255,255,255,0.85); font-weight: 500;
+    justify-content: center;
+  }
+  .header-meta span { display: flex; align-items: center; gap: 3px; }
+
+  /* ─── BODY ─── */
+  .body { padding-top: 16px; flex: 1; }
+
+  .intro {
+    font-size: 11.5px; color: var(--muted); font-weight: 500;
+    border-left: 3px solid var(--warn); padding-left: 10px;
+    margin-bottom: 14px; line-height: 1.55;
+  }
+
+  .section { margin-bottom: 12px; }
+  .section-title {
+    font-family: 'Archivo Black', sans-serif; font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--ink);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+  }
+  .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .dot-amber { background: var(--warn); }
+  .dot-red { background: var(--danger); }
+  .dot-green { background: var(--safe); }
+  .dot-blue { background: #2563EB; }
+
+  .hazard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .hazard-item {
+    display: flex; align-items: flex-start; gap: 5px;
+    background: #FEF3C7; border-radius: 4px; padding: 6px 8px;
+    font-size: 10.5px; font-weight: 500; color: #92400E; line-height: 1.35;
+  }
+  .hazard-item::before { content: '⚠'; font-size: 11px; flex-shrink: 0; }
+
+  .control-list { list-style: none; }
+  .control-list li {
+    position: relative; padding: 4px 0 4px 18px; font-size: 10.5px;
+    font-weight: 500; line-height: 1.4; border-bottom: 1px solid var(--border);
+  }
+  .control-list li:last-child { border-bottom: none; }
+  .control-list li::before {
+    content: '✓'; position: absolute; left: 0; top: 4px;
+    font-weight: 700; color: var(--safe); font-size: 11px;
+  }
+
+  .emergency-box {
+    background: #FEF2F2; border: 1.5px solid #FECACA;
+    border-radius: 5px; padding: 8px 10px; margin-bottom: 12px;
+  }
+  .emergency-box .section-title { margin-bottom: 3px; }
+  .emergency-box p { font-size: 10.5px; font-weight: 500; color: #991B1B; line-height: 1.45; }
+
+  .remember-box {
+    background: #F0FDF4; border-radius: 5px; padding: 8px 10px; margin-bottom: 12px;
+  }
+  .remember-box .section-title { margin-bottom: 3px; }
+  .remember-box ul { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .remember-box li {
+    font-size: 10.5px; font-weight: 600; color: #065F46;
+    padding-left: 12px; position: relative; line-height: 1.35;
+  }
+  .remember-box li::before { content: '▸'; position: absolute; left: 0; color: var(--safe); }
+
+  .legislation {
+    font-size: 9px; color: var(--muted); border-top: 1px dashed var(--border);
+    padding-top: 6px; margin-bottom: 20px; line-height: 1.5;
+  }
+  .legislation strong { color: var(--ink); font-weight: 700; }
+
+  .signoff { border-top: 2px solid var(--ink); padding-top: 10px; margin-top: auto; }
+  .signoff-title {
+    font-family: 'Archivo Black', sans-serif; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+  }
+  .signoff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .signoff-field { border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; }
+  .signoff-field label {
+    display: block; font-size: 8px; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--muted); font-weight: 600; margin-bottom: 12px;
+  }
+
+  .att-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  .att-table th {
+    background: var(--ink); color: #fff; text-align: left;
+    padding: 5px 6px; font-weight: 600; font-size: 8px;
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .att-table td { border-bottom: 1px solid var(--border); padding: 9px 6px; }
+  .att-table tr:nth-child(even) td { background: #F8FAFC; }
+
+  .footer {
+    text-align: center; font-size: 8px; color: var(--muted);
+    padding-top: 6px; letter-spacing: 0.3px; margin-top: auto;
+  }
+  .footer strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+
+
+<!-- ═══════════ PAGE 1 — THE TALK ═══════════ -->
+<div class="page">
+
+  <div class="header">
+    <div class="header-badge">Toolbox Talk</div>
+    <h1>Mast Climbing Work Platform Safety</h1>
+    <div class="header-meta">
+      <span>TBT-ACC-019</span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <p class="intro">Mast climbing work platforms (MCWPs) provide an efficient alternative to traditional scaffolding for repetitive tasks at height such as bricklaying and cladding. However, they present unique risks including platform overloading, mast instability, and falls during boarding. Operatives must understand safe operating procedures before using these platforms. This talk covers the key hazards and controls for MCWP use on UK construction sites.</p>
+
+    <!-- KEY HAZARDS -->
+    <div class="section">
+      <div class="section-title"><span class="dot dot-amber"></span> Key Hazards</div>
+      <div class="hazard-grid">
+        <div class="hazard-item">Platform collapse from overloading beyond safe working load</div>
+        <div class="hazard-item">Falls from the platform due to missing guardrails</div>
+        <div class="hazard-item">Mast instability caused by inadequate ties to structure</div>
+        <div class="hazard-item">Crushing injuries during platform raising and lowering</div>
+      </div>
+    </div>
+
+    <!-- CONTROL MEASURES -->
+    <div class="section">
+      <div class="section-title"><span class="dot dot-green"></span> Control Measures</div>
+      <ul class="control-list">
+        <li>Ensure the MCWP is erected, altered, and dismantled only by competent trained personnel.</li>
+        <li>Check the safe working load (SWL) is displayed and never exceeded during use.</li>
+        <li>Inspect all guardrails, gates, and toe boards before each shift begins.</li>
+        <li>Verify mast ties are installed at the correct intervals as per the design specification.</li>
+        <li>Use the platform controls only if you have received specific MCWP operator training.</li>
+        <li>Keep the platform surface clear of debris, tools, and excess materials at all times.</li>
+        <li>Ensure emergency lowering procedures are understood by all platform users.</li>
+        <li>Report any unusual noises, vibrations, or movement to the supervisor immediately.</li>
+        <li>Complete a thorough examination under LOLER every six months and after any substantial alteration.</li>
+      </ul>
+    </div>
+
+        <div class="emergency-box">
+      <div class="section-title"><span class="dot dot-red"></span> Emergency / Rescue</div>
+      <p>If the platform becomes stuck or shows signs of structural failure, stop all operations and evacuate. Do not attempt to free the platform. Call the supervisor and specialist contractor. Use emergency lowering only if trained to do so.</p>
+    </div>
+
+    <!-- KEY POINTS TO REMEMBER -->
+    <div class="remember-box">
+      <div class="section-title"><span class="dot dot-green"></span> Remember</div>
+      <ul>
+        <li>Only trained and competent operators may raise or lower the platform</li>
+        <li>Never exceed the safe working load displayed on the platform</li>
+        <li>Check all guardrails and toe boards are secure before each use</li>
+        <li>Mast ties must be installed at the correct spacing per the design</li>
+        <li>Report any unusual sounds, vibrations, or platform drift to your supervisor immediately</li>
+        <li>Emergency lowering procedures must be understood by everyone using the platform</li>
+      </ul>
+    </div>
+
+    <!-- LEGISLATION -->
+    <div class="legislation">
+      <strong>Applicable Legislation:</strong> Work at Height Regulations 2005 · LOLER 1998 · PUWER 1998 · BS EN 1495:1998+A2:2009
+    </div>
+
+    <!-- DELIVERED BY -->
+    <div class="signoff">
+      <div class="signoff-title">Delivered By</div>
+      <div class="signoff-grid">
+        <div class="signoff-field"><label>Name (Print)</label></div>
+        <div class="signoff-field"><label>Signature</label></div>
+        <div class="signoff-field"><label>Position / Role</label></div>
+        <div class="signoff-field"><label>Duration (mins)</label></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Mast Climbing Work Platform Safety &nbsp;&middot;&nbsp; TBT-ACC-019
+    <br><span style="color:#94A3B8; font-size:7px;">Produced by <strong style="color:#64748B;">ebrora.com</strong></span>
+  </div>
+</div>
+
+
+</body>
+</html>
