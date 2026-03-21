@@ -16,21 +16,21 @@ export const metadata: Metadata = {
   description:
     "Free interactive tools for construction site teams. Manual handling calculator, fire risk assessment, materials converter, and confined space category calculator.",
   alternates: {
-    canonical: "https://ebrora.com/tools",
+    canonical: "https://www.ebrora.com/tools",
   },
   openGraph: {
     title: "Free Construction Calculators & Safety Tools | Ebrora",
     description: "Free interactive calculators for construction health and safety.",
-    url: "https://ebrora.com/tools",
+    url: "https://www.ebrora.com/tools",
     type: "website",
-    images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Free Construction Calculators & Safety Tools | Ebrora",
     description:
       "Free interactive construction calculators and safety tools for UK site teams.",
-    images: ["https://ebrora.com/og-image.jpg"],
+    images: ["https://www.ebrora.com/og-image.jpg"],
   },
 };
 
@@ -40,11 +40,11 @@ const toolsPageSchema = {
   name: "Free Construction Calculators & Safety Tools",
   description:
     "Free interactive calculators and tools for UK construction site teams. Based on HSE methodologies and UK regulations.",
-  url: "https://ebrora.com/tools",
+  url: "https://www.ebrora.com/tools",
   publisher: {
     "@type": "Organization",
     name: "Ebrora",
-    url: "https://ebrora.com",
+    url: "https://www.ebrora.com",
   },
 };
 
