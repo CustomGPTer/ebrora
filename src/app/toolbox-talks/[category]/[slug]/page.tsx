@@ -48,13 +48,13 @@ export async function generateMetadata({
       title: `${sub.name} — ${category.name} Toolbox Talks | Ebrora`,
       description: `Free ${sub.name.toLowerCase()} toolbox talks from the ${category.name} category. Download as PDF for site briefings.`,
       alternates: {
-        canonical: `https://ebrora.com/toolbox-talks/${catSlug}/${slug}`,
+        canonical: `https://www.ebrora.com/toolbox-talks/${catSlug}/${slug}`,
       },
       openGraph: {
         title: `${sub.name} — ${category.name} Toolbox Talks | Ebrora`,
         description: `Free ${sub.name.toLowerCase()} toolbox talks for construction site teams.`,
-        url: `https://ebrora.com/toolbox-talks/${catSlug}/${slug}`,
-        images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
+        url: `https://www.ebrora.com/toolbox-talks/${catSlug}/${slug}`,
+        images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
         type: "website",
       },
     };
@@ -68,13 +68,13 @@ export async function generateMetadata({
       title: `${talk.title} — ${category.name} Toolbox Talks | Ebrora`,
       description: `${talk.title} toolbox talk from the ${category.name} category. Free download as PDF.`,
       alternates: {
-        canonical: `https://ebrora.com/toolbox-talks/${catSlug}/${slug}`,
+        canonical: `https://www.ebrora.com/toolbox-talks/${catSlug}/${slug}`,
       },
       openGraph: {
         title: `${talk.title} — ${category.name} Toolbox Talks | Ebrora`,
         description: `${talk.title} toolbox talk. Free PDF for site briefings.`,
-        url: `https://ebrora.com/toolbox-talks/${catSlug}/${slug}`,
-        images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
+        url: `https://www.ebrora.com/toolbox-talks/${catSlug}/${slug}`,
+        images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
         type: "website",
       },
     };
