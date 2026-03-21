@@ -15,13 +15,13 @@ export const metadata: Metadata = {
   description:
     'Download professional Excel templates for UK construction and civil engineering. RAMS, COSHH, Gantt charts, inspection registers and more. CDM 2015 compliant, instant download.',
   alternates: {
-    canonical: 'https://ebrora.com',
+    canonical: 'https://www.ebrora.com',
   },
   openGraph: {
     title: 'Construction Excel Templates for UK Sites | Ebrora',
     description:
       'Professional Excel templates for UK construction. RAMS, COSHH, Gantt charts, inspection registers. CDM 2015 compliant, instant download.',
-    url: 'https://ebrora.com',
+    url: 'https://www.ebrora.com',
     type: 'website',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
   },
