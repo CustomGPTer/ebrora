@@ -14,21 +14,21 @@ export const metadata: Metadata = {
   description:
     "Download free construction templates across 15 categories. Excel spreadsheets, Word documents, and PowerPoint presentations for site management, health and safety, quality, and more.",
   alternates: {
-    canonical: "https://ebrora.com/free-templates",
+    canonical: "https://www.ebrora.com/free-templates",
   },
   openGraph: {
     title: "Free Construction Templates in Excel, Word & PPT | Ebrora",
     description: "Free Excel, Word, and PowerPoint templates for construction teams.",
-    url: "https://ebrora.com/free-templates",
+    url: "https://www.ebrora.com/free-templates",
     type: "website",
-    images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Free Construction Templates in Excel, Word & PPT | Ebrora",
     description:
       "Free construction templates for site management, health and safety, quality and more.",
-    images: ["https://ebrora.com/og-image.jpg"],
+    images: ["https://www.ebrora.com/og-image.jpg"],
   },
 };
 
@@ -38,11 +38,11 @@ const freeTemplatesSchema = {
   name: "Free Construction Templates",
   description:
     "Free professional construction templates in Excel, Word, and PowerPoint. Covering site management, health and safety, quality and more.",
-  url: "https://ebrora.com/free-templates",
+  url: "https://www.ebrora.com/free-templates",
   publisher: {
     "@type": "Organization",
     name: "Ebrora",
-    url: "https://ebrora.com",
+    url: "https://www.ebrora.com",
   },
 };
 
