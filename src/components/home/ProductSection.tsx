@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import { useState, useMemo } from 'react';
 import { useSearch } from '@/contexts/SearchContext';
 import type { Product, Category } from '@/lib/types';
@@ -285,12 +287,13 @@ function ProductCard({ product, categories }: ProductCardProps) {
       <div className="product-card__image-wrap">
         {hasImages ? (
           <>
-            <img src={mainImage} alt={product.altText || product.title} className="main-img" loading="lazy" />
-            <img
+            <Image src={mainImage} alt={product.altText || product.title} width={600} height={400} className="main-img" />
+            <Image
               src={hoverImage}
               alt={`${product.title} preview`}
+              width={600}
+              height={400}
               className="hover-img"
-              loading="lazy"
             />
           </>
         ) : (
