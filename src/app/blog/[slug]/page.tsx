@@ -24,25 +24,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     description: post.excerpt,
     alternates: {
-      canonical: `https://ebrora.com/blog/${post.id}`,
+      canonical: `https://www.ebrora.com/blog/${post.id}`,
     },
     openGraph: {
       title: `${post.title} | Ebrora Blog`,
       description: post.excerpt,
-      url: `https://ebrora.com/blog/${post.id}`,
+      url: `https://www.ebrora.com/blog/${post.id}`,
       type: 'article',
       publishedTime: post.date,
       images: post.featuredImage
-        ? [{ url: `https://ebrora.com/${post.featuredImage}`, width: 1200, height: 630, alt: post.title }]
-        : [{ url: 'https://ebrora.com/og-image.jpg', width: 1200, height: 630 }],
+        ? [{ url: `https://www.ebrora.com/${post.featuredImage}`, width: 1200, height: 630, alt: post.title }]
+        : [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${post.title} | Ebrora Blog`,
       description: post.excerpt,
       images: post.featuredImage
-        ? [`https://ebrora.com/${post.featuredImage}`]
-        : ['https://ebrora.com/og-image.jpg'],
+        ? [`https://www.ebrora.com/${post.featuredImage}`]
+        : ['https://www.ebrora.com/og-image.jpg'],
     },
   };
 }
@@ -73,20 +73,20 @@ export default async function BlogPostPage({ params }: PageProps) {
     publisher: {
       '@type': 'Organization',
       name: 'Ebrora',
-      url: 'https://ebrora.com',
+      url: 'https://www.ebrora.com',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://ebrora.com/og-image.jpg',
+        url: 'https://www.ebrora.com/og-image.jpg',
       },
     },
     description: post.excerpt,
     image: post.featuredImage
-      ? `https://ebrora.com/${post.featuredImage}`
-      : 'https://ebrora.com/og-image.jpg',
-    url: `https://ebrora.com/blog/${post.id}`,
+      ? `https://www.ebrora.com/${post.featuredImage}`
+      : 'https://www.ebrora.com/og-image.jpg',
+    url: `https://www.ebrora.com/blog/${post.id}`,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://ebrora.com/blog/${post.id}`,
+      '@id': `https://www.ebrora.com/blog/${post.id}`,
     },
   };
 
