@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Answers to common questions about Ebrora construction Excel templates. Covers compatibility, purchasing, macros, CDM 2015 compliance, refunds and custom services.',
   alternates: {
-    canonical: 'https://ebrora.com/faq',
+    canonical: 'https://www.ebrora.com/faq',
   },
   openGraph: {
     title: 'Construction RAMS & Excel Template FAQs | Ebrora',
@@ -17,20 +17,20 @@ export const metadata: Metadata = {
       'Common questions about our Excel templates for UK construction and civil engineering. Compatibility, purchasing, macros and custom services.',
     images: [
       {
-        url: 'https://ebrora.com/og-image.jpg',
+        url: 'https://www.ebrora.com/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Ebrora FAQ – Construction Excel Templates',
       },
     ],
-    url: 'https://ebrora.com/faq',
+    url: 'https://www.ebrora.com/faq',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Construction RAMS & Excel Template FAQs | Ebrora',
     description: 'Common questions about our Excel templates for UK construction professionals.',
-    images: ['https://ebrora.com/og-image.jpg'],
+    images: ['https://www.ebrora.com/og-image.jpg'],
   },
 };
 
