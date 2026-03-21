@@ -23,17 +23,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       cat.description ||
       `Download free ${cat.name} toolbox talks for construction site teams. ${talkCount} available across ${cat.subfolders.length} sub-categories. PDF format, ready to use.`,
     alternates: {
-      canonical: `https://ebrora.com/toolbox-talks/${slug}`,
+      canonical: `https://www.ebrora.com/toolbox-talks/${slug}`,
     },
     openGraph: {
       title: `${cat.name} Toolbox Talks | Ebrora`,
       description:
         cat.description ||
         `Free ${cat.name} toolbox talks for construction.`,
-      url: `https://ebrora.com/toolbox-talks/${slug}`,
+      url: `https://www.ebrora.com/toolbox-talks/${slug}`,
       type: "website",
       images: [
-        { url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 },
+        { url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 },
       ],
     },
     twitter: {
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description:
         cat.description ||
         `Free ${cat.name} toolbox talks for construction site teams.`,
-      images: ["https://ebrora.com/og-image.jpg"],
+      images: ["https://www.ebrora.com/og-image.jpg"],
     },
   };
 }
@@ -249,11 +249,11 @@ export default async function ToolboxCategoryPage({ params }: PageProps) {
             "@type": "CollectionPage",
             name: `${cat.name} Toolbox Talks`,
             description: cat.description,
-            url: `https://ebrora.com/toolbox-talks/${slug}`,
+            url: `https://www.ebrora.com/toolbox-talks/${slug}`,
             publisher: {
               "@type": "Organization",
               name: "Ebrora",
-              url: "https://ebrora.com",
+              url: "https://www.ebrora.com",
             },
           }),
         }}
