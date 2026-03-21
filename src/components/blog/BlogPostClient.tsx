@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { BlogPost, BlogCategory } from '@/data/posts';
@@ -76,7 +78,7 @@ export default function BlogPostClient({
       {/* Featured Image */}
       {post.featuredImage && (
         <div className="blog-post__featured-image">
-          <img src={`/${post.featuredImage}`} alt={post.title} />
+          <Image src={`/${post.featuredImage}`} alt={post.title} width={1200} height={630} />
         </div>
       )}
 
@@ -163,10 +165,12 @@ export default function BlogPostClient({
                         className="blog-post__related-product-card"
                       >
                         {product.images[0] && (
-                          <img
+                          <Image
                             src={`/${product.images[0]}`}
                             alt={product.title}
                             className="blog-post__related-product-image"
+                          width={600}
+                            height={400}
                           />
                         )}
                         <h4 className="blog-post__related-product-name">
