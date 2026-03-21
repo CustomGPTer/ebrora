@@ -88,31 +88,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       let toolboxTalkPages: MetadataRoute.Sitemap = [];
 
   try {
-          const categories = await prisma.toolboxCategory.findMany({
-                    select: { slug: true, updatedAt: true },
-                    orderBy: { order: 'asc' },
-          });
+    const categories = await prisma.toolboxCategory.findMany({
+      select: { slug: true, updatedAt: true },
+      orderBy: { order: 'asc' },
+    });
 
-        toolboxCategoryPages = categories.map((cat) => ({
-                  url: `${baseUrl}/toolbox-talks/${cat.slug}`,
-                  lastModified: cat.updatedAt ?? new Date(),
-                  changeFrequency: 'weekly' as const,
-                  priority: 0.7,
-        }));
+    toolboxCategoryPages = categories.map((cat) => ({
+      url: `${baseUrl}/toolbox-talks/${cat.slug}`,
+      lastModified: cat.updatedAt ?? new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }));
 
-        const talks = await prisma.toolboxTalk.findMany({
-                  where: { isPublished: true },
-                  select: { slug: true, updatedAt: true, category: { select: { slug: true } } },
-        });
+    const talks = await prisma.toolboxTalk.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true, category: { select: { slug: true } } },
+    });
 
-        toolboxTalkPages = talks.map((talk) => ({
-                  url: `${baseUrl}/toolbox-talks/${talk.category.slug}/${talk.slug}`,
-                  lastModified: talk.updatedAt ?? new Date(),
-                  changeFrequency: 'monthly' as const,
-                  priority: 0.6,
-        }));
-  } catch {
-          // DB unavailable at build time – skip toolbox pages
+    toolboxTalkPages = talks.map((talk) => ({
+      url: `${baseUrl}/toolbox-talks/${talk.category.slug}/${talk.slug}`,
+      lastModified: talk.updatedAt ?? new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
+  } catch (err) {
+    console.error('Sitemap: DB unavailable, falling back to static TBT data', err);
+
+    // Fall back to static structure from tbt-structure.ts
+    const { TBT_CATEGORIES } = await import('@/data/tbt-structure');
+
+    toolboxCategoryPages = TBT_CATEGORIES.map((cat) => ({
+      url: `${baseUrl}/toolbox-talks/${cat.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }));
+
+    toolboxTalkPages = TBT_CATEGORIES.flatMap((cat) =>
+      cat.subfolders.flatMap((sub) =>
+        sub.talks.map((talk) => ({
+          url: `${baseUrl}/toolbox-talks/${cat.slug}/${talk.slug}`,
+          lastModified: new Date(),
+          changeFrequency: 'monthly' as const,
+          priority: 0.6,
+        }))
+      )
+    );
   }
 
   return [
