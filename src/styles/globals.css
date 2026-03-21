@@ -31,8 +31,8 @@
     --color-border: #E2E8E6;
 
     /* Typography */
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'DM Sans', sans-serif;
+    --font-display: var(--font-playfair), 'Playfair Display', serif;
+    --font-body: var(--font-dm-sans), 'DM Sans', sans-serif;
 
     /* Sizing */
     --nav-height: 64px;
