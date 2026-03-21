@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { DM_Sans, Playfair_Display } from 'next/font/google';
 import '@/styles/globals.css';
 import { NavBar } from '@/components/navigation/NavBar';
 import { Footer } from '@/components/Footer';
@@ -6,6 +7,20 @@ import { CookieBanner } from '@/components/CookieBanner';
 import { BackToTop } from '@/components/BackToTop';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import AuthProvider from '@/components/auth/AuthProvider';
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-dm-sans',
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  display: 'swap',
+  variable: '--font-playfair',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.ebrora.com'),
@@ -95,20 +110,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" className={`${dmSans.variable} ${playfairDisplay.variable}`}>
       <head>
-        {/* Google Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
-          rel="stylesheet"
-        />
-        {/* Sitemap */}
+        />        {/* Sitemap */}
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         {/* Schema.org */}
         <script
