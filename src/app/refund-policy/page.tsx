@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description:
     'Refund Policy for Ebrora. Understand our refund terms for instant-download digital Excel templates.',
   alternates: {
-    canonical: 'https://ebrora.com/refund-policy',
+    canonical: 'https://www.ebrora.com/refund-policy',
   },
   openGraph: {
     title: 'Refund Policy | Ebrora',
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
       'Refund Policy for Ebrora. Understand our refund terms for digital Excel templates.',
     images: [
       {
-        url: 'https://ebrora.com/og-image.jpg',
+        url: 'https://www.ebrora.com/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Refund Policy',
       },
     ],
-    url: 'https://ebrora.com/refund-policy',
+    url: 'https://www.ebrora.com/refund-policy',
     type: 'website',
   },
   twitter: {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: 'Refund Policy | Ebrora',
     description:
       'Refund Policy for Ebrora. Understand our refund terms for digital Excel templates.',
-    images: ['https://ebrora.com/og-image.jpg'],
+    images: ['https://www.ebrora.com/og-image.jpg'],
   },
 };
 
