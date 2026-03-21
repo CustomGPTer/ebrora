@@ -8,7 +8,7 @@ import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import AuthProvider from '@/components/auth/AuthProvider';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ebrora.com'),
+  metadataBase: new URL('https://www.ebrora.com'),
   title: {
     default: 'Construction Excel Templates for UK Sites | Ebrora',
     template: '%s | Ebrora',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'Construction Excel Templates for UK Sites | Ebrora',
     description:
       'Professional Excel templates for UK construction and civil engineering. CDM 2015 compliant. Instant download, no signup required.',
-    url: 'https://ebrora.com',
+    url: 'https://www.ebrora.com',
     siteName: 'Ebrora',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
     locale: 'en_GB',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
   },
-  alternates: { canonical: 'https://ebrora.com' },
+  alternates: { canonical: 'https://www.ebrora.com' },
   other: { 'google-site-verification': '' },
 };
 
@@ -59,8 +59,8 @@ const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Ebrora',
-  url: 'https://ebrora.com',
-  logo: 'https://ebrora.com/og-image.jpg',
+  url: 'https://www.ebrora.com',
+  logo: 'https://www.ebrora.com/og-image.jpg',
   description:
     'Professional Excel templates built specifically for UK construction and civil engineering professionals. CDM 2015 compliant tools for site managers, engineers, and project teams.',
   email: 'hello@ebrora.com',
@@ -76,14 +76,14 @@ const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Ebrora',
-  url: 'https://ebrora.com',
+  url: 'https://www.ebrora.com',
   description:
     'Professional Excel templates for UK construction and civil engineering. Instant download, no signup required.',
   potentialAction: {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: 'https://ebrora.com/?search={search_term_string}',
+      urlTemplate: 'https://www.ebrora.com/?search={search_term_string}',
     },
     'query-input': 'required name=search_term_string',
   },
