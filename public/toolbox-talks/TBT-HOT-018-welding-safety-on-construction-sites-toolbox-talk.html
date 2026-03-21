@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welding Safety on Construction Sites - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&display=swap');
+  :root { --warn: #F59E0B; --danger: #DC2626; --safe: #059669; --ink: #1E293B; --muted: #64748B; --card: #FFFFFF; --border: #E2E8F0; --accent-gradient: linear-gradient(135deg, #F59E0B 0%, #DC2626 100%); }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #CBD5E1; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 0; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 0; border: none; box-shadow: none; width: 210mm; min-height: 0; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .no-print { display: none !important; } }
+  .page { width: 100%; min-height: 297mm; padding: 10mm 13mm 12mm 13mm; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+  @media print { .page { min-height: auto; overflow: visible; } }
+  .header { background: var(--accent-gradient); margin: -10mm -13mm 0 -13mm; padding: 8mm 13mm 3.5mm; position: relative; }
+  .header-badge { display: block; background: rgba(255,255,255,0.22); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 12px; border-radius: 4px; margin-bottom: 5px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto; }
+  .header h1 { font-family: 'DM Sans', sans-serif; font-size: 22px; color: #fff; font-weight: 700; line-height: 1.15; margin-bottom: 6px; text-align: center; letter-spacing: -0.3px; }
+  .header-meta { display: flex; gap: 12px; font-size: 10px; color: rgba(255,255,255,0.85); font-weight: 500; justify-content: center; }
+  .header-meta span { display: flex; align-items: center; gap: 3px; }
+  .body { padding-top: 16px; flex: 1; }
+  .intro { font-size: 11.5px; color: var(--muted); font-weight: 500; border-left: 3px solid var(--warn); padding-left: 10px; margin-bottom: 14px; line-height: 1.55; }
+  .section { margin-bottom: 12px; }
+  .section-title { font-family: 'Archivo Black', sans-serif; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .dot-amber { background: var(--warn); } .dot-red { background: var(--danger); } .dot-green { background: var(--safe); } .dot-blue { background: #2563EB; }
+  .hazard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .hazard-item { display: flex; align-items: flex-start; gap: 5px; background: #FEF3C7; border-radius: 4px; padding: 6px 8px; font-size: 10.5px; font-weight: 500; color: #92400E; line-height: 1.35; }
+  .hazard-item::before { content: '⚠'; font-size: 11px; flex-shrink: 0; }
+  .control-list { list-style: none; }
+  .control-list li { position: relative; padding: 4px 0 4px 18px; font-size: 10.5px; font-weight: 500; line-height: 1.4; border-bottom: 1px solid var(--border); }
+  .control-list li:last-child { border-bottom: none; }
+  .control-list li::before { content: '✓'; position: absolute; left: 0; top: 4px; font-weight: 700; color: var(--safe); font-size: 11px; }
+  .emergency-box { background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 5px; padding: 8px 10px; margin-bottom: 12px; }
+  .emergency-box .section-title { margin-bottom: 3px; }
+  .emergency-box p { font-size: 10.5px; font-weight: 500; color: #991B1B; line-height: 1.45; }
+  .remember-box { background: #F0FDF4; border-radius: 5px; padding: 8px 10px; margin-bottom: 12px; }
+  .remember-box .section-title { margin-bottom: 3px; }
+  .remember-box ul { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .remember-box li { font-size: 10.5px; font-weight: 600; color: #065F46; padding-left: 12px; position: relative; line-height: 1.35; }
+  .remember-box li::before { content: '▸'; position: absolute; left: 0; color: var(--safe); }
+  .legislation { font-size: 9px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 6px; margin-bottom: 20px; line-height: 1.5; }
+  .legislation strong { color: var(--ink); font-weight: 700; }
+  .signoff { border-top: 2px solid var(--ink); padding-top: 10px; margin-top: auto; }
+  .signoff-title { font-family: 'Archivo Black', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .signoff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .signoff-field { border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; }
+  .signoff-field label { display: block; font-size: 8px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); font-weight: 600; margin-bottom: 12px; }
+  .footer { text-align: center; font-size: 8px; color: var(--muted); padding-top: 6px; letter-spacing: 0.3px; margin-top: auto; }
+  .footer strong { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-badge">Toolbox Talk</div>
+    <h1>Welding Safety on Construction Sites</h1>
+    <div class="header-meta">
+      <span>TBT-HOT-018</span>
+    </div>
+  </div>
+  <div class="body">
+    <p class="intro">Welding on construction sites presents risks from electric shock, arc eye, toxic fumes, fire, and burns. Whether using MIG, TIG, MMA, or oxy-fuel processes, welders and those working nearby must understand the hazards and follow the correct precautions. Welding fumes are classified as carcinogenic and prolonged exposure causes serious lung disease. Adequate ventilation, correct PPE, and a valid hot works permit are essential for every welding task.</p>
+
+    <div class="section">
+      <div class="section-title"><span class="dot dot-amber"></span> Key Hazards</div>
+      <div class="hazard-grid">
+        <div class="hazard-item">Electric shock from welding equipment in wet or damp conditions</div>
+        <div class="hazard-item">Arc eye causing painful corneal burns from ultraviolet radiation exposure</div>
+        <div class="hazard-item">Toxic welding fume inhalation increasing the risk of lung cancer</div>
+        <div class="hazard-item">Fire ignition from sparks and hot slag landing on combustible materials</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot dot-green"></span> Control Measures</div>
+      <ul class="control-list">
+        <li>Obtain a hot works permit before starting any welding activity on the construction site.</li>
+        <li>Use local exhaust ventilation or forced ventilation to capture and remove welding fumes at source.</li>
+        <li>Wear a correctly rated welding helmet with the appropriate lens shade for the welding process.</li>
+        <li>Use flame-retardant clothing, welding gauntlets, and leather apron to protect against burns and sparks.</li>
+        <li>Erect welding screens around the work area to protect nearby workers from arc flash radiation.</li>
+        <li>Inspect welding equipment, cables, and connections before each use and reject any with damage.</li>
+        <li>Ensure the work area is dry and use insulating mats when welding in damp or confined conditions.</li>
+        <li>Clear all combustible materials from within 10 metres and maintain a fire watch during and after welding.</li>
+        <li>Ensure fire extinguishers are positioned within immediate reach of the welding work location.</li>
+      </ul>
+    </div>
+
+    <div class="emergency-box">
+      <div class="section-title"><span class="dot dot-red"></span> Emergency / Rescue</div>
+      <p>If a welder receives an electric shock, isolate the power supply before touching them. Call 999 and begin CPR if they are unresponsive. For arc eye, flush eyes with clean water and seek medical attention.</p>
+    </div>
+
+    <div class="remember-box">
+      <div class="section-title"><span class="dot dot-green"></span> Remember</div>
+      <ul>
+        <li>Welding fumes are classified as carcinogenic — always use extraction or adequate ventilation.</li>
+        <li>Arc eye is caused by even brief unprotected exposure to the welding arc ultraviolet light.</li>
+        <li>A hot works permit is mandatory for all welding activities on UK construction sites.</li>
+        <li>Inspect all welding equipment daily and never use damaged cables or faulty return clamps.</li>
+        <li>Fire from welding sparks can smoulder for hours before igniting — maintain the full fire watch.</li>
+        <li>Protect nearby workers with welding screens and warning signs around the active work area.</li>
+      </ul>
+    </div>
+
+    <div class="legislation">
+      <strong>Applicable Legislation:</strong> Health and Safety at Work etc. Act 1974 · COSHH Regulations 2002 · Electricity at Work Regulations 1989 · Regulatory Reform (Fire Safety) Order 2005
+    </div>
+
+    <div class="signoff">
+      <div class="signoff-title">Delivered By</div>
+      <div class="signoff-grid">
+        <div class="signoff-field"><label>Name (Print)</label></div>
+        <div class="signoff-field"><label>Signature</label></div>
+        <div class="signoff-field"><label>Position / Role</label></div>
+        <div class="signoff-field"><label>Duration (mins)</label></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    Welding Safety on Construction Sites &nbsp;·&nbsp; TBT-HOT-018
+    <br><span style="color:#94A3B8; font-size:7px;">Produced by <strong style="color:#64748B;">ebrora.com</strong></span>
+  </div>
+</div>
+</body>
+</html>
