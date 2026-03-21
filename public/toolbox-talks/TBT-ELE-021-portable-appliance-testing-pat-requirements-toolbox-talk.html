@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portable Appliance Testing (PAT) Requirements - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --warn: #F59E0B;
+    --danger: #DC2626;
+    --safe: #059669;
+    --ink: #1E293B;
+    --muted: #64748B;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --accent-gradient: linear-gradient(135deg, #F59E0B 0%, #DC2626 100%);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { background: #CBD5E1; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: var(--ink);
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @page { size: A4 portrait; margin: 0; }
+
+  @media print {
+    html { background: #fff; }
+    body {
+      margin: 0;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+      width: 210mm;
+      min-height: 0;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none !important; }
+  }
+
+  .page {
+    width: 100%;
+    min-height: 297mm;
+    padding: 10mm 13mm 12mm 13mm;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-break {
+    page-break-before: always;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  @media print {
+    .page { min-height: auto; overflow: visible; }
+    .page-break { border-top: none; }
+  }
+
+  .header {
+    background: var(--accent-gradient);
+    margin: -10mm -13mm 0 -13mm;
+    padding: 8mm 13mm 3.5mm;
+    position: relative;
+  }
+  .header-badge {
+    display: block; background: rgba(255,255,255,0.22); color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 12px; border-radius: 4px; margin-bottom: 5px;
+    text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
+  }
+  .header h1 {
+    font-family: 'DM Sans', sans-serif; font-size: 22px; color: #fff;
+    font-weight: 700; line-height: 1.15; margin-bottom: 6px; text-align: center;
+    letter-spacing: -0.3px;
+  }
+  .header-meta {
+    display: flex; gap: 12px; font-size: 10px; color: rgba(255,255,255,0.85); font-weight: 500;
+    justify-content: center;
+  }
+  .header-meta span { display: flex; align-items: center; gap: 3px; }
+
+  .body { padding-top: 16px; flex: 1; }
+
+  .intro {
+    font-size: 11.5px; color: var(--muted); font-weight: 500;
+    border-left: 3px solid var(--warn); padding-left: 10px;
+    margin-bottom: 14px; line-height: 1.55;
+  }
+
+  .section { margin-bottom: 12px; }
+  .section-title {
+    font-family: 'Archivo Black', sans-serif; font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--ink);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+  }
+  .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .dot-amber { background: var(--warn); }
+  .dot-red { background: var(--danger); }
+  .dot-green { background: var(--safe); }
+  .dot-blue { background: #2563EB; }
+
+  .hazard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .hazard-item {
+    display: flex; align-items: flex-start; gap: 5px;
+    background: #FEF3C7; border-radius: 4px; padding: 6px 8px;
+    font-size: 10.5px; font-weight: 500; color: #92400E; line-height: 1.35;
+  }
+  .hazard-item::before { content: '⚠'; font-size: 11px; flex-shrink: 0; }
+
+  .control-list { list-style: none; }
+  .control-list li {
+    position: relative; padding: 4px 0 4px 18px; font-size: 10.5px;
+    font-weight: 500; line-height: 1.4; border-bottom: 1px solid var(--border);
+  }
+  .control-list li:last-child { border-bottom: none; }
+  .control-list li::before {
+    content: '✓'; position: absolute; left: 0; top: 4px;
+    font-weight: 700; color: var(--safe); font-size: 11px;
+  }
+
+  .emergency-box {
+    background: #FEF2F2; border: 1.5px solid #FECACA;
+    border-radius: 5px; padding: 8px 10px; margin-bottom: 12px;
+  }
+  .emergency-box .section-title { margin-bottom: 3px; }
+  .emergency-box p { font-size: 10.5px; font-weight: 500; color: #991B1B; line-height: 1.45; }
+
+  .remember-box {
+    background: #F0FDF4; border-radius: 5px; padding: 8px 10px; margin-bottom: 12px;
+  }
+  .remember-box .section-title { margin-bottom: 3px; }
+  .remember-box ul { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .remember-box li {
+    font-size: 10.5px; font-weight: 600; color: #065F46;
+    padding-left: 12px; position: relative; line-height: 1.35;
+  }
+  .remember-box li::before { content: '▸'; position: absolute; left: 0; color: var(--safe); }
+
+  .legislation {
+    font-size: 9px; color: var(--muted); border-top: 1px dashed var(--border);
+    padding-top: 6px; margin-bottom: 20px; line-height: 1.5;
+  }
+  .legislation strong { color: var(--ink); font-weight: 700; }
+
+  .signoff { border-top: 2px solid var(--ink); padding-top: 10px; margin-top: auto; }
+  .signoff-title {
+    font-family: 'Archivo Black', sans-serif; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+  }
+  .signoff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .signoff-field { border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; }
+  .signoff-field label {
+    display: block; font-size: 8px; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--muted); font-weight: 600; margin-bottom: 12px;
+  }
+
+  .att-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  .att-table th {
+    background: var(--ink); color: #fff; text-align: left;
+    padding: 5px 6px; font-weight: 600; font-size: 8px;
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .att-table td { border-bottom: 1px solid var(--border); padding: 9px 6px; }
+  .att-table tr:nth-child(even) td { background: #F8FAFC; }
+
+  .footer {
+    text-align: center; font-size: 8px; color: var(--muted);
+    padding-top: 6px; letter-spacing: 0.3px; margin-top: auto;
+  }
+  .footer strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+
+
+<!-- ═══════════ PAGE 1 — THE TALK ═══════════ -->
+<div class="page">
+
+  <div class="header">
+    <div class="header-badge">Toolbox Talk</div>
+    <h1>Portable Appliance Testing (PAT) Requirements</h1>
+    <div class="header-meta">
+      <span>TBT-ELE-021</span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <p class="intro">Portable electrical appliances on construction sites are exposed to rough handling, moisture, and dust that accelerate wear and increase the risk of electric shock or fire. Regular inspection and testing ensures that faulty equipment is identified and removed from service before it causes harm. This talk covers the PAT testing regime for site equipment, user checks, and what to do if you find a defective appliance.</p>
+
+    <!-- KEY HAZARDS -->
+    <div class="section">
+      <div class="section-title"><span class="dot dot-amber"></span> Key Hazards</div>
+      <div class="hazard-grid">
+        <div class="hazard-item">Electric shock from damaged cables or faulty insulation on portable tools</div>
+        <div class="hazard-item">Fire caused by overheating appliances with internal wiring faults</div>
+        <div class="hazard-item">Continued use of untested equipment with hidden electrical defects</div>
+        <div class="hazard-item">Water ingress into damaged tool casings causing short circuits on site</div>
+      </div>
+    </div>
+
+    <!-- CONTROL MEASURES -->
+    <div class="section">
+      <div class="section-title"><span class="dot dot-green"></span> Control Measures</div>
+      <ul class="control-list">
+        <li>Check that all portable appliances carry a current PAT test label before use each day.</li>
+        <li>Carry out a visual user check of the cable, plug, and casing before connecting any tool to the supply.</li>
+        <li>Remove from service immediately any appliance with a damaged cable, cracked casing, or missing label.</li>
+        <li>Ensure all 230V portable appliances are protected by a 30mA RCD or use 110V reduced voltage supplies.</li>
+        <li>Report defective appliances to your supervisor and attach a 'Do Not Use' tag until repair or disposal.</li>
+        <li>Ensure PAT testing is carried out at the intervals specified in the site electrical management plan.</li>
+        <li>Keep a register of all portable appliances on site including test dates and results.</li>
+        <li>Never attempt to repair electrical equipment unless you are a competent and authorised electrician.</li>
+        <li>Store portable tools in dry conditions and protect them from impact damage when not in use.</li>
+      </ul>
+    </div>
+
+    
+
+    <!-- KEY POINTS TO REMEMBER -->
+    <div class="remember-box">
+      <div class="section-title"><span class="dot dot-green"></span> Remember</div>
+      <ul>
+        <li>Always carry out a visual check of cables, plugs, and casings before using any electrical tool</li>
+        <li>Remove defective appliances from service immediately and tag them as not safe for use</li>
+        <li>All portable appliances must display a current PAT test label before being used on site</li>
+        <li>Use 110V reduced voltage supplies or 30mA RCD protection for all portable equipment on site</li>
+        <li>Never attempt to repair electrical tools yourself unless you are a qualified electrician</li>
+        <li>PAT testing intervals are set in the site electrical management plan and must be followed</li>
+      </ul>
+    </div>
+
+    <!-- LEGISLATION -->
+    <div class="legislation">
+      <strong>Applicable Legislation:</strong> Electricity at Work Regulations 1989 &middot; IET Code of Practice for In-Service Inspection and Testing &middot; PUWER 1998 &middot; Health and Safety at Work etc. Act 1974
+    </div>
+
+    <!-- DELIVERED BY -->
+    <div class="signoff">
+      <div class="signoff-title">Delivered By</div>
+      <div class="signoff-grid">
+        <div class="signoff-field"><label>Name (Print)</label></div>
+        <div class="signoff-field"><label>Signature</label></div>
+        <div class="signoff-field"><label>Position / Role</label></div>
+        <div class="signoff-field"><label>Duration (mins)</label></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Portable Appliance Testing (PAT) Requirements &nbsp;&middot;&nbsp; TBT-ELE-021
+    <br><span style="color:#94A3B8; font-size:7px;">Produced by <strong style="color:#64748B;">ebrora.com</strong></span>
+  </div>
+</div>
+
+
+</body>
+</html>
