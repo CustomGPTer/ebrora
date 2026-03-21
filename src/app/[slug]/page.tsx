@@ -21,20 +21,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Product Not Found' };
   }
   const image = product.images?.[0]
-    ? `https://ebrora.com/${product.images[0]}`
-    : 'https://ebrora.com/og-image.jpg';
+    ? `https://www.ebrora.com/${product.images[0]}`
+    : 'https://www.ebrora.com/og-image.jpg';
   return {
     title: {
       absolute: `${product.title} | Ebrora`,
     },
     description: product.desc,
     alternates: {
-      canonical: `https://ebrora.com/${product.id}`,
+      canonical: `https://www.ebrora.com/${product.id}`,
     },
     openGraph: {
       title: `${product.title} | Ebrora`,
       description: product.desc,
-      url: `https://ebrora.com/${product.id}`,
+      url: `https://www.ebrora.com/${product.id}`,
       type: 'website',
       images: [{ url: image, width: 1200, height: 630, alt: `${product.title} – Ebrora` }],
     },
@@ -75,15 +75,15 @@ export default async function ProductPage({ params }: PageProps) {
     name: product.title,
     description: product.desc,
     image: product.images?.[0]
-      ? `https://ebrora.com/${product.images[0]}`
-      : 'https://ebrora.com/og-image.jpg',
+      ? `https://www.ebrora.com/${product.images[0]}`
+      : 'https://www.ebrora.com/og-image.jpg',
     brand: {
       '@type': 'Brand',
       name: 'Ebrora',
     },
     offers: {
       '@type': 'Offer',
-      url: `https://ebrora.com/${product.id}`,
+      url: `https://www.ebrora.com/${product.id}`,
       priceCurrency: 'GBP',
       price: parsePrice(product.price),
       availability: 'https://schema.org/InStock',
