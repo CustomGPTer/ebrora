@@ -110,7 +110,7 @@ export default async function SlugPage({ params }: PageProps) {
               {sub.name}
             </h1>
             <p className="text-sm text-emerald-100/70">
-              {category.name} \u203A {sub.name} —{" "}
+              {category.name} › {sub.name} —{" "}
               {sub.talks.length} toolbox talk{sub.talks.length !== 1 ? "s" : ""}{" "}
               available
             </p>
@@ -228,7 +228,7 @@ export default async function SlugPage({ params }: PageProps) {
               <span className="text-xs font-mono text-emerald-200/70">{talk.ref}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2" style={{ color: "#ffffff" }}>{talk.title}</h1>
-            <p className="text-sm text-emerald-100/70">{category.name} \u203A {subfolder.name} \u203A {talk.title}</p>
+            <p className="text-sm text-emerald-100/70">{category.name} › {subfolder.name} › {talk.title}</p>
           </div>
         </section>
 
