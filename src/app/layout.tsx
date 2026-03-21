@@ -112,11 +112,7 @@ export default function RootLayout({
   return (
     <html lang="en-GB" className={`${dmSans.variable} ${playfairDisplay.variable}`}>
       <head>
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />        {/* Sitemap */}
+        {/* Sitemap */}
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         {/* Schema.org */}
         <script
