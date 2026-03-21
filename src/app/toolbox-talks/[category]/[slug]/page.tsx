@@ -179,6 +179,44 @@ export default async function SlugPage({ params }: PageProps) {
     const { talk, subfolder, category } = talkResult;
     return (
       <>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: talk.title,
+            description: `${talk.title} toolbox talk for UK construction sites. Free PDF download.`,
+            url: `https://www.ebrora.com/toolbox-talks/${catSlug}/${slug}`,
+            datePublished: '2026-03-01',
+            dateModified: '2026-03-01',
+            author: {
+              '@type': 'Organization',
+              name: 'Ebrora',
+              url: 'https://www.ebrora.com',
+            },
+            publisher: {
+              '@type': 'Organization',
+              name: 'Ebrora',
+              url: 'https://www.ebrora.com',
+              logo: {
+                '@type': 'ImageObject',
+                url: 'https://www.ebrora.com/og-image.jpg',
+              },
+            },
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': `https://www.ebrora.com/toolbox-talks/${catSlug}/${slug}`,
+            },
+            isPartOf: {
+              '@type': 'CollectionPage',
+              name: `${category.name} Toolbox Talks`,
+              url: `https://www.ebrora.com/toolbox-talks/${catSlug}`,
+            },
+          }),
+        }}
+      />
         {/* Hero */}
         <section className="bg-gradient-to-b from-[#0f2d22] to-[#1B5745] text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
