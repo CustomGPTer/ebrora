@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Falls From Height Awareness - Construction Toolbox Talk | ebrora.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --warn: #F59E0B;
+    --danger: #DC2626;
+    --safe: #059669;
+    --ink: #1E293B;
+    --muted: #64748B;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --accent-gradient: linear-gradient(135deg, #F59E0B 0%, #DC2626 100%);
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @media print {
+    @page { size: A4 portrait; margin: 25.4mm; }
+    body { background: #fff; }
+    .page { box-shadow: none !important; border: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; min-height: auto !important; }
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+  }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #CBD5E1;
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .controls { position: fixed; top: 16px; right: 16px; z-index: 100; }
+  .controls button {
+    font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+    padding: 10px 22px; border: none; border-radius: 8px; cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18); background: var(--ink); color: #fff;
+  }
+  .controls button:hover { background: #334155; }
+
+  .page {
+    width: 210mm; min-height: 297mm; margin: 24px auto; background: var(--card);
+    border-radius: 6px; box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    padding: 25.4mm; display: flex; flex-direction: column;
+  }
+
+  .header {
+    background: var(--accent-gradient);
+    margin: -25.4mm -25.4mm 0 -25.4mm;
+    padding: 10mm 25.4mm 9mm;
+    position: relative;
+  }
+  .header::after {
+    content: ''; position: absolute; bottom: -12px; left: 0; right: 0; height: 12px;
+    background:
+      linear-gradient(to bottom right, transparent 49.5%, var(--card) 50.5%),
+      linear-gradient(to bottom left, transparent 49.5%, var(--card) 50.5%);
+    background-size: 50.1% 100%; background-position: left, right; background-repeat: no-repeat;
+  }
+  .header-badge {
+    display: block; background: rgba(255,255,255,0.22); color: #fff;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 14px; border-radius: 4px; margin-bottom: 6px;
+    text-align: center; width: fit-content; margin-left: auto; margin-right: auto;
+  }
+  .header h1 {
+    font-family: 'Archivo Black', sans-serif; font-size: 28px; color: #fff;
+    line-height: 1.15; margin-bottom: 8px; text-align: center;
+  }
+  .header-meta {
+    display: flex; gap: 12px; font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 500;
+    justify-content: center;
+  }
+  .header-meta span { display: flex; align-items: center; gap: 3px; }
+
+  .body { padding-top: 18px; flex: 1; }
+
+  .intro {
+    font-size: 13px; color: var(--muted); font-weight: 500;
+    border-left: 3px solid var(--warn); padding-left: 12px;
+    margin-bottom: 18px; line-height: 1.55;
+  }
+
+  .section { margin-bottom: 16px; }
+  .section-title {
+    font-family: 'Archivo Black', sans-serif; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--ink);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-amber { background: var(--warn); }
+  .dot-red { background: var(--danger); }
+  .dot-green { background: var(--safe); }
+  .dot-blue { background: #2563EB; }
+
+  .hazard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .hazard-item {
+    display: flex; align-items: flex-start; gap: 6px;
+    background: #FEF3C7; border-radius: 5px; padding: 8px 10px;
+    font-size: 12px; font-weight: 500; color: #92400E; line-height: 1.4;
+  }
+  .hazard-item::before { content: '⚠'; font-size: 13px; flex-shrink: 0; }
+
+  .control-list { list-style: none; }
+  .control-list li {
+    position: relative; padding: 6px 0 6px 20px; font-size: 12px;
+    font-weight: 500; line-height: 1.45; border-bottom: 1px solid var(--border);
+  }
+  .control-list li:last-child { border-bottom: none; }
+  .control-list li::before {
+    content: '✓'; position: absolute; left: 0; top: 6px;
+    font-weight: 700; color: var(--safe); font-size: 13px;
+  }
+
+  .emergency-box {
+    background: #FEF2F2; border: 1.5px solid #FECACA;
+    border-radius: 6px; padding: 10px 12px; margin-bottom: 16px;
+  }
+  .emergency-box .section-title { margin-bottom: 4px; }
+  .emergency-box p { font-size: 12px; font-weight: 500; color: #991B1B; line-height: 1.5; }
+
+  .remember-box {
+    background: #F0FDF4; border-radius: 6px; padding: 10px 12px; margin-bottom: 16px;
+  }
+  .remember-box .section-title { margin-bottom: 4px; }
+  .remember-box ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .remember-box li {
+    font-size: 12px; font-weight: 600; color: #065F46;
+    padding-left: 14px; position: relative; line-height: 1.4;
+  }
+  .remember-box li::before { content: '▸'; position: absolute; left: 0; color: var(--safe); }
+
+  .legislation {
+    font-size: 10px; color: var(--muted); border-top: 1px dashed var(--border);
+    padding-top: 8px; margin-bottom: 16px; line-height: 1.55;
+  }
+  .legislation strong { color: var(--ink); font-weight: 700; }
+
+  .signoff { border-top: 2px solid var(--ink); padding-top: 12px; margin-top: auto; }
+  .signoff-title {
+    font-family: 'Archivo Black', sans-serif; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;
+  }
+  .signoff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .signoff-field { border-bottom: 1px solid #CBD5E1; padding-bottom: 6px; }
+  .signoff-field label {
+    display: block; font-size: 9px; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--muted); font-weight: 600; margin-bottom: 14px;
+  }
+
+  .att-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .att-table th {
+    background: var(--ink); color: #fff; text-align: left;
+    padding: 6px 8px; font-weight: 600; font-size: 9px;
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .att-table td { border-bottom: 1px solid var(--border); padding: 12px 8px; }
+  .att-table tr:nth-child(even) td { background: #F8FAFC; }
+
+  .footer {
+    text-align: center; font-size: 9px; color: var(--muted);
+    padding-top: 8px; letter-spacing: 0.3px; margin-top: auto;
+  }
+  .footer strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="controls no-print">
+  <button onclick="window.print()">🖨 Print / Save PDF</button>
+</div>
+
+<!-- ═══════════ PAGE 1 — THE TALK ═══════════ -->
+<div class="page">
+
+  <div class="header">
+    <div class="header-badge">Toolbox Talk</div>
+    <h1>Falls From Height Awareness</h1>
+    <div class="header-meta">
+      <span>🏷 Ref: TBT-WAH-009</span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <p class="intro">Falls from height remain the single biggest killer on UK construction sites. Under the Work at Height Regulations 2005, any place where a person could fall a distance liable to cause personal injury counts as working at height. This includes ground-level work near open edges, voids, and fragile surfaces. Every operative must understand the risks and the controls that prevent fatal and life-changing injuries.</p>
+
+    <!-- KEY HAZARDS -->
+    <div class="section">
+      <div class="section-title"><span class="dot dot-amber"></span> Key Hazards</div>
+      <div class="hazard-grid">
+        <div class="hazard-item">Fatal or serious injury from unprotected falls at open edges and voids</div>
+        <div class="hazard-item">Falls through fragile surfaces such as roof lights, fibre cement sheets, or liner panels</div>
+        <div class="hazard-item">Collapse of poorly erected or overloaded access equipment and platforms</div>
+        <div class="hazard-item">Objects falling from height striking workers below the work area</div>
+      </div>
+    </div>
+
+    <!-- CONTROL MEASURES -->
+    <div class="section">
+      <div class="section-title"><span class="dot dot-green"></span> Control Measures</div>
+      <ul class="control-list">
+        <li>Avoid work at height wherever possible by designing the task to be done from ground level.</li>
+        <li>Use collective protection such as edge protection, guard rails, and safety nets before personal fall protection.</li>
+        <li>Ensure all open edges, floor openings, and voids are protected with rigid barriers or secured covers.</li>
+        <li>Inspect all access equipment before each use and confirm it is suitable for the task.</li>
+        <li>Check that operatives working at height hold the required training and competency for the task.</li>
+        <li>Secure all tools and materials to prevent them falling and striking people below.</li>
+        <li>Establish exclusion zones beneath overhead work areas and use signage to warn others.</li>
+        <li>Review weather conditions before starting height work — stop if wind, rain, or ice creates risk.</li>
+        <li>Report any defective edge protection, access equipment, or missing covers immediately.</li>
+      </ul>
+    </div>
+
+    <!-- EMERGENCY / RESCUE -->
+    <div class="emergency-box">
+      <div class="section-title"><span class="dot dot-red"></span> Emergency / Rescue</div>
+      <p>If a fall occurs, call emergency services immediately and do not move the casualty unless they face further danger. Activate the site emergency plan and ensure a first aider attends. If someone is suspended in a harness, rescue within minutes to prevent suspension trauma.</p>
+    </div>
+
+    <!-- KEY POINTS TO REMEMBER -->
+    <div class="remember-box">
+      <div class="section-title"><span class="dot dot-green"></span> Remember</div>
+      <ul>
+        <li>Falls from height are the leading cause of death in construction.</li>
+        <li>Always follow the hierarchy: avoid, prevent, then mitigate falls.</li>
+        <li>Never remove or alter edge protection without authorisation.</li>
+        <li>Fragile surfaces must be clearly marked and protected at all times.</li>
+        <li>If conditions change, stop work and reassess before continuing.</li>
+        <li>Report all near misses involving work at height immediately.</li>
+      </ul>
+    </div>
+
+    <!-- LEGISLATION -->
+    <div class="legislation">
+      <strong>Applicable Legislation:</strong> Work at Height Regulations 2005 · CDM 2015 · Management of Health and Safety at Work Regulations 1999 · Health and Safety at Work etc. Act 1974
+    </div>
+
+    <!-- DELIVERED BY -->
+    <div class="signoff">
+      <div class="signoff-title">Delivered By</div>
+      <div class="signoff-grid">
+        <div class="signoff-field"><label>Name (Print)</label></div>
+        <div class="signoff-field"><label>Signature</label></div>
+        <div class="signoff-field"><label>Position / Role</label></div>
+        <div class="signoff-field"><label>Duration (mins)</label></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <strong>TOOLBOX TALK</strong> &nbsp;·&nbsp; Falls From Height Awareness &nbsp;·&nbsp; TBT-WAH-009 &nbsp;·&nbsp; Page 1 of 2
+    <br><span style="color:#94A3B8; font-size:8px;">Produced by <strong style="color:#64748B;">ebrora.com</strong></span>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE 2 — ATTENDANCE ═══════════ -->
+<div class="page page-break">
+
+  <div class="header">
+    <div class="header-badge">Attendance Record</div>
+    <h1>Falls From Height Awareness</h1>
+    <div class="header-meta">
+      <span>🏷 Ref: TBT-WAH-009</span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <p class="intro">
+      All personnel attending this toolbox talk must print their name, sign, and note their company.
+      By signing below you confirm you have understood the content and will follow the control measures discussed.
+    </p>
+
+    <table class="att-table">
+      <thead>
+        <tr>
+          <th style="width:5%">#</th>
+          <th style="width:28%">Name (Print)</th>
+          <th style="width:20%">Company</th>
+          <th style="width:27%">Signature</th>
+          <th style="width:20%">Trade / Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>3</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>4</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>5</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>6</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>7</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>8</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>9</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>10</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>11</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>12</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>13</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>14</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>15</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>16</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>17</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>18</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>19</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>20</td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 10px;">
+      <div class="section-title" style="font-size: 10px;"><span class="dot dot-blue"></span> Comments / Actions Arising</div>
+      <div style="border-bottom: 1px solid #CBD5E1; height: 20px;"></div>
+      <div style="border-bottom: 1px solid #CBD5E1; height: 20px;"></div>
+      <div style="border-bottom: 1px solid #CBD5E1; height: 20px;"></div>
+      <div style="border-bottom: 1px solid #CBD5E1; height: 20px;"></div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <strong>TOOLBOX TALK</strong> &nbsp;·&nbsp; Falls From Height Awareness &nbsp;·&nbsp; Attendance Record &nbsp;·&nbsp; Page 2 of 2
+    <br><span style="color:#94A3B8; font-size:8px;">Produced by <strong style="color:#64748B;">ebrora.com</strong></span>
+  </div>
+</div>
+
+</body>
+</html>
