@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description:
     'Terms of Service for Ebrora. Read our terms and conditions for purchasing and using our professional Excel templates.',
   alternates: {
-    canonical: 'https://ebrora.com/terms-of-service',
+    canonical: 'https://www.ebrora.com/terms-of-service',
   },
   openGraph: {
     title: 'Terms of Service | Ebrora',
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
       'Terms of Service for Ebrora. Read our terms for purchasing and using Excel templates.',
     images: [
       {
-        url: 'https://ebrora.com/og-image.jpg',
+        url: 'https://www.ebrora.com/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Terms of Service',
       },
     ],
-    url: 'https://ebrora.com/terms-of-service',
+    url: 'https://www.ebrora.com/terms-of-service',
     type: 'website',
   },
   twitter: {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: 'Terms of Service | Ebrora',
     description:
       'Terms of Service for Ebrora. Read our terms for purchasing and using Excel templates.',
-    images: ['https://ebrora.com/og-image.jpg'],
+    images: ['https://www.ebrora.com/og-image.jpg'],
   },
 };
 
