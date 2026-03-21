@@ -182,6 +182,49 @@ export default function ToolboxTalksPage() {
           }),
         }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'What is a toolbox talk?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'A toolbox talk is a short, focused safety briefing delivered to site teams before work begins. On UK construction sites, they typically last 5 to 15 minutes and cover a specific hazard, safe system of work, or recent incident relevant to the day\'s activities.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'How often should toolbox talks be held on a construction site?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Most UK construction sites hold toolbox talks daily or weekly. Daily talks before shift start are common on high-risk projects. The Health and Safety at Work Act 1974 and CDM 2015 require employers to provide adequate safety information and instruction, and regular toolbox talks help demonstrate compliance.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Are toolbox talks a legal requirement in the UK?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Toolbox talks are not explicitly required by law, but they are a widely recognised and effective way to meet the legal duty under the Health and Safety at Work Act 1974 and the Management of Health and Safety at Work Regulations 1999 to provide employees with adequate health and safety information and instruction.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'How many free toolbox talks does Ebrora offer?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: `Ebrora offers over ${availableCount} free toolbox talks across ${categories.length} health and safety categories, covering topics from excavation safety and working at height to COSHH, confined spaces, MEICA works, and wastewater treatment. All talks are downloadable as PDF.`,
+                },
+              },
+            ],
+          }),
+        }}
+      />
     </>
   );
 }
