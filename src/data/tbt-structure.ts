@@ -4338,49 +4338,56 @@ export function getAllCategories(): TbtCategory[] {
 }
 
 export function getCategoryBySlug(slug: string): TbtCategory | undefined {
-  return TBT_CATEGORIES.find((c) => c.slug === slug);
+  return TBT_CATEGORIES.find(c => c.slug === slug);
 }
 
-export function getCategoryByCode(code: string): TbtCategory | undefined {
-  return TBT_CATEGORIES.find((c) => c.code === code);
+export function getSubfolder(categorySlug: string, subfolderSlug: string): TbtSubfolder | undefined {
+  return getCategoryBySlug(categorySlug)?.subfolders.find(s => s.slug === subfolderSlug);
 }
 
-export function getSubfolderBySlug(
-  categorySlug: string,
-  subfolderSlug: string
-): TbtSubfolder | undefined {
-  const cat = getCategoryBySlug(categorySlug);
-  return cat?.subfolders.find((s) => s.slug === subfolderSlug);
-}
-
-export function getTalkBySlug(
-  categorySlug: string,
-  talkSlug: string
-): { category: TbtCategory; subfolder: TbtSubfolder; talk: TbtTalk } | undefined {
+export function getTalkBySlug(categorySlug: string, talkSlug: string): { talk: TbtTalk; subfolder: TbtSubfolder; category: TbtCategory } | undefined {
   const cat = getCategoryBySlug(categorySlug);
   if (!cat) return undefined;
   for (const sub of cat.subfolders) {
-    const talk = sub.talks.find((t) => t.slug === talkSlug);
-    if (talk) return { category: cat, subfolder: sub, talk };
+    const talk = sub.talks.find(t => t.slug === talkSlug);
+    if (talk) return { talk, subfolder: sub, category: cat };
   }
   return undefined;
 }
 
-export function getAllTalks(): { category: TbtCategory; subfolder: TbtSubfolder; talk: TbtTalk }[] {
-  const result: { category: TbtCategory; subfolder: TbtSubfolder; talk: TbtTalk }[] = [];
+export function isSubfolderSlug(categorySlug: string, slug: string): boolean {
+  return getCategoryBySlug(categorySlug)?.subfolders.some(s => s.slug === slug) ?? false;
+}
+
+export function getAllAvailableTalks(): Array<{
+  ref: string; title: string; slug: string;
+  categorySlug: string; categoryName: string; subfolderName: string;
+}> {
+  const results: Array<{
+    ref: string; title: string; slug: string;
+    categorySlug: string; categoryName: string; subfolderName: string;
+  }> = [];
   for (const cat of TBT_CATEGORIES) {
     for (const sub of cat.subfolders) {
       for (const talk of sub.talks) {
-        result.push({ category: cat, subfolder: sub, talk });
+        results.push({
+          ref: talk.ref, title: talk.title, slug: talk.slug,
+          categorySlug: cat.slug, categoryName: cat.name, subfolderName: sub.name,
+        });
       }
     }
   }
-  return result;
+  return results;
 }
 
-export function getTotalTalkCount(): number {
-  return TBT_CATEGORIES.reduce(
-    (sum, cat) => sum + cat.subfolders.reduce((s, sub) => s + sub.talks.length, 0),
-    0
-  );
+export function getAvailableTalkCount(): number {
+  let n = 0;
+  for (const c of TBT_CATEGORIES) for (const s of c.subfolders) n += s.talks.length;
+  return n;
+}
+
+export function getTotalExpectedCount(): number {
+  let n = 0;
+  for (const c of TBT_CATEGORIES) for (const s of c.subfolders) n += s.expectedTalks.length;
+  return n;
 }
