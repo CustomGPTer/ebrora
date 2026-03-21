@@ -61,12 +61,6 @@ export async function createSubscription(
       },
       body: JSON.stringify({
         plan_id: planId,
-        subscriber: {
-          email_address: userId,
-          name: {
-            given_name: userId,
-          },
-        },
         application_context: {
           brand_name: 'Ebrora',
           locale: 'en-GB',
