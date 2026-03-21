@@ -11,22 +11,22 @@ export const metadata: Metadata = {
   description:
     "Download over 1,500 free toolbox talks across 60 health and safety categories for UK construction sites. Covering excavations, working at height, COSHH, confined spaces, pipelines, MEICA and more. PDF format, ready to use on site.",
   alternates: {
-    canonical: "https://ebrora.com/toolbox-talks",
+    canonical: "https://www.ebrora.com/toolbox-talks",
   },
   openGraph: {
     title: "Free Toolbox Talks for Construction Sites | Ebrora",
     description:
       "Over 1,500 free toolbox talks across 60 H&S categories. PDF format, ready to brief your site team.",
-    url: "https://ebrora.com/toolbox-talks",
+    url: "https://www.ebrora.com/toolbox-talks",
     type: "website",
-    images: [{ url: "https://ebrora.com/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Free Toolbox Talks for Construction Sites | Ebrora",
     description:
       "Over 1,500 free toolbox talks across 60 health and safety categories. PDF format, ready to use on site.",
-    images: ["https://ebrora.com/og-image.jpg"],
+    images: ["https://www.ebrora.com/og-image.jpg"],
   },
 };
 
@@ -164,11 +164,11 @@ export default function ToolboxTalksPage() {
             "@type": "CollectionPage",
             name: "Free Toolbox Talks for Construction Sites",
             description: `Over ${totalExpected.toLocaleString()} toolbox talks across ${categories.length} health and safety categories for UK construction.`,
-            url: "https://ebrora.com/toolbox-talks",
+            url: "https://www.ebrora.com/toolbox-talks",
             publisher: {
               "@type": "Organization",
               name: "Ebrora",
-              url: "https://ebrora.com",
+              url: "https://www.ebrora.com",
             },
           }),
         }}
