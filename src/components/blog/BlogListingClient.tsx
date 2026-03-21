@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { BlogPost, BlogCategory } from '@/data/posts';
@@ -100,11 +102,12 @@ export default function BlogListingClient({ posts, categories }: BlogListingClie
                 className="article-card"
               >
                 <div className="article-card__image">
-                  <img
+                  <Image
                     src={`/${post.featuredImage}`}
                     alt={post.title}
-                    loading="lazy"
-                  />
+                    width={600}
+                    height={400}
+                                      />
                   <span className="article-card__category">
                     {category.icon} {category.label}
                   </span>
