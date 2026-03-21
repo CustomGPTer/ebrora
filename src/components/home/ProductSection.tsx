@@ -285,7 +285,7 @@ function ProductCard({ product, categories }: ProductCardProps) {
       <div className="product-card__image-wrap">
         {hasImages ? (
           <>
-            <img src={mainImage} alt={product.title} className="main-img" loading="lazy" />
+            <img src={mainImage} alt={product.altText || product.title} className="main-img" loading="lazy" />
             <img
               src={hoverImage}
               alt={`${product.title} preview`}
