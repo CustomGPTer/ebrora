@@ -57,6 +57,15 @@ export default function ToolboxTalksPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Search bar */}
         <TbtSearch items={searchItems} />
+        {/* SEO intro copy */}
+        <div className="max-w-3xl mx-auto mb-8 text-sm text-gray-600 leading-relaxed space-y-3">
+          <p>
+            Toolbox talks are short, focused safety briefings delivered to site teams before work begins or when conditions change. On UK construction sites, they are one of the most practical ways to communicate hazards, reinforce safe systems of work, and demonstrate compliance with the Health and Safety at Work Act 1974 and CDM 2015 regulations.
+          </p>
+          <p>
+            Our library covers {categories.length} categories spanning everything from excavation safety and working at height to COSHH, confined spaces, MEICA installations, and wastewater treatment. Each talk is written by experienced UK construction professionals and formatted as a printable A4 PDF, ready to brief your team and capture sign-off. Whether you are a site manager, general foreman, or safety advisor, you can download and deliver these talks in minutes with no signup required.
+          </p>
+        </div>
 
         {/* Stats bar */}
         <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-8 pb-6 border-b border-gray-100">
