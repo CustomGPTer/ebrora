@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/admin/']
     },
-    sitemap: 'https://ebrora.com/sitemap.xml'
+    sitemap: 'https://www.ebrora.com/sitemap.xml'
   };
 }
