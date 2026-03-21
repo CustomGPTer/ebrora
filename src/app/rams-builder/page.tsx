@@ -8,22 +8,22 @@ export const metadata: Metadata = {
   description:
     'Generate professional RAMS documents for construction projects. AI-powered risk assessments and method statements. CDM 2015 compliant, ready for site use.',
   alternates: {
-    canonical: 'https://ebrora.com/rams-builder',
+    canonical: 'https://www.ebrora.com/rams-builder',
   },
   openGraph: {
     title: 'RAMS Builder for Construction Projects | Ebrora',
     description:
       'Generate professional RAMS documents for construction. AI-powered risk assessments and method statements.',
-    url: 'https://ebrora.com/rams-builder',
+    url: 'https://www.ebrora.com/rams-builder',
     type: 'website',
-    images: [{ url: 'https://ebrora.com/og-image.jpg', width: 1200, height: 630 }],
+    images: [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'RAMS Builder for Construction Projects | Ebrora',
     description:
       'AI-powered RAMS document generator for construction. CDM 2015 compliant risk assessments and method statements.',
-    images: ['https://ebrora.com/og-image.jpg'],
+    images: ['https://www.ebrora.com/og-image.jpg'],
   },
 };
 
@@ -34,7 +34,7 @@ const ramsBuilderSchema = {
   applicationCategory: 'BusinessApplication',
   description:
     'AI-powered RAMS document generator for UK construction projects. Produces CDM 2015 compliant risk assessments and method statements.',
-  url: 'https://ebrora.com/rams-builder',
+  url: 'https://www.ebrora.com/rams-builder',
   operatingSystem: 'Web',
   offers: {
     '@type': 'Offer',
@@ -44,7 +44,7 @@ const ramsBuilderSchema = {
   publisher: {
     '@type': 'Organization',
     name: 'Ebrora',
-    url: 'https://ebrora.com',
+    url: 'https://www.ebrora.com',
   },
 };
 
