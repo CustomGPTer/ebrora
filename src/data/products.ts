@@ -129,6 +129,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "excavation-inspection-register",
         title: "Excavation Inspection Register",
+    altText: "Excavation Inspection Register Excel template for tracking excavation safety inspections",
         category: ["inspection", "registers", "hse"],
         price: "£24.99",
         oldPrice: "",
@@ -169,6 +170,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "gantt-chart-project-planner",
         title: "Gantt Chart Project Planner",
+    altText: "Gantt Chart Project Planner Excel template for construction project scheduling",
         category: ["project", "planning"],
         price: "£29.99",
         oldPrice: "",
@@ -209,6 +211,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "coshh-assessment-tool",
         title: "COSHH Assessment Tool",
+    altText: "COSHH Assessment Tool Excel template for hazardous substance risk assessments",
         category: ["hse", "inspection"],
         price: "£19.99",
         oldPrice: "",
@@ -253,6 +256,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "carbon-calculator-construction",
         title: "Carbon Calculator for Construction",
+    altText: "Carbon Calculator Excel spreadsheet for tracking construction project emissions",
         category: ["cost", "environmental"],
         price: "£22.99",
         oldPrice: "",
@@ -293,6 +297,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "daily-diary-template",
         title: "Daily Diary Template",
+    altText: "Daily Diary Template Excel spreadsheet for recording daily construction site activities",
         category: ["daily", "registers", "planning"],
         price: "£18.99",
         oldPrice: "",
@@ -333,6 +338,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "art-assessment-tool",
         title: "ART Assessment Tool",
+    altText: "ART Assessment Tool Excel template for upper limb repetitive task risk assessment",
         category: ["hse", "competence"],
         price: "£16.99",
         oldPrice: "",
@@ -373,6 +379,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "pump-maintenance-tracker",
         title: "Pump Maintenance Tracker",
+    altText: "Pump Maintenance Tracker Excel template for scheduling pump servicing records",
         category: ["wastewater", "asset", "plant"],
         price: "£27.99",
         oldPrice: "",
@@ -413,6 +420,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "concrete-pour-register",
         title: "Concrete Pour Register",
+    altText: "Concrete Pour Register Excel template for logging concrete placement records",
         category: ["concrete", "registers", "inspection"],
         price: "£21.99",
         oldPrice: "",
@@ -457,6 +465,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "delivery-booking-system",
         title: "Delivery Booking System",
+    altText: "Delivery Booking System Excel spreadsheet for managing site material deliveries",
         category: ["planning", "daily", "registers"],
         price: "£23.99",
         oldPrice: "",
@@ -497,6 +506,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "pic-competence-assessment",
         title: "PIC Competence Assessment",
+    altText: "PIC Competence Assessment Excel template for evaluating person-in-charge competency",
         category: ["hse", "competence"],
         price: "£17.99",
         oldPrice: "",
@@ -537,6 +547,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "temporary-works-register",
         title: "Temporary Works Register",
+    altText: "Temporary Works Register Excel template for managing temporary works on site",
         category: ["temporary", "registers", "hse"],
         price: "£26.99",
         oldPrice: "",
@@ -590,6 +601,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "havs-monitoring",
     title: "HAVS Monitoring Register",
+    altText: "HAVS Monitoring Register Excel template for hand-arm vibration exposure tracking",
     category: ["hse", "registers"],
     price: "£18.99",
     oldPrice: "",
@@ -629,6 +641,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "manual-handling-risk-score-calculator",
     title: "Manual Handling Risk Score Calculator",
+    altText: "Manual Handling Risk Calculator Excel template for assessing lifting hazards",
     category: ["hse", "inspection"],
     price: "£16.99",
     oldPrice: "",
@@ -668,6 +681,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "confined-space-assessment-calculator",
     title: "Confined Space Assessment Calculator",
+    altText: "Confined Space Assessment Excel template for confined space risk evaluation",
     category: ["hse", "inspection"],
     price: "£19.99",
     oldPrice: "",
@@ -707,6 +721,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "office-fire-risk-assessment",
     title: "Office Fire Risk Assessment",
+    altText: "Office Fire Risk Assessment Excel template for workplace fire safety compliance",
     category: ["hse", "inspection"],
     price: "£14.99",
     oldPrice: "",
@@ -746,6 +761,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "da-test-register",
     title: "DA Test Register",
+    altText: "DA Test Register Excel template for drug and alcohol testing records",
     category: ["inspection", "registers", "commissioning"],
     price: "£21.99",
     oldPrice: "",
@@ -785,6 +801,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "plant-pre-use-check-sheets",
     title: "Plant Pre-Use Check Sheets",
+    altText: "Plant Pre-Use Check Sheets Excel template for daily plant inspection records",
     category: ["plant", "daily", "hse"],
     price: "£15.99",
     oldPrice: "",
@@ -824,6 +841,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "plant-issues-tracker",
     title: "Plant Issues Tracker",
+    altText: "Plant Issues Tracker Excel spreadsheet for logging plant defects and repairs",
     category: ["plant", "registers"],
     price: "£17.99",
     oldPrice: "",
@@ -863,6 +881,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "access-equipment-selector",
     title: "Access Equipment Selector",
+    altText: "Access Equipment Selector Excel template for choosing work at height equipment",
     category: ["plant", "hse"],
     price: "£14.99",
     oldPrice: "",
@@ -902,6 +921,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "fuel-usage-calculator",
     title: "Fuel Usage Calculator",
+    altText: "Fuel Usage Calculator Excel spreadsheet for tracking site fuel consumption",
     category: ["plant", "cost", "environmental"],
     price: "£14.99",
     oldPrice: "",
@@ -941,6 +961,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "subcontractor-performance-scorecard",
     title: "Subcontractor Performance Scorecard",
+    altText: "Subcontractor Performance Scorecard Excel template for evaluating subcontractor work",
     category: ["project", "stakeholder"],
     price: "£19.99",
     oldPrice: "",
@@ -980,6 +1001,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "site-operative-scorecard",
     title: "Site Operative Scorecard",
+    altText: "Site Operative Scorecard Excel template for tracking worker performance",
     category: ["competence", "daily"],
     price: "£14.99",
     oldPrice: "",
@@ -1019,6 +1041,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "allocation-sheet",
     title: "Allocation Sheet",
+    altText: "Allocation Sheet Excel template for managing construction labour allocation",
     category: ["daily", "planning"],
     price: "£12.99",
     oldPrice: "",
@@ -1058,6 +1081,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "leave-calendar",
     title: "Leave Calendar",
+    altText: "Leave Calendar Excel spreadsheet for tracking staff absence and holidays",
     category: ["daily", "registers"],
     price: "£12.99",
     oldPrice: "",
@@ -1097,6 +1121,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "temporary-works-class-matrix",
     title: "Temporary Works Class Matrix",
+    altText: "Temporary Works Class Matrix Excel template for TWC classification assessment",
     category: ["temporary", "hse"],
     price: "£16.99",
     oldPrice: "",
@@ -1136,6 +1161,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "ladder-stepladder-permit",
     title: "Ladder & Stepladder Permit",
+    altText: "Ladder and Stepladder Permit Excel template for work at height authorisation",
     category: ["hse", "daily"],
     price: "£9.99",
     oldPrice: "",
@@ -1175,6 +1201,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "aggregate-import-tracker",
     title: "Aggregate Import Tracker",
+    altText: "Aggregate Import Tracker Excel spreadsheet for managing material imports to site",
     category: ["concrete", "registers", "planning"],
     price: "£17.99",
     oldPrice: "",
@@ -1214,6 +1241,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "aggregate-price-comparison",
     title: "Aggregate Price Comparison",
+    altText: "Aggregate Price Comparison Excel template for comparing construction material costs",
     category: ["cost", "concrete"],
     price: "£14.99",
     oldPrice: "",
@@ -1253,6 +1281,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "civil-engineering-materials-converter",
     title: "Civil Engineering Materials Converter",
+    altText: "Civil Engineering Materials Converter Excel tool for unit conversion calculations",
     category: ["concrete", "cost"],
     price: "£12.99",
     oldPrice: "",
@@ -1292,6 +1321,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "waste-export-tracker",
     title: "Waste Export Tracker",
+    altText: "Waste Export Tracker Excel spreadsheet for recording site waste disposal records",
     category: ["environmental", "registers"],
     price: "£17.99",
     oldPrice: "",
@@ -1331,6 +1361,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "wwtw-long-lead-item-tracker",
     title: "WWTW Long Lead Item Tracker",
+    altText: "WWTW Long Lead Item Tracker Excel template for wastewater treatment procurement",
     category: ["wastewater", "asset", "planning"],
     price: "£19.99",
     oldPrice: "",
@@ -1370,6 +1401,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "pipe-laying-productivity-log",
     title: "Pipe Laying Productivity Log",
+    altText: "Pipe Laying Productivity Log Excel template for tracking pipeline installation rates",
     category: ["daily", "registers", "wastewater"],
     price: "£16.99",
     oldPrice: "",
@@ -1409,6 +1441,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "productivity-calculator",
     title: "Productivity Calculator",
+    altText: "Productivity Calculator Excel spreadsheet for measuring construction work output",
     category: ["project", "cost", "planning"],
     price: "£18.99",
     oldPrice: "",
@@ -1448,6 +1481,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "focused-planning-meeting-template",
     title: "Focused Planning Meeting Template",
+    altText: "Focused Planning Meeting Template Excel tool for structured site planning sessions",
     category: ["planning", "stakeholder"],
     price: "£14.99",
     oldPrice: "",
@@ -1487,6 +1521,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "recovery-plan-tracker",
     title: "Recovery Plan Tracker",
+    altText: "Recovery Plan Tracker Excel template for managing project recovery schedules",
     category: ["project", "planning"],
     price: "£19.99",
     oldPrice: "",
@@ -1526,6 +1561,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "wwtw-valve-schedule",
     title: "WWTW Valve Schedule",
+    altText: "WWTW Valve Schedule Excel template for wastewater treatment valve management",
     category: ["wastewater", "asset", "registers"],
     price: "£18.99",
     oldPrice: "",
@@ -1565,6 +1601,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "wwtw-sampler-log",
     title: "WWTW Sampler Log",
+    altText: "WWTW Sampler Log Excel spreadsheet for wastewater sampling records",
     category: ["wastewater", "asset", "registers"],
     price: "£16.99",
     oldPrice: "",
@@ -1604,6 +1641,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "engineers-instrument-calibration-log",
     title: "Engineer's Instrument Calibration Log",
+    altText: "Engineer's Instrument Calibration Log Excel template for calibration tracking",
     category: ["inspection", "registers", "commissioning"],
     price: "£17.99",
     oldPrice: "",
@@ -1643,6 +1681,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "meter-readings",
     title: "Meter Readings Log",
+    altText: "Meter Readings Log Excel spreadsheet for recording utility meter data on site",
     category: ["wastewater", "daily", "registers"],
     price: "£12.99",
     oldPrice: "",
@@ -1682,6 +1721,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "testing-commissioning-log",
     title: "Testing & Commissioning Log",
+    altText: "Testing and Commissioning Log Excel template for system handover records",
     category: ["commissioning", "inspection", "registers"],
     price: "£24.99",
     oldPrice: "",
@@ -1721,6 +1761,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "ncr-schedule",
     title: "NCR Schedule",
+    altText: "NCR Schedule Excel template for tracking non-conformance reports on construction projects",
     category: ["inspection", "registers"],
     price: "£17.99",
     oldPrice: "",
@@ -1760,6 +1801,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "root-cause-analysis",
     title: "Root Cause Analysis Template",
+    altText: "Root Cause Analysis Template Excel tool for investigating construction incidents",
     category: ["inspection", "hse"],
     price: "£14.99",
     oldPrice: "",
@@ -1799,6 +1841,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "decision-matrix",
     title: "Decision Matrix",
+    altText: "Decision Matrix Excel template for structured construction project decision making",
     category: ["project", "cost"],
     price: "£12.99",
     oldPrice: "",
@@ -1838,6 +1881,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "ram-matrix",
     title: "RAM Matrix",
+    altText: "RAM Matrix Excel template for responsibility assignment on construction projects",
     category: ["hse", "project"],
     price: "£14.99",
     oldPrice: "",
@@ -1877,6 +1921,7 @@ export const PRODUCTS: Product[] = [
   {
     id: "lessons-learned-register",
     title: "Lessons Learned Register",
+    altText: "Lessons Learned Register Excel template for capturing construction project insights",
     category: ["project", "registers"],
     price: "£14.99",
     oldPrice: "",
@@ -1916,6 +1961,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "owl-list",
         title: "OWL List",
+    altText: "OWL List Excel template for tracking outstanding work items on construction sites",
         category: ["inspection", "registers", "hse"],
         price: "£19.99",
         oldPrice: "",
@@ -1956,6 +2002,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "survey-control-register",
         title: "Survey Control Register",
+    altText: "Survey Control Register Excel spreadsheet for managing site survey control points",
         category: ["inspection", "registers", "planning"],
         price: "£19.99",
         oldPrice: "",
@@ -1996,6 +2043,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "process-client-training-log",
         title: "Process Client Training Log",
+    altText: "Process Client Training Log Excel template for recording operator training records",
         category: ["competence", "commissioning", "registers"],
         price: "£19.99",
         oldPrice: "",
@@ -2036,6 +2084,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "action-calendar",
         title: "Action Calendar",
+    altText: "Action Calendar Excel spreadsheet for scheduling construction project action items",
         category: ["project", "planning", "daily"],
         price: "£19.99",
         oldPrice: "",
@@ -2076,6 +2125,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "ppe-budget-calculator",
         title: "PPE Budget Calculator",
+    altText: "PPE Budget Calculator Excel template for planning personal protective equipment costs",
         category: ["hse", "cost"],
         price: "£19.99",
         oldPrice: "",
@@ -2115,6 +2165,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "construction-mileage-tracker",
         title: "Construction Mileage Tracker",
+    altText: "Construction Mileage Tracker Excel spreadsheet for recording site travel expenses",
         category: ["cost", "daily", "registers"],
         price: "£14.99",
         oldPrice: "",
@@ -2155,6 +2206,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "weekly-inspection-rota",
         title: "Weekly Inspection Rota",
+    altText: "Weekly Inspection Rota Excel template for scheduling site safety inspections",
         category: ["inspection", "hse", "planning"],
         price: "£14.99",
         oldPrice: "",
@@ -2195,6 +2247,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "weight-loss-challenge-tracker",
         title: "Weight Loss Challenge Tracker",
+    altText: "Weight Loss Challenge Tracker Excel spreadsheet for workplace wellbeing programmes",
         category: ["daily", "registers"],
         price: "£9.99",
         oldPrice: "",
@@ -2235,6 +2288,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "supervisors-raci-chart",
         title: "Supervisor's RACI Chart",
+    altText: "Supervisor's RACI Chart Excel template for defining construction team responsibilities",
         category: ["project", "competence", "planning"],
         price: "£14.99",
         oldPrice: "",
@@ -2275,6 +2329,7 @@ export const PRODUCTS: Product[] = [
     {
         id: "uncharted-services-log",
         title: "Uncharted Services Log",
+    altText: "Uncharted Services Log Excel template for recording unidentified underground services",
         category: ["hse", "registers", "inspection"],
         price: "£17.99",
         oldPrice: "",
