@@ -3,169 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Confined Space Awareness and Identification - Construction Toolbox Talk | ebrora.com</title>
+<title>HDPE Butt Fusion Welding Safety - Construction Toolbox Talk | ebrora.com</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&display=swap');
-
-  :root {
-    --warn: #F59E0B;
-    --danger: #DC2626;
-    --safe: #059669;
-    --ink: #1E293B;
-    --muted: #64748B;
-    --card: #FFFFFF;
-    --border: #E2E8F0;
-    --accent-gradient: linear-gradient(135deg, #F59E0B 0%, #DC2626 100%);
-  }
-
+  :root { --warn: #F59E0B; --danger: #DC2626; --safe: #059669; --ink: #1E293B; --muted: #64748B; --card: #FFFFFF; --border: #E2E8F0; --accent-gradient: linear-gradient(135deg, #F59E0B 0%, #DC2626 100%); }
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
   html { background: #CBD5E1; }
-
-  body {
-    font-family: 'DM Sans', system-ui, sans-serif;
-    color: var(--ink);
-    background: #fff;
-    width: 210mm;
-    min-height: 297mm;
-    margin: 20px auto;
-    padding: 0;
-    border: 1px solid #cbd5e1;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-
+  body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 0; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); line-height: 1.5; -webkit-font-smoothing: antialiased; }
   @page { size: A4 portrait; margin: 0; }
-
-  @media print {
-    html { background: #fff; }
-    body {
-      margin: 0;
-      padding: 0;
-      border: none;
-      box-shadow: none;
-      width: 210mm;
-      min-height: 0;
-    }
-    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .no-print { display: none !important; }
-  }
-
+  @media print { html { background: #fff; } body { margin: 0; padding: 0; border: none; box-shadow: none; width: 210mm; min-height: 0; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .no-print { display: none !important; } }
   .page { width: 100%; min-height: 297mm; padding: 10mm 13mm 12mm 13mm; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-  .page-break { page-break-before: always; border-top: 1px solid #e2e8f0; }
-  @media print { .page { min-height: auto; overflow: visible; } .page-break { border-top: none; } }
-
+  @media print { .page { min-height: auto; overflow: visible; } }
   .header { background: var(--accent-gradient); margin: -10mm -13mm 0 -13mm; padding: 8mm 13mm 3.5mm; position: relative; }
   .header-badge { display: block; background: rgba(255,255,255,0.22); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 12px; border-radius: 4px; margin-bottom: 5px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto; }
   .header h1 { font-family: 'DM Sans', sans-serif; font-size: 22px; color: #fff; font-weight: 700; line-height: 1.15; margin-bottom: 6px; text-align: center; letter-spacing: -0.3px; }
   .header-meta { display: flex; gap: 12px; font-size: 10px; color: rgba(255,255,255,0.85); font-weight: 500; justify-content: center; }
   .header-meta span { display: flex; align-items: center; gap: 3px; }
-
   .body { padding-top: 16px; flex: 1; }
   .intro { font-size: 11.5px; color: var(--muted); font-weight: 500; border-left: 3px solid var(--warn); padding-left: 10px; margin-bottom: 14px; line-height: 1.55; }
-
   .section { margin-bottom: 12px; }
   .section-title { font-family: 'Archivo Black', sans-serif; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
   .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-  .dot-amber { background: var(--warn); }
-  .dot-red { background: var(--danger); }
-  .dot-green { background: var(--safe); }
-  .dot-blue { background: #2563EB; }
-
+  .dot-amber { background: var(--warn); } .dot-red { background: var(--danger); } .dot-green { background: var(--safe); } .dot-blue { background: #2563EB; }
   .hazard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .hazard-item { display: flex; align-items: flex-start; gap: 5px; background: #FEF3C7; border-radius: 4px; padding: 6px 8px; font-size: 10.5px; font-weight: 500; color: #92400E; line-height: 1.35; }
   .hazard-item::before { content: '⚠'; font-size: 11px; flex-shrink: 0; }
-
   .control-list { list-style: none; }
   .control-list li { position: relative; padding: 4px 0 4px 18px; font-size: 10.5px; font-weight: 500; line-height: 1.4; border-bottom: 1px solid var(--border); }
   .control-list li:last-child { border-bottom: none; }
   .control-list li::before { content: '✓'; position: absolute; left: 0; top: 4px; font-weight: 700; color: var(--safe); font-size: 11px; }
-
   .emergency-box { background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 5px; padding: 8px 10px; margin-bottom: 12px; }
   .emergency-box .section-title { margin-bottom: 3px; }
   .emergency-box p { font-size: 10.5px; font-weight: 500; color: #991B1B; line-height: 1.45; }
-
   .remember-box { background: #F0FDF4; border-radius: 5px; padding: 8px 10px; margin-bottom: 12px; }
   .remember-box .section-title { margin-bottom: 3px; }
   .remember-box ul { list-style: none; display: flex; flex-direction: column; gap: 3px; }
   .remember-box li { font-size: 10.5px; font-weight: 600; color: #065F46; padding-left: 12px; position: relative; line-height: 1.35; }
   .remember-box li::before { content: '▸'; position: absolute; left: 0; color: var(--safe); }
-
   .legislation { font-size: 9px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 6px; margin-bottom: 20px; line-height: 1.5; }
   .legislation strong { color: var(--ink); font-weight: 700; }
-
   .signoff { border-top: 2px solid var(--ink); padding-top: 10px; margin-top: auto; }
   .signoff-title { font-family: 'Archivo Black', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
   .signoff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .signoff-field { border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; }
   .signoff-field label { display: block; font-size: 8px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); font-weight: 600; margin-bottom: 12px; }
-
   .footer { text-align: center; font-size: 8px; color: var(--muted); padding-top: 6px; letter-spacing: 0.3px; margin-top: auto; }
   .footer strong { color: var(--ink); }
 </style>
 </head>
 <body>
-
 <div class="page">
-
   <div class="header">
     <div class="header-badge">Toolbox Talk</div>
-    <h1>Confined Space Awareness and Identification</h1>
+    <h1>HDPE Butt Fusion Welding Safety</h1>
     <div class="header-meta">
-      <span>TBT-CSP-017</span>
+      <span>TBT-PIP-018</span>
     </div>
   </div>
-
   <div class="body">
-
-    <p class="intro">A confined space is any enclosed or partially enclosed place where dangerous conditions may exist due to limited access, poor ventilation, or the presence of harmful gases. On construction sites, confined spaces include manholes, tanks, culverts, deep excavations, and chambers. Entry without proper precautions has caused multiple fatalities, often killing rescuers too.</p>
-
+    <p class="intro">HDPE butt fusion welding joins polyethylene pipes by heating the pipe ends on a hot plate to melting temperature and pressing them together under controlled pressure. The hot plate operates at temperatures exceeding 200°C and causes severe contact burns. The fusion process requires precise temperature, pressure, and timing parameters to produce a sound joint. Only trained and certified fusion welding operatives should carry out this work, and all joints must be recorded and traceable for the project quality records.</p>
     <div class="section">
       <div class="section-title"><span class="dot dot-amber"></span> Key Hazards</div>
       <div class="hazard-grid">
-        <div class="hazard-item">Oxygen depletion causing rapid loss of consciousness and death</div>
-        <div class="hazard-item">Toxic or flammable gas accumulation in enclosed areas</div>
-        <div class="hazard-item">Drowning from sudden ingress of water or liquid materials</div>
-        <div class="hazard-item">Entrapment from free-flowing solids such as grain or sludge</div>
+        <div class="hazard-item">Severe contact burns from the hot plate operating above 200°C</div>
+        <div class="hazard-item">Defective joints from incorrect temperature, pressure, or timing parameters</div>
+        <div class="hazard-item">Manual handling injuries from positioning heavy pipe sections in the fusion machine</div>
+        <div class="hazard-item">Fume inhalation from overheated HDPE material producing toxic decomposition gases</div>
       </div>
     </div>
-
     <div class="section">
       <div class="section-title"><span class="dot dot-green"></span> Control Measures</div>
       <ul class="control-list">
-        <li>Avoid entry into any confined space unless absolutely necessary and no alternative method exists.</li>
-        <li>Ensure a confined space risk assessment is completed before any entry takes place.</li>
-        <li>Obtain a valid confined space entry permit signed by an authorised person before entering.</li>
-        <li>Test the atmosphere using calibrated gas detection equipment before and during entry.</li>
-        <li>Provide forced ventilation to maintain safe oxygen levels and disperse harmful gases.</li>
-        <li>Ensure a trained top man or entry controller is stationed at the entry point at all times.</li>
-        <li>Establish reliable communication between the entrant and the top man throughout the task.</li>
-        <li>Isolate all mechanical, electrical, and pipework systems connected to the confined space.</li>
-        <li>Have rescue equipment including tripod, winch, and breathing apparatus ready before entry begins.</li>
+        <li>Ensure all fusion welding operatives hold a current certification for the pipe material and diameter range.</li>
+        <li>Never touch the hot plate surface and use the machine handles and clamps for all operations.</li>
+        <li>Follow the manufacturer's fusion procedure exactly for the pipe material grade and wall thickness.</li>
+        <li>Record the fusion parameters including temperature, pressure, bead time, and cooling time for every joint.</li>
+        <li>Use mechanical lifting equipment to load heavy pipe sections into the fusion machine.</li>
+        <li>Allow adequate cooling time before moving or stressing the completed fusion joint.</li>
+        <li>Protect the hot plate from contamination by wind-blown debris using a welding shelter or tent.</li>
+        <li>Inspect the completed joint visually and measure the bead dimensions against the acceptance criteria.</li>
+        <li>Ensure adequate ventilation around the fusion machine to disperse any fumes from the heated material.</li>
       </ul>
-    </div>
-
-    <div class="emergency-box">
-      <div class="section-title"><span class="dot dot-red"></span> Emergency / Rescue</div>
-      <p>Never enter a confined space to rescue someone without breathing apparatus and a rescue plan. Raise the alarm, call 999, and use the tripod and winch system. Untrained rescue attempts cause additional deaths.</p>
     </div>
 
     <div class="remember-box">
       <div class="section-title"><span class="dot dot-green"></span> Remember</div>
       <ul>
-        <li>A confined space does not have to be small — any area with restricted access qualifies.</li>
-        <li>You cannot see or smell many of the gases that can kill in confined spaces.</li>
-        <li>Never enter a confined space without a valid permit and atmospheric testing completed.</li>
-        <li>Failed rescue attempts are the most common cause of multiple deaths in confined spaces.</li>
-        <li>If your gas monitor alarms, leave the space immediately and report to your supervisor.</li>
+        <li>The hot plate operates above 200°C and causes instant severe burns on contact with bare skin.</li>
+        <li>Fusion welding parameters must be followed exactly because incorrect settings produce defective joints.</li>
+        <li>Every joint must be recorded with its parameters for traceability in the project quality records.</li>
+        <li>Heavy HDPE pipe sections must be loaded into the machine using mechanical lifting equipment.</li>
+        <li>Wind, rain, and contamination affect joint quality so use shelters and keep the work area clean.</li>
+        <li>Only certified fusion welding operatives may carry out HDPE butt fusion on the project.</li>
       </ul>
     </div>
-
     <div class="legislation">
-      <strong>Applicable Legislation:</strong> Confined Spaces Regulations 1997 · Health and Safety at Work etc. Act 1974 · Management of Health and Safety at Work Regulations 1999
+      <strong>Applicable Legislation:</strong> CDM Regulations 2015 · Water Industry Specification (WIS) · Health and Safety at Work etc. Act 1974 · PUWER 1998
     </div>
-
     <div class="signoff">
       <div class="signoff-title">Delivered By</div>
       <div class="signoff-grid">
@@ -175,14 +109,11 @@
         <div class="signoff-field"><label>Duration (mins)</label></div>
       </div>
     </div>
-
   </div>
-
   <div class="footer">
-    Confined Space Awareness and Identification &nbsp;·&nbsp; TBT-CSP-017
+    HDPE Butt Fusion Welding Safety &nbsp;·&nbsp; TBT-PIP-018
     <br><span style="color:#94A3B8; font-size:7px;">Produced by <strong style="color:#64748B;">ebrora.com</strong></span>
   </div>
 </div>
-
 </body>
 </html>
