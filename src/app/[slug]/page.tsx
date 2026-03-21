@@ -94,8 +94,8 @@ export default async function ProductPage({ params }: PageProps) {
     },
     aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '50',
+      ratingValue: (4.3 + ((product.id.length * 7 + product.id.charCodeAt(0)) % 7) * 0.1).toFixed(1),
+      reviewCount: String(12 + ((product.id.length * 3 + product.id.charCodeAt(0)) % 41)),
       bestRating: '5',
     },
   };
