@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description:
     'Privacy Policy for Ebrora. Learn how we collect, use, and protect your personal data in compliance with UK GDPR.',
   alternates: {
-    canonical: 'https://ebrora.com/privacy-policy',
+    canonical: 'https://www.ebrora.com/privacy-policy',
   },
   openGraph: {
     title: 'Privacy Policy | Ebrora',
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
       'Privacy Policy for Ebrora. Learn how we collect, use, and protect your personal data.',
     images: [
       {
-        url: 'https://ebrora.com/og-image.jpg',
+        url: 'https://www.ebrora.com/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Privacy Policy',
       },
     ],
-    url: 'https://ebrora.com/privacy-policy',
+    url: 'https://www.ebrora.com/privacy-policy',
     type: 'website',
   },
   twitter: {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: 'Privacy Policy | Ebrora',
     description:
       'Privacy Policy for Ebrora. Learn how we collect, use, and protect your personal data.',
-    images: ['https://ebrora.com/og-image.jpg'],
+    images: ['https://www.ebrora.com/og-image.jpg'],
   },
 };
 
