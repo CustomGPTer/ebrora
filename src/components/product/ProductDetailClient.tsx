@@ -48,7 +48,7 @@ export default function ProductDetailClient({
                 <img
                   id="galleryMainImg"
                   src={`/${mainImage}`}
-                  alt={product.title}
+                  alt={product.altText || product.title}
                 />
               ) : (
                 <>
