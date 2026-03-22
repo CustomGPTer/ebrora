@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { TEMPLATE_CONFIGS, TEMPLATE_ORDER } from '@/lib/rams/template-config';
 import { TemplateSlug } from '@/lib/rams/types';
+import TemplatePreviewModal from './TemplatePreviewModal';
 
 // Free tier: first 2 templates only
 const FREE_TEMPLATES: TemplateSlug[] = ['standard-5x5', 'simple-hml'];
@@ -16,6 +18,7 @@ interface TemplatePickerProps {
 export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [previewSlug, setPreviewSlug] = useState<TemplateSlug | null>(null);
 
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
@@ -44,6 +47,11 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
       return;
     }
     onSelect(slug);
+  };
+
+  const handlePreviewClick = (e: React.MouseEvent, slug: TemplateSlug) => {
+    e.stopPropagation(); // Don't trigger the card's onClick
+    setPreviewSlug(slug);
   };
 
   return (
@@ -87,8 +95,26 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
                   style={{ objectFit: 'cover', objectPosition: 'top' }}
                 />
 
-                {/* Page count pill */}
-                <span className="tpl-card-pages">{template.pageCount} pages</span>
+                {/* Preview pill — clickable */}
+                <span
+                  className="tpl-card-preview-pill"
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => handlePreviewClick(e, slug)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handlePreviewClick(e as unknown as React.MouseEvent, slug);
+                    }
+                  }}
+                  title={`Preview all ${template.pageCount} pages`}
+                >
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  {template.pageCount} pages
+                </span>
 
                 {/* Free badge */}
                 {isFreeTemplate && (
@@ -130,6 +156,14 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
           );
         })}
       </div>
+
+      {/* Preview modal */}
+      {previewSlug && (
+        <TemplatePreviewModal
+          template={TEMPLATE_CONFIGS[previewSlug]}
+          onClose={() => setPreviewSlug(null)}
+        />
+      )}
     </div>
   );
 }
