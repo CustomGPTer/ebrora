@@ -36,9 +36,9 @@ export default function HeroSection({ products }: HeroSectionProps) {
     setSearchInput(value);
     setSearchTerm(value);
 
-    if (value.trim().length >= 3) {
+    if (value.trim().length >= 2) {
       const results = getSearchResults(value.trim());
-      setSuggestions(results.slice(0, 6));
+      setSuggestions(results.slice(0, 5));
       setShowDropdown(true);
     } else {
       setSuggestions([]);
@@ -153,9 +153,9 @@ export default function HeroSection({ products }: HeroSectionProps) {
             value={searchInput}
             onChange={(e) => handleSearchInput(e.target.value)}
             onFocus={() => {
-              if (searchInput.trim().length >= 3) {
+              if (searchInput.trim().length >= 2) {
                 const results = getSearchResults(searchInput.trim());
-                setSuggestions(results.slice(0, 6));
+                setSuggestions(results.slice(0, 5));
                 setShowDropdown(true);
               }
             }}
@@ -196,7 +196,9 @@ export default function HeroSection({ products }: HeroSectionProps) {
                         handleSuggestionClick(product);
                       }}
                     >
-                      <span className="search-dropdown__icon">{product.icon || ''}</span>
+                      <span className="search-dropdown__icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B5B50" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
+                      </span>
                       <span className="search-dropdown__info">
                         <span className="search-dropdown__title">{product.title}</span>
                         <span className="search-dropdown__badge">{product.badge}</span>
@@ -204,9 +206,9 @@ export default function HeroSection({ products }: HeroSectionProps) {
                       <span className="search-dropdown__price">{product.price}</span>
                     </button>
                   ))}
-                  {getSearchResults(searchInput.trim()).length > 6 && (
+                  {getSearchResults(searchInput.trim()).length > 5 && (
                     <div className="search-dropdown__more">
-                      + {getSearchResults(searchInput.trim()).length - 6} more — press Search to see
+                      + {getSearchResults(searchInput.trim()).length - 5} more — press Search to see
                       all
                     </div>
                   )}
