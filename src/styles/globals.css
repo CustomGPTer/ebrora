@@ -434,7 +434,7 @@ p {
     left: 0;
     right: 0;
     margin-top: 0.5rem;
-    background: var(--color-white);
+    background: #ffffff;
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-lg);
     max-height: 360px;
@@ -442,6 +442,7 @@ p {
     z-index: 500;
     display: none;
     border: 1px solid var(--color-border);
+    color: #444444;
 }
 
 .search-dropdown.visible {
@@ -455,14 +456,14 @@ p {
     width: 100%;
     padding: 0.75rem 1rem;
     border: none;
-    background: none;
+    background: #ffffff;
     cursor: pointer;
     text-align: left;
     font-family: var(--font-body);
     font-size: 0.9rem;
-    color: #555555;
+    color: #444444;
     transition: background var(--transition-base);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid #eeeeee;
 }
 
 .search-dropdown__item:last-child {
@@ -498,7 +499,7 @@ p {
 
 .search-dropdown__title {
     font-weight: 600;
-    color: #444444;
+    color: #999999;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -506,14 +507,14 @@ p {
 
 .search-dropdown__badge {
     font-size: 0.75rem;
-    color: var(--color-text-light);
+    color: #bbbbbb;
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
 
 .search-dropdown__price {
     font-weight: 600;
-    color: var(--color-primary);
+    color: #8fbdb5;
     flex-shrink: 0;
     font-size: 0.9rem;
 }
@@ -521,17 +522,18 @@ p {
 .search-dropdown__empty {
     padding: 1.25rem 1rem;
     text-align: center;
-    color: var(--color-text-light);
+    color: #888888;
     font-size: 0.9rem;
+    background: #ffffff;
 }
 
 .search-dropdown__more {
     padding: 0.6rem 1rem;
     text-align: center;
-    color: var(--color-text-light);
+    color: #777777;
     font-size: 0.8rem;
-    background: var(--color-off-white);
-    border-top: 1px solid var(--color-border);
+    background: #fafafa;
+    border-top: 1px solid #eeeeee;
 }
 
 .hero__browse {
