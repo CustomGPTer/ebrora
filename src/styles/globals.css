@@ -470,15 +470,15 @@ p {
 }
 
 .search-dropdown__item:hover {
-    background: var(--color-primary-light);
+    background: #f7f7f7;
 }
 
 .search-dropdown__item:hover .search-dropdown__title {
-    color: #1B5B50;
+    color: #222222;
 }
 
 .search-dropdown__item:hover .search-dropdown__badge {
-    color: #3d8b7a;
+    color: #1B5B50;
 }
 
 .search-dropdown__icon {
