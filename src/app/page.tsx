@@ -3,6 +3,8 @@ import '@/styles/homepage.css';
 import HomepageClient from '@/components/home/HomepageClient';
 import { PRODUCTS, CATEGORIES, REVIEWS } from '@/data/products';
 import { POSTS } from '@/data/posts';
+import { TOOLBOX_CATEGORIES } from '@/data/toolbox-categories';
+import { TOOL_DEFINITIONS } from '@/data/tool-definitions';
 
 export const metadata: Metadata = {
   title: 'Ebrora | Construction Templates, RAMS Builder & Toolbox Talks for UK Sites',
@@ -97,6 +99,36 @@ export default function HomePage() {
         categoryCount={categoryCount}
         reviews={anonymisedReviews}
         latestPosts={latestPosts}
+        searchItems={[
+          ...PRODUCTS.map((p) => ({
+            label: p.title,
+            type: 'Template' as const,
+            icon: p.icon,
+            href: `/products#${p.id}`,
+            meta: p.price,
+          })),
+          ...TOOLBOX_CATEGORIES.map((c) => ({
+            label: c.name,
+            type: 'Toolbox Talks' as const,
+            icon: '🗣️',
+            href: `/toolbox-talks/${c.slug}`,
+            meta: '',
+          })),
+          ...TOOL_DEFINITIONS.map((t) => ({
+            label: t.name,
+            type: 'Free Tool' as const,
+            icon: '🧮',
+            href: t.route,
+            meta: 'Free',
+          })),
+          ...[...POSTS].sort((a, b) => b.date.localeCompare(a.date)).map((p) => ({
+            label: p.title,
+            type: 'Blog' as const,
+            icon: '📝',
+            href: `/blog/${p.id}`,
+            meta: '',
+          })),
+        ]}
       />
     </>
   );
