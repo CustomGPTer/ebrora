@@ -232,10 +232,11 @@
   background: #f0f7f5;
 }
 .hp-search-dropdown__icon {
-  font-size: 1.3rem;
   flex-shrink: 0;
   width: 1.6rem;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .hp-search-dropdown__info {
   display: flex;
