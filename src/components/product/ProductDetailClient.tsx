@@ -33,7 +33,7 @@ export default function ProductDetailClient({
         <div className="container">
           <Link href="/">Home</Link>
           <span className="breadcrumb__separator">/</span>
-          <Link href="/#products">Templates</Link>
+          <Link href="/products">Templates</Link>
           <span className="breadcrumb__separator">/</span>
           <span className="breadcrumb__current">{product.title}</span>
         </div>
@@ -121,7 +121,7 @@ export default function ProductDetailClient({
                     const cat = categories[slug];
                     if (!cat) return null;
                     return (
-                      <a key={slug} href="/#products" className="product-info__badge">
+                      <a key={slug} href="/products" className="product-info__badge">
                         {cat.icon} {cat.label}
                       </a>
                     );
