@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { PRODUCTS } from '@/data/products';
 import { POSTS } from '@/data/posts';
 import { prisma } from '@/lib/prisma';
+import { scanAllTemplates } from '@/lib/free-templates';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const baseUrl = 'https://www.ebrora.com';
@@ -46,8 +47,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       {
                 url: `${baseUrl}/free-templates`,
                 lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.7,
+                changeFrequency: 'weekly',
+                priority: 0.8,
       },
       {
                 url: `${baseUrl}/privacy-policy`,
@@ -83,7 +84,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           priority: 0.6,
   }));
 
-  // Toolbox talks – fetched from DB
+  // ── Free Templates — scanned from /public/free-templates/ ──
+  const ftCategories = scanAllTemplates();
+
+  const freeTemplateCategoryPages: MetadataRoute.Sitemap = ftCategories.map((cat) => ({
+    url: `${baseUrl}/free-templates/${cat.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
+
+  const freeTemplateSubcategoryPages: MetadataRoute.Sitemap = ftCategories.flatMap((cat) =>
+    cat.subcategories
+      .filter((sc) => sc.templates.length > 0)
+      .map((sc) => ({
+        url: `${baseUrl}/free-templates/${cat.slug}/${sc.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      }))
+  );
+
+  const freeTemplatePages: MetadataRoute.Sitemap = ftCategories.flatMap((cat) =>
+    cat.subcategories.flatMap((sc) =>
+      sc.templates.map((tpl) => ({
+        url: `${baseUrl}${tpl.href}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      }))
+    )
+  );
+
+  // ── Toolbox talks — fetched from DB with fallback ──
   let toolboxCategoryPages: MetadataRoute.Sitemap = [];
       let toolboxTalkPages: MetadataRoute.Sitemap = [];
 
@@ -140,6 +173,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           ...staticPages,
           ...productPages,
           ...blogPages,
+          ...freeTemplateCategoryPages,
+          ...freeTemplateSubcategoryPages,
+          ...freeTemplatePages,
           ...toolboxCategoryPages,
           ...toolboxTalkPages,
         ];
