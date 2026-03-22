@@ -327,7 +327,7 @@ p {
     color: var(--color-white);
     text-align: center;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .hero::before {
@@ -439,7 +439,7 @@ p {
     box-shadow: var(--shadow-lg);
     max-height: 360px;
     overflow-y: auto;
-    z-index: 100;
+    z-index: 500;
     display: none;
     border: 1px solid var(--color-border);
 }
@@ -460,7 +460,7 @@ p {
     text-align: left;
     font-family: var(--font-body);
     font-size: 0.9rem;
-    color: var(--color-text);
+    color: #555555;
     transition: background var(--transition-base);
     border-bottom: 1px solid var(--color-border);
 }
@@ -474,11 +474,11 @@ p {
 }
 
 .search-dropdown__item:hover .search-dropdown__title {
-    color: #0d3a32;
+    color: #1B5B50;
 }
 
 .search-dropdown__item:hover .search-dropdown__badge {
-    color: #2a6b5e;
+    color: #3d8b7a;
 }
 
 .search-dropdown__icon {
@@ -498,7 +498,7 @@ p {
 
 .search-dropdown__title {
     font-weight: 600;
-    color: #2d2d2d;
+    color: #444444;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
