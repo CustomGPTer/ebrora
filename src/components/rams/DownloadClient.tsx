@@ -327,7 +327,7 @@ function StandaloneDownload({
         {/* Cross-sell */}
         <div style={{ marginTop: '2rem', textAlign: 'center' }}>
           <p style={{ fontSize: '0.85rem', color: '#666' }}>Need Excel templates for your project?</p>
-          <a href="/#products" style={{ fontSize: '0.85rem', color: '#1B5745', fontWeight: 600 }}>Browse Templates</a>
+          <a href="/products" style={{ fontSize: '0.85rem', color: '#1B5745', fontWeight: 600 }}>Browse Templates</a>
         </div>
 
         {/* Generate another */}
