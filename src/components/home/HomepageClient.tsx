@@ -13,7 +13,6 @@ import ContactSection from '@/components/home/ContactSection';
 export interface SearchItem {
   label: string;
   type: 'Template' | 'Toolbox Talks' | 'Free Tool' | 'Blog';
-  icon: string;
   href: string;
   meta: string;
 }
@@ -80,6 +79,21 @@ function useFadeIn() {
   }, []);
 
   return ref;
+}
+
+/* ── Search type icons ── */
+function SearchTypeIcon({ type }: { type: SearchItem['type'] }) {
+  const props = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: '#1B5B50', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+  switch (type) {
+    case 'Template':
+      return (<svg {...props}><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>);
+    case 'Toolbox Talks':
+      return (<svg {...props}><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>);
+    case 'Free Tool':
+      return (<svg {...props}><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="8" y1="10" x2="16" y2="10" /><line x1="8" y1="14" x2="12" y2="14" /></svg>);
+    case 'Blog':
+      return (<svg {...props}><path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" /></svg>);
+  }
 }
 
 /* ── Hub card data ── */
@@ -343,7 +357,7 @@ export default function HomepageClient({
                       }}
                       onMouseEnter={() => setActiveIndex(idx)}
                     >
-                      <span className="hp-search-dropdown__icon">{item.icon}</span>
+                      <span className="hp-search-dropdown__icon"><SearchTypeIcon type={item.type} /></span>
                       <span className="hp-search-dropdown__info">
                         <span className="hp-search-dropdown__title">{item.label}</span>
                         <span className="hp-search-dropdown__type">{item.type}</span>
