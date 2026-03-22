@@ -1,19 +1,29 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import type { Review } from '@/lib/types';
 import type { BlogPost } from '@/data/posts';
 import AboutSection from '@/components/home/AboutSection';
 import NewsletterSection from '@/components/home/NewsletterSection';
 import ContactSection from '@/components/home/ContactSection';
 
+export interface SearchItem {
+  label: string;
+  type: 'Template' | 'Toolbox Talks' | 'Free Tool' | 'Blog';
+  icon: string;
+  href: string;
+  meta: string;
+}
+
 interface HomepageClientProps {
   templateCount: number;
   categoryCount: number;
   reviews: Review[];
   latestPosts: BlogPost[];
+  searchItems: SearchItem[];
 }
 
 /* ── Animated counter hook ── */
@@ -163,8 +173,15 @@ export default function HomepageClient({
   categoryCount,
   reviews,
   latestPosts,
+  searchItems,
 }: HomepageClientProps) {
   const [searchInput, setSearchInput] = useState('');
+  const [suggestions, setSuggestions] = useState<SearchItem[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const fadeRef1 = useFadeIn();
   const fadeRef2 = useFadeIn();
   const fadeRef3 = useFadeIn();
@@ -177,11 +194,84 @@ export default function HomepageClient({
   const counter3 = useCounter(categoryCount);
   const counter4 = useCounter(500);
 
+  const getResults = useCallback(
+    (query: string): SearchItem[] => {
+      const q = query.toLowerCase();
+      return searchItems.filter((item) => item.label.toLowerCase().includes(q));
+    },
+    [searchItems]
+  );
+
+  const handleInputChange = (value: string) => {
+    setSearchInput(value);
+    setActiveIndex(-1);
+    if (value.trim().length >= 2) {
+      const results = getResults(value.trim());
+      setSuggestions(results.slice(0, 5));
+      setShowDropdown(true);
+    } else {
+      setSuggestions([]);
+      setShowDropdown(false);
+    }
+  };
+
+  const handleSelect = (item: SearchItem) => {
+    setSearchInput('');
+    setShowDropdown(false);
+    setSuggestions([]);
+    router.push(item.href);
+  };
+
   const handleSearch = () => {
+    setShowDropdown(false);
     if (searchInput.trim()) {
       window.location.href = `/products?search=${encodeURIComponent(searchInput.trim())}`;
     }
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown || suggestions.length === 0) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSearch();
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIndex >= 0 && activeIndex < suggestions.length) {
+        handleSelect(suggestions[activeIndex]);
+      } else {
+        handleSearch();
+      }
+    } else if (e.key === 'Escape') {
+      setShowDropdown(false);
+      setActiveIndex(-1);
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -201,20 +291,71 @@ export default function HomepageClient({
           </p>
 
           {/* Site-wide search */}
-          <div className="hp-search">
+          <div className="hp-search" style={{ position: 'relative' }}>
             <svg className="hp-search__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
             <input
+              ref={inputRef}
               type="text"
               placeholder="Search templates, toolbox talks, tools, guides…"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onFocus={() => {
+                if (searchInput.trim().length >= 2) {
+                  const results = getResults(searchInput.trim());
+                  setSuggestions(results.slice(0, 5));
+                  setShowDropdown(true);
+                }
+              }}
+              onKeyDown={handleKeyDown}
               aria-label="Search the whole site"
+              aria-expanded={showDropdown && suggestions.length > 0}
+              aria-haspopup="listbox"
+              aria-controls="hp-search-listbox"
+              aria-activedescendant={activeIndex >= 0 ? `hp-search-opt-${activeIndex}` : undefined}
+              autoComplete="off"
             />
             <button onClick={handleSearch}>Search</button>
+
+            {showDropdown && (
+              <div
+                ref={dropdownRef}
+                id="hp-search-listbox"
+                role="listbox"
+                aria-label="Search suggestions"
+                className="hp-search-dropdown"
+              >
+                {suggestions.length === 0 ? (
+                  <div className="hp-search-dropdown__empty">No results found</div>
+                ) : (
+                  suggestions.map((item, idx) => (
+                    <button
+                      key={`${item.type}-${item.href}`}
+                      id={`hp-search-opt-${idx}`}
+                      role="option"
+                      aria-selected={idx === activeIndex}
+                      className={`hp-search-dropdown__item${idx === activeIndex ? ' hp-search-dropdown__item--active' : ''}`}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSelect(item);
+                      }}
+                      onMouseEnter={() => setActiveIndex(idx)}
+                    >
+                      <span className="hp-search-dropdown__icon">{item.icon}</span>
+                      <span className="hp-search-dropdown__info">
+                        <span className="hp-search-dropdown__title">{item.label}</span>
+                        <span className="hp-search-dropdown__type">{item.type}</span>
+                      </span>
+                      {item.meta && (
+                        <span className="hp-search-dropdown__meta">{item.meta}</span>
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
 
           {/* Quick links */}
