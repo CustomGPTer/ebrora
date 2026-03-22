@@ -117,11 +117,11 @@ export function NavBar() {
             {/* Desktop-only nav links (>=1024px) */}
             <div className="hidden lg:flex items-center gap-7">
               <Link
-                href="/#products"
-                className={`group ${navLinkClasses("/#products")}`}
+                href="/products"
+                className={`group ${navLinkClasses("/products")}`}
               >
                 Templates
-                <span className={activeUnderline("/#products")} />
+                <span className={activeUnderline("/products")} />
               </Link>
 
               <Link
