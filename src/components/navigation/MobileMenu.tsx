@@ -105,10 +105,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
             {/* Templates — always visible in hamburger */}
             <Link
-              href="/#products"
+              href="/products"
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
-                isActive("/#products")
+                isActive("/products")
                   ? "text-[#1B5B50] bg-[#1B5B50]/5"
                   : "text-gray-800 hover:bg-gray-50"
               }`}
