@@ -1,53 +1,103 @@
 import type { Metadata } from 'next';
-import { SearchProvider } from '@/contexts/SearchContext';
-import HeroSection from '@/components/home/HeroSection';
-import TrustBar from '@/components/home/TrustBar';
-import ProductSection from '@/components/home/ProductSection';
-import FeaturesSection from '@/components/home/FeaturesSection';
-import AboutSection from '@/components/home/AboutSection';
-import ReviewsSection from '@/components/home/ReviewsSection';
-import NewsletterSection from '@/components/home/NewsletterSection';
-import ContactSection from '@/components/home/ContactSection';
+import '@/styles/homepage.css';
+import HomepageClient from '@/components/home/HomepageClient';
 import { PRODUCTS, CATEGORIES, REVIEWS } from '@/data/products';
+import { POSTS } from '@/data/posts';
 
 export const metadata: Metadata = {
-  title: 'Construction Excel Templates for UK Sites | Ebrora',
+  title: 'Ebrora | Construction Templates, RAMS Builder & Toolbox Talks for UK Sites',
   description:
-    'Download professional Excel templates for UK construction and civil engineering. RAMS, COSHH, Gantt charts, inspection registers and more. CDM 2015 compliant, instant download.',
+    'The UK construction industry\'s professional toolkit. Premium Excel templates, AI-powered RAMS Builder, 1,500+ free toolbox talks, free calculators, and expert guides — built by site teams, for site teams. CDM 2015 compliant.',
   alternates: {
     canonical: 'https://www.ebrora.com',
   },
   openGraph: {
-    title: 'Construction Excel Templates for UK Sites | Ebrora',
+    title: 'Ebrora | The UK Construction Professional\'s Toolkit',
     description:
-      'Professional Excel templates for UK construction. RAMS, COSHH, Gantt charts, inspection registers. CDM 2015 compliant, instant download.',
+      'Premium Excel templates, AI-powered RAMS Builder, 1,500+ free toolbox talks, and free tools for UK construction and civil engineering professionals.',
     url: 'https://www.ebrora.com',
     type: 'website',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Construction Excel Templates for UK Sites | Ebrora',
+    title: 'Ebrora | The UK Construction Professional\'s Toolkit',
     description:
-      'Professional Excel templates for UK construction. CDM 2015 compliant, instant download, no signup required.',
+      'Premium Excel templates, AI-powered RAMS Builder, 1,500+ free toolbox talks, and free tools for UK construction professionals.',
     images: ['/og-image.jpg'],
   },
 };
 
+const homepageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Ebrora',
+  url: 'https://www.ebrora.com',
+  description:
+    'The UK construction industry\'s professional toolkit. Premium Excel templates, AI-powered RAMS Builder, free toolbox talks, calculators, and expert construction guides.',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://www.ebrora.com/products?search={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Ebrora',
+  url: 'https://www.ebrora.com',
+  logo: 'https://www.ebrora.com/og-image.jpg',
+  description:
+    'Professional construction templates and digital tools built by UK site teams for site teams. Covering health and safety, project management, MEICA, wastewater, and more.',
+  email: 'hello@ebrora.com',
+  address: { '@type': 'PostalAddress', addressCountry: 'GB' },
+  sameAs: [
+    'https://www.linkedin.com/in/ebrora/',
+    'https://x.com/EbroraSheets',
+    'https://www.youtube.com/channel/UCQy-rQ3Ye1kIPpT19A1c0lg',
+  ],
+};
+
 export default function HomePage() {
+  const templateCount = PRODUCTS.length;
+  const categoryCount = Object.keys(CATEGORIES).length;
+  const latestPosts = [...POSTS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+
+  const genericCompanies = [
+    'Infrastructure Ltd', 'Civils Group', 'Site Solutions UK',
+    'Meridian Contractors', 'Northway Engineering', 'Alliance Construction',
+  ];
+  const genericRoles = [
+    'Site Manager', 'Senior Engineer', 'General Foreman',
+    'Project Manager', 'Section Engineer', 'Construction Manager',
+  ];
+
+  const anonymisedReviews = REVIEWS.slice(0, 6).map((review, idx) => ({
+    ...review,
+    author: review.author.split(' ')[0][0] + '. ' + (review.author.split(' ')[1]?.[0] || 'S') + '.',
+    role: `${genericRoles[idx % genericRoles.length]}, ${genericCompanies[idx % genericCompanies.length]}`,
+  }));
+
   return (
-    <SearchProvider>
-      <HeroSection products={PRODUCTS} />
-      <TrustBar />
-      <ProductSection products={PRODUCTS} categories={CATEGORIES} />
-      <FeaturesSection />
-      <AboutSection
-        templateCount={PRODUCTS.length}
-        categoryCount={Object.keys(CATEGORIES).length}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageSchema) }}
       />
-      <ReviewsSection reviews={REVIEWS} />
-      <NewsletterSection />
-      <ContactSection />
-    </SearchProvider>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <HomepageClient
+        templateCount={templateCount}
+        categoryCount={categoryCount}
+        reviews={anonymisedReviews}
+        latestPosts={latestPosts}
+      />
+    </>
   );
 }
