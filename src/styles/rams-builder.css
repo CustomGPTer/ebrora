@@ -298,114 +298,6 @@
 }
 .template-card-btn:hover { background: var(--rams-green-dark); }
 
-/* --- Lightbox --- */
-.template-lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  backdrop-filter: blur(4px);
-}
-.template-lightbox-content {
-  background: var(--rams-white);
-  border-radius: var(--rams-radius-lg);
-  max-width: 800px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 32px;
-  position: relative;
-  box-shadow: var(--rams-shadow-xl);
-}
-.template-lightbox-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: var(--rams-grey-400);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
-.template-lightbox-close:hover {
-  background: var(--rams-grey-100);
-  color: var(--rams-grey-700);
-}
-
-.template-lightbox-header {
-  margin-bottom: 24px;
-}
-.template-lightbox-header h2 {
-  font-size: 24px;
-  color: var(--rams-grey-800);
-  margin-bottom: 8px;
-}
-.template-lightbox-header p {
-  font-size: 15px;
-  color: var(--rams-grey-500);
-  line-height: 1.5;
-}
-.template-lightbox-meta {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  font-size: 13px;
-  color: var(--rams-grey-400);
-}
-
-.template-lightbox-previews {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding: 16px 0;
-  margin-bottom: 24px;
-}
-.template-lightbox-page {
-  flex: 0 0 auto;
-  width: 220px;
-  border: 1px solid var(--rams-grey-200);
-  border-radius: var(--rams-radius);
-  box-shadow: var(--rams-shadow);
-}
-
-.template-lightbox-sections {
-  margin-bottom: 24px;
-}
-.template-lightbox-sections h3 {
-  font-size: 15px;
-  color: var(--rams-grey-700);
-  margin-bottom: 12px;
-}
-.template-lightbox-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.template-lightbox-use {
-  width: 100%;
-  padding: 14px;
-  background: var(--rams-green);
-  color: var(--rams-white);
-  border: none;
-  border-radius: var(--rams-radius);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--rams-transition);
-}
-.template-lightbox-use:hover { background: var(--rams-green-dark); }
-
 /* ============================================================================
    SCOPE INPUT
    ============================================================================ */
@@ -857,9 +749,6 @@
   .rams-progress-label { display: none; }
   .rams-progress-dot { width: 30px; height: 30px; font-size: 12px; }
   .template-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-  .template-lightbox-content { padding: 20px; }
-  .template-lightbox-previews { gap: 12px; }
-  .template-lightbox-page { width: 160px; }
   .scope-input-template { flex-direction: column; align-items: flex-start; }
   .questionnaire-context { margin-left: 0; }
   .questionnaire-input-wrap { margin-left: 0; }
