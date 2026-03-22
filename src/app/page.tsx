@@ -103,28 +103,24 @@ export default function HomePage() {
           ...PRODUCTS.map((p) => ({
             label: p.title,
             type: 'Template' as const,
-            icon: p.icon,
             href: `/products#${p.id}`,
             meta: p.price,
           })),
           ...TOOLBOX_CATEGORIES.map((c) => ({
             label: c.name,
             type: 'Toolbox Talks' as const,
-            icon: '🗣️',
             href: `/toolbox-talks/${c.slug}`,
             meta: '',
           })),
           ...TOOL_DEFINITIONS.map((t) => ({
             label: t.name,
             type: 'Free Tool' as const,
-            icon: '🧮',
             href: t.route,
             meta: 'Free',
           })),
           ...[...POSTS].sort((a, b) => b.date.localeCompare(a.date)).map((p) => ({
             label: p.title,
             type: 'Blog' as const,
-            icon: '📝',
             href: `/blog/${p.id}`,
             meta: '',
           })),
