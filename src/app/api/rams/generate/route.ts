@@ -21,7 +21,8 @@ import {
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const MAX_RETRIES = 2;
+const MAX_RETRIES = 3;
+const MAX_TOTAL_ANSWERS = 40;
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,6 +43,14 @@ export async function POST(req: NextRequest) {
     if (!generationId || !answers || answers.length === 0) {
       return NextResponse.json(
         { error: 'Generation ID and at least one answered question are required' },
+        { status: 400 }
+      );
+    }
+
+    // Max total answers check
+    if (answers.length > MAX_TOTAL_ANSWERS) {
+      return NextResponse.json(
+        { error: `Too many answers (${answers.length}). Maximum is ${MAX_TOTAL_ANSWERS}.` },
         { status: 400 }
       );
     }
@@ -67,14 +76,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Generation not found' }, { status: 404 });
     }
 
-    if (generation.status !== 'PROCESSING') {
+    // Accept both QUEUED (new flow) and PROCESSING (legacy flow)
+    if (generation.status !== 'PROCESSING' && generation.status !== 'QUEUED') {
       return NextResponse.json({ error: 'Invalid generation state' }, { status: 400 });
     }
 
     const templateSlug = generation.rams_format.slug as TemplateSlug;
     const workDescription = description || '';
 
-    // Update status
+    // Update status to PROCESSING
     await prisma.generation.update({
       where: { id: generationId },
       data: { status: 'PROCESSING', answers: JSON.stringify(answers) },
@@ -104,7 +114,7 @@ export async function POST(req: NextRequest) {
 
     while (retryCount <= MAX_RETRIES) {
       const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: 'gpt-4.1',
         messages,
         temperature: 0.5,
         max_tokens: 16000,
