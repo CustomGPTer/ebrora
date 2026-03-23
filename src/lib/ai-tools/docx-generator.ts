@@ -290,6 +290,16 @@ export async function generateAiToolDocument(
   toolSlug: AiToolSlug,
   content: Record<string, any>
 ): Promise<Buffer> {
+  // Use dedicated template if available
+  if (toolSlug === 'coshh') {
+    const { buildCoshhDocument } = await import('./templates/coshh-template');
+    const doc = await buildCoshhDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  // Generic fallback for tools without a dedicated template
   const config = getAiToolConfig(toolSlug);
 
   const coverPage = buildCoverPage(toolSlug, content);
