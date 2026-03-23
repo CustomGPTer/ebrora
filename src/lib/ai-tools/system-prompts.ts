@@ -38,17 +38,25 @@ RESPONSE FORMAT (ready):
 // Tool-specific conversation instructions
 // ---------------------------------------------------------------------------
 const TOOL_CONVERSATION_INSTRUCTIONS: Record<AiToolSlug, string> = {
-  coshh: `You are generating a COSHH Assessment under the Control of Substances Hazardous to Health Regulations 2002.
+  coshh: `You are generating a COSHH Assessment for a SINGLE hazardous substance/product under the Control of Substances Hazardous to Health Regulations 2002.
 
-Focus your questions on:
-1. Specific substances (product names, chemical compositions, SDS availability)
-2. How the substances are used (application method, quantities, duration)
-3. Exposure routes (inhalation, skin contact, ingestion, injection)
-4. Work environment (indoor/outdoor, ventilation, confined space, temperature)
-5. Who is exposed (operatives, nearby workers, public, duration of exposure)
-6. Existing controls (LEV, RPE, PPE, health surveillance, monitoring)
-7. Storage arrangements and emergency spill procedures
-8. Any known health issues among exposed workers`,
+THIS IS A STREAMLINED 2-ROUND FLOW — DO NOT ASK MORE THAN 4 QUESTIONS TOTAL.
+
+ROUND 1 (first call — no previous rounds):
+Ask EXACTLY 1 question:
+- "What is the exact product name and brand/manufacturer? (e.g. Jotun Jotamastic 87, Sika Monotop 610, Dulux Weathershield Masonry Paint)"
+
+ROUND 2 (second call — after the user has named the product):
+You now know the product. Ask EXACTLY 3 follow-up questions tailored to that specific product. Examples:
+- How the product is being used (application method, quantities, mixing)
+- The work environment (indoor/outdoor, ventilation, confined space, kiosk, etc.)
+- Who is exposed and for how long (number of operatives, shift duration, nearby workers)
+
+Choose questions that are relevant to THE SPECIFIC PRODUCT. For a paint, ask about application method. For cement, ask about mixing. For a cleaning chemical, ask about dilution. Be specific.
+
+After Round 2, ALWAYS respond with status "ready". Never ask a third round.
+
+You will use your knowledge of the product's Safety Data Sheet (SDS), GHS classification, H-statements, workplace exposure limits, and control measures when generating the document later — the user does NOT need to provide this technical data.`,
 
   itp: `You are generating an Inspection & Test Plan for construction works.
 
@@ -144,43 +152,56 @@ RULES:
 // Tool-specific generation JSON schemas
 // ---------------------------------------------------------------------------
 const TOOL_GENERATION_SCHEMAS: Record<AiToolSlug, string> = {
-  coshh: `Generate a COSHH Assessment JSON with this structure:
+  coshh: `Generate a COSHH Assessment for a SINGLE product/substance. You MUST use your knowledge of this product's actual Safety Data Sheet (SDS) to populate the technical fields — hazard classification, H-statements, exposure limits, health effects, first aid, etc. Do NOT make up chemical data. If you are unsure about a specific value, state "Refer to manufacturer SDS" rather than guessing.
+
+JSON structure:
 {
-  "documentRef": "string",
-  "assessmentDate": "DD/MM/YYYY",
-  "reviewDate": "DD/MM/YYYY",
+  "documentRef": "string (format: COSHH-YYYY-NNN)",
+  "assessmentDate": "DD/MM/YYYY (today's date)",
+  "reviewDate": "DD/MM/YYYY (12 months from today)",
   "assessedBy": "string",
   "projectName": "string",
   "siteAddress": "string",
-  "activityDescription": "string (min 200 words)",
-  "substances": [
-    {
-      "ref": "S1",
-      "productName": "string",
-      "manufacturer": "string",
-      "hazardClassification": "string (GHS/CLP codes)",
-      "hazardStatements": ["H-statement strings"],
-      "exposureRoutes": "string",
-      "healthEffects": "string",
-      "oel": "string (WEL/OEL if applicable)",
-      "controlMeasures": "string (min 100 words)",
-      "ppeRequired": "string",
-      "storageRequirements": "string",
-      "spillProcedure": "string",
-      "firstAid": "string",
-      "disposalMethod": "string",
-      "monitoringRequired": "string",
-      "healthSurveillance": "string",
-      "riskRating": "High | Medium | Low"
-    }
-  ],
-  "generalControlMeasures": "string (min 200 words)",
-  "emergencyProcedures": "string (min 150 words)",
-  "trainingRequirements": "string",
-  "reviewFrequency": "string",
+  "productName": "string (exact product name as stated by user)",
+  "manufacturer": "string",
+  "productDescription": "string (what the product is — 1-2 sentences)",
+  "activityDescription": "string (min 200 words — detailed description of how the product is being used on this specific project, based on the user's answers)",
+  "hazardClassification": "string (GHS/CLP pictogram codes e.g. GHS02, GHS07, GHS08)",
+  "signalWord": "Danger | Warning | None",
+  "hazardStatements": ["array of H-statement codes with descriptions"],
+  "precautionaryStatements": ["array of key P-statements with descriptions"],
+  "exposureRoutes": "string (min 80 words — inhalation, skin, eye, ingestion — specific to this product and how it's being used)",
+  "healthEffects": "string (min 100 words — short-term and long-term health effects specific to this product's chemical composition)",
+  "workplaceExposureLimit": "string (WEL from EH40 for key components, or 'No WEL assigned — use COSHH Essentials approach')",
+  "controlMeasures": "string (min 250 words — hierarchy of control applied to this specific activity. Must include ventilation, containment, safe working procedures, and supervision arrangements. Be specific to the work environment described by the user)",
+  "ppeRequired": {
+    "respiratory": "string (specific RPE type and filter, e.g. 'Half-face respirator with A2P3 combined filters')",
+    "hands": "string (glove type, material, standard, e.g. 'Nitrile chemical-resistant gloves to EN 374')",
+    "eyes": "string (e.g. 'Chemical splash goggles to EN 166')",
+    "body": "string (e.g. 'Disposable Type 5/6 coveralls')",
+    "feet": "string (e.g. 'Chemical-resistant safety boots to EN ISO 20345')"
+  },
+  "storageRequirements": "string (min 80 words — temperature, ventilation, segregation, bunding, signage)",
+  "spillProcedure": "string (min 100 words — containment, absorption, PPE for cleanup, disposal, environmental protection)",
+  "firstAid": {
+    "inhalation": "string",
+    "skinContact": "string",
+    "eyeContact": "string",
+    "ingestion": "string"
+  },
+  "disposalMethod": "string (include EWC code if known)",
+  "monitoringRequired": "string (atmospheric monitoring method, frequency, equipment)",
+  "healthSurveillance": "string (what surveillance is required and frequency, per HSE guidance)",
+  "riskRating": {
+    "initial": "High | Medium | Low",
+    "residual": "High | Medium | Low"
+  },
+  "emergencyProcedures": "string (min 100 words — fire, major spill, personnel exposure, evacuation)",
+  "trainingRequirements": "string (min 80 words — what training operatives need before using this product)",
   "additionalNotes": "string"
 }
-Minimum 3 substances. Each substance must have specific, realistic detail.`,
+
+CRITICAL: Use real SDS data for this product. The hazard classifications, H-statements, WELs, and first aid measures must match the actual manufacturer's Safety Data Sheet. This is a legal compliance document.`,
 
   itp: `Generate an Inspection & Test Plan JSON with this structure:
 {
