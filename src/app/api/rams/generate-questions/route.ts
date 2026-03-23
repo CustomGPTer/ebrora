@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
 
         // AI Call 1
         const completion = await openai.chat.completions.create({
-                  model: 'gpt-4o',
+                  model: 'gpt-4.1',
                   messages: [
                       { role: 'system', content: systemPrompt },
                       { role: 'user', content: `Template selected: ${templateSlug}\n\nWork description:\n${description}` },
