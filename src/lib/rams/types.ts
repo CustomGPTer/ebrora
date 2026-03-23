@@ -143,6 +143,7 @@ export interface BaseDocumentContent {
 /** Standard hazard row with L×S scoring */
 export interface HazardRow_LxS {
   ref: string;
+  activity: string;            // Activity / Task Step
   hazard: string;
   whoAtRisk: string;
   likelihoodInitial: number;   // 1–5
@@ -170,6 +171,7 @@ export interface HazardRow_HML {
 /** RPN hazard row with L×S×D scoring */
 export interface HazardRow_RPN {
   ref: string;
+  activity: string;            // Activity / Task Step
   hazard: string;
   whoAtRisk: string;
   likelihoodInitial: number;
@@ -240,7 +242,7 @@ export interface Template03Content extends BaseDocumentContent {
   permitRequirements: Array<{ type: string; issuingAuthority: string; conditions: string }>;
   coshhSummary: Array<{ substance: string; hazardClass: string; controls: string; storage: string }>;
   liftingOperations: Array<{ appointedPerson: string; liftPlanRef: string; equipmentType: string; maxLoad: string; exclusionZone: string }>;
-  hazards: HazardRow_LxS[];
+  hazards: (HazardRow_LxS & { consequence: string; owner: string; verified: string })[];
   liftingMethod: string;
   trafficManagement: string;
   noiseVibrationControls: string;
@@ -258,7 +260,7 @@ export interface Template04Content extends BaseDocumentContent {
   cdmRiskFlags: Array<{ category: string; applies: 'Yes' | 'No'; notes: string }>;
   designerResidualRisks: Array<{ risk: string; recommendation: string; contractorResponse: string; status: string }>;
   cppReferences: Array<{ document: string; reference: string }>;
-  hazards: (HazardRow_LxS & { cdmCategory: string; cdmRef: string })[];
+  hazards: (HazardRow_LxS & { cdmCategory: string; cdmRef: string; verified: string })[];
   residualRiskManagement: string;
   hsfContributions: string;
   workLocation: string;
@@ -305,7 +307,7 @@ export interface Template06Content extends BaseDocumentContent {
   insuranceAccreditation: Array<{ type: string; policyNo: string; expiry: string; coverLevel: string }>;
   approvalChain: Array<{ stage: string; name: string; date: string; accepted: string }>;
   pcAmendments: Array<{ amendment: string; raisedBy: string; date: string; status: string }>;
-  hazards: (HazardRow_LxS & { pcComment: string })[];
+  hazards: (HazardRow_LxS & { pcComment: string; responsible: string })[];
   pcSiteRulesCompliance: string;
   monitoringInspectionRegime: Array<{ check: string; frequency: string; carriedOutBy: string; recordLocation: string; escalation: string }>;
   workLocation: string;
@@ -344,7 +346,7 @@ export interface Template09Content extends BaseDocumentContent {
   workingHours: string;
   workforceSize: string;
   preStartChecklist: Array<{ item: string; checkedBy: string }>;
-  hazards: (HazardRow_LxS & { checkRequired: string })[];
+  hazards: (HazardRow_LxS & { checkRequired: string; verified: string })[];
   holdPoints: Array<{ stageActivity: string; inspectionRequired: string; inspectedBy: string }>;
   taskSafetyChecklist: Array<{ item: string }>;
   closeDownChecklist: Array<{ item: string }>;
