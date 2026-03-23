@@ -179,21 +179,48 @@ async function handleSubscriptionCancelled(resource: any): Promise<void> {
           const subscriptionId = resource.id;
           const customId = resource.custom_id;
 
-      if (!subscriptionId || !customId) {
-              console.warn('Missing subscription ID or custom ID');
+      if (!subscriptionId) {
+              console.warn('Missing subscription ID in cancellation webhook');
               return;
       }
 
-      // Update subscription status
+      // Only cancel if the webhook subscription ID matches the user's CURRENT subscription.
+      // This prevents stale/abandoned PayPal subscriptions from nuking an active one.
+      // Also: custom_id may be absent on some PayPal cancel events, so look up by subscription ID too.
+      let existingSub = customId
+              ? await prisma.subscription.findUnique({ where: { user_id: customId } })
+              : null;
+
+      // Fallback: find by paypal_subscription_id if custom_id wasn't provided
+      if (!existingSub) {
+              existingSub = await prisma.subscription.findFirst({
+                        where: { paypal_subscription_id: subscriptionId },
+              });
+      }
+
+      if (!existingSub) {
+              console.log(`No matching DB subscription for PayPal sub ${subscriptionId} — ignoring`);
+              return;
+      }
+
+      // CRITICAL: only cancel if this webhook is for the user's CURRENT active subscription
+      if (existingSub.paypal_subscription_id !== subscriptionId) {
+              console.log(
+                        `Ignoring cancel for old sub ${subscriptionId} — user has active sub ${existingSub.paypal_subscription_id}`
+              );
+              return;
+      }
+
+      // Set status to CANCELLED but keep the tier intact until period ends
+      // (matches the behaviour of the manual cancel route)
       await prisma.subscription.update({
-              where: { user_id: customId },
+              where: { id: existingSub.id },
               data: {
                         status: 'CANCELLED',
-                        tier: 'FREE',
               },
       });
 
-      console.log(`Subscription ${subscriptionId} cancelled for user ${customId}`);
+      console.log(`Subscription ${subscriptionId} cancelled for user ${existingSub.user_id}`);
     } catch (error) {
           console.error('Error handling subscription cancellation:', error);
           throw error;
@@ -205,20 +232,35 @@ async function handleSubscriptionSuspended(resource: any): Promise<void> {
           const subscriptionId = resource.id;
           const customId = resource.custom_id;
 
-      if (!subscriptionId || !customId) {
-              console.warn('Missing subscription ID or custom ID');
+      if (!subscriptionId) {
+              console.warn('Missing subscription ID in suspension webhook');
               return;
       }
 
-      // Update subscription status
+      // Only suspend if this webhook matches the user's current subscription
+      let existingSub = customId
+              ? await prisma.subscription.findUnique({ where: { user_id: customId } })
+              : null;
+
+      if (!existingSub) {
+              existingSub = await prisma.subscription.findFirst({
+                        where: { paypal_subscription_id: subscriptionId },
+              });
+      }
+
+      if (!existingSub || existingSub.paypal_subscription_id !== subscriptionId) {
+              console.log(`Ignoring suspend for non-current sub ${subscriptionId}`);
+              return;
+      }
+
       await prisma.subscription.update({
-              where: { user_id: customId },
+              where: { id: existingSub.id },
               data: {
                         status: 'PAST_DUE',
               },
       });
 
-      console.log(`Subscription ${subscriptionId} suspended for user ${customId}`);
+      console.log(`Subscription ${subscriptionId} suspended for user ${existingSub.user_id}`);
     } catch (error) {
           console.error('Error handling subscription suspension:', error);
           throw error;
