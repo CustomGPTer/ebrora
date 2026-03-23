@@ -42,6 +42,8 @@ interface AccountDashboardClientProps {
   user: User;
   subscription: Subscription | null;
   generationCount: number;
+  tbtDownloadCount: number;
+  templateDownloadCount: number;
   generations: Generation[];
   savedDetails: SavedDetails | null;
   initialTab?: string;
@@ -102,17 +104,28 @@ export default function AccountDashboardClient({
   user,
   subscription,
   generationCount,
+  tbtDownloadCount,
+  templateDownloadCount,
   generations,
   savedDetails,
   initialTab = 'overview',
 }: AccountDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab as TabType);
 
-  const usageLimit = subscription?.plan === 'pro' ? 100 : subscription?.plan === 'starter' ? 20 : 5;
-  const usagePercentage = Math.min((generationCount / usageLimit) * 100, 100);
+  // RAMS limits
+  const ramsLimit = subscription?.plan === 'PROFESSIONAL' ? 25 : subscription?.plan === 'STANDARD' ? 10 : 1;
+  const ramsPercentage = Math.min((generationCount / ramsLimit) * 100, 100);
+
+  // TBT limits
+  const tbtLimit = subscription?.plan === 'PROFESSIONAL' ? 20 : subscription?.plan === 'STANDARD' ? 10 : 2;
+  const tbtPercentage = Math.min((tbtDownloadCount / tbtLimit) * 100, 100);
+
+  // Template limits
+  const templateLimit = subscription?.plan === 'PROFESSIONAL' ? 40 : subscription?.plan === 'STANDARD' ? 20 : 2;
+  const templatePercentage = Math.min((templateDownloadCount / templateLimit) * 100, 100);
 
   const planLabel = subscription?.plan
-    ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)
+    ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1).toLowerCase()
     : 'Free';
 
   return (
@@ -168,38 +181,68 @@ export default function AccountDashboardClient({
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Stat cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Plan card */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Current Plan</p>
                 <p className="text-2xl font-bold text-gray-900">{planLabel}</p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Status: <span className="text-green-600 font-medium">{subscription?.status || 'Active'}</span>
+                  Status: <span className={`font-medium ${subscription?.status === 'ACTIVE' || !subscription ? 'text-green-600' : 'text-amber-600'}`}>{subscription?.status || 'Active'}</span>
                 </p>
               </div>
 
-              {/* Usage card */}
+              {/* RAMS usage */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Monthly Usage</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">RAMS Generated</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {generationCount} <span className="text-base font-normal text-gray-400">/ {usageLimit}</span>
+                  {generationCount} <span className="text-base font-normal text-gray-400">/ {ramsLimit}</span>
                 </p>
                 <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{
-                      width: `${usagePercentage}%`,
-                      backgroundColor: usagePercentage > 80 ? '#dc2626' : '#1B5745',
+                      width: `${ramsPercentage}%`,
+                      backgroundColor: ramsPercentage > 80 ? '#dc2626' : '#1B5745',
                     }}
                   />
                 </div>
+                <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
               </div>
 
-              {/* Documents card */}
+              {/* TBT downloads */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Documents</p>
-                <p className="text-2xl font-bold text-gray-900">{generations.length}</p>
-                <p className="text-xs text-gray-500 mt-1">Recent generations</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Toolbox Talks</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {tbtDownloadCount} <span className="text-base font-normal text-gray-400">/ {tbtLimit}</span>
+                </p>
+                <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${tbtPercentage}%`,
+                      backgroundColor: tbtPercentage > 80 ? '#dc2626' : '#1B5745',
+                    }}
+                  />
+                </div>
+                <p className="text-[11px] text-gray-400 mt-1.5">downloads / rolling 30 days</p>
+              </div>
+
+              {/* Template downloads */}
+              <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Free Templates</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {templateDownloadCount} <span className="text-base font-normal text-gray-400">/ {templateLimit}</span>
+                </p>
+                <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${templatePercentage}%`,
+                      backgroundColor: templatePercentage > 80 ? '#dc2626' : '#1B5745',
+                    }}
+                  />
+                </div>
+                <p className="text-[11px] text-gray-400 mt-1.5">downloads / rolling 30 days</p>
               </div>
             </div>
 
@@ -316,19 +359,39 @@ export default function AccountDashboardClient({
             {/* Usage */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h2 className="text-base font-bold text-gray-900 mb-4">Usage This Period</h2>
-              <div className="flex items-end gap-3 mb-3">
-                <span className="text-3xl font-bold text-gray-900">{generationCount}</span>
-                <span className="text-sm text-gray-400 pb-1">of {usageLimit} documents</span>
+              <div className="space-y-5">
+                {/* RAMS */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm font-medium text-gray-700">RAMS Generated</span>
+                    <span className="text-sm text-gray-500">{generationCount} / {ramsLimit}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${ramsPercentage}%`, backgroundColor: ramsPercentage > 80 ? '#dc2626' : '#1B5745' }} />
+                  </div>
+                </div>
+                {/* TBTs */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm font-medium text-gray-700">Toolbox Talk Downloads</span>
+                    <span className="text-sm text-gray-500">{tbtDownloadCount} / {tbtLimit}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${tbtPercentage}%`, backgroundColor: tbtPercentage > 80 ? '#dc2626' : '#1B5745' }} />
+                  </div>
+                </div>
+                {/* Templates */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm font-medium text-gray-700">Free Template Downloads</span>
+                    <span className="text-sm text-gray-500">{templateDownloadCount} / {templateLimit}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${templatePercentage}%`, backgroundColor: templatePercentage > 80 ? '#dc2626' : '#1B5745' }} />
+                  </div>
+                </div>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${usagePercentage}%`,
-                    backgroundColor: usagePercentage > 80 ? '#dc2626' : '#1B5745',
-                  }}
-                />
-              </div>
+              <p className="text-xs text-gray-400 mt-4">Download limits reset on a rolling 30-day basis.</p>
             </div>
 
             {/* Plan options */}
