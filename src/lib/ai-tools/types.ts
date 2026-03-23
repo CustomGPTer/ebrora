@@ -28,6 +28,10 @@ export interface AiToolConfig {
   documentLabel: string;
   /** Placeholder text for the work description textarea */
   descriptionPlaceholder: string;
+  /** Heading shown above the description field */
+  descriptionHeading: string;
+  /** Hint text shown below the heading */
+  descriptionHint: string;
   /** Example description shown as helper text */
   descriptionExample: string;
   /** Key sections that appear in the generated document */
