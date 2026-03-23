@@ -70,13 +70,13 @@ async function callOpenAI(
   userPrompt: string,
   retryCount: number = 0
 ): Promise<GeneratedContent> {
-  const maxRetries = 2;
+  const maxRetries = 3;
 
   try {
     const client = getOpenAIClient();
 
     const response = await client.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',
