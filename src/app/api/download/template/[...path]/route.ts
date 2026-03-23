@@ -42,7 +42,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
           error: "Authentication required",
           code: "AUTH_REQUIRED",
           message:
-            "Sign in to download free templates. Free accounts get 5 downloads per month.",
+            "Sign in to download free templates. Free accounts get 2 downloads per month.",
         },
         { status: 401 }
       );
@@ -76,53 +76,39 @@ export async function GET(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const tier: SubscriptionTier = user.subscription?.tier || "FREE";
+    const tier: SubscriptionTier = user.subscription?.status === 'ACTIVE'
+      ? user.subscription.tier
+      : "FREE";
     const tierLimits = TIER_LIMITS[tier];
 
     const monthlyLimit =
       "templateDownloadsPerMonth" in tierLimits
         ? (tierLimits as Record<string, unknown>)
             .templateDownloadsPerMonth as number
-        : 5;
+        : 2;
 
-    const now = new Date();
-    let periodStart: Date;
-
-    if (user.subscription?.current_period_start) {
-      periodStart = new Date(user.subscription.current_period_start);
-      while (periodStart < now) {
-        const next = new Date(periodStart);
-        next.setMonth(next.getMonth() + 1);
-        if (next > now) break;
-        periodStart = next;
-      }
-    } else {
-      periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    }
+    // Rolling 30-day window
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
     const downloadsThisPeriod = await prisma.contentDownload.count({
       where: {
         userId,
         contentType: "FREE_TEMPLATE",
         downloadedAt: {
-          gte: periodStart,
+          gte: thirtyDaysAgo,
         },
       },
     });
 
     if (downloadsThisPeriod >= monthlyLimit) {
-      const nextReset = new Date(periodStart);
-      nextReset.setMonth(nextReset.getMonth() + 1);
-
       return NextResponse.json(
         {
-          error: "Monthly download limit reached",
+          error: "Download limit reached",
           code: "LIMIT_REACHED",
           used: downloadsThisPeriod,
           limit: monthlyLimit,
           tier,
-          resetsAt: nextReset.toISOString(),
-          message: `You've used all ${monthlyLimit} of your free template downloads this month. Upgrade for more, or come back after ${nextReset.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.`,
+          message: `You've used all ${monthlyLimit} of your free template downloads. Upgrade for more.`,
         },
         { status: 429 }
       );
