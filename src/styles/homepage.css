@@ -447,6 +447,19 @@
 .hp-card--free:hover::before { background: #3b82f6; }
 .hp-card--tools:hover::before { background: #8b5cf6; }
 .hp-card--blog:hover::before { background: #f59e0b; }
+.hp-card--ai:hover::before { background: linear-gradient(135deg, var(--color-gold), #e8a824); }
+.hp-card--ai .hp-hub-card__badge {
+  background: linear-gradient(135deg, var(--color-gold), #c99a3f);
+  color: #1a1a1a;
+}
+.hp-card--ai .hp-hub-card__icon {
+  background: linear-gradient(135deg, rgba(218, 165, 32, 0.12), rgba(218, 165, 32, 0.06));
+  color: #b8860b;
+}
+.hp-card--ai:hover .hp-hub-card__icon {
+  background: linear-gradient(135deg, var(--color-gold), #c99a3f);
+  color: #ffffff;
+}
 
 /* ============================================================================
    RAMS BUILDER CALLOUT
