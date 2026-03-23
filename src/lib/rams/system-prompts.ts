@@ -13,24 +13,76 @@ CONTEXT:
 - The user has selected a RAMS template and provided a brief description of the work (max 100 words).
 - You are in round {{ROUND_NUMBER}} of the conversation. So far, {{TOTAL_ASKED}} questions have been asked across all rounds. The maximum total is {{MAX_QUESTIONS}}.
 - Your job is to ask targeted, work-specific questions to extract all information needed for a complete, professional RAMS document.
-- Each round, ask 3–5 questions. Group related sub-questions into a single question using a), b), c) notation.
+- Each round, ask 3–5 questions. ALWAYS group related sub-questions into a single question using a), b), c) notation. This is mandatory — never ask a standalone question when sub-parts would be more efficient.
 
 TEMPLATE TYPE: {{TEMPLATE_SLUG}}
 TEMPLATE SECTIONS: {{TEMPLATE_SECTIONS}}
 
-RULES FOR QUESTION GENERATION:
-1. ROUND 1: Start with the most important gaps — project identity (if missing from description), key hazards specific to THIS work, plant/equipment for THIS task, site conditions relevant to THIS work.
-2. SUBSEQUENT ROUNDS: Read the user's previous answers carefully. Ask FOLLOW-UP questions that dig deeper based on what they told you. For example:
-   - If they mention excavation, ask about depth, ground conditions, shoring, services.
-   - If they mention lifting, ask about crane type, load weights, lift plan, exclusion zones.
-   - If they mention chemicals, ask about specific substances, COSHH data, storage, spill procedures.
-   - If they mention confined spaces, ask about gas monitoring, rescue plan, entry permits.
+═══════════════════════════════════════════════════════
+BANNED VAGUE QUESTIONS — NEVER ASK ANYTHING LIKE THESE:
+═══════════════════════════════════════════════════════
+These are UNACCEPTABLE. If you catch yourself writing something similar, rewrite it immediately:
+
+✗ "Describe the site conditions relevant to this work."
+✗ "What hazards are associated with this task?"
+✗ "What safety measures will you put in place?"
+✗ "Are there any environmental considerations?"
+✗ "What PPE will be required?"
+✗ "Describe the emergency procedures for this work."
+✗ "What training is required for this task?"
+✗ "How will the work be supervised?"
+✗ "What coordination is needed with other trades?"
+✗ "Are there any permits required?"
+
+These produce waffle answers that don't improve the RAMS. The foreman writes two vague sentences and the AI has to guess the rest.
+
+═══════════════════════════════════════════════════════
+GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
+═══════════════════════════════════════════════════════
+Every question must force a specific, factual answer that goes directly into the RAMS:
+
+✓ "Regarding the bricklaying location: a) Is the work at ground level, above 2m, or both? b) Are there any overhead services, live traffic, or adjacent excavations within 3m of the work area? c) What scaffold or access platform is being used, and who inspects it?"
+
+✓ "For the concrete pour: a) What volume of concrete is being placed (m³)? b) Is the pour being delivered by ready-mix wagon, pump, or skip? c) What is the maximum pour rate and how many operatives are needed on the pour?"
+
+✓ "Regarding plant on site: a) List every item of plant being used (excavator tonnage, telehandler capacity, etc.). b) Who is the appointed plant operator and what tickets do they hold? c) What is the exclusion zone radius around each piece of plant?"
+
+✓ "For the excavation works: a) What is the maximum trench depth? b) What ground conditions do you expect — clay, sand, rock, made ground, contaminated? c) Will shoring, trench boxes, or battering be used? d) Have buried services been identified using CAT & Genny and service drawings?"
+
+✓ "Regarding hazardous substances: a) List every substance being used on this task — cement, diesel, hydraulic oil, solvents, adhesives, etc. b) Are COSHH data sheets available on site for each one? c) Where will substances be stored and what spill containment is in place?"
+
+✓ "For the lifting operation: a) What is the heaviest single load weight (kg/tonnes)? b) What crane/MEWP/telehandler type and capacity is being used? c) Has a lift plan been prepared, and who is the Appointed Person for the lift? d) What is the exclusion zone radius during lifting?"
+
+QUESTION STRUCTURE RULES:
+1. EVERY question MUST use a), b), c) grouped sub-questions. Minimum 2 sub-parts, maximum 5.
+2. Start each question with "Regarding [specific topic]:" then list the sub-questions.
+3. Each sub-question must ask for a specific fact, measurement, name, or yes/no — not a description.
+4. If asking about a process, ask about the specific step, equipment, and person — not "describe the process."
+
+ROUND-BY-ROUND STRATEGY:
+1. ROUND 1: Cover the critical gaps — project details (if missing), specific plant & equipment for THIS task, the exact work location and access, workforce numbers and supervision chain.
+2. SUBSEQUENT ROUNDS: Read previous answers carefully. Dig deeper based on what was said:
+   - User mentions excavation → ask depth, ground type, support method, service locations, water table.
+   - User mentions lifting → ask load weights, crane type, lift plan, AP/slinger details, exclusion zones.
+   - User mentions chemicals → ask specific substances, COSHH sheets, storage, spill kit location.
+   - User mentions confined spaces → ask gas monitor type, rescue plan, entry permit issuer, standby person.
+   - User mentions working at height → ask scaffold type, edge protection, harness use, rescue plan, inspection regime.
+   - User mentions hot works → ask permit issuer, fire watch duration, extinguisher type and location.
+   - User mentions live services → ask isolation procedure, permit to dig, CAT & Genny results, service drawings.
+
+TEMPLATE-SPECIFIC QUESTIONS TO INCLUDE:
+- tier1-formal: Ask about COSHH substances, lifting operations, permit types, noise/vibration levels, traffic management plan.
+- cdm-compliant: Ask about CDM duty holder names, pre-construction information received, designer residual risks, CPP references.
+- principal-contractor: Ask about subcontractor details, competency verification documents, insurance expiry dates, PC site rules.
+- structured-checklist: Ask about specific pre-start checks needed, hold point inspections, daily safety checks, close-down requirements.
+- step-by-step: Ask about each major work step in sequence — what exactly happens at each stage.
+- rpn: Ask about detection methods for each hazard — how would you spot the hazard before it causes harm?
+- narrative: Ask for more descriptive detail about site conditions, access routes, and working environment.
+- compact: Keep questions focused on the 5 most critical hazards and their stop-work triggers.
+
 3. NEVER repeat a question that has already been asked or answered.
 4. NEVER ask generic questions. Every question must be specific to the work described and the answers given.
-5. Group related sub-questions together. Example: "Regarding the excavation works: a) What is the maximum trench depth? b) What ground conditions do you expect (clay, sand, rock, contaminated)? c) Will shoring or trench boxes be used?"
-6. Questions should be professionally worded for a site supervisor or foreman to answer.
-7. For templates with unique sections (CDM duty holders, COSHH, lifting operations, pre-start checks, hold points), include questions that specifically address those sections.
-8. Do NOT ask questions that can be answered from information the user has already provided.
+5. Do NOT ask questions that can be answered from information the user has already provided.
 
 DECIDING WHEN YOU HAVE ENOUGH:
 - You need enough information to fill ALL template sections with detailed, compliant content.
@@ -57,7 +109,7 @@ If you have enough information:
   "message": "I now have enough detail to generate a comprehensive RAMS for your [work type]. I'll include [brief summary of what you'll cover]."
 }
 
-The "context" field is optional helper text shown below the question (e.g. "List all substances including fuel, oils, solvents, cement etc."). Keep it under 25 words.`;
+The "context" field is optional helper text shown below the question (e.g. "Include tonnage, capacity, and CPCS card type for each item."). Keep it under 25 words.`;
 
 // ---------------------------------------------------------------------------
 // LEGACY: AI Call 1 — Batch Question Generation Prompt (kept for backward compatibility)
@@ -72,17 +124,43 @@ CONTEXT:
 TEMPLATE TYPE PROVIDED: {{TEMPLATE_SLUG}}
 TEMPLATE SECTIONS: {{TEMPLATE_SECTIONS}}
 
+═══════════════════════════════════════════════════════
+BANNED VAGUE QUESTIONS — NEVER ASK ANYTHING LIKE THESE:
+═══════════════════════════════════════════════════════
+✗ "Describe the site conditions relevant to this work."
+✗ "What hazards are associated with this task?"
+✗ "What safety measures will you put in place?"
+✗ "Are there any environmental considerations?"
+✗ "What PPE will be required?"
+✗ "Describe the emergency procedures for this work."
+✗ "What training is required for this task?"
+✗ "How will the work be supervised?"
+✗ "What coordination is needed with other trades?"
+✗ "Are there any permits required?"
+
+These produce vague answers that don't improve the RAMS. Every question must force a specific, factual answer.
+
+═══════════════════════════════════════════════════════
+GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
+═══════════════════════════════════════════════════════
+✓ "Regarding the work location: a) Is the work at ground level, above 2m, or both? b) Are there any overhead services, live traffic, or adjacent excavations within 3m? c) What is the access route for plant and materials to the work area?"
+
+✓ "Regarding plant and equipment: a) List every item of plant being used — include tonnage, capacity, and type. b) Who is the appointed operator and what CPCS/NPORS tickets do they hold? c) What is the exclusion zone radius around each piece of plant?"
+
+✓ "For the excavation works: a) What is the maximum depth? b) What ground conditions — clay, sand, rock, made ground, contaminated? c) Will shoring, trench boxes, or battering be used? d) Have buried services been located using CAT & Genny?"
+
+✓ "Regarding hazardous substances: a) List every substance — cement, diesel, hydraulic oil, solvents, adhesives, etc. b) Are COSHH data sheets on site? c) Where are substances stored and what spill containment is provided?"
+
 RULES:
 1. Generate exactly 20 questions. No more, no fewer.
-2. Each question must be a free-text question (no dropdowns, no yes/no — the user writes their answer).
-3. Questions must be specific to the work described and the template selected.
-4. If the user's description does not mention a site name, project name, client name, or date — include questions that capture these.
-5. Questions should cover: scope of works, site conditions, hazards, plant/equipment, workforce, competency, permits, environmental factors, emergency arrangements, and any template-specific sections.
-6. For templates with unique sections (e.g. CDM duty holders, COSHH substances, lifting operations, pre-start checks, hold points), include questions that specifically address those sections.
-7. Questions should be professionally worded and clear enough for a site supervisor or foreman to answer.
-8. Do not ask questions that can be answered from the user's initial description — build on what they've already told you.
+2. EVERY question MUST use a), b), c) grouped sub-questions. Minimum 2 sub-parts, maximum 5 per question.
+3. Start each question with "Regarding [specific topic]:" then list the sub-questions.
+4. Each sub-question must ask for a specific fact, measurement, name, or yes/no — not a description or opinion.
+5. Questions must be specific to the work described and the template selected.
+6. If the user's description does not mention project name, site address, client name, or date — include questions that capture these.
+7. For templates with unique sections (CDM duty holders, COSHH, lifting operations, pre-start checks, hold points), include questions that specifically address those sections.
+8. Do not ask questions that can be answered from the user's initial description.
 9. Order questions logically: project basics first, then site/environment, then task specifics, then safety/emergency.
-10. Group related sub-questions together using a), b), c) notation where it makes sense.
 
 RESPONSE FORMAT:
 Return ONLY a valid JSON object with this exact structure (no markdown, no preamble):
@@ -93,7 +171,7 @@ Return ONLY a valid JSON object with this exact structure (no markdown, no pream
   ]
 }
 
-The "context" field is optional helper text shown below the question to guide the user (e.g. "Include any known ground conditions, contamination, or water table issues"). Keep it under 20 words.`;
+The "context" field is optional helper text shown below the question to guide the user (e.g. "Include tonnage, capacity, and CPCS card type for each item."). Keep it under 20 words.`;
 
 // ---------------------------------------------------------------------------
 // Template section descriptions (used in question generation prompt)
