@@ -31,7 +31,7 @@ export async function buildTemplate09(content: Template09Content): Promise<Docum
             { label: 'Workforce', value: content.workforceSize },
           ], h.A4_CONTENT_WIDTH),
           h.spacer(100),
-          h.sectionHeading('Task Description'), h.bodyText(content.taskDescription),
+          h.sectionHeading('Task Description'), ...h.richBodyText(content.taskDescription),
           h.spacer(100),
           h.approvalTable([
             { role: 'Prepared By', name: content.preparedBy },
@@ -66,8 +66,8 @@ export async function buildTemplate09(content: Template09Content): Promise<Docum
         footers: { default: h.ebroraFooter() },
         children: [
           h.sectionHeading('Method Statement', 28),
-          h.subHeading('1. Sequence of Works'), h.bodyText(content.sequenceOfWorks),
-          h.subHeading('2. PPE Requirements'), h.bodyText(content.ppeRequirements),
+          h.subHeading('1. Sequence of Works'), ...h.richBodyText(content.sequenceOfWorks),
+          h.subHeading('2. PPE Requirements'), ...h.richBodyText(content.ppeRequirements),
 
           // Hold Points (unique — between sequence and other sections)
           h.subHeading('3. ☑ Hold Points & Inspection Schedule', 20, h.CHECKLIST_TEAL),
@@ -75,13 +75,13 @@ export async function buildTemplate09(content: Template09Content): Promise<Docum
           buildHoldPointsTable(content),
           h.spacer(100),
 
-          h.subHeading('4. Competency & Training'), h.bodyText(content.competencyRequirements),
-          h.subHeading('5. Temporary Works'), h.bodyText(content.temporaryWorks),
-          h.subHeading('6. Environmental Considerations'), h.bodyText(content.environmentalConsiderations),
-          h.subHeading('7. Waste Management'), h.bodyText(content.wasteManagement),
-          h.subHeading('8. Emergency Procedures'), h.bodyText(content.emergencyProcedures),
-          h.subHeading('9. Welfare Facilities'), h.bodyText(content.welfareFacilities),
-          h.subHeading('10. Communication Arrangements'), h.bodyText(content.communicationArrangements),
+          h.subHeading('4. Competency & Training'), ...h.richBodyText(content.competencyRequirements),
+          h.subHeading('5. Temporary Works'), ...h.richBodyText(content.temporaryWorks),
+          h.subHeading('6. Environmental Considerations'), ...h.richBodyText(content.environmentalConsiderations),
+          h.subHeading('7. Waste Management'), ...h.richBodyText(content.wasteManagement),
+          h.subHeading('8. Emergency Procedures'), ...h.richBodyText(content.emergencyProcedures),
+          h.subHeading('9. Welfare Facilities'), ...h.richBodyText(content.welfareFacilities),
+          h.subHeading('10. Communication Arrangements'), ...h.richBodyText(content.communicationArrangements),
 
           // Task-Specific Safety Checklist (unique)
           h.subHeading('11. ☑ Task-Specific Safety Checklist', 20, h.CHECKLIST_TEAL),

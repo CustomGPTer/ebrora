@@ -65,7 +65,7 @@ export async function buildTemplate01(content: Template01Content): Promise<Docum
 
           // Task description
           h.sectionHeading('Task Description'),
-          h.bodyText(content.taskDescription),
+          ...h.richBodyText(content.taskDescription),
 
           h.spacer(200),
 
@@ -114,43 +114,43 @@ export async function buildTemplate01(content: Template01Content): Promise<Docum
 
           // Section 1 — Sequence of Works
           h.subHeading('1. Sequence of Works'),
-          h.bodyText(content.sequenceOfWorks),
+          ...h.richBodyText(content.sequenceOfWorks),
 
           // Section 2 — PPE Requirements
           h.subHeading('2. Personal Protective Equipment (PPE)'),
-          h.bodyText(content.ppeRequirements),
+          ...h.richBodyText(content.ppeRequirements),
 
           // Section 3 — Competency Requirements
           h.subHeading('3. Competency & Training Requirements'),
-          h.bodyText(content.competencyRequirements),
+          ...h.richBodyText(content.competencyRequirements),
 
           // Section 4 — Temporary Works
           h.subHeading('4. Temporary Works'),
-          h.bodyText(content.temporaryWorks),
+          ...h.richBodyText(content.temporaryWorks),
 
           // Section 5 — Environmental Considerations
           h.subHeading('5. Environmental Considerations'),
-          h.bodyText(content.environmentalConsiderations),
+          ...h.richBodyText(content.environmentalConsiderations),
 
           // Section 6 — Waste Management
           h.subHeading('6. Waste Management & Housekeeping'),
-          h.bodyText(content.wasteManagement),
+          ...h.richBodyText(content.wasteManagement),
 
           // Section 7 — Emergency Procedures
           h.subHeading('7. Emergency Procedures'),
-          h.bodyText(content.emergencyProcedures),
+          ...h.richBodyText(content.emergencyProcedures),
 
           // Section 8 — Welfare Facilities
           h.subHeading('8. Welfare Facilities'),
-          h.bodyText(content.welfareFacilities),
+          ...h.richBodyText(content.welfareFacilities),
 
           // Section 9 — Communication Arrangements
           h.subHeading('9. Communication Arrangements'),
-          h.bodyText(content.communicationArrangements),
+          ...h.richBodyText(content.communicationArrangements),
 
           // Section 10 — Monitoring Arrangements
           h.subHeading('10. Monitoring & Review Arrangements'),
-          h.bodyText(content.monitoringArrangements),
+          ...h.richBodyText(content.monitoringArrangements),
 
           h.spacer(300),
 

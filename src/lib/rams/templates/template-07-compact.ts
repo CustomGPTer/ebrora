@@ -27,11 +27,11 @@ export async function buildTemplate07(content: Template07Content): Promise<Docum
           h.spacer(100),
 
           h.sectionHeading('Task Description', 20),
-          h.bodyText(content.taskDescription, 16),
+          ...h.richBodyText(content.taskDescription, 16),
           h.spacer(80),
 
           h.sectionHeading('Resources & PPE', 20),
-          h.bodyText(content.resourcesPPE, 16),
+          ...h.richBodyText(content.resourcesPPE, 16),
           h.spacer(100),
 
           h.approvalTable([
@@ -80,13 +80,13 @@ export async function buildTemplate07(content: Template07Content): Promise<Docum
         footers: { default: h.ebroraFooter() },
         children: [
           h.sectionHeading('Method Statement', 24),
-          h.subHeading('1. Sequence of Works', 18), h.bodyText(content.sequenceOfWorks, 16),
-          h.subHeading('2. PPE Requirements', 18), h.bodyText(content.ppeRequirements, 16),
-          h.subHeading('3. Competency Requirements', 18), h.bodyText(content.competencyRequirements, 16),
-          h.subHeading('4. Environmental & Waste', 18), h.bodyText(content.environmentalConsiderations, 16),
-          h.subHeading('5. Emergency Procedures', 18), h.bodyText(content.emergencyProcedures, 16),
-          h.subHeading('6. Welfare Facilities', 18), h.bodyText(content.welfareFacilities, 16),
-          h.subHeading('7. Coordination & Communication', 18), h.bodyText(content.coordinationCommunication, 16),
+          h.subHeading('1. Sequence of Works', 18), ...h.richBodyText(content.sequenceOfWorks, 16),
+          h.subHeading('2. PPE Requirements', 18), ...h.richBodyText(content.ppeRequirements, 16),
+          h.subHeading('3. Competency Requirements', 18), ...h.richBodyText(content.competencyRequirements, 16),
+          h.subHeading('4. Environmental & Waste', 18), ...h.richBodyText(content.environmentalConsiderations, 16),
+          h.subHeading('5. Emergency Procedures', 18), ...h.richBodyText(content.emergencyProcedures, 16),
+          h.subHeading('6. Welfare Facilities', 18), ...h.richBodyText(content.welfareFacilities, 16),
+          h.subHeading('7. Coordination & Communication', 18), ...h.richBodyText(content.coordinationCommunication, 16),
           h.spacer(200),
           h.sectionHeading('Briefing Record', 20),
           h.briefingRecordTable(10, h.A4_CONTENT_WIDTH_NARROW),
