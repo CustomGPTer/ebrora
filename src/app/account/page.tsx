@@ -57,6 +57,26 @@ export default async function AccountPage({ searchParams }: PageProps) {
     },
   });
 
+  // Download counts for rolling 30-day window
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  const [tbtDownloadCount, templateDownloadCount] = await Promise.all([
+    prisma.contentDownload.count({
+      where: {
+        userId: session.user.id,
+        contentType: 'TOOLBOX_TALK',
+        downloadedAt: { gte: thirtyDaysAgo },
+      },
+    }),
+    prisma.contentDownload.count({
+      where: {
+        userId: session.user.id,
+        contentType: 'FREE_TEMPLATE',
+        downloadedAt: { gte: thirtyDaysAgo },
+      },
+    }),
+  ]);
+
   const recentGenerations = await prisma.generation.findMany({
     where: { user_id: session.user.id },
     select: {
@@ -103,6 +123,8 @@ export default async function AccountPage({ searchParams }: PageProps) {
         }}
         subscription={subscription}
         generationCount={generationCount}
+        tbtDownloadCount={tbtDownloadCount}
+        templateDownloadCount={templateDownloadCount}
         generations={generations}
         savedDetails={savedDetails}
         initialTab={tab}
