@@ -104,6 +104,13 @@ export default withAuth(
           '/contact',
           '/login',
           '/register',
+          '/coshh-builder',
+          '/itp-builder',
+          '/manual-handling-builder',
+          '/dse-builder',
+          '/drawing-checker',
+          '/tbt-builder',
+          '/confined-spaces-builder',
         ];
 
         const pathname = req.nextUrl.pathname;
