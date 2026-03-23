@@ -33,14 +33,76 @@ const RAMS_LIMITS: Record<string, number> = {
 const MAX_TOTAL_QUESTIONS = 30;
 const MAX_ROUNDS = 6;
 
+// Answer validation limits
+const MAX_ANSWER_WORDS = 150;
+const MAX_ANSWERS_PER_ROUND = 8;
+
+// Cooldown: 10 seconds between chat rounds per user (in-memory — resets on cold start)
+const COOLDOWN_MS = 10_000;
+const lastRoundTimestamps = new Map<string, number>();
+
+// Housekeeping: purge stale cooldown entries every 5 minutes
+const COOLDOWN_CLEANUP_INTERVAL = 5 * 60 * 1000;
+let lastCooldownCleanup = Date.now();
+
+function cleanupCooldownMap() {
+  const now = Date.now();
+  if (now - lastCooldownCleanup < COOLDOWN_CLEANUP_INTERVAL) return;
+  lastCooldownCleanup = now;
+  const cutoff = now - COOLDOWN_MS * 2;
+  for (const [uid, ts] of lastRoundTimestamps) {
+    if (ts < cutoff) lastRoundTimestamps.delete(uid);
+  }
+}
+
+// Expiry threshold: 1 hour for abandoned generations
+const EXPIRY_THRESHOLD_MS = 60 * 60 * 1000;
+
+/**
+ * Inline cleanup: mark QUEUED/PROCESSING generations older than 1 hour as EXPIRED.
+ * Runs once per request — lightweight query with an index on status + created_at.
+ */
+async function expireAbandonedGenerations() {
+  const cutoff = new Date(Date.now() - EXPIRY_THRESHOLD_MS);
+  try {
+    await prisma.generation.updateMany({
+      where: {
+        status: { in: ['QUEUED', 'PROCESSING'] },
+        created_at: { lt: cutoff },
+      },
+      data: { status: 'EXPIRED' },
+    });
+  } catch (err) {
+    // Non-critical — log and continue
+    console.warn('[Chat] Failed to expire abandoned generations:', err);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
+    // Run inline expiry cleanup
+    await expireAbandonedGenerations();
+    cleanupCooldownMap();
+
     // Auth check
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Please sign in to use the RAMS Builder.' },
         { status: 401 }
+      );
+    }
+
+    const userId = session.user.id;
+
+    // ── Cooldown check (10 s between rounds) ──────────────────────────
+    const lastTs = lastRoundTimestamps.get(userId);
+    const now = Date.now();
+    if (lastTs && now - lastTs < COOLDOWN_MS) {
+      const waitSec = Math.ceil((COOLDOWN_MS - (now - lastTs)) / 1000);
+      return NextResponse.json(
+        { error: `Please wait ${waitSec} seconds before submitting the next round.` },
+        { status: 429 }
       );
     }
 
@@ -63,9 +125,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ── Validate answers in submitted rounds ──────────────────────────
+    if (rounds && rounds.length > 0) {
+      for (const round of rounds) {
+        // Max 8 answers per round
+        if (round.answers && round.answers.length > MAX_ANSWERS_PER_ROUND) {
+          return NextResponse.json(
+            { error: `Round ${round.roundNumber} exceeds the ${MAX_ANSWERS_PER_ROUND}-answer limit.` },
+            { status: 400 }
+          );
+        }
+
+        // 150-word cap per answer
+        if (round.answers) {
+          for (const a of round.answers) {
+            const wc = a.answer.trim().split(/\s+/).length;
+            if (wc > MAX_ANSWER_WORDS) {
+              return NextResponse.json(
+                { error: `Answer "${a.id}" in round ${round.roundNumber} exceeds the ${MAX_ANSWER_WORDS}-word limit.` },
+                { status: 400 }
+              );
+            }
+          }
+        }
+      }
+    }
+
     // Fetch user with subscription
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       include: { subscription: true },
     });
 
@@ -96,12 +184,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Usage limit check (only on first round — don't count mid-conversation rounds)
+    // Usage limit check (only on first round — count from QUEUED, exclude EXPIRED)
     if (!rounds || rounds.length === 0) {
       const monthLimit = RAMS_LIMITS[tier] ?? 1;
-      const now = new Date();
-      const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      const nowDate = new Date();
+      const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
+      const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
 
       const usageThisMonth = await prisma.generation.count({
         where: {
@@ -172,9 +260,6 @@ export async function POST(req: NextRequest) {
     if (rounds && rounds.length > 0) {
       for (const round of rounds) {
         // AI's questions (assistant message)
-        const questionsText = round.questions
-          .map((q) => `${q.id}: ${q.question}${q.context ? ` (${q.context})` : ''}`)
-          .join('\n');
         messages.push({
           role: 'assistant',
           content: JSON.stringify({
@@ -208,7 +293,7 @@ export async function POST(req: NextRequest) {
 
     // AI Call
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4.1',
       messages,
       temperature: 0.7,
       max_tokens: 3000,
@@ -219,6 +304,9 @@ export async function POST(req: NextRequest) {
     if (!responseText) throw new Error('No response from AI');
 
     const parsed = JSON.parse(responseText);
+
+    // Record the cooldown timestamp AFTER successful AI call
+    lastRoundTimestamps.set(userId, Date.now());
 
     // AI signals it has enough info
     if (parsed.status === 'ready') {
@@ -246,7 +334,7 @@ export async function POST(req: NextRequest) {
 
     const newTotal = totalQuestionsAsked + questions.length;
 
-    // If this is the first round, create the generation record
+    // If this is the first round, create the generation record as QUEUED
     let generationId: string | undefined;
     if (roundNumber === 1) {
       const format = await prisma.ramsFormat.findUnique({
@@ -258,10 +346,10 @@ export async function POST(req: NextRequest) {
 
       const generation = await prisma.generation.create({
         data: {
-          user_id: session.user.id,
+          user_id: userId,
           format_id: format.id,
           questions: JSON.stringify(questions),
-          status: 'PROCESSING',
+          status: 'QUEUED',
         },
       });
       generationId = generation.id;
