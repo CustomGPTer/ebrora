@@ -42,7 +42,7 @@ export default function ScopeInput({ templateSlug, onSubmit, onBack, initialValu
         <h2>Describe the Work You Need a RAMS For</h2>
         <p className="scope-input-hint">
           Explain in detail what the work involves. <strong>The more detail you provide, the better your RAMS document will be.</strong> 
-          Include the type of work, location details, any specific hazards you&apos;re aware of, and the scale of the job.
+           Include the type of work, location details, any specific hazards you&apos;re aware of, and the scale of the job.
         </p>
 
         <div className="scope-input-field">
