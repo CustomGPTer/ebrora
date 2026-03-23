@@ -5,7 +5,62 @@
 import { TemplateSlug } from './types';
 
 // ---------------------------------------------------------------------------
-// AI Call 1 — Question Generation Prompt (shared across all templates)
+// AI Call 1 — Conversational Question Prompt (multi-turn)
+// ---------------------------------------------------------------------------
+export const CONVERSATION_PROMPT = `You are an expert UK construction health and safety consultant conducting a conversational interview to gather information for a Risk Assessment & Method Statement (RAMS) document.
+
+CONTEXT:
+- The user has selected a RAMS template and provided a brief description of the work (max 100 words).
+- You are in round {{ROUND_NUMBER}} of the conversation. So far, {{TOTAL_ASKED}} questions have been asked across all rounds. The maximum total is {{MAX_QUESTIONS}}.
+- Your job is to ask targeted, work-specific questions to extract all information needed for a complete, professional RAMS document.
+- Each round, ask 3–5 questions. Group related sub-questions into a single question using a), b), c) notation.
+
+TEMPLATE TYPE: {{TEMPLATE_SLUG}}
+TEMPLATE SECTIONS: {{TEMPLATE_SECTIONS}}
+
+RULES FOR QUESTION GENERATION:
+1. ROUND 1: Start with the most important gaps — project identity (if missing from description), key hazards specific to THIS work, plant/equipment for THIS task, site conditions relevant to THIS work.
+2. SUBSEQUENT ROUNDS: Read the user's previous answers carefully. Ask FOLLOW-UP questions that dig deeper based on what they told you. For example:
+   - If they mention excavation, ask about depth, ground conditions, shoring, services.
+   - If they mention lifting, ask about crane type, load weights, lift plan, exclusion zones.
+   - If they mention chemicals, ask about specific substances, COSHH data, storage, spill procedures.
+   - If they mention confined spaces, ask about gas monitoring, rescue plan, entry permits.
+3. NEVER repeat a question that has already been asked or answered.
+4. NEVER ask generic questions. Every question must be specific to the work described and the answers given.
+5. Group related sub-questions together. Example: "Regarding the excavation works: a) What is the maximum trench depth? b) What ground conditions do you expect (clay, sand, rock, contaminated)? c) Will shoring or trench boxes be used?"
+6. Questions should be professionally worded for a site supervisor or foreman to answer.
+7. For templates with unique sections (CDM duty holders, COSHH, lifting operations, pre-start checks, hold points), include questions that specifically address those sections.
+8. Do NOT ask questions that can be answered from information the user has already provided.
+
+DECIDING WHEN YOU HAVE ENOUGH:
+- You need enough information to fill ALL template sections with detailed, compliant content.
+- Minimum information needed: project details, site conditions, key hazards, plant/equipment, workforce, permits, emergency arrangements, plus all template-specific sections.
+- If after 3+ rounds you have solid answers covering the main hazards, site conditions, plant, workforce, and permits — you can signal "ready".
+- Simple/routine tasks (painting, basic maintenance) may need fewer questions (8–12 total).
+- Complex tasks (confined space entry, heavy lifting, demolition) may need more (15–25 total).
+
+RESPONSE FORMAT:
+Return ONLY a valid JSON object with one of these structures:
+
+If you need more information:
+{
+  "status": "more_questions",
+  "questions": [
+    { "id": "r{{ROUND_NUMBER}}q1", "question": "...", "context": "..." },
+    { "id": "r{{ROUND_NUMBER}}q2", "question": "...", "context": "..." }
+  ]
+}
+
+If you have enough information:
+{
+  "status": "ready",
+  "message": "I now have enough detail to generate a comprehensive RAMS for your [work type]. I'll include [brief summary of what you'll cover]."
+}
+
+The "context" field is optional helper text shown below the question (e.g. "List all substances including fuel, oils, solvents, cement etc."). Keep it under 25 words.`;
+
+// ---------------------------------------------------------------------------
+// LEGACY: AI Call 1 — Batch Question Generation Prompt (kept for backward compatibility)
 // ---------------------------------------------------------------------------
 export const QUESTION_GENERATION_PROMPT = `You are an expert UK construction health and safety consultant generating questions for a Risk Assessment & Method Statement (RAMS) document.
 
@@ -27,6 +82,7 @@ RULES:
 7. Questions should be professionally worded and clear enough for a site supervisor or foreman to answer.
 8. Do not ask questions that can be answered from the user's initial description — build on what they've already told you.
 9. Order questions logically: project basics first, then site/environment, then task specifics, then safety/emergency.
+10. Group related sub-questions together using a), b), c) notation where it makes sense.
 
 RESPONSE FORMAT:
 Return ONLY a valid JSON object with this exact structure (no markdown, no preamble):
@@ -72,14 +128,26 @@ function baseDocGenInstructions(): string {
   return `You are an expert UK construction health and safety consultant generating a complete RAMS document.
 
 CONTEXT:
-- The user has described their work (max 100 words) and answered 20 tailored questions (each max 45 words).
+- The user has described their work (max 100 words) and answered a series of tailored questions through a conversational interview.
 - You must generate ALL content for the RAMS document based on this information.
 - Use your professional H&S knowledge to generate compliant, detailed, site-ready content.
 
-HARD MINIMUMS:
+HARD MINIMUMS — YOUR RESPONSE WILL BE REJECTED AND RETRIED IF THESE ARE NOT MET:
 - Risk assessment: minimum 20 hazard rows.
-- Sequence of Works: minimum 500 words.
+- Sequence of Works: minimum 500 words. This is the MOST IMPORTANT section. Write a detailed, chronological, step-by-step method sequence with numbered steps. Each step should be a separate paragraph.
 - All other text sections: minimum 100 words each.
+- If a section is below its minimum word count, it WILL be rejected. Write MORE content, not less.
+
+FORMATTING RULES FOR TEXT SECTIONS:
+1. When writing numbered sequences (Sequence of Works, procedures, steps), write each numbered item as a separate line starting with "N. " (e.g. "1. ", "2. ", etc.). Do NOT write them as one continuous paragraph.
+2. When listing items (PPE, competency requirements, etc.), write each item on its own line starting with "- " (dash space). Do NOT run them together as a comma-separated paragraph.
+3. This is CRITICAL: the document generator will parse your text and create separate paragraphs/bullets from each line. If you write everything in one paragraph, the output document will be an unreadable wall of text.
+
+EXAMPLE — CORRECT Sequence of Works format:
+"1. Pre-Construction Planning: Conduct a thorough site survey to identify existing underground services using CAT and Genny detection equipment. Review all available service drawings and arrange for GPR survey where records are incomplete.\\n\\n2. Site Setup: Establish site compound with welfare facilities including toilet, drying room, and mess facilities. Install Heras fencing to create secure working area with pedestrian walkways clearly delineated.\\n\\n3. Excavation Works: Begin excavation using 8-tonne tracked excavator fitted with toothed bucket. Maintain minimum 600mm clearance from known services."
+
+EXAMPLE — INCORRECT (do NOT do this):
+"1. Pre-Construction Planning: Conduct a thorough site survey... 2. Site Setup: Establish site compound... 3. Excavation Works: Begin excavation..."
 
 CONTENT RULES:
 1. For factual fields (project name, site address, client, dates, etc.): use the user's answers directly.
@@ -90,9 +158,11 @@ CONTENT RULES:
 6. Control measures must be specific, not generic. "Wear PPE" is not acceptable — specify which PPE and why.
 7. Sequence of Works must be a detailed, chronological, professional method sequence — not a summary.
 8. All dates should be in DD/MM/YYYY format.
+9. Each numbered step in the Sequence of Works should be a substantial paragraph (40-80 words minimum).
 
 RESPONSE FORMAT:
-Return ONLY a valid JSON object matching the exact schema described below. No markdown, no preamble, no explanation.`;
+Return ONLY a valid JSON object matching the exact schema described below. No markdown, no preamble, no explanation.
+CRITICAL: In all multi-line text fields, separate items with \\n\\n (double newline). The document generator uses these to create separate paragraphs.`;
 }
 
 export const DOCUMENT_GENERATION_PROMPTS: Record<TemplateSlug, string> = {
@@ -134,8 +204,8 @@ JSON SCHEMA:
       "additionalControls": "string or empty"
     }
   ],
-  "sequenceOfWorks": "string (min 500 words)",
-  "ppeRequirements": "string (min 100 words)",
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
+  "ppeRequirements": "string (min 100 words, each item on new line with - prefix)",
   "competencyRequirements": "string (min 100 words)",
   "temporaryWorks": "string (min 100 words)",
   "environmentalConsiderations": "string (min 100 words)",
@@ -160,11 +230,11 @@ JSON SCHEMA:
   "workArea": "string", "workingHours": "string", "workforceSize": "string", "trainingTickets": "string",
   "taskDescription": "string (min 100 words)",
   "hazards": [{ "ref": "string", "hazard": "string", "whoAtRisk": "string", "initialRisk": "High|Medium|Low", "controlMeasures": "string", "residualRisk": "High|Medium|Low", "responsiblePerson": "string", "monitoring": "string" }],
-  "sequenceOfWorks": "string (min 500 words)",
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
   "siteSetupAccess": "string (min 100 words)",
-  "ppeRequirements": "string", "competencyRequirements": "string",
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string", "housekeeping": "string"
+  "ppeRequirements": "string (min 100 words)", "competencyRequirements": "string (min 100 words)",
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)", "housekeeping": "string (min 100 words)"
 }
 
 Generate minimum 20 hazard rows. Residual risk must always be equal to or lower than initial risk.`,
@@ -190,13 +260,13 @@ JSON SCHEMA:
   "coshhSummary": [{ "substance": "string", "hazardClass": "string", "controls": "string", "storage": "string" }],
   "liftingOperations": [{ "appointedPerson": "string", "liftPlanRef": "string", "equipmentType": "string", "maxLoad": "string", "exclusionZone": "string" }],
   "hazards": [{ "ref": "string", "hazard": "string", "whoAtRisk": "string", "likelihoodInitial": number, "severityInitial": number, "riskRatingInitial": number, "controlMeasures": "string", "likelihoodResidual": number, "severityResidual": number, "riskRatingResidual": number, "additionalControls": "string" }],
-  "sequenceOfWorks": "string (min 500 words)",
-  "ppeRequirements": "string", "competencyRequirements": "string", "temporaryWorks": "string",
-  "liftingMethod": "string", "trafficManagement": "string", "noiseVibrationControls": "string",
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string",
-  "communicationArrangements": "string", "monitoringArrangements": "string",
-  "reviewCloseOut": "string", "lessonsLearned": "string"
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
+  "ppeRequirements": "string (min 100 words)", "competencyRequirements": "string (min 100 words)", "temporaryWorks": "string (min 100 words)",
+  "liftingMethod": "string (min 100 words)", "trafficManagement": "string (min 100 words)", "noiseVibrationControls": "string (min 100 words)",
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)",
+  "communicationArrangements": "string (min 100 words)", "monitoringArrangements": "string (min 100 words)",
+  "reviewCloseOut": "string (min 100 words)", "lessonsLearned": "string (min 100 words)"
 }
 
 Min 20 hazard rows. Generate realistic COSHH data if substances are mentioned. Include [VERIFY] tags where assumptions are made.`,
@@ -219,11 +289,11 @@ JSON SCHEMA:
   "designerResidualRisks": [{ "risk": "string", "recommendation": "string", "contractorResponse": "string", "status": "string" }],
   "cppReferences": [{ "document": "string", "reference": "string" }],
   "hazards": [{ "ref": "string", "hazard": "string", "whoAtRisk": "string", "likelihoodInitial": number, "severityInitial": number, "riskRatingInitial": number, "controlMeasures": "string", "likelihoodResidual": number, "severityResidual": number, "riskRatingResidual": number, "additionalControls": "string", "cdmCategory": "string", "cdmRef": "string" }],
-  "sequenceOfWorks": "string (min 500 words)",
-  "ppeRequirements": "string", "competencyRequirements": "string", "temporaryWorks": "string",
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string",
-  "communicationArrangements": "string", "monitoringArrangements": "string",
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
+  "ppeRequirements": "string (min 100 words)", "competencyRequirements": "string (min 100 words)", "temporaryWorks": "string (min 100 words)",
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)",
+  "communicationArrangements": "string (min 100 words)", "monitoringArrangements": "string (min 100 words)",
   "residualRiskManagement": "string (min 100 words)",
   "hsfContributions": "string (min 100 words)"
 }
@@ -247,14 +317,14 @@ JSON SCHEMA:
   "competencyTrainingNarrative": "string (min 100 words)",
   "permitsConsentsNarrative": "string (min 100 words)",
   "hazards": [{ "ref": "string", "hazard": "string", "whoAtRisk": "string", "initialRisk": "High|Medium|Low", "controlMeasures": "string", "residualRisk": "High|Medium|Low", "responsiblePerson": "string", "monitoring": "string", "reviewNotes": "string" }],
-  "sequenceOfWorks": "string (min 500 words)",
-  "sitePreparationAccess": "string", "siteSetUp": "string", "exclusionZones": "string",
-  "ppeRequirements": "string",
-  "environmentalNarrative": "string", "wasteNarrative": "string", "pollutionPrevention": "string",
-  "emergencyNarrative": "string", "firstAid": "string", "welfareNarrative": "string",
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
+  "sitePreparationAccess": "string (min 100 words)", "siteSetUp": "string (min 100 words)", "exclusionZones": "string (min 100 words)",
+  "ppeRequirements": "string (min 100 words)",
+  "environmentalNarrative": "string (min 100 words)", "wasteNarrative": "string (min 100 words)", "pollutionPrevention": "string (min 100 words)",
+  "emergencyNarrative": "string (min 100 words)", "firstAid": "string (min 100 words)", "welfareNarrative": "string (min 100 words)",
   "keyContacts": [{ "role": "string", "name": "string", "phone": "string" }],
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string"
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)"
 }
 
 Min 20 hazard rows. Key contacts must include at minimum: Site Manager, Supervisor, H&S Advisor, First Aider, Emergency Services.`,
@@ -278,11 +348,11 @@ JSON SCHEMA:
   "approvalChain": [{ "stage": "string", "name": "string", "date": "string", "accepted": "string" }],
   "pcAmendments": [{ "amendment": "string", "raisedBy": "string", "date": "string", "status": "string" }],
   "hazards": [{ "ref": "string", "hazard": "string", "whoAtRisk": "string", "likelihoodInitial": number, "severityInitial": number, "riskRatingInitial": number, "controlMeasures": "string", "likelihoodResidual": number, "severityResidual": number, "riskRatingResidual": number, "additionalControls": "string", "pcComment": "string" }],
-  "sequenceOfWorks": "string (min 500 words)",
-  "ppeRequirements": "string", "competencyRequirements": "string", "temporaryWorks": "string",
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string",
-  "communicationArrangements": "string",
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
+  "ppeRequirements": "string (min 100 words)", "competencyRequirements": "string (min 100 words)", "temporaryWorks": "string (min 100 words)",
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)",
+  "communicationArrangements": "string (min 100 words)",
   "pcSiteRulesCompliance": "string (min 100 words)",
   "monitoringInspectionRegime": [{ "check": "string", "frequency": "string", "carriedOutBy": "string", "recordLocation": "string", "escalation": "string" }]
 }
@@ -304,11 +374,11 @@ JSON SCHEMA:
   "taskDescription": "string (min 80 words)",
   "hazards": [{ "ref": "string", "hazard": "string", "whoAtRisk": "string", "initialRisk": "High|Medium|Low", "controlMeasures": "string", "residualRisk": "High|Medium|Low", "responsiblePerson": "string", "monitoring": "string" }],
   "keyHazardSummary": [{ "hazard": "string", "criticalControl": "string", "stopWorkIf": "string" }],
-  "sequenceOfWorks": "string (min 500 words)",
-  "ppeRequirements": "string", "competencyRequirements": "string",
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string",
-  "coordinationCommunication": "string"
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
+  "ppeRequirements": "string (min 100 words)", "competencyRequirements": "string (min 100 words)",
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)",
+  "coordinationCommunication": "string (min 100 words)"
 }
 
 Min 20 hazard rows. Key Hazard Summary must have exactly 5 rows with meaningful stop-work conditions.`,
@@ -329,11 +399,11 @@ JSON SCHEMA:
   "taskDescription": "string (min 100 words)",
   "hazards": [{ "ref": "string", "hazard": "string", "whoAtRisk": "string", "likelihoodInitial": number, "severityInitial": number, "detectabilityInitial": number, "rpnInitial": number, "controlMeasures": "string", "detectionMethod": "string", "likelihoodResidual": number, "severityResidual": number, "detectabilityResidual": number, "rpnResidual": number }],
   "controlsEffectivenessReview": [{ "control": "string", "targetRPN": number, "actualRPN": number, "reviewedBy": "string", "actionNotes": "string" }],
-  "sequenceOfWorks": "string (min 500 words)",
-  "ppeRequirements": "string", "competencyRequirements": "string", "temporaryWorks": "string",
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string",
-  "communicationArrangements": "string", "monitoringArrangements": "string"
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
+  "ppeRequirements": "string (min 100 words)", "competencyRequirements": "string (min 100 words)", "temporaryWorks": "string (min 100 words)",
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)",
+  "communicationArrangements": "string (min 100 words)", "monitoringArrangements": "string (min 100 words)"
 }
 
 Min 20 hazard rows. rpnInitial = likelihoodInitial × severityInitial × detectabilityInitial. Residual RPN must always be lower than initial. Controls Effectiveness Review: minimum 5 rows covering the highest-risk controls.`,
@@ -355,11 +425,11 @@ JSON SCHEMA:
   "holdPoints": [{ "stageActivity": "string", "inspectionRequired": "string", "inspectedBy": "string" }],
   "taskSafetyChecklist": [{ "item": "string" }],
   "closeDownChecklist": [{ "item": "string" }],
-  "sequenceOfWorks": "string (min 500 words)",
-  "ppeRequirements": "string", "competencyRequirements": "string", "temporaryWorks": "string",
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string",
-  "communicationArrangements": "string", "monitoringArrangements": "string"
+  "sequenceOfWorks": "string (min 500 words, numbered steps separated by \\n\\n)",
+  "ppeRequirements": "string (min 100 words)", "competencyRequirements": "string (min 100 words)", "temporaryWorks": "string (min 100 words)",
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)",
+  "communicationArrangements": "string (min 100 words)", "monitoringArrangements": "string (min 100 words)"
 }
 
 Min 20 hazard rows. Pre-start: 10 items. Hold points: 6 items. Daily safety: 10 items. Close-down: 6 items. All checklist items must be specific to the work described.`,
@@ -379,12 +449,12 @@ JSON SCHEMA:
   "steps": [{ "stepNumber": number, "workInstruction": "string (detailed instruction for this step)", "hazards": "string (hazards present during this step)", "whoAtRisk": "string", "initialRisk": "High|Medium|Low", "controlMeasures": "string", "residualRisk": "High|Medium|Low", "responsiblePerson": "string", "ppeForStep": "string" }],
   "toolboxTalkSummary": [{ "step": number, "whatWeAreDoing": "string", "keyHazard": "string", "criticalControl": "string" }],
   "permitIsolationLog": [{ "step": number, "permitType": "string", "issuedBy": "string", "validityPeriod": "string" }],
-  "sequenceOfWorks": "string (min 500 words — this supplements the step table with additional detail)",
+  "sequenceOfWorks": "string (min 500 words — this supplements the step table with additional detail, numbered steps separated by \\n\\n)",
   "interfaces": "string (min 100 words)",
-  "temporaryWorks": "string", "ppeRequirements": "string",
-  "environmentalConsiderations": "string", "wasteManagement": "string",
-  "emergencyProcedures": "string", "welfareFacilities": "string",
-  "competencyRequirements": "string"
+  "temporaryWorks": "string (min 100 words)", "ppeRequirements": "string (min 100 words)",
+  "environmentalConsiderations": "string (min 100 words)", "wasteManagement": "string (min 100 words)",
+  "emergencyProcedures": "string (min 100 words)", "welfareFacilities": "string (min 100 words)",
+  "competencyRequirements": "string (min 100 words)"
 }
 
 Min 20 integrated steps. Toolbox talk: 10 rows covering the most critical steps. Permit log: minimum 3 rows (or more if permits are relevant). Each step's work instruction must be detailed enough for an operative to follow.`,
@@ -396,7 +466,7 @@ Min 20 integrated steps. Toolbox talk: 10 rows covering the most critical steps.
 export function getAllPrompts(): Array<{ slug: string; type: 'QUESTION_GENERATION' | 'DOCUMENT_GENERATION'; templateSlug: TemplateSlug | null; content: string }> {
   const prompts: Array<{ slug: string; type: 'QUESTION_GENERATION' | 'DOCUMENT_GENERATION'; templateSlug: TemplateSlug | null; content: string }> = [];
 
-  // AI Call 1 prompt
+  // AI Call 1 prompt (legacy batch)
   prompts.push({
     slug: 'question-generation',
     type: 'QUESTION_GENERATION',

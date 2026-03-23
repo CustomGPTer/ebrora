@@ -53,7 +53,7 @@ export interface QuestionGenerationResponse {
 export interface AnsweredQuestion {
   number: number;
   question: string;
-  answer: string; // max 45 words
+  answer: string; // max 100 words
 }
 
 /** Full input for AI Call 2 (document generation) */
@@ -62,6 +62,57 @@ export interface DocumentGenerationInput {
   description: string;
   answers: AnsweredQuestion[];
 }
+
+// =============================================================================
+// Conversational Q&A Types
+// =============================================================================
+
+/** A single question within a conversation round */
+export interface ConversationQuestion {
+  id: string;           // unique within the conversation, e.g. 'r1q1', 'r2q3'
+  question: string;     // the question text (may include sub-prompts a), b), c))
+  context?: string;     // optional helper text
+}
+
+/** A single answered question within a conversation round */
+export interface ConversationAnswer {
+  id: string;           // matches ConversationQuestion.id
+  question: string;     // the question text
+  answer: string;       // user's answer (max 100 words)
+}
+
+/** A single round in the conversation */
+export interface ConversationRound {
+  roundNumber: number;
+  questions: ConversationQuestion[];
+  answers: ConversationAnswer[];       // populated after user answers
+}
+
+/** Full conversation state stored in the client */
+export interface ConversationState {
+  templateSlug: TemplateSlug;
+  description: string;
+  rounds: ConversationRound[];
+  isComplete: boolean;
+  totalQuestionsAsked: number;
+}
+
+/** Request body for /api/rams/chat */
+export interface ChatRequest {
+  templateSlug: TemplateSlug;
+  description: string;
+  rounds: ConversationRound[];         // all completed rounds so far
+}
+
+/** Response from /api/rams/chat */
+export interface ChatResponse {
+  status: 'more_questions' | 'ready';
+  questions?: ConversationQuestion[];  // next batch of questions (if status === 'more_questions')
+  roundNumber: number;
+  totalQuestionsAsked: number;
+  message?: string;                    // AI summary message (e.g. "I have enough information...")
+}
+
 
 // =============================================================================
 // AI Call 2 — Structured JSON output shapes per template

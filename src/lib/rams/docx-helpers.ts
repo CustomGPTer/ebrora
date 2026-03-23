@@ -555,3 +555,124 @@ export const LANDSCAPE_SECTION = {
 export async function packDocument(doc: Document): Promise<Buffer> {
   return await Packer.toBuffer(doc);
 }
+
+// ---------------------------------------------------------------------------
+// richBodyText: Smart text parser for method statement sections
+// Converts AI-generated text into proper paragraphs, numbered lists, bullets
+// Use: ...h.richBodyText(content.sequenceOfWorks)  (spread into children[])
+// ---------------------------------------------------------------------------
+
+/**
+ * Parse a text block into proper Word paragraphs.
+ * Splits on double newlines, numbered patterns (1. 2. 3.), and bullets (- / •).
+ * Returns an array — spread it into the section children.
+ */
+export function richBodyText(
+  text: string,
+  fontSize = 18,
+  opts?: { bold?: boolean; italic?: boolean; color?: string }
+): Paragraph[] {
+  if (!text || !text.trim()) {
+    return [new Paragraph({
+      spacing: { after: 80 },
+      children: [new TextRun({ text: '[No content provided]', size: fontSize, font: 'Arial', italics: true, color: '999999' })],
+    })];
+  }
+
+  const paragraphs: Paragraph[] = [];
+  const blocks = text.split(/\n\n+/);
+
+  for (const block of blocks) {
+    const trimmed = block.trim();
+    if (!trimmed) continue;
+
+    const lines = trimmed.split(/\n/);
+
+    for (const line of lines) {
+      const lineTrimmed = line.trim();
+      if (!lineTrimmed) continue;
+
+      // FIRST: Check for inline numbered items crammed into one line ("1. ... 2. ... 3. ...")
+      // This must run BEFORE the single numbered match, otherwise "1. A 2. B 3. C" gets
+      // treated as a single item "1. A 2. B 3. C"
+      const inlineMatches = [...lineTrimmed.matchAll(/(?:^|\s)(\d+)\.\s/g)];
+      if (inlineMatches.length >= 2) {
+        const items = lineTrimmed.split(/(?=(?:^|\s)\d+\.\s)/);
+        for (const item of items) {
+          const t = item.trim();
+          if (!t) continue;
+          const m = t.match(/^(\d+)\.\s+(.+)/);
+          if (m) {
+            paragraphs.push(new Paragraph({
+              spacing: { before: 80, after: 80 },
+              indent: { left: 360, hanging: 360 },
+              children: [
+                new TextRun({ text: `${m[1]}. `, size: fontSize, font: 'Arial', bold: true, color: opts?.color ?? BLACK }),
+                new TextRun({ text: m[2], size: fontSize, font: 'Arial', bold: opts?.bold, italics: opts?.italic, color: opts?.color ?? BLACK }),
+              ],
+            }));
+          } else {
+            paragraphs.push(new Paragraph({
+              spacing: { after: 80 },
+              children: [new TextRun({ text: t, size: fontSize, font: 'Arial', bold: opts?.bold, italics: opts?.italic, color: opts?.color ?? BLACK })],
+            }));
+          }
+        }
+        continue;
+      }
+
+      // Single numbered item on its own line: "1. ", "2. ", "10. "
+      const numberedMatch = lineTrimmed.match(/^(\d+)\.\s+(.+)/);
+      if (numberedMatch) {
+        paragraphs.push(new Paragraph({
+          spacing: { before: 80, after: 80 },
+          indent: { left: 360, hanging: 360 },
+          children: [
+            new TextRun({ text: `${numberedMatch[1]}. `, size: fontSize, font: 'Arial', bold: true, color: opts?.color ?? BLACK }),
+            new TextRun({ text: numberedMatch[2], size: fontSize, font: 'Arial', bold: opts?.bold, italics: opts?.italic, color: opts?.color ?? BLACK }),
+          ],
+        }));
+        continue;
+      }
+
+      // Bullet item: "- ", "• ", "* "
+      const bulletMatch = lineTrimmed.match(/^[-•*]\s+(.+)/);
+      if (bulletMatch) {
+        paragraphs.push(new Paragraph({
+          spacing: { before: 40, after: 40 },
+          indent: { left: 720, hanging: 360 },
+          children: [
+            new TextRun({ text: '•  ', size: fontSize, font: 'Arial', color: opts?.color ?? BLACK }),
+            new TextRun({ text: bulletMatch[1], size: fontSize, font: 'Arial', bold: opts?.bold, italics: opts?.italic, color: opts?.color ?? BLACK }),
+          ],
+        }));
+        continue;
+      }
+
+      // Lettered sub-item: "a) ", "b) "
+      const letteredMatch = lineTrimmed.match(/^([a-z])\)\s+(.+)/);
+      if (letteredMatch) {
+        paragraphs.push(new Paragraph({
+          spacing: { before: 40, after: 40 },
+          indent: { left: 1080, hanging: 360 },
+          children: [
+            new TextRun({ text: `${letteredMatch[1]})  `, size: fontSize, font: 'Arial', bold: true, color: opts?.color ?? BLACK }),
+            new TextRun({ text: letteredMatch[2], size: fontSize, font: 'Arial', bold: opts?.bold, italics: opts?.italic, color: opts?.color ?? BLACK }),
+          ],
+        }));
+        continue;
+      }
+
+      // Plain paragraph
+      paragraphs.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({ text: lineTrimmed, size: fontSize, font: 'Arial', bold: opts?.bold, italics: opts?.italic, color: opts?.color ?? BLACK })],
+      }));
+    }
+  }
+
+  return paragraphs.length > 0 ? paragraphs : [new Paragraph({
+    spacing: { after: 80 },
+    children: [new TextRun({ text: '[No content provided]', size: fontSize, font: 'Arial', italics: true, color: '999999' })],
+  })];
+}
