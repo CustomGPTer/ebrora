@@ -39,7 +39,8 @@ const TIERS: TierData[] = [
       'H/M/L Simple format',
       'AI-generated content',
       'DOCX download',
-      'Community support',
+      '2 toolbox talk downloads / month',
+      '2 free template downloads / month',
     ],
     highlighted: false,
     cta: 'Get Started Free',
@@ -56,6 +57,8 @@ const TIERS: TierData[] = [
     features: [
       'Every risk assessment format',
       'Company logo on documents',
+      '10 toolbox talk downloads / month',
+      '20 free template downloads / month',
       'Priority AI generation',
       'Email support',
       '14-day money-back guarantee',
@@ -73,6 +76,8 @@ const TIERS: TierData[] = [
     formats: 'All 10 formats',
     features: [
       'Everything in Standard',
+      '20 toolbox talk downloads / month',
+      '40 free template downloads / month',
       'Highest generation priority',
       'Priority email & chat support',
       'Bulk generation queue',
@@ -118,6 +123,8 @@ const COMPARISON_ROWS: {
 }[] = [
   { label: 'RAMS per month', free: '1', standard: '10', premium: '25' },
   { label: 'Risk assessment formats', free: '2', standard: '10', premium: '10' },
+  { label: 'Toolbox talk downloads / month', free: '2', standard: '10', premium: '20' },
+  { label: 'Free template downloads / month', free: '2', standard: '20', premium: '40' },
   { label: 'AI-generated content', free: true, standard: true, premium: true },
   { label: 'DOCX download', free: true, standard: true, premium: true },
   { label: 'Company logo on docs', free: false, standard: true, premium: true },
