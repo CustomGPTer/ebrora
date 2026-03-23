@@ -11,24 +11,24 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     name: 'COSHH Assessment Generator',
     shortName: 'COSHH Assessment',
     description:
-      'Generate comprehensive COSHH assessments for hazardous substances used on your project. Covers exposure routes, health effects, control measures, PPE, storage, and emergency procedures.',
+      'Generate a professional COSHH assessment for any hazardous substance. Just name the product — our AI looks up the SDS data and builds a regulation-compliant assessment tailored to your specific work activity.',
     route: '/coshh-builder',
     pageTitle: 'COSHH Assessment Generator | Ebrora',
     metaDescription:
-      'AI-powered COSHH assessment generator for UK construction. Covers hazardous substances, exposure routes, control measures, PPE, and emergency procedures. Regulation compliant.',
+      'AI-powered COSHH assessment generator for UK construction. Name the product, answer 3 questions, get a professional COSHH assessment with real SDS data. Regulation compliant.',
     documentLabel: 'COSHH Assessment',
     descriptionPlaceholder:
-      'Describe the work activity and the hazardous substances involved. E.g. "Applying two-pack epoxy resin coating to steel pipework in a pump station basement..."',
+      'Briefly describe your project and site. E.g. "Salford WwTW – AMP8 works, painting steelwork in the new chemical dosing kiosk"',
     descriptionExample:
-      'Applying two-pack epoxy resin coating to steel pipework in a confined pump station basement. Using Jotun Jotamastic 80 and solvent-based thinner for cleaning. Two operatives working in 8-hour shifts.',
+      'Salford WwTW – AMP8 Improvements. Protective coating works to structural steelwork in the new chemical dosing kiosk.',
     keySections: [
-      'Substance Identification',
-      'Hazard Classification (GHS/CLP)',
+      'Product Identification & GHS Classification',
+      'Hazard & Precautionary Statements',
       'Exposure Routes & Health Effects',
-      'Control Measures Hierarchy',
+      'Control Measures (Hierarchy of Control)',
       'PPE Requirements',
-      'Storage & Handling',
-      'Emergency Procedures & First Aid',
+      'First Aid Measures',
+      'Storage, Spill & Disposal',
       'Monitoring & Health Surveillance',
     ],
     accentColor: 'D4380D',
