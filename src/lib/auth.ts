@@ -161,9 +161,16 @@ export const authOptions: NextAuthOptions = {
                                         try {
                                                           const subscription = await prisma.subscription.findUnique({
                                                                               where: { user_id: token.id as string },
-                                                                              select: { tier: true, status: true },
+                                                                              select: { tier: true, status: true, current_period_end: true },
                                                           });
-                                                          token.subscriptionTier = (subscription?.status === 'ACTIVE' ? subscription?.tier : 'FREE') || 'FREE';
+                                                          // Grant paid tier if ACTIVE, or if CANCELLED but still within billing period
+                                                          const isActive = subscription?.status === 'ACTIVE';
+                                                          const isCancelledButValid =
+                                                                        subscription?.status === 'CANCELLED' &&
+                                                                        subscription?.tier !== 'FREE' &&
+                                                                        subscription?.current_period_end &&
+                                                                        new Date() < subscription.current_period_end;
+                                                          token.subscriptionTier = (isActive || isCancelledButValid) ? (subscription?.tier || 'FREE') : 'FREE';
                                         } catch {
                                                           token.subscriptionTier = 'FREE';
                                         }
