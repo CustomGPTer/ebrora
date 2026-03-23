@@ -7,25 +7,25 @@ import { TOOLBOX_CATEGORIES } from '@/data/toolbox-categories';
 import { TOOL_DEFINITIONS } from '@/data/tool-definitions';
 
 export const metadata: Metadata = {
-  title: 'Ebrora | Construction Templates, RAMS Builder & Toolbox Talks for UK Sites',
+  title: 'Ebrora | AI Construction Document Generators, Templates & Toolbox Talks for UK Sites',
   description:
-    'The UK construction industry\'s professional toolkit. Premium Excel templates, AI-powered RAMS Builder, 1,500+ free toolbox talks, free calculators, and expert guides — built by site teams, for site teams. CDM 2015 compliant.',
+    'The UK construction industry\'s most powerful AI toolkit. 8 AI document generators including RAMS, COSHH, ITP, DSE & more — plus 55+ Excel templates and 1,500+ free toolbox talks. Built by site teams, for site teams.',
   alternates: {
     canonical: 'https://www.ebrora.com',
   },
   openGraph: {
-    title: 'Ebrora | The UK Construction Professional\'s Toolkit',
+    title: 'Ebrora | AI-Powered Construction Document Generators',
     description:
-      'Premium Excel templates, AI-powered RAMS Builder, 1,500+ free toolbox talks, and free tools for UK construction and civil engineering professionals.',
+      '8 AI document generators, 55+ Excel templates, 1,500+ free toolbox talks. Enterprise-grade tools at a fraction of the cost — built for UK construction professionals.',
     url: 'https://www.ebrora.com',
     type: 'website',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ebrora | The UK Construction Professional\'s Toolkit',
+    title: 'Ebrora | AI-Powered Construction Document Generators',
     description:
-      'Premium Excel templates, AI-powered RAMS Builder, 1,500+ free toolbox talks, and free tools for UK construction professionals.',
+      '8 AI document generators, 55+ Excel templates, 1,500+ free toolbox talks. Enterprise-grade tools for UK construction professionals.',
     images: ['/og-image.jpg'],
   },
 };
@@ -36,7 +36,7 @@ const homepageSchema = {
   name: 'Ebrora',
   url: 'https://www.ebrora.com',
   description:
-    'The UK construction industry\'s professional toolkit. Premium Excel templates, AI-powered RAMS Builder, free toolbox talks, calculators, and expert construction guides.',
+    'The UK construction industry\'s most powerful AI toolkit. 8 AI document generators including RAMS, COSHH, ITP, DSE and more — plus premium Excel templates and 1,500+ free toolbox talks.',
   potentialAction: {
     '@type': 'SearchAction',
     target: {
@@ -54,7 +54,7 @@ const organizationSchema = {
   url: 'https://www.ebrora.com',
   logo: 'https://www.ebrora.com/og-image.jpg',
   description:
-    'Professional construction templates and digital tools built by UK site teams for site teams. Covering health and safety, project management, MEICA, wastewater, and more.',
+    'AI-powered construction document generators and professional templates built by UK site teams for site teams. RAMS, COSHH, ITP, DSE, and more — covering health and safety, project management, MEICA, wastewater, and more.',
   email: 'hello@ebrora.com',
   address: { '@type': 'PostalAddress', addressCountry: 'GB' },
   sameAs: [
