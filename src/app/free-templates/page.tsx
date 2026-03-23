@@ -255,8 +255,8 @@ export default function FreeTemplatesPage() {
             Templates are available in Excel (.xlsx, .xlsm), Word (.docx),
             PowerPoint (.pptx), and PDF formats. Preview each template
             before downloading — logged-in users get clean, unwatermarked
-            A4 previews. Free accounts include 5 downloads per month, with
-            Standard and Professional plans offering 30 and 50 downloads
+            A4 previews. Free accounts include 2 downloads per month, with
+            Standard and Professional plans offering 20 and 40 downloads
             respectively.
           </p>
         </div>
