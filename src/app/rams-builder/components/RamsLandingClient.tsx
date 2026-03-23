@@ -180,9 +180,9 @@ export default function RamsLandingClient() {
       {/* Error banner */}
       {error && (
         <div className="rams-error">
-          <span className="rams-error-icon">\u26A0</span>
+          <span className="rams-error-icon">{'\u26A0'}</span>
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="rams-error-close">\u00D7</button>
+          <button onClick={() => setError(null)} className="rams-error-close">{'\u00D7'}</button>
         </div>
       )}
 
