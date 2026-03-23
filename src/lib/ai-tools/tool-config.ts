@@ -18,9 +18,11 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
       'AI-powered COSHH assessment generator for UK construction. Name the product, answer 3 questions, get a professional COSHH assessment with real SDS data. Regulation compliant.',
     documentLabel: 'COSHH Assessment',
     descriptionPlaceholder:
-      'Briefly describe your project and site. E.g. "Salford WwTW – AMP8 works, painting steelwork in the new chemical dosing kiosk"',
+      'E.g. "Jotun Jotamastic 87 – Jotun Paints" or "Sika MonoTop 610 – Sika UK"',
+    descriptionHeading: 'What is the Product?',
+    descriptionHint: 'Enter the exact product name and manufacturer. Our AI will look up the Safety Data Sheet and build a professional COSHH assessment based on the real chemical data for this product.',
     descriptionExample:
-      'Salford WwTW – AMP8 Improvements. Protective coating works to structural steelwork in the new chemical dosing kiosk.',
+      'Jotun Jotamastic 87 – Jotun Paints',
     keySections: [
       'Product Identification & GHS Classification',
       'Hazard & Precautionary Statements',
@@ -48,6 +50,8 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'Inspection & Test Plan',
     descriptionPlaceholder:
       'Describe the works package requiring an ITP. E.g. "Installation of 300mm diameter ductile iron rising main including thrust blocks, valve chambers, and pressure testing..."',
+    descriptionHeading: 'Describe the Works',
+    descriptionHint: 'Explain the works package in detail. Include the type of work, materials, specifications, and any critical quality requirements. The more detail you provide, the better your ITP will be.',
     descriptionExample:
       'Installation of 300mm diameter ductile iron rising main from new pump station to existing connection chamber. Includes thrust blocks, air valves, washout chambers, chlorination, and pressure testing to 1.5x working pressure.',
     keySections: [
@@ -77,6 +81,8 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'Manual Handling Risk Assessment',
     descriptionPlaceholder:
       'Describe the manual handling activity. E.g. "Lifting and positioning precast concrete kerbs (45kg each) along a 200m length of new footpath..."',
+    descriptionHeading: 'Describe the Manual Handling Task',
+    descriptionHint: 'Explain what is being lifted, carried, pushed or pulled. Include the weight, how often, and the working conditions. The more detail you provide, the better your assessment will be.',
     descriptionExample:
       'Lifting and positioning precast concrete kerbs (45kg each) along a 200m length of new footpath. Two-person lift from delivery pallet at ground level to trench edge. Uneven ground, slight gradient, repeated lifts throughout the day.',
     keySections: [
@@ -106,6 +112,8 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'DSE Assessment',
     descriptionPlaceholder:
       'Describe the workstation and user. E.g. "Site office portakabin workstation for a project manager using dual monitors, 8 hours per day. Shared desk environment..."',
+    descriptionHeading: 'Describe the Workstation',
+    descriptionHint: 'Explain where the workstation is, what equipment is used, and who uses it. Include any existing comfort issues or concerns.',
     descriptionExample:
       'Site office portakabin workstation for a project manager using dual monitors 8 hours per day. Shared desk in an open-plan 10-person portakabin. User wears glasses and reports occasional neck stiffness.',
     keySections: [
@@ -136,6 +144,8 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'Drawing Check Report',
     descriptionPlaceholder:
       'Describe the drawing(s) to be checked. E.g. "General arrangement drawing for a new 2000m³ storm tank including plan, sections, and reinforcement details..."',
+    descriptionHeading: 'Describe the Drawing',
+    descriptionHint: 'Provide the drawing reference, title, discipline, and what it shows. Include the designer and the design stage. The more context you give, the more thorough the check report will be.',
     descriptionExample:
       'General arrangement drawing for a new 2000m³ storm tank at Salford WwTW. Drawing ref SK-001 Rev P2. Includes plan view, two cross-sections, and cover slab reinforcement details. Designer: XYZ Consultants.',
     keySections: [
@@ -165,6 +175,8 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'Toolbox Talk',
     descriptionPlaceholder:
       'Describe the topic or activity for the toolbox talk. E.g. "Working near live underground services during excavation works on an operational wastewater treatment site..."',
+    descriptionHeading: 'What is the Toolbox Talk Topic?',
+    descriptionHint: 'Describe the specific activity, hazard, or topic you want to brief your team on. Be as specific to your site as possible — generic talks are less effective.',
     descriptionExample:
       'Working near live underground services (HV cables, gas mains, water mains) during excavation works for new drainage on an operational wastewater treatment site. CAT & Genny scanning required, hand-dig within 500mm of services.',
     keySections: [
@@ -193,6 +205,8 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'Confined Space Risk Assessment',
     descriptionPlaceholder:
       'Describe the confined space and the work to be carried out. E.g. "Entry into a 4m deep wet well at a wastewater pumping station to replace submersible pump and guide rails..."',
+    descriptionHeading: 'Describe the Confined Space Entry',
+    descriptionHint: 'Explain what the confined space is, why entry is needed, and what work will be carried out inside. Include dimensions, access points, and any known hazards.',
     descriptionExample:
       'Entry into a 4m deep wet well at a wastewater pumping station to replace submersible pump and guide rails. Well is 3m × 2m, access via vertical ladder. Known H₂S risk from sewage. Two-person entry team plus top-man. Work duration approximately 6 hours.',
     keySections: [
