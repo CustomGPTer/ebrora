@@ -304,11 +304,9 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
       {step === 'describe-work' && (
         <div className="scope-input">
           <div className="scope-input-body">
-            <h2>Describe the Work</h2>
+            <h2>{toolConfig.descriptionHeading}</h2>
             <p className="scope-input-hint">
-              Explain what the work involves in detail.{' '}
-              <strong>The more detail you provide, the better your {toolConfig.documentLabel} will be.</strong>{' '}
-              Include the type of activity, location, any specific hazards, and the scale of the job.
+              {toolConfig.descriptionHint}
             </p>
 
             <div className="scope-input-field">
