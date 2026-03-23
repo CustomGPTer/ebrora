@@ -96,6 +96,13 @@ function SearchTypeIcon({ type }: { type: SearchItem['type'] }) {
   }
 }
 
+/* ── AI sparkle icon (shared across AI tool cards) ── */
+const AiSparkleIcon = () => (
+  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+  </svg>
+);
+
 /* ── Hub card data ── */
 const HUB_CARDS = [
   {
@@ -113,17 +120,83 @@ const HUB_CARDS = [
   },
   {
     title: 'RAMS Builder',
-    desc: 'AI-powered risk assessments and method statements. Choose from 10 industry formats, generate in minutes.',
+    desc: 'AI-generated risk assessments and method statements. 10 industry formats, CDM 2015 compliant, ready in minutes.',
     href: '/rams-builder',
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-      </svg>
-    ),
+    icon: <AiSparkleIcon />,
+    stat: '10',
+    statLabel: 'formats',
+    accent: 'hp-card--ai',
+    badge: 'AI',
+  },
+  {
+    title: 'COSHH Assessment',
+    desc: 'Generate COSHH assessments for hazardous substances. Covers exposure routes, control measures, and PPE requirements.',
+    href: '/coshh-builder',
+    icon: <AiSparkleIcon />,
     stat: 'AI',
-    statLabel: 'powered',
-    accent: 'hp-card--rams',
-    badge: 'New',
+    statLabel: 'generated',
+    accent: 'hp-card--ai',
+    badge: 'AI',
+  },
+  {
+    title: 'ITP Generator',
+    desc: 'Inspection and test plans tailored to your works. Hold points, witness points, and sign-off matrices built in.',
+    href: '/itp-builder',
+    icon: <AiSparkleIcon />,
+    stat: 'AI',
+    statLabel: 'generated',
+    accent: 'hp-card--ai',
+    badge: 'AI',
+  },
+  {
+    title: 'Manual Handling RA',
+    desc: 'Manual handling risk assessments using TILE methodology. Task, individual, load, and environment analysis.',
+    href: '/manual-handling-builder',
+    icon: <AiSparkleIcon />,
+    stat: 'AI',
+    statLabel: 'generated',
+    accent: 'hp-card--ai',
+    badge: 'AI',
+  },
+  {
+    title: 'DSE Assessment',
+    desc: 'Display screen equipment assessments for office and site welfare. Workstation setup, posture, and eye strain checks.',
+    href: '/dse-builder',
+    icon: <AiSparkleIcon />,
+    stat: 'AI',
+    statLabel: 'generated',
+    accent: 'hp-card--ai',
+    badge: 'AI',
+  },
+  {
+    title: 'Drawing Checker',
+    desc: 'AI-powered drawing review tool. Checks for missing details, annotation gaps, and compliance issues on construction drawings.',
+    href: '/drawing-checker',
+    icon: <AiSparkleIcon />,
+    stat: 'AI',
+    statLabel: 'generated',
+    accent: 'hp-card--ai',
+    badge: 'AI',
+  },
+  {
+    title: 'Toolbox Talk Generator',
+    desc: 'Generate bespoke toolbox talks for any activity or hazard. Site-specific, briefing-ready, and branded to your project.',
+    href: '/tbt-builder',
+    icon: <AiSparkleIcon />,
+    stat: 'AI',
+    statLabel: 'generated',
+    accent: 'hp-card--ai',
+    badge: 'AI',
+  },
+  {
+    title: 'Confined Spaces',
+    desc: 'Confined space risk assessments covering atmospheric hazards, entry permits, rescue plans, and monitoring requirements.',
+    href: '/confined-spaces-builder',
+    icon: <AiSparkleIcon />,
+    stat: 'AI',
+    statLabel: 'generated',
+    accent: 'hp-card--ai',
+    badge: 'AI',
   },
   {
     title: 'Toolbox Talks',
@@ -151,20 +224,6 @@ const HUB_CARDS = [
     stat: '3',
     statLabel: 'formats',
     accent: 'hp-card--free',
-    badge: 'Free',
-  },
-  {
-    title: 'Free Tools',
-    desc: 'Interactive calculators for manual handling, fire risk, confined spaces, and materials conversion.',
-    href: '/tools',
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" />
-      </svg>
-    ),
-    stat: '4+',
-    statLabel: 'tools',
-    accent: 'hp-card--tools',
     badge: 'Free',
   },
   {
@@ -374,11 +433,11 @@ export default function HomepageClient({
 
           {/* Quick links */}
           <div className="hp-hero__pills">
-            <Link href="/products" className="hp-pill">Gantt Charts</Link>
-            <Link href="/products" className="hp-pill">RAMS</Link>
+            <Link href="/rams-builder" className="hp-pill">RAMS Builder</Link>
+            <Link href="/coshh-builder" className="hp-pill">COSHH</Link>
+            <Link href="/itp-builder" className="hp-pill">ITP Generator</Link>
             <Link href="/toolbox-talks" className="hp-pill">Toolbox Talks</Link>
-            <Link href="/products" className="hp-pill">Inspection Registers</Link>
-            <Link href="/tools" className="hp-pill">Calculators</Link>
+            <Link href="/products" className="hp-pill">Excel Templates</Link>
           </div>
         </div>
       </section>
@@ -404,8 +463,8 @@ export default function HomepageClient({
             <span className="hp-section-badge">Explore Ebrora</span>
             <h2 className="hp-section-title">Everything You Need to Run a Better Site</h2>
             <p className="hp-section-subtitle">
-              From premium Excel templates and AI-generated RAMS documents to free toolbox talks and 
-              interactive safety calculators — one platform built for UK construction professionals.
+              From 8 AI-powered document generators and premium Excel templates to 1,500+ free toolbox talks 
+              — tools that rival platforms costing £200+/month, built for UK construction professionals.
             </p>
           </div>
 
@@ -435,7 +494,7 @@ export default function HomepageClient({
         </div>
       </section>
 
-      {/* ━━━ RAMS BUILDER CALLOUT ━━━ */}
+      {/* ━━━ AI TOOLS SUITE CALLOUT ━━━ */}
       <section className="hp-rams" ref={fadeRef2}>
         <div className="hp-container">
           <div className="hp-rams__inner">
@@ -444,24 +503,25 @@ export default function HomepageClient({
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                 </svg>
-                AI-Powered
+                Enterprise-Grade AI — Fraction of the Cost
               </span>
-              <h2 className="hp-rams__title">Generate Professional RAMS in Minutes</h2>
+              <h2 className="hp-rams__title">The Most Powerful AI Construction Tools Available</h2>
               <p className="hp-rams__desc">
-                Stop spending days writing risk assessments and method statements from scratch. 
-                Our AI-powered RAMS Builder generates comprehensive, CDM 2015 compliant documents 
-                tailored to your specific project — choose from 10 industry-standard formats 
-                including client-branded outputs.
+                Comparable platforms charge £200+ per month for a single tool.
+                Ebrora gives you an entire suite of AI-powered document generators — RAMS,
+                COSHH, ITPs, manual handling, DSE, confined spaces, and more — all built 
+                specifically for UK construction by people who actually work on site.
+                Every output is regulation-compliant and ready to use.
               </p>
               <ul className="hp-rams__features">
-                <li>10 professional RAMS formats</li>
-                <li>AI-generated, site-specific content</li>
-                <li>CDM 2015 &amp; BS compliant outputs</li>
-                <li>Download as Word document</li>
-                <li>Free tier available — no card required</li>
+                <li>8 AI document generators in one platform</li>
+                <li>RAMS, COSHH, ITP, DSE, Manual Handling &amp; more</li>
+                <li>CDM 2015, COSHH Regs &amp; BS compliant outputs</li>
+                <li>Download as professional Word documents</li>
+                <li>Free tier on every tool — no card required</li>
               </ul>
               <Link href="/rams-builder" className="hp-rams__cta">
-                Try RAMS Builder
+                Try RAMS Builder Free
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
