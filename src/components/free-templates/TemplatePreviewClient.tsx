@@ -300,7 +300,7 @@ export function TemplatePreviewClient({
             the watermark from previews.
           </p>
           <p className="text-xs text-amber-600 mt-1">
-            Free accounts get 5 downloads per month.{" "}
+            Free accounts get 2 downloads per month.{" "}
             <a
               href="/pricing"
               className="font-semibold underline hover:text-amber-800"
