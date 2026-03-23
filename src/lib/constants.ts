@@ -40,24 +40,24 @@ export const RAMS_CONFIG = {
 export const TIER_LIMITS = {
   FREE: {
     ramsPerMonth: 1,
-    templateDownloadsPerMonth: 5,
-    tbtDownloadsPerMonth: 4,
+    templateDownloadsPerMonth: 2,
+    tbtDownloadsPerMonth: 2,
     formats: 2,
     maxLogoSize: 1024 * 1024, // 1MB
     storageHours: 24,
   },
   STANDARD: {
     ramsPerMonth: 10,
-    templateDownloadsPerMonth: 30,
-    tbtDownloadsPerMonth: 20,
+    templateDownloadsPerMonth: 20,
+    tbtDownloadsPerMonth: 10,
     formats: 10,
     maxLogoSize: 2 * 1024 * 1024, // 2MB
     storageHours: 7 * 24, // 7 days
   },
   PROFESSIONAL: {
     ramsPerMonth: 25,
-    templateDownloadsPerMonth: 50,
-    tbtDownloadsPerMonth: 40,
+    templateDownloadsPerMonth: 40,
+    tbtDownloadsPerMonth: 20,
     formats: 10,
     maxLogoSize: 5 * 1024 * 1024, // 5MB
     storageHours: 30 * 24, // 30 days
