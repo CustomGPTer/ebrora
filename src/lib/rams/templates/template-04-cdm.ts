@@ -186,7 +186,8 @@ function buildCPPTable(c: Template04Content): Table {
 
 function buildHazardTable(c: Template04Content): Table {
   const tw = h.A4_LANDSCAPE_CONTENT_WIDTH;
-  const cols = [400, Math.round(tw * 0.12), Math.round(tw * 0.06), 450, 450, 500, Math.round(tw * 0.19), 450, 450, 500, Math.round(tw * 0.08), Math.round(tw * 0.07), Math.round(tw * 0.06), 0];
+  // 14 columns: Ref, Activity, Hazard, Who, CDM Cat., L, S, Risk, Controls, Res L, Res S, Res R, CDM Ref, Verified
+  const cols = [400, Math.round(tw * 0.1), Math.round(tw * 0.1), Math.round(tw * 0.05), Math.round(tw * 0.07), 450, 450, 500, Math.round(tw * 0.18), 450, 450, 500, Math.round(tw * 0.06), 0];
   cols[13] = tw - cols.slice(0, 13).reduce((a, b) => a + b, 0);
 
   return new Table({
@@ -195,19 +196,19 @@ function buildHazardTable(c: Template04Content): Table {
       new TableRow({
         children: [
           h.headerCell('Ref', cols[0], { fontSize: 9 }),
-          h.headerCell('Hazard', cols[1], { fontSize: 9 }),
-          h.headerCell('Who', cols[2], { fontSize: 9 }),
-          h.headerCell('L', cols[3], { fontSize: 9, alignment: AlignmentType.CENTER }),
-          h.headerCell('S', cols[4], { fontSize: 9, alignment: AlignmentType.CENTER }),
-          h.headerCell('Risk', cols[5], { fontSize: 9, alignment: AlignmentType.CENTER }),
-          h.headerCell('Controls', cols[6], { fontSize: 9 }),
-          h.headerCell('rL', cols[7], { fontSize: 9, alignment: AlignmentType.CENTER }),
-          h.headerCell('rS', cols[8], { fontSize: 9, alignment: AlignmentType.CENTER }),
-          h.headerCell('rRisk', cols[9], { fontSize: 9, alignment: AlignmentType.CENTER }),
-          h.headerCell('Add. Controls', cols[10], { fontSize: 9 }),
-          h.headerCell('■ CDM Cat', cols[11], { fontSize: 9, fillColor: h.CDM_BLUE }),
+          h.headerCell('Activity', cols[1], { fontSize: 9 }),
+          h.headerCell('Hazard', cols[2], { fontSize: 9 }),
+          h.headerCell('Who', cols[3], { fontSize: 9 }),
+          h.headerCell('■ CDM Cat.', cols[4], { fontSize: 9, fillColor: h.CDM_BLUE }),
+          h.headerCell('L', cols[5], { fontSize: 9, alignment: AlignmentType.CENTER }),
+          h.headerCell('S', cols[6], { fontSize: 9, alignment: AlignmentType.CENTER }),
+          h.headerCell('Risk', cols[7], { fontSize: 9, alignment: AlignmentType.CENTER }),
+          h.headerCell('Control Measures', cols[8], { fontSize: 9 }),
+          h.headerCell('Res L', cols[9], { fontSize: 9, alignment: AlignmentType.CENTER }),
+          h.headerCell('Res S', cols[10], { fontSize: 9, alignment: AlignmentType.CENTER }),
+          h.headerCell('Res R', cols[11], { fontSize: 9, alignment: AlignmentType.CENTER }),
           h.headerCell('■ CDM Ref', cols[12], { fontSize: 9, fillColor: h.CDM_BLUE }),
-          h.headerCell('■ Notes', cols[13], { fontSize: 9, fillColor: h.CDM_BLUE }),
+          h.headerCell('■ Verified', cols[13], { fontSize: 9, fillColor: h.CDM_BLUE }),
         ],
       }),
       ...c.hazards.map((hz, idx) => {
@@ -216,19 +217,19 @@ function buildHazardTable(c: Template04Content): Table {
         return new TableRow({
           children: [
             h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 9, alignment: AlignmentType.CENTER }),
-            h.dataCell(hz.hazard, cols[1], { fontSize: 9 }),
-            h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 9 }),
-            h.dataCell(String(hz.likelihoodInitial), cols[3], { fontSize: 9, alignment: AlignmentType.CENTER }),
-            h.dataCell(String(hz.severityInitial), cols[4], { fontSize: 9, alignment: AlignmentType.CENTER }),
-            h.dataCell(String(initScore), cols[5], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(initScore), color: initScore >= 8 ? h.WHITE : h.BLACK }),
-            h.dataCell(hz.controlMeasures, cols[6], { fontSize: 9 }),
-            h.dataCell(String(hz.likelihoodResidual), cols[7], { fontSize: 9, alignment: AlignmentType.CENTER }),
-            h.dataCell(String(hz.severityResidual), cols[8], { fontSize: 9, alignment: AlignmentType.CENTER }),
-            h.dataCell(String(resScore), cols[9], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(resScore), color: resScore >= 8 ? h.WHITE : h.BLACK }),
-            h.dataCell(hz.additionalControls || '', cols[10], { fontSize: 9 }),
-            h.dataCell(hz.cdmCategory, cols[11], { fontSize: 9, fillColor: h.CDM_BLUE_LIGHT }),
+            h.dataCell(hz.activity || '', cols[1], { fontSize: 9 }),
+            h.dataCell(hz.hazard, cols[2], { fontSize: 9 }),
+            h.dataCell(hz.whoAtRisk, cols[3], { fontSize: 9 }),
+            h.dataCell(hz.cdmCategory, cols[4], { fontSize: 9, fillColor: h.CDM_BLUE_LIGHT }),
+            h.dataCell(String(hz.likelihoodInitial), cols[5], { fontSize: 9, alignment: AlignmentType.CENTER }),
+            h.dataCell(String(hz.severityInitial), cols[6], { fontSize: 9, alignment: AlignmentType.CENTER }),
+            h.dataCell(String(initScore), cols[7], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(initScore), color: initScore >= 8 ? h.WHITE : h.BLACK }),
+            h.dataCell(hz.controlMeasures, cols[8], { fontSize: 9 }),
+            h.dataCell(String(hz.likelihoodResidual), cols[9], { fontSize: 9, alignment: AlignmentType.CENTER }),
+            h.dataCell(String(hz.severityResidual), cols[10], { fontSize: 9, alignment: AlignmentType.CENTER }),
+            h.dataCell(String(resScore), cols[11], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(resScore), color: resScore >= 8 ? h.WHITE : h.BLACK }),
             h.dataCell(hz.cdmRef, cols[12], { fontSize: 9, fillColor: h.CDM_BLUE_LIGHT }),
-            h.dataCell('', cols[13], { fontSize: 9, fillColor: h.CDM_BLUE_LIGHT }),
+            h.dataCell(hz.verified || 'Pending', cols[13], { fontSize: 9, fillColor: h.CDM_BLUE_LIGHT }),
           ],
         });
       }),

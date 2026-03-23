@@ -120,7 +120,7 @@ function buildCompactHazardTable(c: Template07Content): Table {
   const cols = [400, Math.round(tw * 0.15), Math.round(tw * 0.08), Math.round(tw * 0.07), Math.round(tw * 0.3), Math.round(tw * 0.07), Math.round(tw * 0.1), 0];
   cols[7] = tw - cols.slice(0, 7).reduce((a, b) => a + b, 0);
   return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
-    new TableRow({ children: [h.headerCell('Ref', cols[0], { fontSize: 11 }), h.headerCell('Hazard', cols[1], { fontSize: 11 }), h.headerCell('Who', cols[2], { fontSize: 11 }), h.headerCell('Risk', cols[3], { fontSize: 11, alignment: AlignmentType.CENTER }), h.headerCell('Control Measures', cols[4], { fontSize: 11 }), h.headerCell('Res.', cols[5], { fontSize: 11, alignment: AlignmentType.CENTER }), h.headerCell('Action By', cols[6], { fontSize: 11 }), h.headerCell('Notes', cols[7], { fontSize: 11 })] }),
+    new TableRow({ children: [h.headerCell('Ref', cols[0], { fontSize: 11 }), h.headerCell('Hazard', cols[1], { fontSize: 11 }), h.headerCell('Who at Risk', cols[2], { fontSize: 11 }), h.headerCell('Risk', cols[3], { fontSize: 11, alignment: AlignmentType.CENTER }), h.headerCell('Control Measures', cols[4], { fontSize: 11 }), h.headerCell('Residual', cols[5], { fontSize: 11, alignment: AlignmentType.CENTER }), h.headerCell('Action By', cols[6], { fontSize: 11 }), h.headerCell('Notes', cols[7], { fontSize: 11 })] }),
     ...c.hazards.map((hz, idx) => new TableRow({ children: [
       h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 11, alignment: AlignmentType.CENTER }),
       h.dataCell(hz.hazard, cols[1], { fontSize: 11 }), h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 11 }),

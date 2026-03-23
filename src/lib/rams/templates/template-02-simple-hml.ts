@@ -121,11 +121,11 @@ function buildHMLHazardTable(content: Template02Content): Table {
       new TableRow({
         children: [
           h.headerCell('Ref', cols[0], { fontSize: 12 }),
-          h.headerCell('Hazard', cols[1], { fontSize: 12 }),
-          h.headerCell('Who at Risk', cols[2], { fontSize: 12 }),
+          h.headerCell('Hazard Description', cols[1], { fontSize: 12 }),
+          h.headerCell('Who is at Risk', cols[2], { fontSize: 12 }),
           h.headerCell('Initial Risk', cols[3], { fontSize: 12, alignment: AlignmentType.CENTER }),
           h.headerCell('Control Measures', cols[4], { fontSize: 12 }),
-          h.headerCell('Residual', cols[5], { fontSize: 12, alignment: AlignmentType.CENTER }),
+          h.headerCell('Residual Risk', cols[5], { fontSize: 12, alignment: AlignmentType.CENTER }),
           h.headerCell('Responsible', cols[6], { fontSize: 12 }),
           h.headerCell('Monitoring', cols[7], { fontSize: 12 }),
         ],

@@ -122,49 +122,51 @@ function buildActionBandsTable(): Table {
 
 function buildRPNHazardTable(c: Template08Content): Table {
   const tw = h.A4_LANDSCAPE_CONTENT_WIDTH;
-  const numW = 380; const refW = 380;
-  const hazW = Math.round(tw * 0.1);
+  // 15 columns: Ref, Activity, Hazard, Who, L, S, D, RPN, Controls, rL, rS, rD, rRPN, Detection Method, Review
+  const numW = 360; const refW = 350;
+  const actW = Math.round(tw * 0.08);
+  const hazW = Math.round(tw * 0.09);
   const whoW = Math.round(tw * 0.05);
-  const ctrlW = Math.round(tw * 0.16);
-  const detW = Math.round(tw * 0.1);
-  const fixed = refW + hazW + whoW + (numW * 8) + ctrlW + detW;
+  const ctrlW = Math.round(tw * 0.15);
+  const detW = Math.round(tw * 0.09);
+  const fixed = refW + actW + hazW + whoW + (numW * 8) + ctrlW + detW;
   const remainW = tw - fixed;
-  const cols = [refW, hazW, whoW, numW, numW, numW, numW, ctrlW, detW, numW, numW, numW, numW, Math.round(remainW * 0.5), remainW - Math.round(remainW * 0.5)];
+  const cols = [refW, actW, hazW, whoW, numW, numW, numW, numW, ctrlW, numW, numW, numW, numW, detW, remainW];
 
   return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [
       h.headerCell('Ref', cols[0], { fontSize: 8 }),
-      h.headerCell('Hazard', cols[1], { fontSize: 8 }),
-      h.headerCell('Who', cols[2], { fontSize: 8 }),
-      h.headerCell('◆L', cols[3], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆S', cols[4], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆D', cols[5], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆RPN', cols[6], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('Controls', cols[7], { fontSize: 8 }),
-      h.headerCell('Detection Method', cols[8], { fontSize: 8, fillColor: h.RPN_PURPLE }),
+      h.headerCell('Activity', cols[1], { fontSize: 8 }),
+      h.headerCell('Hazard', cols[2], { fontSize: 8 }),
+      h.headerCell('Who', cols[3], { fontSize: 8 }),
+      h.headerCell('◆L', cols[4], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆S', cols[5], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆D', cols[6], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆RPN', cols[7], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('Control Measures', cols[8], { fontSize: 8 }),
       h.headerCell('◆rL', cols[9], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
       h.headerCell('◆rS', cols[10], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
       h.headerCell('◆rD', cols[11], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
       h.headerCell('◆rRPN', cols[12], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('Action By', cols[13], { fontSize: 8 }),
-      h.headerCell('Notes', cols[14], { fontSize: 8 }),
+      h.headerCell('◆Detection Method', cols[13], { fontSize: 8, fillColor: h.RPN_PURPLE }),
+      h.headerCell('Review', cols[14], { fontSize: 8 }),
     ] }),
     ...c.hazards.map((hz, idx) => new TableRow({ children: [
       h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 8, alignment: AlignmentType.CENTER }),
-      h.dataCell(hz.hazard, cols[1], { fontSize: 8 }),
-      h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 8 }),
-      h.dataCell(String(hz.likelihoodInitial), cols[3], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.severityInitial), cols[4], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.detectabilityInitial), cols[5], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.rpnInitial), cols[6], { fontSize: 8, bold: true, alignment: AlignmentType.CENTER, fillColor: h.rpnColor(hz.rpnInitial), color: hz.rpnInitial >= 36 ? h.WHITE : h.BLACK }),
-      h.dataCell(hz.controlMeasures, cols[7], { fontSize: 8 }),
-      h.dataCell(hz.detectionMethod, cols[8], { fontSize: 8, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(hz.activity || '', cols[1], { fontSize: 8 }),
+      h.dataCell(hz.hazard, cols[2], { fontSize: 8 }),
+      h.dataCell(hz.whoAtRisk, cols[3], { fontSize: 8 }),
+      h.dataCell(String(hz.likelihoodInitial), cols[4], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.severityInitial), cols[5], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.detectabilityInitial), cols[6], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.rpnInitial), cols[7], { fontSize: 8, bold: true, alignment: AlignmentType.CENTER, fillColor: h.rpnColor(hz.rpnInitial), color: hz.rpnInitial >= 36 ? h.WHITE : h.BLACK }),
+      h.dataCell(hz.controlMeasures, cols[8], { fontSize: 8 }),
       h.dataCell(String(hz.likelihoodResidual), cols[9], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
       h.dataCell(String(hz.severityResidual), cols[10], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
       h.dataCell(String(hz.detectabilityResidual), cols[11], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
       h.dataCell(String(hz.rpnResidual), cols[12], { fontSize: 8, bold: true, alignment: AlignmentType.CENTER, fillColor: h.rpnColor(hz.rpnResidual), color: hz.rpnResidual >= 36 ? h.WHITE : h.BLACK }),
-      h.dataCell('', cols[13], { fontSize: 8 }),
-      h.dataCell('', cols[14], { fontSize: 8 }),
+      h.dataCell(hz.detectionMethod, cols[13], { fontSize: 8, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.emptyCell(cols[14]),
     ] })),
   ] });
 }

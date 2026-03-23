@@ -114,17 +114,24 @@ function buildPreStartTable(c: Template09Content): Table {
 
 function buildChecklistHazardTable(c: Template09Content): Table {
   const tw = h.A4_LANDSCAPE_CONTENT_WIDTH;
-  const cols = [400, Math.round(tw * 0.12), Math.round(tw * 0.05), 450, 450, 500, Math.round(tw * 0.18), 450, 450, 500, Math.round(tw * 0.07), Math.round(tw * 0.12), 0];
+  // 13 columns: Ref, Activity, Hazard, Who, L, S, Risk, Controls, Check Required, Res L, Res S, Res R, Verified
+  const cols = [400, Math.round(tw * 0.1), Math.round(tw * 0.1), Math.round(tw * 0.05), 450, 450, 500, Math.round(tw * 0.17), Math.round(tw * 0.1), 450, 450, 500, 0];
   cols[12] = tw - cols.slice(0, 12).reduce((a, b) => a + b, 0);
 
   return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [
-      h.headerCell('Ref', cols[0], { fontSize: 9 }), h.headerCell('Hazard', cols[1], { fontSize: 9 }), h.headerCell('Who', cols[2], { fontSize: 9 }),
-      h.headerCell('L', cols[3], { fontSize: 9, alignment: AlignmentType.CENTER }), h.headerCell('S', cols[4], { fontSize: 9, alignment: AlignmentType.CENTER }), h.headerCell('Risk', cols[5], { fontSize: 9, alignment: AlignmentType.CENTER }),
-      h.headerCell('Controls', cols[6], { fontSize: 9 }),
-      h.headerCell('rL', cols[7], { fontSize: 9, alignment: AlignmentType.CENTER }), h.headerCell('rS', cols[8], { fontSize: 9, alignment: AlignmentType.CENTER }), h.headerCell('rRisk', cols[9], { fontSize: 9, alignment: AlignmentType.CENTER }),
-      h.headerCell('Add. Controls', cols[10], { fontSize: 9 }),
-      h.headerCell('☑ Check Required', cols[11], { fontSize: 9, fillColor: h.CHECKLIST_TEAL }),
+      h.headerCell('Ref', cols[0], { fontSize: 9 }),
+      h.headerCell('Activity', cols[1], { fontSize: 9 }),
+      h.headerCell('Hazard', cols[2], { fontSize: 9 }),
+      h.headerCell('Who', cols[3], { fontSize: 9 }),
+      h.headerCell('L', cols[4], { fontSize: 9, alignment: AlignmentType.CENTER }),
+      h.headerCell('S', cols[5], { fontSize: 9, alignment: AlignmentType.CENTER }),
+      h.headerCell('Risk', cols[6], { fontSize: 9, alignment: AlignmentType.CENTER }),
+      h.headerCell('Control Measures', cols[7], { fontSize: 9 }),
+      h.headerCell('☑ Check Required', cols[8], { fontSize: 9, fillColor: h.CHECKLIST_TEAL }),
+      h.headerCell('Res L', cols[9], { fontSize: 9, alignment: AlignmentType.CENTER }),
+      h.headerCell('Res S', cols[10], { fontSize: 9, alignment: AlignmentType.CENTER }),
+      h.headerCell('Res R', cols[11], { fontSize: 9, alignment: AlignmentType.CENTER }),
       h.headerCell('☑ Verified', cols[12], { fontSize: 9, fillColor: h.CHECKLIST_TEAL }),
     ] }),
     ...c.hazards.map((hz, idx) => {
@@ -132,17 +139,18 @@ function buildChecklistHazardTable(c: Template09Content): Table {
       const rs = hz.likelihoodResidual * hz.severityResidual;
       return new TableRow({ children: [
         h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(hz.hazard, cols[1], { fontSize: 9 }), h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 9 }),
-        h.dataCell(String(hz.likelihoodInitial), cols[3], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(String(hz.severityInitial), cols[4], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(String(is), cols[5], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(is), color: is >= 8 ? h.WHITE : h.BLACK }),
-        h.dataCell(hz.controlMeasures, cols[6], { fontSize: 9 }),
-        h.dataCell(String(hz.likelihoodResidual), cols[7], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(String(hz.severityResidual), cols[8], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(String(rs), cols[9], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(rs), color: rs >= 8 ? h.WHITE : h.BLACK }),
-        h.dataCell(hz.additionalControls || '', cols[10], { fontSize: 9 }),
-        h.dataCell(hz.checkRequired, cols[11], { fontSize: 9, fillColor: h.CHECKLIST_TEAL_LIGHT }),
-        h.emptyCell(cols[12], { fillColor: h.CHECKLIST_TEAL_LIGHT }),
+        h.dataCell(hz.activity || '', cols[1], { fontSize: 9 }),
+        h.dataCell(hz.hazard, cols[2], { fontSize: 9 }),
+        h.dataCell(hz.whoAtRisk, cols[3], { fontSize: 9 }),
+        h.dataCell(String(hz.likelihoodInitial), cols[4], { fontSize: 9, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(hz.severityInitial), cols[5], { fontSize: 9, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(is), cols[6], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(is), color: is >= 8 ? h.WHITE : h.BLACK }),
+        h.dataCell(hz.controlMeasures, cols[7], { fontSize: 9 }),
+        h.dataCell(hz.checkRequired, cols[8], { fontSize: 9, fillColor: h.CHECKLIST_TEAL_LIGHT }),
+        h.dataCell(String(hz.likelihoodResidual), cols[9], { fontSize: 9, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(hz.severityResidual), cols[10], { fontSize: 9, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(rs), cols[11], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(rs), color: rs >= 8 ? h.WHITE : h.BLACK }),
+        h.dataCell(hz.verified || 'Pending', cols[12], { fontSize: 9, fillColor: h.CHECKLIST_TEAL_LIGHT }),
       ] });
     }),
   ] });
