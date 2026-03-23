@@ -2,15 +2,15 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { TemplateSlug, GeneratedQuestion, AnsweredQuestion } from '@/lib/rams/types';
+import { TemplateSlug, ConversationRound, ConversationQuestion } from '@/lib/rams/types';
 import { TEMPLATE_CONFIGS, TEMPLATE_ORDER } from '@/lib/rams/template-config';
 import TemplatePicker from './TemplatePicker';
 import ScopeInput from './ScopeInput';
-import QuestionnaireClient from './QuestionnaireClient';
+import ConversationClient from './ConversationClient';
 import GeneratingClient from './GeneratingClient';
 import DownloadClient from './DownloadClient';
 
-type BuilderStep = 'pick-template' | 'describe-work' | 'questions' | 'generating' | 'download';
+type BuilderStep = 'pick-template' | 'describe-work' | 'conversation' | 'generating' | 'download';
 
 // Safely parse JSON from a fetch response; returns fallback error if response is not JSON
 async function safeJsonParse(res: Response, fallback: string): Promise<{ error?: string }> {
@@ -30,7 +30,11 @@ export default function RamsLandingClient() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateSlug | null>(null);
   const [description, setDescription] = useState('');
   const [generationId, setGenerationId] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
+
+  // Conversation state
+  const [initialQuestions, setInitialQuestions] = useState<ConversationQuestion[]>([]);
+  const [initialTotalAsked, setInitialTotalAsked] = useState(0);
+
   const [downloadData, setDownloadData] = useState<{
     downloadUrl: string;
     filename: string;
@@ -46,7 +50,6 @@ export default function RamsLandingClient() {
     const subscriptionId = searchParams.get('subscription_id');
     if (!subscriptionId) return;
 
-    // Verify and activate the subscription
     fetch('/api/payments/verify-subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -55,7 +58,6 @@ export default function RamsLandingClient() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          // Remove query params and reload to refresh session
           window.location.href = '/rams-builder';
         }
       })
@@ -63,13 +65,13 @@ export default function RamsLandingClient() {
   }, [searchParams]);
 
   // Step 1: Template selected
-  const handleTemplateSelect = useCallback((slug: TemplateSlug) => {
-    setSelectedTemplate(slug);
+  const handleTemplateSelect = useCallback((templateId: string) => {
+    setSelectedTemplate(templateId as TemplateSlug);
     setStep('describe-work');
     setError(null);
   }, []);
 
-  // Step 2: Description submitted -> AI Call 1
+  // Step 2: Description submitted → start conversation (AI Call 1, Round 1)
   const handleDescriptionSubmit = useCallback(async (desc: string) => {
     if (!selectedTemplate) return;
     setDescription(desc);
@@ -77,38 +79,62 @@ export default function RamsLandingClient() {
     setStep('generating');
 
     try {
-      const res = await fetch('/api/rams/generate-questions', {
+      const res = await fetch('/api/rams/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateSlug: selectedTemplate, description: desc }),
+        body: JSON.stringify({
+          templateSlug: selectedTemplate,
+          description: desc,
+          rounds: [], // first round — no previous conversation
+        }),
       });
 
       if (!res.ok) {
-        const data = await safeJsonParse(res, 'Failed to generate questions. Please sign in.');
-        throw new Error(data.error || 'Failed to generate questions');
+        const data = await safeJsonParse(res, 'Failed to start conversation. Please sign in.');
+        throw new Error(data.error || 'Failed to start conversation');
       }
 
       const data = await res.json();
-      setGenerationId(data.generationId);
-      setQuestions(data.questions);
-      setStep('questions');
+
+      if (data.generationId) {
+        setGenerationId(data.generationId);
+      }
+
+      setInitialQuestions(data.questions || []);
+      setInitialTotalAsked(data.totalQuestionsAsked || 0);
+      setStep('conversation');
     } catch (err: any) {
       setError(err.message);
       setStep('describe-work');
     }
   }, [selectedTemplate]);
 
-  // Step 3: Questions answered -> AI Call 2
-  const handleQuestionsComplete = useCallback(async (answers: AnsweredQuestion[]) => {
-    if (!generationId) return;
+  // Step 3: Conversation complete → generate document (AI Call 2)
+  const handleConversationComplete = useCallback(async (rounds: ConversationRound[], convGenerationId: string) => {
+    const genId = convGenerationId || generationId;
+    if (!genId || !selectedTemplate) return;
     setError(null);
     setStep('generating');
 
     try {
+      // Flatten all Q&A from all rounds into the answers format expected by the generate route
+      let answerNumber = 0;
+      const allAnswers = rounds.flatMap((round) =>
+        round.answers.map((a) => ({
+          number: ++answerNumber,
+          question: a.question,
+          answer: a.answer,
+        }))
+      );
+
       const res = await fetch('/api/rams/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ generationId, answers }),
+        body: JSON.stringify({
+          generationId: genId,
+          answers: allAnswers,
+          description,
+        }),
       });
 
       if (!res.ok) {
@@ -126,16 +152,16 @@ export default function RamsLandingClient() {
       setStep('download');
     } catch (err: any) {
       setError(err.message);
-      setStep('questions');
+      setStep('conversation');
     }
-  }, [generationId]);
+  }, [generationId, selectedTemplate, description]);
 
   // Back navigation
   const handleBack = useCallback(() => {
     if (step === 'describe-work') {
       setStep('pick-template');
       setSelectedTemplate(null);
-    } else if (step === 'questions') {
+    } else if (step === 'conversation') {
       setStep('describe-work');
     }
   }, [step]);
@@ -146,7 +172,8 @@ export default function RamsLandingClient() {
     setSelectedTemplate(null);
     setDescription('');
     setGenerationId(null);
-    setQuestions([]);
+    setInitialQuestions([]);
+    setInitialTotalAsked(0);
     setDownloadData(null);
     setError(null);
   }, []);
@@ -155,7 +182,7 @@ export default function RamsLandingClient() {
   const stepNumber =
     step === 'pick-template' ? 1 :
     step === 'describe-work' ? 2 :
-    step === 'questions' ? 3 :
+    step === 'conversation' ? 3 :
     step === 'generating' ? 3 : 4;
 
   return (
@@ -163,16 +190,32 @@ export default function RamsLandingClient() {
       {/* Progress Bar */}
       <div className="rams-progress">
         <div className="rams-progress-bar">
-          {[1, 2, 3, 4].map(n => (
-            <div key={n} className={`rams-progress-step ${n <= stepNumber ? 'active' : ''} ${n < stepNumber ? 'completed' : ''}`}>
-              <div className="rams-progress-dot">{n < stepNumber ? '\u2713' : n}</div>
+          {[1, 2, 3, 4].map((n) => (
+            <div
+              key={n}
+              className={`rams-progress-step ${n <= stepNumber ? 'active' : ''} ${
+                n < stepNumber ? 'completed' : ''
+              }`}
+            >
+              <div className="rams-progress-dot">
+                {n < stepNumber ? '\u2713' : n}
+              </div>
               <span className="rams-progress-label">
-                {n === 1 ? 'Choose Template' : n === 2 ? 'Describe Work' : n === 3 ? 'Answer Questions' : 'Download'}
+                {n === 1
+                  ? 'Choose Template'
+                  : n === 2
+                  ? 'Describe Work'
+                  : n === 3
+                  ? 'Interview'
+                  : 'Download'}
               </span>
             </div>
           ))}
           <div className="rams-progress-line">
-            <div className="rams-progress-line-fill" style={{ width: `${((stepNumber - 1) / 3) * 100}%` }} />
+            <div
+              className="rams-progress-line-fill"
+              style={{ width: `${((stepNumber - 1) / 3) * 100}%` }}
+            />
           </div>
         </div>
       </div>
@@ -182,7 +225,9 @@ export default function RamsLandingClient() {
         <div className="rams-error">
           <span className="rams-error-icon">{'\u26A0'}</span>
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="rams-error-close">{'\u00D7'}</button>
+          <button onClick={() => setError(null)} className="rams-error-close">
+            {'\u00D7'}
+          </button>
         </div>
       )}
 
@@ -200,18 +245,21 @@ export default function RamsLandingClient() {
         />
       )}
 
-      {step === 'questions' && (
-        <QuestionnaireClient
-          questions={questions}
-          onComplete={handleQuestionsComplete}
+      {step === 'conversation' && selectedTemplate && initialQuestions.length > 0 && (
+        <ConversationClient
+          templateSlug={selectedTemplate}
+          description={description}
+          initialQuestions={initialQuestions}
+          initialGenerationId={generationId || ''}
+          initialTotalAsked={initialTotalAsked}
+          onComplete={handleConversationComplete}
           onBack={handleBack}
-          templateSlug={selectedTemplate!}
         />
       )}
 
       {step === 'generating' && (
         <GeneratingClient
-          phase={generationId && questions.length > 0 ? 'document' : 'questions'}
+          phase={generationId && initialQuestions.length > 0 ? 'document' : 'questions'}
           templateSlug={selectedTemplate!}
         />
       )}
