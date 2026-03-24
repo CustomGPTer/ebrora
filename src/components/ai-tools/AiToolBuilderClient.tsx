@@ -43,7 +43,7 @@ const DOCUMENT_STEPS = [
 ];
 
 const MAX_WORDS_DESCRIPTION = 200;
-const MIN_WORDS_DESCRIPTION = 10;
+const MIN_WORDS_DESCRIPTION = 3;
 const MAX_WORDS_PER_ANSWER = 100;
 
 export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientProps) {
@@ -324,7 +324,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
             </div>
 
             {descUnderMin && (
-              <p className="scope-input-warning">Please provide at least {MIN_WORDS_DESCRIPTION} words to describe the work.</p>
+              <p className="scope-input-warning">Please provide at least {MIN_WORDS_DESCRIPTION} words to describe the product.</p>
             )}
             {descOverLimit && (
               <p className="scope-input-warning">Please keep your description under {MAX_WORDS_DESCRIPTION} words.</p>
