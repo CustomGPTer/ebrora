@@ -19,6 +19,7 @@ import {
   COOLDOWN_MS,
   EXPIRY_THRESHOLD_MS,
   AI_TOOL_LIMITS,
+  getAiToolLimitByTier,
 } from '@/lib/ai-tools';
 import { getConversationPrompt } from '@/lib/ai-tools/system-prompts';
 import type {
@@ -161,7 +162,7 @@ export async function POST(req: NextRequest) {
 
     // Usage limit check (only on first round — per tool, per month)
     if (!rounds || rounds.length === 0) {
-      const monthLimit = AI_TOOL_LIMITS[tier] ?? 1;
+      const monthLimit = getAiToolLimitByTier(tier, toolSlug);
       const nowDate = new Date();
       const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
       const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
@@ -178,15 +179,19 @@ export async function POST(req: NextRequest) {
       const toolConfig = getAiToolConfig(toolSlug);
 
       if (usageThisMonth >= monthLimit) {
+        const isRestricted = monthLimit === 0;
         return NextResponse.json(
           {
-            error: `You've used all ${monthLimit} ${toolConfig.shortName} generation${monthLimit === 1 ? '' : 's'} for this month.`,
+            error: isRestricted
+              ? `The ${toolConfig.shortName} is available on Standard and Professional plans.`
+              : `You've used all ${monthLimit} ${toolConfig.shortName} generation${monthLimit === 1 ? '' : 's'} for this month.`,
             limitReached: true,
             used: usageThisMonth,
             limit: monthLimit,
             tier,
-            message:
-              tier === 'FREE'
+            message: isRestricted
+              ? 'Upgrade your plan to access this tool and generate professional documents.'
+              : tier === 'FREE'
                 ? 'Sign up for a paid plan to generate more documents each month.'
                 : 'Your monthly limit resets at the start of next month, or upgrade your plan for a higher limit.',
           },
