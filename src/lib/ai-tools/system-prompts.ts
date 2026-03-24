@@ -58,18 +58,21 @@ After Round 2, ALWAYS respond with status "ready". Never ask a third round.
 
 You will use your knowledge of the product's Safety Data Sheet (SDS), GHS classification, H-statements, workplace exposure limits, and control measures when generating the document later — the user does NOT need to provide this technical data.`,
 
-  itp: `You are generating an Inspection & Test Plan for construction works.
+  itp: `You are generating an Inspection & Test Plan (ITP) for construction works.
 
-Focus your questions on:
-1. Detailed work activities and sequence of operations
-2. Materials and specifications (BS standards, NWC/WIS specs, client specs)
-3. Critical quality parameters and acceptance criteria
-4. Hold points (where work must stop for inspection before proceeding)
-5. Witness points (where the client/engineer may observe)
-6. Testing requirements (pressure tests, compaction tests, cube tests, etc.)
-7. Reference standards and specifications
-8. Responsible parties for each inspection (contractor QA, client rep, designer)
-9. Record-keeping and documentation requirements`,
+The user has already described the works being carried out. Read their description carefully and ask EXACTLY 3 follow-up questions to fill in the gaps needed for a professional ITP.
+
+Your 3 questions should target the most critical missing information from:
+1. Specific materials, specifications, and BS/EN standards applicable to these works
+2. Testing requirements (pressure tests, compaction tests, weld NDT, CCTV, commissioning, etc.)
+3. Critical hold points — where must work STOP for mandatory inspection before proceeding?
+4. Responsible parties — who is the contractor, client, designer? Any subcontractors?
+5. Key acceptance criteria and tolerances
+6. Environmental or permitting constraints
+
+Pick the 3 most important gaps based on what the user has already told you. Do NOT ask generic questions — be specific to the works described.
+
+After Round 1 answers are received, ALWAYS respond with status "ready". This is a single-round interview — never ask a second round.`,
 
   'manual-handling': `You are generating a Manual Handling Risk Assessment using the TILE methodology (Task, Individual, Load, Environment) per the Manual Handling Operations Regulations 1992 (as amended).
 
@@ -203,45 +206,183 @@ JSON structure:
 
 CRITICAL: Use real SDS data for this product. The hazard classifications, H-statements, WELs, and first aid measures must match the actual manufacturer's Safety Data Sheet. This is a legal compliance document.`,
 
-  itp: `Generate an Inspection & Test Plan JSON with this structure:
+  itp: `Generate an Inspection & Test Plan as JSON. This will be rendered into a professional Excel spreadsheet with three sections: Pre-Works, During Works, and Closeout/Review.
+
+Each inspection item needs a responsibility code for four parties (Subcontractor, Contractor, Client, Designer). Codes must be one of:
+- S = Surveillance (record as diary entry, no notification)
+- I = Inspection (work continues, signed record)
+- W = Witness Point (notification required, signed record if witnessed)
+- H = Hold Point (STOP work until inspected and released)
+- R = Records Review (review of documentation, signed record)
+- O = Observation (observation point, record sheet filled)
+
+Use H for critical quality/safety gates. Use W for important checks. Use I/S for routine monitoring. Use R for document reviews. Use O for general observations. Be realistic — not every cell should be H.
+
+JSON structure:
 {
-  "documentRef": "string",
-  "issueDate": "DD/MM/YYYY",
-  "revision": "string",
-  "preparedBy": "string",
   "projectName": "string",
-  "siteAddress": "string",
-  "worksDescription": "string (min 200 words)",
-  "applicableStandards": [
-    { "ref": "string", "title": "string" }
-  ],
-  "inspectionItems": [
+  "contractNo": "string",
+  "itpReference": "string (format: ITP-XXX-001)",
+  "revision": "0",
+  "date": "DD/MM/YYYY",
+  "generalTitle": "string (short title for the works package)",
+  "workBy": "string (main contractor or subcontractor name if known)",
+  "drawingRefs": "string (drawing numbers or 'To be confirmed')",
+  "preWorks": [
     {
-      "ref": "ITP-001",
-      "activity": "string",
-      "inspectionRequirement": "string",
-      "acceptanceCriteria": "string",
-      "pointType": "Hold | Witness | Review",
-      "inspectedBy": "string",
-      "frequency": "string",
-      "record": "string",
-      "remarks": "string"
+      "op": "1.0",
+      "operation": "string (what is being inspected/checked)",
+      "controlledBy": "string (position/role, e.g. 'Site Agent / Principal Contractor')",
+      "acceptRejectCriteria": "string (specific pass/fail criteria)",
+      "frequency": "string (e.g. 'Prior to works', 'Each section')",
+      "specRef": "string (BS/EN standard, contract spec, method statement reference)",
+      "records": "string (what records are produced — certificates, checklists, permits)",
+      "subcontractor": "S|I|W|H|R|O",
+      "contractor": "S|I|W|H|R|O",
+      "client": "S|I|W|H|R|O",
+      "designer": "S|I|W|H|R|O",
+      "notes": "string (brief practical note)"
     }
   ],
-  "holdPoints": [
-    { "ref": "HP-01", "activity": "string", "requirement": "string", "releasedBy": "string" }
+  "duringWorks": [
+    {
+      "op": "2.0",
+      "operation": "string",
+      "controlledBy": "string",
+      "acceptRejectCriteria": "string",
+      "frequency": "string",
+      "specRef": "string",
+      "records": "string",
+      "subcontractor": "S|I|W|H|R|O",
+      "contractor": "S|I|W|H|R|O",
+      "client": "S|I|W|H|R|O",
+      "designer": "S|I|W|H|R|O",
+      "notes": "string"
+    }
   ],
-  "testRequirements": [
-    { "test": "string", "standard": "string", "acceptanceCriteria": "string", "frequency": "string" }
-  ],
-  "signOff": {
-    "contractorQA": "string",
-    "clientRep": "string",
-    "designer": "string"
-  },
-  "additionalNotes": "string"
+  "closeoutReview": [
+    {
+      "op": "3.0",
+      "operation": "string",
+      "controlledBy": "string",
+      "acceptRejectCriteria": "string",
+      "frequency": "string",
+      "specRef": "string",
+      "records": "string",
+      "subcontractor": "S|I|W|H|R|O",
+      "contractor": "S|I|W|H|R|O",
+      "client": "S|I|W|H|R|O",
+      "designer": "S|I|W|H|R|O",
+      "notes": "string"
+    }
+  ]
 }
-Minimum 10 inspection items. Minimum 3 hold points.`,
+
+REQUIREMENTS — READ CAREFULLY:
+
+COMPREHENSIVENESS IS MANDATORY. An ITP is a quality assurance document that must account for EVERY inspection and test point across the full lifecycle of the works. If something gets built, poured, installed, connected, tested, or handed over — it needs a line in the ITP. A thin ITP is a useless ITP.
+
+MINIMUM ITEMS (hard floor — these are minimums, not targets):
+- Pre-Works: minimum 6 items.
+- During Works: minimum 10 items. This is where the bulk of the ITP sits. Every distinct construction activity must have its own row.
+- Closeout/Review: minimum 6 items.
+If the works are complex (e.g. MEICA + civils + electrical), you should exceed these minimums significantly.
+
+MANDATORY PRE-WORKS (always include, plus more based on the works):
+- RAMS review and approval
+- Design approval / drawing check
+- Materials approval and certification (MARs, mill certs, test certs)
+- Existing services identification and protection (CAT & Genny, GPR, permits to dig)
+- Setting out and survey verification
+- Environmental controls and permits
+
+MANDATORY CLOSEOUT (always include, plus more based on the works):
+- Testing (pressure test, leak test, compaction test — whatever applies)
+- CCTV survey (if pipework)
+- Commissioning and functional testing (if M&E/MEICA)
+- As-built survey and record drawings
+- O&M manual and handover documentation
+- Final inspection and defects walkdown / snagging
+
+DURING WORKS must be broken down by activity — NOT lumped together. Think about what a site engineer actually inspects on a daily basis.
+
+Operation numbering: Pre-Works = 1.0, 1.1, 1.2... During Works = 2.0, 2.1, 2.2... Closeout = 3.0, 3.1, 3.2...
+
+────────────────────────────────────────
+EXAMPLES OF GOOD vs BAD OUTPUT
+────────────────────────────────────────
+
+BAD — vague, lazy, would be rejected on any real project:
+{
+  "op": "2.0",
+  "operation": "Pipe installation",
+  "controlledBy": "Supervisor",
+  "acceptRejectCriteria": "To specification",
+  "frequency": "As required",
+  "specRef": "Contract spec",
+  "records": "Records",
+  "subcontractor": "H", "contractor": "H", "client": "H", "designer": "H",
+  "notes": ""
+}
+WHY IT'S BAD: "Pipe installation" lumps multiple activities into one row. "To specification" is not measurable. "As required" is not a frequency. "Contract spec" is not a reference. "Records" means nothing. Every code is H which is unrealistic — you'd shut the job down.
+
+GOOD — specific, measurable, professionally written:
+{
+  "op": "2.3",
+  "operation": "Pipe installation — alignment, gradient, and jointing",
+  "controlledBy": "Site Engineer / Supervisor",
+  "acceptRejectCriteria": "Alignment within ±25mm of design. Gradient within ±5mm over 3m. Joints fully home with witness mark visible. No debris in pipe bore.",
+  "frequency": "Each pipe run / section",
+  "specRef": "WIS 4-08-02\nBS EN 545\nManufacturer jointing guide\nContract spec. clause 5.4",
+  "records": "Pipe laying record sheet\nLaser alignment report\nPhotographic record of joints\nAs-laid survey",
+  "subcontractor": "W", "contractor": "H", "client": "W", "designer": "O",
+  "notes": "Jointing to be witnessed. Laser checks at each manhole-to-manhole run."
+}
+WHY IT'S GOOD: Specific activity. Measurable tolerances. Real standards cited. Real records listed. Realistic codes — contractor holds the H because they control the work, client witnesses key stages, designer observes.
+
+BAD — closeout item that tells you nothing:
+{
+  "op": "3.0",
+  "operation": "Testing",
+  "controlledBy": "Engineer",
+  "acceptRejectCriteria": "Pass",
+  "frequency": "On completion",
+  "specRef": "Spec",
+  "records": "Test certificate",
+  "subcontractor": "W", "contractor": "W", "client": "W", "designer": "W",
+  "notes": ""
+}
+
+GOOD — closeout item that's actually useful:
+{
+  "op": "3.0",
+  "operation": "Pressure testing — hydrostatic test to 1.5x working pressure",
+  "controlledBy": "Site Engineer / Test Engineer",
+  "acceptRejectCriteria": "Sustained test pressure of 1.5x WP for minimum 1 hour. No visible leaks. Pressure drop not exceeding 0.02 bar over test period. All joints and fittings inspected under pressure.",
+  "frequency": "Each pipeline section / system",
+  "specRef": "WIS 4-01-03\nBS EN 805\nContract spec. clause 7.2\nSite-specific test procedure ref. TP-001",
+  "records": "Pressure test certificate\nTest recorder chart / data logger output\nPhotographic evidence at peak pressure\nWitness signatures",
+  "subcontractor": "W", "contractor": "H", "client": "H", "designer": "H",
+  "notes": "Client witness mandatory. 24hr notice required. Calibrated test equipment only."
+}
+
+────────────────────────────────────────
+FIELD-BY-FIELD RULES
+────────────────────────────────────────
+
+- operation: Describe the SPECIFIC activity being inspected. Break complex activities into separate rows (e.g. "Excavation and formation" is one row, "Bedding and surround" is another, "Pipe laying and jointing" is another). Never lump two different trades or activities into one row.
+- controlledBy: Use role titles (Site Engineer, Supervisor, MEICA Engineer, Welding Inspector, Commissioning Engineer). Include two roles where both are involved (e.g. "Site Engineer / Supervisor").
+- acceptRejectCriteria: MUST be specific and measurable. Include tolerances, dimensions, pass/fail thresholds, or observable conditions. NEVER write "to specification", "as design", "acceptable", or "compliant". State WHAT is acceptable.
+- frequency: State when and how often (e.g. "Each pour", "Each pipe run", "Daily per section", "Prior to works commencing", "On completion per system"). NEVER write "as required" or "as needed".
+- specRef: Cite REAL standards. Use BS EN numbers, WIS references, HSE guidance (e.g. HSG47, HSG65), CDM 2015 regulation numbers, CESWI clauses, manufacturer guidance, or specific contract spec clause numbers. Multiple references separated by newlines.
+- records: List the ACTUAL documents produced. Use real names: "Compaction test results", "Cube test results", "Permit to Dig", "CCTV survey report", "Pressure test certificate", "Weld log", "NDT report", "As-built survey data", "Installation checklist", "Photographic record". Multiple records separated by newlines.
+- notes: Brief practical guidance for the person using the ITP on site. What to watch out for, who needs to be notified, special requirements.
+- Responsibility codes must be REALISTIC:
+  - Contractor typically has the most H and W points (they control the work)
+  - Client holds H on critical quality gates (pressure tests, commissioning, handover)
+  - Designer holds H on design-critical items (alignment, structural elements) and R on documentation
+  - Subcontractor holds H on their own RAMS and W on installation activities they perform
+  - Use S and O for routine monitoring — not everything is a hold point`,
 
   'manual-handling': `Generate a Manual Handling Risk Assessment JSON with this structure:
 {
