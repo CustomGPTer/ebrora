@@ -108,7 +108,6 @@ export default withAuth(
           '/itp-builder',
           '/manual-handling-builder',
           '/dse-builder',
-          '/drawing-checker',
           '/tbt-builder',
           '/confined-spaces-builder',
         ];
