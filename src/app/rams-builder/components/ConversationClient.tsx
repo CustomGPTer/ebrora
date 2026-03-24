@@ -43,7 +43,7 @@ export default function ConversationClient({
   const [readyMessage, setReadyMessage] = useState<string | null>(null);
   const [generationId] = useState(initialGenerationId);
 
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const currentRoundRef = useRef<HTMLDivElement>(null);
   const config = TEMPLATE_CONFIGS[templateSlug];
 
   // Initialise answers for current questions
@@ -55,10 +55,12 @@ export default function ConversationClient({
     setAnswers((prev) => ({ ...prev, ...init }));
   }, [currentQuestions]);
 
-  // Scroll to bottom when new questions arrive
+  // Scroll to top of new questions when they arrive
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentQuestions, rounds]);
+    if (currentQuestions.length > 0 && currentRoundRef.current) {
+      currentRoundRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentQuestions]);
 
   const getWordCount = (text: string): number => {
     return text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -232,7 +234,7 @@ export default function ConversationClient({
 
       {/* Current round questions */}
       {currentQuestions.length > 0 && (
-        <div className="questionnaire-questions">
+        <div ref={currentRoundRef} className="questionnaire-questions">
           {currentQuestions.map((q) => {
             const wordCount = getWordCount(answers[q.id] || '');
             const isOverLimit = wordCount > MAX_WORDS_PER_ANSWER;
@@ -331,7 +333,6 @@ export default function ConversationClient({
         </div>
       )}
 
-      <div ref={bottomRef} />
     </div>
   );
 }
