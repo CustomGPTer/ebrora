@@ -169,16 +169,6 @@ const HUB_CARDS = [
     badge: 'AI',
   },
   {
-    title: 'Drawing Checker',
-    desc: 'AI-powered drawing review tool. Checks for missing details, annotation gaps, and compliance issues on construction drawings.',
-    href: '/drawing-checker',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
     title: 'Toolbox Talk Generator',
     desc: 'Generate bespoke toolbox talks for any activity or hazard. Site-specific, briefing-ready, and branded to your project.',
     href: '/tbt-builder',
