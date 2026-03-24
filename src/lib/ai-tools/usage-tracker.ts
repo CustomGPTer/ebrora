@@ -17,7 +17,7 @@ export async function getAiToolUsage(
   });
 
   const tier = subscription?.tier || 'FREE';
-  const limit = getAiToolLimitByTier(tier);
+  const limit = getAiToolLimitByTier(tier, toolSlug);
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -68,7 +68,7 @@ export async function incrementAiToolUsage(
         where: { user_id: userId },
       });
       const tier = subscription?.tier || 'FREE';
-      const limit = getAiToolLimitByTier(tier);
+      const limit = getAiToolLimitByTier(tier, toolSlug);
 
       await (prisma as any).aiToolUsage.create({
         data: {
@@ -108,7 +108,6 @@ export async function getAllAiToolUsage(
     where: { user_id: userId },
   });
   const tier = subscription?.tier || 'FREE';
-  const limit = getAiToolLimitByTier(tier);
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -135,7 +134,7 @@ export async function getAllAiToolUsage(
   const result = {} as Record<AiToolSlug, { used: number; limit: number }>;
   for (const slug of allSlugs) {
     const rec = records.find((r: any) => r.tool_slug === slug);
-    result[slug] = { used: rec?.generations_count || 0, limit };
+    result[slug] = { used: rec?.generations_count || 0, limit: getAiToolLimitByTier(tier, slug) };
   }
 
   return result;
