@@ -1,7 +1,7 @@
 // =============================================================================
 // AI Tools — Constants
 // Usage limits are SEPARATE from RAMS Builder.
-// RAMS keeps its own limits (1 Free / 10 Standard / 30 Pro).
+// RAMS keeps its own limits (1 Free / 10 Standard / 25 Pro).
 // These apply PER TOOL — each tool gets its own monthly allowance.
 // =============================================================================
 
@@ -12,8 +12,26 @@ export const AI_TOOL_LIMITS: Record<string, number> = {
   PROFESSIONAL: 20,
 };
 
-/** Get the monthly generation limit for a given tier */
-export function getAiToolLimitByTier(tier: string): number {
+/**
+ * Tools that are NOT available on the FREE tier (limit = 0).
+ * These require Standard or Professional to use.
+ */
+export const RESTRICTED_FREE_TOOLS: Set<string> = new Set([
+  'itp',
+  'incident-report',
+  'lift-plan',
+  'emergency-response',
+  'scope-of-works',
+  'early-warning',
+  'ncr',
+]);
+
+/** Get the monthly generation limit for a given tier and tool */
+export function getAiToolLimitByTier(tier: string, toolSlug?: string): number {
+  // If FREE tier and tool is restricted, return 0
+  if ((!tier || tier === 'FREE') && toolSlug && RESTRICTED_FREE_TOOLS.has(toolSlug)) {
+    return 0;
+  }
   return AI_TOOL_LIMITS[tier] ?? AI_TOOL_LIMITS.FREE;
 }
 
