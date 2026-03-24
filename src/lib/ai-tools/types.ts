@@ -5,7 +5,7 @@
 // RAMS Builder remains untouched — its own types stay in /lib/rams/types.ts
 // =============================================================================
 
-/** The 7 AI tool slugs (excludes RAMS which has its own system) */
+/** The 17 AI tool slugs (excludes RAMS which has its own system) */
 export type AiToolSlug =
   | 'coshh'
   | 'itp'
@@ -13,7 +13,17 @@ export type AiToolSlug =
   | 'dse'
   | 'drawing-checker'
   | 'tbt-generator'
-  | 'confined-spaces';
+  | 'confined-spaces'
+  | 'incident-report'
+  | 'lift-plan'
+  | 'emergency-response'
+  | 'quality-checklist'
+  | 'scope-of-works'
+  | 'permit-to-dig'
+  | 'powra'
+  | 'early-warning'
+  | 'ncr'
+  | 'ce-notification';
 
 /** Metadata for each AI tool */
 export interface AiToolConfig {
@@ -39,7 +49,7 @@ export interface AiToolConfig {
   /** Colour accent for UI (hex without #) */
   accentColor: string;
   /** Icon name for consistent iconography */
-  iconType: 'shield' | 'clipboard' | 'search' | 'chat' | 'alert' | 'eye' | 'lock';
+  iconType: 'shield' | 'clipboard' | 'search' | 'chat' | 'alert' | 'eye' | 'lock' | 'warning' | 'crane' | 'siren' | 'check' | 'file' | 'shovel' | 'hardhat' | 'bell' | 'x-circle' | 'pound';
   /** Output file format — defaults to 'docx' if not set */
   outputFormat?: 'docx' | 'xlsx';
 }
