@@ -23,6 +23,7 @@
                     "bcryptjs": "^2.4.3",
                     "date-fns": "^3.6.0",
                     "docx": "^8.5.0",
+                    "exceljs": "^4.4.0",
                     "gray-matter": "^4.0.3",
                     "html2canvas": "^1.4.1",
                     "js-cookie": "^3.0.5",
