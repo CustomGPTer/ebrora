@@ -442,15 +442,21 @@ export default function HomepageClient({
       <section className="hp-hero">
         <div className="hp-hero__bg" />
         <div className="hp-hero__content">
-          <span className="hp-hero__badge">Built by site teams, for site teams</span>
+          <span className="hp-hero__badge">
+            <svg className="w-4 h-4" style={{ display: 'inline', width: '16px', height: '16px', marginRight: '6px', verticalAlign: 'middle' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+            Enterprise-Grade AI — Fraction of the Cost
+          </span>
           <h1 className="hp-hero__title">
-            The UK Construction<br />
-            Professional&apos;s <span className="hp-hero__accent">Toolkit</span>
+            The Most Powerful AI Construction Tools Available
           </h1>
           <p className="hp-hero__subtitle">
-            Premium Excel templates, AI-powered RAMS, 1,500+ free toolbox talks, 
-            interactive calculators, and expert guides — everything your site team 
-            needs, CDM 2015 compliant and ready to use.
+            Comparable platforms charge £200+ per month for a single tool.
+            Ebrora gives you an entire suite of AI-powered document generators — RAMS,
+            COSHH, ITPs, manual handling, DSE, confined spaces, and more — all built
+            specifically for UK construction by people who actually work on site.
+            Every output is regulation-compliant and ready to use.
           </p>
 
           {/* Site-wide search */}
@@ -549,14 +555,6 @@ export default function HomepageClient({
       {/* ━━━ HUB GRID ━━━ */}
       <section className="hp-section" ref={fadeRef1}>
         <div className="hp-container">
-          <div className="hp-section-header">
-            <span className="hp-section-badge">Explore Ebrora</span>
-            <h2 className="hp-section-title">Everything You Need to Run a Better Site</h2>
-            <p className="hp-section-subtitle">
-              From 8 AI-powered document generators and premium Excel templates to 1,500+ free toolbox talks 
-              — tools that rival platforms costing £200+/month, built for UK construction professionals.
-            </p>
-          </div>
 
           <div className="hp-hub-grid">
             {HUB_CARDS.map((card, idx) => (
