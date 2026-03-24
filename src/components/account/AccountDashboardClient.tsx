@@ -101,6 +101,26 @@ const TABS: { key: TabType; label: string; icon: React.ReactNode }[] = [
   },
 ];
 
+/** All AI tools with display label and route — drives the account dashboard usage grid */
+const AI_TOOL_DISPLAY: { slug: string; label: string; href: string }[] = [
+  { slug: 'coshh', label: 'COSHH Assessment', href: '/coshh-builder' },
+  { slug: 'itp', label: 'Inspection & Test Plan', href: '/itp-builder' },
+  { slug: 'manual-handling', label: 'Manual Handling RA', href: '/manual-handling-builder' },
+  { slug: 'dse', label: 'DSE Assessment', href: '/dse-builder' },
+  { slug: 'tbt-generator', label: 'Toolbox Talk Generator', href: '/tbt-builder' },
+  { slug: 'confined-spaces', label: 'Confined Space RA', href: '/confined-spaces-builder' },
+  { slug: 'incident-report', label: 'Incident Report', href: '/incident-report-builder' },
+  { slug: 'lift-plan', label: 'Lift Plan', href: '/lift-plan-builder' },
+  { slug: 'emergency-response', label: 'Emergency Response', href: '/emergency-response-builder' },
+  { slug: 'quality-checklist', label: 'Quality Checklist', href: '/quality-checklist-builder' },
+  { slug: 'scope-of-works', label: 'Scope of Works', href: '/scope-of-works-builder' },
+  { slug: 'permit-to-dig', label: 'Permit to Dig', href: '/permit-to-dig-builder' },
+  { slug: 'powra', label: 'POWRA', href: '/powra-builder' },
+  { slug: 'early-warning', label: 'Early Warning Notice', href: '/early-warning-builder' },
+  { slug: 'ncr', label: 'Non-Conformance Report', href: '/ncr-builder' },
+  { slug: 'ce-notification', label: 'CE Notification', href: '/ce-notification-builder' },
+];
+
 export default function AccountDashboardClient({
   user,
   subscription,
@@ -248,103 +268,40 @@ export default function AccountDashboardClient({
               </div>
             </div>
 
-            {/* AI Tool stat cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* COSHH Assessments */}
-              {(() => {
-                const coshh = aiToolUsage['coshh'] || { used: 0, limit: 1 };
-                const coshhPct = Math.min((coshh.used / coshh.limit) * 100, 100);
-                return (
-                  <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">COSHH Assessments</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {coshh.used} <span className="text-base font-normal text-gray-400">/ {coshh.limit}</span>
-                    </p>
-                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${coshhPct}%`,
-                          backgroundColor: coshhPct > 80 ? '#dc2626' : '#1B5745',
-                        }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
-                  </div>
-                );
-              })()}
-
-              {/* Toolbox Talk Generator */}
-              {(() => {
-                const tbtGen = aiToolUsage['tbt-generator'] || { used: 0, limit: 1 };
-                const tbtGenPct = Math.min((tbtGen.used / tbtGen.limit) * 100, 100);
-                return (
-                  <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Toolbox Talk Generator</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {tbtGen.used} <span className="text-base font-normal text-gray-400">/ {tbtGen.limit}</span>
-                    </p>
-                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${tbtGenPct}%`,
-                          backgroundColor: tbtGenPct > 80 ? '#dc2626' : '#1B5745',
-                        }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
-                  </div>
-                );
-              })()}
-
-              {/* ITP Generator */}
-              {(() => {
-                const itp = aiToolUsage['itp'] || { used: 0, limit: 1 };
-                const itpPct = Math.min((itp.used / itp.limit) * 100, 100);
-                return (
-                  <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">ITP Generator</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {itp.used} <span className="text-base font-normal text-gray-400">/ {itp.limit}</span>
-                    </p>
-                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${itpPct}%`,
-                          backgroundColor: itpPct > 80 ? '#dc2626' : '#1B5745',
-                        }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
-                  </div>
-                );
-              })()}
-
-              {/* Manual Handling */}
-              {(() => {
-                const mh = aiToolUsage['manual-handling'] || { used: 0, limit: 1 };
-                const mhPct = Math.min((mh.used / mh.limit) * 100, 100);
-                return (
-                  <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Manual Handling</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {mh.used} <span className="text-base font-normal text-gray-400">/ {mh.limit}</span>
-                    </p>
-                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${mhPct}%`,
-                          backgroundColor: mhPct > 80 ? '#dc2626' : '#1B5745',
-                        }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
-                  </div>
-                );
-              })()}
+            {/* AI Tool usage cards — dynamic, linked */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-bold text-gray-900">AI Tool Usage This Period</h2>
+                <p className="text-xs text-gray-400">Limits reset monthly</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {AI_TOOL_DISPLAY.map(({ slug, label, href }) => {
+                  const usage = aiToolUsage[slug] || { used: 0, limit: 1 };
+                  const pct = Math.min((usage.used / usage.limit) * 100, 100);
+                  return (
+                    <Link
+                      key={slug}
+                      href={href}
+                      className="block p-4 rounded-lg border border-gray-100 hover:border-[#1B5745] hover:shadow-sm transition-all group"
+                    >
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 group-hover:text-[#1B5745] transition-colors">{label}</p>
+                      <p className="text-xl font-bold text-gray-900">
+                        {usage.used} <span className="text-sm font-normal text-gray-400">/ {usage.limit}</span>
+                      </p>
+                      <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${pct}%`,
+                            backgroundColor: pct > 80 ? '#dc2626' : '#1B5745',
+                          }}
+                        />
+                      </div>
+                      <p className="text-[10px] text-[#1B5745] mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">Open tool →</p>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Quick actions */}
@@ -361,16 +318,28 @@ export default function AccountDashboardClient({
                   Generate RAMS
                 </Link>
                 <Link
-                  href="/rams-builder/pricing"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                  href="/coshh-builder"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1B5745] text-white text-sm font-semibold rounded-lg hover:bg-[#143f33] transition-colors"
                 >
-                  View Pricing
+                  COSHH Assessment
                 </Link>
                 <Link
                   href="/toolbox-talks"
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  Toolbox Talks
+                  Toolbox Talks Library
+                </Link>
+                <Link
+                  href="/templates"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Excel Templates
+                </Link>
+                <Link
+                  href="/rams-builder/pricing"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  View Pricing
                 </Link>
               </div>
             </div>
@@ -464,7 +433,7 @@ export default function AccountDashboardClient({
                 {/* RAMS */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium text-gray-700">RAMS Generated</span>
+                    <Link href="/rams-builder" className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">RAMS Generated</Link>
                     <span className="text-sm text-gray-500">{generationCount} / {ramsLimit}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -474,7 +443,7 @@ export default function AccountDashboardClient({
                 {/* TBTs */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium text-gray-700">Toolbox Talk Downloads</span>
+                    <Link href="/toolbox-talks" className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">Toolbox Talk Downloads</Link>
                     <span className="text-sm text-gray-500">{tbtDownloadCount} / {tbtLimit}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -484,15 +453,35 @@ export default function AccountDashboardClient({
                 {/* Templates */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium text-gray-700">Free Template Downloads</span>
+                    <Link href="/templates" className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">Free Template Downloads</Link>
                     <span className="text-sm text-gray-500">{templateDownloadCount} / {templateLimit}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-500" style={{ width: `${templatePercentage}%`, backgroundColor: templatePercentage > 80 ? '#dc2626' : '#1B5745' }} />
                   </div>
                 </div>
+
+                {/* All AI tools */}
+                <div className="pt-3 border-t border-gray-100">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">AI Document Generators</p>
+                  {AI_TOOL_DISPLAY.map(({ slug, label, href }) => {
+                    const usage = aiToolUsage[slug] || { used: 0, limit: 1 };
+                    const pct = Math.min((usage.used / usage.limit) * 100, 100);
+                    return (
+                      <div key={slug} className="mb-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <Link href={href} className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">{label}</Link>
+                          <span className="text-sm text-gray-500">{usage.used} / {usage.limit}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: pct > 80 ? '#dc2626' : '#1B5745' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <p className="text-xs text-gray-400 mt-4">Download limits reset on a rolling 30-day basis.</p>
+              <p className="text-xs text-gray-400 mt-4">Download limits reset on a rolling 30-day basis. AI tool limits reset monthly.</p>
             </div>
 
             {/* Plan options */}
