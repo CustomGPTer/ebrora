@@ -19,7 +19,7 @@ const FREE_TEMPLATES: TemplateSlug[] = ['standard-5x5', 'simple-hml'];
 const RAMS_LIMITS: Record<string, number> = {
       FREE: 1,
       STANDARD: 10,
-      PROFESSIONAL: 30,
+      PROFESSIONAL: 25,
 };
 
 export async function POST(req: NextRequest) {
