@@ -136,6 +136,214 @@ Focus your questions on:
 8. Communication plan (between entrant, top-man, and rescue team)
 9. Emergency rescue plan (self-rescue, assisted rescue, emergency services)
 10. Permit to work requirements and safe system of work`,
+
+  'incident-report': `You are generating an Incident Investigation Report.
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call — no previous rounds):
+The user has described what happened. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
+1. Date, time, and exact location of the incident
+2. Who was involved (names, roles, employer, experience level)
+3. What activity was being carried out at the time
+4. What the injury/damage/near miss was (body part, severity, treatment given)
+5. What immediate actions were taken after the incident
+6. Were there any witnesses?
+7. What RAMS/permits were in place for the task?
+8. Environmental conditions at the time (weather, lighting, ground conditions)
+
+Pick the 3–5 most important gaps based on what the user has already told you.
+
+ROUND 2 (after the user answers):
+Ask 2–3 deeper questions to support root cause analysis:
+1. What deviated from the planned method of work?
+2. Were there any contributing factors (fatigue, time pressure, supervision, training)?
+3. Has a similar incident occurred before on this site or project?
+4. Were there any precursor events or warning signs?
+
+After Round 2, ALWAYS respond with status "ready".`,
+
+  'lift-plan': `You are generating a Lift Plan under BS 7121 and LOLER 1998.
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the lifting operation. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
+1. Exact load weight including rigging (SWL vs actual)
+2. Load dimensions, centre of gravity, and rigging arrangement (sling type, angles)
+3. Crane type, model, and capacity at the required radius
+4. Maximum radius and lift height required
+5. Ground conditions and outrigger setup (working platform, bearing capacity)
+6. Proximity hazards (overhead power lines, structures, public areas, live plant)
+7. Number of lifts and sequence
+8. Wind speed limits and weather restrictions
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Appointed persons — who is the crane supervisor, slinger/signaller, lift planner?
+2. Communication method between crane operator and slinger (radio, hand signals)?
+3. Any tandem lifts, blind lifts, or lifts over personnel?
+
+After Round 2, ALWAYS respond with status "ready".`,
+
+  'emergency-response': `You are generating a Site-Specific Emergency Response Plan.
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+Ask 3–5 targeted questions covering:
+1. Site name, address, and grid reference / what3words
+2. Nature of the works (construction type, key hazards)
+3. Number of personnel on site (average and peak)
+4. Nearest A&E hospital (name and approximate distance/travel time)
+5. Site access points (for emergency vehicles) and any access restrictions
+6. Key site hazards that could generate an emergency (deep excavations, confined spaces, hazardous substances, heavy plant, live services, water bodies)
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. First aid provision — how many first aiders, where are first aid kits located?
+2. Fire arrangements — fire points, extinguisher locations, hot works frequency
+3. Environmental risks — watercourses nearby, pollution pathways, spill kits available?
+4. Muster point location(s)
+
+After Round 2, ALWAYS respond with status "ready".`,
+
+  'quality-checklist': `You are generating a Quality Inspection Checklist for a specific construction activity.
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the activity. Ask 3–5 targeted questions covering:
+1. Specific materials and their BS/EN standards (concrete grade, steel grade, pipe material, etc.)
+2. Critical dimensions and tolerances
+3. Testing requirements (compaction, pressure, NDT, cube tests, CCTV, etc.)
+4. Hold points — where must work STOP for inspection before proceeding?
+5. Design drawings and specification references
+6. Who is responsible for inspection (site engineer, clerk of works, client)?
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Any specific acceptance criteria from the client or designer?
+2. What records/evidence need to be produced (photos, test certs, signed checklists)?
+3. Any lessons learned from previous similar activities?
+
+After Round 2, ALWAYS respond with status "ready".`,
+
+  'scope-of-works': `You are generating a Subcontractor Scope of Works document.
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described what the subcontractor needs to do. Ask 3–5 targeted questions covering:
+1. Subcontractor name (if known) and their discipline/trade
+2. Contract / project reference and principal contractor
+3. What materials and equipment the subcontractor is expected to supply vs what is free-issued
+4. Programme constraints — when must the works start and finish?
+5. Interface with other packages — who else is working in the same area?
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. What documentation/deliverables are expected (RAMS, ITPs, O&M manuals, as-builts)?
+2. Any specific testing, commissioning, or handover requirements?
+3. Site-specific rules or restrictions (working hours, access, permits, PPE standards)?
+
+After Round 2, ALWAYS respond with status "ready".`,
+
+  'permit-to-dig': `You are generating a Permit to Dig document in accordance with HSG47 (Avoiding danger from underground services).
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the excavation. Ask 3–5 targeted questions covering:
+1. Exact location of the excavation (grid reference, chainage, or description relative to landmarks)
+2. Depth and extent of the excavation
+3. What utility searches have been done (StatMap/desktop search, GPR survey, trial holes)?
+4. What services are known to be in the area?
+5. What excavation method will be used (machine, hand-dig, vacuum excavation)?
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Who will be operating the CAT & Genny and are they competent (CSCS/EUSR)?
+2. Are there any live services that need isolation or protection?
+3. What is the ground type and is there any contamination risk?
+4. Who is the designated excavation supervisor?
+
+After Round 2, ALWAYS respond with status "ready".`,
+
+  powra: `You are generating a Point of Work Risk Assessment (POWRA) — a quick, field-level assessment.
+
+THIS IS A STREAMLINED 1-2 ROUND FLOW. POWRAs are intentionally brief — do not over-question.
+
+ROUND 1 (first call):
+The user has described today's task. Ask 2–4 targeted questions covering:
+1. Specific hazards they are concerned about for THIS task today
+2. Weather/ground conditions today
+3. Any changes from normal working (new operatives, different plant, restricted access)?
+4. What permits or RAMS are in place for this task?
+
+After Round 1, if you have enough information, respond with status "ready". Otherwise ask 2 more follow-up questions maximum in Round 2, then ALWAYS respond with status "ready".
+
+CRITICAL: POWRAs are supposed to be quick. Do NOT over-engineer the questioning. Two rounds maximum. The output should be a concise, practical, one-page field document.`,
+
+  'early-warning': `You are generating an NEC Early Warning Notice under clause 15.1 of the NEC4 Engineering and Construction Contract (or NEC3 clause 16.1).
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the risk or issue. Ask 3–4 targeted questions covering:
+1. Which NEC contract form is being used (NEC3 or NEC4) and the contract reference?
+2. When was the risk first identified and by whom?
+3. What is the estimated impact on the Completion Date (days/weeks)?
+4. What is the estimated cost impact (£ ballpark)?
+5. What evidence exists to support the early warning (survey data, test results, design info)?
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Have you proposed any mitigation measures? What are they?
+2. Is a risk reduction meeting required? Who should attend?
+3. Are there any related compensation events or previous early warnings?
+
+After Round 2, ALWAYS respond with status "ready".`,
+
+  ncr: `You are generating a Non-Conformance Report (NCR) aligned with ISO 9001 quality management principles.
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the non-conformance. Ask 3–5 targeted questions covering:
+1. When and where was the non-conformance discovered?
+2. Who discovered it (role, not necessarily name)?
+3. What was the specified requirement (drawing ref, spec clause, BS standard)?
+4. What was the actual condition found (measurements, test results, observations)?
+5. Has the affected work continued or has it been stopped?
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions for root cause analysis:
+1. What do you think caused this to happen (materials, method, supervision, design)?
+2. Has this type of non-conformance occurred before on this project?
+3. What immediate containment action has been taken to prevent further non-conforming work?
+
+After Round 2, ALWAYS respond with status "ready".`,
+
+  'ce-notification': `You are generating a Compensation Event Notification under the NEC Engineering and Construction Contract.
+
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the compensation event. Ask 3–5 targeted questions covering:
+1. Which NEC contract form (NEC3/NEC4) and specific contract clause under which this is a compensation event (e.g. 60.1(1) for client instruction, 60.1(12) for physical conditions)?
+2. Date the event occurred or the instruction was received
+3. The Project Manager / Supervisor who issued the instruction (if applicable)
+4. What was the original scope/design and what has changed?
+5. Has a Project Manager's instruction been received, or is the Contractor notifying?
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. What is the estimated programme impact (critical path delay in days/weeks)?
+2. What is the estimated additional cost (labour, plant, materials, subcontractors)?
+3. What records/evidence do you have to support the notification (instructions, emails, photos, programme extracts)?
+
+After Round 2, ALWAYS respond with status "ready".`,
 };
 
 // ---------------------------------------------------------------------------
@@ -617,6 +825,568 @@ Minimum 5 key hazards. Minimum 6 control measures. Minimum 4 discussion points.`
   "additionalNotes": "string"
 }
 Minimum 3 atmospheric hazards. Minimum 4 physical hazards.`,
+
+  'incident-report': `Generate an Incident Investigation Report JSON with this structure:
+{
+  "documentRef": "string (format: IR-YYYY-NNN)",
+  "incidentDate": "DD/MM/YYYY",
+  "incidentTime": "HH:MM",
+  "reportDate": "DD/MM/YYYY",
+  "investigatedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "incidentType": "Injury | Near Miss | Dangerous Occurrence | Environmental | Property Damage",
+  "severity": "Fatal | Major | Over-7-Day | RIDDOR Specified | Minor | Near Miss",
+  "incidentSummary": "string (min 250 words — detailed factual account of what happened, in chronological order)",
+  "exactLocation": "string",
+  "personsInvolved": [
+    {
+      "name": "string (or 'To be confirmed')",
+      "role": "string",
+      "employer": "string",
+      "injuryDescription": "string",
+      "treatmentGiven": "string",
+      "timeOffWork": "string"
+    }
+  ],
+  "witnesses": [
+    { "name": "string", "role": "string", "employer": "string" }
+  ],
+  "activityAtTimeOfIncident": "string (min 100 words — what work was being carried out)",
+  "ramsInPlace": "string (reference number and title of relevant RAMS/permits)",
+  "environmentalConditions": "string (weather, lighting, ground conditions, temperature)",
+  "immediateCauses": [
+    { "cause": "string", "detail": "string" }
+  ],
+  "rootCauseAnalysis": {
+    "method": "5 Whys",
+    "why1": "string",
+    "why2": "string",
+    "why3": "string",
+    "why4": "string",
+    "why5": "string",
+    "rootCause": "string (min 100 words — the fundamental root cause identified)"
+  },
+  "riddorAssessment": {
+    "isRiddorReportable": "Yes | No | To Be Confirmed",
+    "riddorCategory": "string (e.g. 'Over-7-day injury', 'Specified injury', 'Dangerous occurrence', or 'Not reportable')",
+    "riddorJustification": "string (min 80 words — explain why it is or is not reportable under RIDDOR 2013)"
+  },
+  "immediateActionsTaken": [
+    { "action": "string", "takenBy": "string", "date": "string" }
+  ],
+  "correctiveActions": [
+    { "action": "string", "responsiblePerson": "string", "targetDate": "string", "status": "Open" }
+  ],
+  "preventiveActions": [
+    { "action": "string", "responsiblePerson": "string", "targetDate": "string", "status": "Open" }
+  ],
+  "lessonsLearned": "string (min 150 words — what can be learned and applied to future works)",
+  "additionalNotes": "string"
+}
+Minimum 3 immediate causes. Minimum 4 corrective actions. Minimum 3 preventive actions.`,
+
+  'lift-plan': `Generate a Lift Plan JSON with this structure. Reference BS 7121 and LOLER 1998 throughout.
+{
+  "documentRef": "string (format: LP-YYYY-NNN)",
+  "planDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY",
+  "preparedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "liftDescription": "string (min 200 words — detailed description of the lifting operation including purpose, sequence, and method)",
+  "loadDetails": {
+    "description": "string",
+    "weight": "string (include rigging weight)",
+    "dimensions": "string (L x W x H)",
+    "centreOfGravity": "string",
+    "numberOfLifts": "string",
+    "loadCondition": "string (new, used, fragile, flexible, etc.)"
+  },
+  "craneDetails": {
+    "type": "string (mobile, tower, crawler, etc.)",
+    "makeModel": "string",
+    "capacity": "string (maximum SWL)",
+    "serialNumber": "string (or 'To be confirmed on day')",
+    "lastThoroughExamination": "string",
+    "currentCertificateExpiry": "string"
+  },
+  "liftGeometry": {
+    "maxRadius": "string",
+    "minRadius": "string",
+    "maxHeight": "string",
+    "dutyAtRadius": "string (from load chart — SWL at max radius)",
+    "percentageOfCapacity": "string",
+    "slewArc": "string"
+  },
+  "riggingArrangement": {
+    "slingType": "string",
+    "slingCapacity": "string",
+    "slingAngle": "string",
+    "shacklesAndConnectors": "string",
+    "deductionForRigging": "string (weight)"
+  },
+  "groundConditions": {
+    "bearingCapacity": "string",
+    "outriggerSetup": "string",
+    "matsPadsRequired": "string",
+    "groundAssessment": "string (min 80 words)"
+  },
+  "exclusionZones": "string (min 100 words — describe the exclusion zone setup, barriers, signage, banksmen positions)",
+  "proximityHazards": [
+    { "hazard": "string", "distance": "string", "controlMeasure": "string" }
+  ],
+  "appointedPersons": {
+    "liftPlanner": "string",
+    "craneSupervisor": "string",
+    "slingerSignaller": "string",
+    "craneOperator": "string",
+    "banksmen": "string"
+  },
+  "communicationPlan": "string (min 80 words — radio channels, hand signals, method of communication between all appointed persons)",
+  "weatherLimits": {
+    "maxWindSpeed": "string",
+    "visibilityMinimum": "string",
+    "otherRestrictions": "string"
+  },
+  "riskAssessment": [
+    { "hazard": "string", "risk": "string", "likelihood": "High | Medium | Low", "severity": "High | Medium | Low", "controlMeasure": "string", "residualRisk": "High | Medium | Low" }
+  ],
+  "contingencyProcedures": "string (min 100 words — what happens if the lift cannot proceed, load snagging, crane breakdown, sudden weather change)",
+  "emergencyProcedures": "string (min 80 words)",
+  "additionalNotes": "string"
+}
+Minimum 5 proximity hazards. Minimum 6 risk assessment items.`,
+
+  'emergency-response': `Generate an Emergency Response Plan JSON with this structure:
+{
+  "documentRef": "string (format: ERP-YYYY-NNN)",
+  "issueDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY",
+  "preparedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "gridReference": "string",
+  "siteDescription": "string (min 150 words — overview of site, works, and key hazards)",
+  "keyContacts": [
+    { "role": "string", "name": "string", "phone": "string" }
+  ],
+  "emergencyServices": {
+    "nearestAE": "string (hospital name, address, distance, travel time)",
+    "ambulance": "999",
+    "fire": "999",
+    "police": "999",
+    "environmentAgency": "0800 80 70 60",
+    "nationalGasEmergency": "0800 111 999",
+    "electricityEmergency": "105"
+  },
+  "contactCascade": "string (min 100 words — step-by-step notification procedure from discovery to senior management and client)",
+  "fireEmergency": {
+    "procedure": "string (min 200 words — detailed fire emergency procedure)",
+    "firePoints": "string",
+    "extinguisherLocations": "string",
+    "assemblyPoint": "string",
+    "hotWorksControls": "string"
+  },
+  "firstAidArrangements": {
+    "firstAiders": "string (number and locations)",
+    "firstAidKitLocations": "string",
+    "defibLocation": "string",
+    "procedure": "string (min 150 words — step-by-step first aid response)"
+  },
+  "environmentalSpillResponse": {
+    "spillKitLocations": "string",
+    "procedure": "string (min 150 words — containment, cleanup, notification, reporting)",
+    "watercourseProtection": "string",
+    "reportingRequirements": "string"
+  },
+  "structuralCollapse": "string (min 100 words — procedure for structural collapse or ground failure)",
+  "confinedSpaceRescue": "string (min 100 words — rescue procedure if applicable)",
+  "utilitiesFailure": "string (min 80 words — loss of power, water, communications)",
+  "severeWeather": "string (min 100 words — high wind, lightning, flooding, extreme heat/cold procedures)",
+  "evacuation": {
+    "procedure": "string (min 150 words)",
+    "musterPoints": "string",
+    "headCountProcedure": "string",
+    "allClearProcedure": "string"
+  },
+  "siteSpecificEmergencies": [
+    { "scenario": "string", "procedure": "string" }
+  ],
+  "trainingAndDrills": "string (min 80 words — emergency drill frequency, induction requirements, competency)",
+  "additionalNotes": "string"
+}
+Minimum 6 key contacts. Minimum 3 site-specific emergencies. Key contacts must include: Site Manager, Project Manager, H&S Advisor, Principal Contractor, Client, First Aider.`,
+
+  'quality-checklist': `Generate a Quality Inspection Checklist JSON with this structure. The checklist must be activity-specific and field-ready — an engineer should be able to pick this up and use it on site immediately.
+{
+  "documentRef": "string (format: QIC-YYYY-NNN)",
+  "date": "DD/MM/YYYY",
+  "preparedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "activityDescription": "string (min 150 words — detailed description of the activity being inspected)",
+  "drawingReferences": "string",
+  "specificationReferences": "string",
+  "preActivityChecks": [
+    {
+      "ref": "string (P1, P2, etc.)",
+      "checkItem": "string (specific, measurable check)",
+      "acceptanceCriteria": "string (measurable pass/fail criteria)",
+      "standardRef": "string (BS/EN reference)",
+      "isHoldPoint": "boolean",
+      "result": "Pass | Fail | N/A",
+      "comments": "string"
+    }
+  ],
+  "duringActivityChecks": [
+    {
+      "ref": "string (D1, D2, etc.)",
+      "checkItem": "string",
+      "acceptanceCriteria": "string",
+      "standardRef": "string",
+      "frequency": "string (continuous, each layer, each pour, etc.)",
+      "isHoldPoint": "boolean",
+      "result": "Pass | Fail | N/A",
+      "comments": "string"
+    }
+  ],
+  "postActivityChecks": [
+    {
+      "ref": "string (C1, C2, etc.)",
+      "checkItem": "string",
+      "acceptanceCriteria": "string",
+      "standardRef": "string",
+      "isHoldPoint": "boolean",
+      "result": "Pass | Fail | N/A",
+      "comments": "string"
+    }
+  ],
+  "materialVerification": [
+    { "material": "string", "specifiedGrade": "string", "certificateRequired": "string", "verified": "Yes | No | N/A" }
+  ],
+  "testingRequirements": [
+    { "test": "string", "standard": "string", "frequency": "string", "acceptanceCriteria": "string", "result": "string" }
+  ],
+  "holdPointSummary": [
+    { "ref": "string", "description": "string", "releasedBy": "string", "signature": "string", "date": "string" }
+  ],
+  "signOff": {
+    "inspectedBy": "string",
+    "date": "string",
+    "result": "Accepted | Accepted with Observations | Rejected | Re-inspect Required",
+    "comments": "string"
+  },
+  "additionalNotes": "string"
+}
+Minimum 6 pre-activity checks. Minimum 8 during-activity checks. Minimum 4 post-activity checks. Minimum 3 testing requirements. All acceptance criteria MUST be specific and measurable — never "to specification" or "as design". Cite real BS/EN standards.`,
+
+  'scope-of-works': `Generate a Subcontractor Scope of Works JSON with this structure:
+{
+  "documentRef": "string (format: SOW-YYYY-NNN)",
+  "issueDate": "DD/MM/YYYY",
+  "revision": "0",
+  "preparedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "clientName": "string",
+  "principalContractor": "string",
+  "subcontractorName": "string (or 'To be confirmed')",
+  "subcontractorDiscipline": "string",
+  "scopeOverview": "string (min 250 words — comprehensive overview of the works package, objectives, and context within the wider project)",
+  "inclusions": [
+    { "item": "string", "detail": "string" }
+  ],
+  "exclusions": [
+    { "item": "string", "detail": "string" }
+  ],
+  "designResponsibility": "string (min 100 words — who is responsible for design, temporary works design, design checks. Specify if subcontractor has any design responsibility or if all design is provided by the main contractor/client)",
+  "materialsAndEquipment": {
+    "subcontractorToSupply": "string (min 100 words — all materials, plant, and equipment the subcontractor must provide)",
+    "freeIssueByContractor": "string (materials/items provided by the main contractor)",
+    "materialApprovalProcess": "string"
+  },
+  "programmeAndSequencing": {
+    "plannedStartDate": "string",
+    "plannedCompletionDate": "string",
+    "keyMilestones": "string",
+    "sequenceConstraints": "string (min 80 words — dependencies, access windows, interfaces with other trades)",
+    "workingHours": "string"
+  },
+  "interfaceRequirements": [
+    { "interfaceWith": "string", "description": "string", "responsibility": "string" }
+  ],
+  "testingAndCommissioning": "string (min 100 words — what testing the subcontractor must carry out, witness requirements, commissioning responsibilities)",
+  "deliverables": [
+    { "document": "string", "requiredBy": "string", "format": "string" }
+  ],
+  "healthSafetyEnvironmental": "string (min 150 words — HSE requirements, permits, RAMS approval process, environmental constraints, waste management responsibilities)",
+  "commercialTerms": {
+    "paymentBasis": "string (lump sum, measure and value, schedule of rates, dayworks)",
+    "retentionPercentage": "string",
+    "defectsPeriod": "string",
+    "insuranceRequirements": "string"
+  },
+  "additionalNotes": "string"
+}
+Minimum 8 inclusions. Minimum 5 exclusions. Minimum 4 interface requirements. Minimum 6 deliverables.`,
+
+  'permit-to-dig': `Generate a Permit to Dig JSON with this structure. Reference HSG47 (Avoiding danger from underground services) throughout.
+{
+  "documentRef": "string (format: PTD-YYYY-NNN)",
+  "permitDate": "DD/MM/YYYY",
+  "permitExpiry": "DD/MM/YYYY",
+  "issuedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "excavationDetails": {
+    "location": "string (exact location description)",
+    "gridReference": "string",
+    "purpose": "string",
+    "method": "string (machine dig, hand dig, vacuum excavation)",
+    "depth": "string",
+    "length": "string",
+    "width": "string",
+    "plantToBeUsed": "string"
+  },
+  "utilitySearchRecords": {
+    "statMapDesktopSearch": { "completed": "boolean", "date": "string", "reference": "string" },
+    "sitePlanReview": { "completed": "boolean", "date": "string", "reference": "string" },
+    "gprSurvey": { "completed": "boolean", "date": "string", "reference": "string" },
+    "trialHoles": { "completed": "boolean", "date": "string", "reference": "string" }
+  },
+  "servicesIdentified": [
+    {
+      "serviceType": "string (e.g. HV Electric, LV Electric, Gas, Water, Telecoms, Foul Sewer, Surface Water, Other)",
+      "size": "string",
+      "depth": "string",
+      "material": "string",
+      "status": "Live | Abandoned | Unknown",
+      "horizontalDistance": "string (from excavation)",
+      "owner": "string"
+    }
+  ],
+  "catAndGenny": {
+    "operatorName": "string",
+    "competenceCard": "string (CSCS, EUSR, etc.)",
+    "equipmentSerial": "string",
+    "lastCalibration": "string",
+    "scanCompleted": "boolean",
+    "scanDate": "string",
+    "scanFindings": "string (min 80 words)"
+  },
+  "handDigZones": "string (min 100 words — where hand digging is required, distances from services, method to be used within hand-dig zone)",
+  "safeDIggingMethod": "string (min 200 words — step-by-step safe digging method covering approach to known and unknown services, spotting techniques, and machine restrictions)",
+  "supervisionArrangements": {
+    "excavationSupervisor": "string",
+    "competence": "string",
+    "inspectionFrequency": "string"
+  },
+  "emergencyProcedures": {
+    "serviceStrike": "string (min 100 words — procedure for striking a gas, electric, water, or telecoms service)",
+    "emergencyContacts": [
+      { "service": "string", "number": "string" }
+    ]
+  },
+  "permitConditions": [
+    "string"
+  ],
+  "riskAssessment": [
+    { "hazard": "string", "controlMeasure": "string", "riskRating": "High | Medium | Low" }
+  ],
+  "signOff": {
+    "issuedBy": "string",
+    "receivedBy": "string",
+    "date": "string"
+  },
+  "additionalNotes": "string"
+}
+Minimum 3 services identified (even if described as 'None identified — treat as live'). Minimum 6 permit conditions. Minimum 5 risk assessment items.`,
+
+  powra: `Generate a Point of Work Risk Assessment (POWRA) JSON. This is a CONCISE, one-page field document — keep it practical and focused.
+{
+  "documentRef": "string (format: POWRA-YYYY-NNN)",
+  "date": "DD/MM/YYYY",
+  "time": "HH:MM",
+  "assessedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "location": "string (exact location on site)",
+  "taskDescription": "string (min 80 words — clear description of today's specific task)",
+  "ramsReference": "string (reference number of the RAMS covering this activity)",
+  "permitReferences": "string (any permits in place)",
+  "conditions": {
+    "weather": "string",
+    "groundConditions": "string",
+    "lighting": "string",
+    "accessEgress": "string"
+  },
+  "hazards": [
+    {
+      "hazard": "string",
+      "consequence": "string",
+      "riskBefore": "High | Medium | Low",
+      "controlMeasure": "string",
+      "riskAfter": "High | Medium | Low"
+    }
+  ],
+  "ppeRequired": ["string"],
+  "stopConditions": [
+    "string (conditions under which ALL WORK MUST STOP immediately)"
+  ],
+  "emergencyArrangements": "string (nearest first aider, first aid kit, muster point, emergency number)",
+  "teamSignOn": [
+    { "name": "string", "role": "string", "signature": "string", "understood": "Yes" }
+  ],
+  "additionalNotes": "string"
+}
+Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on. Keep ALL text concise — this is a field document, not a report.`,
+
+  'early-warning': `Generate an NEC Early Warning Notice JSON with this structure:
+{
+  "documentRef": "string (format: EWN-YYYY-NNN)",
+  "noticeDate": "DD/MM/YYYY",
+  "notifiedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "contractReference": "string",
+  "contractForm": "NEC3 ECC | NEC4 ECC",
+  "clauseReference": "string (e.g. 'Clause 15.1' for NEC4 or 'Clause 16.1' for NEC3)",
+  "notifiedTo": "string (Project Manager name/role)",
+  "riskDescription": "string (min 250 words — detailed description of the matter that could increase the total of the Prices, delay Completion, delay meeting a Key Date, or impair the performance of the works in use)",
+  "dateFirstIdentified": "DD/MM/YYYY",
+  "identifiedBy": "string",
+  "evidenceSummary": "string (min 100 words — what evidence exists: survey data, test results, design information, photographs, correspondence)",
+  "potentialImpactOnCost": {
+    "estimatedAdditionalCost": "string (£ figure or range)",
+    "costBreakdown": "string (min 80 words — labour, plant, materials, subcontractor, preliminaries)",
+    "assumptions": "string"
+  },
+  "potentialImpactOnProgramme": {
+    "estimatedDelay": "string (days/weeks)",
+    "criticalPathAffected": "Yes | No | To Be Confirmed",
+    "keyDatesAffected": "string",
+    "programmeNarrative": "string (min 80 words — explain the programme impact)"
+  },
+  "potentialImpactOnQuality": "string (how could this affect the performance of the works in use)",
+  "proposedMitigation": [
+    { "action": "string", "responsibleParty": "string", "targetDate": "string", "estimatedCostSaving": "string" }
+  ],
+  "riskReductionMeeting": {
+    "requested": "Yes | No",
+    "proposedDate": "string",
+    "proposedAttendees": "string"
+  },
+  "relatedNotices": "string (previous early warnings or compensation events related to this matter)",
+  "additionalNotes": "string"
+}
+Minimum 3 proposed mitigation measures.`,
+
+  ncr: `Generate a Non-Conformance Report JSON aligned with ISO 9001. This is a formal quality document.
+{
+  "documentRef": "string (format: NCR-YYYY-NNN)",
+  "raisedDate": "DD/MM/YYYY",
+  "raisedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "contractReference": "string",
+  "ncrCategory": "Major | Minor | Observation",
+  "discipline": "Civils | Structural | Mechanical | Electrical | ICA | Architectural | Pipework | Other",
+  "nonConformanceDescription": "string (min 200 words — detailed factual description of the non-conformance. What was found, where, when, and by whom)",
+  "location": "string (exact location — grid reference, chainage, structure name, floor level)",
+  "discoveredDuring": "string (routine inspection, testing, audit, surveillance, handover)",
+  "specifiedRequirement": {
+    "description": "string (min 100 words — what was required by the design/specification)",
+    "drawingRef": "string",
+    "specClause": "string",
+    "standardRef": "string (BS/EN standard)"
+  },
+  "actualCondition": {
+    "description": "string (min 100 words — what was actually found, with measurements/test results)",
+    "measurements": "string (actual vs required values)",
+    "photographicEvidence": "string (photo references or 'To be attached')"
+  },
+  "rootCauseAnalysis": {
+    "method": "5 Whys | Fishbone | Other",
+    "analysis": "string (min 150 words — systematic analysis of why the non-conformance occurred)",
+    "rootCause": "string (single sentence identifying the fundamental root cause)",
+    "contributingFactors": ["string"]
+  },
+  "immediateContainmentActions": [
+    { "action": "string", "takenBy": "string", "date": "string", "status": "Complete | In Progress" }
+  ],
+  "correctiveActions": [
+    { "action": "string", "responsiblePerson": "string", "targetDate": "string", "status": "Open", "verificationMethod": "string" }
+  ],
+  "preventiveActions": [
+    { "action": "string", "responsiblePerson": "string", "targetDate": "string", "status": "Open" }
+  ],
+  "disposition": {
+    "decision": "Rework | Repair | Use As Is | Reject & Replace | Concession Required",
+    "justification": "string (min 80 words — why this disposition was chosen)",
+    "designerApprovalRequired": "Yes | No",
+    "clientApprovalRequired": "Yes | No"
+  },
+  "closeOutVerification": {
+    "verifiedBy": "string",
+    "verificationDate": "string",
+    "verificationMethod": "string (re-inspection, re-test, document review)",
+    "result": "Closed Out | Remains Open",
+    "evidence": "string"
+  },
+  "additionalNotes": "string"
+}
+Minimum 2 containment actions. Minimum 3 corrective actions. Minimum 2 preventive actions. Minimum 3 contributing factors.`,
+
+  'ce-notification': `Generate a Compensation Event Notification JSON for an NEC Engineering and Construction Contract.
+{
+  "documentRef": "string (format: CEN-YYYY-NNN)",
+  "notificationDate": "DD/MM/YYYY",
+  "notifiedBy": "string (Contractor's Project Manager)",
+  "projectName": "string",
+  "siteAddress": "string",
+  "contractReference": "string",
+  "contractForm": "NEC3 ECC | NEC4 ECC",
+  "notifiedTo": "string (Client's Project Manager)",
+  "eventDate": "DD/MM/YYYY (date the event occurred or the instruction was received)",
+  "compensationEventClause": "string (e.g. '60.1(1) — The Project Manager gives an instruction changing the Works Information')",
+  "relatedInstruction": {
+    "instructionRef": "string (PMI reference number, or 'N/A')",
+    "instructionDate": "string",
+    "issuedBy": "string"
+  },
+  "eventDescription": "string (min 300 words — detailed factual description of the compensation event. What happened, what changed, what instruction was given, and how it differs from the original Works Information / Scope)",
+  "originalScope": "string (min 100 words — describe what was originally required under the contract)",
+  "changedScope": "string (min 100 words — describe what is now required as a result of the event)",
+  "entitlementBasis": "string (min 150 words — explain why this constitutes a compensation event under the cited clause. Reference the contract conditions and explain how the event meets the criteria)",
+  "programmeImpact": {
+    "criticalPathAffected": "Yes | No",
+    "estimatedDelay": "string (working days)",
+    "plannedCompletionImpact": "string",
+    "keyDatesAffected": "string",
+    "programmeNarrative": "string (min 100 words — explain the cause-and-effect on the programme)"
+  },
+  "costImplications": {
+    "estimatedAdditionalCost": "string (£)",
+    "labourCost": "string",
+    "plantCost": "string",
+    "materialsCost": "string",
+    "subcontractorCost": "string",
+    "preliminariesImpact": "string",
+    "costNarrative": "string (min 100 words — explain the cost build-up)"
+  },
+  "quotationRequirements": {
+    "quotationDueDate": "string (3 weeks from notification under NEC4)",
+    "alternativeQuotationsRequired": "Yes | No",
+    "revisedProgrammeRequired": "Yes | No"
+  },
+  "supportingEvidence": [
+    { "document": "string", "reference": "string", "status": "Attached | To Follow" }
+  ],
+  "relatedNotices": "string (related early warnings, previous CEs, or other notifications)",
+  "additionalNotes": "string"
+}
+Minimum 4 supporting evidence items. The entitlement basis must correctly cite NEC clause numbers and demonstrate understanding of the contract mechanism.`,
 };
 
 // ---------------------------------------------------------------------------

@@ -299,6 +299,86 @@ export async function generateAiToolDocument(
     return Buffer.from(buffer);
   }
 
+  if (toolSlug === 'incident-report') {
+    const { buildIncidentReportDocument } = await import('./templates/incident-report-template');
+    const doc = await buildIncidentReportDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'lift-plan') {
+    const { buildLiftPlanDocument } = await import('./templates/lift-plan-template');
+    const doc = await buildLiftPlanDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'emergency-response') {
+    const { buildEmergencyResponseDocument } = await import('./templates/emergency-response-template');
+    const doc = await buildEmergencyResponseDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'quality-checklist') {
+    const { buildQualityChecklistDocument } = await import('./templates/quality-checklist-template');
+    const doc = await buildQualityChecklistDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'scope-of-works') {
+    const { buildScopeOfWorksDocument } = await import('./templates/scope-of-works-template');
+    const doc = await buildScopeOfWorksDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'permit-to-dig') {
+    const { buildPermitToDigDocument } = await import('./templates/permit-to-dig-template');
+    const doc = await buildPermitToDigDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'powra') {
+    const { buildPowraDocument } = await import('./templates/powra-template');
+    const doc = await buildPowraDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'early-warning') {
+    const { buildEarlyWarningDocument } = await import('./templates/early-warning-template');
+    const doc = await buildEarlyWarningDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'ncr') {
+    const { buildNcrDocument } = await import('./templates/ncr-template');
+    const doc = await buildNcrDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
+  if (toolSlug === 'ce-notification') {
+    const { buildCeNotificationDocument } = await import('./templates/ce-notification-template');
+    const doc = await buildCeNotificationDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
   // Generic fallback for tools without a dedicated template
   const config = getAiToolConfig(toolSlug);
 
