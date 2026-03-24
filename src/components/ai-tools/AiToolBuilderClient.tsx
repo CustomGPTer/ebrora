@@ -1,12 +1,9 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import type {
-  AiToolSlug,
   AiToolConfig,
   AiToolQuestion,
-  AiToolAnswer,
   AiToolConversationRound,
   AiToolBuilderStep,
 } from '@/lib/ai-tools/types';
@@ -42,11 +39,15 @@ const DOCUMENT_STEPS = [
   'Formatting and finalising...',
 ];
 
-const MAX_WORDS_DESCRIPTION = 200;
-const MIN_WORDS_DESCRIPTION = 3;
 const MAX_WORDS_PER_ANSWER = 100;
 
 export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientProps) {
+  // Per-tool limits with sensible defaults
+  const MAX_WORDS = toolConfig.maxWords ?? 200;
+  const MIN_WORDS = toolConfig.minWords ?? 3;
+  const TEXTAREA_ROWS = toolConfig.textareaRows ?? 6;
+  const WARNING_TEXT = (toolConfig.warningText ?? 'Please provide at least {min} words to describe the work.').replace('{min}', String(MIN_WORDS));
+
   const [step, setStep] = useState<AiToolBuilderStep>('describe-work');
   const [description, setDescription] = useState('');
   const [generationId, setGenerationId] = useState<string | null>(null);
@@ -73,7 +74,8 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
     generationId: string;
   } | null>(null);
 
-  const bottomRef = useRef<HTMLDivElement>(null);
+  // Ref for scrolling to new questions (NOT the bottom of the page)
+  const currentRoundRef = useRef<HTMLDivElement>(null);
 
   // Initialise answers when questions change
   useEffect(() => {
@@ -83,10 +85,19 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
     setAnswers((prev) => ({ ...prev, ...init }));
   }, [currentQuestions]);
 
-  // Scroll to bottom on new questions
+  // Scroll to the TOP of the new questions block (not the bottom of the page)
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentQuestions, rounds]);
+    if (currentQuestions.length > 0 && currentRoundRef.current) {
+      currentRoundRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentQuestions]);
+
+  // Also scroll when readyMessage appears
+  useEffect(() => {
+    if (readyMessage && currentRoundRef.current) {
+      currentRoundRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [readyMessage]);
 
   // Generating step animation
   useEffect(() => {
@@ -109,7 +120,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
   /* ── Step 1: Submit description ── */
   const handleDescriptionSubmit = useCallback(async () => {
     const wc = wordCount(description);
-    if (wc < MIN_WORDS_DESCRIPTION || wc > MAX_WORDS_DESCRIPTION) return;
+    if (wc < MIN_WORDS || wc > MAX_WORDS) return;
 
     setError(null);
     setStep('generating');
@@ -141,7 +152,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
       setError(err.message);
       setStep('describe-work');
     }
-  }, [description, toolConfig.slug]);
+  }, [description, toolConfig.slug, MIN_WORDS, MAX_WORDS]);
 
   /* ── Step 2: Submit round ── */
   const currentAnswersValid = currentQuestions.every((q) => {
@@ -262,8 +273,8 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
   }, []);
 
   const descWc = wordCount(description);
-  const descOverLimit = descWc > MAX_WORDS_DESCRIPTION;
-  const descUnderMin = descWc > 0 && descWc < MIN_WORDS_DESCRIPTION;
+  const descOverLimit = descWc > MAX_WORDS;
+  const descUnderMin = descWc > 0 && descWc < MIN_WORDS;
 
   return (
     <div className="rams-builder">
@@ -314,20 +325,20 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={toolConfig.descriptionPlaceholder}
-                rows={6}
+                rows={TEXTAREA_ROWS}
                 className={descOverLimit ? 'over-limit' : ''}
                 autoFocus
               />
-              <div className={`scope-input-counter ${descOverLimit ? 'over-limit' : descWc >= 180 ? 'near-limit' : ''}`}>
-                {descWc} / {MAX_WORDS_DESCRIPTION} words
+              <div className={`scope-input-counter ${descOverLimit ? 'over-limit' : descWc >= Math.round(MAX_WORDS * 0.9) ? 'near-limit' : ''}`}>
+                {descWc} / {MAX_WORDS} words
               </div>
             </div>
 
             {descUnderMin && (
-              <p className="scope-input-warning">Please provide at least {MIN_WORDS_DESCRIPTION} words to describe the product.</p>
+              <p className="scope-input-warning">{WARNING_TEXT}</p>
             )}
             {descOverLimit && (
-              <p className="scope-input-warning">Please keep your description under {MAX_WORDS_DESCRIPTION} words.</p>
+              <p className="scope-input-warning">Please keep your description under {MAX_WORDS} words.</p>
             )}
 
             <button
@@ -365,73 +376,83 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
           </div>
 
           {/* Previous rounds (read-only) */}
-          {rounds.map((round) => (
-            <div key={round.roundNumber} className="conversation-round completed-round">
-              <div className="round-label">Round {round.roundNumber} — Completed ✓</div>
-              {round.answers.map((a) => (
-                <div key={a.id} className="conversation-qa">
-                  <div className="conversation-question">
-                    <span className="conversation-q-icon">Q</span>
-                    <span>{a.question}</span>
-                  </div>
-                  <div className="conversation-answer-display">
-                    <span className="conversation-a-icon">A</span>
-                    <span>{a.answer}</span>
-                  </div>
+          <div className="conversation-history">
+            {rounds.map((round) => (
+              <div key={round.roundNumber} className="conversation-round-summary">
+                <div className="conversation-round-header">
+                  <span className="conversation-round-badge">Round {round.roundNumber}</span>
+                  <span className="conversation-round-count">{round.answers.length} questions ✓</span>
                 </div>
-              ))}
-            </div>
-          ))}
+                <div className="conversation-round-qa">
+                  {round.answers.map((a) => (
+                    <div key={a.id} className="conversation-qa-pair">
+                      <div className="conversation-q">
+                        <span className="conversation-q-label">Q:</span> {a.question}
+                      </div>
+                      <div className="conversation-a">
+                        <span className="conversation-a-label">A:</span>{' '}
+                        {a.answer}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
 
-          {/* Current questions */}
+          {/* Current questions — ref attached here so scroll targets the top of new questions */}
           {currentQuestions.length > 0 && (
-            <div className="conversation-round current-round">
-              <div className="round-label">Round {currentRoundNumber}</div>
-              {currentQuestions.map((q) => {
-                const wc = wordCount(answers[q.id] || '');
-                const isOver = wc > MAX_WORDS_PER_ANSWER;
-                return (
-                  <div key={q.id} className="conversation-qa">
-                    <div className="conversation-question">
-                      <span className="conversation-q-icon">Q</span>
-                      <div>
-                        <span>{q.question}</span>
+            <div ref={currentRoundRef} className="conversation-round-summary" style={{ borderColor: '#1B5745' }}>
+              <div className="conversation-round-header" style={{ background: '#E8F0EC' }}>
+                <span className="conversation-round-badge">Round {currentRoundNumber}</span>
+                <span className="conversation-round-count">Current</span>
+              </div>
+              <div className="conversation-round-qa">
+                {currentQuestions.map((q) => {
+                  const wc = wordCount(answers[q.id] || '');
+                  const isOver = wc > MAX_WORDS_PER_ANSWER;
+                  return (
+                    <div key={q.id} className="conversation-qa-pair">
+                      <div className="conversation-q">
+                        <span className="conversation-q-label">Q:</span> {q.question}
                         {q.context && <p className="conversation-context">{q.context}</p>}
                       </div>
-                    </div>
-                    <div className="conversation-answer-input">
-                      <textarea
-                        value={answers[q.id] || ''}
-                        onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
-                        placeholder="Type your answer here..."
-                        rows={3}
-                        className={isOver ? 'over-limit' : ''}
-                        disabled={isLoading}
-                      />
-                      <div className={`scope-input-counter ${isOver ? 'over-limit' : wc >= 80 ? 'near-limit' : ''}`}>
-                        {wc} / {MAX_WORDS_PER_ANSWER}
+                      <div className="questionnaire-input-wrap">
+                        <textarea
+                          value={answers[q.id] || ''}
+                          onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
+                          placeholder="Type your answer here..."
+                          rows={3}
+                          className={isOver ? 'over-limit' : ''}
+                          disabled={isLoading}
+                        />
+                        <div className={`scope-input-counter ${isOver ? 'over-limit' : wc >= 80 ? 'near-limit' : ''}`}>
+                          {wc} / {MAX_WORDS_PER_ANSWER}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
 
-              <button
-                className="rams-primary-btn"
-                onClick={handleSubmitRound}
-                disabled={!currentAnswersValid || isLoading}
-              >
-                {isLoading ? 'Submitting...' : 'Submit Answers →'}
-              </button>
+              <div style={{ padding: '0 1rem 1rem' }}>
+                <button
+                  className="rams-primary-btn"
+                  onClick={handleSubmitRound}
+                  disabled={!currentAnswersValid || isLoading}
+                >
+                  {isLoading ? 'Submitting...' : 'Submit Answers →'}
+                </button>
+              </div>
             </div>
           )}
 
           {/* Ready message */}
           {readyMessage && (
-            <div className="conversation-ready">
+            <div ref={currentRoundRef} className="conversation-ready">
               <div className="conversation-ready-icon">✓</div>
               <h3>Ready to Generate</h3>
-              <p>{readyMessage}</p>
+              <p className="conversation-ready-message">{readyMessage}</p>
               <div className="conversation-ready-actions">
                 <button className="rams-primary-btn" onClick={handleGenerate}>
                   Generate My {toolConfig.shortName} →
@@ -439,8 +460,6 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
               </div>
             </div>
           )}
-
-          <div ref={bottomRef} />
         </div>
       )}
 
