@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth-utils';
+import { getAllAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import AccountDashboardClient from '@/components/account/AccountDashboardClient';
 
 export const metadata: Metadata = {
@@ -77,6 +78,21 @@ export default async function AccountPage({ searchParams }: PageProps) {
     }),
   ]);
 
+  // AI tool usage (COSHH, ITP, Manual Handling, TBT Generator, etc.)
+  let aiToolUsage: Record<string, { used: number; limit: number }>;
+  try {
+    aiToolUsage = await getAllAiToolUsage(session.user.id);
+  } catch {
+    // Fallback if AI tool tables don't exist yet
+    const fallbackLimit = subscription?.plan === 'PROFESSIONAL' ? 20 : subscription?.plan === 'STANDARD' ? 6 : 1;
+    aiToolUsage = {
+      'coshh': { used: 0, limit: fallbackLimit },
+      'tbt-generator': { used: 0, limit: fallbackLimit },
+      'itp': { used: 0, limit: fallbackLimit },
+      'manual-handling': { used: 0, limit: fallbackLimit },
+    };
+  }
+
   const recentGenerations = await prisma.generation.findMany({
     where: { user_id: session.user.id },
     select: {
@@ -128,6 +144,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
         generations={generations}
         savedDetails={savedDetails}
         initialTab={tab}
+        aiToolUsage={aiToolUsage}
       />
     </main>
   );
