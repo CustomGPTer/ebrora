@@ -111,7 +111,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'How long are download links available?',
-    a: 'Download links expire after 12 hours. We also email you the link, so check your inbox if you need it later.',
+    a: 'Download links expire after 24 hours. We also email you the link, so check your inbox if you need it later.',
   },
 ];
 
