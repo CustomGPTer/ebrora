@@ -5532,3 +5532,13 @@ p {
     transform: rotate(360deg);
   }
 }
+
+/* --- AI Tool conversation extras --- */
+
+.conversation-context {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+  font-style: italic;
+}
