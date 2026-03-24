@@ -126,7 +126,10 @@ export async function getAllAiToolUsage(
 
   const allSlugs: AiToolSlug[] = [
     'coshh', 'itp', 'manual-handling', 'dse',
-    'tbt-generator', 'confined-spaces',
+    'tbt-generator', 'confined-spaces', 'incident-report',
+    'lift-plan', 'emergency-response', 'quality-checklist',
+    'scope-of-works', 'permit-to-dig', 'powra',
+    'early-warning', 'ncr', 'ce-notification',
   ];
 
   const result = {} as Record<AiToolSlug, { used: number; limit: number }>;
