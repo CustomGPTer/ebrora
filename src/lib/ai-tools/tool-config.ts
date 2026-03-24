@@ -49,23 +49,22 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
       'AI-powered inspection and test plan generator for UK construction. Hold points, witness points, sign-off matrices, and quality verification — built for your specific works.',
     documentLabel: 'Inspection & Test Plan',
     descriptionPlaceholder:
-      'Describe the works package requiring an ITP. E.g. "Installation of 300mm diameter ductile iron rising main including thrust blocks, valve chambers, and pressure testing..."',
-    descriptionHeading: 'Describe the Works',
-    descriptionHint: 'Explain the works package in detail. Include the type of work, materials, specifications, and any critical quality requirements. The more detail you provide, the better your ITP will be.',
+      'E.g. "Installation of 300mm diameter ductile iron rising main from new pump station to existing connection chamber. Includes thrust blocks, air valves, washout chambers, chlorination, and pressure testing to 1.5x working pressure."',
+    descriptionHeading: 'Describe the Works Being Carried Out',
+    descriptionHint: 'Explain the works package in as much detail as possible — type of work, materials, specifications, testing requirements, and any critical quality hold points. The AI will ask 3 follow-up questions based on your description.',
     descriptionExample:
       'Installation of 300mm diameter ductile iron rising main from new pump station to existing connection chamber. Includes thrust blocks, air valves, washout chambers, chlorination, and pressure testing to 1.5x working pressure.',
     keySections: [
-      'Work Activity Breakdown',
-      'Inspection & Test Matrix',
-      'Hold Points',
-      'Witness Points',
-      'Review Points',
-      'Acceptance Criteria',
-      'Reference Standards & Specifications',
+      'Pre-Works Inspections',
+      'During Works Inspections',
+      'Closeout / Review',
+      'Responsibility Matrix (S/I/W/H/R/O)',
+      'Checksheets per Section',
       'Sign-Off & Approval Record',
     ],
     accentColor: '1D6FB8',
     iconType: 'clipboard',
+    outputFormat: 'xlsx',
   },
 
   'manual-handling': {
