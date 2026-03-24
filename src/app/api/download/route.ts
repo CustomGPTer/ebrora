@@ -1,12 +1,26 @@
 // src/app/api/download/route.ts
+// Records a content download and returns the blob URL.
+// Auth required. Tier-based limits enforced (rolling 30-day window).
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ContentType } from "@prisma/client";
+import { TIER_LIMITS } from "@/lib/constants";
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Authentication required", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
-    const { contentType, contentId, email, userId } = body;
+    const { contentType, contentId } = body;
 
     if (!contentType || !contentId) {
       return NextResponse.json(
@@ -15,7 +29,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate contentType
     if (!["TOOLBOX_TALK", "FREE_TEMPLATE"].includes(contentType)) {
       return NextResponse.json(
         { error: "Invalid contentType" },
@@ -23,7 +36,74 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get client IP for basic tracking
+    // Get user tier
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { subscription: true },
+    });
+
+    const tier = (user?.subscription?.status === "ACTIVE"
+      ? user.subscription.tier
+      : "FREE") as keyof typeof TIER_LIMITS;
+
+    const limits = TIER_LIMITS[tier] || TIER_LIMITS.FREE;
+
+    // Enforce rolling 30-day download limit
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    if (contentType === "TOOLBOX_TALK") {
+      const limit = limits.tbtDownloadsPerMonth;
+      if (typeof limit === "number") {
+        const count = await prisma.contentDownload.count({
+          where: {
+            userId: session.user.id,
+            contentType: "TOOLBOX_TALK",
+            downloadedAt: { gte: thirtyDaysAgo },
+          },
+        });
+        if (count >= limit) {
+          return NextResponse.json(
+            {
+              error: "Download limit reached",
+              code: "LIMIT_REACHED",
+              used: count,
+              limit,
+              tier,
+              message: `You've used all ${limit} toolbox talk downloads this period. Upgrade for more.`,
+            },
+            { status: 429 }
+          );
+        }
+      }
+    }
+
+    if (contentType === "FREE_TEMPLATE") {
+      const limit = limits.templateDownloadsPerMonth;
+      if (typeof limit === "number") {
+        const count = await prisma.contentDownload.count({
+          where: {
+            userId: session.user.id,
+            contentType: "FREE_TEMPLATE",
+            downloadedAt: { gte: thirtyDaysAgo },
+          },
+        });
+        if (count >= limit) {
+          return NextResponse.json(
+            {
+              error: "Download limit reached",
+              code: "LIMIT_REACHED",
+              used: count,
+              limit,
+              tier,
+              message: `You've used all ${limit} free template downloads this period. Upgrade for more.`,
+            },
+            { status: 429 }
+          );
+        }
+      }
+    }
+
+    // Get client IP for tracking
     const forwarded = request.headers.get("x-forwarded-for");
     const ipAddress = forwarded ? forwarded.split(",")[0].trim() : "unknown";
 
@@ -37,8 +117,8 @@ export async function POST(request: NextRequest) {
       freeTemplateId?: string;
     } = {
       contentType: contentType as ContentType,
-      email: email || null,
-      userId: userId || null,
+      email: user?.email || null,
+      userId: session.user.id,
       ipAddress,
     };
 
