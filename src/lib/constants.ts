@@ -26,7 +26,7 @@ export const SITE_CONFIG = {
  */
 export const RAMS_CONFIG = {
   maxFileSize: 2 * 1024 * 1024, // 2MB logo
-  fileExpiryHours: 12,
+  fileExpiryHours: 24,
   maxRetries: 2,
   generationTimeoutMs: 120000, // 2 minutes
   supportedLogoTypes: ['image/png', 'image/jpeg', 'image/svg+xml'],
@@ -52,7 +52,7 @@ export const TIER_LIMITS = {
     tbtDownloadsPerMonth: 10,
     formats: 10,
     maxLogoSize: 2 * 1024 * 1024, // 2MB
-    storageHours: 7 * 24, // 7 days
+    storageHours: 24, // all tiers: 24-hour download window
   },
   PROFESSIONAL: {
     ramsPerMonth: 25,
@@ -60,7 +60,7 @@ export const TIER_LIMITS = {
     tbtDownloadsPerMonth: 20,
     formats: 10,
     maxLogoSize: 5 * 1024 * 1024, // 5MB
-    storageHours: 30 * 24, // 30 days
+    storageHours: 24, // all tiers: 24-hour download window
   },
   ENTERPRISE: {
     ramsPerMonth: 'unlimited',
@@ -68,7 +68,7 @@ export const TIER_LIMITS = {
     tbtDownloadsPerMonth: 'unlimited',
     formats: 10,
     maxLogoSize: 10 * 1024 * 1024, // 10MB
-    storageHours: 'unlimited',
+    storageHours: 24, // all tiers: 24-hour download window
   },
 } as const;
 
