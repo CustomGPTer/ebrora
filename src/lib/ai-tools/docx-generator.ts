@@ -182,10 +182,13 @@ function processContent(
       if (value.length > 200) {
         // Long text: section heading + body
         elements.push(heading(label, depth === 0 ? 2 : 3));
-        // Split into paragraphs at double newlines
-        const paras = value.split(/\n\n+/).filter(Boolean);
-        for (const p of paras) {
-          elements.push(bodyText(p.trim()));
+        // Split into paragraphs — first on double newlines, then on single newlines
+        const blocks = value.split(/\n\n+/).filter(Boolean);
+        for (const block of blocks) {
+          const lines = block.split(/\n/).filter(Boolean);
+          for (const line of lines) {
+            elements.push(bodyText(line.trim()));
+          }
         }
       } else {
         elements.push(labelledField(label, value));

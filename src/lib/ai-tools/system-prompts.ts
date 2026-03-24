@@ -357,7 +357,8 @@ RULES:
 - Reference specific UK regulations, HSE guidance, and British Standards where relevant.
 - Be thorough and specific — generic boilerplate content is not acceptable.
 - All text fields should contain complete, professional prose suitable for a formal document.
-- Minimum content: every text field should contain at least 2-3 substantive sentences.`;
+- Minimum content: every text field should contain at least 2-3 substantive sentences.
+- PARAGRAPH BREAKS: In all long text fields (100+ words), use double newlines (\\n\\n) to separate distinct paragraphs. Never write one continuous block of text — break content into readable paragraphs of 3-5 sentences each.`;
 
 // ---------------------------------------------------------------------------
 // Tool-specific generation JSON schemas
