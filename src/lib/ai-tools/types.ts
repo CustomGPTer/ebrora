@@ -40,6 +40,8 @@ export interface AiToolConfig {
   accentColor: string;
   /** Icon name for consistent iconography */
   iconType: 'shield' | 'clipboard' | 'search' | 'chat' | 'alert' | 'eye' | 'lock';
+  /** Output file format — defaults to 'docx' if not set */
+  outputFormat?: 'docx' | 'xlsx';
 }
 
 /** A single AI-generated question (same shape as RAMS) */
