@@ -47,6 +47,7 @@ interface AccountDashboardClientProps {
   generations: Generation[];
   savedDetails: SavedDetails | null;
   initialTab?: string;
+  aiToolUsage: Record<string, { used: number; limit: number }>;
 }
 
 type TabType = 'overview' | 'documents' | 'saved-details' | 'subscription' | 'settings';
@@ -109,6 +110,7 @@ export default function AccountDashboardClient({
   generations,
   savedDetails,
   initialTab = 'overview',
+  aiToolUsage,
 }: AccountDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab as TabType);
 
@@ -244,6 +246,105 @@ export default function AccountDashboardClient({
                 </div>
                 <p className="text-[11px] text-gray-400 mt-1.5">downloads / rolling 30 days</p>
               </div>
+            </div>
+
+            {/* AI Tool stat cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* COSHH Assessments */}
+              {(() => {
+                const coshh = aiToolUsage['coshh'] || { used: 0, limit: 1 };
+                const coshhPct = Math.min((coshh.used / coshh.limit) * 100, 100);
+                return (
+                  <div className="bg-white rounded-xl border border-gray-200 p-5">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">COSHH Assessments</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {coshh.used} <span className="text-base font-normal text-gray-400">/ {coshh.limit}</span>
+                    </p>
+                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${coshhPct}%`,
+                          backgroundColor: coshhPct > 80 ? '#dc2626' : '#1B5745',
+                        }}
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
+                  </div>
+                );
+              })()}
+
+              {/* Toolbox Talk Generator */}
+              {(() => {
+                const tbtGen = aiToolUsage['tbt-generator'] || { used: 0, limit: 1 };
+                const tbtGenPct = Math.min((tbtGen.used / tbtGen.limit) * 100, 100);
+                return (
+                  <div className="bg-white rounded-xl border border-gray-200 p-5">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Toolbox Talk Generator</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {tbtGen.used} <span className="text-base font-normal text-gray-400">/ {tbtGen.limit}</span>
+                    </p>
+                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${tbtGenPct}%`,
+                          backgroundColor: tbtGenPct > 80 ? '#dc2626' : '#1B5745',
+                        }}
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
+                  </div>
+                );
+              })()}
+
+              {/* ITP Generator */}
+              {(() => {
+                const itp = aiToolUsage['itp'] || { used: 0, limit: 1 };
+                const itpPct = Math.min((itp.used / itp.limit) * 100, 100);
+                return (
+                  <div className="bg-white rounded-xl border border-gray-200 p-5">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">ITP Generator</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {itp.used} <span className="text-base font-normal text-gray-400">/ {itp.limit}</span>
+                    </p>
+                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${itpPct}%`,
+                          backgroundColor: itpPct > 80 ? '#dc2626' : '#1B5745',
+                        }}
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
+                  </div>
+                );
+              })()}
+
+              {/* Manual Handling */}
+              {(() => {
+                const mh = aiToolUsage['manual-handling'] || { used: 0, limit: 1 };
+                const mhPct = Math.min((mh.used / mh.limit) * 100, 100);
+                return (
+                  <div className="bg-white rounded-xl border border-gray-200 p-5">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Manual Handling</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {mh.used} <span className="text-base font-normal text-gray-400">/ {mh.limit}</span>
+                    </p>
+                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${mhPct}%`,
+                          backgroundColor: mhPct > 80 ? '#dc2626' : '#1B5745',
+                        }}
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Quick actions */}
