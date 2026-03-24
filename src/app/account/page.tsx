@@ -84,24 +84,27 @@ export default async function AccountPage({ searchParams }: PageProps) {
     aiToolUsage = await getAllAiToolUsage(session.user.id);
   } catch {
     // Fallback if AI tool tables don't exist yet
-    const fallbackLimit = subscription?.plan === 'PROFESSIONAL' ? 20 : subscription?.plan === 'STANDARD' ? 6 : 1;
+    const tier = subscription?.plan || 'FREE';
+    const fallbackLimit = tier === 'PROFESSIONAL' ? 20 : tier === 'STANDARD' ? 6 : 1;
+    const restrictedOnFree = new Set(['itp', 'incident-report', 'lift-plan', 'emergency-response', 'scope-of-works', 'early-warning', 'ncr']);
+    const fl = (slug: string) => (tier === 'FREE' && restrictedOnFree.has(slug)) ? 0 : fallbackLimit;
     aiToolUsage = {
-      'coshh': { used: 0, limit: fallbackLimit },
-      'itp': { used: 0, limit: fallbackLimit },
-      'manual-handling': { used: 0, limit: fallbackLimit },
-      'dse': { used: 0, limit: fallbackLimit },
-      'tbt-generator': { used: 0, limit: fallbackLimit },
-      'confined-spaces': { used: 0, limit: fallbackLimit },
-      'incident-report': { used: 0, limit: fallbackLimit },
-      'lift-plan': { used: 0, limit: fallbackLimit },
-      'emergency-response': { used: 0, limit: fallbackLimit },
-      'quality-checklist': { used: 0, limit: fallbackLimit },
-      'scope-of-works': { used: 0, limit: fallbackLimit },
-      'permit-to-dig': { used: 0, limit: fallbackLimit },
-      'powra': { used: 0, limit: fallbackLimit },
-      'early-warning': { used: 0, limit: fallbackLimit },
-      'ncr': { used: 0, limit: fallbackLimit },
-      'ce-notification': { used: 0, limit: fallbackLimit },
+      'coshh': { used: 0, limit: fl('coshh') },
+      'itp': { used: 0, limit: fl('itp') },
+      'manual-handling': { used: 0, limit: fl('manual-handling') },
+      'dse': { used: 0, limit: fl('dse') },
+      'tbt-generator': { used: 0, limit: fl('tbt-generator') },
+      'confined-spaces': { used: 0, limit: fl('confined-spaces') },
+      'incident-report': { used: 0, limit: fl('incident-report') },
+      'lift-plan': { used: 0, limit: fl('lift-plan') },
+      'emergency-response': { used: 0, limit: fl('emergency-response') },
+      'quality-checklist': { used: 0, limit: fl('quality-checklist') },
+      'scope-of-works': { used: 0, limit: fl('scope-of-works') },
+      'permit-to-dig': { used: 0, limit: fl('permit-to-dig') },
+      'powra': { used: 0, limit: fl('powra') },
+      'early-warning': { used: 0, limit: fl('early-warning') },
+      'ncr': { used: 0, limit: fl('ncr') },
+      'ce-notification': { used: 0, limit: fl('ce-notification') },
     };
   }
 
