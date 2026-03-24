@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import type {
   AiToolConfig,
   AiToolQuestion,
@@ -53,6 +54,10 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
   const [generationId, setGenerationId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Access check state (for restricted free-tier tools)
+  const [accessChecked, setAccessChecked] = useState(false);
+  const [toolLocked, setToolLocked] = useState(false);
+
   // Conversation state
   const [rounds, setRounds] = useState<AiToolConversationRound[]>([]);
   const [currentQuestions, setCurrentQuestions] = useState<AiToolQuestion[]>([]);
@@ -76,6 +81,24 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
 
   // Ref for scrolling to new questions (NOT the bottom of the page)
   const currentRoundRef = useRef<HTMLDivElement>(null);
+
+  // Check if user has access to this tool (restricted tools show locked overlay for free tier)
+  useEffect(() => {
+    async function checkAccess() {
+      try {
+        const res = await fetch(`/api/ai-tools/check-access?tool=${toolConfig.slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          setToolLocked(!data.allowed);
+        }
+      } catch {
+        // If check fails, allow access (fail open)
+      } finally {
+        setAccessChecked(true);
+      }
+    }
+    checkAccess();
+  }, [toolConfig.slug]);
 
   // Initialise answers when questions change
   useEffect(() => {
@@ -309,10 +332,106 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
         </div>
       )}
 
+      {/* ── Locked Overlay (restricted tools on free tier) ── */}
+      {accessChecked && toolLocked && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '4rem 2rem',
+          textAlign: 'center',
+          minHeight: '400px',
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: '#FEF3C7',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '1.5rem',
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+          </div>
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            color: '#111827',
+            marginBottom: '0.75rem',
+          }}>
+            {toolConfig.shortName} — Upgrade Required
+          </h2>
+          <p style={{
+            fontSize: '0.95rem',
+            color: '#6B7280',
+            maxWidth: '480px',
+            lineHeight: '1.6',
+            marginBottom: '0.5rem',
+          }}>
+            The {toolConfig.shortName} is available on our <strong style={{ color: '#1B5745' }}>Standard</strong> and <strong style={{ color: '#1B5745' }}>Professional</strong> plans.
+            Upgrade to generate unlimited {toolConfig.documentLabel.toLowerCase()}s with full AI-powered interviews and professional document output.
+          </p>
+          <p style={{
+            fontSize: '0.85rem',
+            color: '#9CA3AF',
+            marginBottom: '2rem',
+          }}>
+            Plans start from just £9.99/month — cancel anytime.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link
+              href="/rams-builder/pricing"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1.75rem',
+                background: '#1B5745',
+                color: '#FFFFFF',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                borderRadius: '0.5rem',
+                textDecoration: 'none',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#143f33')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#1B5745')}
+            >
+              View Plans & Pricing
+            </Link>
+            <Link
+              href="/account"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1.75rem',
+                background: '#F3F4F6',
+                color: '#374151',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                borderRadius: '0.5rem',
+                textDecoration: 'none',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#E5E7EB')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#F3F4F6')}
+            >
+              My Account
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* ════════════════════════════════════════════════
           STEP 1: DESCRIBE WORK
           ════════════════════════════════════════════════ */}
-      {step === 'describe-work' && (
+      {!toolLocked && step === 'describe-work' && (
         <div className="scope-input">
           <div className="scope-input-body">
             <h2>{toolConfig.descriptionHeading}</h2>
@@ -355,7 +474,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
       {/* ════════════════════════════════════════════════
           STEP 2: CONVERSATION
           ════════════════════════════════════════════════ */}
-      {step === 'conversation' && (
+      {!toolLocked && step === 'conversation' && (
         <div className="questionnaire">
           <div className="questionnaire-header">
             <button className="rams-back-btn" onClick={() => setStep('describe-work')}>
@@ -466,7 +585,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
       {/* ════════════════════════════════════════════════
           GENERATING
           ════════════════════════════════════════════════ */}
-      {step === 'generating' && (
+      {!toolLocked && step === 'generating' && (
         <div className="generating">
           <div className="generating-content">
             <div className="generating-spinner">
@@ -509,7 +628,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
       {/* ════════════════════════════════════════════════
           DOWNLOAD
           ════════════════════════════════════════════════ */}
-      {step === 'download' && downloadData && (
+      {!toolLocked && step === 'download' && downloadData && (
         <div className="generating">
           <div className="generating-content">
             <div className="generating-spinner">
