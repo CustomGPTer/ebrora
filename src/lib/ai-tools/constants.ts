@@ -31,4 +31,4 @@ export const EXPIRY_THRESHOLD_MS = 60 * 60 * 1000;
 
 /** Description word limit */
 export const MAX_DESCRIPTION_WORDS = 200;
-export const MIN_DESCRIPTION_WORDS = 10;
+export const MIN_DESCRIPTION_WORDS = 3;
