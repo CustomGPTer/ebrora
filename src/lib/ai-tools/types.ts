@@ -10,7 +10,6 @@ export type AiToolSlug =
   | 'itp'
   | 'manual-handling'
   | 'dse'
-  | 'drawing-checker'
   | 'tbt-generator'
   | 'confined-spaces'
   | 'incident-report'

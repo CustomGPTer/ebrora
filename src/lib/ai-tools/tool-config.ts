@@ -146,41 +146,6 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     warningText: 'Please provide at least {min} words to describe the workstation.',
   },
 
-  'drawing-checker': {
-    slug: 'drawing-checker',
-    name: 'Drawing Checker',
-    shortName: 'Drawing Check Report',
-    description:
-      'AI-powered drawing review tool. Generates a structured check report identifying missing details, annotation gaps, dimension queries, and compliance issues on construction drawings.',
-    route: '/drawing-checker',
-    pageTitle: 'AI Drawing Checker for Construction | Ebrora',
-    metaDescription:
-      'AI-powered construction drawing checker. Identifies missing details, annotation gaps, dimension queries, and compliance issues. Generates a formal drawing check report.',
-    documentLabel: 'Drawing Check Report',
-    descriptionPlaceholder:
-      'Describe the drawing(s) to be checked. E.g. "General arrangement drawing for a new 2000m³ storm tank including plan, sections, and reinforcement details..."',
-    descriptionHeading: 'Describe the Drawing',
-    descriptionHint: 'Provide the drawing reference, title, discipline, and what it shows. Include the designer and the design stage. The more context you give, the more thorough the check report will be.',
-    descriptionExample:
-      'General arrangement drawing for a new 2000m³ storm tank at Salford WwTW. Drawing ref SK-001 Rev P2. Includes plan view, two cross-sections, and cover slab reinforcement details. Designer: XYZ Consultants.',
-    keySections: [
-      'Drawing Identification',
-      'General Completeness Check',
-      'Dimensions & Setting Out',
-      'Annotations & Notes',
-      'Cross-Reference Verification',
-      'Buildability Review',
-      'Compliance & Standards Check',
-      'Action Items & Queries',
-    ],
-    accentColor: 'B45309',
-    iconType: 'search',
-    maxWords: 100,
-    minWords: 5,
-    textareaRows: 5,
-    warningText: 'Please provide at least {min} words to describe the drawing.',
-  },
-
   'tbt-generator': {
     slug: 'tbt-generator',
     name: 'Toolbox Talk Generator',
@@ -618,7 +583,6 @@ export const AI_TOOL_ORDER: AiToolSlug[] = [
   'itp',
   'manual-handling',
   'dse',
-  'drawing-checker',
   'tbt-generator',
   'confined-spaces',
   'incident-report',

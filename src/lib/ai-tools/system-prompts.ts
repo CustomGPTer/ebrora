@@ -120,29 +120,6 @@ Ask 2–3 deeper questions:
 
 After Round 2, ALWAYS respond with status "ready".`,
 
-  'drawing-checker': `You are generating a Drawing Check Report for construction drawings.
-
-THIS IS A 2-ROUND FLOW.
-
-ROUND 1 (first call):
-The user has described the drawing. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
-1. Drawing details (reference number, revision, title, discipline, scale)
-2. Type of drawing (GA, structural, mechanical, electrical, civils, P&ID)
-3. Stage of design (preliminary, detailed, for construction, as-built)
-4. Key dimensions and setting-out references
-5. Standards and specifications the drawing should comply with
-6. Known constraints (existing services, site boundaries, live plant)
-
-Pick the 3–5 most important gaps based on what the user has already told you.
-
-ROUND 2 (after answers):
-Ask 2–3 deeper questions:
-1. Specific concerns or areas the reviewer wants checked
-2. Interface with other drawings or work packages
-3. Any RFIs or technical queries already raised against this drawing
-
-After Round 2, ALWAYS respond with status "ready".`,
-
   'tbt-generator': `You are generating a site-specific Toolbox Talk for a construction site briefing.
 
 THIS IS A 2-ROUND FLOW.
@@ -739,46 +716,6 @@ FIELD-BY-FIELD RULES
   "additionalNotes": "string"
 }
 Minimum 8 assessment findings.`,
-
-  'drawing-checker': `Generate a Drawing Check Report JSON with this structure:
-{
-  "documentRef": "string",
-  "checkDate": "DD/MM/YYYY",
-  "checkedBy": "string",
-  "projectName": "string",
-  "drawingRef": "string",
-  "drawingTitle": "string",
-  "drawingRevision": "string",
-  "designer": "string",
-  "discipline": "string",
-  "scale": "string",
-  "drawingDescription": "string (min 150 words)",
-  "generalCompleteness": {
-    "titleBlock": "string",
-    "revisionHistory": "string",
-    "northPoint": "string",
-    "keyAndLegend": "string",
-    "gridReferences": "string",
-    "overallComment": "string"
-  },
-  "checkItems": [
-    {
-      "ref": "DC-001",
-      "category": "Dimensions | Annotations | Cross-References | Buildability | Compliance | Coordination | Details",
-      "description": "string",
-      "status": "OK | Query | Action Required | Not Applicable",
-      "comment": "string",
-      "priority": "Critical | Major | Minor | Observation"
-    }
-  ],
-  "queries": [
-    { "ref": "Q-001", "query": "string", "addressedTo": "string", "responseRequired": "boolean" }
-  ],
-  "summary": "string (min 200 words)",
-  "recommendation": "Approved | Approved with Comments | Revise and Resubmit | Rejected",
-  "additionalNotes": "string"
-}
-Minimum 12 check items. Minimum 3 queries.`,
 
   'tbt-generator': `Generate a Toolbox Talk JSON with this structure:
 {
