@@ -76,66 +76,117 @@ After Round 1 answers are received, ALWAYS respond with status "ready". This is 
 
   'manual-handling': `You are generating a Manual Handling Risk Assessment using the TILE methodology (Task, Individual, Load, Environment) per the Manual Handling Operations Regulations 1992 (as amended).
 
-Focus your questions on:
-1. The specific manual handling task (what, where, how often, duration)
-2. Load characteristics (weight, size, shape, grip, stability, sharp edges)
-3. Task requirements (distance carried, height of lift, twisting, pushing/pulling)
-4. Individual factors (training, fitness, known conditions, lone working)
-5. Environmental factors (floor surface, space constraints, temperature, lighting)
-6. Frequency and repetition throughout the shift
-7. Available mechanical aids (trolleys, hoists, vacuum lifters, etc.)
-8. Any previous incidents or near-misses related to this task`,
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the manual handling task. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
+1. Load characteristics (weight, size, shape, grip, stability, sharp edges)
+2. Task requirements (distance carried, height of lift, twisting, pushing/pulling)
+3. Individual factors (training, fitness, known conditions, lone working)
+4. Environmental factors (floor surface, space constraints, temperature, lighting)
+5. Frequency and repetition throughout the shift
+6. Available mechanical aids (trolleys, hoists, vacuum lifters, etc.)
+
+Pick the 3–5 most important gaps based on what the user has already told you.
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Any previous incidents or near-misses related to this task
+2. Specific control measures already in place
+3. Who supervises this activity and what training has been provided
+
+After Round 2, ALWAYS respond with status "ready".`,
 
   dse: `You are generating a Display Screen Equipment (DSE) Assessment under the Health and Safety (Display Screen Equipment) Regulations 1992 (as amended).
 
-Focus your questions on:
-1. The workstation location (office, site cabin, portakabin, home office)
-2. Equipment used (monitors, keyboard, mouse, laptop, docking station)
-3. Chair type and adjustability
-4. Desk/work surface dimensions and arrangement
-5. Lighting conditions (natural light, glare, reflections)
-6. User's working pattern (hours at screen, breaks, task variety)
-7. Any existing discomfort or health issues (eyes, neck, back, wrists)
-8. Special requirements (glasses, ergonomic equipment, disabilities)`,
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the workstation. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
+1. Equipment used (monitors, keyboard, mouse, laptop, docking station)
+2. Chair type and adjustability
+3. Desk/work surface dimensions and arrangement
+4. Lighting conditions (natural light, glare, reflections)
+5. User's working pattern (hours at screen, breaks, task variety)
+6. Any existing discomfort or health issues (eyes, neck, back, wrists)
+
+Pick the 3–5 most important gaps based on what the user has already told you.
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Special requirements (glasses, ergonomic equipment, disabilities)
+2. Whether a previous DSE assessment has been done and what was recommended
+3. Any changes planned to the workstation or working pattern
+
+After Round 2, ALWAYS respond with status "ready".`,
 
   'drawing-checker': `You are generating a Drawing Check Report for construction drawings.
 
-Focus your questions on:
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the drawing. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
 1. Drawing details (reference number, revision, title, discipline, scale)
 2. Type of drawing (GA, structural, mechanical, electrical, civils, P&ID)
 3. Stage of design (preliminary, detailed, for construction, as-built)
-4. What the drawing shows (structures, services, earthworks, pipework, etc.)
-5. Key dimensions and setting-out references
-6. Standards and specifications the drawing should comply with
-7. Known constraints (existing services, site boundaries, live plant)
-8. Specific concerns or areas the reviewer wants checked
-9. Interface with other drawings or work packages`,
+4. Key dimensions and setting-out references
+5. Standards and specifications the drawing should comply with
+6. Known constraints (existing services, site boundaries, live plant)
+
+Pick the 3–5 most important gaps based on what the user has already told you.
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Specific concerns or areas the reviewer wants checked
+2. Interface with other drawings or work packages
+3. Any RFIs or technical queries already raised against this drawing
+
+After Round 2, ALWAYS respond with status "ready".`,
 
   'tbt-generator': `You are generating a site-specific Toolbox Talk for a construction site briefing.
 
-Focus your questions on:
-1. The specific topic or activity (be precise — not just "working at height" but the exact task)
-2. Site conditions and location
-3. Specific hazards and risks relevant to this site
-4. Recent incidents or near-misses related to the topic
-5. Any permits, exclusion zones, or special procedures in place
-6. PPE requirements specific to this activity
-7. Emergency procedures relevant to the topic
-8. Audience (who is being briefed — operatives, subcontractors, visitors?)`,
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the toolbox talk topic. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
+1. Site conditions and location
+2. Specific hazards and risks relevant to this site
+3. Any permits, exclusion zones, or special procedures in place
+4. PPE requirements specific to this activity
+5. Audience (who is being briefed — operatives, subcontractors, visitors?)
+
+Pick the 3–5 most important gaps based on what the user has already told you.
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Recent incidents or near-misses related to the topic
+2. Emergency procedures relevant to the topic
+3. Any specific do's and don'ts the user wants emphasised
+
+After Round 2, ALWAYS respond with status "ready".`,
 
   'confined-spaces': `You are generating a Confined Space Risk Assessment under the Confined Spaces Regulations 1997 and HSE ACoP L101.
 
-Focus your questions on:
-1. Confined space identification (type, dimensions, access/egress points)
-2. Purpose of entry (what work is being carried out)
-3. Atmospheric hazards (known gases, fumes, O₂ depletion risks)
-4. Physical hazards (engulfment, entrapment, flooding, moving parts)
-5. Previous history of the space (last entry, known incidents, contamination)
-6. Ventilation (natural/forced, pre-entry purging requirements)
-7. Gas monitoring equipment and alarm set-points
-8. Communication plan (between entrant, top-man, and rescue team)
-9. Emergency rescue plan (self-rescue, assisted rescue, emergency services)
-10. Permit to work requirements and safe system of work`,
+THIS IS A 2-ROUND FLOW.
+
+ROUND 1 (first call):
+The user has described the confined space entry. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
+1. Atmospheric hazards (known gases, fumes, O₂ depletion risks)
+2. Physical hazards (engulfment, entrapment, flooding, moving parts)
+3. Previous history of the space (last entry, known incidents, contamination)
+4. Ventilation (natural/forced, pre-entry purging requirements)
+5. Gas monitoring equipment and alarm set-points
+6. Access/egress details (ladders, manholes, hatches, confined dimensions)
+
+Pick the 3–5 most important gaps based on what the user has already told you.
+
+ROUND 2 (after answers):
+Ask 2–3 deeper questions:
+1. Communication plan (between entrant, top-man, and rescue team)
+2. Emergency rescue plan (self-rescue, assisted rescue, emergency services)
+3. Permit to work requirements and safe system of work
+
+After Round 2, ALWAYS respond with status "ready".`,
 
   'incident-report': `You are generating an Incident Investigation Report.
 
