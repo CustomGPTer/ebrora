@@ -87,9 +87,21 @@ export default async function AccountPage({ searchParams }: PageProps) {
     const fallbackLimit = subscription?.plan === 'PROFESSIONAL' ? 20 : subscription?.plan === 'STANDARD' ? 6 : 1;
     aiToolUsage = {
       'coshh': { used: 0, limit: fallbackLimit },
-      'tbt-generator': { used: 0, limit: fallbackLimit },
       'itp': { used: 0, limit: fallbackLimit },
       'manual-handling': { used: 0, limit: fallbackLimit },
+      'dse': { used: 0, limit: fallbackLimit },
+      'tbt-generator': { used: 0, limit: fallbackLimit },
+      'confined-spaces': { used: 0, limit: fallbackLimit },
+      'incident-report': { used: 0, limit: fallbackLimit },
+      'lift-plan': { used: 0, limit: fallbackLimit },
+      'emergency-response': { used: 0, limit: fallbackLimit },
+      'quality-checklist': { used: 0, limit: fallbackLimit },
+      'scope-of-works': { used: 0, limit: fallbackLimit },
+      'permit-to-dig': { used: 0, limit: fallbackLimit },
+      'powra': { used: 0, limit: fallbackLimit },
+      'early-warning': { used: 0, limit: fallbackLimit },
+      'ncr': { used: 0, limit: fallbackLimit },
+      'ce-notification': { used: 0, limit: fallbackLimit },
     };
   }
 
