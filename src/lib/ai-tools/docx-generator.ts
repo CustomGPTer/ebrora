@@ -382,6 +382,14 @@ export async function generateAiToolDocument(
     return Buffer.from(buffer);
   }
 
+  if (toolSlug === 'tbt-generator') {
+    const { buildTbtDocument } = await import('./templates/tbt-template');
+    const doc = await buildTbtDocument(content as any);
+    const { Packer } = await import('docx');
+    const buffer = await Packer.toBuffer(doc);
+    return Buffer.from(buffer);
+  }
+
   // Generic fallback for tools without a dedicated template
   const config = getAiToolConfig(toolSlug);
 
