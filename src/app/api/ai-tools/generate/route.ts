@@ -9,7 +9,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
-import { getAiToolConfig, isValidAiToolSlug } from '@/lib/ai-tools';
+import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
 import { getGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import type { AiToolSlug } from '@/lib/ai-tools';
@@ -79,6 +79,44 @@ export async function POST(req: NextRequest) {
     const toolSlug = generation.tool_slug as AiToolSlug;
     if (!isValidAiToolSlug(toolSlug)) {
       return NextResponse.json({ error: 'Invalid tool.' }, { status: 400 });
+    }
+
+    // Independent tier limit check (prevents replay attacks bypassing chat check)
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { subscription: true },
+    });
+    const tier = user?.subscription?.tier ?? 'FREE';
+    const monthLimit = getAiToolLimitByTier(tier, toolSlug);
+    const nowDate = new Date();
+    const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
+    const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
+
+    const usageThisMonth = await (prisma as any).aiToolGeneration.count({
+      where: {
+        user_id: session.user.id,
+        tool_slug: toolSlug,
+        created_at: { gte: periodStart, lte: periodEnd },
+        status: { in: ['COMPLETED', 'PROCESSING', 'QUEUED'] },
+        id: { not: generationId }, // exclude current generation being processed
+      },
+    });
+
+    if (usageThisMonth >= monthLimit) {
+      const toolConfig = getAiToolConfig(toolSlug);
+      await (prisma as any).aiToolGeneration.update({
+        where: { id: generationId },
+        data: { status: 'FAILED', error_message: 'Monthly limit exceeded' },
+      });
+      return NextResponse.json(
+        {
+          error: monthLimit === 0
+            ? `The ${toolConfig.shortName} is available on Standard and Professional plans.`
+            : `You've reached your monthly limit for ${toolConfig.shortName}.`,
+          limitReached: true,
+        },
+        { status: 429 }
+      );
     }
 
     const toolConfig = getAiToolConfig(toolSlug);
