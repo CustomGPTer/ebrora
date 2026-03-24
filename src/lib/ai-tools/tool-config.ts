@@ -35,6 +35,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'D4380D',
     iconType: 'shield',
+    maxWords: 20,
+    minWords: 2,
+    textareaRows: 2,
+    warningText: 'Please provide at least {min} words for the product name.',
   },
 
   itp: {
@@ -65,6 +69,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     accentColor: '1D6FB8',
     iconType: 'clipboard',
     outputFormat: 'xlsx',
+    maxWords: 100,
+    minWords: 5,
+    textareaRows: 5,
+    warningText: 'Please provide at least {min} words to describe the works.',
   },
 
   'manual-handling': {
@@ -96,6 +104,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: '7C3AED',
     iconType: 'alert',
+    maxWords: 100,
+    minWords: 5,
+    textareaRows: 5,
+    warningText: 'Please provide at least {min} words to describe the task.',
   },
 
   dse: {
@@ -128,6 +140,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: '059669',
     iconType: 'eye',
+    maxWords: 80,
+    minWords: 5,
+    textareaRows: 4,
+    warningText: 'Please provide at least {min} words to describe the workstation.',
   },
 
   'drawing-checker': {
@@ -159,6 +175,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'B45309',
     iconType: 'search',
+    maxWords: 100,
+    minWords: 5,
+    textareaRows: 5,
+    warningText: 'Please provide at least {min} words to describe the drawing.',
   },
 
   'tbt-generator': {
@@ -189,6 +209,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: '0891B2',
     iconType: 'chat',
+    maxWords: 80,
+    minWords: 3,
+    textareaRows: 4,
+    warningText: 'Please provide at least {min} words to describe the topic.',
   },
 
   'confined-spaces': {
@@ -221,6 +245,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'DC2626',
     iconType: 'lock',
+    maxWords: 120,
+    minWords: 5,
+    textareaRows: 5,
+    warningText: 'Please provide at least {min} words to describe the confined space entry.',
   },
 
   'incident-report': {
@@ -253,6 +281,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'DC2626',
     iconType: 'warning',
+    maxWords: 150,
+    minWords: 10,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the incident.',
   },
 
   'lift-plan': {
@@ -286,6 +318,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'D97706',
     iconType: 'crane',
+    maxWords: 100,
+    minWords: 5,
+    textareaRows: 5,
+    warningText: 'Please provide at least {min} words to describe the lifting operation.',
   },
 
   'emergency-response': {
@@ -319,6 +355,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'B91C1C',
     iconType: 'siren',
+    maxWords: 150,
+    minWords: 10,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the site.',
   },
 
   'quality-checklist': {
@@ -350,6 +390,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: '059669',
     iconType: 'check',
+    maxWords: 100,
+    minWords: 5,
+    textareaRows: 5,
+    warningText: 'Please provide at least {min} words to describe the activity.',
   },
 
   'scope-of-works': {
@@ -383,6 +427,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: '7C3AED',
     iconType: 'file',
+    maxWords: 150,
+    minWords: 10,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the works package.',
   },
 
   'permit-to-dig': {
@@ -415,6 +463,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: '92400E',
     iconType: 'shovel',
+    maxWords: 100,
+    minWords: 5,
+    textareaRows: 5,
+    warningText: 'Please provide at least {min} words to describe the excavation.',
   },
 
   powra: {
@@ -446,6 +498,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'EA580C',
     iconType: 'hardhat',
+    maxWords: 80,
+    minWords: 5,
+    textareaRows: 4,
+    warningText: 'Please provide at least {min} words to describe the task.',
   },
 
   'early-warning': {
@@ -477,6 +533,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'D97706',
     iconType: 'bell',
+    maxWords: 150,
+    minWords: 10,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the risk or issue.',
   },
 
   ncr: {
@@ -510,6 +570,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: 'BE123C',
     iconType: 'x-circle',
+    maxWords: 150,
+    minWords: 10,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the non-conformance.',
   },
 
   'ce-notification': {
@@ -541,6 +605,10 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: '1D4ED8',
     iconType: 'pound',
+    maxWords: 150,
+    minWords: 10,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the compensation event.',
   },
 };
 

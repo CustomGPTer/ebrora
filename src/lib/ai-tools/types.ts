@@ -1,7 +1,6 @@
 // =============================================================================
 // AI Tools — Shared Type Definitions
-// All 7 AI tools (COSHH, ITP, Manual Handling, DSE, Drawing Checker,
-// TBT Generator, Confined Spaces) share these types.
+// All 17 AI tools share these types.
 // RAMS Builder remains untouched — its own types stay in /lib/rams/types.ts
 // =============================================================================
 
@@ -52,6 +51,14 @@ export interface AiToolConfig {
   iconType: 'shield' | 'clipboard' | 'search' | 'chat' | 'alert' | 'eye' | 'lock' | 'warning' | 'crane' | 'siren' | 'check' | 'file' | 'shovel' | 'hardhat' | 'bell' | 'x-circle' | 'pound';
   /** Output file format — defaults to 'docx' if not set */
   outputFormat?: 'docx' | 'xlsx';
+  /** Maximum words allowed in the description textarea */
+  maxWords?: number;
+  /** Minimum words required in the description textarea */
+  minWords?: number;
+  /** Number of rows for the description textarea */
+  textareaRows?: number;
+  /** Warning text shown when description is below minimum words. Use {min} as placeholder for the number. */
+  warningText?: string;
 }
 
 /** A single AI-generated question (same shape as RAMS) */
