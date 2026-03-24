@@ -16,7 +16,7 @@ export default function ScopeInput({ templateSlug, onSubmit, onBack, initialValu
   const config = TEMPLATE_CONFIGS[templateSlug];
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
-  const isOverLimit = wordCount > 100;
+  const isOverLimit = wordCount > 200;
   const isUnderMinimum = wordCount < 10;
 
   const handleSubmit = () => {
@@ -54,8 +54,8 @@ export default function ScopeInput({ templateSlug, onSubmit, onBack, initialValu
             className={isOverLimit ? 'over-limit' : ''}
             autoFocus
           />
-          <div className={`scope-input-counter ${isOverLimit ? 'over-limit' : wordCount >= 80 ? 'near-limit' : ''}`}>
-            {wordCount} / 100 words
+          <div className={`scope-input-counter ${isOverLimit ? 'over-limit' : wordCount >= 180 ? 'near-limit' : ''}`}>
+            {wordCount} / 200 words
           </div>
         </div>
 
