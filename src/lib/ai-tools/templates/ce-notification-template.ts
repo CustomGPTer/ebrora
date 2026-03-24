@@ -12,9 +12,7 @@ function section(text: string): Paragraph {
   return new Paragraph({ spacing: { before: 300, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: ACCENT } },
     children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 24, font: 'Arial', color: NEC_BLUE })] });
 }
-function prose(text: string): Paragraph[] {
-  return (text || 'Not specified.').split(/\n\n+/).filter(Boolean).map(p => h.bodyText(p));
-}
+// prose() now imported from docx-helpers via h.prose()
 
 export async function buildCeNotificationDocument(content: any): Promise<Document> {
   const W = h.A4_CONTENT_WIDTH;
@@ -70,19 +68,19 @@ export async function buildCeNotificationDocument(content: any): Promise<Documen
         properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader() }, footers: { default: h.ebroraFooter() },
         children: [
           section('Event Description'),
-          ...prose(content.eventDescription),
+          ...h.prose(content.eventDescription),
           h.spacer(200),
 
           section('Original Scope / Works Information'),
-          ...prose(content.originalScope),
+          ...h.prose(content.originalScope),
           h.spacer(200),
 
           section('Changed Scope / Revised Requirement'),
-          ...prose(content.changedScope),
+          ...h.prose(content.changedScope),
           h.spacer(200),
 
           section('Entitlement Basis'),
-          ...prose(content.entitlementBasis),
+          ...h.prose(content.entitlementBasis),
         ],
       },
       {
@@ -96,7 +94,7 @@ export async function buildCeNotificationDocument(content: any): Promise<Documen
             { label: 'Key Dates Affected', value: prog.keyDatesAffected || '' },
           ], W),
           h.spacer(80),
-          ...prose(prog.programmeNarrative),
+          ...h.prose(prog.programmeNarrative),
           h.spacer(200),
 
           section('Cost Implications'),
@@ -113,7 +111,7 @@ export async function buildCeNotificationDocument(content: any): Promise<Documen
             ] }),
           ] }),
           h.spacer(80),
-          ...prose(cost.costNarrative),
+          ...h.prose(cost.costNarrative),
           h.spacer(200),
 
           section('Quotation Requirements'),
@@ -143,7 +141,7 @@ export async function buildCeNotificationDocument(content: any): Promise<Documen
           ...(content.relatedNotices ? [h.infoTable([{ label: 'Related Notices', value: content.relatedNotices }], W)] : []),
           h.spacer(200),
 
-          ...(content.additionalNotes ? [section('Additional Notes'), ...prose(content.additionalNotes), h.spacer(160)] : []),
+          ...(content.additionalNotes ? [section('Additional Notes'), ...h.prose(content.additionalNotes), h.spacer(160)] : []),
 
           h.sectionHeading('Acknowledgement'),
           h.approvalTable([

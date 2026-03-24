@@ -12,9 +12,7 @@ function section(text: string): Paragraph {
   return new Paragraph({ spacing: { before: 300, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: ACCENT } },
     children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 24, font: 'Arial', color: NEC_BLUE })] });
 }
-function prose(text: string): Paragraph[] {
-  return (text || 'Not specified.').split(/\n\n+/).filter(Boolean).map(p => h.bodyText(p));
-}
+// prose() now imported from docx-helpers via h.prose()
 
 export async function buildEarlyWarningDocument(content: any): Promise<Document> {
   const W = h.A4_CONTENT_WIDTH;
@@ -53,11 +51,11 @@ export async function buildEarlyWarningDocument(content: any): Promise<Document>
           h.spacer(200),
 
           section('Risk Description'),
-          ...prose(content.riskDescription),
+          ...h.prose(content.riskDescription),
           h.spacer(160),
 
           section('Evidence Summary'),
-          ...prose(content.evidenceSummary),
+          ...h.prose(content.evidenceSummary),
         ],
       },
       {
@@ -69,7 +67,7 @@ export async function buildEarlyWarningDocument(content: any): Promise<Document>
             { label: 'Assumptions', value: cost.assumptions || '' },
           ], W),
           h.spacer(80),
-          ...prose(cost.costBreakdown),
+          ...h.prose(cost.costBreakdown),
           h.spacer(200),
 
           section('Potential Impact on Programme'),
@@ -79,11 +77,11 @@ export async function buildEarlyWarningDocument(content: any): Promise<Document>
             { label: 'Key Dates Affected', value: prog.keyDatesAffected || '' },
           ], W),
           h.spacer(80),
-          ...prose(prog.programmeNarrative),
+          ...h.prose(prog.programmeNarrative),
           h.spacer(200),
 
           section('Potential Impact on Quality / Performance'),
-          ...prose(content.potentialImpactOnQuality),
+          ...h.prose(content.potentialImpactOnQuality),
           h.spacer(200),
 
           section('Proposed Mitigation Measures'),
@@ -115,7 +113,7 @@ export async function buildEarlyWarningDocument(content: any): Promise<Document>
           ...(content.relatedNotices ? [h.infoTable([{ label: 'Related Notices', value: content.relatedNotices }], W)] : []),
           h.spacer(200),
 
-          ...(content.additionalNotes ? [section('Additional Notes'), ...prose(content.additionalNotes), h.spacer(160)] : []),
+          ...(content.additionalNotes ? [section('Additional Notes'), ...h.prose(content.additionalNotes), h.spacer(160)] : []),
 
           h.sectionHeading('Acknowledgement'),
           h.approvalTable([

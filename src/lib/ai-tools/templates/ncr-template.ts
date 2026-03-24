@@ -11,9 +11,7 @@ function section(text: string): Paragraph {
   return new Paragraph({ spacing: { before: 300, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: ACCENT } },
     children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 24, font: 'Arial', color: h.EBRORA_GREEN })] });
 }
-function prose(text: string): Paragraph[] {
-  return (text || 'Not specified.').split(/\n\n+/).filter(Boolean).map(p => h.bodyText(p));
-}
+// prose() now imported from docx-helpers via h.prose()
 
 export async function buildNcrDocument(content: any): Promise<Document> {
   const W = h.A4_CONTENT_WIDTH;
@@ -65,11 +63,11 @@ export async function buildNcrDocument(content: any): Promise<Document> {
         properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader() }, footers: { default: h.ebroraFooter() },
         children: [
           section('Non-Conformance Description'),
-          ...prose(content.nonConformanceDescription),
+          ...h.prose(content.nonConformanceDescription),
           h.spacer(200),
 
           section('Specified Requirement'),
-          ...prose(spec.description),
+          ...h.prose(spec.description),
           h.spacer(80),
           h.infoTable([
             { label: 'Drawing Reference', value: spec.drawingRef || '' },
@@ -79,7 +77,7 @@ export async function buildNcrDocument(content: any): Promise<Document> {
           h.spacer(200),
 
           section('Actual Condition Found'),
-          ...prose(actual.description),
+          ...h.prose(actual.description),
           h.spacer(80),
           h.infoTable([
             { label: 'Measurements', value: actual.measurements || '' },
@@ -93,7 +91,7 @@ export async function buildNcrDocument(content: any): Promise<Document> {
           section('Root Cause Analysis'),
           h.infoTable([{ label: 'Method', value: rca.method || '5 Whys' }], W),
           h.spacer(80),
-          ...prose(rca.analysis),
+          ...h.prose(rca.analysis),
           h.spacer(80),
           new Paragraph({ spacing: { before: 100, after: 120 }, shading: { type: ShadingType.CLEAR, fill: ACCENT_LIGHT }, children: [
             new TextRun({ text: '  ROOT CAUSE: ', bold: true, size: 20, font: 'Arial', color: ACCENT }),
@@ -171,7 +169,7 @@ export async function buildNcrDocument(content: any): Promise<Document> {
           new Paragraph({ spacing: { before: 100, after: 120 }, shading: { type: ShadingType.CLEAR, fill: ACCENT_LIGHT }, children: [
             new TextRun({ text: `  DISPOSITION: ${(disp.decision || '').toUpperCase()}  `, bold: true, size: 22, font: 'Arial', color: ACCENT }),
           ] }),
-          ...prose(disp.justification),
+          ...h.prose(disp.justification),
           h.spacer(80),
           h.infoTable([
             { label: 'Designer Approval Required', value: disp.designerApprovalRequired || '' },
@@ -189,7 +187,7 @@ export async function buildNcrDocument(content: any): Promise<Document> {
           ], W),
           h.spacer(200),
 
-          ...(content.additionalNotes ? [section('Additional Notes'), ...prose(content.additionalNotes), h.spacer(160)] : []),
+          ...(content.additionalNotes ? [section('Additional Notes'), ...h.prose(content.additionalNotes), h.spacer(160)] : []),
 
           new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 200 },
             border: { top: { style: BorderStyle.SINGLE, size: 1, color: h.GREY_MID } },

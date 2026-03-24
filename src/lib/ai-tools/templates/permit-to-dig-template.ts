@@ -11,9 +11,7 @@ function section(text: string): Paragraph {
   return new Paragraph({ spacing: { before: 300, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: ACCENT } },
     children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 24, font: 'Arial', color: h.EBRORA_GREEN })] });
 }
-function prose(text: string): Paragraph[] {
-  return (text || 'Not specified.').split(/\n\n+/).filter(Boolean).map(p => h.bodyText(p));
-}
+// prose() now imported from docx-helpers via h.prose()
 
 export async function buildPermitToDigDocument(content: any): Promise<Document> {
   const W = h.A4_CONTENT_WIDTH;
@@ -126,18 +124,18 @@ export async function buildPermitToDigDocument(content: any): Promise<Document> 
             { label: 'Scan Date', value: cat.scanDate || '' },
           ], W),
           h.spacer(80),
-          ...prose(cat.scanFindings),
+          ...h.prose(cat.scanFindings),
         ],
       },
       {
         properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader() }, footers: { default: h.ebroraFooter() },
         children: [
           section('Hand-Dig Zones'),
-          ...prose(content.handDigZones),
+          ...h.prose(content.handDigZones),
           h.spacer(200),
 
           section('Safe Digging Method'),
-          ...prose(content.safeDIggingMethod || content.safeDiggingMethod),
+          ...h.prose(content.safeDIggingMethod || content.safeDiggingMethod),
           h.spacer(200),
 
           section('Supervision Arrangements'),
@@ -149,7 +147,7 @@ export async function buildPermitToDigDocument(content: any): Promise<Document> 
           h.spacer(200),
 
           section('Emergency Procedures — Service Strike'),
-          ...prose(emerg.serviceStrike),
+          ...h.prose(emerg.serviceStrike),
           h.spacer(80),
           ...(Array.isArray(emerg.emergencyContacts) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
             new TableRow({ children: [h.headerCell('Service', Math.round(W * 0.5), { fontSize: 14 }), h.headerCell('Emergency Number', W - Math.round(W * 0.5), { fontSize: 14 })] }),

@@ -11,9 +11,7 @@ function section(text: string): Paragraph {
   return new Paragraph({ spacing: { before: 300, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: ACCENT } },
     children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 24, font: 'Arial', color: h.EBRORA_GREEN })] });
 }
-function prose(text: string): Paragraph[] {
-  return (text || 'Not specified.').split(/\n\n+/).filter(Boolean).map(p => h.bodyText(p));
-}
+// prose() now imported from docx-helpers via h.prose()
 
 export async function buildLiftPlanDocument(content: any): Promise<Document> {
   const W = h.A4_CONTENT_WIDTH;
@@ -66,7 +64,7 @@ export async function buildLiftPlanDocument(content: any): Promise<Document> {
         footers: { default: h.ebroraFooter() },
         children: [
           section('Lift Description'),
-          ...prose(content.liftDescription),
+          ...h.prose(content.liftDescription),
           h.spacer(160),
 
           section('Load Details'),
@@ -124,11 +122,11 @@ export async function buildLiftPlanDocument(content: any): Promise<Document> {
             { label: 'Mats / Pads Required', value: ground.matsPadsRequired || '' },
           ], W),
           h.spacer(80),
-          ...prose(ground.groundAssessment),
+          ...h.prose(ground.groundAssessment),
           h.spacer(160),
 
           section('Exclusion Zones'),
-          ...prose(content.exclusionZones),
+          ...h.prose(content.exclusionZones),
           h.spacer(160),
 
           section('Proximity Hazards'),
@@ -162,7 +160,7 @@ export async function buildLiftPlanDocument(content: any): Promise<Document> {
           h.spacer(160),
 
           section('Communication Plan'),
-          ...prose(content.communicationPlan),
+          ...h.prose(content.communicationPlan),
           h.spacer(160),
 
           section('Weather Limits'),
@@ -195,13 +193,13 @@ export async function buildLiftPlanDocument(content: any): Promise<Document> {
           h.spacer(200),
 
           section('Contingency Procedures'),
-          ...prose(content.contingencyProcedures),
+          ...h.prose(content.contingencyProcedures),
           h.spacer(160),
           section('Emergency Procedures'),
-          ...prose(content.emergencyProcedures),
+          ...h.prose(content.emergencyProcedures),
           h.spacer(160),
 
-          ...(content.additionalNotes ? [section('Additional Notes'), ...prose(content.additionalNotes), h.spacer(160)] : []),
+          ...(content.additionalNotes ? [section('Additional Notes'), ...h.prose(content.additionalNotes), h.spacer(160)] : []),
 
           section('Regulatory References'),
           h.bodyText('• BS 7121 — Code of Practice for Safe Use of Cranes'),

@@ -46,9 +46,7 @@ function coshhSub(text: string): Paragraph {
   });
 }
 
-function prose(text: string): Paragraph[] {
-  return (text || 'Not specified.').split(/\n\n+/).filter(Boolean).map(p => h.bodyText(p));
-}
+// prose() now imported from docx-helpers via h.prose()
 
 interface CoshhContent {
   documentRef: string;
@@ -180,7 +178,7 @@ export async function buildCoshhDocument(content: CoshhContent): Promise<Documen
         footers: { default: h.ebroraFooter() },
         children: [
           coshhSection('Activity Description'),
-          ...prose(content.activityDescription),
+          ...h.prose(content.activityDescription),
           h.spacer(160),
 
           coshhSection('Hazard Statements'),
@@ -196,11 +194,11 @@ export async function buildCoshhDocument(content: CoshhContent): Promise<Documen
           h.spacer(160),
 
           coshhSection('Exposure Routes'),
-          ...prose(content.exposureRoutes),
+          ...h.prose(content.exposureRoutes),
           h.spacer(160),
 
           coshhSection('Health Effects'),
-          ...prose(content.healthEffects),
+          ...h.prose(content.healthEffects),
           h.spacer(120),
 
           h.infoTable([
@@ -216,7 +214,7 @@ export async function buildCoshhDocument(content: CoshhContent): Promise<Documen
         footers: { default: h.ebroraFooter() },
         children: [
           coshhSection('Control Measures'),
-          ...prose(content.controlMeasures),
+          ...h.prose(content.controlMeasures),
           h.spacer(200),
 
           coshhSection('Personal Protective Equipment (PPE)'),
@@ -231,7 +229,7 @@ export async function buildCoshhDocument(content: CoshhContent): Promise<Documen
           h.spacer(200),
 
           coshhSection('Storage Requirements'),
-          ...prose(content.storageRequirements),
+          ...h.prose(content.storageRequirements),
         ],
       },
 
@@ -252,15 +250,15 @@ export async function buildCoshhDocument(content: CoshhContent): Promise<Documen
           h.spacer(200),
 
           coshhSection('Spill / Leak Procedure'),
-          ...prose(content.spillProcedure),
+          ...h.prose(content.spillProcedure),
           h.spacer(160),
 
           coshhSection('Disposal'),
-          ...prose(content.disposalMethod),
+          ...h.prose(content.disposalMethod),
           h.spacer(200),
 
           coshhSection('Emergency Procedures'),
-          ...prose(content.emergencyProcedures),
+          ...h.prose(content.emergencyProcedures),
         ],
       },
 
@@ -271,19 +269,19 @@ export async function buildCoshhDocument(content: CoshhContent): Promise<Documen
         footers: { default: h.ebroraFooter() },
         children: [
           coshhSection('Monitoring Requirements'),
-          ...prose(content.monitoringRequired),
+          ...h.prose(content.monitoringRequired),
           h.spacer(160),
 
           coshhSection('Health Surveillance'),
-          ...prose(content.healthSurveillance),
+          ...h.prose(content.healthSurveillance),
           h.spacer(160),
 
           coshhSection('Training Requirements'),
-          ...prose(content.trainingRequirements),
+          ...h.prose(content.trainingRequirements),
           h.spacer(160),
 
           ...(content.additionalNotes
-            ? [coshhSection('Additional Notes'), ...prose(content.additionalNotes), h.spacer(160)]
+            ? [coshhSection('Additional Notes'), ...h.prose(content.additionalNotes), h.spacer(160)]
             : []),
 
           coshhSection('Regulatory References'),

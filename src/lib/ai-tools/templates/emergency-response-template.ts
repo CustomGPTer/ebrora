@@ -11,9 +11,7 @@ function section(text: string): Paragraph {
   return new Paragraph({ spacing: { before: 300, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: ACCENT } },
     children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 24, font: 'Arial', color: h.EBRORA_GREEN })] });
 }
-function prose(text: string): Paragraph[] {
-  return (text || 'Not specified.').split(/\n\n+/).filter(Boolean).map(p => h.bodyText(p));
-}
+// prose() now imported from docx-helpers via h.prose()
 
 export async function buildEmergencyResponseDocument(content: any): Promise<Document> {
   const W = h.A4_CONTENT_WIDTH;
@@ -47,7 +45,7 @@ export async function buildEmergencyResponseDocument(content: any): Promise<Docu
           h.spacer(160),
 
           section('Site Description'),
-          ...prose(content.siteDescription),
+          ...h.prose(content.siteDescription),
           h.spacer(200),
 
           section('Emergency Services'),
@@ -81,11 +79,11 @@ export async function buildEmergencyResponseDocument(content: any): Promise<Docu
           h.spacer(200),
 
           section('Emergency Contact Cascade'),
-          ...prose(content.contactCascade),
+          ...h.prose(content.contactCascade),
           h.spacer(200),
 
           section('Fire Emergency Procedure'),
-          ...prose(fire.procedure),
+          ...h.prose(fire.procedure),
           h.spacer(80),
           h.infoTable([
             { label: 'Fire Points', value: fire.firePoints || '' },
@@ -105,7 +103,7 @@ export async function buildEmergencyResponseDocument(content: any): Promise<Docu
             { label: 'Defibrillator Location', value: fa.defibLocation || '' },
           ], W),
           h.spacer(80),
-          ...prose(fa.procedure),
+          ...h.prose(fa.procedure),
           h.spacer(200),
 
           section('Environmental Spill Response'),
@@ -115,27 +113,27 @@ export async function buildEmergencyResponseDocument(content: any): Promise<Docu
             { label: 'Reporting Requirements', value: spill.reportingRequirements || '' },
           ], W),
           h.spacer(80),
-          ...prose(spill.procedure),
+          ...h.prose(spill.procedure),
           h.spacer(200),
 
           section('Structural Collapse / Ground Failure'),
-          ...prose(content.structuralCollapse),
+          ...h.prose(content.structuralCollapse),
           h.spacer(160),
           section('Confined Space Rescue'),
-          ...prose(content.confinedSpaceRescue),
+          ...h.prose(content.confinedSpaceRescue),
           h.spacer(160),
           section('Utilities Failure'),
-          ...prose(content.utilitiesFailure),
+          ...h.prose(content.utilitiesFailure),
           h.spacer(160),
           section('Severe Weather'),
-          ...prose(content.severeWeather),
+          ...h.prose(content.severeWeather),
         ],
       },
       {
         properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader() }, footers: { default: h.ebroraFooter() },
         children: [
           section('Evacuation Procedure'),
-          ...prose(evac.procedure),
+          ...h.prose(evac.procedure),
           h.spacer(80),
           h.infoTable([
             { label: 'Muster Points', value: evac.musterPoints || '' },
@@ -158,10 +156,10 @@ export async function buildEmergencyResponseDocument(content: any): Promise<Docu
           h.spacer(200),
 
           section('Training & Emergency Drills'),
-          ...prose(content.trainingAndDrills),
+          ...h.prose(content.trainingAndDrills),
           h.spacer(200),
 
-          ...(content.additionalNotes ? [section('Additional Notes'), ...prose(content.additionalNotes), h.spacer(160)] : []),
+          ...(content.additionalNotes ? [section('Additional Notes'), ...h.prose(content.additionalNotes), h.spacer(160)] : []),
 
           h.sectionHeading('Approval'),
           h.approvalTable([

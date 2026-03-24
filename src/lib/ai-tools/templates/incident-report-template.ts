@@ -21,9 +21,7 @@ function section(text: string): Paragraph {
   });
 }
 
-function prose(text: string): Paragraph[] {
-  return (text || 'Not specified.').split(/\n\n+/).filter(Boolean).map(p => h.bodyText(p));
-}
+// prose() now imported from docx-helpers via h.prose()
 
 function severityColour(sev: string): { fill: string; text: string } {
   const s = (sev || '').toLowerCase();
@@ -103,11 +101,11 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
         footers: { default: h.ebroraFooter() },
         children: [
           section('Incident Summary'),
-          ...prose(content.incidentSummary),
+          ...h.prose(content.incidentSummary),
           h.spacer(160),
 
           section('Activity at Time of Incident'),
-          ...prose(content.activityAtTimeOfIncident),
+          ...h.prose(content.activityAtTimeOfIncident),
           h.spacer(120),
           h.infoTable([
             { label: 'RAMS / Permits in Place', value: content.ramsInPlace || '' },
@@ -201,7 +199,7 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
             { label: 'RIDDOR Category', value: riddor.riddorCategory || '' },
           ], W),
           h.spacer(80),
-          ...prose(riddor.riddorJustification),
+          ...h.prose(riddor.riddorJustification),
         ],
       },
 
@@ -274,10 +272,10 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
           h.spacer(200),
 
           section('Lessons Learned'),
-          ...prose(content.lessonsLearned),
+          ...h.prose(content.lessonsLearned),
           h.spacer(160),
 
-          ...(content.additionalNotes ? [section('Additional Notes'), ...prose(content.additionalNotes), h.spacer(160)] : []),
+          ...(content.additionalNotes ? [section('Additional Notes'), ...h.prose(content.additionalNotes), h.spacer(160)] : []),
 
           section('Regulatory References'),
           h.bodyText('• Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013 (RIDDOR)'),
