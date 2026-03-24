@@ -23,7 +23,7 @@ export const PLAN_CONFIG = {
     price: '19.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_PREMIUM_MONTHLY || '',
-    ramsLimit: 30,
+    ramsLimit: 25,
     formatsAccess: 'ALL',
   },
   PROFESSIONAL_YEARLY: {
@@ -32,7 +32,7 @@ export const PLAN_CONFIG = {
     price: '199.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_PREMIUM_YEARLY || '',
-    ramsLimit: 30,
+    ramsLimit: 25,
     formatsAccess: 'ALL',
   },
 } as const;
@@ -64,7 +64,7 @@ export const FREE_TIER = {
 export function getRamsLimitByTier(tier: string): number {
   switch (tier) {
     case 'PROFESSIONAL':
-      return 30;
+      return 25;
     case 'STANDARD':
       return 10;
     case 'FREE':
