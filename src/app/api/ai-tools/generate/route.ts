@@ -137,8 +137,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Generate the docx buffer
-    const docxBuffer = await generateAiToolDocument(toolSlug, documentContent);
+    // Generate the document buffer (xlsx for ITP, docx for others)
+    const toolOutputFormat = toolConfig.outputFormat || 'docx';
+    let docBuffer: Buffer;
+    let mimeType: string;
+    let fileExtension: string;
+
+    if (toolSlug === 'itp') {
+      const { generateItpXlsx } = await import('@/lib/ai-tools/templates/itp-xlsx-generator');
+      docBuffer = await generateItpXlsx(documentContent);
+      mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      fileExtension = 'xlsx';
+    } else {
+      docBuffer = await generateAiToolDocument(toolSlug, documentContent);
+      mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      fileExtension = 'docx';
+    }
 
     // Generate filename
     const projectName = (documentContent.projectName || documentContent.topic || toolConfig.shortName)
@@ -146,12 +160,12 @@ export async function POST(req: NextRequest) {
       .replace(/\s+/g, '-')
       .substring(0, 50);
     const dateStr = new Date().toISOString().split('T')[0];
-    const filename = `${toolConfig.shortName.replace(/\s+/g, '-')}-${projectName}-${dateStr}.docx`;
+    const filename = `${toolConfig.shortName.replace(/\s+/g, '-')}-${projectName}-${dateStr}.${fileExtension}`;
 
     // Upload to Vercel Blob
-    const blob = await put(filename, docxBuffer, {
+    const blob = await put(filename, docBuffer, {
       access: 'public',
-      contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      contentType: mimeType,
     });
 
     // 24-hour expiry
