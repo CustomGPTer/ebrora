@@ -26,7 +26,7 @@ import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug } from '@/lib/ai-tools/tool-config';
 import { getAiToolLimitByTier } from '@/lib/ai-tools/constants';
-import { getConversationPrompt, getGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
 import type { AiToolSlug } from '@/lib/ai-tools/types';
@@ -176,37 +176,9 @@ export async function POST(req: NextRequest) {
       }, { status: 422 });
     }
 
-    // ── 7. AI Analysis — Phase 1: Conversation (single round, auto-ready) ─
-    const conversationPrompt = getConversationPrompt(toolSlug);
-
-    const phaseOneMsg = `UPLOADED FILE: ${fileName} (${parsed.fileType.toUpperCase()})
-FILE SIZE: ${(file.size / 1024).toFixed(0)} KB
-EXTRACTED CONTENT (${parsed.characterCount.toLocaleString()} characters):
-
-${parsed.text}`;
-
-    const phaseOneResponse = await openai.chat.completions.create({
-      model: 'gpt-4.1',
-      messages: [
-        { role: 'system', content: conversationPrompt },
-        { role: 'user', content: phaseOneMsg },
-      ],
-      temperature: 0.3,
-      max_tokens: 200,
-      response_format: { type: 'json_object' },
-    });
-
-    const phaseOneText = phaseOneResponse.choices[0]?.message?.content || '{}';
-
-    let phaseOneJson: any = {};
-    try { phaseOneJson = JSON.parse(phaseOneText); } catch { /* proceed */ }
-
-    if (phaseOneJson.status !== 'ready') {
-      // Force ready — upload tools should always be single-round
-      phaseOneJson = { status: 'ready' };
-    }
-
-    // ── 8. AI Generation — Phase 2: Generate JSON document content ────────
+    // ── 7. AI Generation — Generate JSON document content ──────────────
+    // Upload tools are single-round: skip the conversation phase entirely
+    // and go straight to document generation.
     const generationPrompt = getGenerationPrompt(toolSlug);
 
     const phaseTwoMsg = `UPLOADED FILE: ${fileName} (${parsed.fileType.toUpperCase()})
