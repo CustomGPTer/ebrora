@@ -12,6 +12,7 @@ import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
 import { getGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
+import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import type { AiToolSlug } from '@/lib/ai-tools';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -221,6 +222,9 @@ export async function POST(req: NextRequest) {
         completed_at: new Date(),
       },
     });
+
+    // Track usage for account dashboard
+    await incrementAiToolUsage(session.user.id, toolSlug);
 
     return NextResponse.json({
       generationId,
