@@ -88,6 +88,20 @@ export async function POST(req: NextRequest) {
       include: { subscription: true },
     });
     const tier = user?.subscription?.tier ?? 'FREE';
+    const subscriptionStatus = user?.subscription?.status ?? 'ACTIVE';
+
+    // Paid tier: require active subscription
+    if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
+      await (prisma as any).aiToolGeneration.update({
+        where: { id: generationId },
+        data: { status: 'FAILED', error_message: 'Subscription not active' },
+      });
+      return NextResponse.json(
+        { error: 'Your subscription is not active. Please update your billing details.' },
+        { status: 403 }
+      );
+    }
+
     const monthLimit = getAiToolLimitByTier(tier, toolSlug);
     const nowDate = new Date();
     const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
