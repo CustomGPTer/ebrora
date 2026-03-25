@@ -896,7 +896,7 @@
 .hp-section-sub {
   font-size: 0.9rem;
   color: var(--color-text-light);
-  margin-top: 0.4rem;
+  margin: 0.4rem auto 0;
   max-width: 540px;
 }
 
