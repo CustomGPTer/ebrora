@@ -242,7 +242,7 @@ export async function buildQuoteGeneratorDocument(c: any): Promise<Document> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SAFETY ALERT
+// SAFETY ALERT — Inline title, no separate cover page
 // ─────────────────────────────────────────────────────────────────────────────
 export async function buildSafetyAlertDocument(c: any): Promise<Document> {
   const ACCENT = 'DC2626';
@@ -267,7 +267,7 @@ export async function buildSafetyAlertDocument(c: any): Promise<Document> {
       { label: 'Date',               value: c.alertDate            || '' },
       { label: 'Classification',     value: c.alertClassification  || '' },
       { label: 'Category',           value: c.alertCategory        || '' },
-      { label: 'Project / Site',     value: `${c.projectName || ''} — ${c.siteAddress || ''}` },
+      { label: 'Project / Site',     value: `${c.projectName || ''}${c.siteAddress ? ' — ' + c.siteAddress : ''}` },
       { label: 'Prepared By',        value: c.preparedBy           || '' },
       { label: 'Approved By',        value: c.approvedBy           || '' },
     ], ACCENT),
@@ -313,16 +313,10 @@ export async function buildSafetyAlertDocument(c: any): Promise<Document> {
     h.briefingRecordTable(15, W),
   ];
 
-  return p.buildPremiumDocument({
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Safety Alert Bulletin',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.siteAddress,
-    preparedBy: c.preparedBy,
-    date: c.alertDate,
     classification: `${c.alertClassification || 'HIGH RISK'} — DISTRIBUTE IMMEDIATELY`,
-    extraFields: [['Category', c.alertCategory || '']],
   }, [s1, s2, s3]);
 }
 
@@ -961,4 +955,295 @@ export async function buildCarbonReductionPlanDocument(c: any): Promise<Document
       ['Total Current Emissions', `${c.currentEmissions?.totalCurrentEmissions || '—'} tCO₂e`],
     ],
   }, [s1, s2, s3]);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MANUAL HANDLING RISK ASSESSMENT — Premium, inline title, no cover page
+// ─────────────────────────────────────────────────────────────────────────────
+export async function buildManualHandlingDocument(c: any): Promise<Document> {
+  const ACCENT = '7C3AED';
+
+  const s1: any[] = [
+    ...p.infoSection('Assessment Details', [
+      { label: 'Document Reference',  value: c.documentRef       || '' },
+      { label: 'Assessment Date',     value: c.assessmentDate    || '' },
+      { label: 'Review Date',         value: c.reviewDate        || '' },
+      { label: 'Assessed By',         value: c.assessedBy        || '' },
+      { label: 'Project Name',        value: c.projectName       || '' },
+      { label: 'Site / Address',      value: c.siteAddress       || '' },
+    ], ACCENT),
+    ...p.proseSection('Legal Basis', c.legalBasis, ACCENT),
+    ...p.proseSection('Activity Description', c.activityDescription, ACCENT),
+    ...p.proseSection('Can the Manual Handling Be Avoided?', c.canTaskBeAvoided, ACCENT),
+  ];
+
+  const s2: any[] = [
+    p.sectionBand('TILE Analysis', ACCENT),
+    ...p.infoSection('Task Analysis', [
+      { label: 'Description',        value: c.taskAnalysis?.description      || '' },
+      { label: 'Frequency',          value: c.taskAnalysis?.frequency        || '' },
+      { label: 'Duration',           value: c.taskAnalysis?.duration         || '' },
+      { label: 'Distance Carried',   value: c.taskAnalysis?.distanceCarried  || '' },
+      { label: 'Height of Lift',     value: c.taskAnalysis?.heightOfLift     || '' },
+      { label: 'Start Position',     value: c.taskAnalysis?.startPosition    || '' },
+      { label: 'End Position',       value: c.taskAnalysis?.endPosition      || '' },
+      { label: 'Twisting Required',  value: c.taskAnalysis?.twistingRequired ? 'Yes' : 'No' },
+      { label: 'Pushing / Pulling',  value: c.taskAnalysis?.pushingPulling   || '' },
+      { label: 'Team Lift',          value: c.taskAnalysis?.teamLift ? 'Yes — ' + (c.taskAnalysis?.numberOfPersons || '') + ' persons' : 'No' },
+      { label: 'Rest Breaks',        value: c.taskAnalysis?.restBreaks       || '' },
+      { label: 'Repetition Rate',    value: c.taskAnalysis?.repetitionRate   || '' },
+    ], ACCENT),
+    ...p.infoSection('Individual Factors', [
+      { label: 'Training Required',        value: c.individualFactors?.trainingRequired     || '' },
+      { label: 'Fitness Requirements',      value: c.individualFactors?.fitnessRequirements  || '' },
+      { label: 'Known Limitations',         value: c.individualFactors?.knownLimitations     || '' },
+      { label: 'Pregnancy Considerations',  value: c.individualFactors?.pregnancyConsiderations || '' },
+      { label: 'Young Persons',             value: c.individualFactors?.youngPersons         || '' },
+      { label: 'Aging Workforce',           value: c.individualFactors?.agingWorkforce       || '' },
+      { label: 'Previous Injuries',         value: c.individualFactors?.previousInjuries     || '' },
+    ], ACCENT),
+    ...p.infoSection('Load Characteristics', [
+      { label: 'Weight',                   value: c.loadCharacteristics?.weight               || '' },
+      { label: 'Dimensions',               value: c.loadCharacteristics?.dimensions           || '' },
+      { label: 'Shape',                    value: c.loadCharacteristics?.shape                || '' },
+      { label: 'Grip Availability',        value: c.loadCharacteristics?.gripAvailability     || '' },
+      { label: 'Stability',                value: c.loadCharacteristics?.stability            || '' },
+      { label: 'Sharp Edges',              value: c.loadCharacteristics?.sharpEdges ? 'Yes' : 'No' },
+      { label: 'Temperature Issues',       value: c.loadCharacteristics?.temperatureIssues    || '' },
+      { label: 'Contents Predictability',  value: c.loadCharacteristics?.contentsPredictability || '' },
+      { label: 'Centre of Gravity',        value: c.loadCharacteristics?.centreOfGravity      || '' },
+    ], ACCENT),
+    ...p.infoSection('Environmental Factors', [
+      { label: 'Floor Surface',       value: c.environmentalFactors?.floorSurface     || '' },
+      { label: 'Space Constraints',   value: c.environmentalFactors?.spaceConstraints || '' },
+      { label: 'Lighting',            value: c.environmentalFactors?.lighting         || '' },
+      { label: 'Temperature',         value: c.environmentalFactors?.temperature      || '' },
+      { label: 'Weather Exposure',    value: c.environmentalFactors?.weatherExposure  || '' },
+      { label: 'Slopes / Gradients',  value: c.environmentalFactors?.slopes           || '' },
+      { label: 'Obstructions',        value: c.environmentalFactors?.obstructions     || '' },
+      { label: 'Housekeeping',        value: c.environmentalFactors?.housekeeping     || '' },
+    ], ACCENT),
+  ];
+
+  const s3: any[] = [
+    ...p.dataTableSection('TILE Risk Scoring', [
+      { factor: 'Task',        score: c.tileScoring?.taskScore || '', justification: c.tileScoring?.taskJustification || '' },
+      { factor: 'Individual',  score: c.tileScoring?.individualScore || '', justification: c.tileScoring?.individualJustification || '' },
+      { factor: 'Load',        score: c.tileScoring?.loadScore || '', justification: c.tileScoring?.loadJustification || '' },
+      { factor: 'Environment', score: c.tileScoring?.environmentScore || '', justification: c.tileScoring?.environmentJustification || '' },
+      { factor: 'OVERALL',     score: c.tileScoring?.overallRisk || '', justification: c.tileScoring?.overallJustification || '' },
+    ], [
+      { key: 'factor',        label: 'TILE Factor',    width: Math.floor(W * 0.16) },
+      { key: 'score',         label: 'Risk Rating',    width: Math.floor(W * 0.14) },
+      { key: 'justification', label: 'Justification',  width: W - Math.floor(W * 0.16) - Math.floor(W * 0.14) },
+    ], ACCENT),
+    ...p.infoSection('MAC Assessment (HSE Manual Handling Assessment Chart)', [
+      { label: 'Lift / Lower Score',        value: c.macAssessment?.liftLowerScore       || '' },
+      { label: 'Carry Score',               value: c.macAssessment?.carryScore            || '' },
+      { label: 'Team Handling Score',        value: c.macAssessment?.teamHandlingScore     || '' },
+      { label: 'Overall MAC Category',       value: c.macAssessment?.overallMacCategory    || '' },
+    ], ACCENT),
+    ...p.proseSection('MAC Assessment Narrative', c.macAssessment?.macNarrative, ACCENT),
+  ];
+
+  const s4: any[] = [
+    ...p.dataTableSection('Control Measures', c.controlMeasures || [], [
+      { key: 'measure',        label: 'Measure',          width: Math.floor(W * 0.24) },
+      { key: 'hierarchyLevel', label: 'Hierarchy Level',  width: Math.floor(W * 0.14) },
+      { key: 'detail',         label: 'Detail',           width: W - Math.floor(W * 0.24) - Math.floor(W * 0.14) },
+    ], ACCENT),
+    ...p.dataTableSection('Mechanical Aids & Alternatives', c.mechanicalAids || [], [
+      { key: 'aid',          label: 'Aid / Equipment',  width: Math.floor(W * 0.22) },
+      { key: 'application',  label: 'Application',      width: Math.floor(W * 0.26) },
+      { key: 'benefit',      label: 'Benefit',          width: Math.floor(W * 0.26) },
+      { key: 'suitability',  label: 'Suitability',      width: W - Math.floor(W * 0.22) - Math.floor(W * 0.26) - Math.floor(W * 0.26) },
+    ], ACCENT),
+    ...p.infoSection('Residual Risk', [
+      { label: 'Residual Risk Rating', value: c.residualRisk || '' },
+    ], ACCENT),
+    ...p.proseSection('Residual Risk Justification', c.residualRiskJustification, ACCENT),
+    ...p.dataTableSection('Training Requirements', c.trainingRequirements || [], [
+      { key: 'trainingItem', label: 'Training Item',  width: Math.floor(W * 0.30) },
+      { key: 'who',          label: 'Who',             width: Math.floor(W * 0.22) },
+      { key: 'frequency',    label: 'Frequency',       width: Math.floor(W * 0.22) },
+      { key: 'provider',     label: 'Provider',        width: W - Math.floor(W * 0.30) - Math.floor(W * 0.22) - Math.floor(W * 0.22) },
+    ], ACCENT),
+    ...p.proseSection('Monitoring Arrangements', c.monitoringArrangements, ACCENT),
+    ...p.bulletListSection('Review Triggers', c.reviewTriggers || [], ACCENT),
+    ...p.proseSection('Additional Notes', c.additionalNotes, ACCENT),
+    ...p.signatureBlock([
+      { role: 'Assessed By',  name: c.assessedBy || '' },
+      { role: 'Reviewed By',  name: '' },
+      { role: 'Approved By',  name: '' },
+    ], ACCENT),
+  ];
+
+  return p.buildPremiumDocumentInline({
+    documentLabel: 'Manual Handling Risk Assessment',
+    accentHex: ACCENT,
+    classification: 'HEALTH & SAFETY DOCUMENT',
+  }, [s1, s2, s3, s4]);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFINED SPACE RISK ASSESSMENT — Premium, inline title, no cover page
+// ─────────────────────────────────────────────────────────────────────────────
+export async function buildConfinedSpacesDocument(c: any): Promise<Document> {
+  const ACCENT = 'DC2626';
+
+  const s1: any[] = [
+    ...p.infoSection('Assessment Details', [
+      { label: 'Document Reference',  value: c.documentRef       || '' },
+      { label: 'Assessment Date',     value: c.assessmentDate    || '' },
+      { label: 'Review Date',         value: c.reviewDate        || '' },
+      { label: 'Assessed By',         value: c.assessedBy        || '' },
+      { label: 'Project Name',        value: c.projectName       || '' },
+      { label: 'Site / Address',      value: c.siteAddress       || '' },
+    ], ACCENT),
+    ...p.proseSection('Legal Basis', c.legalBasis, ACCENT),
+    ...p.infoSection('Confined Space Identification', [
+      { label: 'Space Name',           value: c.spaceIdentification?.name            || '' },
+      { label: 'Type',                 value: c.spaceIdentification?.type            || '' },
+      { label: 'Classification',       value: c.spaceIdentification?.classification  || '' },
+      { label: 'Location',             value: c.spaceIdentification?.location        || '' },
+      { label: 'Dimensions',           value: c.spaceIdentification?.dimensions      || '' },
+      { label: 'Volume',               value: c.spaceIdentification?.volume          || '' },
+      { label: 'Access Points',        value: c.spaceIdentification?.accessPoints    || '' },
+      { label: 'Egress Points',        value: c.spaceIdentification?.egressPoints    || '' },
+      { label: 'Normal Contents',      value: c.spaceIdentification?.normalContents  || '' },
+      { label: 'Previous Use',         value: c.spaceIdentification?.previousUse     || '' },
+      { label: 'Adjacent Hazards',     value: c.spaceIdentification?.adjacentHazards || '' },
+    ], ACCENT),
+    ...p.proseSection('Reason for Entry', c.reasonForEntry, ACCENT),
+    ...p.proseSection('Can Entry Be Avoided? (Regulation 4(1))', c.canWorkBeAvoidedWithoutEntry, ACCENT),
+    ...p.dataTableSection('Alternative Methods Considered', c.alternativeMethodsConsidered || [], [
+      { key: 'method',          label: 'Alternative Method',  width: Math.floor(W * 0.40) },
+      { key: 'reasonRejected',  label: 'Reason Rejected',     width: W - Math.floor(W * 0.40) },
+    ], ACCENT),
+  ];
+
+  const s2: any[] = [
+    ...p.dataTableSection('Atmospheric Hazards', c.atmosphericHazards || [], [
+      { key: 'hazard',           label: 'Hazard',           width: Math.floor(W * 0.16) },
+      { key: 'source',           label: 'Source',           width: Math.floor(W * 0.18) },
+      { key: 'oel',              label: 'OEL',              width: Math.floor(W * 0.10) },
+      { key: 'alarmLevel',       label: 'Alarm Level',      width: Math.floor(W * 0.12) },
+      { key: 'actionRequired',   label: 'Action Required',  width: Math.floor(W * 0.22) },
+      { key: 'monitoringMethod', label: 'Monitoring',       width: W - Math.floor(W * 0.16) - Math.floor(W * 0.18) - Math.floor(W * 0.10) - Math.floor(W * 0.12) - Math.floor(W * 0.22) },
+    ], ACCENT),
+    ...p.dataTableSection('Physical Hazards', c.physicalHazards || [], [
+      { key: 'hazard',         label: 'Hazard',          width: Math.floor(W * 0.22) },
+      { key: 'risk',           label: 'Risk Rating',     width: Math.floor(W * 0.12) },
+      { key: 'controlMeasure', label: 'Control Measure', width: Math.floor(W * 0.40) },
+      { key: 'residualRisk',   label: 'Residual Risk',   width: W - Math.floor(W * 0.22) - Math.floor(W * 0.12) - Math.floor(W * 0.40) },
+    ], ACCENT),
+    ...p.dataTableSection('Biological Hazards', c.biologicalHazards || [], [
+      { key: 'hazard',         label: 'Hazard',          width: Math.floor(W * 0.22) },
+      { key: 'source',         label: 'Source',          width: Math.floor(W * 0.34) },
+      { key: 'controlMeasure', label: 'Control Measure', width: W - Math.floor(W * 0.22) - Math.floor(W * 0.34) },
+    ], ACCENT),
+  ];
+
+  const s3: any[] = [
+    ...p.proseSection('Safe System of Work', c.safeSystemOfWork, ACCENT),
+    ...p.dataTableSection('Entry Sequence', c.entrySequence || [], [
+      { key: 'step',           label: 'Step',           width: Math.floor(W * 0.06) },
+      { key: 'action',         label: 'Action',         width: Math.floor(W * 0.38) },
+      { key: 'responsibility', label: 'Responsibility', width: Math.floor(W * 0.24) },
+      { key: 'checkpoint',     label: 'Checkpoint',     width: W - Math.floor(W * 0.06) - Math.floor(W * 0.38) - Math.floor(W * 0.24) },
+    ], ACCENT),
+    ...p.infoSection('Permit to Work Requirements', [
+      { label: 'Permit Type',               value: c.permitRequirements?.permitType            || '' },
+      { label: 'Issued By',                 value: c.permitRequirements?.issuedBy              || '' },
+      { label: 'Authorised By',             value: c.permitRequirements?.authorisedBy          || '' },
+      { label: 'Validity Period',            value: c.permitRequirements?.validityPeriod        || '' },
+      { label: 'Conditions',                value: c.permitRequirements?.conditions            || '' },
+      { label: 'Cancellation Procedure',    value: c.permitRequirements?.cancellationProcedure || '' },
+    ], ACCENT),
+    ...p.infoSection('Gas Monitoring', [
+      { label: 'Equipment',                  value: c.gasMonitoring?.equipment              || '' },
+      { label: 'Calibration Date',           value: c.gasMonitoring?.calibrationDate        || '' },
+      { label: 'Pre-Entry Readings',         value: c.gasMonitoring?.preEntryReadings       || '' },
+      { label: 'Continuous Monitoring',       value: c.gasMonitoring?.continuousMonitoring ? 'Yes' : 'No' },
+      { label: 'Bump Test Required',          value: c.gasMonitoring?.bumpTestRequired ? 'Yes' : 'No' },
+      { label: 'O₂ Low Alarm',               value: c.gasMonitoring?.alarmSetPoints?.o2Low  || '' },
+      { label: 'O₂ High Alarm',              value: c.gasMonitoring?.alarmSetPoints?.o2High || '' },
+      { label: 'LEL Alarm',                  value: c.gasMonitoring?.alarmSetPoints?.lel    || '' },
+      { label: 'H₂S Alarm',                  value: c.gasMonitoring?.alarmSetPoints?.h2s    || '' },
+      { label: 'CO Alarm',                   value: c.gasMonitoring?.alarmSetPoints?.co     || '' },
+      { label: 'Calibration Requirements',   value: c.gasMonitoring?.calibrationRequirements || '' },
+    ], ACCENT),
+    ...p.infoSection('Ventilation', [
+      { label: 'Type',                   value: c.ventilation?.type                || '' },
+      { label: 'Equipment',              value: c.ventilation?.equipment           || '' },
+      { label: 'Air Changes Required',   value: c.ventilation?.airChangesRequired  || '' },
+      { label: 'Pre-Entry Purging Time', value: c.ventilation?.preEntryPurgingTime || '' },
+      { label: 'Ducting Arrangement',    value: c.ventilation?.ductingArrangement  || '' },
+    ], ACCENT),
+  ];
+
+  const s4: any[] = [
+    ...p.proseSection('Communication Plan', c.communicationPlan, ACCENT),
+    ...p.dataTableSection('Communication Methods', c.communicationMethods || [], [
+      { key: 'method',        label: 'Method',          width: Math.floor(W * 0.30) },
+      { key: 'betweenWhom',   label: 'Between Whom',    width: Math.floor(W * 0.38) },
+      { key: 'checkInterval', label: 'Check Interval',  width: W - Math.floor(W * 0.30) - Math.floor(W * 0.38) },
+    ], ACCENT),
+    p.sectionBand('Emergency Rescue Plan', ACCENT),
+    ...p.infoSection('Rescue Arrangements', [
+      { label: 'Rescue Method',             value: c.emergencyRescuePlan?.rescueMethod         || '' },
+      { label: 'Rescue Equipment',          value: c.emergencyRescuePlan?.rescueEquipment      || '' },
+      { label: 'Rescue Team Details',       value: c.emergencyRescuePlan?.rescueTeamDetails    || '' },
+      { label: 'Rescue Team Training',      value: c.emergencyRescuePlan?.rescueTeamTraining   || '' },
+      { label: 'Emergency Services',        value: c.emergencyRescuePlan?.emergencyServices    || '' },
+      { label: 'Nearest A&E',              value: c.emergencyRescuePlan?.nearestA_E           || '' },
+      { label: 'Rescue Drill Frequency',    value: c.emergencyRescuePlan?.rescueDrillFrequency || '' },
+    ], ACCENT),
+    ...p.proseSection('Emergency Rescue Procedure', c.emergencyRescuePlan?.procedureDescription, ACCENT),
+    ...p.dataTableSection('Personnel & Roles', c.personnelRoles || [], [
+      { key: 'role',          label: 'Role',           width: Math.floor(W * 0.18) },
+      { key: 'name',          label: 'Name',           width: Math.floor(W * 0.18) },
+      { key: 'competencies',  label: 'Competencies',   width: Math.floor(W * 0.38) },
+      { key: 'trainingDate',  label: 'Training Date',  width: W - Math.floor(W * 0.18) - Math.floor(W * 0.18) - Math.floor(W * 0.38) },
+    ], ACCENT),
+  ];
+
+  const s5: any[] = [
+    ...p.dataTableSection('PPE Requirements', c.ppeRequirements || [], [
+      { key: 'item',           label: 'PPE Item',        width: Math.floor(W * 0.30) },
+      { key: 'standard',       label: 'Standard',        width: Math.floor(W * 0.34) },
+      { key: 'checkRequired',  label: 'Check Required',  width: W - Math.floor(W * 0.30) - Math.floor(W * 0.34) },
+    ], ACCENT),
+    ...p.dataTableSection('Equipment Required', c.equipmentRequired || [], [
+      { key: 'item',               label: 'Equipment',          width: Math.floor(W * 0.26) },
+      { key: 'purpose',            label: 'Purpose',            width: Math.floor(W * 0.38) },
+      { key: 'inspectionRequired', label: 'Inspection Required', width: W - Math.floor(W * 0.26) - Math.floor(W * 0.38) },
+    ], ACCENT),
+    ...p.dataTableSection('Isolation Requirements', c.isolationRequirements || [], [
+      { key: 'service',          label: 'Service / Energy',   width: Math.floor(W * 0.26) },
+      { key: 'isolationMethod',  label: 'Isolation Method',   width: Math.floor(W * 0.40) },
+      { key: 'verifiedBy',       label: 'Verified By',        width: W - Math.floor(W * 0.26) - Math.floor(W * 0.40) },
+    ], ACCENT),
+    ...p.proseSection('Competency Requirements', c.competencyRequirements, ACCENT),
+    ...p.infoSection('Overall Risk Assessment', [
+      { label: 'Overall Risk Rating', value: c.overallRiskRating || '' },
+    ], ACCENT),
+    ...p.proseSection('Risk Rating Justification', c.riskRatingJustification, ACCENT),
+    ...p.bulletListSection('Review Triggers', c.reviewTriggers || [], ACCENT),
+    ...p.proseSection('Additional Notes', c.additionalNotes, ACCENT),
+    ...p.signatureBlock([
+      { role: 'Assessed By',           name: c.assessedBy || '' },
+      { role: 'Permit Issuer',         name: '' },
+      { role: 'Entrant Acknowledgement', name: '' },
+      { role: 'Approved By',           name: '' },
+    ], ACCENT),
+    p.sectionBand('Briefing & Acknowledgement Record', ACCENT),
+    h.briefingRecordTable(15, W),
+  ];
+
+  return p.buildPremiumDocumentInline({
+    documentLabel: 'Confined Space Risk Assessment',
+    accentHex: ACCENT,
+    classification: 'CONFINED SPACES REGULATIONS 1997 — HIGH RISK ACTIVITY',
+  }, [s1, s2, s3, s4, s5]);
 }
