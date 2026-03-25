@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -103,7 +103,69 @@ const AiSparkleIcon = () => (
   </svg>
 );
 
-/* ── Hub card data ── */
+/* ── Categorised AI tool grid data ── */
+type ToolCategory = 'Health & Safety' | 'Quality' | 'Commercial' | 'Programme';
+
+interface AiToolCard {
+  title: string;
+  desc: string;
+  href: string;
+  badge?: string;
+  isNew?: boolean;
+  isUpload?: boolean;
+}
+
+const CATEGORY_ACCENT: Record<ToolCategory, string> = {
+  'Health & Safety': '#DC2626',
+  'Quality':         '#1D6FB8',
+  'Commercial':      '#065F46',
+  'Programme':       '#0F766E',
+};
+
+const CATEGORISED_TOOLS: Record<ToolCategory, AiToolCard[]> = {
+  'Health & Safety': [
+    { title: 'RAMS Builder',           desc: '10 industry formats. AI-generated risk assessments and method statements, CDM 2015 compliant.',    href: '/rams-builder',               badge: 'AI' },
+    { title: 'COSHH Assessment',       desc: 'AI looks up the SDS and builds a regulation-compliant assessment for any hazardous substance.',    href: '/coshh-builder',              badge: 'AI' },
+    { title: 'Manual Handling RA',     desc: 'TILE methodology risk assessments. Task, individual, load, and environment analysis.',              href: '/manual-handling-builder',    badge: 'AI' },
+    { title: 'DSE Assessment',         desc: 'Workstation assessments for office and site welfare. Posture, screen setup, and lighting.',         href: '/dse-builder',                badge: 'AI' },
+    { title: 'Toolbox Talk Generator', desc: 'Bespoke, site-specific toolbox talks for any activity or hazard. Briefing-ready with attendance.',  href: '/tbt-builder',                badge: 'AI' },
+    { title: 'Confined Space RA',      desc: 'Atmospheric hazards, entry permits, rescue plans, gas monitoring, and communication requirements.', href: '/confined-spaces-builder',    badge: 'AI' },
+    { title: 'Incident Report',        desc: 'Root cause analysis, 5 Whys, RIDDOR assessment, corrective actions, and lessons learned.',         href: '/incident-report-builder',    badge: 'AI' },
+    { title: 'Lift Plan',              desc: 'Load details, crane specification, radius charts, exclusion zones, and appointed persons.',         href: '/lift-plan-builder',          badge: 'AI' },
+    { title: 'Emergency Response Plan',desc: 'Site-specific plans covering fire, first aid, environmental spills, and evacuation procedures.',    href: '/emergency-response-builder', badge: 'AI' },
+    { title: 'Permit to Dig',          desc: 'Utility searches, CAT & Genny scanning, hand-dig zones, and safe digging methods. HSG47 aligned.', href: '/permit-to-dig-builder',      badge: 'AI' },
+    { title: 'POWRA',                  desc: 'Quick point of work risk assessments. Hazards, controls, stop conditions, and team sign-on.',       href: '/powra-builder',              badge: 'AI' },
+    { title: 'CDM Compliance Checker', desc: 'Gap analysis across all CDM 2015 duty holder responsibilities. HSE L153 aligned narrative report.', href: '/cdm-checker-builder',        badge: 'AI', isNew: true },
+    { title: 'Noise Assessment',       desc: 'BS 5228-1:2009 compliant. Predict noise levels at receptors, assess impacts, specify mitigation.', href: '/noise-assessment-builder',   badge: 'AI', isNew: true },
+    { title: 'Safety Alert Generator', desc: 'Turn incidents and near misses into professional safety bulletins. Immediate distribution ready.', href: '/safety-alert-builder',       badge: 'AI', isNew: true },
+    { title: 'RAMS Review Tool',       desc: 'Upload your RAMS for AI review against HSE guidance and CDM 2015. Gaps and improvements identified.', href: '/rams-review-builder',     badge: 'AI', isNew: true, isUpload: true },
+  ],
+  'Quality': [
+    { title: 'ITP Generator',          desc: 'Hold points, witness points, review points, and sign-off matrices for any works package.',          href: '/itp-builder',               badge: 'AI' },
+    { title: 'Quality Checklist',      desc: 'Activity-specific inspection checklists with acceptance criteria, hold points, and BS standards.',  href: '/quality-checklist-builder', badge: 'AI' },
+    { title: 'NCR Generator',          desc: 'Non-conformance reports with root cause analysis, corrective actions, and close-out verification.', href: '/ncr-builder',               badge: 'AI' },
+  ],
+  'Commercial': [
+    { title: 'Scope of Works',             desc: 'Formal subcontractor scope documents. Inclusions, exclusions, interfaces, and deliverables.',      href: '/scope-of-works-builder',          badge: 'AI' },
+    { title: 'Early Warning Notice',       desc: 'NEC-compliant early warnings with cost, programme, and quality impact assessment.',                href: '/early-warning-builder',           badge: 'AI' },
+    { title: 'CE Notification',            desc: 'NEC compensation event notifications with clause references, programme, and cost implications.',   href: '/ce-notification-builder',         badge: 'AI' },
+    { title: 'Quotation Generator',        desc: 'Professional subcontractor quotations to Tier 1 standards. BoQ, inclusions, exclusions, terms.',   href: '/quote-generator-builder',         badge: 'AI', isNew: true },
+    { title: 'Delay Notification Letter',  desc: 'NEC & JCT compliant delay notifications. Clause references, programme impact, entitlement.',       href: '/delay-notification-builder',      badge: 'AI', isNew: true },
+    { title: 'Variation Confirmation',     desc: 'Formally confirm verbal variations in writing. Cost and time impact, request for written instruction.', href: '/variation-confirmation-builder', badge: 'AI', isNew: true },
+    { title: 'RFI Generator',             desc: 'Formal Requests for Information with drawing references, clear question, and non-response impact.', href: '/rfi-generator-builder',           badge: 'AI', isNew: true },
+    { title: 'Payment Application',       desc: 'Structured interim valuations with BoQ, variations, retention, and CIS. HGCRA compliant.',          href: '/payment-application-builder',     badge: 'AI', isNew: true },
+    { title: 'Daywork Sheet',             desc: 'CECA Schedule of Dayworks 2011 compliant. Labour, plant, materials, supervision, and overheads.',   href: '/daywork-sheet-builder',           badge: 'AI', isNew: true },
+  ],
+  'Programme': [
+    { title: 'Programme Checker',      desc: 'Upload your programme for a RAG-rated AI review. Logic, sequencing, WBS, critical path, milestones.', href: '/programme-checker-builder', badge: 'AI', isNew: true, isUpload: true },
+    { title: 'Carbon Footprint',       desc: 'ICE v3.2 activity-based carbon assessment. Materials, plant, transport, waste, reduction opportunities.', href: '/carbon-footprint-builder', badge: 'AI', isNew: true },
+    { title: 'Carbon Reduction Plan',  desc: 'PPN 06/21 compliant Carbon Reduction Plans for public sector and Tier 1 framework bids.',              href: '/carbon-reduction-plan-builder', badge: 'AI', isNew: true },
+  ],
+};
+
+const ALL_CATEGORIES: ToolCategory[] = ['Health & Safety', 'Quality', 'Commercial', 'Programme'];
+
+/* ── Legacy non-AI hub cards (shown below the categorised AI tools grid) ── */
 const HUB_CARDS = [
   {
     title: 'Premium Templates',
@@ -339,6 +401,7 @@ export default function HomepageClient({
   searchItems,
 }: HomepageClientProps) {
   const [searchInput, setSearchInput] = useState('');
+  const [activeCategory, setActiveCategory] = useState<ToolCategory>('Health & Safety');
   const [suggestions, setSuggestions] = useState<SearchItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -355,7 +418,7 @@ export default function HomepageClient({
   const counter1 = useCounter(templateCount);
   const counter2 = useCounter(1500);
   const counter3 = useCounter(categoryCount);
-  const counter4 = useCounter(500);
+  const counter4 = useCounter(29);
 
   const getResults = useCallback(
     (query: string): SearchItem[] => {
@@ -602,11 +665,11 @@ export default function HomepageClient({
                 Every output is regulation-compliant and ready to use.
               </p>
               <ul className="hp-rams__features">
-                <li>8 AI document generators in one platform</li>
-                <li>RAMS, COSHH, ITP, DSE, Manual Handling &amp; more</li>
-                <li>CDM 2015, COSHH Regs &amp; BS compliant outputs</li>
-                <li>Download as professional Word documents</li>
-                <li>Free tier on every tool — no card required</li>
+                <li>29 AI document generators across 4 categories</li>
+                <li>H&amp;S, Quality, Commercial, and Programme tools</li>
+                <li>CDM 2015, COSHH Regs, NEC, JCT &amp; BS compliant outputs</li>
+                <li>Download as professional Word and Excel documents</li>
+                <li>Standard from £X/month — Standard &amp; Professional plans</li>
               </ul>
               <Link href="/rams-builder" className="hp-rams__cta">
                 Try RAMS Builder Free
@@ -655,7 +718,7 @@ export default function HomepageClient({
             </div>
             <div className="hp-stats__item" ref={counter4.ref}>
               <span className="hp-stats__number">{counter4.count}+</span>
-              <span className="hp-stats__label">Professionals Served</span>
+              <span className="hp-stats__label">AI Tools</span>
             </div>
           </div>
         </div>
