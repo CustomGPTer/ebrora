@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import DocumentHistory from './DocumentHistory';
 import SavedDetailsForm from './SavedDetailsForm';
@@ -101,25 +101,59 @@ const TABS: { key: TabType; label: string; icon: React.ReactNode }[] = [
   },
 ];
 
-/** All AI tools with display label and route — drives the account dashboard usage grid */
-const AI_TOOL_DISPLAY: { slug: string; label: string; href: string }[] = [
-  { slug: 'coshh', label: 'COSHH Assessment', href: '/coshh-builder' },
-  { slug: 'itp', label: 'Inspection & Test Plan', href: '/itp-builder' },
-  { slug: 'manual-handling', label: 'Manual Handling RA', href: '/manual-handling-builder' },
-  { slug: 'dse', label: 'DSE Assessment', href: '/dse-builder' },
-  { slug: 'tbt-generator', label: 'Toolbox Talk Generator', href: '/tbt-builder' },
-  { slug: 'confined-spaces', label: 'Confined Space RA', href: '/confined-spaces-builder' },
-  { slug: 'incident-report', label: 'Incident Report', href: '/incident-report-builder' },
-  { slug: 'lift-plan', label: 'Lift Plan', href: '/lift-plan-builder' },
-  { slug: 'emergency-response', label: 'Emergency Response', href: '/emergency-response-builder' },
-  { slug: 'quality-checklist', label: 'Quality Checklist', href: '/quality-checklist-builder' },
-  { slug: 'scope-of-works', label: 'Scope of Works', href: '/scope-of-works-builder' },
-  { slug: 'permit-to-dig', label: 'Permit to Dig', href: '/permit-to-dig-builder' },
-  { slug: 'powra', label: 'POWRA', href: '/powra-builder' },
-  { slug: 'early-warning', label: 'Early Warning Notice', href: '/early-warning-builder' },
-  { slug: 'ncr', label: 'Non-Conformance Report', href: '/ncr-builder' },
-  { slug: 'ce-notification', label: 'CE Notification', href: '/ce-notification-builder' },
-];
+/** All 29 AI tools grouped by category — drives account dashboard usage grid */
+type DashToolCategory = 'Health & Safety' | 'Quality' | 'Commercial' | 'Programme';
+
+interface DashToolEntry { slug: string; label: string; href: string; }
+
+const AI_TOOL_CATEGORIES: Record<DashToolCategory, DashToolEntry[]> = {
+  'Health & Safety': [
+    { slug: 'coshh',              label: 'COSHH Assessment',      href: '/coshh-builder' },
+    { slug: 'manual-handling',    label: 'Manual Handling RA',    href: '/manual-handling-builder' },
+    { slug: 'dse',                label: 'DSE Assessment',        href: '/dse-builder' },
+    { slug: 'tbt-generator',      label: 'Toolbox Talk',          href: '/tbt-builder' },
+    { slug: 'confined-spaces',    label: 'Confined Space RA',     href: '/confined-spaces-builder' },
+    { slug: 'incident-report',    label: 'Incident Report',       href: '/incident-report-builder' },
+    { slug: 'lift-plan',          label: 'Lift Plan',             href: '/lift-plan-builder' },
+    { slug: 'emergency-response', label: 'Emergency Response',    href: '/emergency-response-builder' },
+    { slug: 'permit-to-dig',      label: 'Permit to Dig',         href: '/permit-to-dig-builder' },
+    { slug: 'powra',              label: 'POWRA',                 href: '/powra-builder' },
+    { slug: 'cdm-checker',        label: 'CDM Compliance',        href: '/cdm-checker-builder' },
+    { slug: 'noise-assessment',   label: 'Noise Assessment',      href: '/noise-assessment-builder' },
+    { slug: 'safety-alert',       label: 'Safety Alert',          href: '/safety-alert-builder' },
+    { slug: 'rams-review',        label: 'RAMS Review',           href: '/rams-review-builder' },
+  ],
+  'Quality': [
+    { slug: 'itp',               label: 'ITP',                   href: '/itp-builder' },
+    { slug: 'quality-checklist', label: 'Quality Checklist',     href: '/quality-checklist-builder' },
+    { slug: 'ncr',               label: 'NCR',                   href: '/ncr-builder' },
+  ],
+  'Commercial': [
+    { slug: 'scope-of-works',          label: 'Scope of Works',      href: '/scope-of-works-builder' },
+    { slug: 'early-warning',           label: 'Early Warning',       href: '/early-warning-builder' },
+    { slug: 'ce-notification',         label: 'CE Notification',     href: '/ce-notification-builder' },
+    { slug: 'quote-generator',         label: 'Quotation',           href: '/quote-generator-builder' },
+    { slug: 'delay-notification',      label: 'Delay Notification',  href: '/delay-notification-builder' },
+    { slug: 'variation-confirmation',  label: 'Variation Confirm',   href: '/variation-confirmation-builder' },
+    { slug: 'rfi-generator',           label: 'RFI',                 href: '/rfi-generator-builder' },
+    { slug: 'payment-application',     label: 'Payment Application', href: '/payment-application-builder' },
+    { slug: 'daywork-sheet',           label: 'Daywork Sheet',       href: '/daywork-sheet-builder' },
+  ],
+  'Programme': [
+    { slug: 'programme-checker',       label: 'Programme Checker',   href: '/programme-checker-builder' },
+    { slug: 'carbon-footprint',        label: 'Carbon Footprint',    href: '/carbon-footprint-builder' },
+    { slug: 'carbon-reduction-plan',   label: 'Carbon Reduction Plan', href: '/carbon-reduction-plan-builder' },
+  ],
+};
+
+const DASH_CATEGORY_COLOR: Record<DashToolCategory, string> = {
+  'Health & Safety': '#DC2626',
+  'Quality':         '#1D6FB8',
+  'Commercial':      '#065F46',
+  'Programme':       '#0F766E',
+};
+
+const DASH_ALL_CATEGORIES: DashToolCategory[] = ['Health & Safety', 'Quality', 'Commercial', 'Programme'];
 
 export default function AccountDashboardClient({
   user,
@@ -268,37 +302,59 @@ export default function AccountDashboardClient({
               </div>
             </div>
 
-            {/* AI Tool usage cards — dynamic, linked */}
+            {/* AI Tool usage — grouped by category */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-5">
                 <h2 className="text-base font-bold text-gray-900">AI Tool Usage This Period</h2>
                 <p className="text-xs text-gray-400">Limits reset monthly</p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {AI_TOOL_DISPLAY.map(({ slug, label, href }) => {
-                  const usage = aiToolUsage[slug] || { used: 0, limit: 1 };
-                  const pct = Math.min((usage.used / usage.limit) * 100, 100);
+              <div className="space-y-6">
+                {DASH_ALL_CATEGORIES.map((category) => {
+                  const tools = AI_TOOL_CATEGORIES[category];
+                  const accent = DASH_CATEGORY_COLOR[category];
                   return (
-                    <Link
-                      key={slug}
-                      href={href}
-                      className="block p-4 rounded-lg border border-gray-100 hover:border-[#1B5745] hover:shadow-sm transition-all group"
-                    >
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1 group-hover:text-[#1B5745] transition-colors">{label}</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        {usage.used} <span className="text-sm font-normal text-gray-400">/ {usage.limit}</span>
-                      </p>
-                      <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div key={category}>
+                      <div className="flex items-center gap-2 mb-3">
                         <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor: pct > 80 ? '#dc2626' : '#1B5745',
-                          }}
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: accent }}
                         />
+                        <p
+                          className="text-xs font-bold uppercase tracking-wide"
+                          style={{ color: accent }}
+                        >
+                          {category}
+                        </p>
+                        <div className="flex-1 h-px bg-gray-100" />
                       </div>
-                      <p className="text-[10px] text-[#1B5745] mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">Open tool →</p>
-                    </Link>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                        {tools.map(({ slug, label, href }) => {
+                          const usage = aiToolUsage[slug] || { used: 0, limit: 1 };
+                          const pct = Math.min((usage.used / Math.max(usage.limit, 1)) * 100, 100);
+                          const isAtLimit = usage.used >= usage.limit && usage.limit > 0;
+                          return (
+                            <Link
+                              key={slug}
+                              href={href}
+                              className="block p-3 rounded-lg border border-gray-100 hover:shadow-sm transition-all group"
+                              style={{ borderLeftWidth: '3px', borderLeftColor: accent } as React.CSSProperties}
+                            >
+                              <p className="text-[11px] font-semibold text-gray-500 mb-1 leading-tight group-hover:text-gray-800 transition-colors truncate">{label}</p>
+                              <p className="text-lg font-bold text-gray-900 leading-none">
+                                {usage.used}
+                                <span className="text-xs font-normal text-gray-400 ml-0.5">/{usage.limit}</span>
+                              </p>
+                              <div className="mt-1.5 h-1 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${pct}%`, backgroundColor: isAtLimit ? '#dc2626' : accent }}
+                                />
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -461,24 +517,35 @@ export default function AccountDashboardClient({
                   </div>
                 </div>
 
-                {/* All AI tools */}
+                {/* All AI tools — grouped by category */}
                 <div className="pt-3 border-t border-gray-100">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">AI Document Generators</p>
-                  {AI_TOOL_DISPLAY.map(({ slug, label, href }) => {
-                    const usage = aiToolUsage[slug] || { used: 0, limit: 1 };
-                    const pct = Math.min((usage.used / usage.limit) * 100, 100);
-                    return (
-                      <div key={slug} className="mb-3">
-                        <div className="flex items-center justify-between mb-1">
-                          <Link href={href} className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">{label}</Link>
-                          <span className="text-sm text-gray-500">{usage.used} / {usage.limit}</span>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">AI Document Generators (29 tools)</p>
+                  <div className="space-y-5">
+                    {DASH_ALL_CATEGORIES.map((category) => {
+                      const tools = AI_TOOL_CATEGORIES[category];
+                      const accent = DASH_CATEGORY_COLOR[category];
+                      return (
+                        <div key={category}>
+                          <p className="text-[11px] font-bold uppercase tracking-wide mb-2" style={{ color: accent } as React.CSSProperties}>{category}</p>
+                          {tools.map(({ slug, label, href }) => {
+                            const usage = aiToolUsage[slug] || { used: 0, limit: 1 };
+                            const pct = Math.min((usage.used / Math.max(usage.limit, 1)) * 100, 100);
+                            return (
+                              <div key={slug} className="mb-2">
+                                <div className="flex items-center justify-between mb-1">
+                                  <Link href={href} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">{label}</Link>
+                                  <span className="text-xs text-gray-500">{usage.used} / {usage.limit}</span>
+                                </div>
+                                <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: pct > 80 ? '#dc2626' : accent } as React.CSSProperties} />
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: pct > 80 ? '#dc2626' : '#1B5745' }} />
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
               <p className="text-xs text-gray-400 mt-4">Download limits reset on a rolling 30-day basis. AI tool limits reset monthly.</p>
