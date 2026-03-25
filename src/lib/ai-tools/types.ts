@@ -1,11 +1,19 @@
 // =============================================================================
 // AI Tools — Shared Type Definitions
-// All 17 AI tools share these types.
+// All 29 AI tools share these types.
 // RAMS Builder remains untouched — its own types stay in /lib/rams/types.ts
 // =============================================================================
 
-/** The 17 AI tool slugs (excludes RAMS which has its own system) */
+/** Tool category — drives homepage grid tabs and account dashboard grouping */
+export type AiToolCategory =
+  | 'Health & Safety'
+  | 'Quality'
+  | 'Commercial'
+  | 'Programme';
+
+/** All 29 AI tool slugs (excludes RAMS which has its own system) */
 export type AiToolSlug =
+  // ── Existing 16 ──────────────────────────────────────────────────────────
   | 'coshh'
   | 'itp'
   | 'manual-handling'
@@ -21,7 +29,21 @@ export type AiToolSlug =
   | 'powra'
   | 'early-warning'
   | 'ncr'
-  | 'ce-notification';
+  | 'ce-notification'
+  // ── New 13 ───────────────────────────────────────────────────────────────
+  | 'programme-checker'
+  | 'cdm-checker'
+  | 'noise-assessment'
+  | 'quote-generator'
+  | 'safety-alert'
+  | 'carbon-footprint'
+  | 'rams-review'
+  | 'delay-notification'
+  | 'variation-confirmation'
+  | 'rfi-generator'
+  | 'payment-application'
+  | 'daywork-sheet'
+  | 'carbon-reduction-plan';
 
 /** Metadata for each AI tool */
 export interface AiToolConfig {
@@ -32,6 +54,8 @@ export interface AiToolConfig {
   route: string;
   pageTitle: string;
   metaDescription: string;
+  /** Category for grid filtering and dashboard grouping */
+  category: AiToolCategory;
   /** What the generated document is called, e.g. "COSHH Assessment" */
   documentLabel: string;
   /** Placeholder text for the work description textarea */
@@ -47,16 +71,42 @@ export interface AiToolConfig {
   /** Colour accent for UI (hex without #) */
   accentColor: string;
   /** Icon name for consistent iconography */
-  iconType: 'shield' | 'clipboard' | 'search' | 'chat' | 'alert' | 'eye' | 'lock' | 'warning' | 'crane' | 'siren' | 'check' | 'file' | 'shovel' | 'hardhat' | 'bell' | 'x-circle' | 'pound';
+  iconType:
+    | 'shield' | 'clipboard' | 'search' | 'chat' | 'alert' | 'eye'
+    | 'lock' | 'warning' | 'crane' | 'siren' | 'check' | 'file'
+    | 'shovel' | 'hardhat' | 'bell' | 'x-circle' | 'pound'
+    // New icons for the 13 new tools
+    | 'calendar' | 'leaf' | 'noise' | 'letter' | 'clock'
+    | 'question-circle' | 'invoice' | 'timesheet' | 'carbon';
   /** Output file format — defaults to 'docx' if not set */
   outputFormat?: 'docx' | 'xlsx';
+  /**
+   * Whether this tool requires a file upload instead of a text description.
+   * Upload tools (programme-checker, rams-review) use AiUploadToolClient
+   * instead of AiToolBuilderClient.
+   */
+  requiresUpload?: boolean;
+  /**
+   * Accepted upload file formats for upload tools.
+   * E.g. ['pdf', 'xlsx', 'xer'] or ['pdf', 'docx', 'xlsx']
+   */
+  uploadFormats?: string[];
+  /**
+   * Upload instructions shown on the upload tool page.
+   */
+  uploadInstructions?: string;
+  /**
+   * Whether this tool uses the new premium docx template (true for all 13 new tools).
+   * Existing 16 tools use the original template style.
+   */
+  premiumTemplate?: boolean;
   /** Maximum words allowed in the description textarea */
   maxWords?: number;
   /** Minimum words required in the description textarea */
   minWords?: number;
   /** Number of rows for the description textarea */
   textareaRows?: number;
-  /** Warning text shown when description is below minimum words. Use {min} as placeholder for the number. */
+  /** Warning text shown when description is below minimum words. Use {min} as placeholder. */
   warningText?: string;
 }
 
@@ -115,4 +165,13 @@ export interface AiToolConversationState {
   rounds: AiToolConversationRound[];
   isComplete: boolean;
   totalQuestionsAsked: number;
+}
+
+/** Upload tool state (for programme-checker and rams-review) */
+export interface AiUploadToolState {
+  toolSlug: AiToolSlug;
+  fileName: string;
+  fileType: string;
+  parsedContent: string;
+  analysisComplete: boolean;
 }

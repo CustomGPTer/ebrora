@@ -15,8 +15,15 @@ export const AI_TOOL_LIMITS: Record<string, number> = {
 /**
  * Tools that are NOT available on the FREE tier (limit = 0).
  * These require Standard or Professional to use.
+ *
+ * Original restricted tools (7):
+ *   itp, incident-report, lift-plan, emergency-response,
+ *   scope-of-works, early-warning, ncr
+ *
+ * All 13 new tools are also restricted (Standard+ only).
  */
 export const RESTRICTED_FREE_TOOLS: Set<string> = new Set([
+  // Existing restricted tools
   'itp',
   'incident-report',
   'lift-plan',
@@ -24,6 +31,20 @@ export const RESTRICTED_FREE_TOOLS: Set<string> = new Set([
   'scope-of-works',
   'early-warning',
   'ncr',
+  // New 13 — all restricted to Standard+ tier
+  'programme-checker',
+  'cdm-checker',
+  'noise-assessment',
+  'quote-generator',
+  'safety-alert',
+  'carbon-footprint',
+  'rams-review',
+  'delay-notification',
+  'variation-confirmation',
+  'rfi-generator',
+  'payment-application',
+  'daywork-sheet',
+  'carbon-reduction-plan',
 ]);
 
 /** Get the monthly generation limit for a given tier and tool */
@@ -50,3 +71,22 @@ export const EXPIRY_THRESHOLD_MS = 60 * 60 * 1000;
 /** Description word limit */
 export const MAX_DESCRIPTION_WORDS = 200;
 export const MIN_DESCRIPTION_WORDS = 3;
+
+/** Maximum upload file size for upload tools (10 MB) */
+export const MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024;
+
+/** Accepted MIME types for Programme Checker */
+export const PROGRAMME_CHECKER_ACCEPT = {
+  'application/pdf': ['.pdf'],
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+  'application/vnd.ms-excel': ['.xls'],
+  'text/plain': ['.xer', '.xml'],
+  'application/xml': ['.xml'],
+};
+
+/** Accepted MIME types for RAMS Review */
+export const RAMS_REVIEW_ACCEPT = {
+  'application/pdf': ['.pdf'],
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+};

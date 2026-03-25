@@ -2,7 +2,7 @@
 // AI Tools — Usage Tracker
 // Tracks generations per tool, per user, per month.
 // Completely separate from RAMS Builder usage tracking.
-// Depends on AiToolUsage Prisma model (added in Step 4).
+// Covers all 29 tools (16 existing + 13 new).
 // =============================================================================
 import prisma from '@/lib/prisma';
 import { getAiToolLimitByTier } from './constants';
@@ -101,6 +101,41 @@ export async function checkAiToolUsageLimit(
   };
 }
 
+/** All 29 tool slugs — used by getAllAiToolUsage and account dashboard */
+export const ALL_AI_TOOL_SLUGS: AiToolSlug[] = [
+  // Existing 16
+  'coshh',
+  'itp',
+  'manual-handling',
+  'dse',
+  'tbt-generator',
+  'confined-spaces',
+  'incident-report',
+  'lift-plan',
+  'emergency-response',
+  'quality-checklist',
+  'scope-of-works',
+  'permit-to-dig',
+  'powra',
+  'early-warning',
+  'ncr',
+  'ce-notification',
+  // New 13
+  'programme-checker',
+  'cdm-checker',
+  'noise-assessment',
+  'quote-generator',
+  'safety-alert',
+  'carbon-footprint',
+  'rams-review',
+  'delay-notification',
+  'variation-confirmation',
+  'rfi-generator',
+  'payment-application',
+  'daywork-sheet',
+  'carbon-reduction-plan',
+];
+
 export async function getAllAiToolUsage(
   userId: string
 ): Promise<Record<AiToolSlug, { used: number; limit: number }>> {
@@ -123,18 +158,13 @@ export async function getAllAiToolUsage(
     select: { tool_slug: true, generations_count: true },
   });
 
-  const allSlugs: AiToolSlug[] = [
-    'coshh', 'itp', 'manual-handling', 'dse',
-    'tbt-generator', 'confined-spaces', 'incident-report',
-    'lift-plan', 'emergency-response', 'quality-checklist',
-    'scope-of-works', 'permit-to-dig', 'powra',
-    'early-warning', 'ncr', 'ce-notification',
-  ];
-
   const result = {} as Record<AiToolSlug, { used: number; limit: number }>;
-  for (const slug of allSlugs) {
+  for (const slug of ALL_AI_TOOL_SLUGS) {
     const rec = records.find((r: any) => r.tool_slug === slug);
-    result[slug] = { used: rec?.generations_count || 0, limit: getAiToolLimitByTier(tier, slug) };
+    result[slug] = {
+      used: rec?.generations_count || 0,
+      limit: getAiToolLimitByTier(tier, slug),
+    };
   }
 
   return result;
