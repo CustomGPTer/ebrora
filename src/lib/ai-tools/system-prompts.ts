@@ -825,62 +825,95 @@ FIELD-BY-FIELD RULES
 
   'manual-handling': `Generate a Manual Handling Risk Assessment JSON with this structure:
 {
-  "documentRef": "string",
-  "assessmentDate": "DD/MM/YYYY",
-  "reviewDate": "DD/MM/YYYY",
+  "documentRef": "string (format: MH-YYYY-NNN)",
+  "assessmentDate": "",
+  "reviewDate": "",
   "assessedBy": "string",
   "projectName": "string",
-  "siteAddress": "string",
-  "activityDescription": "string (min 200 words)",
+  "siteAddress": "",
+  "legalBasis": "string (min 100 words — reference Manual Handling Operations Regulations 1992 (as amended), HSE L23 guidance, MAC tool, and Schedule 1 risk factors)",
+  "activityDescription": "string (min 250 words — comprehensive description of the manual handling activity, environment, workforce involved, and why the task is necessary)",
+  "canTaskBeAvoided": "string (min 80 words — can the manual handling be avoided entirely through mechanisation, redesign, or elimination? If not, explain why)",
   "taskAnalysis": {
-    "description": "string (min 150 words)",
+    "description": "string (min 200 words — detailed breakdown of the task including postures adopted, grip types, and movement patterns)",
     "frequency": "string",
     "duration": "string",
     "distanceCarried": "string",
     "heightOfLift": "string",
+    "startPosition": "string (e.g. floor level, waist height, shoulder height)",
+    "endPosition": "string",
     "twistingRequired": "boolean",
     "pushingPulling": "string",
     "teamLift": "boolean",
-    "numberOfPersons": "number"
+    "numberOfPersons": "number",
+    "restBreaks": "string",
+    "repetitionRate": "string"
   },
   "individualFactors": {
     "trainingRequired": "string",
     "fitnessRequirements": "string",
     "knownLimitations": "string",
-    "pregnancyConsiderations": "string"
+    "pregnancyConsiderations": "string",
+    "youngPersons": "string (under-18 restrictions per MHOR Reg 4(3))",
+    "agingWorkforce": "string",
+    "previousInjuries": "string"
   },
   "loadCharacteristics": {
-    "weight": "string",
-    "dimensions": "string",
-    "shape": "string",
-    "gripAvailability": "string",
-    "stability": "string",
+    "weight": "string (include unit weight and total shift load)",
+    "dimensions": "string (L x W x H)",
+    "shape": "string (regular, irregular, awkward)",
+    "gripAvailability": "string (handles, handholds, grip points)",
+    "stability": "string (rigid, flexible, shifting contents)",
     "sharpEdges": "boolean",
-    "temperatureIssues": "string"
+    "temperatureIssues": "string",
+    "contentsPredictability": "string (can contents shift unexpectedly?)",
+    "centreOfGravity": "string (central, offset, variable)"
   },
   "environmentalFactors": {
-    "floorSurface": "string",
-    "spaceConstraints": "string",
-    "lighting": "string",
-    "temperature": "string",
-    "weatherExposure": "string",
-    "slopes": "string"
+    "floorSurface": "string (condition, material, slip risk)",
+    "spaceConstraints": "string (headroom, width, access restrictions)",
+    "lighting": "string (lux levels, shadows, glare)",
+    "temperature": "string (ambient, extremes, effect on grip)",
+    "weatherExposure": "string (outdoor factors — wind, rain, ice)",
+    "slopes": "string (gradients, ramps, stairs)",
+    "obstructions": "string (cables, pipes, stored materials in path)",
+    "housekeeping": "string (general condition of work area)"
   },
   "tileScoring": {
     "taskScore": "High | Medium | Low",
+    "taskJustification": "string (min 60 words — explain the score)",
     "individualScore": "High | Medium | Low",
+    "individualJustification": "string (min 60 words)",
     "loadScore": "High | Medium | Low",
+    "loadJustification": "string (min 60 words)",
     "environmentScore": "High | Medium | Low",
-    "overallRisk": "High | Medium | Low"
+    "environmentJustification": "string (min 60 words)",
+    "overallRisk": "High | Medium | Low",
+    "overallJustification": "string (min 100 words — synthesis of all four TILE factors explaining the overall rating)"
   },
-  "controlMeasures": "string (min 200 words)",
+  "macAssessment": {
+    "liftLowerScore": "string (Green / Amber / Red / Purple per HSE MAC tool filter scores)",
+    "carryScore": "string (Green / Amber / Red / Purple)",
+    "teamHandlingScore": "string (Green / Amber / Red / Purple — if applicable, otherwise N/A)",
+    "overallMacCategory": "string (Green: low risk / Amber: medium risk / Red: high risk / Purple: very high risk)",
+    "macNarrative": "string (min 100 words — explain how the MAC filter scores were determined and what they mean for this task)"
+  },
+  "controlMeasures": [
+    { "measure": "string (title)", "detail": "string (min 50 words — specific, practical, implementable)", "hierarchyLevel": "Eliminate | Substitute | Engineering Control | Administrative Control | PPE" }
+  ],
   "mechanicalAids": [
-    { "aid": "string", "application": "string", "benefit": "string" }
+    { "aid": "string", "application": "string", "benefit": "string", "suitability": "string (suitable / partially suitable / not suitable — with reason)" }
   ],
   "residualRisk": "High | Medium | Low",
-  "monitoringArrangements": "string",
+  "residualRiskJustification": "string (min 80 words — explain what risk remains after controls and why it is acceptable or what further action is needed)",
+  "trainingRequirements": [
+    { "trainingItem": "string", "who": "string (role)", "frequency": "string (initial / annual / refresher)", "provider": "string" }
+  ],
+  "monitoringArrangements": "string (min 100 words — how the assessment will be monitored, who will supervise, incident reporting, health surveillance triggers)",
+  "reviewTriggers": ["string — events that would trigger a review (e.g. change in task, new equipment, incident, complaint, change in personnel)"],
   "additionalNotes": "string"
-}`,
+}
+Minimum 6 control measures following hierarchy of control. Minimum 3 mechanical aids considered. Minimum 3 training requirements. Minimum 5 review triggers. All TILE justifications must be specific to this task, not generic.`,
 
   dse: `Generate a DSE Assessment JSON with this structure:
 {
@@ -949,73 +982,114 @@ Minimum 5 key hazards. Minimum 6 control measures. Minimum 4 discussion points.`
 
   'confined-spaces': `Generate a Confined Space Risk Assessment JSON with this structure:
 {
-  "documentRef": "string",
-  "assessmentDate": "DD/MM/YYYY",
-  "reviewDate": "DD/MM/YYYY",
+  "documentRef": "string (format: CS-YYYY-NNN)",
+  "assessmentDate": "",
+  "reviewDate": "",
   "assessedBy": "string",
   "projectName": "string",
-  "siteAddress": "string",
+  "siteAddress": "",
+  "legalBasis": "string (min 120 words — reference Confined Spaces Regulations 1997 (all relevant regulations), HSE ACoP L101, INDG258, and any sector-specific guidance e.g. EI15 for wastewater)",
   "spaceIdentification": {
     "name": "string",
-    "type": "string",
+    "type": "string (e.g. wet well, dry well, chamber, tank, sewer, duct, pit, vessel)",
+    "classification": "string (Regulation 1(2) classification — explain why this meets the definition of a confined space)",
     "location": "string",
-    "dimensions": "string",
-    "accessPoints": "string",
+    "dimensions": "string (L x W x D or diameter x depth)",
+    "volume": "string (approximate m³)",
+    "accessPoints": "string (number, type, size — e.g. 600mm manhole, ladder access)",
     "egressPoints": "string",
-    "normalContents": "string",
-    "previousUse": "string"
+    "normalContents": "string (what the space normally contains — sewage, chemicals, nothing, etc.)",
+    "previousUse": "string",
+    "adjacentHazards": "string (what hazards exist in connected or adjacent spaces)"
   },
-  "reasonForEntry": "string (min 200 words)",
-  "canWorkBeAvoidedWithoutEntry": "string",
+  "reasonForEntry": "string (min 250 words — detailed justification for why entry is necessary, what work will be done, expected duration, and planned sequence of activities inside the space)",
+  "canWorkBeAvoidedWithoutEntry": "string (min 100 words — Regulation 4(1) requires entry to be avoided where reasonably practicable. Explain what alternatives have been considered and why entry is necessary)",
+  "alternativeMethodsConsidered": [
+    { "method": "string (e.g. remote inspection, CCTV, extended reach tools, robotic systems)", "reasonRejected": "string (specific reason this alternative is not reasonably practicable)" }
+  ],
   "atmosphericHazards": [
     {
-      "hazard": "string",
-      "source": "string",
-      "alarmLevel": "string",
-      "actionRequired": "string",
-      "monitoringMethod": "string"
+      "hazard": "string (e.g. Hydrogen Sulphide, Carbon Monoxide, Methane, Oxygen Depletion, Oxygen Enrichment)",
+      "source": "string (where this hazard originates)",
+      "oel": "string (Occupational Exposure Limit — LTEL and STEL where applicable)",
+      "alarmLevel": "string (gas monitor alarm set-point)",
+      "actionRequired": "string (what to do when alarm activates — evacuate, increase ventilation, etc.)",
+      "monitoringMethod": "string (4-gas monitor, single-gas, tubes, etc.)"
     }
   ],
   "physicalHazards": [
-    { "hazard": "string", "risk": "string", "controlMeasure": "string" }
+    { "hazard": "string", "risk": "High | Medium | Low", "controlMeasure": "string (min 30 words)", "residualRisk": "High | Medium | Low" }
   ],
-  "safeSystemOfWork": "string (min 300 words)",
+  "biologicalHazards": [
+    { "hazard": "string (e.g. Leptospirosis, E.coli, Legionella)", "source": "string", "controlMeasure": "string" }
+  ],
+  "safeSystemOfWork": "string (min 400 words — detailed step-by-step safe system of work from pre-entry checks through to space handback. Reference permit stages, gas clearance, ventilation establishment, communication checks, and emergency standby confirmation)",
+  "entrySequence": [
+    { "step": "number", "action": "string (specific action)", "responsibility": "string (role — Permit Issuer / Top Man / Entrant / Rescue Team)", "checkpoint": "string (what must be confirmed before proceeding)" }
+  ],
   "permitRequirements": {
-    "permitType": "string",
-    "issuedBy": "string",
+    "permitType": "string (e.g. Confined Space Entry Permit, Hot Work Permit if applicable)",
+    "issuedBy": "string (role and competency required)",
     "authorisedBy": "string",
-    "validityPeriod": "string",
-    "conditions": "string"
+    "validityPeriod": "string (maximum duration before permit must be revalidated)",
+    "conditions": "string (min 80 words — specific conditions attached to the permit)",
+    "cancellationProcedure": "string (when and how the permit is cancelled)"
   },
   "gasMonitoring": {
-    "equipment": "string",
-    "preEntryReadings": "string",
+    "equipment": "string (make/model type — e.g. 4-gas personal monitor)",
+    "calibrationDate": "string",
+    "preEntryReadings": "string (what readings must be achieved before entry is permitted)",
     "continuousMonitoring": "boolean",
-    "alarmSetPoints": { "o2Low": "string", "o2High": "string", "lel": "string", "h2s": "string", "co": "string" },
-    "calibrationRequirements": "string"
+    "alarmSetPoints": {
+      "o2Low": "string (typically 19.5% v/v)",
+      "o2High": "string (typically 23.5% v/v)",
+      "lel": "string (typically 10% LEL)",
+      "h2s": "string (typically 5 ppm TWA / 10 ppm STEL)",
+      "co": "string (typically 20 ppm TWA / 100 ppm STEL)"
+    },
+    "calibrationRequirements": "string",
+    "bumpTestRequired": "boolean"
   },
   "ventilation": {
     "type": "Natural | Forced | Both",
-    "equipment": "string",
-    "airChangesRequired": "string",
-    "preEntryPurgingTime": "string"
+    "equipment": "string (fan type, capacity, ducting)",
+    "airChangesRequired": "string (number per hour and basis for calculation)",
+    "preEntryPurgingTime": "string (minimum time before entry)",
+    "ductingArrangement": "string (where fresh air is supplied to and where exhaust is extracted from)"
   },
-  "communicationPlan": "string (min 100 words)",
+  "communicationPlan": "string (min 150 words — detailed communication arrangements between entrant, top man, standby person, rescue team, and site management. Include check intervals, emergency signals, and backup communication methods)",
+  "communicationMethods": [
+    { "method": "string (e.g. two-way radio, hardwired intercom, visual signals, tug rope)", "betweenWhom": "string", "checkInterval": "string" }
+  ],
   "emergencyRescuePlan": {
-    "rescueMethod": "string",
-    "rescueEquipment": "string",
-    "rescueTeamDetails": "string",
-    "emergencyServices": "string",
-    "nearestA_E": "string",
-    "procedureDescription": "string (min 200 words)"
+    "rescueMethod": "string (self-rescue / non-entry rescue / entry rescue — preference order)",
+    "rescueEquipment": "string (winch, tripod, fall arrest, stretcher, BA sets, etc.)",
+    "rescueTeamDetails": "string (who are they, where are they located, response time)",
+    "rescueTeamTraining": "string (IOSH, City & Guilds, in-house — what certification)",
+    "emergencyServices": "string (how and when to call 999, what information to give)",
+    "nearestA_E": "string (name, address, distance, estimated travel time)",
+    "procedureDescription": "string (min 250 words — step-by-step emergency rescue procedure from alarm activation to casualty handover to emergency services. Include who does what, in what order, and what equipment is used at each stage)",
+    "rescueDrillFrequency": "string (how often rescue drills are conducted)"
   },
-  "ppeRequirements": ["string"],
-  "equipmentRequired": ["string"],
-  "competencyRequirements": "string",
+  "personnelRoles": [
+    { "role": "string (Entrant / Top Man / Standby Person / Rescue Team Member / Permit Issuer / Authorised Person)", "name": "string (or 'To be confirmed')", "competencies": "string (required qualifications and experience)", "trainingDate": "string" }
+  ],
+  "ppeRequirements": [
+    { "item": "string (e.g. Full body harness EN 361)", "standard": "string (EN/BS standard)", "checkRequired": "string (pre-use inspection requirement)" }
+  ],
+  "equipmentRequired": [
+    { "item": "string", "purpose": "string", "inspectionRequired": "string (LOLER, PUWER, or visual inspection requirement)" }
+  ],
+  "isolationRequirements": [
+    { "service": "string (e.g. incoming flow, electrical supply, mechanical drive, chemical dosing)", "isolationMethod": "string (LOTO, valve closure, blank/spade, physical disconnection)", "verifiedBy": "string (role)" }
+  ],
+  "competencyRequirements": "string (min 120 words — what competencies, qualifications, training, and experience are required for each role. Reference IOSH, CITB, City & Guilds, and any client-specific requirements)",
   "overallRiskRating": "High | Medium | Low",
+  "riskRatingJustification": "string (min 80 words — explain the overall risk rating considering all identified hazards and controls)",
+  "reviewTriggers": ["string — events that trigger a review (e.g. change in space conditions, incident, change in work scope, personnel change, new hazard identified)"],
   "additionalNotes": "string"
 }
-Minimum 3 atmospheric hazards. Minimum 4 physical hazards.`,
+Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL as a minimum). Minimum 5 physical hazards. Minimum 2 biological hazards for wastewater environments. Minimum 8 entry sequence steps. Minimum 3 alternative methods considered. Minimum 4 PPE items with standards. Minimum 3 equipment items. Minimum 5 personnel roles. Minimum 5 review triggers. All prose sections must be specific to this confined space, not generic.`,
 
   'incident-report': `Generate an Incident Investigation Report JSON with this structure:
 {
@@ -2035,11 +2109,11 @@ Minimum 10 BoQ line items with realistic quantities. Minimum 10 inclusions. Mini
 JSON structure:
 {
   "documentRef": "string (format: SA-YYYY-NNN)",
-  "alertDate": "DD/MM/YYYY",
+  "alertDate": "",
   "alertClassification": "HIGH RISK | MEDIUM RISK | LOW RISK",
   "alertCategory": "Struck By | Caught In/Between | Falls from Height | Ground Collapse | Electrical | Plant & Transport | Manual Handling | Hazardous Substances | Fire & Explosion | Confined Space | Near Miss | Environmental | Other",
   "projectName": "string",
-  "siteAddress": "string",
+  "siteAddress": "",
   "preparedBy": "string",
   "approvedBy": "string",
   "alertHeadline": "string (punchy, specific — max 12 words, e.g. 'Banksman struck by excavator counterweight — blind spot fatality risk')",

@@ -483,6 +483,20 @@ export async function generateAiToolDocument(
     return Buffer.from(await Packer.toBuffer(doc));
   }
 
+  if (toolSlug === 'manual-handling') {
+    const { buildManualHandlingDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildManualHandlingDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'confined-spaces') {
+    const { buildConfinedSpacesDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildConfinedSpacesDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
   // Generic fallback for tools without a dedicated template
   const config = getAiToolConfig(toolSlug);
 
