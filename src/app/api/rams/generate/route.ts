@@ -81,6 +81,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid generation state' }, { status: 400 });
     }
 
+    // Subscription status check (prevents generation after cancellation)
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { subscription: true },
+    });
+    const tier = user?.subscription?.tier ?? 'FREE';
+    const subscriptionStatus = user?.subscription?.status ?? 'ACTIVE';
+
+    if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
+      await prisma.generation.update({
+        where: { id: generationId },
+        data: { status: 'FAILED' },
+      });
+      return NextResponse.json(
+        { error: 'Your subscription is not active. Please update your billing details.' },
+        { status: 403 }
+      );
+    }
+
     const templateSlug = generation.rams_format.slug as TemplateSlug;
     const workDescription = description || '';
 
