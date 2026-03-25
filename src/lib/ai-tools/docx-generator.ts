@@ -390,6 +390,99 @@ export async function generateAiToolDocument(
     return Buffer.from(buffer);
   }
 
+  // ── New 13 tools — premium templates ──────────────────────────────────────
+
+  if (toolSlug === 'programme-checker') {
+    const { buildProgrammeCheckerDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildProgrammeCheckerDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'cdm-checker') {
+    const { buildCdmCheckerDocument } = await import('./templates/cdm-checker-template');
+    const doc = await buildCdmCheckerDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'noise-assessment') {
+    const { buildNoiseAssessmentDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildNoiseAssessmentDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'quote-generator') {
+    const { buildQuoteGeneratorDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildQuoteGeneratorDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'safety-alert') {
+    const { buildSafetyAlertDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildSafetyAlertDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'carbon-footprint') {
+    const { buildCarbonFootprintDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildCarbonFootprintDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'rams-review') {
+    const { buildRamsReviewDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildRamsReviewDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'delay-notification') {
+    const { buildDelayNotificationDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildDelayNotificationDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'variation-confirmation') {
+    const { buildVariationConfirmationDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildVariationConfirmationDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'rfi-generator') {
+    const { buildRfiGeneratorDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildRfiGeneratorDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'payment-application') {
+    const { buildPaymentApplicationDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildPaymentApplicationDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'daywork-sheet') {
+    const { buildDayworkSheetDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildDayworkSheetDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
+  if (toolSlug === 'carbon-reduction-plan') {
+    const { buildCarbonReductionPlanDocument } = await import('./templates/new-tools-templates');
+    const doc = await buildCarbonReductionPlanDocument(content as any);
+    const { Packer } = await import('docx');
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
   // Generic fallback for tools without a dedicated template
   const config = getAiToolConfig(toolSlug);
 
