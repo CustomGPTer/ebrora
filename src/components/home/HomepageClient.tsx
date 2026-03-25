@@ -165,7 +165,7 @@ const CATEGORISED_TOOLS: Record<ToolCategory, AiToolCard[]> = {
 
 const ALL_CATEGORIES: ToolCategory[] = ['Health & Safety', 'Quality', 'Commercial', 'Programme'];
 
-/* ── Legacy non-AI hub cards (shown below the categorised AI tools grid) ── */
+/* ── Resource cards (shown below the categorised AI tools grid) ── */
 const HUB_CARDS = [
   {
     title: 'Premium Templates',
@@ -179,176 +179,6 @@ const HUB_CARDS = [
     stat: '55+',
     statLabel: 'templates',
     accent: 'hp-card--templates',
-  },
-  {
-    title: 'RAMS Builder',
-    desc: 'AI-generated risk assessments and method statements. 10 industry formats, CDM 2015 compliant, ready in minutes.',
-    href: '/rams-builder',
-    icon: <AiSparkleIcon />,
-    stat: '10',
-    statLabel: 'formats',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'COSHH Assessment',
-    desc: 'Generate COSHH assessments for hazardous substances. Covers exposure routes, control measures, and PPE requirements.',
-    href: '/coshh-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'ITP Generator',
-    desc: 'Inspection and test plans tailored to your works. Hold points, witness points, and sign-off matrices built in.',
-    href: '/itp-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Manual Handling RA',
-    desc: 'Manual handling risk assessments using TILE methodology. Task, individual, load, and environment analysis.',
-    href: '/manual-handling-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'DSE Assessment',
-    desc: 'Display screen equipment assessments for office and site welfare. Workstation setup, posture, and eye strain checks.',
-    href: '/dse-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Toolbox Talk Generator',
-    desc: 'Generate bespoke toolbox talks for any activity or hazard. Site-specific, briefing-ready, and branded to your project.',
-    href: '/tbt-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Confined Spaces',
-    desc: 'Confined space risk assessments covering atmospheric hazards, entry permits, rescue plans, and monitoring requirements.',
-    href: '/confined-spaces-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Incident Report',
-    desc: 'Incident investigation reports with root cause analysis, 5 Whys methodology, RIDDOR assessment, and corrective actions.',
-    href: '/incident-report-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Lift Plan',
-    desc: 'Structured lift plans covering load details, crane specification, exclusion zones, appointed persons, and communication.',
-    href: '/lift-plan-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Emergency Response Plan',
-    desc: 'Site-specific emergency response plans covering fire, first aid, environmental spills, and evacuation procedures.',
-    href: '/emergency-response-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Quality Checklist',
-    desc: 'Activity-specific quality inspection checklists with hold points, acceptance criteria, and reference standards.',
-    href: '/quality-checklist-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Scope of Works',
-    desc: 'Subcontractor scope of works with inclusions, exclusions, interfaces, programme constraints, and deliverables.',
-    href: '/scope-of-works-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Permit to Dig',
-    desc: 'Permit to dig documents covering utility searches, CAT & Genny scanning, hand-dig zones, and safe digging methods.',
-    href: '/permit-to-dig-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'POWRA',
-    desc: 'Point of work risk assessments — quick field-level assessments with hazards, controls, stop conditions, and team sign-on.',
-    href: '/powra-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'Early Warning Notice',
-    desc: 'NEC-compliant early warning notices with risk description, cost and programme impact, and proposed mitigation.',
-    href: '/early-warning-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'NCR Generator',
-    desc: 'Non-conformance reports with root cause analysis, corrective and preventive actions, disposition, and close-out.',
-    href: '/ncr-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
-  },
-  {
-    title: 'CE Notification',
-    desc: 'NEC compensation event notifications with clause references, programme impact, cost implications, and entitlement basis.',
-    href: '/ce-notification-builder',
-    icon: <AiSparkleIcon />,
-    stat: 'AI',
-    statLabel: 'generated',
-    accent: 'hp-card--ai',
-    badge: 'AI',
   },
   {
     title: 'Toolbox Talks',
@@ -615,30 +445,88 @@ export default function HomepageClient({
         </div>
       </div>
 
-      {/* ━━━ HUB GRID ━━━ */}
+      {/* ━━━ AI TOOLS — CATEGORISED TAB GRID ━━━ */}
       <section className="hp-section" ref={fadeRef1}>
         <div className="hp-container">
+          <div className="hp-section-header">
+            <span className="hp-section-badge">AI Document Generators</span>
+            <h2 className="hp-section-title">29 AI Tools Across 4 Categories</h2>
+            <p className="hp-section-sub">Every tool is built specifically for UK construction. Regulation-compliant outputs, ready to use on site.</p>
+          </div>
 
-          <div className="hp-hub-grid">
+          {/* Category tabs */}
+          <div className="hp-cat-tabs">
+            {ALL_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                className={`hp-cat-tab${activeCategory === cat ? ' hp-cat-tab--active' : ''}`}
+                onClick={() => setActiveCategory(cat)}
+                style={activeCategory === cat ? { borderColor: CATEGORY_ACCENT[cat], color: CATEGORY_ACCENT[cat] } : undefined}
+              >
+                <span className="hp-cat-tab__label">{cat}</span>
+                <span
+                  className="hp-cat-tab__count"
+                  style={activeCategory === cat ? { background: CATEGORY_ACCENT[cat], color: '#fff' } : undefined}
+                >
+                  {CATEGORISED_TOOLS[cat].length}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Tool cards grid */}
+          <div className="hp-tools-grid">
+            {CATEGORISED_TOOLS[activeCategory].map((tool, idx) => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className="hp-tool-card"
+                style={{ animationDelay: `${idx * 50}ms` }}
+              >
+                <div className="hp-tool-card__badges">
+                  {tool.badge && (
+                    <span className="hp-tool-card__badge hp-tool-card__badge--ai">
+                      <AiSparkleIcon /> {tool.badge}
+                    </span>
+                  )}
+                  {tool.isNew && (
+                    <span className="hp-tool-card__badge hp-tool-card__badge--new">New</span>
+                  )}
+                  {tool.isUpload && (
+                    <span className="hp-tool-card__badge hp-tool-card__badge--upload">Upload</span>
+                  )}
+                </div>
+                <h3 className="hp-tool-card__title">{tool.title}</h3>
+                <p className="hp-tool-card__desc">{tool.desc}</p>
+                <div className="hp-tool-card__footer">
+                  <span className="hp-tool-card__cta" style={{ color: CATEGORY_ACCENT[activeCategory] }}>
+                    Try Free →
+                  </span>
+                </div>
+                <div className="hp-tool-card__line" style={{ background: CATEGORY_ACCENT[activeCategory] }} />
+              </Link>
+            ))}
+          </div>
+
+          {/* Resources row */}
+          <div className="hp-resources-row">
             {HUB_CARDS.map((card, idx) => (
               <Link
                 key={idx}
                 href={card.href}
-                className={`hp-hub-card ${card.accent}`}
-                style={{ animationDelay: `${idx * 80}ms` }}
+                className={`hp-resource-card ${card.accent}`}
               >
-                {card.badge && <span className="hp-hub-card__badge">{card.badge}</span>}
-                <div className="hp-hub-card__icon">{card.icon}</div>
-                <h3 className="hp-hub-card__title">{card.title}</h3>
-                <p className="hp-hub-card__desc">{card.desc}</p>
-                <div className="hp-hub-card__footer">
-                  <span className="hp-hub-card__stat">
+                {card.badge && <span className="hp-resource-card__badge">{card.badge}</span>}
+                <div className="hp-resource-card__icon">{card.icon}</div>
+                <div className="hp-resource-card__body">
+                  <span className="hp-resource-card__title">{card.title}</span>
+                  <span className="hp-resource-card__stat">
                     <strong>{card.stat}</strong> {card.statLabel}
                   </span>
-                  <svg className="hp-hub-card__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
                 </div>
+                <svg className="hp-resource-card__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </Link>
             ))}
           </div>
