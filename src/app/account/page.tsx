@@ -86,7 +86,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
     // Fallback if AI tool tables don't exist yet
     const tier = subscription?.plan || 'FREE';
     const fallbackLimit = tier === 'PROFESSIONAL' ? 20 : tier === 'STANDARD' ? 6 : 1;
-    const restrictedOnFree = new Set(['itp', 'incident-report', 'lift-plan', 'emergency-response', 'scope-of-works', 'early-warning', 'ncr']);
+    const restrictedOnFree = new Set(['itp', 'incident-report', 'lift-plan', 'emergency-response', 'scope-of-works', 'early-warning', 'ncr', 'programme-checker', 'cdm-checker', 'noise-assessment', 'quote-generator', 'safety-alert', 'carbon-footprint', 'rams-review', 'delay-notification', 'variation-confirmation', 'rfi-generator', 'payment-application', 'daywork-sheet', 'carbon-reduction-plan']);
     const fl = (slug: string) => (tier === 'FREE' && restrictedOnFree.has(slug)) ? 0 : fallbackLimit;
     aiToolUsage = {
       'coshh': { used: 0, limit: fl('coshh') },
@@ -105,6 +105,19 @@ export default async function AccountPage({ searchParams }: PageProps) {
       'early-warning': { used: 0, limit: fl('early-warning') },
       'ncr': { used: 0, limit: fl('ncr') },
       'ce-notification': { used: 0, limit: fl('ce-notification') },
+      'programme-checker': { used: 0, limit: fl('programme-checker') },
+      'cdm-checker': { used: 0, limit: fl('cdm-checker') },
+      'noise-assessment': { used: 0, limit: fl('noise-assessment') },
+      'quote-generator': { used: 0, limit: fl('quote-generator') },
+      'safety-alert': { used: 0, limit: fl('safety-alert') },
+      'carbon-footprint': { used: 0, limit: fl('carbon-footprint') },
+      'rams-review': { used: 0, limit: fl('rams-review') },
+      'delay-notification': { used: 0, limit: fl('delay-notification') },
+      'variation-confirmation': { used: 0, limit: fl('variation-confirmation') },
+      'rfi-generator': { used: 0, limit: fl('rfi-generator') },
+      'payment-application': { used: 0, limit: fl('payment-application') },
+      'daywork-sheet': { used: 0, limit: fl('daywork-sheet') },
+      'carbon-reduction-plan': { used: 0, limit: fl('carbon-reduction-plan') },
     };
   }
 
