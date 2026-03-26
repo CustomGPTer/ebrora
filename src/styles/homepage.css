@@ -78,7 +78,7 @@
    ============================================================================ */
 .hp-hero {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   background: linear-gradient(160deg, #0f2d22 0%, #1B5B50 45%, #1a6b5c 100%);
   padding: 4rem 1.5rem 3.5rem;
   text-align: center;
@@ -86,6 +86,7 @@
 .hp-hero__bg {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212, 164, 76, 0.08) 0%, transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 80%, rgba(27, 91, 80, 0.3) 0%, transparent 50%);
@@ -133,6 +134,7 @@
 /* ── Search (premium editorial) ── */
 .hp-search-wrapper {
   position: relative;
+  z-index: 100;
   max-width: 660px;
   margin: 0 auto 1.5rem;
 }
