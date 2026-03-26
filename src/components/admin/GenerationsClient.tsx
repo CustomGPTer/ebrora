@@ -11,44 +11,35 @@ interface Generation {
   userEmail: string;
   formatName: string;
   status: string;
-  createdAt: Date;
-  completedAt: Date | null;
-  estimatedDurationSeconds: number;
+  createdAt: string;
+  completedAt: string | null;
   errorMessage: string | null;
   answers: any;
 }
 
-interface GenerationsClientProps {
+interface Props {
   generations: Generation[];
   currentPage: number;
   totalPages: number;
   totalCount: number;
   currentStatus: string;
+  statusCounts: Record<string, number>;
 }
 
-export function GenerationsClient({
-  generations,
-  currentPage,
-  totalPages,
-  totalCount,
-  currentStatus,
-}: GenerationsClientProps) {
+export function GenerationsClient({ generations, currentPage, totalPages, totalCount, currentStatus, statusCounts }: Props) {
   const router = useRouter();
-  const [status, setStatus] = useState(currentStatus);
-  const [selectedGen, setSelectedGen] = useState<string | null>(null);
+  const [selectedGen, setSelectedGen] = useState<Generation | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleStatusChange = (newStatus: string) => {
-    setStatus(newStatus);
+  const handleStatusFilter = (status: string) => {
     const params = new URLSearchParams();
-    if (newStatus !== 'ALL') params.set('status', newStatus);
+    if (status !== 'ALL') params.set('status', status);
     params.set('page', '1');
     router.push(`/admin/generations?${params.toString()}`);
   };
 
   const handleRetry = async (genId: string) => {
     if (!confirm('Retry this generation?')) return;
-
     setLoading(true);
     try {
       const res = await fetch('/api/admin/generations', {
@@ -56,323 +47,170 @@ export function GenerationsClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ generationId: genId }),
       });
-
-      if (!res.ok) throw new Error('Failed to retry generation');
+      if (!res.ok) throw new Error('Failed');
       router.refresh();
-    } catch (error) {
-      alert('Error retrying generation');
-    } finally {
-      setLoading(false);
-    }
+    } catch { alert('Error retrying'); }
+    finally { setLoading(false); }
   };
 
-  const pageUrl = (pageNum: number) => {
+  const pageUrl = (p: number) => {
     const params = new URLSearchParams();
-    if (status !== 'ALL') params.set('status', status);
-    params.set('page', pageNum.toString());
+    if (currentStatus !== 'ALL') params.set('status', currentStatus);
+    params.set('page', p.toString());
     return `/admin/generations?${params.toString()}`;
   };
 
-  const selectedGenData = generations.find((g) => g.id === selectedGen);
+  const statusBadge = (s: string) => {
+    switch (s) {
+      case 'COMPLETED': return 'admin-badge--completed';
+      case 'FAILED': return 'admin-badge--failed';
+      case 'PROCESSING': return 'admin-badge--processing';
+      case 'QUEUED': return 'admin-badge--queued';
+      default: return 'admin-badge--free';
+    }
+  };
+
+  const statuses = ['ALL', 'QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED'];
 
   return (
-    <div style={{ padding: '1.5rem 0' }}>
-      <h1 style={{ marginBottom: '1.5rem', color: '#1B5B50', fontSize: '1.5rem' }}>
-        Generation Monitoring
-      </h1>
+    <div>
+      <div className="admin-page-heading">
+        <div>
+          <h2 className="admin-page-heading__title">RAMS Generations</h2>
+          <p className="admin-page-heading__subtitle">{totalCount} total generations</p>
+        </div>
+      </div>
 
-      {/* Status Filter */}
-      <div className="admin-filters" style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        {['ALL', 'QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED'].map((s) => (
+      {/* Status Filter Pills */}
+      <div className="admin-filters">
+        {statuses.map((s) => (
           <button
             key={s}
-            onClick={() => handleStatusChange(s)}
-            style={{
-              padding: '0.5rem 1rem',
-              border: '1px solid #1B5B50',
-              backgroundColor: status === s ? '#1B5B50' : 'white',
-              color: status === s ? 'white' : '#1B5B50',
-              borderRadius: '0.25rem',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}
+            className={`admin-filter-btn ${currentStatus === s ? 'admin-filter-btn--active' : ''}`}
+            onClick={() => handleStatusFilter(s)}
           >
-            {s}
+            {s} {s !== 'ALL' && statusCounts[s] ? `(${statusCounts[s]})` : ''}
           </button>
         ))}
       </div>
 
-      {/* Results Info */}
-      <div style={{ marginBottom: '1rem', color: '#666', fontSize: '0.875rem' }}>
-        Showing {(currentPage - 1) * 50 + 1} to {Math.min(currentPage * 50, totalCount)} of{' '}
-        {totalCount} generations
+      <div className="admin-pagination__info">
+        Showing {Math.min((currentPage - 1) * 50 + 1, totalCount)}–{Math.min(currentPage * 50, totalCount)} of {totalCount}
       </div>
 
-      {/* Generations Table */}
-      <div style={{ overflowX: 'auto', marginBottom: '1.5rem' }}>
-        <table className="admin-gen-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ borderBottom: '2px solid #1B5B50' }}>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                ID
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                User
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Format
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Status
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Created
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Duration
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {generations.map((gen) => (
-              <tr key={gen.id} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                <td style={{ padding: '0.75rem', fontSize: '0.75rem', fontFamily: 'monospace' }}>
-                  {gen.id.substring(0, 8)}
-                </td>
-                <td style={{ padding: '0.75rem' }}>
-                  <div style={{ fontSize: '0.875rem' }}>{gen.userName}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#999' }}>{gen.userEmail}</div>
-                </td>
-                <td style={{ padding: '0.75rem' }}>{gen.formatName}</td>
-                <td style={{ padding: '0.75rem' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      padding: '0.25rem 0.75rem',
-                      borderRadius: '0.25rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      backgroundColor:
-                        gen.status === 'COMPLETED'
-                          ? '#d4edda'
-                          : gen.status === 'FAILED'
-                            ? '#f8d7da'
-                            : '#fff3cd',
-                      color:
-                        gen.status === 'COMPLETED'
-                          ? '#155724'
-                          : gen.status === 'FAILED'
-                            ? '#721c24'
-                            : '#856404',
-                    }}
-                  >
-                    {gen.status}
-                  </span>
-                </td>
-                <td style={{ padding: '0.75rem', fontSize: '0.875rem', color: '#999' }}>
-                  {formatDistanceToNow(new Date(gen.createdAt), { addSuffix: true })}
-                </td>
-                <td style={{ padding: '0.75rem', fontSize: '0.875rem' }}>
-                  {gen.completedAt
-                    ? `${Math.round(
-                        (new Date(gen.completedAt).getTime() - new Date(gen.createdAt).getTime()) /
-                          1000
-                      )}s`
-                    : '—'}
-                </td>
-                <td style={{ padding: '0.75rem' }}>
-                  <button
-                    onClick={() => setSelectedGen(gen.id)}
-                    style={{
-                      padding: '0.25rem 0.75rem',
-                      backgroundColor: '#D4A44C',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem',
-                      marginRight: '0.5rem',
-                    }}
-                  >
-                    View
-                  </button>
-                  {gen.status === 'FAILED' && (
-                    <button
-                      onClick={() => handleRetry(gen.id)}
-                      disabled={loading}
-                      style={{
-                        padding: '0.25rem 0.75rem',
-                        backgroundColor: '#d32f2f',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '0.25rem',
-                        cursor: 'pointer',
-                        fontSize: '0.75rem',
-                      }}
-                    >
-                      Retry
-                    </button>
-                  )}
-                </td>
+      {/* Table */}
+      <div className="admin-card">
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Format</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th>Created</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {generations.map((gen) => (
+                <tr key={gen.id}>
+                  <td><span className="admin-table__mono">{gen.id.substring(0, 8)}</span></td>
+                  <td>
+                    <span className="admin-table__user-name">{gen.userName}</span>
+                    <span className="admin-table__user-email">{gen.userEmail}</span>
+                  </td>
+                  <td>{gen.formatName}</td>
+                  <td><span className={`admin-badge ${statusBadge(gen.status)}`}>{gen.status}</span></td>
+                  <td style={{ fontSize: '0.8125rem', color: 'var(--admin-text-secondary)' }}>
+                    {gen.completedAt
+                      ? `${Math.round((new Date(gen.completedAt).getTime() - new Date(gen.createdAt).getTime()) / 1000)}s`
+                      : '—'}
+                  </td>
+                  <td style={{ fontSize: '0.8125rem', color: 'var(--admin-text-muted)' }}>
+                    {formatDistanceToNow(new Date(gen.createdAt), { addSuffix: true })}
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '0.375rem' }}>
+                      <button className="admin-btn admin-btn--gold admin-btn--sm" onClick={() => setSelectedGen(gen)}>
+                        View
+                      </button>
+                      {gen.status === 'FAILED' && (
+                        <button className="admin-btn admin-btn--danger admin-btn--sm" onClick={() => handleRetry(gen.id)} disabled={loading}>
+                          Retry
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {generations.length === 0 && (
+                <tr><td colSpan={7}><div className="admin-empty"><div className="admin-empty__icon">⚙️</div><p className="admin-empty__text">No generations found</p></div></td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="admin-pagination" style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
-          {currentPage > 1 && (
-            <a
-              href={pageUrl(currentPage - 1)}
-              style={{
-                padding: '0.5rem 0.75rem',
-                border: '1px solid #1B5B50',
-                color: '#1B5B50',
-                textDecoration: 'none',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-              }}
-            >
-              ← Prev
-            </a>
-          )}
-
-          {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((p) => (
-            <a
-              key={p}
-              href={pageUrl(p)}
-              style={{
-                padding: '0.5rem 0.75rem',
-                border: '1px solid #ddd',
-                backgroundColor: p === currentPage ? '#1B5B50' : 'white',
-                color: p === currentPage ? 'white' : '#1B5B50',
-                textDecoration: 'none',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-              }}
-            >
-              {p}
-            </a>
+        <div className="admin-pagination">
+          {currentPage > 1 && <a href={pageUrl(currentPage - 1)} className="admin-pagination__btn">← Prev</a>}
+          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1).map((p) => (
+            <a key={p} href={pageUrl(p)} className={`admin-pagination__btn ${p === currentPage ? 'admin-pagination__btn--active' : ''}`}>{p}</a>
           ))}
-
-          {currentPage < totalPages && (
-            <a
-              href={pageUrl(currentPage + 1)}
-              style={{
-                padding: '0.5rem 0.75rem',
-                border: '1px solid #1B5B50',
-                color: '#1B5B50',
-                textDecoration: 'none',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-              }}
-            >
-              Next →
-            </a>
-          )}
+          {currentPage < totalPages && <a href={pageUrl(currentPage + 1)} className="admin-pagination__btn">Next →</a>}
         </div>
       )}
 
-      {/* Details Modal */}
-      {selectedGenData && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
-          onClick={() => setSelectedGen(null)}
-        >
-          <div
-            style={{
-              backgroundColor: 'white',
-              padding: '2rem',
-              borderRadius: '0.5rem',
-              maxWidth: '600px',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 style={{ margin: '0 0 1rem 0', color: '#1B5B50' }}>Generation Details</h2>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontSize: '0.875rem', color: '#999', marginBottom: '0.25rem' }}>
-                ID
-              </div>
-              <div style={{ fontFamily: 'monospace' }}>{selectedGenData.id}</div>
+      {/* Detail Modal */}
+      {selectedGen && (
+        <div className="admin-modal-overlay" onClick={() => setSelectedGen(null)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal__header">
+              <h3 className="admin-modal__title">Generation Details</h3>
+              <button className="admin-modal__close" onClick={() => setSelectedGen(null)}>✕</button>
             </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontSize: '0.875rem', color: '#999', marginBottom: '0.25rem' }}>
-                User
-              </div>
-              <div>{selectedGenData.userName}</div>
-              <div style={{ fontSize: '0.875rem', color: '#999' }}>{selectedGenData.userEmail}</div>
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontSize: '0.875rem', color: '#999', marginBottom: '0.25rem' }}>
-                Status
-              </div>
-              <div>{selectedGenData.status}</div>
-            </div>
-
-            {selectedGenData.errorMessage && (
-              <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#f8d7da', borderRadius: '0.25rem' }}>
-                <div style={{ fontSize: '0.875rem', color: '#999', marginBottom: '0.25rem' }}>
-                  Error
-                </div>
-                <div style={{ color: '#721c24', fontSize: '0.875rem' }}>
-                  {selectedGenData.errorMessage}
-                </div>
-              </div>
-            )}
-
-            {selectedGenData.answers && (
+            <div className="admin-modal__body">
               <div style={{ marginBottom: '1rem' }}>
-                <div style={{ fontSize: '0.875rem', color: '#999', marginBottom: '0.25rem' }}>
-                  Answers
-                </div>
-                <pre
-                  style={{
-                    backgroundColor: '#f5f5f5',
-                    padding: '1rem',
-                    borderRadius: '0.25rem',
-                    overflow: 'auto',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  {JSON.stringify(selectedGenData.answers, null, 2)}
-                </pre>
+                <label className="admin-label">ID</label>
+                <div className="admin-table__mono">{selectedGen.id}</div>
               </div>
-            )}
-
-            <button
-              onClick={() => setSelectedGen(null)}
-              style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: '#1B5B50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-              }}
-            >
-              Close
-            </button>
+              <div style={{ marginBottom: '1rem' }}>
+                <label className="admin-label">User</label>
+                <div>{selectedGen.userName} — {selectedGen.userEmail}</div>
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label className="admin-label">Format</label>
+                <div>{selectedGen.formatName}</div>
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label className="admin-label">Status</label>
+                <span className={`admin-badge ${statusBadge(selectedGen.status)}`}>{selectedGen.status}</span>
+              </div>
+              {selectedGen.errorMessage && (
+                <div className="admin-alert admin-alert--danger" style={{ marginBottom: '1rem' }}>
+                  <span className="admin-alert__icon">🔴</span>
+                  <span className="admin-alert__text">{selectedGen.errorMessage}</span>
+                </div>
+              )}
+              {selectedGen.answers && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label className="admin-label">Answers</label>
+                  <pre style={{
+                    background: 'var(--admin-bg)', padding: '1rem', borderRadius: '6px',
+                    overflow: 'auto', fontSize: '0.75rem', maxHeight: '300px',
+                    border: '1px solid var(--admin-border-light)', lineHeight: 1.6,
+                  }}>
+                    {JSON.stringify(selectedGen.answers, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+            <div className="admin-modal__footer">
+              <button className="admin-btn admin-btn--outline" onClick={() => setSelectedGen(null)}>Close</button>
+            </div>
           </div>
         </div>
       )}

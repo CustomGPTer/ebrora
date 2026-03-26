@@ -11,12 +11,15 @@ interface User {
   role: string;
   tier: string;
   status: string;
-  generationsCount: number;
-  createdAt: Date;
-  disabled: boolean;
+  paypalId: string | null;
+  ramsCount: number;
+  aiToolCount: number;
+  authMethod: string;
+  emailVerified: boolean;
+  createdAt: string;
 }
 
-interface UsersClientProps {
+interface Props {
   users: User[];
   currentPage: number;
   totalPages: number;
@@ -25,62 +28,31 @@ interface UsersClientProps {
   currentSearch: string;
 }
 
-export function UsersClient({
-  users,
-  currentPage,
-  totalPages,
-  totalCount,
-  currentTier,
-  currentSearch,
-}: UsersClientProps) {
+export function UsersClient({ users, currentPage, totalPages, totalCount, currentTier, currentSearch }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState(currentSearch);
   const [tier, setTier] = useState(currentTier);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', role: '', tier: '' });
   const [loading, setLoading] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (tier !== 'ALL') params.set('tier', tier);
     params.set('page', '1');
     router.push(`/admin/users?${params.toString()}`);
-    setLoading(false);
   };
 
-  const handleRoleChange = async (userId: string, newRole: string) => {
-    if (!confirm(`Change user role to ${newRole}?`)) return;
-
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, role: newRole }),
-      });
-
-      if (!res.ok) throw new Error('Failed to update user');
-      router.refresh();
-    } catch (error) {
-      alert('Error updating user');
-    }
-  };
-
-  const handleDisableUser = async (userId: string) => {
-    if (!confirm('Disable this user account?')) return;
-
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, disabled: true }),
-      });
-
-      if (!res.ok) throw new Error('Failed to disable user');
-      router.refresh();
-    } catch (error) {
-      alert('Error disabling user');
-    }
+  const handleTierFilter = (newTier: string) => {
+    setTier(newTier);
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (newTier !== 'ALL') params.set('tier', newTier);
+    params.set('page', '1');
+    router.push(`/admin/users?${params.toString()}`);
   };
 
   const pageUrl = (pageNum: number) => {
@@ -91,225 +63,312 @@ export function UsersClient({
     return `/admin/users?${params.toString()}`;
   };
 
+  const openEdit = (user: User) => {
+    setEditingUser(user);
+    setEditForm({ name: user.name, role: user.role, tier: user.tier });
+  };
+
+  const saveEdit = async () => {
+    if (!editingUser) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: editingUser.id, ...editForm }),
+      });
+      if (!res.ok) throw new Error('Failed');
+      setEditingUser(null);
+      router.refresh();
+    } catch {
+      alert('Error updating user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteUser) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: deleteUser.id }),
+      });
+      if (!res.ok) throw new Error('Failed');
+      setDeleteUser(null);
+      router.refresh();
+    } catch {
+      alert('Error deleting user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportCSV = () => {
+    const headers = ['Name', 'Email', 'Role', 'Tier', 'Status', 'RAMS', 'AI Tools', 'Auth', 'Joined'];
+    const rows = users.map((u) => [
+      u.name, u.email, u.role, u.tier, u.status,
+      u.ramsCount, u.aiToolCount, u.authMethod,
+      new Date(u.createdAt).toLocaleDateString('en-GB'),
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ebrora-users-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const tierBadgeClass = (t: string) => {
+    switch (t) {
+      case 'PROFESSIONAL': return 'admin-badge--professional';
+      case 'STANDARD': return 'admin-badge--standard';
+      default: return 'admin-badge--free';
+    }
+  };
+
   return (
-    <div style={{ padding: '1.5rem 0' }}>
-      <h1 style={{ marginBottom: '1.5rem', color: '#1B5B50', fontSize: '1.5rem' }}>
-        User Management
-      </h1>
-
-      {/* Search & Filter */}
-      <form onSubmit={handleSearch} className="admin-search">
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              flex: 1,
-              minWidth: '200px',
-              padding: '0.75rem',
-              border: '1px solid #ddd',
-              borderRadius: '0.25rem',
-            }}
-          />
-          <select
-            value={tier}
-            onChange={(e) => setTier(e.target.value)}
-            style={{
-              padding: '0.75rem',
-              border: '1px solid #ddd',
-              borderRadius: '0.25rem',
-              backgroundColor: 'white',
-            }}
-          >
-            <option value="ALL">All Tiers</option>
-            <option value="FREE">Free</option>
-            <option value="STANDARD">Standard</option>
-            <option value="PROFESSIONAL">Professional</option>
-          </select>
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#1B5B50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.25rem',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}
-          >
-            Search
-          </button>
+    <div>
+      {/* Page Heading */}
+      <div className="admin-page-heading">
+        <div>
+          <h2 className="admin-page-heading__title">User Management</h2>
+          <p className="admin-page-heading__subtitle">{totalCount} total users</p>
         </div>
-      </form>
-
-      {/* Results Info */}
-      <div style={{ marginBottom: '1rem', color: '#666', fontSize: '0.875rem' }}>
-        Showing {(currentPage - 1) * 20 + 1} to {Math.min(currentPage * 20, totalCount)} of{' '}
-        {totalCount} users
+        <button className="admin-btn admin-btn--outline admin-export-btn" onClick={exportCSV}>
+          📥 Export CSV
+        </button>
       </div>
 
-      {/* Users Table */}
-      <div style={{ overflowX: 'auto', marginBottom: '1.5rem' }}>
-        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr className="admin-table__header" style={{ borderBottom: '2px solid #1B5B50' }}>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Name
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Email
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Role
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Tier
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Generations
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Joined
-              </th>
-              <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: 'bold', color: '#1B5B50' }}>
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr
-                key={user.id}
-                className="admin-table__row"
-                style={{
-                  borderBottom: '1px solid #e0e0e0',
-                  opacity: user.disabled ? 0.6 : 1,
-                }}
-              >
-                <td style={{ padding: '0.75rem' }}>
-                  <strong>{user.name}</strong>
-                  {user.disabled && (
-                    <div style={{ fontSize: '0.75rem', color: '#d32f2f' }}>DISABLED</div>
-                  )}
-                </td>
-                <td style={{ padding: '0.75rem', fontSize: '0.875rem' }}>{user.email}</td>
-                <td style={{ padding: '0.75rem' }}>
-                  <select
-                    value={user.role}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                    style={{
-                      padding: '0.25rem 0.5rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '0.25rem',
-                    }}
-                  >
-                    <option value="USER">User</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                </td>
-                <td style={{ padding: '0.75rem' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      padding: '0.25rem 0.75rem',
-                      borderRadius: '0.25rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      backgroundColor:
-                        user.tier === 'PROFESSIONAL'
-                          ? '#fce4ec'
-                          : user.tier === 'STANDARD'
-                            ? '#e3f2fd'
-                            : '#f5f5f5',
-                      color: user.tier === 'PROFESSIONAL' ? '#c2185b' : user.tier === 'STANDARD' ? '#1565c0' : '#666',
-                    }}
-                  >
-                    {user.tier}
-                  </span>
-                </td>
-                <td style={{ padding: '0.75rem' }}>{user.generationsCount}</td>
-                <td style={{ padding: '0.75rem', fontSize: '0.875rem', color: '#999' }}>
-                  {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
-                </td>
-                <td style={{ padding: '0.75rem' }}>
-                  <button
-                    onClick={() => handleDisableUser(user.id)}
-                    disabled={user.disabled}
-                    style={{
-                      padding: '0.25rem 0.75rem',
-                      backgroundColor: user.disabled ? '#ccc' : '#d32f2f',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '0.25rem',
-                      cursor: user.disabled ? 'default' : 'pointer',
-                      fontSize: '0.75rem',
-                    }}
-                  >
-                    {user.disabled ? 'Disabled' : 'Disable'}
-                  </button>
-                </td>
+      {/* Search & Filter */}
+      <form onSubmit={handleSearch} className="admin-search-bar">
+        <input
+          type="text"
+          placeholder="Search by name or email..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="admin-input"
+        />
+        <select
+          value={tier}
+          onChange={(e) => handleTierFilter(e.target.value)}
+          className="admin-select"
+        >
+          <option value="ALL">All Tiers</option>
+          <option value="FREE">Free</option>
+          <option value="STANDARD">Standard</option>
+          <option value="PROFESSIONAL">Professional</option>
+        </select>
+        <button type="submit" className="admin-btn admin-btn--primary">
+          Search
+        </button>
+      </form>
+
+      {/* Results */}
+      <div className="admin-pagination__info">
+        Showing {Math.min((currentPage - 1) * 20 + 1, totalCount)}–{Math.min(currentPage * 20, totalCount)} of {totalCount}
+      </div>
+
+      {/* Table */}
+      <div className="admin-card">
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Tier</th>
+                <th>RAMS</th>
+                <th>AI Tools</th>
+                <th>Auth</th>
+                <th>Joined</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.id}>
+                  <td>
+                    <span className="admin-table__user-name">{user.name || '—'}</span>
+                    <span className="admin-table__user-email">{user.email}</span>
+                  </td>
+                  <td>
+                    <span className={`admin-badge ${user.role === 'ADMIN' ? 'admin-badge--admin' : 'admin-badge--user'}`}>
+                      {user.role}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`admin-badge ${tierBadgeClass(user.tier)}`}>
+                      {user.tier}
+                    </span>
+                  </td>
+                  <td>{user.ramsCount}</td>
+                  <td>{user.aiToolCount}</td>
+                  <td>
+                    <span style={{ fontSize: '0.8125rem', color: 'var(--admin-text-secondary)' }}>
+                      {user.authMethod}
+                    </span>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '0.8125rem', color: 'var(--admin-text-muted)' }}>
+                      {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                    </span>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '0.375rem' }}>
+                      <button className="admin-btn admin-btn--gold admin-btn--sm" onClick={() => openEdit(user)}>
+                        Edit
+                      </button>
+                      <button className="admin-btn admin-btn--danger admin-btn--sm" onClick={() => setDeleteUser(user)}>
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {users.length === 0 && (
+                <tr>
+                  <td colSpan={8}>
+                    <div className="admin-empty">
+                      <div className="admin-empty__icon">👥</div>
+                      <p className="admin-empty__text">No users found</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="admin-pagination" style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
+        <div className="admin-pagination">
           {currentPage > 1 && (
-            <a
-              href={pageUrl(currentPage - 1)}
-              style={{
-                padding: '0.5rem 0.75rem',
-                border: '1px solid #1B5B50',
-                color: '#1B5B50',
-                textDecoration: 'none',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-              }}
-            >
-              ← Prev
-            </a>
+            <a href={pageUrl(currentPage - 1)} className="admin-pagination__btn">← Prev</a>
           )}
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <a
-              key={p}
-              href={pageUrl(p)}
-              style={{
-                padding: '0.5rem 0.75rem',
-                border: '1px solid #ddd',
-                backgroundColor: p === currentPage ? '#1B5B50' : 'white',
-                color: p === currentPage ? 'white' : '#1B5B50',
-                textDecoration: 'none',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-              }}
-            >
-              {p}
-            </a>
-          ))}
-
+          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+            let p: number;
+            if (totalPages <= 7) {
+              p = i + 1;
+            } else if (currentPage <= 4) {
+              p = i + 1;
+            } else if (currentPage >= totalPages - 3) {
+              p = totalPages - 6 + i;
+            } else {
+              p = currentPage - 3 + i;
+            }
+            return (
+              <a
+                key={p}
+                href={pageUrl(p)}
+                className={`admin-pagination__btn ${p === currentPage ? 'admin-pagination__btn--active' : ''}`}
+              >
+                {p}
+              </a>
+            );
+          })}
           {currentPage < totalPages && (
-            <a
-              href={pageUrl(currentPage + 1)}
-              style={{
-                padding: '0.5rem 0.75rem',
-                border: '1px solid #1B5B50',
-                color: '#1B5B50',
-                textDecoration: 'none',
-                borderRadius: '0.25rem',
-                cursor: 'pointer',
-              }}
-            >
-              Next →
-            </a>
+            <a href={pageUrl(currentPage + 1)} className="admin-pagination__btn">Next →</a>
           )}
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingUser && (
+        <div className="admin-modal-overlay" onClick={() => setEditingUser(null)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal__header">
+              <h3 className="admin-modal__title">Edit User</h3>
+              <button className="admin-modal__close" onClick={() => setEditingUser(null)}>✕</button>
+            </div>
+            <div className="admin-modal__body">
+              <div style={{ marginBottom: '1rem' }}>
+                <label className="admin-label">Email</label>
+                <div style={{ fontSize: '0.875rem', color: 'var(--admin-text-secondary)', padding: '0.5rem 0' }}>
+                  {editingUser.email}
+                </div>
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label className="admin-label">Name</label>
+                <input
+                  className="admin-input"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label className="admin-label">Role</label>
+                <select
+                  className="admin-select"
+                  value={editForm.role}
+                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                  style={{ width: '100%' }}
+                >
+                  <option value="USER">User</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label className="admin-label">Subscription Tier</label>
+                <select
+                  className="admin-select"
+                  value={editForm.tier}
+                  onChange={(e) => setEditForm({ ...editForm, tier: e.target.value })}
+                  style={{ width: '100%' }}
+                >
+                  <option value="FREE">Free</option>
+                  <option value="STANDARD">Standard</option>
+                  <option value="PROFESSIONAL">Professional</option>
+                </select>
+              </div>
+              {editingUser.paypalId && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label className="admin-label">PayPal Subscription ID</label>
+                  <div className="admin-table__mono" style={{ padding: '0.5rem 0' }}>{editingUser.paypalId}</div>
+                </div>
+              )}
+            </div>
+            <div className="admin-modal__footer">
+              <button className="admin-btn admin-btn--outline" onClick={() => setEditingUser(null)}>Cancel</button>
+              <button className="admin-btn admin-btn--primary" onClick={saveEdit} disabled={loading}>
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteUser && (
+        <div className="admin-modal-overlay" onClick={() => setDeleteUser(null)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal__header">
+              <h3 className="admin-modal__title">Delete User</h3>
+              <button className="admin-modal__close" onClick={() => setDeleteUser(null)}>✕</button>
+            </div>
+            <div className="admin-modal__body">
+              <div className="admin-alert admin-alert--danger" style={{ marginBottom: '1rem' }}>
+                <span className="admin-alert__icon">⚠️</span>
+                <span className="admin-alert__text">
+                  This action is permanent and cannot be undone. All user data, subscriptions, and generations will be deleted.
+                </span>
+              </div>
+              <p style={{ fontSize: '0.875rem', color: 'var(--admin-text-secondary)' }}>
+                Are you sure you want to delete <strong>{deleteUser.name || deleteUser.email}</strong>?
+              </p>
+            </div>
+            <div className="admin-modal__footer">
+              <button className="admin-btn admin-btn--outline" onClick={() => setDeleteUser(null)}>Cancel</button>
+              <button className="admin-btn admin-btn--danger" onClick={confirmDelete} disabled={loading}>
+                {loading ? 'Deleting...' : 'Delete User'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

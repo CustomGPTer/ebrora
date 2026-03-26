@@ -13,65 +13,35 @@ interface Format {
   order: number;
 }
 
-interface FormatsClientProps {
+interface Props {
   formats: Format[];
 }
 
-export function FormatsClient({ formats: initialFormats }: FormatsClientProps) {
+export function FormatsClient({ formats: initialFormats }: Props) {
   const router = useRouter();
   const [formats, setFormats] = useState(initialFormats);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Format>>({});
   const [loading, setLoading] = useState(false);
 
-  const startEdit = (format: Format) => {
-    setEditingId(format.id);
-    setEditData({ ...format });
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditData({});
-  };
+  const startEdit = (f: Format) => { setEditingId(f.id); setEditData({ ...f }); };
+  const cancelEdit = () => { setEditingId(null); setEditData({}); };
 
   const saveEdit = async () => {
     if (!editingId) return;
-
     setLoading(true);
     try {
       const res = await fetch('/api/admin/formats', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: editingId,
-          ...editData,
-        }),
+        body: JSON.stringify({ id: editingId, ...editData }),
       });
-
-      if (!res.ok) throw new Error('Failed to update format');
-
-      setFormats(
-        formats.map((f) =>
-          f.id === editingId
-            ? {
-                ...f,
-                name: editData.name || f.name,
-                description: editData.description || f.description,
-                scoringType: editData.scoringType || f.scoringType,
-                isFree: editData.isFree !== undefined ? editData.isFree : f.isFree,
-                enabled: editData.enabled !== undefined ? editData.enabled : f.enabled,
-              }
-            : f
-        )
-      );
-      setEditingId(null);
-      setEditData({});
+      if (!res.ok) throw new Error('Failed');
+      setFormats(formats.map((f) => f.id === editingId ? { ...f, ...editData } as Format : f));
+      cancelEdit();
       router.refresh();
-    } catch (error) {
-      alert('Error updating format');
-    } finally {
-      setLoading(false);
-    }
+    } catch { alert('Error updating format'); }
+    finally { setLoading(false); }
   };
 
   const toggleFormat = async (id: string, enabled: boolean) => {
@@ -81,196 +51,94 @@ export function FormatsClient({ formats: initialFormats }: FormatsClientProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, enabled: !enabled }),
       });
-
-      if (!res.ok) throw new Error('Failed to toggle format');
-
-      setFormats(
-        formats.map((f) => (f.id === id ? { ...f, enabled: !enabled } : f))
-      );
-      router.refresh();
-    } catch (error) {
-      alert('Error toggling format');
-    }
+      if (!res.ok) throw new Error('Failed');
+      setFormats(formats.map((f) => (f.id === id ? { ...f, enabled: !enabled } : f)));
+    } catch { alert('Error toggling format'); }
   };
 
   return (
-    <div style={{ padding: '1.5rem 0' }}>
-      <h1 style={{ marginBottom: '1.5rem', color: '#1B5B50', fontSize: '1.5rem' }}>
-        Format Management
-      </h1>
+    <div>
+      <div className="admin-page-heading">
+        <div>
+          <h2 className="admin-page-heading__title">Format Management</h2>
+          <p className="admin-page-heading__subtitle">
+            {formats.length} formats • {formats.filter((f) => f.enabled).length} enabled
+          </p>
+        </div>
+      </div>
 
-      <div className="admin-formats" style={{ display: 'grid', gap: '1rem' }}>
+      <div className="admin-card">
         {formats.map((format) => (
           <div
             key={format.id}
-            className="admin-format-card"
-            style={{
-              padding: '1.5rem',
-              border: '1px solid #e0e0e0',
-              borderRadius: '0.5rem',
-              backgroundColor: format.enabled ? 'white' : '#f5f5f5',
-              opacity: format.enabled ? 1 : 0.7,
-            }}
+            className={`admin-format-card ${!format.enabled ? 'admin-format-card--disabled' : ''}`}
           >
             {editingId === format.id ? (
               <div>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1B5B50' }}>
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    value={editData.name || ''}
-                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '0.25rem',
-                      boxSizing: 'border-box',
-                    }}
-                  />
+                  <label className="admin-label">Name</label>
+                  <input className="admin-input" value={editData.name || ''} onChange={(e) => setEditData({ ...editData, name: e.target.value })} />
                 </div>
-
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1B5B50' }}>
-                    Description
-                  </label>
-                  <textarea
-                    value={editData.description || ''}
-                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                    rows={3}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '0.25rem',
-                      boxSizing: 'border-box',
-                      fontFamily: 'inherit',
-                    }}
-                  />
+                  <label className="admin-label">Description</label>
+                  <textarea className="admin-textarea" rows={3} value={editData.description || ''} onChange={(e) => setEditData({ ...editData, description: e.target.value })} style={{ fontFamily: 'inherit' }} />
                 </div>
-
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1B5B50' }}>
-                    Scoring Type
-                  </label>
-                  <input
-                    type="text"
-                    value={editData.scoringType || ''}
-                    onChange={(e) => setEditData({ ...editData, scoringType: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '0.25rem',
-                      boxSizing: 'border-box',
-                    }}
-                  />
+                  <label className="admin-label">Scoring Type</label>
+                  <input className="admin-input" value={editData.scoringType || ''} onChange={(e) => setEditData({ ...editData, scoringType: e.target.value })} />
                 </div>
-
-                <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input
-                      type="checkbox"
-                      checked={editData.isFree || false}
-                      onChange={(e) => setEditData({ ...editData, isFree: e.target.checked })}
-                    />
-                    <span>Free Format</span>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={editData.isFree || false} onChange={(e) => setEditData({ ...editData, isFree: e.target.checked })} />
+                    <span style={{ fontSize: '0.875rem' }}>Free Format</span>
                   </label>
                 </div>
-
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button
-                    onClick={saveEdit}
-                    disabled={loading}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      backgroundColor: '#1B5B50',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    Save
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button className="admin-btn admin-btn--primary" onClick={saveEdit} disabled={loading}>
+                    {loading ? 'Saving...' : 'Save'}
                   </button>
-                  <button
-                    onClick={cancelEdit}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      backgroundColor: '#ddd',
-                      color: '#333',
-                      border: 'none',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Cancel
-                  </button>
+                  <button className="admin-btn admin-btn--outline" onClick={cancelEdit}>Cancel</button>
                 </div>
               </div>
             ) : (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 0.5rem 0', color: '#1B5B50' }}>{format.name}</h3>
-                    <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.875rem', color: '#666' }}>
-                      {format.description}
-                    </p>
+                <div className="admin-format-card__header">
+                  <div style={{ flex: 1 }}>
+                    <h3 className="admin-format-card__name">{format.name}</h3>
+                    <p className="admin-format-card__desc">{format.description}</p>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <label className="admin-toggle" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <input
-                        type="checkbox"
-                        checked={format.enabled}
-                        onChange={() => toggleFormat(format.id, format.enabled)}
-                      />
-                      <span style={{ fontSize: '0.875rem' }}>
-                        {format.enabled ? 'Enabled' : 'Disabled'}
-                      </span>
-                    </label>
+                  <label className="admin-toggle">
+                    <input type="checkbox" checked={format.enabled} onChange={() => toggleFormat(format.id, format.enabled)} />
+                    <span className="admin-toggle__track" />
+                    <span className="admin-toggle__label">{format.enabled ? 'Enabled' : 'Disabled'}</span>
+                  </label>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div className="admin-format-card__meta">
+                    <div className="admin-format-card__meta-item">
+                      <span className="admin-format-card__meta-label">Scoring</span>
+                      <span className="admin-format-card__meta-value">{format.scoringType}</span>
+                    </div>
+                    <div className="admin-format-card__meta-item">
+                      <span className="admin-format-card__meta-label">Free</span>
+                      <span className="admin-format-card__meta-value">{format.isFree ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div className="admin-format-card__meta-item">
+                      <span className="admin-format-card__meta-label">Order</span>
+                      <span className="admin-format-card__meta-value">{format.order}</span>
+                    </div>
+                  </div>
+                  <div style={{ marginLeft: 'auto' }}>
+                    <button className="admin-btn admin-btn--gold admin-btn--sm" onClick={() => startEdit(format)}>Edit</button>
                   </div>
                 </div>
-
-                <div style={{ marginBottom: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: '#999', marginBottom: '0.25rem' }}>
-                      Scoring Type
-                    </div>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#1B5B50' }}>
-                      {format.scoringType}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: '#999', marginBottom: '0.25rem' }}>
-                      Free Format
-                    </div>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#1B5B50' }}>
-                      {format.isFree ? 'Yes' : 'No'}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => startEdit(format)}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    backgroundColor: '#D4A44C',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '0.25rem',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  Edit
-                </button>
               </div>
             )}
           </div>
         ))}
+        {formats.length === 0 && (
+          <div className="admin-empty"><div className="admin-empty__icon">📋</div><p className="admin-empty__text">No formats found</p></div>
+        )}
       </div>
     </div>
   );
