@@ -99,6 +99,12 @@ const nextConfig = {
     // Vercel-specific optimizations
     experimental: {
                   optimizePackageImports: [],
+                  outputFileTracingIncludes: {
+                        '/api/download/template/[...path]': ['./data/free-templates/**/*'],
+                        '/free-templates/[category]': ['./data/free-templates/**/*'],
+                        '/free-templates/[category]/[subcategory]': ['./data/free-templates/**/*'],
+                        '/free-templates/[category]/[subcategory]/[template]': ['./data/free-templates/**/*'],
+                  },
     },
 
     // Environment variables that should be available in the browser (must be prefixed with NEXT_PUBLIC_)
