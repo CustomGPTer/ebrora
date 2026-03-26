@@ -2,18 +2,10 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-utils';
 import { UsersClient } from '@/components/admin/UsersClient';
 
-export const metadata = {
-  title: 'User Management - Admin',
-};
-
-interface SearchParams {
-  page?: string;
-  tier?: string;
-  search?: string;
-}
+export const metadata = { title: 'User Management – Admin' };
 
 interface PageProps {
-  searchParams: Promise<SearchParams>;
+  searchParams: Promise<{ page?: string; tier?: string; search?: string }>;
 }
 
 export default async function UsersPage({ searchParams }: PageProps) {
@@ -23,11 +15,9 @@ export default async function UsersPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(params.page || '1'));
   const tier = params.tier || 'ALL';
   const search = params.search || '';
-
   const pageSize = 20;
   const skip = (page - 1) * pageSize;
 
-  // Build filter
   const filter: any = {};
   if (tier !== 'ALL') {
     filter.subscription = { tier };
@@ -39,13 +29,13 @@ export default async function UsersPage({ searchParams }: PageProps) {
     ];
   }
 
-  // Fetch users with pagination
   const [users, totalCount] = await Promise.all([
     prisma.user.findMany({
       where: filter,
       include: {
-        subscription: { select: { tier: true, status: true } },
-        _count: { select: { generations: true } },
+        subscription: { select: { tier: true, status: true, paypal_subscription_id: true } },
+        _count: { select: { generations: true, ai_tool_generations: true } },
+        accounts: { select: { provider: true } },
       },
       orderBy: { created_at: 'desc' },
       skip,
@@ -58,14 +48,17 @@ export default async function UsersPage({ searchParams }: PageProps) {
 
   const usersData = users.map((user) => ({
     id: user.id,
-    name: user.name,
+    name: user.name || '',
     email: user.email,
     role: user.role,
     tier: user.subscription?.tier || 'FREE',
     status: user.subscription?.status || 'ACTIVE',
-    generationsCount: user._count.generations,
-    createdAt: user.created_at,
-    disabled: false,
+    paypalId: user.subscription?.paypal_subscription_id || null,
+    ramsCount: user._count.generations,
+    aiToolCount: user._count.ai_tool_generations,
+    authMethod: user.google_id ? 'Google' : user.accounts.length > 0 ? user.accounts[0].provider : 'Email',
+    emailVerified: user.email_verified,
+    createdAt: user.created_at.toISOString(),
   }));
 
   return (
