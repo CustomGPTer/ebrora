@@ -3,8 +3,9 @@
 // File-based system: scans /public/free-templates/ at build time
 import { Metadata } from "next";
 import Link from "next/link";
-import { scanAllTemplates } from "@/lib/free-templates";
+import { scanAllTemplates, getAllTemplatesForSearch } from "@/lib/free-templates";
 import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
+import { FreeTemplateSearch } from "@/components/free-templates/FreeTemplateSearch";
 import { UpsellBanner } from "@/components/shared/UpsellBanner";
 import { RAMS_BUILDER_UPSELL } from "@/data/upsell-config";
 
@@ -61,6 +62,7 @@ export default function FreeTemplatesPage() {
     (sum, cat) => sum + cat.subcategories.length,
     0
   );
+  const searchItems = getAllTemplatesForSearch();
 
   return (
     <>
@@ -92,6 +94,9 @@ export default function FreeTemplatesPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <BreadcrumbNav items={[{ label: "Free Templates" }]} />
+
+        {/* Search bar */}
+        <FreeTemplateSearch items={searchItems} />
 
         {/* Stats bar */}
         <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-8 pb-6 border-b border-gray-100">
