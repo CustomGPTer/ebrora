@@ -154,7 +154,7 @@ export function TbtSearch({ items }: TbtSearchProps) {
               key={`${item.categorySlug}-${item.slug}`}
               onClick={() => navigate(item)}
               onMouseEnter={() => setActiveIdx(idx)}
-              className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors ${
+              className={`w-full text-left px-4 pt-3 pb-1.5 flex items-start gap-3 transition-colors ${
                 idx === activeIdx ? "bg-[#1B5745]/5" : "hover:bg-gray-50"
               } ${idx > 0 ? "border-t border-gray-100" : ""}`}
             >
