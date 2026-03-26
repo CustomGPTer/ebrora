@@ -1,19 +1,20 @@
 // src/lib/free-templates.ts
-// FILE-BASED TEMPLATE SCANNER
-// Reads /public/free-templates/ at build time to discover all templates.
-// No database required — the folder structure IS the data.
+// FILE-BASED TEMPLATE SCANNER — FLAT FOLDER CONVENTION
+// Reads /data/free-templates/ at build time to discover all templates.
+// No database required — the folder IS the data.
 //
-// FOLDER CONVENTION:
-//   /public/free-templates/{category-slug}/{subcategory-slug}/{filename}.xlsx
-//   /public/free-templates/{category-slug}/{subcategory-slug}/_meta.json   (optional)
-//   /public/free-templates/{category-slug}/{subcategory-slug}/{filename}.preview.png (optional)
+// FLAT FILENAME CONVENTION:
+//   /data/free-templates/{category-slug}--{subcategory-slug}--{template-name}.xlsx
+//
+// Drop a file into data/free-templates/ using the -- convention and it
+// automatically appears in the correct category and subcategory on the site.
 //
 // SUPPORTED FILE TYPES:
 //   .xlsx, .xlsm, .docx, .pptx, .pdf
 //
 // TITLE GENERATION:
-//   1. If _meta.json exists with a "files" key containing the filename, use that title
-//   2. Otherwise: strip extension, replace dashes with spaces, title-case each word
+//   Strip the category and subcategory prefixes, remove extension,
+//   replace dashes with spaces, title-case each word.
 
 import fs from "fs";
 import path from "path";
@@ -27,11 +28,11 @@ import type { FtCategory, FtSubcategory } from "@/data/free-template-categories"
 // ── Types ──
 
 export interface FtTemplateFile {
-  /** Display title (from _meta.json or auto-generated from filename) */
+  /** Display title (auto-generated from filename) */
   title: string;
-  /** URL-safe slug derived from filename without extension */
+  /** URL-safe slug derived from template-name portion of filename */
   slug: string;
-  /** Original filename with extension */
+  /** Original full filename with extension (e.g. cat--subcat--name.xlsx) */
   fileName: string;
   /** File extension without dot, lowercase: xlsx, xlsm, docx, pptx, pdf */
   fileType: string;
@@ -39,15 +40,15 @@ export interface FtTemplateFile {
   fileTypeLabel: string;
   /** File size in bytes */
   fileSize: number;
-  /** SEO description (from _meta.json or auto-generated) */
+  /** SEO description (auto-generated) */
   description: string;
-  /** SEO keywords (from _meta.json or empty) */
+  /** SEO keywords */
   keywords: string;
-  /** Path relative to /public/ for direct download */
+  /** Download API path */
   publicPath: string;
   /** Whether a .preview.png exists alongside the file */
   hasPreview: boolean;
-  /** Path to preview image relative to /public/ (if exists) */
+  /** Path to preview image (if exists) */
   previewPath: string | null;
   /** Parent category slug */
   categorySlug: string;
@@ -74,24 +75,6 @@ export interface FtCategoryWithFiles {
   subcategories: FtSubcategoryWithFiles[];
   totalTemplates: number;
   href: string;
-}
-
-interface MetaJson {
-  /** Override title for the folder (subcategory) level */
-  title?: string;
-  /** Override description for the folder (subcategory) level */
-  description?: string;
-  /** Override keywords for the folder (subcategory) level */
-  keywords?: string;
-  /** Per-file overrides keyed by filename */
-  files?: Record<
-    string,
-    {
-      title?: string;
-      description?: string;
-      keywords?: string;
-    }
-  >;
 }
 
 // ── Constants ──
@@ -121,7 +104,6 @@ function slugToTitle(slug: string): string {
   return slug
     .split("-")
     .map((word) => {
-      // Keep short words lowercase unless first word
       const lower = word.toLowerCase();
       if (["and", "or", "the", "in", "on", "of", "for", "to", "a"].includes(lower)) {
         return lower;
@@ -129,22 +111,7 @@ function slugToTitle(slug: string): string {
       return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
     })
     .join(" ")
-    // Capitalise first word regardless
     .replace(/^./, (c) => c.toUpperCase());
-}
-
-/** Read and parse _meta.json from a directory, returns null if not found */
-function readMeta(dirPath: string): MetaJson | null {
-  const metaPath = path.join(dirPath, "_meta.json");
-  try {
-    if (fs.existsSync(metaPath)) {
-      const raw = fs.readFileSync(metaPath, "utf-8");
-      return JSON.parse(raw) as MetaJson;
-    }
-  } catch {
-    // Silently ignore malformed _meta.json
-  }
-  return null;
 }
 
 /** Get file size in bytes, returns 0 if file doesn't exist */
@@ -158,12 +125,10 @@ function getFileSize(filePath: string): number {
 
 /** Check if a preview image exists for a given file */
 function findPreview(filePath: string): string | null {
-  // Convention: {filename}.preview.png alongside the file
   const previewPath = filePath + ".preview.png";
   if (fs.existsSync(previewPath)) {
     return previewPath;
   }
-  // Also check for .preview.jpg
   const jpgPath = filePath + ".preview.jpg";
   if (fs.existsSync(jpgPath)) {
     return jpgPath;
@@ -171,100 +136,138 @@ function findPreview(filePath: string): string | null {
   return null;
 }
 
-// ── Core scanning functions ──
+// ── Parsed flat file entry ──
+
+interface ParsedFlatFile {
+  categorySlug: string;
+  subcategorySlug: string;
+  templateNameSlug: string;
+  fileName: string;
+  ext: string;
+  filePath: string;
+}
 
 /**
- * Scan a subcategory directory for template files.
- * Returns an array of FtTemplateFile objects.
+ * Parse a flat filename like "civils-and-earthworks--concrete-works--concrete-cube-test-results-log.xlsx"
+ * Returns null if the filename doesn't match the convention or has an unsupported extension.
  */
-function scanSubcategoryDir(
-  dirPath: string,
-  categorySlug: string,
-  subcategorySlug: string,
-  meta: MetaJson | null
-): FtTemplateFile[] {
-  if (!fs.existsSync(dirPath)) return [];
+function parseFlatFilename(fileName: string): ParsedFlatFile | null {
+  const ext = path.extname(fileName).toLowerCase();
+  if (!SUPPORTED_EXTENSIONS.has(ext)) return null;
 
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-  const templates: FtTemplateFile[] = [];
+  const nameNoExt = path.basename(fileName, ext);
+  const parts = nameNoExt.split("--");
+  if (parts.length < 3) return null;
+
+  // First segment = category slug, second = subcategory slug,
+  // remaining segments (joined back with --) = template name
+  const categorySlug = parts[0].trim();
+  const subcategorySlug = parts[1].trim();
+  const templateNameSlug = parts.slice(2).join("--").trim();
+
+  if (!categorySlug || !subcategorySlug || !templateNameSlug) return null;
+
+  return {
+    categorySlug,
+    subcategorySlug,
+    templateNameSlug,
+    fileName,
+    ext,
+    filePath: path.join(BASE_DIR, fileName),
+  };
+}
+
+/**
+ * Scan the flat data/free-templates/ directory and build a lookup map:
+ * Map<categorySlug, Map<subcategorySlug, FtTemplateFile[]>>
+ */
+function scanFlatDir(): Map<string, Map<string, FtTemplateFile[]>> {
+  const result = new Map<string, Map<string, FtTemplateFile[]>>();
+
+  if (!fs.existsSync(BASE_DIR)) return result;
+
+  const entries = fs.readdirSync(BASE_DIR, { withFileTypes: true });
 
   for (const entry of entries) {
     if (!entry.isFile()) continue;
-
-    const ext = path.extname(entry.name).toLowerCase();
-    if (!SUPPORTED_EXTENSIONS.has(ext)) continue;
-
-    // Skip preview images and _meta.json
+    if (entry.name.startsWith(".")) continue;
     if (entry.name.includes(".preview.")) continue;
-    if (entry.name === "_meta.json") continue;
 
-    const fileNameNoExt = path.basename(entry.name, ext);
-    const slug = fileNameNoExt.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const fileType = ext.slice(1); // remove the dot
-    const filePath = path.join(dirPath, entry.name);
+    const parsed = parseFlatFilename(entry.name);
+    if (!parsed) continue;
+
+    const { categorySlug, subcategorySlug, templateNameSlug, fileName, ext, filePath } = parsed;
+
+    const fileType = ext.slice(1);
     const fileSize = getFileSize(filePath);
     const preview = findPreview(filePath);
+    const slug = templateNameSlug.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const title = slugToTitle(templateNameSlug);
+    const description = `Free ${FILE_TYPE_LABELS[fileType] || fileType.toUpperCase()} template: ${title}. Download for UK construction sites.`;
 
-    // Title: check _meta.json files override first, then auto-generate
-    const fileMeta = meta?.files?.[entry.name];
-    const title = fileMeta?.title || slugToTitle(fileNameNoExt);
-    const description =
-      fileMeta?.description ||
-      `Free ${FILE_TYPE_LABELS[fileType] || fileType.toUpperCase()} template: ${title}. Download for UK construction sites.`;
-    const keywords = fileMeta?.keywords || "";
-
-    // Public path for download (relative to /public/)
-    const publicPath = `/free-templates/${categorySlug}/${subcategorySlug}/${entry.name}`;
-
-    // Preview path (relative to /public/)
     const previewPath = preview
-      ? `/free-templates/${categorySlug}/${subcategorySlug}/${path.basename(preview)}`
+      ? `/free-templates/previews/${path.basename(preview)}`
       : null;
 
-    templates.push({
+    const template: FtTemplateFile = {
       title,
       slug,
-      fileName: entry.name,
+      fileName,
       fileType,
       fileTypeLabel: FILE_TYPE_LABELS[fileType] || fileType.toUpperCase(),
       fileSize,
       description,
-      keywords,
-      publicPath,
+      keywords: "",
+      publicPath: `/api/download/template/${categorySlug}/${subcategorySlug}/${slug}`,
       hasPreview: !!preview,
       previewPath,
       categorySlug,
       subcategorySlug,
       href: `/free-templates/${categorySlug}/${subcategorySlug}/${slug}`,
-    });
+    };
+
+    // Insert into nested map
+    if (!result.has(categorySlug)) {
+      result.set(categorySlug, new Map());
+    }
+    const catMap = result.get(categorySlug)!;
+    if (!catMap.has(subcategorySlug)) {
+      catMap.set(subcategorySlug, []);
+    }
+    catMap.get(subcategorySlug)!.push(template);
   }
 
-  // Sort alphabetically by title
-  templates.sort((a, b) => a.title.localeCompare(b.title));
+  // Sort templates within each subcategory
+  for (const catMap of result.values()) {
+    for (const templates of catMap.values()) {
+      templates.sort((a, b) => a.title.localeCompare(b.title));
+    }
+  }
 
-  return templates;
+  return result;
 }
+
+// ── Core scanning functions ──
 
 /**
  * Scan all categories and subcategories, returning the full data structure.
  * Called at build time by page components.
  */
 export function scanAllTemplates(): FtCategoryWithFiles[] {
+  const flatMap = scanFlatDir();
   const results: FtCategoryWithFiles[] = [];
 
   for (const cat of FT_CATEGORIES) {
-    const catDir = path.join(BASE_DIR, cat.slug);
+    const catFiles = flatMap.get(cat.slug);
     const subcats: FtSubcategoryWithFiles[] = [];
 
     for (const subcat of cat.subcategories) {
-      const subcatDir = path.join(catDir, subcat.slug);
-      const meta = readMeta(subcatDir);
-      const templates = scanSubcategoryDir(subcatDir, cat.slug, subcat.slug, meta);
+      const templates = catFiles?.get(subcat.slug) || [];
 
       subcats.push({
-        name: meta?.title || subcat.name,
+        name: subcat.name,
         slug: subcat.slug,
-        description: meta?.description || subcat.description,
+        description: subcat.description,
         categorySlug: cat.slug,
         templates,
         href: `/free-templates/${cat.slug}/${subcat.slug}`,
@@ -294,18 +297,17 @@ export function getCategoryWithFiles(categorySlug: string): FtCategoryWithFiles 
   const cat = getCategoryBySlug(categorySlug);
   if (!cat) return null;
 
-  const catDir = path.join(BASE_DIR, cat.slug);
+  const flatMap = scanFlatDir();
+  const catFiles = flatMap.get(cat.slug);
   const subcats: FtSubcategoryWithFiles[] = [];
 
   for (const subcat of cat.subcategories) {
-    const subcatDir = path.join(catDir, subcat.slug);
-    const meta = readMeta(subcatDir);
-    const templates = scanSubcategoryDir(subcatDir, cat.slug, subcat.slug, meta);
+    const templates = catFiles?.get(subcat.slug) || [];
 
     subcats.push({
-      name: meta?.title || subcat.name,
+      name: subcat.name,
       slug: subcat.slug,
-      description: meta?.description || subcat.description,
+      description: subcat.description,
       categorySlug: cat.slug,
       templates,
       href: `/free-templates/${cat.slug}/${subcat.slug}`,
@@ -336,14 +338,13 @@ export function getSubcategoryWithFiles(
   const subcat = getSubcategoryBySlug(categorySlug, subcategorySlug);
   if (!cat || !subcat) return null;
 
-  const subcatDir = path.join(BASE_DIR, cat.slug, subcat.slug);
-  const meta = readMeta(subcatDir);
-  const templates = scanSubcategoryDir(subcatDir, cat.slug, subcat.slug, meta);
+  const flatMap = scanFlatDir();
+  const templates = flatMap.get(cat.slug)?.get(subcat.slug) || [];
 
   return {
-    name: meta?.title || subcat.name,
+    name: subcat.name,
     slug: subcat.slug,
-    description: meta?.description || subcat.description,
+    description: subcat.description,
     categorySlug: cat.slug,
     templates,
     href: `/free-templates/${cat.slug}/${subcat.slug}`,
