@@ -112,7 +112,7 @@ const FILE_TYPE_LABELS: Record<string, string> = {
   pdf: "PDF",
 };
 
-const BASE_DIR = path.join(process.cwd(), "public", "free-templates");
+const BASE_DIR = path.join(process.cwd(), "data", "free-templates");
 
 // ── Utility functions ──
 
