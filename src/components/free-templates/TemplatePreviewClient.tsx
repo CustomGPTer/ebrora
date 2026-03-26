@@ -79,9 +79,9 @@ export function TemplatePreviewClient({
       const res = await fetch(
         `/api/download/template/${categorySlug}/${subcategorySlug}/${templateSlug}`
       );
-      const data = await res.json();
 
       if (!res.ok) {
+        const data = await res.json();
         if (data.code === "LIMIT_REACHED") {
           setLimitReached(true);
           setLimitMessage(data.message || "Monthly download limit reached.");
@@ -95,16 +95,21 @@ export function TemplatePreviewClient({
         return;
       }
 
-      // Success — trigger the actual file download
-      if (data.downloadUrl) {
-        const link = document.createElement("a");
-        link.href = data.downloadUrl;
-        link.download = data.fileName || "";
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      // Success — API streams the file directly as binary
+      const blob = await res.blob();
+      const disposition = res.headers.get("Content-Disposition") || "";
+      const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
+      const fileName = fileNameMatch ? fileNameMatch[1] : `template.${fileType}`;
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch {
       setError("Download failed. Please check your connection and try again.");
     } finally {
