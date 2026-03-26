@@ -2,17 +2,10 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-utils';
 import { GenerationsClient } from '@/components/admin/GenerationsClient';
 
-export const metadata = {
-  title: 'Generation Monitoring - Admin',
-};
-
-interface SearchParams {
-  page?: string;
-  status?: string;
-}
+export const metadata = { title: 'RAMS Generations – Admin' };
 
 interface PageProps {
-  searchParams: Promise<SearchParams>;
+  searchParams: Promise<{ page?: string; status?: string }>;
 }
 
 export default async function GenerationsPage({ searchParams }: PageProps) {
@@ -21,18 +14,13 @@ export default async function GenerationsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page || '1'));
   const status = params.status || 'ALL';
-
   const pageSize = 50;
   const skip = (page - 1) * pageSize;
 
-  // Build filter
   const filter: any = {};
-  if (status !== 'ALL') {
-    filter.status = status;
-  }
+  if (status !== 'ALL') filter.status = status;
 
-  // Fetch generations with pagination
-  const [generations, totalCount] = await Promise.all([
+  const [generations, totalCount, statusCounts] = await Promise.all([
     prisma.generation.findMany({
       where: filter,
       include: {
@@ -44,6 +32,10 @@ export default async function GenerationsPage({ searchParams }: PageProps) {
       take: pageSize,
     }),
     prisma.generation.count({ where: filter }),
+    prisma.generation.groupBy({
+      by: ['status'],
+      _count: { status: true },
+    }),
   ]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -55,12 +47,13 @@ export default async function GenerationsPage({ searchParams }: PageProps) {
     userEmail: gen.user?.email || '',
     formatName: gen.rams_format?.name || 'Unknown',
     status: gen.status,
-    createdAt: gen.created_at,
-    completedAt: gen.completed_at,
-    estimatedDurationSeconds: 0,
+    createdAt: gen.created_at.toISOString(),
+    completedAt: gen.completed_at?.toISOString() || null,
     errorMessage: gen.error_message,
     answers: gen.answers,
   }));
+
+  const statusCountsMap = Object.fromEntries(statusCounts.map((s) => [s.status, s._count.status]));
 
   return (
     <GenerationsClient
@@ -69,6 +62,7 @@ export default async function GenerationsPage({ searchParams }: PageProps) {
       totalPages={totalPages}
       totalCount={totalCount}
       currentStatus={status}
+      statusCounts={statusCountsMap}
     />
   );
 }
