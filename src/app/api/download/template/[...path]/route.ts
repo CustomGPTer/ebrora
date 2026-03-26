@@ -157,8 +157,6 @@ export async function GET(request: NextRequest, context: RouteContext) {
     // User-friendly download name (just the template-name part, not the full flat filename)
     const friendlyName = `${template.slug}.${template.fileType}`;
  
-    const contentType = CONTENT_TYPES[template.fileType] || "application/octet-stream";
- 
     return new NextResponse(fileBuffer, {
       status: 200,
       headers: {
@@ -176,4 +174,3 @@ export async function GET(request: NextRequest, context: RouteContext) {
     );
   }
 }
- 
