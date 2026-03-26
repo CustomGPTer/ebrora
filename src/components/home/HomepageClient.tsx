@@ -12,10 +12,32 @@ import ContactSection from '@/components/home/ContactSection';
 
 export interface SearchItem {
   label: string;
-  type: 'Template' | 'Toolbox Talks' | 'Free Tool' | 'Blog';
+  type: 'Template' | 'Toolbox Talk' | 'AI Builder' | 'Free Template' | 'Free Tool' | 'Blog';
   href: string;
   meta: string;
 }
+
+const SEARCH_TYPES = ['AI Builder', 'Toolbox Talk', 'Free Template', 'Template', 'Free Tool', 'Blog'] as const;
+
+const TYPE_BADGE_CLASS: Record<SearchItem['type'], string> = {
+  'AI Builder':     'hp-badge--ai-builder',
+  'Template':       'hp-badge--template',
+  'Toolbox Talk':   'hp-badge--toolbox-talk',
+  'Free Template':  'hp-badge--free-template',
+  'Free Tool':      'hp-badge--free-tool',
+  'Blog':           'hp-badge--blog',
+};
+
+const TYPE_GROUP_LABEL: Record<SearchItem['type'], string> = {
+  'AI Builder':     'AI Builders',
+  'Template':       'Premium Templates',
+  'Toolbox Talk':   'Toolbox Talks',
+  'Free Template':  'Free Templates',
+  'Free Tool':      'Free Tools',
+  'Blog':           'Blog & Guides',
+};
+
+const MAX_PER_GROUP = 2;
 
 interface HomepageClientProps {
   templateCount: number;
@@ -85,10 +107,14 @@ function useFadeIn() {
 function SearchTypeIcon({ type }: { type: SearchItem['type'] }) {
   const props = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: '#1B5B50', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   switch (type) {
+    case 'AI Builder':
+      return (<svg {...props}><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /><path d="M18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25z" /></svg>);
     case 'Template':
       return (<svg {...props}><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>);
-    case 'Toolbox Talks':
+    case 'Toolbox Talk':
       return (<svg {...props}><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>);
+    case 'Free Template':
+      return (<svg {...props}><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>);
     case 'Free Tool':
       return (<svg {...props}><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="8" y1="10" x2="16" y2="10" /><line x1="8" y1="14" x2="12" y2="14" /></svg>);
     case 'Blog':
@@ -235,8 +261,11 @@ export default function HomepageClient({
   const [suggestions, setSuggestions] = useState<SearchItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [activeFilter, setActiveFilter] = useState<SearchItem['type'] | ''>('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
   const fadeRef1 = useFadeIn();
   const fadeRef2 = useFadeIn();
@@ -250,10 +279,46 @@ export default function HomepageClient({
   const counter3 = useCounter(categoryCount);
   const counter4 = useCounter(29);
 
-  const getResults = useCallback(
-    (query: string): SearchItem[] => {
+  /* ── Grouped search: max MAX_PER_GROUP results per type, ordered by type priority ── */
+  const getGroupedResults = useCallback(
+    (query: string, filterType: SearchItem['type'] | ''): SearchItem[] => {
       const q = query.toLowerCase();
-      return searchItems.filter((item) => item.label.toLowerCase().includes(q));
+      let pool = searchItems;
+      if (filterType) pool = pool.filter((item) => item.type === filterType);
+
+      // Score each item
+      const scored = pool
+        .map((item) => {
+          const label = item.label.toLowerCase();
+          let score = 0;
+          if (label === q) score = 100;
+          else if (label.startsWith(q)) score = 80;
+          else if (label.includes(q)) score = 60;
+          else {
+            const words = q.split(/\s+/);
+            const matches = words.filter((w) => label.includes(w)).length;
+            score = (matches / words.length) * 40;
+          }
+          return { item, score };
+        })
+        .filter((s) => s.score > 0)
+        .sort((a, b) => b.score - a.score);
+
+      // If filtering by type, just return top results
+      if (filterType) return scored.slice(0, 8).map((s) => s.item);
+
+      // Group by type, max MAX_PER_GROUP per type
+      const grouped: SearchItem[] = [];
+      const counts: Partial<Record<SearchItem['type'], number>> = {};
+      for (const { item } of scored) {
+        const c = counts[item.type] || 0;
+        if (c < MAX_PER_GROUP) {
+          grouped.push(item);
+          counts[item.type] = c + 1;
+        }
+        if (grouped.length >= 12) break;
+      }
+      return grouped;
     },
     [searchItems]
   );
@@ -261,13 +326,26 @@ export default function HomepageClient({
   const handleInputChange = (value: string) => {
     setSearchInput(value);
     setActiveIndex(-1);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     if (value.trim().length >= 2) {
-      const results = getResults(value.trim());
-      setSuggestions(results.slice(0, 5));
-      setShowDropdown(true);
+      debounceRef.current = setTimeout(() => {
+        const results = getGroupedResults(value.trim(), activeFilter);
+        setSuggestions(results);
+        setShowDropdown(true);
+      }, 200);
     } else {
       setSuggestions([]);
       setShowDropdown(false);
+    }
+  };
+
+  const handleFilterChange = (type: SearchItem['type'] | '') => {
+    setActiveFilter(type);
+    setActiveIndex(-1);
+    if (searchInput.trim().length >= 2) {
+      const results = getGroupedResults(searchInput.trim(), type);
+      setSuggestions(results);
+      setShowDropdown(true);
     }
   };
 
@@ -279,9 +357,11 @@ export default function HomepageClient({
   };
 
   const handleSearch = () => {
-    setShowDropdown(false);
-    if (searchInput.trim()) {
-      window.location.href = `/products?search=${encodeURIComponent(searchInput.trim())}`;
+    // Stay on homepage — show dropdown with results or "no results"
+    if (searchInput.trim().length >= 2) {
+      const results = getGroupedResults(searchInput.trim(), activeFilter);
+      setSuggestions(results);
+      setShowDropdown(true);
     }
   };
 
@@ -313,15 +393,28 @@ export default function HomepageClient({
     }
   };
 
+  // Build grouped sections for display
+  const groupedSections = React.useMemo(() => {
+    const sections: { type: SearchItem['type']; label: string; items: SearchItem[] }[] = [];
+    const typeOrder: SearchItem['type'][] = ['AI Builder', 'Toolbox Talk', 'Free Template', 'Template', 'Free Tool', 'Blog'];
+    for (const t of typeOrder) {
+      const items = suggestions.filter((s) => s.type === t);
+      if (items.length > 0) {
+        sections.push({ type: t, label: TYPE_GROUP_LABEL[t], items });
+      }
+    }
+    return sections;
+  }, [suggestions]);
+
+  // Flat list for keyboard navigation (matches render order)
+  const flatSuggestions = React.useMemo(() => {
+    return groupedSections.flatMap((s) => s.items);
+  }, [groupedSections]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node) &&
-        inputRef.current &&
-        !inputRef.current.contains(e.target as Node)
-      ) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setShowDropdown(false);
       }
     };
@@ -353,34 +446,56 @@ export default function HomepageClient({
           </p>
 
           {/* Site-wide search */}
-          <div className="hp-search" style={{ position: 'relative' }}>
-            <svg className="hp-search__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Search templates, toolbox talks, tools, guides…"
-              value={searchInput}
-              onChange={(e) => handleInputChange(e.target.value)}
-              onFocus={() => {
-                if (searchInput.trim().length >= 2) {
-                  const results = getResults(searchInput.trim());
-                  setSuggestions(results.slice(0, 5));
-                  setShowDropdown(true);
-                }
-              }}
-              onKeyDown={handleKeyDown}
-              aria-label="Search the whole site"
-              aria-expanded={showDropdown && suggestions.length > 0}
-              aria-haspopup="listbox"
-              aria-controls="hp-search-listbox"
-              aria-activedescendant={activeIndex >= 0 ? `hp-search-opt-${activeIndex}` : undefined}
-              autoComplete="off"
-            />
-            <button onClick={handleSearch}>Search</button>
+          <div className="hp-search-wrapper" ref={wrapperRef}>
+            <div className="hp-search">
+              <svg className="hp-search__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Search everything…"
+                value={searchInput}
+                onChange={(e) => handleInputChange(e.target.value)}
+                onFocus={() => {
+                  if (searchInput.trim().length >= 2) {
+                    const results = getGroupedResults(searchInput.trim(), activeFilter);
+                    setSuggestions(results);
+                    setShowDropdown(true);
+                  }
+                }}
+                onKeyDown={handleKeyDown}
+                aria-label="Search the whole site"
+                aria-expanded={showDropdown && suggestions.length > 0}
+                aria-haspopup="listbox"
+                aria-controls="hp-search-listbox"
+                aria-activedescendant={activeIndex >= 0 ? `hp-search-opt-${activeIndex}` : undefined}
+                autoComplete="off"
+              />
+              <button className="hp-search__btn" onClick={handleSearch}>Search</button>
+            </div>
 
+            {/* Type filter pills */}
+            <div className="hp-search-filters">
+              <button
+                className={`hp-filter-pill${activeFilter === '' ? ' hp-filter-pill--active' : ''}`}
+                onClick={() => handleFilterChange('')}
+              >
+                All
+              </button>
+              {SEARCH_TYPES.map((t) => (
+                <button
+                  key={t}
+                  className={`hp-filter-pill${activeFilter === t ? ' hp-filter-pill--active' : ''}`}
+                  onClick={() => handleFilterChange(t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            {/* Grouped dropdown */}
             {showDropdown && (
               <div
                 ref={dropdownRef}
@@ -390,30 +505,41 @@ export default function HomepageClient({
                 className="hp-search-dropdown"
               >
                 {suggestions.length === 0 ? (
-                  <div className="hp-search-dropdown__empty">No results found</div>
+                  <div className="hp-search-dropdown__empty">
+                    No results found for &ldquo;{searchInput}&rdquo;
+                    {activeFilter && <> in {activeFilter}</>}
+                  </div>
                 ) : (
-                  suggestions.map((item, idx) => (
-                    <button
-                      key={`${item.type}-${item.href}`}
-                      id={`hp-search-opt-${idx}`}
-                      role="option"
-                      aria-selected={idx === activeIndex}
-                      className={`hp-search-dropdown__item${idx === activeIndex ? ' hp-search-dropdown__item--active' : ''}`}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        handleSelect(item);
-                      }}
-                      onMouseEnter={() => setActiveIndex(idx)}
-                    >
-                      <span className="hp-search-dropdown__icon"><SearchTypeIcon type={item.type} /></span>
-                      <span className="hp-search-dropdown__info">
-                        <span className="hp-search-dropdown__title">{item.label}</span>
-                        <span className="hp-search-dropdown__type">{item.type}</span>
-                      </span>
-                      {item.meta && (
-                        <span className="hp-search-dropdown__meta">{item.meta}</span>
-                      )}
-                    </button>
+                  groupedSections.map((section) => (
+                    <div key={section.type}>
+                      <div className="hp-search-dropdown__group-label">{section.label}</div>
+                      {section.items.map((item) => {
+                        const flatIdx = flatSuggestions.indexOf(item);
+                        return (
+                          <button
+                            key={`${item.type}-${item.href}`}
+                            id={`hp-search-opt-${flatIdx}`}
+                            role="option"
+                            aria-selected={flatIdx === activeIndex}
+                            className={`hp-search-dropdown__item${flatIdx === activeIndex ? ' hp-search-dropdown__item--active' : ''}`}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelect(item);
+                            }}
+                            onMouseEnter={() => setActiveIndex(flatIdx)}
+                          >
+                            <span className="hp-search-dropdown__icon"><SearchTypeIcon type={item.type} /></span>
+                            <span className="hp-search-dropdown__info">
+                              <span className="hp-search-dropdown__title">{item.label}</span>
+                              <span className="hp-search-dropdown__type">{item.meta}</span>
+                            </span>
+                            <span className={`hp-search-dropdown__badge ${TYPE_BADGE_CLASS[item.type]}`}>
+                              {item.type}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   ))
                 )}
               </div>
