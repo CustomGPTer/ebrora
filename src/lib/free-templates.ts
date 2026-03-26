@@ -390,3 +390,42 @@ export function formatFileSize(bytes: number): string {
   const size = bytes / Math.pow(1024, i);
   return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
+
+// ── Search-friendly flat list ──
+
+export interface FtSearchItem {
+  title: string;
+  slug: string;
+  href: string;
+  categorySlug: string;
+  categoryName: string;
+  subcategoryName: string;
+  fileType: string;
+  fileTypeLabel: string;
+}
+
+/**
+ * Return every template as a flat search-friendly array with human names.
+ * Called at build time by the search component.
+ */
+export function getAllTemplatesForSearch(): FtSearchItem[] {
+  const all = scanAllTemplates();
+  const results: FtSearchItem[] = [];
+  for (const cat of all) {
+    for (const sc of cat.subcategories) {
+      for (const t of sc.templates) {
+        results.push({
+          title: t.title,
+          slug: t.slug,
+          href: t.href,
+          categorySlug: cat.slug,
+          categoryName: cat.name,
+          subcategoryName: sc.name,
+          fileType: t.fileType,
+          fileTypeLabel: t.fileTypeLabel,
+        });
+      }
+    }
+  }
+  return results;
+}
