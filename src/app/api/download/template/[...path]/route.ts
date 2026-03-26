@@ -18,7 +18,7 @@ import { getTemplateBySlug } from "@/lib/free-templates";
 import { TIER_LIMITS } from "@/lib/constants";
 import type { SubscriptionTier } from "@prisma/client";
 import fs from "fs";
-import path from "path";
+import nodePath from "path";
  
 interface RouteContext {
   params: Promise<{ path: string[] }>;
@@ -127,15 +127,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
       },
     });
  
-    const downloadUrl = template.publicPath;
- 
-    // Serve the file from data/free-templates/ (private, not publicly accessible)
-    const filePath = path.join(
+    // Serve the file from data/free-templates/ (flat folder, private)
+    const filePath = nodePath.join(
       process.cwd(),
       "data",
       "free-templates",
-      template.categorySlug,
-      template.subcategorySlug,
       template.fileName
     );
  
@@ -158,11 +154,16 @@ export async function GET(request: NextRequest, context: RouteContext) {
  
     const contentType = CONTENT_TYPES[template.fileType] || "application/octet-stream";
  
+    // User-friendly download name (just the template-name part, not the full flat filename)
+    const friendlyName = `${template.slug}.${template.fileType}`;
+ 
+    const contentType = CONTENT_TYPES[template.fileType] || "application/octet-stream";
+ 
     return new NextResponse(fileBuffer, {
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Content-Disposition": `attachment; filename="${template.fileName}"`,
+        "Content-Disposition": `attachment; filename="${friendlyName}"`,
         "Content-Length": String(fileBuffer.length),
         "Cache-Control": "no-store",
       },
@@ -175,3 +176,4 @@ export async function GET(request: NextRequest, context: RouteContext) {
     );
   }
 }
+ 
