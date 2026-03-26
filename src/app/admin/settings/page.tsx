@@ -1,32 +1,31 @@
 import { requireAdmin } from '@/lib/auth-utils';
 
-export const metadata = {
-  title: 'Settings - Admin',
-};
+export const metadata = { title: 'Settings – Admin' };
 
 export default async function SettingsPage() {
   await requireAdmin();
 
   return (
-    <div style={{ padding: '1.5rem 0' }}>
-      <h1 style={{ marginBottom: '1.5rem', color: '#1B5B50', fontSize: '1.5rem' }}>
-        System Settings
-      </h1>
+    <div>
+      <div className="admin-page-heading">
+        <div>
+          <h2 className="admin-page-heading__title">Settings</h2>
+          <p className="admin-page-heading__subtitle">System configuration and preferences</p>
+        </div>
+      </div>
 
-      <div
-        style={{
-          padding: '2rem',
-          border: '1px solid #e0e0e0',
-          borderRadius: '0.5rem',
-          backgroundColor: '#f9f9f9',
-          color: '#666',
-          textAlign: 'center',
-        }}
-      >
-        <p>System settings will be available here.</p>
-        <p style={{ fontSize: '0.875rem', marginTop: '1rem', color: '#999' }}>
-          Coming soon: Email configuration, API settings, and system-wide preferences.
-        </p>
+      <div className="admin-card">
+        <div className="admin-card__header">
+          <h3 className="admin-card__title">System Settings</h3>
+        </div>
+        <div className="admin-card__body">
+          <div className="admin-empty">
+            <div className="admin-empty__icon">⚙️</div>
+            <p className="admin-empty__text">
+              Settings page coming soon — email configuration, API settings, and system-wide preferences.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
