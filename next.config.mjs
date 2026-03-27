@@ -16,7 +16,11 @@ const nextConfig = {
     // Images optimization
     images: {
           formats: ['image/avif', 'image/webp'],
-          domains: ['ebrora.com', 'www.ebrora.com', 'cdn.ebrora.com'],
+          remotePatterns: [
+            { protocol: 'https', hostname: 'ebrora.com' },
+            { protocol: 'https', hostname: 'www.ebrora.com' },
+            { protocol: 'https', hostname: 'cdn.ebrora.com' },
+          ],
     },
 
     // MDX support

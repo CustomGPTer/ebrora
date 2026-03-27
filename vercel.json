@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/cleanup-ai-tools",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/downgrade-subscriptions",
+      "schedule": "0 3 * * *"
     }
   ],
   "functions": {
