@@ -3,6 +3,7 @@ import { z } from 'zod';
 import bcryptjs from 'bcryptjs';
 import { getSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
+import { validateOrigin } from '@/lib/csrf';
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1),
@@ -11,6 +12,11 @@ const changePasswordSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF check
+    if (!validateOrigin(request)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const session = await getSession();
 
     if (!session?.user?.id) {
