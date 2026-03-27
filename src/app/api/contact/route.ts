@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { sendEmail } from '@/lib/email/send-email';
+import { rateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
 
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -8,37 +10,56 @@ const contactSchema = z.object({
   message: z.string().min(1, 'Message is required')
 });
 
+// Sanitise user input before embedding in HTML email
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function POST(request: Request) {
   try {
+    // Rate limit: 10 contact submissions per IP per hour
+    const ip = getClientIp(request);
+    const { allowed, retryAfterMs } = rateLimit(ip, 'contact', RATE_LIMITS.contact);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, message: 'Too many messages. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(retryAfterMs / 1000)) } }
+      );
+    }
+
     const body = await request.json();
     const data = contactSchema.parse(body);
 
-    // TODO: Replace with actual email sending (nodemailer) when SMTP configured
-    // For now, log and return success
-    console.log('Contact form submission:', data);
+    const html = `
+      <h2 style="color:#1B5B50;">New Contact Form Submission</h2>
+      <p><strong>Name:</strong> ${escapeHtml(data.name)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(data.email)}</p>
+      <p><strong>Subject:</strong> ${escapeHtml(data.subject)}</p>
+      <hr style="border:none;border-top:1px solid #ddd;margin:16px 0;" />
+      <p><strong>Message:</strong></p>
+      <p>${escapeHtml(data.message).replace(/\n/g, '<br>')}</p>
+    `;
 
-    // Placeholder for nodemailer integration:
-    // const transporter = nodemailer.createTransport({
-    //   host: process.env.SMTP_HOST,
-    //   port: parseInt(process.env.SMTP_PORT || '587'),
-    //   secure: process.env.SMTP_SECURE === 'true',
-    //   auth: {
-    //     user: process.env.SMTP_USER,
-    //     pass: process.env.SMTP_PASS,
-    //   },
-    // });
-    //
-    // await transporter.sendMail({
-    //   from: process.env.SMTP_FROM,
-    //   to: 'hello@ebrora.com',
-    //   subject: `[Ebrora Contact] ${data.subject}`,
-    //   html: `<p><strong>Name:</strong> ${data.name}</p>
-    //          <p><strong>Email:</strong> ${data.email}</p>
-    //          <p><strong>Subject:</strong> ${data.subject}</p>
-    //          <p><strong>Message:</strong></p>
-    //          <p>${data.message.replace(/\n/g, '<br>')}</p>`,
-    //   replyTo: data.email,
-    // });
+    // Send to both hello@ebrora.com and admin
+    const recipients = ['hello@ebrora.com', 'jacksonja21@gmail.com'];
+    const results = await Promise.all(
+      recipients.map((to) =>
+        sendEmail(to, `[Ebrora Contact] ${data.subject}`, html)
+      )
+    );
+
+    if (results.every((r) => r === false)) {
+      console.error('Contact form: all email sends failed');
+      return NextResponse.json(
+        { success: false, message: 'Failed to send message. Please try again.' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
