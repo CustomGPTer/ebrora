@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getAiToolLimitByTier } from '@/lib/ai-tools/constants';
 import prisma from '@/lib/prisma';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 
 export async function GET(req: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
       where: { user_id: session.user.id },
     });
 
-    const tier = subscription?.tier || 'FREE';
+    const tier = resolveEffectiveTier(subscription);
     const limit = getAiToolLimitByTier(tier, toolSlug);
 
     return NextResponse.json({
