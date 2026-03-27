@@ -127,6 +127,7 @@ export default withAuth(
         const isPublic =
           publicPaths.includes(pathname) ||
           isProductPage ||
+          /^\/[a-z0-9][a-z0-9-]*-builder$/.test(pathname) ||
           pathname.startsWith('/blog/') ||
           pathname.startsWith('/api/auth') ||
           pathname.startsWith('/api/payments/webhook') ||
