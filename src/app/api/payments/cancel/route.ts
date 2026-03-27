@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth-utils';
 import { cancelSubscription } from '@/lib/payments/paypal-client';
 import prisma from '@/lib/prisma';
+import { validateOrigin } from '@/lib/csrf';
 
 export async function POST(request: NextRequest) {
         try {
+                    // CSRF check
+                    if (!validateOrigin(request)) {
+                            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+                    }
+
                     const session = await getSession();
 
             if (!session || !session.user || !session.user.id) {
