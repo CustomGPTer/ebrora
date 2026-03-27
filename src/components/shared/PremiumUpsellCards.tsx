@@ -289,17 +289,12 @@ const premiumStyles = `
     border-radius: 12px;
   }
   .prem-equal-card {
-    flex: 1;
     display: flex;
     flex-direction: column;
   }
   .prem-sidebar-body {
-    flex: 1;
     display: flex;
     flex-direction: column;
-  }
-  .prem-sidebar-body p {
-    flex: 1;
   }
   .prem-sidebar-cta {
     margin-top: auto;
