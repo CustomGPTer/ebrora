@@ -123,10 +123,12 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
   }, [readyMessage]);
 
   // Generating step animation
+  // Timing: questions phase ~4.8s (4 steps × 1200ms), document phase ~25.2s (6 steps × 4200ms)
+  // Total animation time ~30 seconds
   useEffect(() => {
     if (step !== 'generating') return;
     const steps = generatingPhase === 'questions' ? QUESTION_STEPS : DOCUMENT_STEPS;
-    const interval = generatingPhase === 'questions' ? 800 : 2000;
+    const interval = generatingPhase === 'questions' ? 1200 : 4200;
     setGeneratingStep(0);
     const timer = setInterval(() => {
       setGeneratingStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
@@ -590,7 +592,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
           <div className="generating-content">
             <div className="generating-spinner">
               <div className="generating-spinner-ring" />
-              <div className="generating-spinner-logo">E</div>
+              <div className="generating-spinner-logo" style={{ fontFamily: "'Playfair Display', serif" }}>E</div>
             </div>
 
             <h2>
@@ -618,7 +620,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
 
             {generatingPhase === 'document' && (
               <p className="generating-note">
-                This usually takes 15–30 seconds. Please don&apos;t close this page.
+                This usually takes 30–45 seconds. Please don&apos;t close this page.
               </p>
             )}
           </div>
@@ -661,6 +663,18 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
             >
               ← Generate Another {toolConfig.shortName}
             </button>
+
+            {/* Disclaimer */}
+            <p style={{
+              marginTop: '2rem',
+              fontSize: '0.75rem',
+              color: '#6B7280',
+              maxWidth: '400px',
+              textAlign: 'center',
+              lineHeight: '1.5',
+            }}>
+              Ebrora can make mistakes. Always review AI-generated documents before use and verify compliance with current regulations and site-specific requirements.
+            </p>
           </div>
         </div>
       )}
