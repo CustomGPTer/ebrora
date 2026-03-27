@@ -7,9 +7,16 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ContentType } from "@prisma/client";
 import { TIER_LIMITS } from "@/lib/constants";
+import { resolveEffectiveTier } from "@/lib/payments/resolve-tier";
+import { validateOrigin } from "@/lib/csrf";
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF check
+    if (!validateOrigin(request)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     // Auth check
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -42,9 +49,7 @@ export async function POST(request: NextRequest) {
       include: { subscription: true },
     });
 
-    const tier = (user?.subscription?.status === "ACTIVE"
-      ? user.subscription.tier
-      : "FREE") as keyof typeof TIER_LIMITS;
+    const tier = resolveEffectiveTier(user?.subscription) as keyof typeof TIER_LIMITS;
 
     const limits = TIER_LIMITS[tier] || TIER_LIMITS.FREE;
 
