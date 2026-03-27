@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { sendEmail } from '@/lib/email/send-email';
 import { passwordResetEmail } from '@/lib/email/templates';
+import { rateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
 
 const schema = z.object({
     email: z.string().email('Invalid email address'),
@@ -11,6 +12,14 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
+          // Rate limit: 5 reset requests per IP per hour
+          const ip = getClientIp(request);
+          const { allowed, retryAfterMs } = rateLimit(ip, 'forgot-password', RATE_LIMITS.forgotPassword);
+          if (!allowed) {
+                  // Still return success to prevent email enumeration
+                  return NextResponse.json({ success: true });
+          }
+
           const body = await request.json();
           const { email } = schema.parse(body);
 
