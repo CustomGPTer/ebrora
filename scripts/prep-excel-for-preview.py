@@ -54,7 +54,13 @@ def main():
         target_index = 0
 
     ws = wb[target_name]
-    wb.active = target_index
+
+    # Delete all other sheets so LibreOffice only renders the target
+    for name in sheets:
+        if name != target_name:
+            del wb[name]
+
+    wb.active = 0  # Now only one sheet remains at index 0
 
     # Set A3 landscape, fit to one page wide (unlimited height)
     ws.page_setup.paperSize = ws.PAPERSIZE_A3
