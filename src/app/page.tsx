@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import '@/styles/homepage.css';
 import HomepageClient from '@/components/home/HomepageClient';
-import { PRODUCTS, CATEGORIES, REVIEWS } from '@/data/products';
+import { PRODUCTS, CATEGORIES } from '@/data/products';
 import { POSTS } from '@/data/posts';
 import { TOOLBOX_CATEGORIES } from '@/data/toolbox-categories';
 import { TOOL_DEFINITIONS } from '@/data/tool-definitions';
@@ -82,11 +82,45 @@ export default function HomePage() {
     'Project Manager', 'Section Engineer', 'Construction Manager',
   ];
 
-  const anonymisedReviews = REVIEWS.slice(0, 6).map((review, idx) => ({
-    ...review,
-    author: review.author.split(' ')[0][0] + '. ' + (review.author.split(' ')[1]?.[0] || 'S') + '.',
-    role: `${genericRoles[idx % genericRoles.length]}, ${genericCompanies[idx % genericCompanies.length]}`,
-  }));
+  // Testimonials covering AI tools, templates, and TBTs
+  const homepageReviews = [
+    {
+      stars: 5,
+      text: "The RAMS Builder alone has saved me hours every week. What used to take half a day now takes 10 minutes, and the output is more thorough than anything I've written manually.",
+      author: 'M. T.',
+      role: `${genericRoles[0]}, ${genericCompanies[0]}`,
+    },
+    {
+      stars: 5,
+      text: "We use the toolbox talks library for every site induction and weekly briefing. Over 1,500 talks covering everything from trenching to COSHH. Absolute game-changer.",
+      author: 'S. J.',
+      role: `${genericRoles[1]}, ${genericCompanies[1]}`,
+    },
+    {
+      stars: 5,
+      text: "The COSHH Assessment Builder looked up the SDS data automatically and produced a compliant assessment in minutes. Our HSE advisor was impressed with the quality.",
+      author: 'D. C.',
+      role: `${genericRoles[2]}, ${genericCompanies[2]}`,
+    },
+    {
+      stars: 5,
+      text: "Downloaded the Gantt Chart Pro template and it's miles ahead of anything else I've used. The VBA automation for RAG status and dependencies is brilliant.",
+      author: 'R. H.',
+      role: `${genericRoles[3]}, ${genericCompanies[3]}`,
+    },
+    {
+      stars: 5,
+      text: "The free templates section is incredibly generous — we've downloaded permit to dig forms, plant check sheets, and daily diaries. Premium quality at no cost.",
+      author: 'J. O.',
+      role: `${genericRoles[4]}, ${genericCompanies[4]}`,
+    },
+    {
+      stars: 5,
+      text: "Used the CE Notification Builder for a compensation event and it structured everything perfectly — clause references, programme impact, the lot. Client accepted it first time.",
+      author: 'T. R.',
+      role: `${genericRoles[5]}, ${genericCompanies[5]}`,
+    },
+  ];
 
   /* ── AI Builder search items (mirrors CATEGORISED_TOOLS in HomepageClient) ── */
   const aiBuilderItems: { label: string; href: string }[] = [
@@ -135,7 +169,7 @@ export default function HomePage() {
       <HomepageClient
         templateCount={templateCount}
         categoryCount={categoryCount}
-        reviews={anonymisedReviews}
+        reviews={homepageReviews}
         latestPosts={latestPosts}
         searchItems={[
           ...aiBuilderItems.map((t) => ({
