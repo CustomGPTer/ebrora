@@ -66,7 +66,6 @@ export const metadata: Metadata = {
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
   },
   alternates: { canonical: 'https://www.ebrora.com' },
-  other: { 'google-site-verification': '' },
 };
 
 // Schema.org JSON-LD for Organization + WebSite
@@ -94,14 +93,6 @@ const websiteSchema = {
   url: 'https://www.ebrora.com',
   description:
     'Professional Excel templates for UK construction and civil engineering. Instant download, no signup required.',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: {
-      '@type': 'EntryPoint',
-      urlTemplate: 'https://www.ebrora.com/?search={search_term_string}',
-    },
-    'query-input': 'required name=search_term_string',
-  },
 };
 
 export default function RootLayout({

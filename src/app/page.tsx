@@ -39,14 +39,6 @@ const homepageSchema = {
   url: 'https://www.ebrora.com',
   description:
     'The UK construction industry\'s most powerful AI toolkit. 8 AI document generators including RAMS, COSHH, ITP, DSE and more — plus premium Excel templates and 1,500+ free toolbox talks.',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: {
-      '@type': 'EntryPoint',
-      urlTemplate: 'https://www.ebrora.com/products?search={search_term_string}',
-    },
-    'query-input': 'required name=search_term_string',
-  },
 };
 
 const organizationSchema = {

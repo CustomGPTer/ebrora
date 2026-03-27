@@ -3,9 +3,40 @@ import { PRODUCTS } from '@/data/products';
 import { POSTS } from '@/data/posts';
 import { prisma } from '@/lib/prisma';
 import { scanAllTemplates } from '@/lib/free-templates';
+import fs from 'fs';
+import path from 'path';
+
+// Auto-discover all *-builder directories under src/app/
+function discoverBuilderPages(): string[] {
+  try {
+    const appDir = path.join(process.cwd(), 'src', 'app');
+    const entries = fs.readdirSync(appDir, { withFileTypes: true });
+    return entries
+      .filter(
+        (e) =>
+          e.isDirectory() &&
+          e.name.endsWith('-builder') &&
+          fs.existsSync(path.join(appDir, e.name, 'page.tsx'))
+      )
+      .map((e) => e.name)
+      .sort();
+  } catch {
+    console.warn('Sitemap: could not auto-discover builder pages');
+    return [];
+  }
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const baseUrl = 'https://www.ebrora.com';
+
+  // Auto-discovered builder pages
+  const builderSlugs = discoverBuilderPages();
+  const builderPages: MetadataRoute.Sitemap = builderSlugs.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.9,
+  }));
 
   const staticPages: MetadataRoute.Sitemap = [
       {
@@ -27,106 +58,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 priority: 0.7,
       },
       {
-                url: `${baseUrl}/rams-builder`,
+                url: `${baseUrl}/products`,
                 lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
+                changeFrequency: 'weekly',
+                priority: 0.8,
       },
       {
-                url: `${baseUrl}/coshh-builder`,
+                url: `${baseUrl}/rams-builder/pricing`,
                 lastModified: new Date(),
                 changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/itp-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/manual-handling-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/dse-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/tbt-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/confined-spaces-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/incident-report-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/lift-plan-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/emergency-response-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/quality-checklist-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/scope-of-works-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/permit-to-dig-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/powra-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/early-warning-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/ncr-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
-      },
-      {
-                url: `${baseUrl}/ce-notification-builder`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.9,
+                priority: 0.8,
       },
       {
                 url: `${baseUrl}/toolbox-talks`,
@@ -267,6 +208,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
           ...staticPages,
+          ...builderPages,
           ...productPages,
           ...blogPages,
           ...freeTemplateCategoryPages,
