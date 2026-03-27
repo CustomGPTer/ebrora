@@ -13,11 +13,10 @@ import {
   getCategoryBySlug,
 } from "@/data/free-template-categories";
 import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
-import { UpsellBanner } from "@/components/shared/UpsellBanner";
 import {
-  RAMS_BUILDER_UPSELL,
-  DEFAULT_PRODUCT_UPSELL,
-} from "@/data/upsell-config";
+  RamsBuilderBanner,
+  PremiumSidebar,
+} from "@/components/shared/PremiumUpsellCards";
 
 interface PageProps {
   params: Promise<{ category: string; subcategory: string }>;
@@ -266,29 +265,12 @@ export default async function FreeTemplateSubcategoryPage({
               </>
             )}
 
-            <UpsellBanner
-              title={RAMS_BUILDER_UPSELL.title}
-              description={RAMS_BUILDER_UPSELL.description}
-              href={RAMS_BUILDER_UPSELL.gumroadUrl}
-              variant="bottom"
-            />
+            {/* RAMS Builder — full-width banner below grid */}
+            <RamsBuilderBanner />
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:w-72 shrink-0 space-y-5">
-            <UpsellBanner
-              title={RAMS_BUILDER_UPSELL.title}
-              description={RAMS_BUILDER_UPSELL.description}
-              href={RAMS_BUILDER_UPSELL.gumroadUrl}
-              variant="sidebar"
-            />
-            <UpsellBanner
-              title={DEFAULT_PRODUCT_UPSELL.title}
-              description={DEFAULT_PRODUCT_UPSELL.description}
-              href={DEFAULT_PRODUCT_UPSELL.gumroadUrl}
-              variant="sidebar"
-            />
-          </div>
+          {/* Sidebar — AI Tools + Browse Templates with light trace borders */}
+          <PremiumSidebar />
         </div>
       </div>
 
