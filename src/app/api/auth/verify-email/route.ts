@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import { sendEmail } from '@/lib/email/send-email';
+import { welcomeEmail } from '@/lib/email/templates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -83,6 +85,14 @@ export async function GET(request: NextRequest) {
         },
       },
     });
+
+    // Send welcome email (non-blocking — don't fail verification if email fails)
+    try {
+      const { subject, html } = welcomeEmail(user.name || 'there');
+      await sendEmail(user.email, subject, html);
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+    }
 
     // Redirect to login with success message
     return NextResponse.redirect(
