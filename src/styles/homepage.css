@@ -98,90 +98,56 @@
   margin: 0 auto;
 }
 .hp-hero__badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   position: relative;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.65);
-  background: rgba(27, 91, 80, 0.3);
-  padding: 0.35rem 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(212, 164, 76, 0.06);
+  padding: 0.55rem 1.5rem;
   border-radius: var(--radius-pill);
   margin-bottom: 1.25rem;
   overflow: hidden;
-  border: 1px solid transparent;
-  animation: badge-glow 1.5s ease-out forwards;
+  border: 1.5px solid rgba(212, 164, 76, 0.35);
 }
 
-/* Animated border that travels around once */
+/* Light sweep beam */
 .hp-hero__badge::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  padding: 2px;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    var(--color-gold) 0deg,
-    var(--color-gold) 60deg,
-    transparent 60deg
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(212, 164, 76, 0.15) 30%,
+    rgba(232, 195, 106, 0.2) 50%,
+    rgba(212, 164, 76, 0.15) 70%,
+    transparent 100%
   );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: border-spin 1.2s ease-out forwards;
-  opacity: 0;
+  animation: badge-sweep 3s ease-in-out infinite;
 }
 
-/* Star flash on the sparkle icon */
+/* Glowing sparkle icon */
 .hp-hero__badge svg {
-  animation: star-flash 0.8s ease-out 0.3s forwards;
-  opacity: 0.6;
+  color: #e8c36a;
+  filter: drop-shadow(0 0 3px rgba(212, 164, 76, 0.4));
 }
 
-@keyframes border-spin {
+@keyframes badge-sweep {
   0% {
-    opacity: 1;
-    transform: rotate(0deg);
+    left: -100%;
+  }
+  45% {
+    left: 140%;
   }
   100% {
-    opacity: 0;
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes badge-glow {
-  0% {
-    border-color: transparent;
-    box-shadow: none;
-  }
-  50% {
-    border-color: var(--color-gold);
-    box-shadow: 0 0 20px rgba(212, 164, 76, 0.4), inset 0 0 10px rgba(212, 164, 76, 0.1);
-  }
-  100% {
-    border-color: rgba(212, 164, 76, 0.35);
-    box-shadow: 0 0 8px rgba(212, 164, 76, 0.15);
-  }
-}
-
-@keyframes star-flash {
-  0% {
-    opacity: 0.6;
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1.4);
-    filter: brightness(2) drop-shadow(0 0 6px var(--color-gold));
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    filter: brightness(1.2);
+    left: 140%;
   }
 }
 .hp-hero__title {
@@ -649,45 +615,41 @@
   align-items: center;
   gap: 0.4rem;
   position: relative;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: var(--color-gold);
-  background: rgba(212, 164, 76, 0.12);
-  padding: 0.35rem 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(212, 164, 76, 0.06);
+  padding: 0.55rem 1.5rem;
   border-radius: var(--radius-pill);
   margin-bottom: 1rem;
   overflow: hidden;
-  border: 1px solid transparent;
-  animation: badge-glow 1.5s ease-out forwards;
+  border: 1.5px solid rgba(212, 164, 76, 0.35);
 }
 
-/* Animated border that travels around once */
+/* Light sweep beam */
 .hp-rams__badge::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  padding: 2px;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    var(--color-gold) 0deg,
-    var(--color-gold) 60deg,
-    transparent 60deg
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(212, 164, 76, 0.15) 30%,
+    rgba(232, 195, 106, 0.2) 50%,
+    rgba(212, 164, 76, 0.15) 70%,
+    transparent 100%
   );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: border-spin 1.2s ease-out forwards;
-  opacity: 0;
+  animation: badge-sweep 3s ease-in-out infinite;
 }
 
 .hp-rams__badge svg {
-  color: var(--color-gold);
-  animation: star-flash 0.8s ease-out 0.3s forwards;
-  opacity: 0.6;
+  color: #e8c36a;
+  filter: drop-shadow(0 0 3px rgba(212, 164, 76, 0.4));
 }
 .hp-rams__title {
   font-family: var(--font-display);
