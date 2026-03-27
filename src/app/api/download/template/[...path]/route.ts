@@ -16,6 +16,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTemplateBySlug } from "@/lib/free-templates";
 import { TIER_LIMITS } from "@/lib/constants";
+import { resolveEffectiveTier } from "@/lib/payments/resolve-tier";
 import type { SubscriptionTier } from "@prisma/client";
 import fs from "fs";
 import nodePath from "path";
@@ -78,9 +79,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       );
     }
  
-    const tier: SubscriptionTier = user.subscription?.status === 'ACTIVE'
-      ? user.subscription.tier
-      : "FREE";
+    const tier: SubscriptionTier = resolveEffectiveTier(user.subscription);
     const tierLimits = TIER_LIMITS[tier];
  
     const monthlyLimit =
