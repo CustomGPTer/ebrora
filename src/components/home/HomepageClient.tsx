@@ -278,6 +278,7 @@ export default function HomepageClient({
   const counter2 = useCounter(1500);
   const counter3 = useCounter(categoryCount);
   const counter4 = useCounter(29);
+  const counter5 = useCounter(500);
 
   /* ── Grouped search: max MAX_PER_GROUP results per type, ordered by type priority ── */
   const getGroupedResults = useCallback(
@@ -473,7 +474,6 @@ export default function HomepageClient({
                 aria-activedescendant={activeIndex >= 0 ? `hp-search-opt-${activeIndex}` : undefined}
                 autoComplete="off"
               />
-              <button className="hp-search__btn" onClick={handleSearch}>Search</button>
             </div>
 
             {/* Type filter pills */}
@@ -544,15 +544,6 @@ export default function HomepageClient({
                 )}
               </div>
             )}
-          </div>
-
-          {/* Quick links */}
-          <div className="hp-hero__pills">
-            <Link href="/rams-builder" className="hp-pill">RAMS Builder</Link>
-            <Link href="/coshh-builder" className="hp-pill">COSHH</Link>
-            <Link href="/itp-builder" className="hp-pill">ITP Generator</Link>
-            <Link href="/toolbox-talks" className="hp-pill">Toolbox Talks</Link>
-            <Link href="/products" className="hp-pill">Excel Templates</Link>
           </div>
         </div>
       </section>
@@ -683,7 +674,7 @@ export default function HomepageClient({
                 <li>H&amp;S, Quality, Commercial, and Programme tools</li>
                 <li>CDM 2015, COSHH Regs, NEC, JCT &amp; BS compliant outputs</li>
                 <li>Download as professional Word and Excel documents</li>
-                <li>Standard from £X/month — Standard &amp; Professional plans</li>
+                <li>Standard from £9.99/month — Standard &amp; Professional plans</li>
               </ul>
               <Link href="/rams-builder" className="hp-rams__cta">
                 Try RAMS Builder Free
@@ -718,21 +709,21 @@ export default function HomepageClient({
       <section className="hp-stats">
         <div className="hp-container">
           <div className="hp-stats__grid">
+            <div className="hp-stats__item" ref={counter4.ref}>
+              <span className="hp-stats__number">{counter4.count}+</span>
+              <span className="hp-stats__label">AI Tools</span>
+            </div>
             <div className="hp-stats__item" ref={counter1.ref}>
               <span className="hp-stats__number">{counter1.count}+</span>
               <span className="hp-stats__label">Premium Templates</span>
             </div>
+            <div className="hp-stats__item" ref={counter5.ref}>
+              <span className="hp-stats__number">{counter5.count}+</span>
+              <span className="hp-stats__label">Free Templates</span>
+            </div>
             <div className="hp-stats__item" ref={counter2.ref}>
               <span className="hp-stats__number">{counter2.count.toLocaleString()}+</span>
               <span className="hp-stats__label">Toolbox Talks</span>
-            </div>
-            <div className="hp-stats__item" ref={counter3.ref}>
-              <span className="hp-stats__number">{counter3.count}</span>
-              <span className="hp-stats__label">Categories</span>
-            </div>
-            <div className="hp-stats__item" ref={counter4.ref}>
-              <span className="hp-stats__number">{counter4.count}+</span>
-              <span className="hp-stats__label">AI Tools</span>
             </div>
           </div>
         </div>
@@ -747,10 +738,10 @@ export default function HomepageClient({
           </div>
           <div className="hp-features-grid">
             {[
-              { icon: '🏗️', title: 'Industry Expertise', desc: 'Every template and tool is designed by practising construction professionals who understand UK site workflows, CDM 2015, and British Standards.' },
-              { icon: '⚡', title: 'Instant Access', desc: 'Download templates immediately. No lengthy onboarding, no complex setup. Open in Excel and start using on site within minutes.' },
-              { icon: '🛡️', title: 'Compliance Built In', desc: 'Templates are designed around HSE guidance, CDM 2015 regulations, LOLER, PUWER, and relevant British Standards so your paperwork stands up to audit.' },
-              { icon: '💻', title: 'Works Everywhere', desc: 'All templates are fully compatible with Microsoft Excel on Windows and Mac, and most work in Google Sheets. VBA features require Excel desktop.' },
+              { icon: '🏗️', title: 'Industry Expertise', desc: 'Every AI tool, template, and toolbox talk is designed by practising construction professionals who understand UK site workflows, CDM 2015, NEC contracts, and British Standards.' },
+              { icon: '⚡', title: 'Instant Results', desc: 'Generate professional documents in minutes with our AI tools, download ready-to-use Excel templates, or brief your team with toolbox talks — no lengthy setup required.' },
+              { icon: '🛡️', title: 'Compliance Built In', desc: 'All outputs are designed around HSE guidance, CDM 2015, COSHH, LOLER, PUWER, NEC, JCT, and relevant British Standards so your paperwork stands up to audit.' },
+              { icon: '💻', title: 'Works Everywhere', desc: 'AI-generated documents download as Word and Excel files. Templates work in Microsoft Excel and Google Sheets. Access everything from desktop, tablet, or mobile.' },
             ].map((f, i) => (
               <div key={i} className="hp-feature-card">
                 <span className="hp-feature-card__icon">{f.icon}</span>
