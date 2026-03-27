@@ -4,7 +4,7 @@
           "description": "Ebrora - UK Construction Excel Templates Store with RAMS Builder",
           "scripts": {
                     "dev": "next dev",
-                    "build": "node scripts/sync-tbt.js && mkdir -p public && cp -r product-images public/ && cp -r blog-images public/ && cp favicon.ico favicon-*.png android-chrome-*.png apple-touch-icon.png mstile-150x150.png public/ && prisma generate && next build",
+                    "build": "node scripts/sync-tbt.js && prisma generate && next build",
                     "start": "next start",
                     "lint": "next lint",
                     "prisma:generate": "prisma generate",
