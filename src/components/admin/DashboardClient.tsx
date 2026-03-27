@@ -30,6 +30,9 @@ interface DashboardData {
   monthEmailCaptures: number;
   todayDownloads: number;
   monthDownloads: number;
+  todayFreeTemplateDownloads: number;
+  monthFreeTemplateDownloads: number;
+  totalFreeTemplateDownloads: number;
   signupChartData: { date: string; label: string; count: number }[];
   allActivity: ActivityItem[];
   ramsActivity: ActivityItem[];
@@ -194,6 +197,7 @@ export function DashboardClient({ data }: Props) {
               <StatMini label="RAMS Gens" value={data.todayGenerations} icon="⚙️" />
               <StatMini label="AI Tool Uses" value={data.todayAiToolUses} icon="🤖" />
               <StatMini label="Downloads" value={data.todayDownloads} icon="📥" />
+              <StatMini label="Free Templates" value={data.todayFreeTemplateDownloads} icon="📄" />
               <StatMini label="Email Captures" value={data.todayEmailCaptures} icon="📧" />
             </div>
           </div>
@@ -217,6 +221,7 @@ export function DashboardClient({ data }: Props) {
               <StatMini label="RAMS Gens" value={data.monthGenerations} icon="⚙️" />
               <StatMini label="AI Tool Uses" value={data.monthAiToolUses} icon="🤖" />
               <StatMini label="Downloads" value={data.monthDownloads} icon="📥" />
+              <StatMini label="Free Templates" value={data.monthFreeTemplateDownloads} icon="📄" />
               <StatMini label="Email Captures" value={data.monthEmailCaptures} icon="📧" />
             </div>
           </div>
@@ -256,6 +261,14 @@ export function DashboardClient({ data }: Props) {
           <div className="admin-stat-card__body">
             <div className="admin-stat-card__label">Email Captures</div>
             <div className="admin-stat-card__value">{data.totalEmailCaptures.toLocaleString()}</div>
+          </div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-card__icon admin-stat-card__icon--green">📄</div>
+          <div className="admin-stat-card__body">
+            <div className="admin-stat-card__label">Free Template Downloads</div>
+            <div className="admin-stat-card__value">{data.totalFreeTemplateDownloads.toLocaleString()}</div>
           </div>
         </div>
       </div>
