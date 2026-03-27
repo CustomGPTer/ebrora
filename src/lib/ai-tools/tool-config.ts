@@ -14,15 +14,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   coshh: {
     slug: 'coshh',
-    name: 'COSHH Assessment Generator',
+    name: 'COSHH Assessment Builder',
     shortName: 'COSHH Assessment',
     category: 'Health & Safety',
     description:
-      'Generate a professional COSHH assessment for any hazardous substance. Just name the product — our AI looks up the SDS data and builds a regulation-compliant assessment tailored to your specific work activity.',
+      'Create a professional COSHH assessment for any hazardous substance in minutes. Simply name the product and our AI looks up the Safety Data Sheet, then builds a fully compliant assessment aligned to the Control of Substances Hazardous to Health Regulations 2002 (COSHH) — tailored to your specific work activity with proper GHS classification, exposure routes, control measures, and PPE requirements.',
     route: '/coshh-builder',
-    pageTitle: 'COSHH Assessment Generator | Ebrora',
+    pageTitle: 'COSHH Assessment Builder | Ebrora',
     metaDescription:
-      'AI-powered COSHH assessment generator for UK construction. Name the product, answer 3 questions, get a professional COSHH assessment with real SDS data. Regulation compliant.',
+      'AI-powered COSHH assessment builder for UK construction. Name the product, answer 3 questions, get a professional COSHH assessment with real SDS data. COSHH Regulations 2002 compliant.',
     documentLabel: 'COSHH Assessment',
     descriptionPlaceholder: 'E.g. "Jotun Jotamastic 87 – Jotun Paints" or "Sika MonoTop 610 – Sika UK"',
     descriptionHeading: 'What is the Product?',
@@ -48,15 +48,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   itp: {
     slug: 'itp',
-    name: 'ITP Generator',
+    name: 'ITP Builder',
     shortName: 'Inspection & Test Plan',
     category: 'Quality',
     description:
-      'Generate inspection and test plans tailored to your construction works. Hold points, witness points, review points, and sign-off matrices — all mapped to your work activities.',
+      'Build comprehensive Inspection and Test Plans tailored to your construction works in minutes. Generates hold points, witness points, review points, and sign-off matrices — all mapped to your specific work activities and aligned with ISO 9001 quality management principles and CESWI inspection requirements.',
     route: '/itp-builder',
-    pageTitle: 'ITP Generator – Inspection & Test Plans | Ebrora',
+    pageTitle: 'ITP Builder – Inspection & Test Plans | Ebrora',
     metaDescription:
-      'AI-powered inspection and test plan generator for UK construction. Hold points, witness points, sign-off matrices, and quality verification — built for your specific works.',
+      'AI-powered ITP builder for UK construction. Hold points, witness points, sign-off matrices, and quality verification — built for your specific works. ISO 9001 and CESWI aligned.',
     documentLabel: 'Inspection & Test Plan',
     descriptionPlaceholder:
       'E.g. "Installation of 300mm diameter ductile iron rising main from new pump station to existing connection chamber. Includes thrust blocks, air valves, washout chambers, chlorination, and pressure testing to 1.5x working pressure."',
@@ -83,15 +83,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'manual-handling': {
     slug: 'manual-handling',
-    name: 'Manual Handling Risk Assessment',
-    shortName: 'Manual Handling RA',
+    name: 'Manual Handling Assessment Builder',
+    shortName: 'Manual Handling Assessment',
     category: 'Health & Safety',
     description:
-      'Generate manual handling risk assessments using the TILE methodology. Covers task analysis, individual capability, load characteristics, and environmental factors.',
+      'Create detailed manual handling risk assessments using the TILE methodology in minutes. Produces comprehensive task analysis, individual capability assessment, load characteristics, and environmental factors — fully aligned with the Manual Handling Operations Regulations 1992 and HSE MAC (Manual Handling Assessment Charts) and RAPP (Risk Assessment of Pushing and Pulling) guidance.',
     route: '/manual-handling-builder',
-    pageTitle: 'Manual Handling Risk Assessment Generator | Ebrora',
+    pageTitle: 'Manual Handling Assessment Builder | Ebrora',
     metaDescription:
-      'AI-powered manual handling risk assessment generator using TILE methodology. Task, individual, load, and environment analysis for UK construction activities.',
+      'AI-powered manual handling assessment builder using TILE methodology. Task, individual, load, and environment analysis aligned with Manual Handling Operations Regulations 1992 and HSE MAC/RAPP.',
     documentLabel: 'Manual Handling Risk Assessment',
     descriptionPlaceholder:
       'Describe the manual handling activity. E.g. "Lifting and positioning precast concrete kerbs (45kg each) along a 200m length of new footpath..."',
@@ -119,15 +119,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   dse: {
     slug: 'dse',
-    name: 'DSE Assessment Generator',
+    name: 'DSE Assessment Builder',
     shortName: 'DSE Assessment',
     category: 'Health & Safety',
     description:
-      'Generate display screen equipment assessments for office workstations and site welfare facilities. Covers posture, screen setup, lighting, and eye strain considerations.',
+      'Create professional display screen equipment assessments for office workstations and site welfare facilities. Generates comprehensive assessments covering posture, screen setup, lighting, chair and seating, desk layout, and eye strain considerations — fully compliant with the Health and Safety (Display Screen Equipment) Regulations 1992.',
     route: '/dse-builder',
-    pageTitle: 'DSE Assessment Generator | Ebrora',
+    pageTitle: 'DSE Assessment Builder | Ebrora',
     metaDescription:
-      'AI-powered DSE workstation assessment generator. Display screen equipment assessments covering posture, screen setup, lighting, and eye strain for UK workplaces.',
+      'AI-powered DSE workstation assessment builder. Display screen equipment assessments covering posture, screen setup, lighting, and eye strain. Compliant with DSE Regulations 1992.',
     documentLabel: 'DSE Assessment',
     descriptionPlaceholder:
       'Describe the workstation and user. E.g. "Site office portakabin workstation for a project manager using dual monitors, 8 hours per day. Shared desk environment..."',
@@ -156,15 +156,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'tbt-generator': {
     slug: 'tbt-generator',
-    name: 'Toolbox Talk Generator',
+    name: 'Toolbox Talk Builder',
     shortName: 'Toolbox Talk',
     category: 'Health & Safety',
     description:
-      'Generate bespoke toolbox talks for any activity, hazard, or site condition. Site-specific, briefing-ready, with attendance record — tailored to your project.',
+      'Create bespoke, site-specific toolbox talks for any activity, hazard, or site condition in minutes. Generates briefing-ready documents with key hazards, control measures, do\'s and don\'ts, and attendance records — aligned with CDM 2015 requirements for worker engagement and HSE guidance on effective safety briefings.',
     route: '/tbt-builder',
-    pageTitle: 'AI Toolbox Talk Generator | Ebrora',
+    pageTitle: 'AI Toolbox Talk Builder | Ebrora',
     metaDescription:
-      'AI-powered toolbox talk generator for UK construction sites. Generate site-specific safety briefings with attendance records for any activity or hazard.',
+      'AI-powered toolbox talk builder for UK construction sites. Generate site-specific safety briefings with attendance records for any activity or hazard. CDM 2015 aligned.',
     documentLabel: 'Toolbox Talk',
     descriptionPlaceholder:
       'Describe the topic or activity for the toolbox talk. E.g. "Working near live underground services during excavation works on an operational wastewater treatment site..."',
@@ -191,15 +191,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'confined-spaces': {
     slug: 'confined-spaces',
-    name: 'Confined Space Assessment',
-    shortName: 'Confined Space RA',
+    name: 'Confined Space Assessment Builder',
+    shortName: 'Confined Space Assessment',
     category: 'Health & Safety',
     description:
-      'Generate confined space risk assessments covering atmospheric hazards, entry/exit, emergency rescue plans, permits, gas monitoring, and communication requirements.',
+      'Create comprehensive confined space risk assessments covering atmospheric hazards, entry/exit procedures, emergency rescue plans, permits, gas monitoring, and communication requirements. Fully aligned with the Confined Spaces Regulations 1997 and HSE Approved Code of Practice L101 — with proper hazard identification and control measures for safe systems of work.',
     route: '/confined-spaces-builder',
-    pageTitle: 'Confined Space Risk Assessment Generator | Ebrora',
+    pageTitle: 'Confined Space Assessment Builder | Ebrora',
     metaDescription:
-      'AI-powered confined space risk assessment generator. Atmospheric hazards, entry procedures, rescue plans, permits, and monitoring requirements for UK construction.',
+      'AI-powered confined space assessment builder. Atmospheric hazards, entry procedures, rescue plans, permits, and monitoring requirements. Confined Spaces Regulations 1997 and HSE L101 compliant.',
     documentLabel: 'Confined Space Risk Assessment',
     descriptionPlaceholder:
       'Describe the confined space and the work to be carried out. E.g. "Entry into a 4m deep wet well at a wastewater pumping station to replace submersible pump and guide rails..."',
@@ -228,15 +228,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'incident-report': {
     slug: 'incident-report',
-    name: 'Incident Report Generator',
+    name: 'Incident Report Builder',
     shortName: 'Incident Report',
     category: 'Health & Safety',
     description:
-      'Generate professional incident investigation reports with root cause analysis, 5 Whys methodology, RIDDOR reportability assessment, corrective actions, and lessons learned.',
+      'Create professional incident investigation reports with root cause analysis, 5 Whys methodology, RIDDOR reportability assessment, corrective actions, and lessons learned. Generates comprehensive reports aligned with RIDDOR 2013 (Reporting of Injuries, Diseases and Dangerous Occurrences Regulations) and HSE investigation guidance — ready for management review and regulatory submission.',
     route: '/incident-report-builder',
-    pageTitle: 'AI Incident Report Generator for Construction | Ebrora',
+    pageTitle: 'AI Incident Report Builder for Construction | Ebrora',
     metaDescription:
-      'AI-powered incident report generator for UK construction sites. Root cause analysis, 5 Whys, RIDDOR assessment, corrective actions, and lessons learned — in minutes.',
+      'AI-powered incident report builder for UK construction sites. Root cause analysis, 5 Whys, RIDDOR 2013 assessment, corrective actions, and lessons learned — in minutes.',
     documentLabel: 'Incident Investigation Report',
     descriptionPlaceholder:
       'Describe what happened. E.g. "Operative struck by falling scaffold tube during dismantling of tower scaffold on the north elevation..."',
@@ -265,15 +265,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'lift-plan': {
     slug: 'lift-plan',
-    name: 'Lift Plan Generator',
+    name: 'Lift Plan Builder',
     shortName: 'Lift Plan',
     category: 'Health & Safety',
     description:
-      'Generate structured lift plans covering load details, crane specification, radius charts, ground conditions, exclusion zones, appointed persons, and communication arrangements.',
+      'Create structured lift plans covering load details, crane specification, radius charts, ground conditions, exclusion zones, appointed persons, and communication arrangements. Generates comprehensive documentation aligned with BS 7121 (Code of Practice for Safe Use of Cranes) and LOLER 1998 (Lifting Operations and Lifting Equipment Regulations) — ready for lifting supervisor sign-off.',
     route: '/lift-plan-builder',
-    pageTitle: 'AI Lift Plan Generator for Construction | Ebrora',
+    pageTitle: 'AI Lift Plan Builder for Construction | Ebrora',
     metaDescription:
-      'AI-powered lift plan generator for UK construction. Load details, crane selection, exclusion zones, appointed persons, and communication plans. BS 7121 compliant.',
+      'AI-powered lift plan builder for UK construction. Load details, crane selection, exclusion zones, appointed persons, and communication plans. BS 7121 and LOLER 1998 compliant.',
     documentLabel: 'Lift Plan',
     descriptionPlaceholder:
       'Describe the lift. E.g. "Installation of precast concrete beams (8 tonnes each) using a 50T mobile crane. 12m radius, lifting from delivery vehicle to permanent position at 6m height..."',
@@ -303,15 +303,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'emergency-response': {
     slug: 'emergency-response',
-    name: 'Emergency Response Plan Generator',
+    name: 'Emergency Response Plan Builder',
     shortName: 'Emergency Response Plan',
     category: 'Health & Safety',
     description:
-      'Generate site-specific emergency response plans covering fire, first aid, environmental spills, structural collapse, utilities failure, and evacuation procedures.',
+      'Create site-specific emergency response plans covering fire, first aid, environmental spills, structural collapse, utilities failure, and evacuation procedures. Generates comprehensive plans aligned with CDM 2015 requirements and HSE guidance — with emergency contact cascades, muster points, and role-specific responsibilities ready for site induction.',
     route: '/emergency-response-builder',
-    pageTitle: 'AI Emergency Response Plan Generator | Ebrora',
+    pageTitle: 'AI Emergency Response Plan Builder | Ebrora',
     metaDescription:
-      'AI-powered emergency response plan generator for UK construction sites. Fire plans, first aid, environmental spills, evacuation, muster points — site-specific and CDM compliant.',
+      'AI-powered emergency response plan builder for UK construction sites. Fire plans, first aid, environmental spills, evacuation, muster points — site-specific and CDM 2015 compliant.',
     documentLabel: 'Emergency Response Plan',
     descriptionPlaceholder:
       'Describe the site and its key hazards. E.g. "Operational wastewater treatment works with active construction of new storm tank. Site has deep excavations, confined spaces, H₂S risk, heavy plant, and is adjacent to the Manchester Ship Canal..."',
@@ -341,15 +341,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'quality-checklist': {
     slug: 'quality-checklist',
-    name: 'Quality Inspection Checklist Generator',
+    name: 'Quality Checklist Builder',
     shortName: 'Quality Checklist',
     category: 'Quality',
     description:
-      'Generate activity-specific quality inspection checklists with hold points, acceptance criteria, reference standards, and sign-off fields for construction works.',
+      'Create activity-specific quality inspection checklists with hold points, acceptance criteria, reference standards, and sign-off fields for construction works. Generates comprehensive checklists aligned with ISO 9001 quality management principles and relevant BS EN standards — ready for site inspection and quality record keeping.',
     route: '/quality-checklist-builder',
-    pageTitle: 'AI Quality Inspection Checklist Generator | Ebrora',
+    pageTitle: 'AI Quality Checklist Builder | Ebrora',
     metaDescription:
-      'AI-powered quality inspection checklist generator for UK construction. Activity-specific checklists with hold points, acceptance criteria, and BS/EN standards references.',
+      'AI-powered quality checklist builder for UK construction. Activity-specific checklists with hold points, acceptance criteria, and BS/EN standards references. ISO 9001 aligned.',
     documentLabel: 'Quality Inspection Checklist',
     descriptionPlaceholder:
       'Describe the activity to be inspected. E.g. "Concrete pour for 300mm thick reinforced concrete base slab, 15m x 8m, C35/45 concrete with steel fibre reinforcement..."',
@@ -377,15 +377,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'scope-of-works': {
     slug: 'scope-of-works',
-    name: 'Scope of Works Writer',
+    name: 'Scope of Works Builder',
     shortName: 'Scope of Works',
     category: 'Commercial',
     description:
-      'Generate formal subcontractor scope of works documents with inclusions, exclusions, interfaces, programme constraints, deliverables, and commercial terms.',
+      'Create formal subcontractor scope of works documents with comprehensive inclusions, exclusions, design responsibilities, interface requirements, programme constraints, deliverables, and commercial terms. Generates professionally structured documents aligned with NEC and JCT subcontract frameworks — clearly defining the boundary of works to minimise disputes and ensure all parties understand their obligations. Includes materials and equipment specifications, testing and commissioning requirements, health safety and environmental responsibilities, and documentation deliverables.',
     route: '/scope-of-works-builder',
-    pageTitle: 'AI Scope of Works Writer for Construction | Ebrora',
+    pageTitle: 'AI Scope of Works Builder for Construction | Ebrora',
     metaDescription:
-      'AI-powered scope of works generator for UK construction subcontracts. Inclusions, exclusions, interfaces, deliverables, and programme constraints — professionally structured.',
+      'AI-powered scope of works builder for UK construction subcontracts. Inclusions, exclusions, interfaces, deliverables, programme constraints, and commercial terms — professionally structured for NEC and JCT frameworks.',
     documentLabel: 'Scope of Works',
     descriptionPlaceholder:
       'Describe what the subcontractor needs to do. E.g. "Supply and install MEICA equipment for a new storm water pumping station — 3 No. submersible pumps, MCC panel, level instrumentation, and all associated pipework..."',
@@ -415,15 +415,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'permit-to-dig': {
     slug: 'permit-to-dig',
-    name: 'Permit to Dig Generator',
+    name: 'Permit to Dig Builder',
     shortName: 'Permit to Dig',
     category: 'Health & Safety',
     description:
-      'Generate permit to dig documents covering utility searches, CAT & Genny scanning, hand-dig zones, safe digging methods, and supervision requirements.',
+      'Create permit to dig documents covering utility searches, CAT & Genny scanning requirements, hand-dig zones, safe digging methods, and supervision requirements. Generates comprehensive permits aligned with HSG47 (Avoiding Danger from Underground Services) and PAS 128 utility survey standards — ready for excavation works sign-off.',
     route: '/permit-to-dig-builder',
-    pageTitle: 'AI Permit to Dig Generator | Ebrora',
+    pageTitle: 'AI Permit to Dig Builder | Ebrora',
     metaDescription:
-      'AI-powered permit to dig generator for UK construction. Utility searches, CAT & Genny requirements, hand-dig zones, safe digging methods, and HSG47 compliance.',
+      'AI-powered permit to dig builder for UK construction. Utility searches, CAT & Genny requirements, hand-dig zones, safe digging methods, and HSG47 compliance.',
     documentLabel: 'Permit to Dig',
     descriptionPlaceholder:
       'Describe the excavation. E.g. "Trench excavation for 225mm diameter foul sewer, 2.5m deep, along the eastern boundary of the site adjacent to the existing substation..."',
@@ -452,15 +452,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   powra: {
     slug: 'powra',
-    name: 'POWRA Generator',
+    name: 'POWRA Builder',
     shortName: 'POWRA',
     category: 'Health & Safety',
     description:
-      "Generate point of work risk assessments — quick, field-level assessments done before each task covering today's hazards, controls, stop conditions, and team sign-on.",
+      'Create point of work risk assessments — quick, field-level assessments done before each task covering today\'s hazards, controls, stop conditions, and team sign-on. Generates practical, site-ready documents aligned with CDM 2015 requirements for dynamic risk assessment and safe systems of work.',
     route: '/powra-builder',
-    pageTitle: 'AI POWRA Generator — Point of Work Risk Assessment | Ebrora',
+    pageTitle: 'AI POWRA Builder — Point of Work Risk Assessment | Ebrora',
     metaDescription:
-      'AI-powered POWRA generator for UK construction. Quick point of work risk assessments with hazards, controls, stop conditions, and team sign-on. Field-ready format.',
+      'AI-powered POWRA builder for UK construction. Quick point of work risk assessments with hazards, controls, stop conditions, and team sign-on. CDM 2015 aligned, field-ready format.',
     documentLabel: 'Point of Work Risk Assessment (POWRA)',
     descriptionPlaceholder:
       "Describe today's task. E.g. \"Excavation of trial holes to locate existing 300mm water main using 3T mini excavator and hand digging within 500mm of services...\"",
@@ -488,15 +488,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'early-warning': {
     slug: 'early-warning',
-    name: 'Early Warning Notice Drafter',
+    name: 'Early Warning Notice Builder',
     shortName: 'Early Warning Notice',
     category: 'Commercial',
     description:
-      'Generate NEC-compliant early warning notices with risk description, potential impact on cost, time, and quality, and proposed mitigation measures.',
+      'Create NEC-compliant early warning notices with risk description, potential impact on cost, time, and quality, and proposed mitigation measures. Generates formal notices aligned with NEC3/NEC4 Clause 15 requirements — protecting your contractual position and triggering risk reduction meetings.',
     route: '/early-warning-builder',
-    pageTitle: 'AI Early Warning Notice Generator | Ebrora',
+    pageTitle: 'AI Early Warning Notice Builder | Ebrora',
     metaDescription:
-      'AI-powered NEC early warning notice generator for UK construction contracts. Risk description, impact assessment, and mitigation proposals — contract-compliant format.',
+      'AI-powered NEC early warning notice builder for UK construction contracts. Risk description, impact assessment, and mitigation proposals — NEC3/NEC4 Clause 15 compliant format.',
     documentLabel: 'Early Warning Notice',
     descriptionPlaceholder:
       'Describe the risk or issue. E.g. "Unforeseen ground conditions encountered during piling — soft alluvial deposits extending 3m deeper than the GI report indicated..."',
@@ -524,15 +524,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   ncr: {
     slug: 'ncr',
-    name: 'NCR Generator',
+    name: 'NCR Builder',
     shortName: 'Non-Conformance Report',
     category: 'Quality',
     description:
-      'Generate non-conformance reports with defect description, root cause analysis, corrective and preventive actions, disposition, and close-out requirements.',
+      'Create non-conformance reports with defect description, root cause analysis, corrective and preventive actions, disposition, and close-out requirements. Generates comprehensive NCRs aligned with ISO 9001 quality management principles — ready for quality system integration and audit trail documentation.',
     route: '/ncr-builder',
-    pageTitle: 'AI Non-Conformance Report Generator | Ebrora',
+    pageTitle: 'AI NCR Builder — Non-Conformance Report | Ebrora',
     metaDescription:
-      'AI-powered NCR generator for UK construction. Defect description, root cause analysis, corrective actions, disposition, and close-out verification — ISO 9001 aligned.',
+      'AI-powered NCR builder for UK construction. Defect description, root cause analysis, corrective actions, disposition, and close-out verification — ISO 9001 aligned.',
     documentLabel: 'Non-Conformance Report',
     descriptionPlaceholder:
       'Describe the non-conformance. E.g. "Concrete test cubes from base slab pour on 15/03/2026 failed to reach specified 28-day strength — results show 31 N/mm² against specified C35/45..."',
@@ -562,15 +562,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'ce-notification': {
     slug: 'ce-notification',
-    name: 'Compensation Event Notification Drafter',
+    name: 'CE Notification Builder',
     shortName: 'CE Notification',
     category: 'Commercial',
     description:
-      'Generate NEC-compliant compensation event notifications with clause references, event description, programme impact, cost implications, and supporting evidence checklist.',
+      'Create NEC-compliant compensation event notifications with clause references, event description, programme impact, cost implications, and supporting evidence checklist. Generates formal notifications aligned with NEC3/NEC4 Clause 60-65 requirements — protecting your entitlement to time and cost.',
     route: '/ce-notification-builder',
-    pageTitle: 'AI Compensation Event Notification Generator | Ebrora',
+    pageTitle: 'AI CE Notification Builder — Compensation Event | Ebrora',
     metaDescription:
-      'AI-powered NEC compensation event notification generator for UK construction. Clause references, impact assessment, and entitlement — contract-compliant format.',
+      'AI-powered NEC compensation event notification builder for UK construction. Clause references, impact assessment, and entitlement — NEC3/NEC4 Clause 60-65 compliant format.',
     documentLabel: 'Compensation Event Notification',
     descriptionPlaceholder:
       'Describe the compensation event. E.g. "Client instruction to change storm tank overflow weir level from 42.150m AOD to 42.350m AOD — requires redesign of weir wall, new formwork, and additional concrete..."',
@@ -606,7 +606,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     shortName: 'Programme Checker',
     category: 'Programme',
     description:
-      'Upload your construction programme (PDF, Excel, or P6/MSP XER/XML) and receive an AI-powered RAG-rated review. Logic errors, sequencing issues, missing activities, WBS gaps, duration anomalies, and contractual compliance — all scored and reported.',
+      'Upload your construction programme (PDF, Excel, or P6/MSP XER/XML) and receive an AI-powered RAG-rated review. Analyses logic errors, sequencing issues, missing activities, WBS gaps, duration anomalies, and contractual milestone compliance — aligned with NEC and JCT programme requirements. Generates a comprehensive review report with prioritised recommendations.',
     route: '/programme-checker-builder',
     pageTitle: 'AI Construction Programme Checker | Ebrora',
     metaDescription:
@@ -648,7 +648,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     shortName: 'CDM Compliance Checker',
     category: 'Health & Safety',
     description:
-      'Describe your project or upload key documents and receive a comprehensive CDM 2015 compliance gap analysis. Duty holder responsibilities assessed against the Construction (Design and Management) Regulations 2015 and HSE L153 guidance.',
+      'Describe your project or upload key documents and receive a comprehensive CDM 2015 compliance gap analysis. Assesses all duty holder responsibilities against the Construction (Design and Management) Regulations 2015 and HSE L153 Approved Code of Practice — identifying gaps and producing a prioritised improvement roadmap.',
     route: '/cdm-checker-builder',
     pageTitle: 'AI CDM 2015 Compliance Checker | Ebrora',
     metaDescription:
@@ -686,15 +686,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'noise-assessment': {
     slug: 'noise-assessment',
-    name: 'Noise Assessment Generator',
+    name: 'Noise Assessment Builder',
     shortName: 'Noise Assessment',
     category: 'Health & Safety',
     description:
-      'Generate BS 5228-aligned construction noise assessments. Predict noise levels at sensitive receptors from plant and activities, assess impact against BS 5228 criteria, and produce a formal assessment with monitoring requirements and mitigation measures.',
+      'Create BS 5228-aligned construction noise assessments in minutes. Predicts noise levels at sensitive receptors from plant and activities, assesses impact against BS 5228 criteria, and produces a formal assessment with monitoring requirements and mitigation measures — fully compliant with BS 5228-1:2009+A1:2014 (Code of Practice for Noise and Vibration Control on Construction and Open Sites).',
     route: '/noise-assessment-builder',
-    pageTitle: 'AI Construction Noise Assessment Generator | Ebrora',
+    pageTitle: 'AI Construction Noise Assessment Builder | Ebrora',
     metaDescription:
-      'AI-powered construction noise assessment generator. BS 5228-1:2009+A1:2014 compliant. Plant noise levels, receptor predictions, impact assessment, and mitigation measures for UK construction.',
+      'AI-powered construction noise assessment builder. BS 5228-1:2009+A1:2014 compliant. Plant noise levels, receptor predictions, impact assessment, and mitigation measures for UK construction.',
     documentLabel: 'Construction Noise Assessment',
     descriptionPlaceholder:
       'E.g. "Earthworks and piling for new road bridge abutments, 6 months duration. Working hours 07:30–18:00 Mon–Fri, 07:30–13:00 Sat. Nearest sensitive receptor is a residential terrace at 85m to the north. Plant includes 20T excavator, 360° piling rig (CFA), dumpers, and compactor..."',
@@ -729,15 +729,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'quote-generator': {
     slug: 'quote-generator',
-    name: 'Subcontractor Quotation Generator',
+    name: 'Quotation Builder',
     shortName: 'Quotation',
     category: 'Commercial',
     description:
-      'Generate professional subcontractor quotations for submission to main contractors. Priced BoQ breakdown, inclusions, exclusions, assumptions, programme, commercial and contractual terms — formatted to Tier 1 standards.',
+      'Create professional subcontractor quotations for submission to main contractors in minutes. Generates priced BoQ breakdowns, inclusions, exclusions, assumptions, programme, and commercial and contractual terms — formatted to Tier 1 standards and ready for tender submission.',
     route: '/quote-generator-builder',
-    pageTitle: 'AI Subcontractor Quotation Generator | Ebrora',
+    pageTitle: 'AI Quotation Builder for Subcontractors | Ebrora',
     metaDescription:
-      'AI-powered subcontractor quotation generator for UK construction. Professional tender submissions with BoQ, inclusions, exclusions, programme, and commercial terms. Tier 1 ready.',
+      'AI-powered subcontractor quotation builder for UK construction. Professional tender submissions with BoQ, inclusions, exclusions, programme, and commercial terms. Tier 1 ready.',
     documentLabel: 'Subcontractor Quotation',
     descriptionPlaceholder:
       'E.g. "Quotation for supply and installation of 450mm diameter HDPE rising main, approximately 380m length, from new pumping station to existing connection chamber. Includes directional drilling under the A57, thrust blocks, air valves, and pressure testing. Client: United Utilities. Main contractor: C2V+. Tender return date: 15/04/2026."',
@@ -772,15 +772,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'safety-alert': {
     slug: 'safety-alert',
-    name: 'Safety Alert Generator',
+    name: 'Safety Alert Builder',
     shortName: 'Safety Alert',
     category: 'Health & Safety',
     description:
-      'Generate professional safety alert bulletins from incident descriptions, near misses, or emerging hazard intelligence. Structured for immediate distribution across site teams with clear lessons learned and preventive actions.',
+      'Create professional safety alert bulletins from incident descriptions, near misses, or emerging hazard intelligence in minutes. Generates structured alerts with clear lessons learned and preventive actions — aligned with CDM 2015 requirements for sharing safety intelligence and ready for immediate distribution across site teams.',
     route: '/safety-alert-builder',
-    pageTitle: 'AI Safety Alert Generator for Construction | Ebrora',
+    pageTitle: 'AI Safety Alert Builder for Construction | Ebrora',
     metaDescription:
-      'AI-powered safety alert generator for UK construction. Turn incident descriptions and near misses into professional safety bulletins — structured, clear, and ready to distribute.',
+      'AI-powered safety alert builder for UK construction. Turn incident descriptions and near misses into professional safety bulletins — structured, clear, and ready to distribute. CDM 2015 aligned.',
     documentLabel: 'Safety Alert Bulletin',
     descriptionPlaceholder:
       'E.g. "Near miss — banksman stepped into the swing radius of a 20T excavator during lifting operations on the east compound. Operator did not see the banksman as he was in a blind spot. No injury but banksman was struck by the counterweight. Site stopped, investigation underway."',
@@ -812,15 +812,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'carbon-footprint': {
     slug: 'carbon-footprint',
-    name: 'Carbon Footprint Generator',
+    name: 'Carbon Footprint Builder',
     shortName: 'Carbon Footprint',
     category: 'Programme',
     description:
-      'Generate an activity-based carbon footprint assessment for construction works. Materials, plant, transport, waste, and temporary works quantified using ICE v3.2 emission factors — with reduction opportunities identified.',
+      'Create activity-based carbon footprint assessments for construction works in minutes. Quantifies materials, plant, transport, waste, and temporary works using ICE v3.2 emission factors — with reduction opportunities identified. Aligned with PAS 2080:2023 (Carbon Management in Infrastructure) for comprehensive whole-life carbon assessment.',
     route: '/carbon-footprint-builder',
-    pageTitle: 'AI Construction Carbon Footprint Generator | Ebrora',
+    pageTitle: 'AI Construction Carbon Footprint Builder | Ebrora',
     metaDescription:
-      'AI-powered construction carbon footprint calculator. ICE v3.2 emission factors, materials, plant, transport, waste, and reduction opportunities. PAS 2080:2023 aligned.',
+      'AI-powered construction carbon footprint builder. ICE v3.2 emission factors, materials, plant, transport, waste, and reduction opportunities. PAS 2080:2023 aligned.',
     documentLabel: 'Construction Carbon Footprint Assessment',
     descriptionPlaceholder:
       'E.g. "New reinforced concrete storm tank, 30m × 20m × 5m deep. 1,800m³ C35/45 concrete, 180T rebar, 2,500m² formwork, 500T imported fill. Plant includes 2 No. 20T excavators (10 weeks), 50T crane (4 weeks). 120km average material haulage. 8,000m³ muck away to licensed tip 15km."',
@@ -859,11 +859,11 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     shortName: 'RAMS Review',
     category: 'Health & Safety',
     description:
-      'Upload a RAMS document (PDF, Word, or Excel) and receive a thorough AI review against HSE guidance, CDM 2015, and industry best practice. Gaps identified, improvements suggested, and a formal review report produced.',
+      'Upload a RAMS document (PDF, Word, or Excel) and receive a thorough AI review against HSE guidance, CDM 2015, and industry best practice. Identifies gaps and improvements against HSG65 (Successful Health and Safety Management), PUWER, LOLER, and relevant Approved Codes of Practice — producing a formal review report with prioritised recommendations.',
     route: '/rams-review-builder',
     pageTitle: 'AI RAMS Review Tool | Ebrora',
     metaDescription:
-      'Upload your RAMS document for an AI-powered review. Gaps, improvements, and compliance issues identified against HSE guidance and CDM 2015. PDF, DOCX, and XLSX accepted.',
+      'Upload your RAMS document for an AI-powered review. Gaps, improvements, and compliance issues identified against HSE guidance, CDM 2015, HSG65, PUWER, and LOLER. PDF, DOCX, and XLSX accepted.',
     documentLabel: 'RAMS Review Report',
     descriptionPlaceholder: 'Upload your RAMS document below (PDF, DOCX, or XLSX)',
     descriptionHeading: 'Upload Your RAMS Document',
@@ -901,15 +901,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'delay-notification': {
     slug: 'delay-notification',
-    name: 'Delay Notification Letter Generator',
+    name: 'Delay Notification Builder',
     shortName: 'Delay Notification',
     category: 'Commercial',
     description:
-      'Generate contract-compliant delay notification letters for NEC3, NEC4, JCT SBC, and JCT D&B contracts. Clause references, event description, programme effect, mitigation, and entitlement argument — protecting your time and cost position.',
+      'Create contract-compliant delay notification letters for NEC3, NEC4, JCT SBC, and JCT D&B contracts in minutes. Generates formal letters with clause references, event description, programme effect, mitigation, and entitlement argument — protecting your time and cost position under the contract.',
     route: '/delay-notification-builder',
-    pageTitle: 'AI Delay Notification Letter Generator | Ebrora',
+    pageTitle: 'AI Delay Notification Builder | Ebrora',
     metaDescription:
-      'AI-powered delay notification letter generator for NEC and JCT contracts. Clause references, programme impact, mitigation, and entitlement — contract-compliant formal letters for UK construction.',
+      'AI-powered delay notification builder for NEC and JCT contracts. Clause references, programme impact, mitigation, and entitlement — contract-compliant formal letters for UK construction.',
     documentLabel: 'Delay Notification Letter',
     descriptionPlaceholder:
       'E.g. "Client-instructed design change to storm tank base slab thickness from 300mm to 450mm received 12/03/2026. Impacts 3 concrete pours already scheduled. Expected delay 3 weeks to Milestone 4 (storm tank base slab completion, contractual date 02/04/2026)."',
@@ -943,15 +943,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'variation-confirmation': {
     slug: 'variation-confirmation',
-    name: 'Variation Confirmation Letter Writer',
+    name: 'Variation Confirmation Builder',
     shortName: 'Variation Confirmation',
     category: 'Commercial',
     description:
-      'Generate formal written confirmation of verbal or informally instructed variation instructions. Contract references, description of change, cost and time impact, and instruction for written confirmation — protecting subcontractor entitlement.',
+      'Create formal written confirmation of verbal or informally instructed variation instructions in minutes. Generates letters with contract references, description of change, cost and time impact, and request for written instruction — protecting subcontractor entitlement under NEC and JCT contracts.',
     route: '/variation-confirmation-builder',
-    pageTitle: 'AI Variation Confirmation Letter Generator | Ebrora',
+    pageTitle: 'AI Variation Confirmation Builder | Ebrora',
     metaDescription:
-      'AI-powered variation confirmation letter generator for UK construction. Confirm verbal instructions in writing with contract references, cost and time impact, and entitlement protection.',
+      'AI-powered variation confirmation builder for UK construction. Confirm verbal instructions in writing with contract references, cost and time impact, and entitlement protection. NEC and JCT aligned.',
     documentLabel: 'Variation Confirmation Letter',
     descriptionPlaceholder:
       'E.g. "Site instruction from main contractor\'s site manager on 14/03/2026 to extend the gabion retaining wall by an additional 15m. Verbal instruction only — no written order issued. Works will require additional 45T gabion baskets, 15T stone fill, and an estimated 3 additional working days."',
@@ -984,15 +984,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'rfi-generator': {
     slug: 'rfi-generator',
-    name: 'RFI Generator',
+    name: 'RFI Builder',
     shortName: 'RFI',
     category: 'Commercial',
     description:
-      'Generate formal Requests for Information with drawing and specification references, a clear question, impact of non-response, required response deadline, and contractual implications — structured for Tier 1 acceptance.',
+      'Create formal Requests for Information with drawing and specification references, a clear question, impact of non-response, required response deadline, and contractual implications — structured for Tier 1 acceptance and proper documentation trail.',
     route: '/rfi-generator-builder',
-    pageTitle: 'AI RFI Generator — Request for Information | Ebrora',
+    pageTitle: 'AI RFI Builder — Request for Information | Ebrora',
     metaDescription:
-      'AI-powered RFI generator for UK construction. Formal requests for information with drawing references, clear questions, non-response impact, and response deadlines. Tier 1 ready.',
+      'AI-powered RFI builder for UK construction. Formal requests for information with drawing references, clear questions, non-response impact, and response deadlines. Tier 1 ready.',
     documentLabel: 'Request for Information (RFI)',
     descriptionPlaceholder:
       'E.g. "Conflict between drawing C-101 Rev C and Specification Section 5.4.2 regarding pipe bedding material for the 300mm HDPE gravity sewer — drawing shows Type B granular bedding but specification requires Class S selected granular. Clarification needed before pipe laying begins on 28/03/2026."',
@@ -1025,15 +1025,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'payment-application': {
     slug: 'payment-application',
-    name: 'Payment Application Generator',
+    name: 'Payment Application Builder',
     shortName: 'Payment Application',
     category: 'Commercial',
     description:
-      'Generate structured interim payment applications with BoQ breakdown, cumulative values, variations, retention, CIS deductions, and supporting narrative — formatted to main contractor Tier 1 standards.',
+      'Create structured interim payment applications with BoQ breakdown, cumulative values, variations, retention, CIS deductions, and supporting narrative — formatted to main contractor Tier 1 standards and compliant with the Housing Grants, Construction and Regeneration Act 1996 (HGCRA) payment provisions.',
     route: '/payment-application-builder',
-    pageTitle: 'AI Payment Application Generator | Ebrora',
+    pageTitle: 'AI Payment Application Builder | Ebrora',
     metaDescription:
-      'AI-powered payment application generator for UK construction subcontractors. Structured interim valuations with BoQ, variations, retention, and CIS. Tier 1 submission standard.',
+      'AI-powered payment application builder for UK construction subcontractors. Structured interim valuations with BoQ, variations, retention, and CIS. HGCRA compliant, Tier 1 submission standard.',
     documentLabel: 'Payment Application',
     descriptionPlaceholder:
       'E.g. "Interim Application No. 4 for the month ending 31/03/2026. Contract value £385,000. Works to date: 450m of 300mm HDPE rising main laid and tested (75% of 600m total), 1 No. thrust block complete, 2 No. air valve chambers complete. Approved variation for additional directional drilling £18,500. Retention 3%. CIS 20%."',
@@ -1069,15 +1069,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'daywork-sheet': {
     slug: 'daywork-sheet',
-    name: 'Daywork Sheet Generator',
+    name: 'Daywork Sheet Builder',
     shortName: 'Daywork Sheet',
     category: 'Commercial',
     description:
-      'Generate properly formatted daywork record sheets covering labour, plant, materials, supervision, and overheads — structured for Tier 1 acceptance and compliant with CECA Schedule of Dayworks 2011.',
+      'Create properly formatted daywork record sheets covering labour, plant, materials, supervision, and overheads — structured for Tier 1 acceptance and compliant with the CECA Schedule of Dayworks 2011 (Civil Engineering Contractors Association).',
     route: '/daywork-sheet-builder',
-    pageTitle: 'AI Daywork Sheet Generator | Ebrora',
+    pageTitle: 'AI Daywork Sheet Builder | Ebrora',
     metaDescription:
-      'AI-powered daywork sheet generator for UK construction. Labour, plant, materials, supervision, and overheads formatted to CECA Schedule of Dayworks 2011 for Tier 1 acceptance.',
+      'AI-powered daywork sheet builder for UK construction. Labour, plant, materials, supervision, and overheads formatted to CECA Schedule of Dayworks 2011 for Tier 1 acceptance.',
     documentLabel: 'Daywork Sheet',
     descriptionPlaceholder:
       'E.g. "Daywork for removal of unforeseen buried brick culvert discovered at chainage 45m during foul sewer excavation on 19/03/2026. 2 No. labourers (8 hours each), 1 No. 3T mini excavator (6 hours), 1 No. 360° concrete breaker attachment (4 hours), waste disposal (2T skip). Works instructed verbally by C2V+ site manager."',
@@ -1110,15 +1110,15 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 
   'carbon-reduction-plan': {
     slug: 'carbon-reduction-plan',
-    name: 'Carbon Reduction Plan Generator',
+    name: 'Carbon Reduction Plan Builder',
     shortName: 'Carbon Reduction Plan',
     category: 'Programme',
     description:
-      'Generate PPN 06/21-compliant Carbon Reduction Plans for public sector and Tier 1 framework bids. Baseline emissions, net zero target, reduction measures, reporting commitments, and board-level sign-off — meeting mandatory procurement requirements.',
+      'Create PPN 06/21-compliant Carbon Reduction Plans for public sector and Tier 1 framework bids in minutes. Generates baseline emissions, net zero target, reduction measures, reporting commitments, and board-level sign-off — meeting mandatory UK Government procurement requirements under Procurement Policy Note 06/21.',
     route: '/carbon-reduction-plan-builder',
-    pageTitle: 'AI Carbon Reduction Plan Generator | Ebrora',
+    pageTitle: 'AI Carbon Reduction Plan Builder | Ebrora',
     metaDescription:
-      'AI-powered Carbon Reduction Plan generator for UK construction. PPN 06/21 compliant — baseline emissions, net zero target, reduction measures, and reporting. Required for public sector frameworks.',
+      'AI-powered Carbon Reduction Plan builder for UK construction. PPN 06/21 compliant — baseline emissions, net zero target, reduction measures, and reporting. Required for public sector frameworks.',
     documentLabel: 'Carbon Reduction Plan',
     descriptionPlaceholder:
       'E.g. "Carbon Reduction Plan for Apex Civil Engineering Ltd, a groundworks and civil engineering subcontractor with 45 employees and annual turnover of £8.2M. Works primarily on water/wastewater infrastructure projects in the North West. Scope 1: company vehicles (5 vans, 2 pick-ups) and site plant. Scope 2: office and welfare electricity. Scope 3: supply chain materials and subcontracted works."',
