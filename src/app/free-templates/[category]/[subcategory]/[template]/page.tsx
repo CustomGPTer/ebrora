@@ -14,11 +14,10 @@ import {
   getSubcategoryBySlug,
 } from "@/data/free-template-categories";
 import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
-import { UpsellBanner } from "@/components/shared/UpsellBanner";
 import {
-  RAMS_BUILDER_UPSELL,
-  DEFAULT_PRODUCT_UPSELL,
-} from "@/data/upsell-config";
+  AIToolsSidebarCard,
+  BrowseTemplatesSidebarCard,
+} from "@/components/shared/PremiumUpsellCards";
 import { TemplatePreviewClient } from "@/components/free-templates/TemplatePreviewClient";
 
 interface PageProps {
@@ -252,19 +251,9 @@ export default async function TemplatePage({ params }: PageProps) {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:w-72 shrink-0 space-y-5">
-            <UpsellBanner
-              title={RAMS_BUILDER_UPSELL.title}
-              description={RAMS_BUILDER_UPSELL.description}
-              href={RAMS_BUILDER_UPSELL.gumroadUrl}
-              variant="sidebar"
-            />
-            <UpsellBanner
-              title={DEFAULT_PRODUCT_UPSELL.title}
-              description={DEFAULT_PRODUCT_UPSELL.description}
-              href={DEFAULT_PRODUCT_UPSELL.gumroadUrl}
-              variant="sidebar"
-            />
+          <div className="lg:w-72 shrink-0 flex flex-col gap-5">
+            <AIToolsSidebarCard />
+            <BrowseTemplatesSidebarCard />
           </div>
         </div>
       </div>
