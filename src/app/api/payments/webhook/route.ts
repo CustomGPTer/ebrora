@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { validateWebhookSignature } from '@/lib/payments/paypal-client';
+import { validateWebhookSignature, getSubscriptionDetails } from '@/lib/payments/paypal-client';
 import { sendSubscriptionConfirmationEmail } from '@/lib/email'; // Adjust path as needed
 
 export async function POST(request: NextRequest) {
@@ -17,7 +17,18 @@ export async function POST(request: NextRequest) {
           const webhookId = process.env.PAYPAL_WEBHOOK_ID || '';
 
       // Validate webhook signature
-      if (transmissionId && transmissionTime && certUrl && transmissionSig) {
+      // Allow bypass only when explicitly set (local/sandbox testing)
+      const skipSignatureCheck = process.env.PAYPAL_SKIP_SIGNATURE_CHECK === 'true';
+
+      if (!skipSignatureCheck) {
+              if (!transmissionId || !transmissionTime || !certUrl || !transmissionSig) {
+                        console.warn('Missing webhook signature headers');
+                        return NextResponse.json(
+                          { error: 'Missing signature headers' },
+                          { status: 401 }
+                        );
+              }
+
               try {
                         const isValid = await validateWebhookSignature(
                                     webhookId,
@@ -29,12 +40,18 @@ export async function POST(request: NextRequest) {
                                   );
 
                 if (!isValid) {
-                            console.warn('Invalid webhook signature');
-                            // Continue processing anyway, but log the warning
+                            console.warn('Invalid webhook signature — rejecting');
+                            return NextResponse.json(
+                              { error: 'Invalid webhook signature' },
+                              { status: 401 }
+                            );
                 }
               } catch (error) {
-                        console.warn('Failed to validate webhook signature:', error);
-                        // Continue processing
+                        console.error('Webhook signature validation error:', error);
+                        return NextResponse.json(
+                          { error: 'Signature validation failed' },
+                          { status: 401 }
+                        );
               }
       }
 
@@ -270,8 +287,45 @@ async function handleSubscriptionSuspended(resource: any): Promise<void> {
 async function handlePaymentCompleted(resource: any): Promise<void> {
     try {
           const saleId = resource.id;
-          console.log(`Payment ${saleId} completed`);
-          // Payment processing logic can be added here
+          const billingAgreementId = resource.billing_agreement_id;
+
+      console.log(`Payment ${saleId} completed for subscription ${billingAgreementId || 'unknown'}`);
+
+      if (!billingAgreementId) {
+              // Not a recurring subscription payment — nothing to update
+              return;
+      }
+
+      // Find the subscription by PayPal subscription ID
+      const subscription = await prisma.subscription.findFirst({
+              where: { paypal_subscription_id: billingAgreementId },
+      });
+
+      if (!subscription) {
+              console.log(`No DB subscription found for PayPal agreement ${billingAgreementId}`);
+              return;
+      }
+
+      // Fetch subscription details from PayPal to get the next billing date
+      try {
+              const details = await getSubscriptionDetails(billingAgreementId);
+              const nextBillingTime = details.billing_info?.next_billing_time;
+
+              if (nextBillingTime) {
+                        await prisma.subscription.update({
+                                    where: { id: subscription.id },
+                                    data: {
+                                                current_period_end: new Date(nextBillingTime),
+                                                current_period_start: new Date(),
+                                                status: 'ACTIVE',
+                                    },
+                        });
+                        console.log(`Updated period end to ${nextBillingTime} for user ${subscription.user_id}`);
+              }
+      } catch (detailsError) {
+              console.error(`Failed to fetch subscription details for ${billingAgreementId}:`, detailsError);
+              // Don't throw — the payment was still successful
+      }
     } catch (error) {
           console.error('Error handling payment completion:', error);
           throw error;
