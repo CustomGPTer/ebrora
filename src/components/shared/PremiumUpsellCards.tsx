@@ -113,7 +113,7 @@ export function PremiumSidebar() {
 /* ──────────────────────────────────────────────
    AI Construction Tools — Sidebar Card
    ────────────────────────────────────────────── */
-function AIToolsSidebarCard() {
+export function AIToolsSidebarCard() {
   const cardRef = useTraceOnView();
 
   return (
@@ -146,7 +146,7 @@ function AIToolsSidebarCard() {
 /* ──────────────────────────────────────────────
    Browse All Templates — Sidebar Card
    ────────────────────────────────────────────── */
-function BrowseTemplatesSidebarCard() {
+export function BrowseTemplatesSidebarCard() {
   const cardRef = useTraceOnView();
 
   return (
