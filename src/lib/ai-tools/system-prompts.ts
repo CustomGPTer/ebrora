@@ -7,6 +7,7 @@
 import type { AiToolSlug } from './types';
 import type { TbtTemplateSlug } from '@/lib/tbt/tbt-types';
 import type { CoshhTemplateSlug } from '@/lib/coshh/types';
+import type { CdmCheckerTemplateSlug } from '@/lib/cdm-checker/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -3091,6 +3092,42 @@ ${styleGuide}
 --- OUTPUT JSON SCHEMA ---
 Generate a COSHH Assessment JSON with this structure:
 ${COSHH_EXPANDED_SCHEMA}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// CDM Compliance Checker — Template-Aware Prompts (4 templates)
+// =============================================================================
+
+const CDM_CHECKER_TEMPLATE_STYLE: Record<CdmCheckerTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (professional, green branded, cover page, duty holder sections)
+WRITING STYLE: Professional and thorough. Each duty holder gets their own section with regulation-by-regulation compliance checks. Findings should be specific to this project — not generic CDM guidance. Every non-compliant or partial finding must have a concrete recommendation with a named responsible party. The identified gaps section must be ranked by priority (High first). The compliance roadmap must include realistic target dates. Use formal but readable language suitable for a project team meeting.`,
+
+  'compliance-matrix': `TEMPLATE: Compliance Matrix (teal, matrix-heavy, visual gap scanning)
+WRITING STYLE: Data-dense, minimal prose. The template is dominated by a large compliance matrix showing every CDM regulation cross-referenced against all 5 duty holder types. Status values must be exactly one of: Compliant, Partial, Non-Compliant, Not Applicable, Unknown. Keep findings extremely concise — the matrix format has limited cell width. Focus on making non-compliant items immediately visible. The gaps and roadmap sections should be condensed but actionable.`,
+
+  'audit-trail': `TEMPLATE: Audit Trail (navy, formal, evidence references, NCR register)
+WRITING STYLE: Formal audit language. Every compliance check must include an evidence reference — the specific document name, reference number, revision, and date that was reviewed. Use phrases like "Verified against [document]", "Evidence reviewed: [ref]", "No evidence available". Non-conformances must be logged with formal NCR numbers (NCR-001, NCR-002 etc.) and include corrective action, owner, and due date. Lower-priority items go in an Observations register (OBS-001 etc.). This template must survive an HSE inspector's document review — every claim needs a paper trail.`,
+
+  'executive-summary': `TEMPLATE: Executive Summary (charcoal/green, dashboard, management-focused)
+WRITING STYLE: Write for a client project director or board member — not a site team. Open with high-level compliance scores (percentage per duty holder). Lead with the most critical findings and their business impact (enforcement risk, programme delay, cost exposure). Recommendations should be actionable and addressed to specific roles. The narrative summary must be a standalone briefing — someone reading only that section should understand the full compliance position and what needs to happen next. Avoid technical jargon where possible; explain CDM regulation numbers in plain English.`,
+};
+
+export function getCdmCheckerTemplateGenerationPrompt(templateSlug: CdmCheckerTemplateSlug): string {
+  const styleGuide = CDM_CHECKER_TEMPLATE_STYLE[templateSlug] || CDM_CHECKER_TEMPLATE_STYLE['ebrora-standard'];
+  const cdmSchema = TOOL_GENERATION_SCHEMAS['cdm-checker'];
+
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+CDM 2015 Compliance Gap Analysis
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+${cdmSchema}
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }

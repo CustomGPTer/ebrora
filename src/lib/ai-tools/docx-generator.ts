@@ -416,8 +416,16 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'cdm-checker') {
-    const { buildCdmCheckerDocument } = await import('./templates/cdm-checker-template');
-    const doc = await buildCdmCheckerDocument(content as any);
+    const cdmSlug = (content as any)._cdmCheckerTemplateSlug;
+    let doc;
+    if (cdmSlug) {
+      const { buildCdmCheckerTemplateDocument } = await import('./templates/cdm-checker-templates');
+      doc = await buildCdmCheckerTemplateDocument(content as any, cdmSlug);
+    } else {
+      // Fallback to original single template (backwards compatible)
+      const { buildCdmCheckerDocument } = await import('./templates/cdm-checker-template');
+      doc = await buildCdmCheckerDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }
