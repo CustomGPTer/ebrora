@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
-import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import type { AiToolSlug } from '@/lib/ai-tools';
@@ -32,12 +32,13 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
       tbtTemplateSlug?: string;
       coshhTemplateSlug?: string;
+      cdmCheckerTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -145,11 +146,13 @@ export async function POST(req: NextRequest) {
       data: { status: 'PROCESSING', answers: JSON.stringify(answers) },
     });
 
-    // Get the tool-specific generation prompt (template-aware for TBT and COSHH)
+    // Get the tool-specific generation prompt (template-aware for TBT, COSHH, CDM)
     const systemPrompt = (toolSlug === 'tbt-generator' && tbtTemplateSlug)
       ? getTbtTemplateGenerationPrompt(tbtTemplateSlug as any)
       : (toolSlug === 'coshh' && coshhTemplateSlug)
       ? getCoshhTemplateGenerationPrompt(coshhTemplateSlug as any)
+      : (toolSlug === 'cdm-checker' && cdmCheckerTemplateSlug)
+      ? getCdmCheckerTemplateGenerationPrompt(cdmCheckerTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A
@@ -210,6 +213,11 @@ export async function POST(req: NextRequest) {
     // Inject COSHH template slug into content so docx-generator can route it
     if (toolSlug === 'coshh' && coshhTemplateSlug) {
       documentContent._coshhTemplateSlug = coshhTemplateSlug;
+    }
+
+    // Inject CDM Checker template slug into content so docx-generator can route it
+    if (toolSlug === 'cdm-checker' && cdmCheckerTemplateSlug) {
+      documentContent._cdmCheckerTemplateSlug = cdmCheckerTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
