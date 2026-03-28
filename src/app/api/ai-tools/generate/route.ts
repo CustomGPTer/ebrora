@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
-import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import type { AiToolSlug } from '@/lib/ai-tools';
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       coshhTemplateSlug?: string;
       cdmCheckerTemplateSlug?: string;
       confinedSpacesTemplateSlug?: string;
+      erpTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -147,7 +148,7 @@ export async function POST(req: NextRequest) {
       data: { status: 'PROCESSING', answers: JSON.stringify(answers) },
     });
 
-    // Get the tool-specific generation prompt (template-aware for TBT, COSHH, CDM, Confined Spaces)
+    // Get the tool-specific generation prompt (template-aware for TBT, COSHH, CDM, Confined Spaces, ERP)
     const systemPrompt = (toolSlug === 'tbt-generator' && tbtTemplateSlug)
       ? getTbtTemplateGenerationPrompt(tbtTemplateSlug as any)
       : (toolSlug === 'coshh' && coshhTemplateSlug)
@@ -156,6 +157,8 @@ export async function POST(req: NextRequest) {
       ? getCdmCheckerTemplateGenerationPrompt(cdmCheckerTemplateSlug as any)
       : (toolSlug === 'confined-spaces' && confinedSpacesTemplateSlug)
       ? getConfinedSpacesTemplateGenerationPrompt(confinedSpacesTemplateSlug as any)
+      : (toolSlug === 'emergency-response' && erpTemplateSlug)
+      ? getErpTemplateGenerationPrompt(erpTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A
@@ -226,6 +229,11 @@ export async function POST(req: NextRequest) {
     // Inject Confined Spaces template slug into content so docx-generator can route it
     if (toolSlug === 'confined-spaces' && confinedSpacesTemplateSlug) {
       documentContent._confinedSpacesTemplateSlug = confinedSpacesTemplateSlug;
+    }
+
+    // Inject ERP template slug into content so docx-generator can route it
+    if (toolSlug === 'emergency-response' && erpTemplateSlug) {
+      documentContent._erpTemplateSlug = erpTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
