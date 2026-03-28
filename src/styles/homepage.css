@@ -1592,3 +1592,19 @@
 .hp-a3-card:hover {
   box-shadow: 0 8px 28px color-mix(in srgb, var(--cat-color, #000) 10%, transparent);
 }
+
+/* ── AI Sparkle Icon (pulsing gold, no background) ── */
+.hp-a3-card__ai-sparkle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hp-ai-sparkle {
+  animation: hp-sparkle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hp-sparkle-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
