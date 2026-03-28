@@ -1,26 +1,25 @@
 import type { Metadata } from 'next';
-import AiToolBuilderClient from '@/components/ai-tools/AiToolBuilderClient';
-import { AI_TOOL_CONFIGS } from '@/lib/ai-tools/tool-config';
+import CoshhBuilderClient from './components/CoshhBuilderClient';
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'COSHH Assessment Generator | Ebrora',
+    absolute: 'AI COSHH Assessment Builder | 5 Templates | Ebrora',
   },
-  description: 'AI-powered COSHH assessment generator for UK construction. Covers hazardous substances, exposure routes, control measures, PPE, and emergency procedures.',
+  description: 'AI-powered COSHH assessment generator with 5 professional templates for UK construction. 18-section assessments covering composition, GHS classification, exposure limits, PPE, health surveillance, and regulatory compliance.',
   alternates: {
     canonical: 'https://www.ebrora.com/coshh-builder',
   },
   openGraph: {
-    title: 'COSHH Assessment Generator | Ebrora',
-    description: 'AI-powered COSHH assessment generator for UK construction. Covers hazardous substances, exposure routes, control measures, PPE, and emergency procedures.',
+    title: 'AI COSHH Assessment Builder | 5 Templates | Ebrora',
+    description: 'AI-powered COSHH assessment generator with 5 professional templates for UK construction.',
     url: 'https://www.ebrora.com/coshh-builder',
     type: 'website',
     images: [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'COSHH Assessment Generator | Ebrora',
-    description: 'AI-powered COSHH assessment generator for UK construction. Covers hazardous substances, exposure routes, control measures, PPE, and emergency procedures.',
+    title: 'AI COSHH Assessment Builder | 5 Templates | Ebrora',
+    description: 'AI-powered COSHH assessment generator with 5 professional templates for UK construction.',
     images: ['https://www.ebrora.com/og-image.jpg'],
   },
 };
@@ -28,9 +27,9 @@ export const metadata: Metadata = {
 const toolSchema = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Ebrora COSHH Assessment Generator',
+  name: 'Ebrora AI COSHH Assessment Builder',
   applicationCategory: 'BusinessApplication',
-  description: 'AI-powered COSHH assessment generator for UK construction projects. Produces regulation-compliant assessments covering hazardous substances, control measures, and PPE requirements.',
+  description: 'AI-powered COSHH assessment generator with 5 professional templates for UK construction projects. Produces 18-section regulation-compliant assessments.',
   url: 'https://www.ebrora.com/coshh-builder',
   operatingSystem: 'Web',
   offers: {
@@ -46,15 +45,13 @@ const toolSchema = {
 };
 
 export default function Page() {
-  const toolConfig = AI_TOOL_CONFIGS['coshh'];
-
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
-      <AiToolBuilderClient toolConfig={toolConfig} />
+      <CoshhBuilderClient />
     </>
   );
 }
