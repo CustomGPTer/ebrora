@@ -13,6 +13,8 @@ interface AiToolBuilderClientProps {
   toolConfig: AiToolConfig;
   /** For TBT multi-template — passed to generate route */
   tbtTemplateSlug?: string;
+  /** For COSHH multi-template — passed to generate route */
+  coshhTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -44,7 +46,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -263,6 +265,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug }: AiT
           answers: allAnswers,
           description,
           ...(tbtTemplateSlug ? { tbtTemplateSlug } : {}),
+          ...(coshhTemplateSlug ? { coshhTemplateSlug } : {}),
         }),
       });
 
@@ -283,7 +286,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug }: AiT
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
