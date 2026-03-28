@@ -6,6 +6,7 @@
 // =============================================================================
 import type { AiToolSlug } from './types';
 import type { TbtTemplateSlug } from '@/lib/tbt/tbt-types';
+import type { CoshhTemplateSlug } from '@/lib/coshh/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -2905,6 +2906,191 @@ ${styleGuide}
 --- OUTPUT JSON SCHEMA ---
 Generate a Toolbox Talk JSON with this structure:
 ${TBT_BASE_SCHEMA}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// COSHH Assessment — Template-Aware Prompts (5 templates)
+// =============================================================================
+
+const COSHH_TEMPLATE_STYLE: Record<CoshhTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (professional, green branded, cover page, 18 numbered sections)
+WRITING STYLE: Professional and thorough. Every section should be complete and self-contained. Use precise chemical terminology from the SDS but explain implications in plain English. Control measures should be specific to the described work activity — not generic boilerplate. PPE specifications must include EN standards and breakthrough times. Health surveillance section must reference COSHH Regulation 11 specifically. Risk ratings must use numerical likelihood × severity scoring.`,
+
+  'red-hazard': `TEMPLATE: Red Hazard (hazard-first, red accent, warning callout boxes, urgent tone)
+WRITING STYLE: Direct, urgent, safety-critical tone. Lead every section with the most dangerous information first. The exposure routes section MUST order routes by severity (highest first). Write control measures as mandatory instructions ("All operatives MUST...", "Under no circumstances..."). First aid procedures should be written as immediate-action commands. The template will display warning callout boxes for: the overall hazard classification, the primary exposure hazard, and eye splash procedures — so make these sections punchy and actionable. Emphasise skin absorption notation where applicable.`,
+
+  'sds-technical': `TEMPLATE: SDS Technical (navy, monospace, specification-style, inline regulation references)
+WRITING STYLE: Technical and precise, mirroring the 16-section SDS structure that COSHH coordinators already know. Reference specific regulation clauses inline (e.g. "per COSHH Reg 7(3)(c)", "EH40 Table 1", "SDS §4.1"). Include DNEL values, BMGV data, and biological monitoring guidance where applicable. WEL data must include both 8-hr TWA and STEL where available, plus any skin notation. Composition section must list individual components with CAS numbers and concentration ranges. Use clipped, factual phrasing — no narrative prose. Every data point should be traceable to the SDS or EH40.`,
+
+  'compact-field': `TEMPLATE: Compact Field (dense, no cover page, condensed to 1-2 pages, field-ready)
+WRITING STYLE: Extremely concise. Every word must earn its place. Health surveillance and training are combined into one section. Storage and disposal are combined. Use abbreviated references (e.g. "EN 374" not "BS EN 374:2016"). PPE specs should be one-line each. First aid should use arrow notation style ("Fresh air → O₂ if trained → medical if persistent"). Skip preamble and context — this template is for someone who already knows what the product is and just needs the critical safety data at a glance. Target: maximum information density without losing any mandatory COSHH content.`,
+
+  'audit-ready': `TEMPLATE: Audit-Ready (teal, document control block, revision history, 3-person sign-off, formal)
+WRITING STYLE: Formal, auditable, and comprehensive — this is the template an ISO 45001/14001 auditor or HSE inspector will review. Include document control metadata (revision number, classification, status). Health surveillance section must include biological monitoring guidance (BMGV values) and records retention period (40 years per COSHH Reg 11(4)). Training section must specify competency verification methods. The approval chain has three tiers: Prepared By, Reviewed By, Approved By — with qualification columns. Use complete sentences, avoid abbreviations. Reference specific regulation clause numbers throughout. This template must leave zero audit findings.`,
+};
+
+const COSHH_EXPANDED_SCHEMA = `{
+  "documentRef": "string (format: COSHH-YYYY-NNN)",
+  "assessmentDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY (12 months from assessment date)",
+  "assessedBy": "string (name and qualification e.g. 'J. Mitchell, CMIOSH')",
+  "projectName": "string",
+  "siteAddress": "string",
+  "productName": "string (exact product name)",
+  "manufacturer": "string (full company name and address)",
+  "emergencyContact": "string (manufacturer emergency telephone)",
+  "sdsVersion": "string (e.g. 'Rev 4.0 — 12 January 2024')",
+  "physicalForm": "string (e.g. 'White liquid emulsion')",
+  "odour": "string",
+  "pH": "string (e.g. '8.0–10.0')",
+  "activityDescription": "string (min 100 words — how the product is used on this specific site)",
+  "composition": [
+    {
+      "component": "string (chemical name)",
+      "cas": "string (CAS number or 'Proprietary')",
+      "concentration": "string (e.g. '30–60%')",
+      "classification": "string (CLP classification or 'Not classified')",
+      "hStatements": "string (H-statement codes or '—')"
+    }
+  ],
+  "hazardClassification": "string (GHS pictogram codes e.g. 'GHS02, GHS07')",
+  "signalWord": "Danger | Warning | None",
+  "hazardClasses": "string (e.g. 'Skin Irrit. 2, Eye Irrit. 2, STOT SE 3')",
+  "hStatements": "string (all H-statements with descriptions)",
+  "pStatements": "string (all key P-statements with descriptions)",
+  "supplementalInfo": "string (EUH statements if applicable)",
+  "exposureRoutes": [
+    {
+      "route": "string (Inhalation | Skin Contact | Eye Contact | Ingestion)",
+      "healthEffect": "string (min 30 words — specific to this product)",
+      "symptoms": "string",
+      "onset": "Acute | Chronic | Acute / Chronic",
+      "severity": "High | Medium | Low"
+    }
+  ],
+  "welData": [
+    {
+      "substance": "string (mixture name or individual component)",
+      "welTwa": "string (8-hr TWA or 'No WEL assigned')",
+      "welStel": "string (15-min STEL or '—')",
+      "notes": "string (source reference, skin notation, etc.)"
+    }
+  ],
+  "dnelData": "string (DNEL values if available, or empty string)",
+  "bmgvData": "string (biological monitoring guidance value if available)",
+  "monitoringRequired": "string (when atmospheric monitoring is needed)",
+  "controlMeasures": [
+    {
+      "level": "Elimination | Substitution | Engineering | Administrative | PPE",
+      "measure": "string (min 30 words — specific to the work activity)",
+      "verification": "string (how compliance is checked)"
+    }
+  ],
+  "ppeRequirements": [
+    {
+      "type": "string (Gloves | Eye Protection | RPE | Coveralls | Footwear)",
+      "specification": "string (specific product type and material)",
+      "standard": "string (EN/ISO standard number)",
+      "replacement": "string (when to replace / breakthrough time)",
+      "mandatory": "Yes | If mist | If enclosed"
+    }
+  ],
+  "riskRating": {
+    "beforeLikelihood": "number (1-5)",
+    "beforeSeverity": "number (1-5)",
+    "beforeScore": "number (L×S)",
+    "beforeRating": "High | Medium | Low",
+    "afterLikelihood": "number (1-5)",
+    "afterSeverity": "number (1-5)",
+    "afterScore": "number (L×S)",
+    "afterRating": "High | Medium | Low"
+  },
+  "healthSurveillance": {
+    "required": "Yes | No",
+    "type": "string (what surveillance is required)",
+    "frequency": "string (how often)",
+    "responsiblePerson": "string (role responsible)",
+    "recordsRetention": "string (e.g. '40 years (COSHH Reg 11(4))')"
+  },
+  "training": [
+    {
+      "type": "string (e.g. 'Product-specific TBT')",
+      "content": "string (what the training covers)",
+      "audience": "string (who needs it)",
+      "frequency": "string (when and how often)"
+    }
+  ],
+  "firstAid": [
+    {
+      "scenario": "string (Inhalation | Skin Contact | Eye Contact | Ingestion)",
+      "immediateAction": "string (what to do immediately)",
+      "followUp": "string (next steps and when to seek medical attention)"
+    }
+  ],
+  "spillResponse": [
+    {
+      "step": "string (e.g. '1. Personal Protection')",
+      "action": "string (what to do)"
+    }
+  ],
+  "storage": {
+    "temperature": "string",
+    "container": "string",
+    "ventilation": "string",
+    "incompatibles": "string",
+    "bunding": "string",
+    "signage": "string",
+    "shelfLife": "string"
+  },
+  "disposal": {
+    "ewcCode": "string (6-digit EWC code)",
+    "classification": "string (hazardous/non-hazardous, WM3 reference)",
+    "method": "string",
+    "containers": "string (how to dispose of empty containers)",
+    "drains": "string"
+  },
+  "transport": {
+    "unNumber": "string (UN number or 'Not classified as dangerous goods')",
+    "adrClass": "string (ADR class or 'Not regulated')",
+    "precautions": "string",
+    "marinePollutant": "string (Yes/No)"
+  },
+  "monitoringReview": {
+    "reviewDate": "string (same as reviewDate above)",
+    "responsiblePerson": "string",
+    "reviewTriggers": "string (comma-separated list of triggers)",
+    "linkedDocuments": "string (related RAMS, TBT, permit references)",
+    "coshhRegister": "string"
+  },
+  "regulatoryReferences": [
+    {
+      "reference": "string (full reference title)",
+      "description": "string (what it covers)"
+    }
+  ],
+  "additionalNotes": "string"
+}
+
+MINIMUMS: 4+ composition rows (including water/balance), 4 exposure routes (inhalation, skin, eyes, ingestion), 2+ WEL rows, 5 control measures (one per hierarchy level), 5+ PPE items, 4+ training types, 4+ first aid scenarios, 5+ spill response steps, 6+ regulatory references.
+
+CRITICAL: Use real SDS data for this product. The hazard classifications, H-statements, CAS numbers, WELs, and first aid measures must match the actual manufacturer Safety Data Sheet. This is a legal compliance document — do not fabricate chemical data. If unsure about a specific value, state "Refer to manufacturer SDS" rather than guessing.`;
+
+export function getCoshhTemplateGenerationPrompt(templateSlug: CoshhTemplateSlug): string {
+  const styleGuide = COSHH_TEMPLATE_STYLE[templateSlug] || COSHH_TEMPLATE_STYLE['ebrora-standard'];
+
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+COSHH Assessment (18-section expanded format)
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+Generate a COSHH Assessment JSON with this structure:
+${COSHH_EXPANDED_SCHEMA}
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }

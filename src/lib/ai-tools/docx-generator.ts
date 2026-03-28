@@ -295,8 +295,16 @@ export async function generateAiToolDocument(
 ): Promise<Buffer> {
   // Use dedicated template if available
   if (toolSlug === 'coshh') {
-    const { buildCoshhDocument } = await import('./templates/coshh-template');
-    const doc = await buildCoshhDocument(content as any);
+    const coshhSlug = (content as any)._coshhTemplateSlug;
+    let doc;
+    if (coshhSlug) {
+      const { buildCoshhTemplateDocument } = await import('./templates/coshh-templates');
+      doc = await buildCoshhTemplateDocument(content as any, coshhSlug);
+    } else {
+      // Fallback to original single template (backwards compatible)
+      const { buildCoshhDocument } = await import('./templates/coshh-template');
+      doc = await buildCoshhDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);
