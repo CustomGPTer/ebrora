@@ -383,8 +383,16 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'tbt-generator') {
-    const { buildTbtDocument } = await import('./templates/tbt-template');
-    const doc = await buildTbtDocument(content as any);
+    const tbtSlug = (content as any)._tbtTemplateSlug;
+    let doc;
+    if (tbtSlug) {
+      const { buildTbtTemplateDocument } = await import('./templates/tbt-templates');
+      doc = await buildTbtTemplateDocument(content as any, tbtSlug);
+    } else {
+      // Fallback to original single template (backwards compatible)
+      const { buildTbtDocument } = await import('./templates/tbt-template');
+      doc = await buildTbtDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);

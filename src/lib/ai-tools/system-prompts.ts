@@ -5,6 +5,7 @@
 // system-prompts.ts pattern but are tool-specific.
 // =============================================================================
 import type { AiToolSlug } from './types';
+import type { TbtTemplateSlug } from '@/lib/tbt/tbt-types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -960,25 +961,25 @@ Minimum 8 assessment findings.`,
   "projectName": "string",
   "siteAddress": "string",
   "topic": "string",
-  "introduction": "string (min 150 words — set the scene, explain why this topic matters today)",
+  "introduction": "string (80-120 words — concise, get to the point. Why this topic matters today, what happened recently, what the team needs to know)",
   "keyHazards": [
-    { "hazard": "string", "consequence": "string", "likelihood": "string" }
+    { "hazard": "string (min 30 words — specific hazard description, not generic)", "consequence": "string (min 30 words — realistic worst-case outcome)", "likelihood": "High | Medium | Low" }
   ],
   "controlMeasures": [
-    { "measure": "string", "detail": "string" }
+    { "measure": "string (short name)", "detail": "string (min 30 words — specific, practical control with who/what/how)" }
   ],
   "dosAndDonts": {
-    "dos": ["string"],
-    "donts": ["string"]
+    "dos": ["string (min 5 items — specific positive actions)"],
+    "donts": ["string (min 5 items — specific prohibited actions)"]
   },
-  "emergencyProcedures": "string (min 100 words)",
-  "discussionPoints": ["string — questions to ask the team to check understanding"],
+  "emergencyProcedures": "string (100-200 words — step-by-step with responsibilities: who calls 999, who administers first aid, who secures the area, who notifies management, escalation procedure)",
+  "discussionPoints": ["string — open questions to check understanding and encourage team input"],
   "keyTakeaways": ["string — 3-5 critical points to remember"],
-  "ppeRequired": ["string"],
-  "relevantStandards": ["string — regulations, HSE guidance, BS standards"],
+  "ppeRequired": ["string — specific PPE items required for this activity"],
+  "relevantStandards": ["string — regulations, HSE guidance, BS standards, ACoPs"],
   "additionalNotes": "string"
 }
-Minimum 5 key hazards. Minimum 6 control measures. Minimum 4 discussion points.`,
+Minimum 5 key hazards (add more if the topic warrants it). Minimum 6 control measures. Minimum 4 discussion points. Each hazard and control measure item must contain at least 30 words of specific, practical content — no generic one-liners.`,
 
   'confined-spaces': `Generate a Confined Space Risk Assessment JSON with this structure:
 {
@@ -2825,6 +2826,85 @@ ${config.documentLabel}
 
 --- OUTPUT JSON SCHEMA ---
 ${TOOL_GENERATION_SCHEMAS[toolSlug]}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// TBT Template-Specific Generation Prompts
+// Same JSON structure, different writing style per visual template.
+// =============================================================================
+
+const TBT_BASE_SCHEMA = `{
+  "documentRef": "string",
+  "date": "DD/MM/YYYY",
+  "deliveredBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "topic": "string",
+  "introduction": "string (80-120 words)",
+  "keyHazards": [
+    { "hazard": "string (min 30 words)", "consequence": "string (min 30 words)", "likelihood": "High | Medium | Low" }
+  ],
+  "controlMeasures": [
+    { "measure": "string", "detail": "string (min 30 words)" }
+  ],
+  "dosAndDonts": {
+    "dos": ["string (min 5 items)"],
+    "donts": ["string (min 5 items)"]
+  },
+  "emergencyProcedures": "string (100-200 words — step-by-step with responsibilities)",
+  "discussionPoints": ["string — open questions"],
+  "keyTakeaways": ["string — 3-5 critical points"],
+  "ppeRequired": ["string"],
+  "relevantStandards": ["string"],
+  "additionalNotes": "string"
+}
+MINIMUMS: 5+ hazards, 6+ controls, 4+ discussion points, 5+ do's, 5+ don'ts. Each hazard/control must have 30+ words. Add more items if the topic warrants it.`;
+
+const TBT_TEMPLATE_STYLE: Record<TbtTemplateSlug, string> = {
+  'ebrora-branded': `TEMPLATE: Ebrora Branded (professional, numbered sections)
+WRITING STYLE: Professional and structured. Use clear, direct language suitable for a formal site briefing document. Each section should read as a standalone reference — someone should be able to open any section and understand it without reading the others. Key takeaways should be punchy, memorable one-liners that stick in someone's head after the briefing.`,
+
+  'red-safety': `TEMPLATE: Red Safety (hazard-first, urgent tone)
+WRITING STYLE: Direct, urgent, safety-critical tone. Lead every section with the most dangerous point first. Use active voice and imperative commands ("Do not", "Always", "Never"). The first key takeaway MUST be the single most critical safety message for this topic — it will be displayed in a prominent red warning box. Consequences should be blunt and realistic, not softened. This template is designed to grab attention and make the danger real.`,
+
+  'editorial': `TEMPLATE: Editorial (clean, narrative, pull-quote style)
+WRITING STYLE: Authoritative but conversational. Write the introduction as you would an opening paragraph of a well-written safety article — engaging, human, drawing the reader in. The first key takeaway will be displayed as a large pull-quote, so make it a powerful, quotable statement (ideally under 20 words). Avoid jargon where plain English works. Hazards and controls should still be technically accurate but written in flowing prose style rather than clipped bullet points.`,
+
+  'sidebar': `TEMPLATE: Sidebar Layout (concise, space-efficient)
+WRITING STYLE: Concise and scannable. The sidebar layout has limited horizontal space, so keep everything tight. Introduction should be at the shorter end (80-90 words). Hazard descriptions can be slightly shorter but must still hit the 30-word minimum. Control measure details should be practical and action-focused — no preamble, straight to "what to do". Discussion points should be short, direct questions. This template prioritises quick scanning over lengthy reading.`,
+
+  'magazine': `TEMPLATE: Magazine (editorial, two-column, publication style)
+WRITING STYLE: Editorial and engaging, as if writing for a construction industry magazine. The introduction should hook the reader with a compelling fact, statistic, or recent incident. The first key takeaway will appear as a pull-quote in the column layout, so make it punchy and quotable. Write hazards and controls in a more narrative style — each one should read like a paragraph, not just a bullet point. Use specific UK statistics or HSE data references where possible.`,
+
+  'blueprint': `TEMPLATE: Blueprint Technical (monospace, specification style)
+WRITING STYLE: Technical and procedural, like a specification document. Use precise terminology, reference specific standards by number (e.g. "BS 5975:2019 Clause 6.2" not just "BS 5975"). Write in clipped, technical phrases where appropriate. Emergency procedures should read like a protocol flowchart — step → action → responsibility → checkpoint. Control measures should reference specific equipment, tolerances, or inspection intervals. Avoid narrative prose — this template suits factual, reference-grade content.`,
+
+  'rag-bands': `TEMPLATE: RAG Traffic Light Bands (colour-coded risk sections)
+WRITING STYLE: Content is grouped by risk severity — RED (hazards/what can hurt you), AMBER (controls/what we must do), GREEN (safe behaviour/what good looks like), BLUE (emergency). Write hazards as direct threat statements ("Falls from scaffold platforms due to missing guardrails"). Write controls as mandatory actions ("Check scaffold tag before every access"). Write do's as positive safe behaviours ("Keep platforms clear of loose materials"). Emergency procedures should be a clear sequence of actions. Each section must stand alone — someone looking at just the RED section should understand the full danger.`,
+
+  'card-based': `TEMPLATE: Card-Based (modern, clean, each section is a standalone card)
+WRITING STYLE: Each section is displayed as its own card, so every section must be self-contained and scannable. Keep content structured and well-spaced. Use short sentences. Lead each hazard with the specific danger, followed by the practical consequence. Controls should start with an action verb ("Inspect", "Verify", "Ensure", "Maintain"). Discussion points should be genuine open questions that prompt real team conversation, not yes/no questions.`,
+
+  'hazard-industrial': `TEMPLATE: Hazard Industrial (yellow/black, construction-site urgency)
+WRITING STYLE: Mandatory, no-nonsense safety language. This template uses industrial hazard colours (yellow/black) to signal critical importance. The first key takeaway will appear in a prominent caution box — make it a direct, non-negotiable safety rule. Use phrases like "It is mandatory that...", "Under no circumstances...", "All personnel must...". Write as if this briefing is being delivered by a principal contractor's safety manager to a workforce that includes agency labour who may not be familiar with the site. Be explicit about consequences of non-compliance.`,
+};
+
+export function getTbtTemplateGenerationPrompt(templateSlug: TbtTemplateSlug): string {
+  const styleGuide = TBT_TEMPLATE_STYLE[templateSlug] || TBT_TEMPLATE_STYLE['ebrora-branded'];
+
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+Toolbox Talk
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+Generate a Toolbox Talk JSON with this structure:
+${TBT_BASE_SCHEMA}
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }
