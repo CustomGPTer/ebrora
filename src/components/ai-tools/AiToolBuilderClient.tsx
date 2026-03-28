@@ -15,6 +15,8 @@ interface AiToolBuilderClientProps {
   tbtTemplateSlug?: string;
   /** For COSHH multi-template — passed to generate route */
   coshhTemplateSlug?: string;
+  /** For CDM Checker multi-template — passed to generate route */
+  cdmCheckerTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -46,7 +48,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -266,6 +268,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           description,
           ...(tbtTemplateSlug ? { tbtTemplateSlug } : {}),
           ...(coshhTemplateSlug ? { coshhTemplateSlug } : {}),
+          ...(cdmCheckerTemplateSlug ? { cdmCheckerTemplateSlug } : {}),
         }),
       });
 
@@ -286,7 +289,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
