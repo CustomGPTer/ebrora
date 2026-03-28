@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
-import { getGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getGenerationPrompt, getTbtTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import type { AiToolSlug } from '@/lib/ai-tools';
@@ -32,10 +32,11 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description } = body as {
+    const { generationId, answers, description, tbtTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
+      tbtTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -143,8 +144,10 @@ export async function POST(req: NextRequest) {
       data: { status: 'PROCESSING', answers: JSON.stringify(answers) },
     });
 
-    // Get the tool-specific generation prompt
-    const systemPrompt = getGenerationPrompt(toolSlug);
+    // Get the tool-specific generation prompt (template-aware for TBT)
+    const systemPrompt = (toolSlug === 'tbt-generator' && tbtTemplateSlug)
+      ? getTbtTemplateGenerationPrompt(tbtTemplateSlug as any)
+      : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A
     const answersText = answers
@@ -195,6 +198,11 @@ export async function POST(req: NextRequest) {
     let docBuffer: Buffer;
     let mimeType: string;
     let fileExtension: string;
+
+    // Inject TBT template slug into content so docx-generator can route it
+    if (toolSlug === 'tbt-generator' && tbtTemplateSlug) {
+      documentContent._tbtTemplateSlug = tbtTemplateSlug;
+    }
 
     if (toolSlug === 'itp') {
       const { generateItpXlsx } = await import('@/lib/ai-tools/templates/itp-xlsx-generator');
