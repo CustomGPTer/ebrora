@@ -2260,6 +2260,8 @@ Minimum 8 materials. Minimum 3 transport entries. Minimum 4 carbon reduction opp
 
   'rams-review': `You are reviewing an uploaded RAMS document. Analyse it thoroughly against HSE guidance (HSG65, L153 CDM 2015), Management of Health and Safety at Work Regulations 1999, CDM 2015, and UK construction industry best practice.
 
+CRITICAL: For each checklist item, you MUST judge whether it is applicable to the specific task described in the RAMS. If the RAMS describes groundworks, items about lifting operations or confined spaces should be marked N/A with explanation. If the RAMS describes work at height, temporary works items are likely applicable. Think carefully about what the task actually involves.
+
 JSON structure:
 {
   "documentRef": "string (format: RR-YYYY-NNN)",
@@ -2269,40 +2271,16 @@ JSON structure:
   "originalDocumentRef": "string",
   "originalDocumentRevision": "string",
   "originalDocumentDate": "string",
+  "producedByCompany": "string (extracted from RAMS or 'Not stated')",
   "documentOverview": "string (min 200 words — summary of what the RAMS covers, who it was written for, general quality and professionalism assessment)",
-  "scopeAssessment": {
-    "worksDescribed": "string",
-    "adequacy": "Adequate | Partial | Inadequate",
-    "findings": "string (min 100 words)",
-    "gaps": ["string"]
-  },
-  "riskAssessmentReview": {
-    "overallAdequacy": "Adequate | Requires Improvement | Inadequate",
-    "hazardsIdentified": "string",
-    "hierarchyOfControlApplied": "Yes | Partial | No",
-    "riskRatingMethodology": "string",
-    "findings": "string (min 200 words — specificity of hazards, practicality of controls, hierarchy of control application, residual risk realism)",
-    "specificGaps": [
-      {
-        "hazardArea": "string",
-        "gap": "string",
-        "recommendation": "string"
-      }
-    ]
-  },
-  "methodStatementReview": {
-    "overallAdequacy": "Adequate | Requires Improvement | Inadequate",
-    "sequencingClarity": "Clear | Unclear | Not Present",
-    "plantAndEquipmentCovered": "Yes | Partial | No",
-    "findings": "string (min 200 words — sequence logic, match with risk assessment, plant/equipment/competency requirements, critical safety sequences)",
-    "specificGaps": [
-      {
-        "section": "string",
-        "gap": "string",
-        "recommendation": "string"
-      }
-    ]
-  },
+  "checklistItems": [
+    {
+      "no": 1,
+      "content": "Description of Work — clear description of the works to be carried out",
+      "status": "Yes | No | N/A",
+      "finding": "string — if Yes: brief confirmation of adequacy. If No: explain what is missing or inadequate. If N/A: explain why this item does not apply to this task."
+    }
+  ],
   "regulatoryComplianceReview": [
     {
       "legislation": "string",
@@ -2311,22 +2289,6 @@ JSON structure:
       "recommendation": "string"
     }
   ],
-  "ppeAndEmergencyReview": {
-    "ppeAdequate": "Yes | Partial | No",
-    "emergencyArrangementsPresent": "Yes | Partial | No",
-    "firstAidArrangements": "string",
-    "findings": "string (min 100 words)"
-  },
-  "competencyAndTrainingReview": {
-    "competencyRequirementsClear": "Yes | Partial | No",
-    "specificTrainingRequired": ["string"],
-    "findings": "string (min 80 words)"
-  },
-  "environmentalConsiderations": {
-    "covered": "Yes | Partial | No",
-    "findings": "string (min 80 words)",
-    "gaps": ["string"]
-  },
   "priorityRecommendations": [
     {
       "priority": "number (1 = highest)",
@@ -2336,13 +2298,65 @@ JSON structure:
       "regulatoryBasis": "string"
     }
   ],
-  "overallRating": {
-    "rating": "Approved with Comments | Approved Subject to Amendments | Not Approved — Significant Revisions Required",
+  "overallVerdict": {
+    "verdict": "Approved — Suitable for Use | Conditionally Approved — Amendments Required Before Works Commence | Not Approved — Significant Revisions Required Before Resubmission",
     "summary": "string (min 200 words — direct and professional overall assessment. State clearly whether suitable for use, what must be fixed before approval, what improvements would significantly raise quality)"
-  },
-  "additionalNotes": "string"
+  }
 }
-Minimum 5 regulatory items. Minimum 8 priority recommendations. Minimum 4 risk assessment gaps. Minimum 3 method statement gaps.`,
+
+THE 34 CHECKLIST ITEMS — use these exact items (content field) in this order:
+1. Description of Work — clear description of the works to be carried out
+2. Sequence of Operations — logical step-by-step methodology
+3. Named Supervision & Responsibilities — named supervisor with defined responsibilities including quality assurance and control
+4. Controls & Monitoring Arrangements — who monitors, checks on plant and activities
+5. Amendment / Revision Procedure — procedure for making changes to methodology
+6. Reference to Current Drawings & Specifications — does methodology list the drawings and project specification being used
+7. Inspection & Test Plan (ITP) Reference — reference to specific ITP stating who inspects what, how, and how often
+8. Hold Points Identified & Release Procedure — does methodology show where hold points are and how they are released
+9. Work Inspection Sheets (WIS) Reference — reference to specific WIS sheets to be completed
+10. Temporary Works Design & Certification — temporary works design briefs, design check certificates signed off, IFC drawings issued
+11. Protection of Finished Works — level of protection including weather protection
+12. Storage of Materials — arrangements for material storage on site
+13. Plant Inspection & Operator Competency — plant inspection records and operator training/competency
+14. Disconnection / Isolation of Services — arrangements for safe disconnection or isolation of existing services
+15. Manual Handling Risk Assessment — specific manual handling hazards identified and assessed
+16. COSHH Assessment — substances hazardous to health identified with control measures
+17. HAVs / WBV Assessment — hand-arm vibration and whole-body vibration risks assessed
+18. Work at Height Risk Assessment — work at height hazards assessed with hierarchy of controls
+19. Noise Assessment — noise exposure assessed against action values
+20. Lifting Operations (LOLER) Assessment — lifting plan, appointed person, examination certificates
+21. Confined Spaces Assessment — confined space entry procedures, atmospheric monitoring, rescue plan
+22. Electrical Safety Assessment — electrical hazards identified with safe systems of work
+23. Hot Works Assessment — fire prevention measures for cutting, welding, grinding
+24. Excavation Safety — excavation support, edge protection, buried services detection
+25. Safety of Public, Occupiers & Third Parties — measures to protect non-workers
+26. Environmental Protection Measures — pollution prevention, ecological protection
+27. Waste Management Arrangements — waste segregation, storage, disposal routes
+28. First Aid Arrangements — first aid provision, trained first aiders, equipment
+29. PPE Requirements Specified — specific PPE requirements listed for each task
+30. Emergency Procedures — site-specific emergency response procedures
+31. Fire Prevention & Control — fire risk mitigation for the specific works
+32. Notification to Regulatory Bodies — notifications to HSE, EA, NRW, SEPA, local authority as required
+33. Competency & Training Requirements — required competencies, qualifications, and training
+34. Traffic Management / Pedestrian Segregation — vehicle and pedestrian management arrangements
+
+For items 15-24: These are specialist risk assessments. Mark as N/A if the RAMS task genuinely does not involve that hazard (e.g. mark "Confined Spaces Assessment" as N/A if the work is entirely above ground). ALWAYS explain why in the finding field.
+
+REGULATORY COMPLIANCE: Include at minimum these regulations where applicable (mark Not Applicable with explanation if not relevant to the task):
+- Management of Health and Safety at Work Regulations 1999
+- CDM Regulations 2015
+- MHSW Regulation 3 (Risk Assessment)
+- Work at Height Regulations 2005
+- LOLER 1998
+- PUWER 1998
+- Manual Handling Operations Regulations 1992
+- Control of Noise at Work Regulations 2005
+- COSHH Regulations 2002
+- Confined Spaces Regulations 1997
+- Electricity at Work Regulations 1989
+- HSG65 Managing for Health and Safety
+
+Minimum 8 regulatory items. Minimum 6 priority recommendations.`,
 
   'delay-notification': `Generate a formal Delay Notification Letter. Professionally formatted, legally precise, protecting contractual entitlement.
 
