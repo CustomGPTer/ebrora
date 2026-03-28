@@ -311,8 +311,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'incident-report') {
-    const { buildIncidentReportDocument } = await import('./templates/incident-report-template');
-    const doc = await buildIncidentReportDocument(content as any);
+    const irSlug = (content as any)._incidentReportTemplateSlug;
+    let doc;
+    if (irSlug) {
+      const { buildIncidentReportTemplateDocument } = await import('./templates/incident-report-templates');
+      doc = await buildIncidentReportTemplateDocument(content as any, irSlug);
+    } else {
+      const { buildIncidentReportDocument } = await import('./templates/incident-report-template');
+      doc = await buildIncidentReportDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);

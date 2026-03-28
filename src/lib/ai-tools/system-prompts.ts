@@ -10,6 +10,7 @@ import type { CoshhTemplateSlug } from '@/lib/coshh/types';
 import type { CdmCheckerTemplateSlug } from '@/lib/cdm-checker/types';
 import type { ConfinedSpacesTemplateSlug } from '@/lib/confined-spaces/types';
 import type { ErpTemplateSlug } from '@/lib/erp/types';
+import type { IncidentReportTemplateSlug } from '@/lib/incident-report/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -3496,6 +3497,265 @@ ${styleGuide}
 --- OUTPUT JSON SCHEMA ---
 Generate an Emergency Response Plan JSON with this structure:
 ${ERP_SCHEMA}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+
+// =============================================================================
+// INCIDENT REPORT — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const INCIDENT_REPORT_TEMPLATE_STYLE: Record<IncidentReportTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, comprehensive 14-section investigation)
+AI INTERVIEW — ask these SPECIFIC questions during the conversation:
+Round 1: "What type of incident was this? (Injury / Near Miss / Dangerous Occurrence / Environmental / Property Damage). Was anyone injured? If so, what was the injury and what treatment was given?"
+Round 1: "Where exactly did the incident happen? (building, level, bay, grid reference). What activity was being carried out at the time?"
+Round 1: "Who was involved? (names, roles, employers). Were there any witnesses?"
+Round 2: "Walk me through the timeline — what happened in the minutes/hours leading up to the incident?"
+Round 2: "What do you think the immediate causes were? (substandard acts and/or substandard conditions)"
+Round 2: "Is this RIDDOR reportable? If so, has the F2508 been submitted? What category? (specified injury, over-7-day, dangerous occurrence)"
+Round 2: "What corrective actions have been taken or are planned? (immediate, short-term, long-term)"
+
+Generate ALL sections: incident summary, persons involved, timeline, immediate causes, 5 Whys root cause analysis, contributing factors matrix (People/Plant/Process/Environment categories), RIDDOR assessment, evidence collected, risk re-rating (pre/post), corrective actions with priority/status/verification, lessons learned, regulatory references, distribution list.
+
+WRITING STYLE: Professional, thorough. Timeline must be chronological with specific times. 5 Whys must cascade logically to a root cause. Contributing factors must map to management system elements. Corrective actions need priority (IMMEDIATE/SHORT-TERM/LONG-TERM) and status (CLOSED/IN PROGRESS/PLANNED). Minimum 3 immediate causes, 5 contributing factors, 5 why entries, 6 corrective actions, 3 lessons learned.`,
+
+  'riddor-focused': `TEMPLATE: RIDDOR Focused (red, regulatory submission format, F2508 field mapping)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Is this incident RIDDOR reportable? Which category: death, specified injury (Schedule 1), over-7-day incapacitation, non-fatal to non-worker, dangerous occurrence (Schedule 2), or occupational disease (Schedule 3)?"
+Round 1: "Tell me about the injured person: full name, date of birth, occupation/trade, employer, employment status, length of service, CSCS card type."
+Round 1: "What was the nature of the injury? Which body part? What was the mechanism (struck by, fell from, etc.)?"
+Round 2: "Was first aid given on site? Was the person taken to hospital? If so, which hospital? Were they admitted overnight? How many days absent from work?"
+Round 2: "Has the F2508 been submitted to HSE? When? What is the reference number? Which HSE regional office? Has an inspector been notified?"
+Round 2: "Were there any defective items of plant, equipment, or substances involved? If so, describe the defect and what's been done with the item."
+Round 2: "List the witnesses and the key points from each witness statement."
+
+Generate ALL RIDDOR-specific sections: incident classification table (all 6 RIDDOR categories with Yes/No), statutory reporting timeline, injured person details (F2508 Part B fields), injury details (F2508 Part C), specified injuries checklist (Schedule 1 — minimum 8 items), dangerous occurrences checklist (Schedule 2 — minimum 6 items), HSE accident kind code, incident particulars, defective plant/equipment, witness statements summary, medical treatment record, immediate causes & root cause, corrective actions with F2508 linkage, enforcing authority notification details, statutory notification checklist (minimum 7 items).
+
+WRITING STYLE: Regulatory precision. Every F2508 field must be populated. Checklists must use ✓ YES / ✗ NO format. Medical details must be specific. Statutory deadlines must be calculated correctly (10 days for death/specified injury, 15 days for over-7-day). HSE accident kind codes must use the standard HSE classification system.`,
+
+  'root-cause': `TEMPLATE: Root Cause Analysis (navy, analytical, barrier analysis, systemic recommendations)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Describe what happened factually. What was the direct event that caused harm or could have caused harm?"
+Round 1: "What defences or controls were supposed to prevent this? Did they work, partially work, or were they absent entirely?"
+Round 2: "Let's work through the 5 Whys. Starting with 'Why did this happen?' — walk me through each level of causation. What was the underlying reason at each level?"
+Round 2: "Which categories of contributing factor apply? People (competence, behaviour, fatigue), Plant (equipment defect, maintenance), Process (risk assessment, permit, method statement), Place (environment, access, lighting), Procedure (SOP, management system)."
+Round 2: "What management system gaps does this investigation reveal? (risk assessment process, permit system, change management, competence management, supervision, behavioural safety). Reference ISO 45001 clauses if possible."
+Round 2: "What are your recommended corrective actions? Separate into systemic (organisation-wide) and local (site-specific). For each action, what would be a measurable verification KPI?"
+
+Generate ALL analytical sections: investigation summary, incident facts, 5 Whys deep-dive (minimum 5 entries cascading to root cause), contributing factors matrix with 5 categories (People/Plant/Process/Place/Procedure — minimum 7 factors), barrier analysis (minimum 7 defence layers — each marked FAILED/WEAKENED/ABSENT), causal chain (minimum 5 steps), risk re-rating (pre/post/target), systemic recommendations (minimum 3), local recommendations (minimum 4), management system gaps (minimum 4 with ISO 45001 references), corrective actions with verification KPIs, close-out milestones (30/60/90/180 day).
+
+WRITING STYLE: Analytical, structured, evidence-based. Every factor must link to a management system element. Barrier analysis must identify each defence layer systematically (elimination → engineering → physical barrier → risk assessment → permit → supervision → individual → equipment → PPE). Root cause statement must be a systemic failure, not an individual blame statement. ISO 45001 clause references where applicable.`,
+
+  'near-miss': `TEMPLATE: Near Miss / Observation (amber, compact, prevention-focused)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What did you observe? Describe the near miss, unsafe condition, or unsafe act. Was anyone nearly harmed?"
+Round 1: "Where did this happen and what activity was going on at the time? How many people were in the area?"
+Round 1: "What classification applies? (Near Miss / Unsafe Condition / Unsafe Act / Environmental). You can select more than one."
+Round 2: "What COULD have happened if this had resulted in contact/harm? Estimate the potential severity — could it have been fatal, major injury, minor injury?"
+Round 2: "What immediate action did you take? (stop work, remove hazard, report, barrier, etc.)"
+Round 2: "Has anything similar happened before on this site? If so, when? Were the lessons from that event applied?"
+Round 2: "What prevention measures would you recommend? Split into immediate fixes (site-specific) and systemic actions (prevent recurrence across all sites)."
+
+Generate ALL near-miss sections: observation details, classification table (4 types with Yes/No), primary classification with description, potential severity assessment with fatality-potential statement, severity assessment factors (actual outcome, potential worst case, probability of recurrence, persons exposed, frequency of exposure), hazard identification table, immediate actions taken, underlying causes (People/Process/Environment categories), prevention measures split into immediate fixes and systemic actions, similar previous occurrences with trend analysis, communication plan, positive observations (what went RIGHT — e.g. prompt reporting, stop-work exercised), reporter recognition statement, follow-up actions with dates.
+
+WRITING STYLE: Encouraging, prevention-focused. This is NOT a blame document — it celebrates reporting. The potential severity assessment must be honest about worst-case outcomes (including fatality potential where applicable). Trend analysis should identify patterns across multiple events. Positive observations section is MANDATORY — always find something the reporter or responders did well. Reporter recognition statement must thank the reporter by role.`,
+};
+
+const INCIDENT_REPORT_SCHEMA = `{
+  "documentRef": "string (IR-YYYY-NNN for standard/RIDDOR/RCA, NM-YYYY-NNN for near-miss)",
+  "incidentDate": "DD/MM/YYYY",
+  "incidentTime": "HH:MM",
+  "reportDate": "DD/MM/YYYY",
+  "investigationLead": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "principalContractor": "string",
+  "client": "string",
+  "contractRef": "string",
+  "incidentCategory": "string (e.g. 'Over-7-Day Injury', 'Near Miss', 'Dangerous Occurrence')",
+  "riddorReportable": "string (e.g. 'YES — F2508 FILED', 'NO', 'N/A — Near Miss')",
+  "exactLocation": "string (specific area, level, bay)",
+  "activityAtTime": "string (min 20 words)",
+  "weatherConditions": "string",
+  "briefDescription": "string (min 100 words — factual chronological account)",
+  "immediateOutcome": "string",
+  "personsInvolved": [
+    { "name": "string", "role": "string", "employer": "string", "injuryDescription": "string", "treatmentGiven": "string", "daysLost": "string", "returnDate": "string" }
+  ],
+  "timelineEntries": [
+    { "time": "string (HH:MM or date)", "event": "string (min 15 words)", "source": "string" }
+  ],
+  "immediateCauses": [
+    { "category": "Substandard Act | Substandard Condition | Root Cause", "cause": "string (min 15 words)", "evidence": "string" }
+  ],
+  "whyEntries": [
+    { "why": "string (1-5)", "question": "string", "answer": "string (min 20 words)" }
+  ],
+  "rootCauseStatement": "string (min 40 words — must identify systemic/management failure, not individual blame)",
+  "contributingFactors": [
+    { "category": "People | Plant | Process | Place | Procedure | Environment", "factor": "string (min 15 words)", "significance": "HIGH | MEDIUM | LOW", "systemLink": "string", "evidence": "string" }
+  ],
+  "riddorCategories": [
+    { "category": "string", "applicable": "✓ YES | ✗ NO", "regulation": "string", "notes": "string" }
+  ],
+  "specifiedInjuries": [
+    { "injury": "string", "applicable": "✓ YES | ✗ NO", "notes": "string" }
+  ],
+  "dangerousOccurrences": [
+    { "occurrence": "string", "applicable": "✓ YES | ✗ NO", "notes": "string" }
+  ],
+  "f2508Ref": "string (or 'N/A')",
+  "dateReported": "string",
+  "reportedBy": "string",
+  "enforcingAuthority": "string (e.g. 'HSE')",
+  "hseRegionalOffice": "string",
+  "hseInspectorNotified": "string",
+  "scenePreserved": "string",
+  "improvementNotice": "string (or 'None issued')",
+  "prohibitionNotice": "string (or 'None issued')",
+  "riddorCategory": "string",
+  "reportingCategory": "string",
+  "reportingMilestones": [
+    { "milestone": "string", "dateTime": "string", "status": "COMPLETED | MET | TRACKING | OCCURRED", "notes": "string" }
+  ],
+  "ipFullName": "string", "ipDob": "string", "ipNiNumber": "[REDACTED]", "ipGender": "string",
+  "ipAddress": "[REDACTED — held in personnel file]", "ipOccupation": "string", "ipEmployer": "string",
+  "ipEmploymentStatus": "string", "ipLengthOfService": "string",
+  "ipCscsCard": "string", "ipTrainingCurrent": "string",
+  "natureOfInjury": "string", "bodyPartAffected": "string", "mechanismOfInjury": "string",
+  "firstAidOnSite": "string", "hospitalTreatment": "string", "admittedOvernight": "string",
+  "daysAbsent": "string", "returnToWorkDate": "string", "permanentDisability": "string",
+  "hseAccidentKindCode": "string (e.g. '09 — Struck by moving, flying or falling object')",
+  "agentInvolved": "string", "activityAtTimeHse": "string", "processHse": "string", "sicCode": "string",
+  "defectiveItems": [
+    { "item": "string", "idRef": "string", "defect": "string (min 15 words)", "actionTaken": "string", "status": "DEFECTIVE | SERVICEABLE | QUARANTINED" }
+  ],
+  "witnessEntries": [
+    { "name": "string", "role": "string", "keyPoints": "string (min 25 words)", "statementRef": "string" }
+  ],
+  "medicalEntries": [
+    { "date": "string", "provider": "string", "treatment": "string (min 15 words)", "outcome": "string" }
+  ],
+  "notificationItems": [
+    { "requirement": "string", "completed": "✓ YES | ✗ NO | ✓ CONFIRMED", "notes": "string" }
+  ],
+  "evidenceItems": [
+    { "type": "string", "description": "string (min 15 words)", "collectedBy": "string", "date": "string" }
+  ],
+  "preRiskRatings": [
+    { "hazard": "string", "severity": "string", "likelihood": "string", "rating": "string (e.g. '6 MED')", "ratingLevel": "HIGH | MEDIUM | LOW" }
+  ],
+  "postRiskRatings": [
+    { "hazard": "string", "severity": "string", "likelihood": "string", "rating": "string", "ratingLevel": "HIGH | MEDIUM | LOW" }
+  ],
+  "riskJustification": "string (min 30 words — why the rating changed)",
+  "targetRatings": [
+    { "hazard": "string", "severity": "string", "targetLikelihood": "string", "targetRating": "string", "controlsRequired": "string" }
+  ],
+  "correctiveActions": [
+    { "action": "string (min 15 words)", "priority": "IMMEDIATE | SHORT-TERM | LONG-TERM", "owner": "string (specific role)", "dueDate": "string", "status": "CLOSED | IN PROGRESS | PLANNED", "verifiedBy": "string (or '—')", "kpi": "string (measurable verification)", "f2508Linked": "Yes | No" }
+  ],
+  "lessonsLearned": [
+    { "lesson": "string (min 25 words)", "howShared": "string", "audience": "string" }
+  ],
+  "distributionEntries": [
+    { "recipient": "string", "organisation": "string", "method": "string", "date": "string" }
+  ],
+  "barrierEntries": [
+    { "defenceLayer": "string (e.g. 'Hazard Elimination', 'Engineering Controls', 'Physical Barrier')", "expectedBarrier": "string", "status": "FAILED | WEAKENED | ABSENT", "failureMode": "string (min 10 words)" }
+  ],
+  "barrierSummary": "string (min 30 words — overall barrier analysis conclusion)",
+  "causalChainSteps": [
+    { "step": "string (1-7)", "event": "string", "category": "Systemic | Planning | Behavioural | Individual | Plant | Task | Outcome", "description": "string (min 15 words)", "linkToNext": "string" }
+  ],
+  "systemicRecs": [
+    { "ref": "string (S1, S2...)", "recommendation": "string (min 20 words)", "systemElement": "string", "owner": "string", "timeline": "string" }
+  ],
+  "localRecs": [
+    { "ref": "string (L1, L2...)", "recommendation": "string", "owner": "string", "dueDate": "string", "status": "CLOSED | IN PROGRESS | PLANNED" }
+  ],
+  "mgmtGaps": [
+    { "gap": "string (G1, G2...)", "systemElement": "string", "description": "string (min 20 words)", "standardRef": "string (e.g. 'ISO 45001 §6.1')", "priority": "HIGH | MEDIUM | LOW" }
+  ],
+  "closeOutMilestones": [
+    { "milestone": "string (e.g. '30-Day Review')", "targetDate": "string", "activity": "string (min 15 words)", "owner": "string", "verification": "string" }
+  ],
+  "observerName": "string",
+  "observerRole": "string",
+  "dateObserved": "string",
+  "timeObserved": "string",
+  "dateReportedNm": "string",
+  "personsInArea": "string",
+  "classificationItems": [
+    { "type": "NEAR MISS | UNSAFE CONDITION | UNSAFE ACT | ENVIRONMENTAL", "applicable": "✓ YES | ✗ NO", "notes": "string" }
+  ],
+  "primaryClassification": "string",
+  "nmDescription": "string (min 60 words — what happened and what could have happened)",
+  "severityAssessments": [
+    { "factor": "string (e.g. 'Actual Outcome', 'Potential Severity', 'Probability of Recurrence')", "rating": "NIL HARM | MINOR | MAJOR | FATAL | HIGH | MEDIUM | LOW | DAILY | MULTIPLE", "rationale": "string" }
+  ],
+  "potentialOutcomeStatement": "string (min 30 words — what could have happened, including energy/force calculations if relevant)",
+  "hazardIdents": [
+    { "hazard": "string", "description": "string (min 15 words)", "riskLevel": "HIGH | MEDIUM | LOW", "currentControls": "string" }
+  ],
+  "immediateActionsTaken": [
+    { "action": "string", "priority": "string", "owner": "string (who took the action)", "dueDate": "string (time taken)", "status": "string (outcome)", "verifiedBy": "", "kpi": "", "f2508Linked": "" }
+  ],
+  "underlyingCauses": [
+    { "category": "Process | People | Environment | Plant", "cause": "string (min 15 words)", "significance": "HIGH | MEDIUM | LOW", "link": "string" }
+  ],
+  "immediateFixes": [
+    { "action": "string", "priority": "", "owner": "string", "dueDate": "string", "status": "CLOSED | IN PROGRESS | PLANNED", "verifiedBy": "", "kpi": "", "f2508Linked": "" }
+  ],
+  "systemicActions": [
+    { "action": "string", "priority": "", "owner": "string", "dueDate": "string", "status": "CLOSED | IN PROGRESS | PLANNED", "verifiedBy": "", "kpi": "", "f2508Linked": "" }
+  ],
+  "previousOccurrences": [
+    { "date": "string", "ref": "string", "description": "string", "outcome": "NEAR MISS | MINOR INJURY | LTI", "lessonsApplied": "string" }
+  ],
+  "trendStatement": "string (min 25 words — identify patterns across previous events)",
+  "commEntries": [
+    { "audience": "string", "method": "string", "date": "string", "status": "DONE | PLANNED | IN PROGRESS" }
+  ],
+  "positiveObservations": [
+    { "observation": "string (min 20 words — what went RIGHT)", "significance": "string" }
+  ],
+  "reporterRecognition": "string (min 25 words — thank the reporter, explain why near miss reporting matters)",
+  "followUpActions": [
+    { "milestone": "string (e.g. '7-Day Check')", "targetDate": "string", "activity": "string", "owner": "string", "verification": "string" }
+  ],
+  "regulatoryReferences": [
+    { "reference": "string", "description": "string" }
+  ],
+  "additionalNotes": "string"
+}
+
+CRITICAL RULES:
+- Populate the arrays relevant to the chosen template. T1 (ebrora-standard) needs: personsInvolved, timelineEntries, immediateCauses, whyEntries, contributingFactors, evidenceItems, preRiskRatings, postRiskRatings, correctiveActions, lessonsLearned, distributionEntries. T2 (riddor-focused) needs: riddorCategories, reportingMilestones, specifiedInjuries, dangerousOccurrences, defectiveItems, witnessEntries, medicalEntries, notificationItems, immediateCauses, correctiveActions. T3 (root-cause) needs: whyEntries, contributingFactors, barrierEntries, causalChainSteps, preRiskRatings, postRiskRatings, targetRatings, systemicRecs, localRecs, mgmtGaps, correctiveActions, closeOutMilestones. T4 (near-miss) needs: classificationItems, severityAssessments, hazardIdents, immediateActionsTaken, underlyingCauses, immediateFixes, systemicActions, previousOccurrences, commEntries, positiveObservations, followUpActions.
+- Always populate regulatoryReferences regardless of template (minimum 5 entries).
+- Root cause must be a SYSTEMIC failure (management system, process, organisational decision) — NEVER individual blame.
+- All word counts are MINIMUMS. Keep content tight. Tables and action steps are primary — not prose.
+- Every corrective action must name a specific owner role (not "someone" or "TBC").
+- For near-miss template: potentialOutcomeStatement MUST honestly assess worst-case, including fatality potential where applicable. positiveObservations and reporterRecognition are MANDATORY.
+- RIDDOR categories must use correct regulation numbers. Specified injuries must match Schedule 1. Dangerous occurrences must match Schedule 2.
+- Contributing factors MUST map to management system elements. Barrier analysis must use the hierarchy of controls.`;
+
+export function getIncidentReportTemplateGenerationPrompt(templateSlug: IncidentReportTemplateSlug): string {
+  const styleGuide = INCIDENT_REPORT_TEMPLATE_STYLE[templateSlug] || INCIDENT_REPORT_TEMPLATE_STYLE['ebrora-standard'];
+
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+Incident Investigation Report
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+Generate an Incident Investigation Report JSON with this structure:
+${INCIDENT_REPORT_SCHEMA}
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }
