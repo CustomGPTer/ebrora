@@ -23,6 +23,16 @@ interface AiToolBuilderClientProps {
   erpTemplateSlug?: string;
   /** For Incident Report multi-template — passed to generate route */
   incidentReportTemplateSlug?: string;
+  /** For Lift Plan multi-template — passed to generate route */
+  liftPlanTemplateSlug?: string;
+  /** For Manual Handling multi-template — passed to generate route */
+  manualHandlingTemplateSlug?: string;
+  /** For Noise Assessment multi-template — passed to generate route */
+  noiseAssessmentTemplateSlug?: string;
+  /** For Permit to Dig multi-template — passed to generate route */
+  permitToDigTemplateSlug?: string;
+  /** For POWRA multi-template — passed to generate route */
+  powraTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -54,7 +64,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -278,6 +288,11 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           ...(confinedSpacesTemplateSlug ? { confinedSpacesTemplateSlug } : {}),
           ...(erpTemplateSlug ? { erpTemplateSlug } : {}),
           ...(incidentReportTemplateSlug ? { incidentReportTemplateSlug } : {}),
+          ...(liftPlanTemplateSlug ? { liftPlanTemplateSlug } : {}),
+          ...(manualHandlingTemplateSlug ? { manualHandlingTemplateSlug } : {}),
+          ...(noiseAssessmentTemplateSlug ? { noiseAssessmentTemplateSlug } : {}),
+          ...(permitToDigTemplateSlug ? { permitToDigTemplateSlug } : {}),
+          ...(powraTemplateSlug ? { powraTemplateSlug } : {}),
         }),
       });
 
@@ -298,7 +313,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
