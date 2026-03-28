@@ -21,6 +21,8 @@ interface AiToolBuilderClientProps {
   confinedSpacesTemplateSlug?: string;
   /** For Emergency Response Plan multi-template — passed to generate route */
   erpTemplateSlug?: string;
+  /** For Incident Report multi-template — passed to generate route */
+  incidentReportTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -52,7 +54,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -275,6 +277,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           ...(cdmCheckerTemplateSlug ? { cdmCheckerTemplateSlug } : {}),
           ...(confinedSpacesTemplateSlug ? { confinedSpacesTemplateSlug } : {}),
           ...(erpTemplateSlug ? { erpTemplateSlug } : {}),
+          ...(incidentReportTemplateSlug ? { incidentReportTemplateSlug } : {}),
         }),
       });
 
@@ -295,7 +298,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
