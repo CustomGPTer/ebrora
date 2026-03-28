@@ -392,87 +392,285 @@ export async function buildCarbonFootprintDocument(c: any): Promise<Document> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RAMS REVIEW
+// RAMS REVIEW — v2 Industry-Leading
+//   • 34-item checklist with Yes/No/N/A RAG colours
+//   • AI explains N/A reasoning and No findings per item
+//   • Score summary at top with overall verdict
+//   • Regulatory compliance with AI-decided applicability
+//   • Priority recommendations with criticality
+//   • Narrative assessment sections retained
+//   • Single continuous body section
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── RAMS Review helpers ──────────────────────────────────────────────────────
+const RR_ACCENT   = 'B91C1C';
+const RR_BODY     = 20;
+const RR_SMALL    = 16;
+const RR_TINY     = 14;
+const RR_GREEN    = '059669';
+const RR_GREEN_L  = 'D1FAE5';
+const RR_RED      = 'DC2626';
+const RR_RED_L    = 'FEE2E2';
+const RR_GREY     = '6B7280';
+const RR_GREY_L   = 'F3F4F6';
+const RR_AMBER    = 'D97706';
+const RR_AMBER_L  = 'FEF3C7';
+
+function rrSection(num: string, text: string): Paragraph {
+  return new Paragraph({
+    spacing: { before: 360, after: 140 },
+    border: { left: { style: BorderStyle.SINGLE, size: 18, color: RR_ACCENT, space: 6 } },
+    children: [
+      new TextRun({ text: `${num}   ${text.toUpperCase()}`, bold: true, size: 22, font: 'Arial', color: RR_ACCENT }),
+    ],
+  });
+}
+
+function rrStatusColours(status: string): { bg: string; fg: string } {
+  const s = (status || '').toLowerCase();
+  if (s === 'yes' || s === 'acceptable' || s === 'compliant')        return { bg: RR_GREEN_L, fg: RR_GREEN };
+  if (s === 'no' || s === 'not acceptable' || s === 'non-compliant') return { bg: RR_RED_L, fg: RR_RED };
+  if (s === 'n/a' || s === 'not applicable')                         return { bg: RR_GREY_L, fg: RR_GREY };
+  if (s === 'partial' || s.includes('partial'))                      return { bg: RR_AMBER_L, fg: RR_AMBER };
+  return { bg: 'FFFFFF', fg: '000000' };
+}
+
+function rrVerdictColours(verdict: string): { bg: string; fg: string } {
+  const v = (verdict || '').toLowerCase();
+  if (v.includes('approved') && v.includes('suitable'))   return { bg: RR_GREEN_L, fg: RR_GREEN };
+  if (v.includes('conditional'))                           return { bg: RR_AMBER_L, fg: RR_AMBER };
+  if (v.includes('not approved'))                          return { bg: RR_RED_L, fg: RR_RED };
+  return { bg: RR_GREY_L, fg: RR_GREY };
+}
+
+function rrCriticalityColours(crit: string): { bg: string; fg: string } {
+  const c = (crit || '').toLowerCase();
+  if (c.includes('must') || c.includes('before work'))     return { bg: RR_RED_L, fg: RR_RED };
+  if (c.includes('should'))                                 return { bg: RR_AMBER_L, fg: RR_AMBER };
+  if (c.includes('improvement'))                            return { bg: RR_GREEN_L, fg: RR_GREEN };
+  return { bg: RR_GREY_L, fg: RR_GREY };
+}
+
 export async function buildRamsReviewDocument(c: any): Promise<Document> {
-  const ACCENT = 'B91C1C';
+  const items: Array<{ no: number; content: string; status: string; finding: string }> = c.checklistItems || [];
+  const regItems: Array<{ legislation: string; status: string; finding: string; recommendation: string }> = c.regulatoryComplianceReview || [];
+  const prioItems: Array<{ priority: number; criticality: string; finding: string; recommendation: string; regulatoryBasis: string }> = c.priorityRecommendations || [];
 
-  const s1: any[] = [
-    ...p.infoSection('Document Details', [
-      { label: 'Original Document Title',    value: c.originalDocumentTitle    || '' },
-      { label: 'Original Document Ref',      value: c.originalDocumentRef      || '' },
-      { label: 'Original Revision',          value: c.originalDocumentRevision || '' },
-      { label: 'Original Document Date',     value: c.originalDocumentDate     || '' },
-      { label: 'Review Date',                value: c.reviewDate               || '' },
-      { label: 'Reviewed By',               value: c.reviewedBy               || '' },
-    ], ACCENT),
-    ...p.proseSection('Document Overview', c.documentOverview, ACCENT),
-    ...p.infoSection('Scope Assessment', [
-      { label: 'Works Described', value: c.scopeAssessment?.worksDescribed || '' },
-      { label: 'Adequacy',        value: c.scopeAssessment?.adequacy        || '' },
-    ], ACCENT),
-    ...h.prose(c.scopeAssessment?.findings || ''),
-    ...p.bulletListSection('Scope Gaps', c.scopeAssessment?.gaps || [], ACCENT),
+  // ── Column widths ──
+  const clNo   = Math.floor(W * 0.05);
+  const clCont = Math.floor(W * 0.38);
+  const clStat = Math.floor(W * 0.10);
+  const clFind = W - clNo - clCont - clStat;
+
+  // ── Score Summary ──
+  const yesCount = items.filter(i => (i.status || '').toLowerCase() === 'yes').length;
+  const noCount  = items.filter(i => (i.status || '').toLowerCase() === 'no').length;
+  const naCount  = items.filter(i => (i.status || '').toLowerCase() === 'n/a').length;
+  const total    = items.length;
+  const verdict  = c.overallVerdict?.verdict || '';
+  const vc       = rrVerdictColours(verdict);
+
+  const summaryCol = Math.floor(W / 5);
+  const summaryLastCol = W - (summaryCol * 4);
+
+  const summaryTable = new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [summaryCol, summaryCol, summaryCol, summaryCol, summaryLastCol],
+    rows: [
+      new TableRow({ tableHeader: true, children: [
+        h.headerCell('Total Items', summaryCol, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Acceptable', summaryCol, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Not Acceptable', summaryCol, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('N/A', summaryCol, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Overall Verdict', summaryLastCol, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+      ] }),
+      new TableRow({ children: [
+        h.dataCell(String(total), summaryCol, { bold: true, fontSize: RR_BODY, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(yesCount), summaryCol, { bold: true, fontSize: RR_BODY, fillColor: RR_GREEN_L, color: RR_GREEN, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(noCount), summaryCol, { bold: true, fontSize: RR_BODY, fillColor: noCount > 0 ? RR_RED_L : RR_GREEN_L, color: noCount > 0 ? RR_RED : RR_GREEN, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(naCount), summaryCol, { bold: true, fontSize: RR_BODY, fillColor: RR_GREY_L, color: RR_GREY, alignment: AlignmentType.CENTER }),
+        h.dataCell(verdict, summaryLastCol, { bold: true, fontSize: RR_SMALL, fillColor: vc.bg, color: vc.fg, alignment: AlignmentType.CENTER }),
+      ] }),
+    ],
+  });
+
+  // ── Checklist table ──
+  const checklistRows = items.map((item, i) => {
+    const sc = rrStatusColours(item.status);
+    const zebra = i % 2 === 0 ? 'F5F5F5' : 'FFFFFF';
+    return new TableRow({
+      children: [
+        h.dataCell(String(item.no), clNo, { bold: true, fontSize: RR_TINY, fillColor: zebra, alignment: AlignmentType.CENTER }),
+        h.dataCell(item.content || '', clCont, { fontSize: RR_TINY, fillColor: zebra }),
+        h.dataCell(item.status || '', clStat, { bold: true, fontSize: RR_TINY, fillColor: sc.bg, color: sc.fg, alignment: AlignmentType.CENTER }),
+        h.dataCell(item.finding || '', clFind, { fontSize: RR_TINY, fillColor: zebra }),
+      ],
+    });
+  });
+
+  const checklistTable = new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [clNo, clCont, clStat, clFind],
+    rows: [
+      new TableRow({ tableHeader: true, children: [
+        h.headerCell('#', clNo, { fontSize: RR_SMALL, fillColor: RR_ACCENT, alignment: AlignmentType.CENTER }),
+        h.headerCell('Content', clCont, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Status', clStat, { fontSize: RR_SMALL, fillColor: RR_ACCENT, alignment: AlignmentType.CENTER }),
+        h.headerCell('Finding / Comment', clFind, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+      ] }),
+      ...checklistRows,
+    ],
+  });
+
+  // ── Regulatory compliance table with RAG ──
+  const rcCol1 = Math.floor(W * 0.28);
+  const rcCol2 = Math.floor(W * 0.14);
+  const rcCol3 = Math.floor(W * 0.28);
+  const rcCol4 = W - rcCol1 - rcCol2 - rcCol3;
+  const regTable = regItems.length > 0 ? new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [rcCol1, rcCol2, rcCol3, rcCol4],
+    rows: [
+      new TableRow({ tableHeader: true, children: [
+        h.headerCell('Legislation / Standard', rcCol1, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Status', rcCol2, { fontSize: RR_SMALL, fillColor: RR_ACCENT, alignment: AlignmentType.CENTER }),
+        h.headerCell('Finding', rcCol3, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Recommendation', rcCol4, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+      ] }),
+      ...regItems.map((item, i) => {
+        const sc = rrStatusColours(item.status);
+        const zebra = i % 2 === 0 ? 'F5F5F5' : 'FFFFFF';
+        return new TableRow({
+          children: [
+            h.dataCell(item.legislation || '', rcCol1, { bold: true, fontSize: RR_TINY, fillColor: zebra }),
+            h.dataCell(item.status || '', rcCol2, { bold: true, fontSize: RR_TINY, fillColor: sc.bg, color: sc.fg, alignment: AlignmentType.CENTER }),
+            h.dataCell(item.finding || '', rcCol3, { fontSize: RR_TINY, fillColor: zebra }),
+            h.dataCell(item.recommendation || '', rcCol4, { fontSize: RR_TINY, fillColor: zebra }),
+          ],
+        });
+      }),
+    ],
+  }) : null;
+
+  // ── Priority recommendations table with criticality RAG ──
+  const prCol1 = Math.floor(W * 0.05);
+  const prCol2 = Math.floor(W * 0.22);
+  const prCol3 = Math.floor(W * 0.28);
+  const prCol4 = Math.floor(W * 0.25);
+  const prCol5 = W - prCol1 - prCol2 - prCol3 - prCol4;
+  const prioTable = prioItems.length > 0 ? new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [prCol1, prCol2, prCol3, prCol4, prCol5],
+    rows: [
+      new TableRow({ tableHeader: true, children: [
+        h.headerCell('#', prCol1, { fontSize: RR_SMALL, fillColor: RR_ACCENT, alignment: AlignmentType.CENTER }),
+        h.headerCell('Criticality', prCol2, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Finding', prCol3, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Recommendation', prCol4, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+        h.headerCell('Regulatory Basis', prCol5, { fontSize: RR_SMALL, fillColor: RR_ACCENT }),
+      ] }),
+      ...prioItems.map((item, i) => {
+        const cc = rrCriticalityColours(item.criticality);
+        const zebra = i % 2 === 0 ? 'F5F5F5' : 'FFFFFF';
+        return new TableRow({
+          children: [
+            h.dataCell(String(item.priority || i + 1), prCol1, { bold: true, fontSize: RR_TINY, fillColor: zebra, alignment: AlignmentType.CENTER }),
+            h.dataCell(item.criticality || '', prCol2, { bold: true, fontSize: RR_TINY, fillColor: cc.bg, color: cc.fg }),
+            h.dataCell(item.finding || '', prCol3, { fontSize: RR_TINY, fillColor: zebra }),
+            h.dataCell(item.recommendation || '', prCol4, { fontSize: RR_TINY, fillColor: zebra }),
+            h.dataCell(item.regulatoryBasis || '', prCol5, { fontSize: RR_TINY, fillColor: zebra }),
+          ],
+        });
+      }),
+    ],
+  }) : null;
+
+  // ── Section counter ──
+  let sec = 1;
+  const n = () => `${sec++}.0`;
+
+  // ── Build single continuous body ──
+  const body: any[] = [
+    // 1.0 Document Details
+    rrSection(n(), 'Document Details'),
+    new Table({
+      width: { size: W, type: WidthType.DXA },
+      columnWidths: [Math.round(W * 0.35), W - Math.round(W * 0.35)],
+      rows: [
+        { label: 'RAMS Title',              value: c.originalDocumentTitle    || '' },
+        { label: 'Document Reference',       value: c.originalDocumentRef      || '' },
+        { label: 'Revision',                value: c.originalDocumentRevision || '' },
+        { label: 'Document Date',            value: c.originalDocumentDate     || '' },
+        { label: 'Produced By (Company)',    value: c.producedByCompany        || '' },
+        { label: 'Review Date',             value: c.reviewDate               || '' },
+        { label: 'Reviewed By',             value: c.reviewedBy               || '' },
+      ].filter(r => r.value && r.value.trim()).map((r, i) => {
+        const bg = i % 2 === 1 ? 'F5F5F5' : 'FFFFFF';
+        return new TableRow({ children: [
+          h.dataCell(r.label, Math.round(W * 0.35), { bold: true, fontSize: RR_SMALL, fillColor: bg }),
+          h.dataCell(r.value, W - Math.round(W * 0.35), { fontSize: RR_SMALL, fillColor: bg }),
+        ] });
+      }),
+    }),
+    h.spacer(60),
+
+    // 2.0 Score Summary
+    rrSection(n(), 'Review Score Summary'),
+    summaryTable,
+    h.spacer(60),
+
+    // 3.0 Document Overview
+    ...(c.documentOverview ? [
+      rrSection(n(), 'Document Overview'),
+      ...h.prose(c.documentOverview, RR_BODY),
+    ] : []),
+
+    // 4.0 RAMS Content Checklist
+    rrSection(n(), 'RAMS Content Checklist'),
+    checklistTable,
+    h.spacer(60),
+
+    // 5.0 Regulatory Compliance
+    ...(regTable ? [
+      rrSection(n(), 'Regulatory Compliance Review'),
+      regTable,
+      h.spacer(60),
+    ] : []),
+
+    // 6.0 Priority Recommendations
+    ...(prioTable ? [
+      rrSection(n(), 'Priority Recommendations'),
+      prioTable,
+      h.spacer(60),
+    ] : []),
+
+    // 7.0 Overall Review Assessment
+    rrSection(n(), 'Overall Review Assessment'),
+    new Table({
+      width: { size: W, type: WidthType.DXA },
+      columnWidths: [Math.round(W * 0.35), W - Math.round(W * 0.35)],
+      rows: [new TableRow({ children: [
+        h.dataCell('Verdict', Math.round(W * 0.35), { bold: true, fontSize: RR_SMALL }),
+        h.dataCell(verdict, W - Math.round(W * 0.35), { bold: true, fontSize: RR_SMALL, fillColor: vc.bg, color: vc.fg }),
+      ] })],
+    }),
+    h.spacer(40),
+    ...h.prose(c.overallVerdict?.summary || '', RR_BODY),
+
+    // 8.0 Document Sign-Off
+    rrSection(n(), 'Document Sign-Off'),
+    h.approvalTable([
+      { role: 'Reviewed By',  name: c.reviewedBy || '' },
+      { role: 'Approved By',  name: '' },
+    ], W),
+    h.spacer(120),
   ];
 
-  const s2: any[] = [
-    ...p.infoSection('Risk Assessment', [
-      { label: 'Overall Adequacy',              value: c.riskAssessmentReview?.overallAdequacy                || '' },
-      { label: 'Hierarchy of Control Applied',  value: c.riskAssessmentReview?.hierarchyOfControlApplied     || '' },
-      { label: 'Risk Rating Methodology',       value: c.riskAssessmentReview?.riskRatingMethodology          || '' },
-    ], ACCENT),
-    ...h.prose(c.riskAssessmentReview?.findings || ''),
-    ...p.dataTableSection('Risk Assessment Gaps', c.riskAssessmentReview?.specificGaps || [], [
-      { key: 'hazardArea',    label: 'Hazard Area',    width: Math.floor(W * 0.28) },
-      { key: 'gap',           label: 'Gap Identified', width: Math.floor(W * 0.36) },
-      { key: 'recommendation',label: 'Recommendation', width: W - Math.floor(W * 0.28) - Math.floor(W * 0.36) },
-    ], ACCENT),
-    ...p.infoSection('Method Statement', [
-      { label: 'Overall Adequacy',         value: c.methodStatementReview?.overallAdequacy        || '' },
-      { label: 'Sequencing Clarity',       value: c.methodStatementReview?.sequencingClarity      || '' },
-      { label: 'Plant & Equipment Covered',value: c.methodStatementReview?.plantAndEquipmentCovered|| '' },
-    ], ACCENT),
-    ...h.prose(c.methodStatementReview?.findings || ''),
-    ...p.dataTableSection('Method Statement Gaps', c.methodStatementReview?.specificGaps || [], [
-      { key: 'section',       label: 'Section',        width: Math.floor(W * 0.24) },
-      { key: 'gap',           label: 'Gap',            width: Math.floor(W * 0.38) },
-      { key: 'recommendation',label: 'Recommendation', width: W - Math.floor(W * 0.24) - Math.floor(W * 0.38) },
-    ], ACCENT),
-  ];
-
-  const s3: any[] = [
-    ...p.dataTableSection('Regulatory Compliance', c.regulatoryComplianceReview || [], [
-      { key: 'legislation',    label: 'Legislation',    width: Math.floor(W * 0.30) },
-      { key: 'status',         label: 'Status',         width: Math.floor(W * 0.16) },
-      { key: 'finding',        label: 'Finding',        width: Math.floor(W * 0.28) },
-      { key: 'recommendation', label: 'Recommendation', width: W - Math.floor(W * 0.30) - Math.floor(W * 0.16) - Math.floor(W * 0.28) },
-    ], ACCENT),
-    ...p.dataTableSection('Priority Recommendations', c.priorityRecommendations || [], [
-      { key: 'priority',        label: '#',             width: Math.floor(W * 0.06) },
-      { key: 'criticality',     label: 'Criticality',   width: Math.floor(W * 0.28) },
-      { key: 'finding',         label: 'Finding',       width: Math.floor(W * 0.28) },
-      { key: 'recommendation',  label: 'Recommendation',width: W - Math.floor(W * 0.06) - Math.floor(W * 0.28) - Math.floor(W * 0.28) },
-    ], ACCENT),
-    p.sectionBand('Overall Review Rating', ACCENT),
-    h.infoTable([{ label: 'Rating', value: c.overallRating?.rating || '' }], W),
-    h.spacer(80),
-    ...h.prose(c.overallRating?.summary || ''),
-    ...p.signatureBlock([
-      { role: 'Reviewer',    name: c.reviewedBy || '' },
-      { role: 'Approved By', name: '' },
-    ], ACCENT),
-  ];
-
-  return p.buildPremiumDocument({
+  return p.buildPremiumDocumentInline({
     documentLabel: 'RAMS Review Report',
-    accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.originalDocumentTitle || 'RAMS Review',
-    preparedBy: c.reviewedBy,
-    date: c.reviewDate,
+    accentHex: RR_ACCENT,
     classification: 'HEALTH & SAFETY DOCUMENT REVIEW',
-    extraFields: [['Overall Rating', c.overallRating?.rating || '']],
-  }, [s1, s2, s3]);
+  }, [body]);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
