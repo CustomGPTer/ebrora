@@ -394,7 +394,7 @@ function infoTable(rows: Array<{ label: string; value: string }>, labelBg: strin
 // ── Standard data table with header + zebra rows ─────────────────────────────
 function dataTable(
   headers: Array<{ text: string; width: number }>,
-  rows: Array<Array<{ text: string; bold?: boolean; ragRating?: string }>>,
+  rows: Array<Array<{ text: string; bold?: boolean; ragRating?: boolean }>>,
   headerBg: string,
   zebraColor = ZEBRA,
   fontSize = SM * 1.125 | 0,
