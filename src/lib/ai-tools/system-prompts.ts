@@ -11,6 +11,11 @@ import type { CdmCheckerTemplateSlug } from '@/lib/cdm-checker/types';
 import type { ConfinedSpacesTemplateSlug } from '@/lib/confined-spaces/types';
 import type { ErpTemplateSlug } from '@/lib/erp/types';
 import type { IncidentReportTemplateSlug } from '@/lib/incident-report/types';
+import type { LiftPlanTemplateSlug } from '@/lib/lift-plan/types';
+import type { ManualHandlingTemplateSlug } from '@/lib/manual-handling/types';
+import type { NoiseAssessmentTemplateSlug } from '@/lib/noise-assessment/types';
+import type { PermitToDigTemplateSlug } from '@/lib/permit-to-dig/types';
+import type { PowraTemplateSlug } from '@/lib/powra/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -3758,4 +3763,683 @@ Generate an Incident Investigation Report JSON with this structure:
 ${INCIDENT_REPORT_SCHEMA}
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+
+// =============================================================================
+// LIFT PLAN — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const LIFT_PLAN_TEMPLATE_STYLE: Record<LiftPlanTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, 22-section ultra-comprehensive lift plan)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What is being lifted? Give me the load description, net weight, dimensions, and condition (new, used, fragile, flexible). How many lifts are planned?"
+Round 1: "What crane are you using? Type (mobile, tower, crawler), make/model, maximum SWL. Do you have a specific serial number or will it be confirmed on the day?"
+Round 1: "What is the maximum radius and lift height? Do you know the duty at that radius from the load chart? What boom/jib configuration?"
+Round 2: "What are the ground conditions? Bearing capacity (kN/m²), ground type (hardstanding, compacted gravel, soft ground). Are outrigger mats/timbers being used? What is the gradient?"
+Round 2: "What proximity hazards exist? (overhead power lines, adjacent structures, underground services, live traffic, public areas, operational plant). Distances?"
+Round 2: "Who are the appointed persons? (Appointed Person, Crane Supervisor, Slinger/Signaller, Crane Operator). Names and qualifications where known."
+Round 2: "What communication method will be used? (radio, hand signals, both). What are the weather limits? (max wind speed, visibility, lightning stand-down)."
+Round 2: "Describe the lift sequence step by step — from initial positioning through to load landed and crane stood down."
+
+Generate ALL 22 sections: lift description, load details with lifting points, crane specification with thorough examination, lift geometry with % capacity calculation, rigging arrangement with certification, ground conditions with outrigger pad sizing, proximity hazards, overhead services assessment, exclusion zones, appointed persons with competence records, communication arrangements, weather limits, environmental considerations, pre-lift inspection checklist (minimum 10 items), lift sequence (minimum 8 steps), contingency & emergency procedures (minimum 5 scenarios), risk assessment (minimum 6 hazards), regulatory references, approval sign-off (5 roles), lift completion record, post-lift inspection checklist.
+
+WRITING STYLE: Technical, precise, BS 7121 compliant. Every dimension/weight must include units. % capacity must be calculated and stated. Rigging items need SWL and cert references. Pre-lift checklist items need specific verification criteria. Lift sequence must be numbered and name responsible person at each step. Risk assessment must show initial and residual ratings.`,
+
+  'operator-brief': `TEMPLATE: Crane Operator Brief (amber, compact cab card, lamination-ready, 3 pages max)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What is the total lifted weight (including rigging)? What is the duty at radius? What percentage of crane capacity?"
+Round 1: "Maximum radius, height, slew arc, and tail swing clearance?"
+Round 2: "Describe the lift sequence in simple numbered steps that the operator can follow."
+Round 2: "What are the abort criteria? (wind speed, load spinning, comms failure, obstruction in slew arc)"
+Round 2: "Key contacts — crane supervisor, slinger/signaller, banksman names?"
+
+Generate a CONCISE operator reference: key load/duty data (large-print), rigging summary, numbered lift sequence, exclusion zones, abort criteria, weather limits, emergency contacts, and communication channel. Maximum content for 3 pages. No engineering calculations — just the facts the operator needs in the cab.
+
+WRITING STYLE: Extremely concise. Large-print key data. Numbered steps not paragraphs. This is a cab reference card — the operator glances at it, not reads it. Every entry must be actionable.`,
+
+  'tandem-lift': `TEMPLATE: Tandem / Complex Lift (teal, dual-crane, multi-phase, BS 7121-1 Annex C)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "How many cranes are involved? What are the types and capacities of each crane?"
+Round 1: "What is the total load weight and how will it be shared between cranes? What percentage does each crane take?"
+Round 1: "Is this a tandem lift (two cranes sharing one load), a relay lift (load transferred between cranes), or a multi-phase operation?"
+Round 2: "Describe each phase of the lift — what does each crane do at each phase? Include the load sharing percentage per phase if it changes."
+Round 2: "What communication method will be used BETWEEN the two crane operators? (dedicated radio channel, hand signals from AP, etc.)"
+Round 2: "What are the crane interaction zones? Minimum separation distances? What happens if one crane fails during the lift?"
+Round 2: "Are the ground conditions different at each crane position? Bearing capacity and outrigger setup per position?"
+
+Generate ALL tandem-specific sections: dual crane specifications side-by-side comparison, load sharing calculations, synchronisation plan with phased lift sequence (minimum 4 phases), inter-crane communication protocol, crane interaction zones, what-if failure analysis (minimum 4 scenarios: crane failure, comms failure, load shift, ground subsidence), ground conditions per crane position, risk assessment, engineering calculations summary, references (BS 7121-1 Annex C), sign-off for BOTH crane teams (7 roles).
+
+WRITING STYLE: Engineering-grade precision. Load sharing must be expressed as percentages. Phases must show what each crane does simultaneously. What-if scenarios must include consequence AND response. This is a complex lift — the documentation must demonstrate that every failure mode has been considered.`,
+
+  'loler-compliance': `TEMPLATE: LOLER Compliance (navy, regulatory checklists, thorough examination evidence)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What category is this lift under BS 7121? (Routine, Non-routine, or Complex). What is the basis for that categorisation?"
+Round 1: "What lifting equipment is being used? For each item (crane, slings, shackles, spreader beams etc.) give me the SWL, last thorough examination date, and certificate reference."
+Round 2: "Who is the Competent Person under LOLER Reg 8 who planned this lift? What are their qualifications?"
+Round 2: "When was the last thorough examination of the crane (LOLER Reg 9/10)? Is the certificate current? Who was the examining body?"
+Round 2: "Have similar lifts been carried out before? If so, describe them and the outcome."
+Round 2: "What is the defect reporting procedure if any equipment is found to be defective before, during, or after the lift?"
+
+Generate ALL compliance sections: lift summary with BS 7121 categorisation, LOLER regulation-by-regulation compliance checklist (minimum 8 regulations: Reg 4 strength/stability, Reg 5 positioning, Reg 6 marking, Reg 7 organisation, Reg 8 planning, Reg 9 thorough examination, Reg 10 reports, Reg 11 defects), equipment register with thorough examination status, sling & shackle certification table, competent persons register (LOLER Reg 8), previous similar lifts log, risk assessment (MHSW Reg 3), pre-lift inspection checklist, post-lift inspection checklist, defect reporting procedure, regulatory cross-reference table. Sign-off includes H&S Advisor.
+
+WRITING STYLE: Regulatory audit-ready. Every compliance item must state the regulation number, the requirement, the compliance status (COMPLIANT/NON-COMPLIANT/N-A), and the evidence reference. Equipment register must show certificate status (CURRENT/EXPIRED/DUE). This document proves compliance — treat it as evidence for an HSE inspector.`,
+};
+
+const LIFT_PLAN_SCHEMA = `{
+  "documentRef": "string (LP-YYYY-NNN)",
+  "planDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY",
+  "preparedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "principalContractor": "string",
+  "client": "string",
+  "contractRef": "string",
+  "liftCategory": "string (Routine | Non-routine | Complex | Tandem per BS 7121)",
+  "liftDescription": "string (min 150 words — detailed description of the lifting operation)",
+  "loadDetails": {
+    "description": "string", "weight": "string (net weight with units)", "riggingWeight": "string",
+    "totalWeight": "string (net + rigging)", "dimensions": "string (L×W×H with units)",
+    "centreOfGravity": "string", "numberOfLifts": "string",
+    "loadCondition": "string (new/used/fragile/flexible)", "liftingPoints": "string (number, type, rated capacity)",
+    "specialConsiderations": "string"
+  },
+  "craneDetails": {
+    "type": "string (mobile/tower/crawler/MEWP)", "makeModel": "string",
+    "capacity": "string (max SWL with units)", "serialNumber": "string (or 'TBC on day')",
+    "lastThoroughExam": "string (date)", "certExpiry": "string (date)",
+    "owner": "string", "insuranceRef": "string"
+  },
+  "crane2Details": {
+    "type": "string", "makeModel": "string", "capacity": "string", "serialNumber": "string",
+    "lastThoroughExam": "string", "certExpiry": "string", "owner": "string", "insuranceRef": "string"
+  },
+  "liftGeometry": {
+    "maxRadius": "string (with units)", "minRadius": "string", "maxHeight": "string",
+    "dutyAtRadius": "string (SWL at max radius from load chart)", "percentCapacity": "string (e.g. '72%')",
+    "slewArc": "string (degrees)", "tailSwing": "string", "boomLength": "string",
+    "jibLength": "string (or 'N/A')", "counterweight": "string"
+  },
+  "crane2Geometry": {
+    "maxRadius": "string", "minRadius": "string", "maxHeight": "string",
+    "dutyAtRadius": "string", "percentCapacity": "string", "slewArc": "string",
+    "tailSwing": "string", "boomLength": "string", "jibLength": "string", "counterweight": "string"
+  },
+  "riggingItems": [
+    { "item": "string (e.g. 'Chain sling 4-leg')", "specification": "string", "swl": "string", "certRef": "string", "certExpiry": "string", "condition": "string (Good/Fair/Replace)" }
+  ],
+  "groundDetails": {
+    "bearingCapacity": "string (kN/m²)", "groundType": "string",
+    "matType": "string (timber/steel/bog mats)", "matSize": "string",
+    "outriggerSpread": "string", "padLoadPerLeg": "string (tonnes)",
+    "gradient": "string (max % or degrees)", "groundSurvey": "string", "groundPrep": "string"
+  },
+  "crane2GroundDetails": {
+    "bearingCapacity": "string", "groundType": "string", "matType": "string", "matSize": "string",
+    "outriggerSpread": "string", "padLoadPerLeg": "string", "gradient": "string",
+    "groundSurvey": "string", "groundPrep": "string"
+  },
+  "proximityHazards": [
+    { "hazard": "string", "distance": "string", "mitigation": "string (min 15 words)", "riskLevel": "HIGH | MEDIUM | LOW" }
+  ],
+  "overheadServices": [
+    { "service": "string (e.g. '11kV power line')", "height": "string", "owner": "string", "clearance": "string", "mitigation": "string" }
+  ],
+  "exclusionZones": [
+    { "zone": "string", "dimensions": "string", "barrierType": "string", "signage": "string", "banksman": "string" }
+  ],
+  "appointedPersons": [
+    { "role": "string (AP / Crane Supervisor / Slinger / Operator)", "name": "string", "qualification": "string (e.g. 'CPCS A62')", "certRef": "string", "certExpiry": "string", "employer": "string" }
+  ],
+  "commItems": [
+    { "method": "string (radio/hand signals)", "channel": "string", "users": "string", "backup": "string" }
+  ],
+  "weatherLimits": [
+    { "parameter": "string (wind speed/visibility/lightning)", "limit": "string", "action": "string", "monitoredBy": "string" }
+  ],
+  "envConsiderations": [
+    { "consideration": "string", "restriction": "string", "mitigation": "string" }
+  ],
+  "preLiftChecks": [
+    { "checkItem": "string", "requirement": "string", "verified": "string (pass/fail/N-A)", "notes": "string" }
+  ],
+  "liftSteps": [
+    { "step": "string (1, 2, 3...)", "action": "string (min 15 words)", "responsibility": "string (specific role)", "signal": "string", "notes": "string" }
+  ],
+  "contingencyItems": [
+    { "scenario": "string", "action": "string (min 15 words)", "responsibility": "string", "equipment": "string" }
+  ],
+  "riskEntries": [
+    { "hazard": "string", "severity": "string (1-5)", "likelihood": "string (1-5)", "riskRating": "string (e.g. '12 HIGH')", "ratingLevel": "HIGH | MEDIUM | LOW", "controlMeasures": "string (min 15 words)", "residualRating": "string", "residualLevel": "HIGH | MEDIUM | LOW" }
+  ],
+  "liftPhases": [
+    { "phase": "string (1, 2...)", "description": "string", "crane1Action": "string", "crane2Action": "string", "loadShare1": "string (%)", "loadShare2": "string (%)", "signalMethod": "string", "abortCriteria": "string" }
+  ],
+  "craneInteractions": [
+    { "zone": "string", "hazard": "string", "separation": "string", "control": "string" }
+  ],
+  "whatIfScenarios": [
+    { "scenario": "string (e.g. 'Crane 2 hydraulic failure mid-lift')", "consequence": "string", "response": "string", "prevention": "string" }
+  ],
+  "lolerChecks": [
+    { "regulation": "string (e.g. 'Reg 4')", "requirement": "string", "compliance": "COMPLIANT | NON-COMPLIANT | N/A", "evidence": "string" }
+  ],
+  "equipmentRegister": [
+    { "item": "string", "id": "string", "swl": "string", "lastExam": "string (date)", "nextExam": "string (date)", "status": "CURRENT | EXPIRED | DUE" }
+  ],
+  "previousLifts": [
+    { "date": "string", "description": "string", "crane": "string", "weight": "string", "outcome": "string (Successful/Issues/Failed)" }
+  ],
+  "postLiftChecks": [
+    { "checkItem": "string", "requirement": "string", "result": "string (pass/fail/N-A)" }
+  ],
+  "loadShareCalc": "string (min 50 words — describe load sharing calculation methodology and results)",
+  "syncPlan": "string (synchronisation approach)",
+  "interCraneComms": "string (min 30 words — dedicated comms protocol between crane operators)",
+  "engineeringCalcSummary": "string (summary of any engineering calculations performed)",
+  "defectReporting": "string (min 40 words — procedure for reporting defects under LOLER Reg 11)",
+  "regulatoryReferences": [
+    { "reference": "string", "description": "string" }
+  ],
+  "additionalNotes": "string"
+}
+
+CRITICAL RULES:
+- Populate arrays relevant to the chosen template. T1 (ebrora-standard) needs ALL arrays populated. T2 (operator-brief) needs: riggingItems, liftSteps, exclusionZones, contingencyItems, weatherLimits, appointedPersons, commItems. T3 (tandem-lift) needs: liftPhases, craneInteractions, whatIfScenarios, commItems, riskEntries + crane2Details/crane2Geometry/crane2GroundDetails. T4 (loler-compliance) needs: lolerChecks, equipmentRegister, riggingItems, appointedPersons, previousLifts, preLiftChecks, postLiftChecks, riskEntries.
+- Always populate regulatoryReferences (minimum 5 entries).
+- crane2Details and crane2Geometry should ONLY be populated for tandem-lift template. Leave empty objects for single-crane templates.
+- % capacity MUST be calculated: (total lifted weight / duty at radius) × 100. Must be below 80% for routine lifts, below 90% for non-routine.
+- Every lift step must name a SPECIFIC role as responsible (not "someone").
+- Equipment certification must show realistic dates and status.
+- Pre-lift checklist items must have specific pass/fail verification criteria.
+- All word counts are MINIMUMS. Content must be technically precise with correct units throughout.`;
+
+export function getLiftPlanTemplateGenerationPrompt(templateSlug: LiftPlanTemplateSlug): string {
+  const styleGuide = LIFT_PLAN_TEMPLATE_STYLE[templateSlug] || LIFT_PLAN_TEMPLATE_STYLE['ebrora-standard'];
+
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+Lift Plan
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+Generate a Lift Plan JSON with this structure:
+${LIFT_PLAN_SCHEMA}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+
+// =============================================================================
+// MANUAL HANDLING — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const MANUAL_HANDLING_TEMPLATE_STYLE: Record<ManualHandlingTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, comprehensive TILE methodology, 15+ sections)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Describe the manual handling task — what is being lifted, carried, pushed or pulled? What does it weigh? How often is it done?"
+Round 1: "How is the task performed? Describe the start and end positions, distances carried, heights involved, and whether twisting or stooping is required."
+Round 2: "Is this a team lift? If so, how many people? What rest breaks are provided between lifts?"
+Round 2: "What are the environmental conditions? (indoor/outdoor, floor surface, gradients, lighting, temperature, wind, confined spaces)"
+Round 2: "Are there any individual factors to consider? (new/young workers, pregnancy, existing musculoskeletal conditions, training status)"
+Round 2: "Can this manual handling be avoided entirely? Are there mechanical aids available? (sack trucks, pallet trucks, hoists, conveyors)"
+
+Generate ALL TILE sections: activity description, avoidance assessment, Task analysis (16 fields including postures, grip, movement pattern, repetition), Individual factors (7 fields), Load characteristics (9 fields), Environment factors (9 fields), Schedule 1 risk factor checklist (minimum 10 factors), risk scoring matrix, control measures with hierarchy of controls, mechanical aids, residual risk, monitoring plan, legal basis, regulatory references, sign-off.
+
+WRITING STYLE: Thorough, evidence-based. Every TILE field must be populated with specific detail — not generic statements. Weight must include units. Distances must be specific. Schedule 1 checklist must reference actual MHOR 1992 Schedule 1 factors. Control measures must follow hierarchy: eliminate → reduce → mechanical aid → administrative → PPE.`,
+
+  'mac-assessment': `TEMPLATE: MAC Assessment (amber, HSE Manual Handling Assessment Charts scoring)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What is the load weight and how often is it lifted? (I need to score this against the MAC weight/frequency chart)"
+Round 1: "Where are the hands relative to the body during the lift? (close to body / at arm's length / extended reach)"
+Round 2: "What vertical zone does the lift occur in? (floor to knuckle / knuckle to shoulder / above shoulder)"
+Round 2: "Is torso twisting involved? Are there any postural constraints (confined space, kneeling, one-handed)?"
+Round 2: "What is the grip quality? (good handles / reasonable grip / poor grip / gloves affecting grip)"
+Round 2: "What is the floor surface? (clean dry / slightly uncontaminated / wet/uneven/slippery). Is there carrying involved — if so, what distance?"
+
+Generate ALL MAC sections: task summary, MAC factor scoring table (minimum 8 factors: load weight/frequency, hand distance from body, vertical lift zone, torso twisting, postural constraints, grip quality, floor surface, carrying distance — each with score 0-3 and colour G/A/R/P), overall MAC score with priority level, factor-linked control measures, mechanical aids, references.
+
+WRITING STYLE: Scoring-focused. Each MAC factor must have a numerical score (0-3), a colour code (Green/Amber/Red/Purple), and a justification for that score. Total MAC score determines priority: 0-4 Low, 5-12 Medium, 13-20 High, 21+ Very High. Control measures must link to the specific factors scoring highest.`,
+
+  'rapp-assessment': `TEMPLATE: RAPP Assessment (teal, HSE Risk Assessment of Pushing and Pulling)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Describe the pushing or pulling operation — what is being moved, its weight, and is it on wheels or being dragged?"
+Round 1: "What force is required to start the push/pull (initial force) vs keep it moving (sustained force)? Can you estimate in kg?"
+Round 2: "What height are the handles or push points? Is the pushing one-handed or two-handed?"
+Round 2: "What distance is the load pushed/pulled? What is the floor surface and gradient?"
+Round 2: "If wheeled — what condition are the wheels/castors? Size? Swivel or fixed?"
+Round 2: "How often is this push/pull task performed? What is the duration of each push/pull?"
+
+Generate ALL RAPP sections: push/pull operation description, push/pull parameter details (minimum 10 parameters: load weight, initial force, sustained force, handle height, one/two-handed, distance, floor surface, gradient, wheel condition, frequency), RAPP factor scoring (minimum 6 factors with colour scores), RAPP total score and priority level, push/pull-specific control measures, mechanical alternatives, references.
+
+WRITING STYLE: Push/pull specific. Forces should be estimated in Newtons or kg-equivalent. Handle heights relative to body (elbow height ideal). Floor surfaces scored for coefficient of friction. Wheel/castor condition directly impacts force requirements. Control measures specific to pushing/pulling (maintain wheels, reduce loads, improve floor surface, correct handle height).`,
+
+  'training-briefing': `TEMPLATE: Training & Briefing Card (navy, compact operative training handout, lamination-ready)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What specific manual handling task are your operatives doing? What does the load weigh?"
+Round 1: "What mechanical aids are available on site for this task? Where are they located?"
+Round 2: "Are there any specific hazards with this load? (sharp edges, hot surfaces, unstable contents, awkward shape)"
+Round 2: "What PPE is required for this manual handling task?"
+
+Generate ALL training sections: task-specific summary, safe lifting technique steps (minimum 8 steps with key points), HSE weight guideline figures table (shoulder, elbow, knuckle, mid-lower-leg zones for male and female), do's and don'ts (minimum 6 of each), common manual handling injuries with causes and prevention (minimum 4), mechanical aids available on site, reporting procedure for discomfort/pain, attendance register (7 sign-off rows).
+
+WRITING STYLE: Simple, direct, operative-friendly. No jargon. Short sentences. Numbered steps. This is a training card — it needs to be understood by everyone regardless of literacy level. The reporting section MUST emphasise that reporting pain/discomfort will NOT result in punishment — early reporting prevents serious injury.`,
+};
+
+const MANUAL_HANDLING_SCHEMA = `{
+  "documentRef": "string (MH-YYYY-NNN)",
+  "assessmentDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY (12 months or when task changes)",
+  "assessedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "principalContractor": "string",
+  "client": "string",
+  "activityDescription": "string (min 100 words — what is being handled, by whom, where, why)",
+  "canTaskBeAvoided": "string (min 60 words — can it be eliminated? If not, why not?)",
+  "legalBasis": "string (min 60 words — reference MHOR 1992, HSE L23, Schedule 1)",
+  "taskAnalysis": {
+    "description": "string (min 100 words)", "frequency": "string", "duration": "string",
+    "distanceCarried": "string (with units)", "heightOfLift": "string (start to end heights)",
+    "startPosition": "string", "endPosition": "string",
+    "twistingRequired": "string (Yes/No + detail)", "pushingPulling": "string",
+    "teamLift": "string (Yes/No)", "numberOfPersons": "string",
+    "restBreaks": "string", "repetitionRate": "string (lifts per hour/shift)",
+    "posturesAdopted": "string", "gripType": "string", "movementPattern": "string"
+  },
+  "individualFactors": {
+    "trainingRequired": "string", "trainingProvided": "string",
+    "fitnessRequirements": "string", "pregnancyConsiderations": "string",
+    "existingConditions": "string", "ageConsiderations": "string", "ppe": "string"
+  },
+  "loadCharacteristics": {
+    "weight": "string (with units)", "shape": "string", "size": "string (with dimensions)",
+    "grip": "string (good/reasonable/poor)", "stability": "string",
+    "sharpEdges": "string", "temperature": "string", "contents": "string", "labelling": "string"
+  },
+  "environmentFactors": {
+    "spaceConstraints": "string", "floorSurface": "string", "levels": "string",
+    "lighting": "string", "temperature": "string", "humidity": "string",
+    "wind": "string", "noise": "string", "vibration": "string"
+  },
+  "scheduleOneItems": [
+    { "factor": "string (from MHOR 1992 Schedule 1)", "present": "Yes | No", "detail": "string" }
+  ],
+  "riskScores": [
+    { "factor": "string (T/I/L/E factor)", "score": "string (1-5)", "level": "HIGH | MEDIUM | LOW", "justification": "string" }
+  ],
+  "overallRiskRating": "string (e.g. '14 HIGH')",
+  "overallRiskLevel": "HIGH | MEDIUM | LOW",
+  "controlMeasures": [
+    { "measure": "string (min 15 words)", "type": "Elimination | Reduction | Mechanical Aid | Administrative | PPE", "owner": "string", "targetDate": "string", "status": "Implemented | Planned | Under Review" }
+  ],
+  "mechanicalAids": [
+    { "aid": "string", "application": "string", "available": "Yes | No | To Order", "location": "string" }
+  ],
+  "residualRiskRating": "string",
+  "residualRiskLevel": "HIGH | MEDIUM | LOW",
+  "monitoringItems": [
+    { "activity": "string", "frequency": "string", "responsibility": "string", "record": "string" }
+  ],
+  "macFactors": [
+    { "factor": "string (e.g. 'Load weight/frequency')", "description": "string", "score": "string (0-3)", "colour": "Green | Amber | Red | Purple", "notes": "string" }
+  ],
+  "macTotalScore": "string (sum of all factor scores)",
+  "macPriorityLevel": "string (Low 0-4 | Medium 5-12 | High 13-20 | Very High 21+)",
+  "macOverallColour": "string (Green | Amber | Red | Purple)",
+  "rappFactors": [
+    { "factor": "string", "description": "string", "score": "string (0-3)", "colour": "Green | Amber | Red | Purple", "notes": "string" }
+  ],
+  "rappTotalScore": "string",
+  "rappPriorityLevel": "string",
+  "pushPullDetails": [
+    { "parameter": "string (e.g. 'Initial force', 'Sustained force', 'Handle height')", "value": "string (with units)", "notes": "string" }
+  ],
+  "liftingSteps": [
+    { "step": "string (1, 2, 3...)", "instruction": "string", "keyPoint": "string" }
+  ],
+  "weightGuidelines": [
+    { "zone": "string (e.g. 'Shoulder height', 'Elbow height')", "male": "string (kg)", "female": "string (kg)", "notes": "string" }
+  ],
+  "dosDonts": [
+    { "type": "Do | Don't", "item": "string" }
+  ],
+  "commonInjuries": [
+    { "injury": "string", "cause": "string", "prevention": "string" }
+  ],
+  "regulatoryReferences": [
+    { "reference": "string", "description": "string" }
+  ],
+  "additionalNotes": "string"
+}
+
+CRITICAL RULES:
+- Populate arrays relevant to the chosen template. T1 (ebrora-standard) needs: scheduleOneItems, riskScores, controlMeasures, mechanicalAids, monitoringItems + all TILE fields. T2 (mac-assessment) needs: macFactors (minimum 8), controlMeasures, mechanicalAids. T3 (rapp-assessment) needs: rappFactors (minimum 6), pushPullDetails (minimum 10), controlMeasures, mechanicalAids. T4 (training-briefing) needs: liftingSteps (minimum 8), weightGuidelines (minimum 4 zones), dosDonts (minimum 12 total), commonInjuries (minimum 4), mechanicalAids.
+- Always populate regulatoryReferences (minimum 4 entries).
+- Weight must ALWAYS include units (kg). Distances must include units (m/mm).
+- HSE guideline weight figures: shoulder height male 10kg/female 7kg, elbow height male 25kg/female 16kg, knuckle height male 20kg/female 13kg, mid-lower leg male 10kg/female 7kg. These are GUIDELINE figures, not limits.
+- MAC scores: 0=Green, 1=Amber, 2=Red, 3=Purple. Total determines priority.
+- Control measures must follow the hierarchy: eliminate → reduce load → mechanical aid → administrative → training → PPE.
+- Schedule 1 factors come from MHOR 1992 Schedule 1 — use the actual regulatory wording.`;
+
+export function getManualHandlingTemplateGenerationPrompt(templateSlug: ManualHandlingTemplateSlug): string {
+  const styleGuide = MANUAL_HANDLING_TEMPLATE_STYLE[templateSlug] || MANUAL_HANDLING_TEMPLATE_STYLE['ebrora-standard'];
+
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+Manual Handling Risk Assessment
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+Generate a Manual Handling Risk Assessment JSON with this structure:
+${MANUAL_HANDLING_SCHEMA}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+
+// =============================================================================
+// NOISE ASSESSMENT — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const NOISE_ASSESSMENT_TEMPLATE_STYLE: Record<NoiseAssessmentTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, comprehensive BS 5228-1:2009+A1:2014 noise assessment)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What construction activities are planned? List all plant/equipment to be used (excavators, piling rigs, compactors, etc.)"
+Round 1: "Where are the nearest sensitive receptors? (residential, schools, hospitals, offices). What type and approximate distance from site boundary?"
+Round 2: "What are the proposed working hours? Any out-of-hours or weekend working planned?"
+Round 2: "Do you know the existing background noise levels at the receptors? (LAeq and LA90 if available)"
+Round 2: "Are there any Section 61 consent conditions already in place? What local authority area is the site in?"
+Round 2: "Are there any vibration-sensitive receptors nearby? (listed buildings, sensitive equipment, tunnels)"
+
+Generate ALL sections: site description, assessment basis/methodology, working hours, plant inventory with BS 5228 Table C source noise levels (minimum 5 items with LWA values), sensitive receptors (minimum 2), predicted LAeq at each receptor using distance attenuation, impact assessment using ABC method, BPM statement, mitigation measures (minimum 5), monitoring plan with locations, vibration screening (minimum 3 sources), regulatory references.
+
+WRITING STYLE: Technical, BS 5228 compliant. Plant noise levels must reference BS 5228-1 Table C entries. Predictions must show the methodology (point source attenuation: LAeq = LWA - 20log(r) - 8). Impact must be assessed against the ABC method criteria from BS 5228-1. BPM statement must demonstrate Best Practicable Means per CoPA 1974.`,
+
+  'section-61': `TEMPLATE: Section 61 Application (red, Control of Pollution Act 1974 consent format)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Who is the applicant? (company name, address, contact person for the consent application)"
+Round 1: "What local authority will this be submitted to? What is the site address?"
+Round 2: "What are the proposed working hours and any justification for out-of-hours work?"
+Round 2: "What noise limits are you proposing at the site boundary or nearest receptor? (LAeq and LAmax)"
+Round 2: "How will you handle noise complaints from residents?"
+
+Generate ALL Section 61 sections: applicant details, site details, proposed works with programme, working hours table (with justification for any non-standard hours), plant list with predicted levels, BPM statement with mitigation measures, proposed noise limits at boundary/receptor locations, monitoring methodology and locations, complaint handling procedure (minimum 4 steps), Section 61 declaration, regulatory references.
+
+WRITING STYLE: Formal application format suitable for local authority submission. Every field must be populated. Proposed limits must be justified against background levels or BS 5228 ABC criteria. BPM must demonstrate all practicable measures are being taken.`,
+
+  'monitoring-report': `TEMPLATE: Monitoring Report (teal, ongoing measurement results)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What monitoring period does this report cover? What consent or criteria are you monitoring against?"
+Round 1: "What monitoring locations are being used? (describe locations, grid refs if known, receptor type)"
+Round 2: "What measurement equipment is being used? (make, model, serial number, last calibration date)"
+Round 2: "Have there been any exceedances of consent limits during this period? If so, what caused them?"
+Round 2: "What were the weather conditions during monitoring? (wind speed affects measurement validity)"
+
+Generate ALL monitoring sections: monitoring summary, monitoring locations table (minimum 3), equipment and calibration records, measurement results table with LAeq/LAmax/LA90 per location per period (minimum 6 results), exceedance analysis (if any), weather conditions log, trend analysis, compliance summary, corrective actions for any exceedances.
+
+WRITING STYLE: Data-driven, factual. Measurement results must include LAeq, LAmax, and LA90. Compliance must be stated clearly against specific limit values. Weather must be recorded as BS 5228-1 requires valid measurements below 5 m/s wind speed. Trends should identify whether levels are improving, stable, or worsening.`,
+
+  'resident-communication': `TEMPLATE: Resident Communication (navy, plain English stakeholder summary)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What works are you doing that residents need to know about? Describe in simple terms."
+Round 1: "What are the committed working hours? Any weekend or evening work?"
+Round 2: "Who is the community liaison contact? (name, phone, email)"
+Round 2: "What are the noisiest phases and when will they happen?"
+Round 2: "What measures are you taking to reduce noise impact on residents?"
+
+Generate ALL resident sections: plain English works summary (no jargon), committed working hours, everyday noise comparisons table (minimum 5 comparisons like 'normal conversation = 60 dB'), what residents might notice, what the project is doing to reduce noise, project timeline with noisy phases highlighted, complaint procedure (minimum 3 steps), contact details. NO technical terminology — explain everything in terms residents can understand.
+
+WRITING STYLE: Friendly, reassuring, plain English. NO dB values without everyday comparisons. NO technical jargon (LAeq, receptor, attenuation). Use phrases like "about as loud as a busy road" not "approximately 72 dB LAeq". Complaint procedure must be simple and non-intimidating. Tone should be: "we're your neighbours for the duration of this project and we want to minimise disruption."`,
+};
+
+const NOISE_ASSESSMENT_SCHEMA = `{
+  "documentRef": "string (NA-YYYY-NNN)",
+  "assessmentDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY",
+  "assessedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "principalContractor": "string",
+  "client": "string",
+  "localAuthority": "string",
+  "siteDescription": "string (min 80 words)",
+  "worksDescription": "string (min 80 words)",
+  "programmeDuration": "string",
+  "assessmentBasis": "string (min 60 words — reference BS 5228-1, ABC method)",
+  "methodology": "string (min 60 words — prediction methodology)",
+  "plantItems": [
+    { "plant": "string", "bs5228Ref": "string (Table C ref)", "lwa": "string (dB LWA)", "quantity": "string", "onTime": "string (%)", "usage": "string" }
+  ],
+  "receptors": [
+    { "id": "string (R1, R2...)", "type": "string (Residential/School/Hospital)", "address": "string", "distance": "string (m)", "direction": "string", "existingBackground": "string (dB LA90)" }
+  ],
+  "predictedLevels": [
+    { "receptorId": "string", "receptorName": "string", "predictedLaeq": "string (dB)", "criterion": "string (dB)", "impact": "Negligible|Low|Moderate|Significant", "margin": "string (dB above/below criterion)" }
+  ],
+  "impactSummary": "string (min 60 words)",
+  "bpmStatement": "string (min 80 words — Best Practicable Means justification)",
+  "mitigationMeasures": [
+    { "measure": "string", "type": "Source|Path|Receptor|Administrative", "expectedReduction": "string (dB)", "implementedBy": "string", "status": "Implemented|Planned" }
+  ],
+  "monitoringPlan": "string (min 40 words)",
+  "monitoringLocations": [
+    { "id": "string (ML1...)", "description": "string", "gridRef": "string", "receptorType": "string", "consentLimit": "string (dB LAeq)" }
+  ],
+  "measurementResults": [
+    { "locationId": "string", "date": "string", "startTime": "string", "endTime": "string", "laeq": "string (dB)", "lamax": "string (dB)", "la90": "string (dB)", "dominantSource": "string", "compliance": "Compliant|Exceedance" }
+  ],
+  "exceedances": [
+    { "locationId": "string", "date": "string", "measuredLevel": "string (dB)", "limit": "string (dB)", "exceedanceDb": "string", "cause": "string", "correctiveAction": "string" }
+  ],
+  "weatherLogs": [
+    { "date": "string", "time": "string", "windSpeed": "string (m/s)", "windDir": "string", "temp": "string (°C)", "rain": "string", "notes": "string" }
+  ],
+  "calibrationRecords": [
+    { "instrument": "string", "serialNumber": "string", "lastCal": "string", "nextCal": "string", "driftCheck": "string (dB)" }
+  ],
+  "complianceSummary": "string (min 40 words)",
+  "trendAnalysis": "string (min 40 words)",
+  "workingHours": [
+    { "period": "string (Daytime/Evening/Weekend)", "days": "string", "hours": "string", "noiseType": "string", "justification": "string" }
+  ],
+  "vibrationScreening": [
+    { "source": "string", "ppv": "string (mm/s)", "distance": "string (m)", "criterion": "string", "impact": "Negligible|Low|Moderate|Significant" }
+  ],
+  "proposedLimits": [
+    { "location": "string", "period": "string", "limitLaeq": "string (dB)", "limitLamax": "string (dB)", "basis": "string" }
+  ],
+  "complaintProcedure": [
+    { "step": "string (1,2...)", "action": "string", "timeframe": "string", "responsible": "string" }
+  ],
+  "timelinePhases": [
+    { "phase": "string", "duration": "string", "keyPlant": "string", "expectedNoise": "string", "peakPeriod": "string" }
+  ],
+  "everydayComparisons": [
+    { "source": "string (e.g. 'Normal conversation')", "level": "string (e.g. '60 dB')", "comparison": "string (how our works compare)" }
+  ],
+  "whatYouMightNotice": "string (min 40 words — plain English)",
+  "whatWeAreDoing": "string (min 60 words — plain English)",
+  "applicantName": "string", "applicantAddress": "string", "applicantContact": "string",
+  "section61Declaration": "string (formal declaration text)",
+  "contactName": "string", "contactPhone": "string", "contactEmail": "string",
+  "regulatoryReferences": [{ "reference": "string", "description": "string" }],
+  "additionalNotes": "string"
+}
+
+CRITICAL RULES:
+- T1 needs: plantItems, receptors, predictedLevels, mitigationMeasures, monitoringLocations, workingHours, vibrationScreening.
+- T2 needs: workingHours, plantItems, mitigationMeasures, proposedLimits, monitoringLocations, complaintProcedure, applicant details.
+- T3 needs: monitoringLocations, calibrationRecords, measurementResults, exceedances (if any), weatherLogs.
+- T4 needs: workingHours, everydayComparisons, timelinePhases, mitigationMeasures, complaintProcedure, contact details.
+- Plant noise levels MUST reference real BS 5228-1 Table C entries with realistic LWA values.
+- Predictions must use correct formula: LAeq = LWA - 20log(r) - 8 for point sources.
+- Impact assessment must use BS 5228-1 ABC method criteria.
+- Monitoring measurements invalid if wind speed > 5 m/s.
+- Resident communication MUST avoid all technical jargon — plain English only.`;
+
+export function getNoiseAssessmentTemplateGenerationPrompt(templateSlug: NoiseAssessmentTemplateSlug): string {
+  const styleGuide = NOISE_ASSESSMENT_TEMPLATE_STYLE[templateSlug] || NOISE_ASSESSMENT_TEMPLATE_STYLE['ebrora-standard'];
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+Construction Noise Assessment
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+Generate a Construction Noise Assessment JSON with this structure:
+${NOISE_ASSESSMENT_SCHEMA}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+
+// =============================================================================
+// PERMIT TO DIG — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const PERMIT_TO_DIG_TEMPLATE_STYLE: Record<PermitToDigTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, comprehensive HSG47 permit)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What type of excavation is this? Dimensions — max depth, length, width?"
+Round 1: "Where on site? Grid ref/what3words? Ground conditions?"
+Round 1: "Statutory utility searches completed? Providers and reference numbers?"
+Round 2: "CAT & Genny scan done? Operator, model, cal date? Services detected?"
+Round 2: "Services identified? For each: type, depth, horizontal distance, verified?"
+Round 2: "Plant restrictions? Backfill spec? Permit issuer and validity?"
+Generate ALL sections. Minimum 5 statutory searches, 3 services, 4 CAT results, 3 hand-dig zones, 6 safe dig rules, 3 plant restrictions, 3 backfill layers, 4 strike actions. Hand-dig 500 mm per HSG47. Gas 0800 111 999, Electric 105.`,
+
+  'daily-permit': `TEMPLATE: Daily Permit (amber, ONE SHIFT ONLY)
+AI INTERVIEW: Round 1: "Date, shift time, location?" Round 1: "Weather and ground conditions?" Round 1: "Services present today?"
+Round 2: "Personnel on permit? Names, roles, employers." Round 2: "Pre-dig checklist completed? 10 items."
+Generate compact shift card. 10-item checklist, personnel table (6 rows), IF YOU STRIKE warning. Extremely concise.`,
+
+  'utility-strike': `TEMPLATE: Utility Strike (red, emergency response)
+AI INTERVIEW: Round 1: "What utility struck? What happened?" Round 1: "Notification cascade — who, in what order?"
+Round 2: "Area made safe? Evacuation distance? Utility company called?" Round 2: "RIDDOR-reportable? Scene preserved?"
+Round 2: "What caused the strike? Corrective actions?"
+Generate: immediate actions by 4 service types, notification cascade 6+ contacts, 8-step strike response, scene preservation, investigation, RIDDOR assessment, lessons learned.`,
+
+  'avoidance-plan': `TEMPLATE: Avoidance Plan (navy, site-wide strategy)
+AI INTERVIEW: Round 1: "Site details? How many excavation zones?" Round 1: "Statutory searches done? PAS 128 survey level?"
+Round 2: "Describe each zone: location, services, density High/Medium/Low, special measures?"
+Round 2: "CAT operators — names, certs, expiry? Permit procedure steps?"
+Round 2: "Monitoring and audit arrangements?"
+Generate: avoidance statement, statutory records, PAS 128, excavation zones with density, safe dig rules, competence register, permit procedure, audit plan. Min 3 zones, 6 rules, 3 competence, 5 procedure steps, 4 audit items.`,
+};
+
+const PERMIT_TO_DIG_SCHEMA = `{
+  "documentRef": "string (PTD-YYYY-NNN)", "issueDate": "DD/MM/YYYY", "reviewDate": "DD/MM/YYYY",
+  "preparedBy": "string", "projectName": "string", "siteAddress": "string",
+  "gridRef": "string", "what3Words": "string", "principalContractor": "string", "client": "string",
+  "excavationType": "string", "location": "string", "maxDepth": "string", "maxLength": "string", "maxWidth": "string",
+  "startDate": "DD/MM/YYYY", "endDate": "DD/MM/YYYY", "groundConditions": "string",
+  "nearStructures": "string", "previousExcavations": "string",
+  "statSearches": [{ "provider": "string", "completed": true, "date": "DD/MM/YYYY", "reference": "string" }],
+  "servicesIdentified": [{ "type": "gas | electric | water | telecom | sewer", "description": "string", "depth": "string", "horizontalDistance": "string", "verified": true, "notes": "string" }],
+  "catOperator": "string", "catModel": "string", "catCalDate": "DD/MM/YYYY", "gennyModel": "string", "gennyCalDate": "DD/MM/YYYY",
+  "catResults": [{ "location": "string", "serviceDetected": "string", "signalType": "string", "depth": "string", "action": "string" }],
+  "handDigZones": [{ "zone": "string", "services": "string", "radius": "string", "method": "string", "restrictions": "string" }],
+  "safeDig": ["string"], "plantRestrictions": [{ "plant": "string", "minimumDistance": "string", "condition": "string" }],
+  "backfillLayers": [{ "layer": "string", "material": "string", "compaction": "string", "thickness": "string" }],
+  "reinstatementSpec": "string",
+  "strikeActions": [{ "serviceType": "Gas | Electric | Water | Telecom", "immediateAction": "string", "evacuationDistance": "string", "emergencyNumber": "string", "doNot": "string" }],
+  "notificationCascade": [{ "order": "string", "role": "string", "name": "string", "number": "string", "when": "string" }],
+  "strikeSteps": [{ "step": "string", "action": "string", "responsibility": "string" }],
+  "investigationItems": [{ "question": "string", "response": "string" }],
+  "riddorAssessment": "string", "lessonsLearned": [{ "finding": "string", "action": "string", "responsible": "string", "dueDate": "DD/MM/YYYY" }],
+  "scenePreservation": "string", "avoidanceStatement": "string", "pas128Classification": "string",
+  "excavationZones": [{ "zone": "string", "location": "string", "serviceDensity": "High | Medium | Low", "servicesPresent": "string", "permitRequired": true, "specialMeasures": "string" }],
+  "safeDigRules": ["string"], "competenceRegister": [{ "name": "string", "role": "string", "catCert": "string", "certExpiry": "DD/MM/YYYY", "lastAssessed": "DD/MM/YYYY" }],
+  "permitProcedure": ["string"], "auditItems": [{ "item": "string", "frequency": "string", "responsibility": "string", "record": "string" }],
+  "shiftDate": "DD/MM/YYYY", "shiftTime": "string", "weatherConditions": "string", "groundConditionsToday": "string",
+  "preDigChecklist": [{ "item": "string", "checked": true }],
+  "personnelOnPermit": [{ "name": "string", "role": "string", "employer": "string", "signOn": "string", "signOff": "string" }],
+  "servicesInAreaToday": "string", "permitIssuer": "string", "permitIssuerRole": "string",
+  "permitValidity": "string", "extensionProcedure": "string",
+  "regulatoryReferences": [{ "reference": "string", "description": "string" }],
+  "signOffRoles": [{ "role": "string", "name": "string" }], "additionalNotes": "string"
+}
+
+CRITICAL: Populate arrays relevant to chosen template. ALWAYS populate regulatoryReferences and signOffRoles. Gas: 0800 111 999. Electric: 105. Hand-dig: 500 mm per HSG47.`;
+
+export function getPermitToDigTemplateGenerationPrompt(templateSlug: PermitToDigTemplateSlug): string {
+  const styleGuide = PERMIT_TO_DIG_TEMPLATE_STYLE[templateSlug] || PERMIT_TO_DIG_TEMPLATE_STYLE['ebrora-standard'];
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nPermit to Dig\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Permit to Dig JSON with this structure:\n${PERMIT_TO_DIG_SCHEMA}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+
+// =============================================================================
+// POWRA — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const POWRA_TEMPLATE_STYLE: Record<PowraTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, comprehensive POWRA with hazard matrix and RAG rating)
+AI INTERVIEW: Round 1: "What task today? Activity, location, duration." Round 1: "Conditions? Weather, ground, lighting, access, overhead, adjacent work."
+Round 1: "Hazards identified? For each: what could go wrong, consequence, control measures."
+Round 2: "PPE required?" Round 2: "Stop conditions — when must ALL work stop?"
+Round 2: "Emergency arrangements? First aider, kit location, muster, number. Team today — names, roles, employers."
+Generate ALL sections. Min 6 hazards, 5 PPE, 5 stop conditions, 5 reassessment triggers, 4 team members. Risk ratings MUST show improvement.`,
+
+  'quick-card': `TEMPLATE: Quick Card (amber, STOP-THINK-ACT, 1 page)
+AI INTERVIEW: Round 1: "Task and location — brief." Round 1: "Conditions — weather, ground, overhead, access."
+Round 2: "Hazards — tick applicable: height, services, manual handling, plant, confined spaces, electrical, slips, noise. Others?"
+Round 2: "Key controls in 1-2 sentences."
+Generate compact card. 8-item checklist, controls summary, max 4 stop conditions. One page only.`,
+
+  'task-specific': `TEMPLATE: Task Specific (teal, phase-by-phase)
+AI INTERVIEW: Round 1: "Break task into phases/steps. What are they?"
+Round 1: "For each phase — hazards and controls?"
+Round 2: "Plant and equipment? Pre-use check, operator, restrictions?"
+Round 2: "Permits required per phase? Type, reference, issuer."
+Round 2: "Team today? Phase-specific stop conditions?"
+Generate phase-by-phase sections. Min 3 phases, 2 hazards per phase, 2 plant items, 4 team members.`,
+
+  'supervisor-review': `TEMPLATE: Supervisor Review (navy, audit layer)
+AI INTERVIEW: Round 1: "Task description, RAMS ref, permits."
+Round 1: "Hazards — each with consequence, risk before, control, residual risk."
+Round 2: "Competency verification: CSCS? Training? RAMS briefing? PPE? Plant tickets?"
+Round 2: "Environmental considerations? Monitoring required? Close-out checks?"
+Round 2: "Lessons learned from similar tasks?"
+Generate ALL sections. Min 6 hazards, 5 competency checks, 4 monitoring items, 5 close-out items, 5 regulatory refs. Formal — file retention document.`,
+};
+
+const POWRA_SCHEMA = `{
+  "documentRef": "string (POWRA-YYYY-NNN)", "date": "DD/MM/YYYY", "time": "HH:MM",
+  "assessedBy": "string", "projectName": "string", "siteAddress": "string",
+  "location": "string", "ramsReference": "string", "permitReferences": "string",
+  "taskDescription": "string (min 80 words)",
+  "conditions": { "weather": "string", "groundConditions": "string", "lighting": "string", "accessEgress": "string", "overhead": "string", "adjacentWork": "string" },
+  "hazards": [{ "hazard": "string", "consequence": "string", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string (min 15 words)", "riskAfter": "High | Medium | Low" }],
+  "ppeRequired": ["string"], "stopConditions": ["string"], "reassessmentTriggers": ["string"],
+  "emergencyArrangements": "string",
+  "teamSignOn": [{ "name": "string", "role": "string", "employer": "string", "briefed": true }],
+  "hazardChecklist": [{ "item": "string", "checked": true }],
+  "controlsSummary": "string",
+  "taskPhases": [{ "phase": "string", "description": "string", "hazards": [{ "hazard": "string", "consequence": "string", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string", "riskAfter": "High | Medium | Low" }], "plantEquipment": "string", "permitsRequired": "string", "stopConditions": ["string"] }],
+  "plantRegister": [{ "item": "string", "checkCompleted": true, "operator": "string", "restrictions": "string" }],
+  "permitsCrossRef": [{ "type": "string", "reference": "string", "issuer": "string", "validity": "string" }],
+  "competencyChecks": [{ "item": "string", "verified": true, "verifiedBy": "string" }],
+  "environmentalConsiderations": "string",
+  "monitoringItems": [{ "item": "string", "frequency": "string", "responsibility": "string", "action": "string" }],
+  "closeOutItems": [{ "item": "string", "completed": true, "signedBy": "string" }],
+  "lessonsLearned": [{ "finding": "string", "action": "string", "responsible": "string" }],
+  "regulatoryReferences": [{ "reference": "string", "description": "string" }],
+  "additionalNotes": "string"
+}
+
+CRITICAL: Populate arrays relevant to chosen template. ALWAYS populate conditions, teamSignOn, stopConditions. Risk ratings MUST show improvement. Controls must be SPECIFIC and ACTIONABLE. Hazards must be task-specific.`;
+
+export function getPowraTemplateGenerationPrompt(templateSlug: PowraTemplateSlug): string {
+  const styleGuide = POWRA_TEMPLATE_STYLE[templateSlug] || POWRA_TEMPLATE_STYLE['ebrora-standard'];
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nPoint of Work Risk Assessment (POWRA)\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a POWRA JSON with this structure:\n${POWRA_SCHEMA}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }

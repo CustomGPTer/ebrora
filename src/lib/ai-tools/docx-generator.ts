@@ -326,8 +326,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'lift-plan') {
-    const { buildLiftPlanDocument } = await import('./templates/lift-plan-template');
-    const doc = await buildLiftPlanDocument(content as any);
+    const lpSlug = (content as any)._liftPlanTemplateSlug;
+    let doc;
+    if (lpSlug) {
+      const { buildLiftPlanTemplateDocument } = await import('./templates/lift-plan-templates');
+      doc = await buildLiftPlanTemplateDocument(content as any, lpSlug);
+    } else {
+      const { buildLiftPlanDocument } = await import('./templates/lift-plan-template');
+      doc = await buildLiftPlanDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);
@@ -365,16 +372,30 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'permit-to-dig') {
-    const { buildPermitToDigDocument } = await import('./templates/permit-to-dig-template');
-    const doc = await buildPermitToDigDocument(content as any);
+    const ptdSlug = (content as any)._permitToDigTemplateSlug;
+    let doc;
+    if (ptdSlug) {
+      const { buildPermitToDigTemplateDocument } = await import('./templates/permit-to-dig-templates');
+      doc = await buildPermitToDigTemplateDocument(content as any, ptdSlug);
+    } else {
+      const { buildPermitToDigDocument } = await import('./templates/permit-to-dig-template');
+      doc = await buildPermitToDigDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);
   }
 
   if (toolSlug === 'powra') {
-    const { buildPowraDocument } = await import('./templates/powra-template');
-    const doc = await buildPowraDocument(content as any);
+    const powraSlug = (content as any)._powraTemplateSlug;
+    let doc;
+    if (powraSlug) {
+      const { buildPowraTemplateDocument } = await import('./templates/powra-templates');
+      doc = await buildPowraTemplateDocument(content as any, powraSlug);
+    } else {
+      const { buildPowraDocument } = await import('./templates/powra-template');
+      doc = await buildPowraDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);
@@ -445,8 +466,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'noise-assessment') {
-    const { buildNoiseAssessmentDocument } = await import('./templates/new-tools-templates');
-    const doc = await buildNoiseAssessmentDocument(content as any);
+    const naSlug = (content as any)._noiseAssessmentTemplateSlug;
+    let doc;
+    if (naSlug) {
+      const { buildNoiseAssessmentTemplateDocument } = await import('./templates/noise-assessment-templates');
+      doc = await buildNoiseAssessmentTemplateDocument(content as any, naSlug);
+    } else {
+      const { buildNoiseAssessmentDocument } = await import('./templates/new-tools-templates');
+      doc = await buildNoiseAssessmentDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }
@@ -522,8 +550,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'manual-handling') {
-    const { buildManualHandlingDocument } = await import('./templates/new-tools-templates');
-    const doc = await buildManualHandlingDocument(content as any);
+    const mhSlug = (content as any)._manualHandlingTemplateSlug;
+    let doc;
+    if (mhSlug) {
+      const { buildManualHandlingTemplateDocument } = await import('./templates/manual-handling-templates');
+      doc = await buildManualHandlingTemplateDocument(content as any, mhSlug);
+    } else {
+      const { buildManualHandlingDocument } = await import('./templates/new-tools-templates');
+      doc = await buildManualHandlingDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }
