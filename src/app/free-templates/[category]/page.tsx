@@ -8,6 +8,7 @@ import { getCategoryWithFiles } from "@/lib/free-templates";
 import { FT_CATEGORIES } from "@/data/free-template-categories";
 import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 import { UpsellBanner } from "@/components/shared/UpsellBanner";
+import { ToolboxTalksSidebarCard } from "@/components/shared/PremiumUpsellCards";
 import { RAMS_BUILDER_UPSELL } from "@/data/upsell-config";
 
 interface PageProps {
@@ -226,6 +227,10 @@ export default async function FreeTemplateCategoryPage({
           href={RAMS_BUILDER_UPSELL.gumroadUrl}
           variant="bottom"
         />
+
+        <div className="mt-5 max-w-xs">
+          <ToolboxTalksSidebarCard />
+        </div>
       </div>
 
       {/* JSON-LD */}
