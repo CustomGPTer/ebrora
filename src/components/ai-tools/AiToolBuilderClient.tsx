@@ -79,6 +79,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
   // Access check state (for restricted free-tier tools)
   const [accessChecked, setAccessChecked] = useState(false);
   const [toolLocked, setToolLocked] = useState(false);
+  const [userLoggedIn, setUserLoggedIn] = useState(true);
 
   // Conversation state
   const [rounds, setRounds] = useState<AiToolConversationRound[]>([]);
@@ -112,6 +113,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
         if (res.ok) {
           const data = await res.json();
           setToolLocked(!data.allowed);
+          if (data.tier === 'NONE') setUserLoggedIn(false);
         }
       } catch {
         // If check fails, allow access (fail open)
@@ -399,7 +401,9 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
             color: '#111827',
             marginBottom: '0.75rem',
           }}>
-            {toolConfig.shortName} — Upgrade Required
+            {userLoggedIn
+              ? `${toolConfig.shortName} — Upgrade Required`
+              : `${toolConfig.shortName} — Sign In Required`}
           </h2>
           <p style={{
             fontSize: '0.95rem',
@@ -408,57 +412,110 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
             lineHeight: '1.6',
             marginBottom: '0.5rem',
           }}>
-            The {toolConfig.shortName} is available on our <strong style={{ color: '#1B5745' }}>Standard</strong> and <strong style={{ color: '#1B5745' }}>Professional</strong> plans.
-            Upgrade to generate unlimited {toolConfig.documentLabel.toLowerCase()}s with full AI-powered interviews and professional document output.
+            {userLoggedIn ? (
+              <>The {toolConfig.shortName} is available on our <strong style={{ color: '#1B5745' }}>Standard</strong> and <strong style={{ color: '#1B5745' }}>Professional</strong> plans.
+            Upgrade to generate unlimited {toolConfig.documentLabel.toLowerCase()}s with full AI-powered interviews and professional document output.</>
+            ) : (
+              <>You must be logged in to use the {toolConfig.shortName}. Create a free account or sign in to get started.</>
+            )}
           </p>
           <p style={{
             fontSize: '0.85rem',
             color: '#9CA3AF',
             marginBottom: '2rem',
           }}>
-            Plans start from just £9.99/month — cancel anytime.
+            {userLoggedIn
+              ? 'Plans start from just £9.99/month — cancel anytime.'
+              : 'It only takes a moment to create an account.'}
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Link
-              href="/rams-builder/pricing"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.75rem 1.75rem',
-                background: '#1B5745',
-                color: '#FFFFFF',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                borderRadius: '0.5rem',
-                textDecoration: 'none',
-                transition: 'background 0.2s',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#143f33')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = '#1B5745')}
-            >
-              View Plans & Pricing
-            </Link>
-            <Link
-              href="/account"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.75rem 1.75rem',
-                background: '#F3F4F6',
-                color: '#374151',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                borderRadius: '0.5rem',
-                textDecoration: 'none',
-                transition: 'background 0.2s',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#E5E7EB')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = '#F3F4F6')}
-            >
-              My Account
-            </Link>
+            {userLoggedIn ? (
+              <>
+                <Link
+                  href="/rams-builder/pricing"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.75rem',
+                    background: '#1B5745',
+                    color: '#FFFFFF',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#143f33')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#1B5745')}
+                >
+                  View Plans & Pricing
+                </Link>
+                <Link
+                  href="/account"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.75rem',
+                    background: '#F3F4F6',
+                    color: '#374151',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#E5E7EB')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#F3F4F6')}
+                >
+                  My Account
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.75rem',
+                    background: '#1B5745',
+                    color: '#FFFFFF',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#143f33')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#1B5745')}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/auth/register"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.75rem',
+                    background: '#F3F4F6',
+                    color: '#374151',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#E5E7EB')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#F3F4F6')}
+                >
+                  Create Account
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
