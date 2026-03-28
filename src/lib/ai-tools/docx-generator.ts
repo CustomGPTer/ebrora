@@ -515,8 +515,16 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'confined-spaces') {
-    const { buildConfinedSpacesDocument } = await import('./templates/new-tools-templates');
-    const doc = await buildConfinedSpacesDocument(content as any);
+    const csSlug = (content as any)._confinedSpacesTemplateSlug;
+    let doc;
+    if (csSlug) {
+      const { buildConfinedSpacesTemplateDocument } = await import('./templates/confined-spaces-templates');
+      doc = await buildConfinedSpacesTemplateDocument(content as any, csSlug);
+    } else {
+      // Fallback to original single template (backwards compatible)
+      const { buildConfinedSpacesDocument } = await import('./templates/new-tools-templates');
+      doc = await buildConfinedSpacesDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }

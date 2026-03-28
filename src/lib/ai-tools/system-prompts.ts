@@ -8,6 +8,7 @@ import type { AiToolSlug } from './types';
 import type { TbtTemplateSlug } from '@/lib/tbt/tbt-types';
 import type { CoshhTemplateSlug } from '@/lib/coshh/types';
 import type { CdmCheckerTemplateSlug } from '@/lib/cdm-checker/types';
+import type { ConfinedSpacesTemplateSlug } from '@/lib/confined-spaces/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -3128,6 +3129,206 @@ ${styleGuide}
 
 --- OUTPUT JSON SCHEMA ---
 ${cdmSchema}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// Confined Spaces — Template-Aware Prompts (4 templates)
+// Each prompt tells the AI EXACTLY what structure that specific template renders.
+// =============================================================================
+
+const CONFINED_SPACES_TEMPLATE_STYLE: Record<ConfinedSpacesTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, 22 comprehensive sections)
+WRITING STYLE: Professional and exhaustive. This is the most comprehensive confined space assessment on the market. Every section must be specific to this space — not generic.
+
+TEMPLATE-SPECIFIC REQUIREMENTS — the template engine renders ALL of these sections, so you MUST populate every field:
+- adjacentSpaces: array of connected/adjacent spaces with gas migration risk assessment per connection. For wastewater, consider shared pipework, overflow channels, inlet feeds.
+- historicalReadings: array of previous gas readings with dates, all 4 parameters, conditions, and recorder. Minimum 2 entries. Include trend analysis in historicalAnalysis.
+- simops: array of simultaneous operations that could affect this space (adjacent tank operations, chemical dosing, tanker movements, weather events).
+- Duration limits: maxContinuousWork (work/rest cycle), maxShiftDuration, hydration, heatStressIndicators, scbaWeightFactor.
+- Welfare/decon: deconStation location, deconProcedure, noEatingDrinking, leptospirosisAwareness (for wastewater), hepatitisA vaccination, welfareFacilities.
+- 22 numbered sections total including all of the above plus space ID, hazards, SSOW, atmospheric monitoring, ventilation, isolation, entry/exit, PPE, comms, rescue plan, emergencies, risk rating, competency, permit, monitoring/review, references, sign-off.`,
+
+  'red-danger': `TEMPLATE: Red Danger (red/black, IDLH danger callouts, hazard-first, 17 sections)
+WRITING STYLE: Urgent, direct, life-or-death language. Lead every section with what can KILL you. The template renders prominent red DANGER callout boxes before atmospheric hazards, gas migration, rescue plan, and leptospirosis sections — so write those opening statements as if they are the last thing someone reads before entering the space.
+
+TEMPLATE-SPECIFIC REQUIREMENTS:
+- hazards array: order by severity (fatal first). Use "Fatal" and "Serious" as severity values, not "High/Medium".
+- historicalReadings: highlight worst-case readings. historicalAnalysis should emphasise the danger trend.
+- adjacentSpaces: the template renders a gas migration danger callout — make the gas migration risk assessment punchy and specific.
+- rescueSteps: the template renders a callout quoting "over 60% of UK confined space fatalities are would-be rescuers" (L101 §129). Write rescue steps as absolute commands.
+- Leptospirosis: the template renders a specific danger callout. Include Weil's disease fatality risk, decon requirements.
+- Include all fields from ebrora-standard but written in urgent, directive tone. "You WILL die" not "there is a risk of death".`,
+
+  'permit-style': `TEMPLATE: Permit Style (orange/amber, combined assessment + entry permit format)
+WRITING STYLE: Formal permit language. Concise and checklist-oriented. This template doubles as the ACTUAL entry permit — it will be printed and carried to the access point.
+
+TEMPLATE-SPECIFIC REQUIREMENTS — the template renders these specific permit components:
+- preEntryChecklist: array of { item: string } — minimum 19 items. Each must be a specific, verifiable check that can be ticked off. Include: all electrical isolations LOTO, all mechanical isolations LOTO, adjacent space isolations, SIMOPS check, tank drained, ventilation duration, gas test O₂ at all depths, gas test H₂S at all depths, gas test LEL at all depths, gas test CO at all depths, rescue tripod erected, rescue SCBA checked, radio comms check, FA/AED/O₂ at surface, decon station, full PPE worn, standby in position, weather check, emergency route confirmed.
+- The template renders blank gas test tables for 3 depths (top/middle/bottom) — specify the depths in metres for this specific space in the preEntryTesting field.
+- The template renders a periodic re-test log table (every 30 minutes) — mention 30-minute re-test interval in continuousMonitoring.
+- The template renders a personnel entry/exit log — mention in permitType that entry/exit times must be logged.
+- The template renders a 5-person authorisation chain: Responsible Person, Entrant 1, Entrant 2, Standby Person, Rescue Standby.
+- The template renders a formal permit handback/close-out section — describe close-out procedure in permitCancellation.
+- Keep prose sections SHORT. This is a working document, not a report.`,
+
+  'rescue-focused': `TEMPLATE: Rescue Focused (teal, rescue plan given equal weight to assessment, 8 top-level sections)
+WRITING STYLE: The rescue plan IS the document. Section 3 alone has 8 sub-sections. Write as if you are briefing a rescue team that has never seen this space before and may need to extract an unconscious person through a restricted opening under time pressure.
+
+TEMPLATE-SPECIFIC REQUIREMENTS — the template renders ALL of these rescue-specific components, so EVERY field must be populated:
+- rescueSteps: array with timeTarget field (e.g. "0 min", "1-3 min", "5-8 min") and equipment field. Minimum 10 steps from alarm to post-incident.
+- extractionSteps: array of { step, method, equipment, consideration } — specific to the access opening size. If manhole <700mm, describe vertical extraction method, arm positioning, head support, spinal precaution, manhole rim padding. Minimum 4 steps.
+- multiCasualtyScenarios: array of { scenario, action, limitation } — minimum 4 scenarios: both conscious, one unconscious, both unconscious, rescue entrant cannot descend. Include BA time limits and FRS escalation triggers.
+- frsPreNotify: whether FRS has been pre-notified. frsContact: local FRS non-emergency number. frsInfoProvided: what information was given. frsAccess: how FRS access the site.
+- rescueEquipment: array of { equipment, specification, standard, location } — minimum 10 items including tripod, winch, SCBA, escape sets, harnesses, rescue sling, head support collar, manhole rim padding, O₂ kit, AED, basket stretcher, gas detectors.
+- commsCascade: array of { order, contact, nameRole, number, when } — 5-tier escalation from 999 to HSE.
+- hospitalName, hospitalDistance, hospitalGridRef, hospitalRoute — specific to the site location.
+- postIncidentSteps: array of { step, action, responsibility, notes } — minimum 7 steps. CRITICAL: include "Do NOT ventilate the space — preserve atmospheric conditions for investigation" and "Download gas detector data logs" and "Secure CCTV footage".
+- The assessment and controls sections (1.0, 2.0) are condensed summaries. Keep them tight — the rescue plan is the focus.`,
+};
+
+const CONFINED_SPACES_EXPANDED_SCHEMA = `{
+  "documentRef": "string (CS-YYYY-NNN)",
+  "assessmentDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY (6 months)",
+  "assessedBy": "string (name + qualification)",
+  "projectName": "string",
+  "siteAddress": "string",
+  "spaceName": "string (e.g. 'PST No.3 Desludge Chamber')",
+  "spaceLocation": "string (specific location on site)",
+  "spaceType": "string (e.g. below-ground chamber, wet well, tank, sewer)",
+  "dimensions": "string (L×W×D or diameter×depth + volume in m³)",
+  "accessType": "string (manhole size, ladder type, alternative egress)",
+  "classification": "string (Regulation 1(2) — why this is a confined space)",
+  "reasonForEntry": "string (min 100 words — what work, why entry needed)",
+  "entryAvoidable": "Yes | No — with justification",
+  "loneWorking": "string (always 'Absolutely Prohibited — minimum 3 persons at all times')",
+  "adjacentSpaces": [
+    { "space": "string", "connectionType": "string (pipe size, type)", "isolationMethod": "string", "gasMigrationRisk": "High | Medium | Low", "status": "Isolated | Not Isolated" }
+  ],
+  "hazards": [
+    { "category": "Atmospheric | Physical | Biological | Mechanical | Environmental", "hazard": "string", "causeSource": "string (min 20 words)", "severity": "Fatal | Serious | Moderate | Minor", "likelihood": "High | Medium | Low" }
+  ],
+  "historicalReadings": [
+    { "date": "DD MMM YYYY", "o2": "string (%)", "h2s": "string (ppm)", "lel": "string (%)", "co": "string (ppm)", "conditions": "string", "recordedBy": "string" }
+  ],
+  "historicalAnalysis": "string (trend analysis of readings)",
+  "safeSystemOfWork": "string (min 200 words — Regulation 4 SSOW narrative)",
+  "atmosphericParams": [
+    { "parameter": "string", "alarmLevel": "string", "evacuateLevel": "string", "instrument": "string", "actionRequired": "string" }
+  ],
+  "preEntryTesting": "string (depths, duration, acceptance criteria)",
+  "continuousMonitoring": "string",
+  "instrumentCalibration": "string",
+  "ventilationType": "string",
+  "ventilationSpec": "string (ACH, fan spec, ATEX rating)",
+  "preVentDuration": "string",
+  "ventInletPosition": "string",
+  "ventFailureAction": "string",
+  "isolations": [
+    { "system": "string", "method": "string", "isolationPoint": "string (ID/tag)", "verifiedBy": "string", "lockOff": "string" }
+  ],
+  "simops": [
+    { "activity": "string", "potentialImpact": "string", "controlMeasure": "string", "risk": "High | Medium | Low", "acceptable": "Yes (controlled) | No" }
+  ],
+  "entrySteps": [
+    { "step": "string", "action": "string", "responsibility": "string", "verification": "string" }
+  ],
+  "ppeItems": [
+    { "type": "string", "specification": "string", "standard": "string (EN number)", "replacement": "string", "mandatory": "Yes | If mist | Conditional" }
+  ],
+  "maxContinuousWork": "string (e.g. '45 min on, 15 min rest')",
+  "maxShiftDuration": "string",
+  "hydration": "string",
+  "heatStressIndicators": "string",
+  "scbaWeightFactor": "string",
+  "primaryComms": "string",
+  "backupComms": "string",
+  "checkInFrequency": "string (e.g. 'Every 5 minutes')",
+  "emergencySignal": "string",
+  "rescueSteps": [
+    { "step": "string", "action": "string", "responsibility": "string", "timeTarget": "string", "equipment": "string" }
+  ],
+  "rescueEquipmentLocation": "string",
+  "nearestAE": "string (hospital name, distance, time, route)",
+  "rescueDrillFrequency": "string",
+  "extractionSteps": [
+    { "step": "string", "method": "string", "equipment": "string", "consideration": "string" }
+  ],
+  "multiCasualtyScenarios": [
+    { "scenario": "string", "action": "string", "limitation": "string" }
+  ],
+  "frsPreNotify": "string (Recommended / Yes / No + detail)",
+  "frsContact": "string (local FRS number)",
+  "frsInfoProvided": "string",
+  "frsAccess": "string",
+  "rescueEquipment": [
+    { "equipment": "string", "specification": "string", "standard": "string", "location": "string" }
+  ],
+  "commsCascade": [
+    { "order": "string (1-5)", "contact": "string", "nameRole": "string", "number": "string", "when": "string" }
+  ],
+  "hospitalName": "string",
+  "hospitalDistance": "string (miles, minutes, route name)",
+  "hospitalGridRef": "string",
+  "hospitalRoute": "string (turn-by-turn)",
+  "postIncidentSteps": [
+    { "step": "string", "action": "string", "responsibility": "string", "notes": "string" }
+  ],
+  "emergencyScenarios": [
+    { "scenario": "string", "immediateAction": "string", "responsibility": "string", "escalation": "string" }
+  ],
+  "deconStation": "string",
+  "deconProcedure": "string",
+  "noEatingDrinking": "string",
+  "leptospirosisAwareness": "string",
+  "hepatitisA": "string",
+  "welfareFacilities": "string",
+  "riskRating": {
+    "beforeLikelihood": "number (1-5)", "beforeSeverity": "number (1-5)",
+    "beforeScore": "number", "beforeRating": "High | Medium | Low",
+    "afterLikelihood": "number (1-5)", "afterSeverity": "number (1-5)",
+    "afterScore": "number", "afterRating": "High | Medium | Low"
+  },
+  "riskNote": "string (explain why residual severity stays high for fatal hazards)",
+  "competencyRoles": [
+    { "role": "string", "requiredTraining": "string", "evidence": "string", "refresher": "string" }
+  ],
+  "permitType": "string",
+  "authorisationChain": "string",
+  "maxOccupancy": "string",
+  "permitCancellation": "string",
+  "preEntryChecklist": [
+    { "item": "string (specific verifiable check)" }
+  ],
+  "reviewDate2": "string",
+  "reviewTriggers": "string",
+  "linkedDocuments": "string",
+  "regulatoryReferences": [
+    { "reference": "string", "description": "string" }
+  ],
+  "additionalNotes": "string"
+}
+
+MINIMUMS: 4+ atmospheric params (O₂, H₂S, LEL, CO minimum), 7+ hazards, 5+ adjacent spaces for WwTW, 2+ historical readings, 4+ SIMOPS, 8+ isolations, 8+ entry steps, 6+ PPE items, 7+ rescue steps, 4+ extraction steps, 4+ multi-casualty scenarios, 10+ rescue equipment items, 5+ comms cascade entries, 7+ post-incident steps, 5+ emergency scenarios, 4+ competency roles, 19+ pre-entry checklist items, 7+ regulatory references.
+
+CRITICAL: This is a LIFE-SAFETY document. Atmospheric data must be realistic for the space type described. For wastewater confined spaces, H₂S is the primary killer — always include it with historical data showing real levels. Residual severity for atmospheric hazards STAYS at 5 (fatal) — only likelihood is reduced by controls. Reference L101 ACoP throughout.`;
+
+export function getConfinedSpacesTemplateGenerationPrompt(templateSlug: ConfinedSpacesTemplateSlug): string {
+  const styleGuide = CONFINED_SPACES_TEMPLATE_STYLE[templateSlug] || CONFINED_SPACES_TEMPLATE_STYLE['ebrora-standard'];
+
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+Confined Space Risk Assessment (expanded format with adjacent spaces, SIMOPS, rescue plan, decontamination)
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+Generate a Confined Space Assessment JSON with this structure:
+${CONFINED_SPACES_EXPANDED_SCHEMA}
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }
