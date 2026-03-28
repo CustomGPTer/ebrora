@@ -105,6 +105,7 @@ export function PremiumSidebar() {
       <div className="lg:w-72 shrink-0 flex flex-col gap-5 pt-[57px]">
         <AIToolsSidebarCard />
         <BrowseTemplatesSidebarCard />
+        <ToolboxTalksSidebarCard />
       </div>
     </>
   );
@@ -129,7 +130,7 @@ export function AIToolsSidebarCard() {
       <div className="prem-sidebar-body p-5 bg-white border border-gray-200 border-t-0 rounded-b-xl">
         <h4 className="text-sm font-bold text-gray-900">AI Construction Tools</h4>
         <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-          13+ AI-powered tools for UK construction. RAMS, safety alerts, COSHH assessments, RFIs and more — professional output in minutes.
+          30+ AI-powered tools for UK construction. RAMS, safety alerts, COSHH assessments, RFIs and more — professional output in minutes.
         </p>
         <Link
           href="/tools"
@@ -177,6 +178,39 @@ export function BrowseTemplatesSidebarCard() {
 }
 
 /* ──────────────────────────────────────────────
+   Free Toolbox Talks — Sidebar Card
+   ────────────────────────────────────────────── */
+export function ToolboxTalksSidebarCard() {
+  const cardRef = useTraceOnView();
+
+  return (
+    <div className="prem-sidebar-wrap prem-trace prem-equal-card rounded-xl overflow-hidden shadow-sm" ref={cardRef}>
+      <div className="bg-gradient-to-r from-[#0f2d22] to-[#1B5745] px-5 py-3 relative overflow-hidden">
+        <div className="flex items-center gap-2.5">
+          <div className="prem-stars-mini">
+            <MegaphoneIcon className="w-4 h-4 text-emerald-300 relative z-[1]" />
+          </div>
+          <span className="text-sm font-semibold text-white">Free</span>
+        </div>
+      </div>
+      <div className="prem-sidebar-body p-5 bg-white border border-gray-200 border-t-0 rounded-b-xl">
+        <h4 className="text-sm font-bold text-gray-900">Free Toolbox Talks</h4>
+        <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+          1,500+ free toolbox talks across 60 categories. Ready-to-use safety briefings for your site team — no sign-up needed.
+        </p>
+        <Link
+          href="/toolbox-talks"
+          className="prem-sidebar-cta mt-4 flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-[#1B5745] to-[#236b55] text-white text-xs font-semibold rounded-lg hover:brightness-110 transition-all duration-200 hover:-translate-y-0.5"
+        >
+          Browse Toolbox Talks
+          <ArrowSmIcon />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────
    SVG icons
    ────────────────────────────────────────────── */
 function SparklesIcon({ className }: { className?: string }) {
@@ -191,6 +225,14 @@ function GridIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+    </svg>
+  );
+}
+
+function MegaphoneIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
     </svg>
   );
 }
