@@ -1,21 +1,33 @@
 import type { Metadata } from 'next';
-import AiToolBuilderClient from '@/components/ai-tools/AiToolBuilderClient';
-import { AI_TOOL_CONFIGS } from '@/lib/ai-tools/tool-config';
+import CdmCheckerBuilderClient from './components/CdmCheckerBuilderClient';
 
 export const metadata: Metadata = {
-  title: { absolute: 'AI CDM 2015 Compliance Checker | Ebrora' },
-  description: 'AI-powered CDM 2015 compliance checker. Gap analysis across all duty holder responsibilities — Client, PD, PC, Designer, and Contractor. HSE L153 aligned.',
+  title: { absolute: 'AI CDM 2015 Compliance Checker | 4 Templates | Ebrora' },
+  description: 'AI-powered CDM 2015 compliance gap analysis with 4 professional templates. Duty holder assessments, compliance matrix, audit trail, and executive summary formats.',
   alternates: { canonical: 'https://www.ebrora.com/cdm-checker-builder' },
   openGraph: {
-    title: 'AI CDM 2015 Compliance Checker | Ebrora',
-    description: 'AI-powered CDM 2015 compliance gap analysis. Duty holder responsibilities assessed against the Construction (Design and Management) Regulations 2015.',
+    title: 'AI CDM 2015 Compliance Checker | 4 Templates | Ebrora',
+    description: 'AI-powered CDM 2015 compliance gap analysis with 4 professional templates.',
     url: 'https://www.ebrora.com/cdm-checker-builder',
     type: 'website',
     images: [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }],
   },
 };
 
+const toolSchema = {
+  '@context': 'https://schema.org', '@type': 'SoftwareApplication',
+  name: 'Ebrora AI CDM 2015 Compliance Checker', applicationCategory: 'BusinessApplication',
+  description: 'AI-powered CDM 2015 compliance gap analysis with 4 professional templates.',
+  url: 'https://www.ebrora.com/cdm-checker-builder', operatingSystem: 'Web',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+  publisher: { '@type': 'Organization', name: 'Ebrora', url: 'https://www.ebrora.com' },
+};
+
 export default function Page() {
-  const toolConfig = AI_TOOL_CONFIGS['cdm-checker'];
-  return <AiToolBuilderClient toolConfig={toolConfig} />;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }} />
+      <CdmCheckerBuilderClient />
+    </>
+  );
 }
