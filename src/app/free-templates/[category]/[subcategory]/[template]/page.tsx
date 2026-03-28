@@ -17,6 +17,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 import {
   AIToolsSidebarCard,
   BrowseTemplatesSidebarCard,
+  ToolboxTalksSidebarCard,
 } from "@/components/shared/PremiumUpsellCards";
 import { TemplatePreviewClient } from "@/components/free-templates/TemplatePreviewClient";
 
@@ -254,6 +255,7 @@ export default async function TemplatePage({ params }: PageProps) {
           <div className="lg:w-72 shrink-0 flex flex-col gap-5">
             <AIToolsSidebarCard />
             <BrowseTemplatesSidebarCard />
+            <ToolboxTalksSidebarCard />
           </div>
         </div>
       </div>
