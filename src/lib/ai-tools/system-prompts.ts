@@ -9,6 +9,7 @@ import type { TbtTemplateSlug } from '@/lib/tbt/tbt-types';
 import type { CoshhTemplateSlug } from '@/lib/coshh/types';
 import type { CdmCheckerTemplateSlug } from '@/lib/cdm-checker/types';
 import type { ConfinedSpacesTemplateSlug } from '@/lib/confined-spaces/types';
+import type { ErpTemplateSlug } from '@/lib/erp/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -3329,6 +3330,172 @@ ${styleGuide}
 --- OUTPUT JSON SCHEMA ---
 Generate a Confined Space Assessment JSON with this structure:
 ${CONFINED_SPACES_EXPANDED_SCHEMA}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// Emergency Response Plan — Template-Aware Prompts (4 templates)
+// Each prompt tells the AI what questions to ask AND what structure to generate.
+// =============================================================================
+
+const ERP_TEMPLATE_STYLE: Record<ErpTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, sequential scenario sections, comprehensive)
+AI INTERVIEW — ask these SPECIFIC questions during the conversation:
+Round 1: "Which emergency scenarios apply to your site? Select all that apply: fire/explosion, medical emergency, structural collapse, environmental spill, severe weather, confined space emergency, gas release (H₂S/CO/CH₄), bomb/security threat, utility failure (power/water), flooding, working over water, other. Are there any site-specific process hazards?"
+Round 1: "Who is appointed as Emergency Controller? Do you have designated Fire Marshals, First Aiders, and Environmental Officers? How many of each?"
+Round 2: "Where is your primary muster point? Is there a secondary muster point? What alarm signal do you use (air horn / siren / tannoy)?"
+Round 2: "What is the nearest A&E hospital, fire station, and their approximate distance/travel time from site?"
+Round 2: "Are there any operational processes running adjacent to the works that could create emergency scenarios (e.g. live sewage, chemical dosing, gas holders)?"
+
+ONLY generate scenario sections for scenarios the user confirmed as relevant. Do NOT include gas/H₂S scenarios if the user did not select them.
+
+WRITING STYLE: Professional, concise. Action step tables are the primary content — keep prose to the absolute minimum needed. Every step must name a responsible person/role. Equipment column must be specific (not "as required").`,
+
+  'quick-reference': `TEMPLATE: Quick Reference (red/orange, lamination-ready, 2 pages max, action cards)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Which emergency scenarios apply? (fire, medical, spill, collapse, gas release, severe weather, other). Only selected scenarios will appear as action cards."
+Round 1: "What are the key emergency phone numbers for this site? (Site Manager, Client rep, Operations Control if applicable)"
+Round 2: "Where is the primary muster point? What alarm signal is used?"
+Round 2: "Where are emergency equipment locations? (first aid, AED, fire extinguishers, spill kits — give building/area names)"
+Round 2: "Nearest A&E hospital name, distance, and basic route direction?"
+
+ONLY generate action cards for scenarios the user confirmed. Skip everything else.
+
+WRITING STYLE: Extremely concise. This is a lamination-ready quick reference — NOT a report. Action cards must be single-line numbered steps (e.g. "1. Shout FIRE → 2. Call 999 → 3. Evacuate → 4. Headcount → 5. Meet FRS at gate"). Large-print emergency numbers. No paragraphs. No narrative.
+
+The template renders actionCards array — each card has: scenario (name), colour (red/blue/amber/green/purple), steps (single string of numbered actions joined with →).`,
+
+  'role-based': `TEMPLATE: Role-Based (navy, organised by ROLE not scenario, standalone role cards)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Which emergency roles are appointed on your site? (Emergency Controller, Deputy EC, Fire Marshal, First Aider, Environmental Officer, H₂S/Gas Coordinator, other). How many of each?"
+Round 1: "Which emergency scenarios apply? (fire, medical, spill, collapse, gas, weather, other)"
+Round 2: "For each role you listed — what specific equipment do they need access to and where is it located?"
+Round 2: "Do your Fire Marshals have designated sweep zones? If so, how many zones?"
+Round 2: "Do your First Aiders have any site-specific protocols (e.g. H₂S exposure treatment, leptospirosis awareness for wastewater sites)?"
+
+ONLY generate role cards for roles the user confirmed exist on site. ONLY include scenarios the user selected within each role card.
+
+WRITING STYLE: Direct commands per role. Each role card reads like a personal briefing — "YOUR actions in a fire: ..." not "The Fire Marshal should...". Keep weekly duties to one sentence. The template renders roleCards array — each card has: role, icon (emoji), scenarioActions array [{scenario, actions, contact, equipment}], weeklyDuties string.`,
+
+  'multi-scenario': `TEMPLATE: Multi-Scenario (teal, trigger→immediate→escalate→recover flowcharts per scenario)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Which emergency scenarios apply to your site? (fire/explosion, medical, structural collapse, environmental spill, gas release, confined space emergency, severe weather, bomb/security, utility failure, flooding, other). I will create a 4-phase response flowchart for each selected scenario."
+Round 1: "For each scenario — what would be the TRIGGER event? (e.g. for gas: 'personal monitor alarm activates' vs 'smell of gas reported')"
+Round 2: "What severity rating would you assign each scenario? (Critical / High / Medium / Low)"
+Round 2: "What scenario-specific equipment is available? (e.g. for spill: spill kits + drain covers; for gas: SCBA + gas monitors)"
+Round 2: "Are there any severe weather triggers specific to your site? (wind speed for crane operations, flood levels, lightning protocol)"
+
+ONLY generate flowScenarios for scenarios the user confirmed. Each flowScenario needs: trigger, immediate actions, escalation steps, recovery/stand-down steps — with responsibility and equipment for each phase.
+
+WRITING STYLE: Phase-based, not narrative. Each phase (TRIGGER/IMMEDIATE/ESCALATE/RECOVER) must be a self-contained instruction. Keep each phase to 2–3 sentences max. The template renders flowScenarios array — each has: name, severity, trigger, immediate, escalate, recover + corresponding Resp and Equip fields for each phase.`,
+};
+
+const ERP_SCHEMA = `{
+  "documentRef": "string (ERP-YYYY-NNN)",
+  "issueDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY (6 months)",
+  "preparedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "gridRef": "string",
+  "what3Words": "string",
+  "principalContractor": "string",
+  "client": "string",
+  "workingHours": "string",
+  "peakWorkforce": "string",
+  "siteSpecificHazards": "string (comma-separated list of site-specific hazards)",
+  "emergencyRoles": [
+    { "role": "string (e.g. Emergency Controller)", "name": "string or 'TBC'", "contact": "string or 'TBC'", "responsibilities": "string (min 15 words)" }
+  ],
+  "communicationCascade": [
+    { "order": "string (1-7)", "contact": "string", "nameRole": "string", "number": "string", "when": "string" }
+  ],
+  "primaryMuster": "string",
+  "secondaryMuster": "string",
+  "evacuationSignal": "string",
+  "allClearSignal": "string",
+  "headcountMethod": "string",
+  "visitorProcedure": "string",
+  "scenarios": [
+    {
+      "id": "string (fire/medical/spill/collapse/gas/cs-emergency etc.)",
+      "name": "string (display name e.g. 'Fire Emergency')",
+      "severity": "Critical | High | Medium | Low",
+      "steps": [
+        { "step": "string", "action": "string (min 10 words)", "responsibility": "string (specific role)", "notes": "string" }
+      ]
+    }
+  ],
+  "flowScenarios": [
+    {
+      "id": "string", "name": "string", "severity": "Critical | High | Medium | Low",
+      "trigger": "string", "immediate": "string", "escalate": "string", "recover": "string",
+      "triggerResp": "string", "immediateResp": "string", "escalateResp": "string", "recoverResp": "string",
+      "triggerEquip": "string", "immediateEquip": "string", "escalateEquip": "string", "recoverEquip": "string"
+    }
+  ],
+  "roleCards": [
+    {
+      "role": "string", "icon": "string (emoji)",
+      "scenarioActions": [
+        { "scenario": "string", "actions": "string (min 15 words — what THIS role does)", "contact": "string", "equipment": "string" }
+      ],
+      "weeklyDuties": "string"
+    }
+  ],
+  "actionCards": [
+    { "scenario": "string", "colour": "red | blue | amber | green | purple | orange", "steps": "string (numbered actions joined with →)" }
+  ],
+  "weatherConditions": [
+    { "condition": "string", "trigger": "string", "action": "string", "decisionMaker": "string" }
+  ],
+  "equipmentItems": [
+    { "equipment": "string", "location": "string (specific area/building)", "inspection": "string", "responsible": "string" }
+  ],
+  "drillItems": [
+    { "activity": "string", "frequency": "string", "participants": "string", "record": "string" }
+  ],
+  "nearestFireStation": "string (name, distance, response time)",
+  "nearestAE": "string (name, address, distance, time)",
+  "policeContact": "string",
+  "siteAccessForEmergency": "string (gate location, minimum width, key holder)",
+  "firePlanSubmitted": "string",
+  "hazardInfoProvided": "string",
+  "hospitalName": "string",
+  "hospitalDistance": "string",
+  "hospitalGridRef": "string",
+  "hospitalRoute": "string (turn-by-turn)",
+  "regulatoryReferences": [
+    { "reference": "string", "description": "string" }
+  ],
+  "additionalNotes": "string"
+}
+
+CRITICAL RULES:
+- ONLY populate scenarios/flowScenarios/roleCards/actionCards for scenarios the user confirmed as relevant to their site.
+- Do NOT include gas/H₂S scenarios unless the user explicitly selected them.
+- Do NOT pad with generic content. If a site has 3 scenarios, generate 3 — not 8.
+- All word counts are MINIMUMS. Keep content tight. Tables and action steps are primary — not prose.
+- Every action step must name a specific role as responsible (not "someone" or "as appropriate").
+- Equipment must be specific items in specific locations (not "available equipment").
+- Communication cascade must include 999 as order 1, then site-specific contacts.
+- Populate the arrays relevant to the chosen template: scenarios for ebrora-standard, actionCards for quick-reference, roleCards for role-based, flowScenarios for multi-scenario. Always populate equipmentItems, drillItems, communicationCascade, and emergencyRoles regardless of template.`;
+
+export function getErpTemplateGenerationPrompt(templateSlug: ErpTemplateSlug): string {
+  const styleGuide = ERP_TEMPLATE_STYLE[templateSlug] || ERP_TEMPLATE_STYLE['ebrora-standard'];
+
+  return `${GENERATION_PREAMBLE}
+
+--- DOCUMENT TYPE ---
+Emergency Response Plan
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+Generate an Emergency Response Plan JSON with this structure:
+${ERP_SCHEMA}
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }

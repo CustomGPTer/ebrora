@@ -327,8 +327,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'emergency-response') {
-    const { buildEmergencyResponseDocument } = await import('./templates/emergency-response-template');
-    const doc = await buildEmergencyResponseDocument(content as any);
+    const erpSlug = (content as any)._erpTemplateSlug;
+    let doc;
+    if (erpSlug) {
+      const { buildErpTemplateDocument } = await import('./templates/erp-templates');
+      doc = await buildErpTemplateDocument(content as any, erpSlug);
+    } else {
+      const { buildEmergencyResponseDocument } = await import('./templates/emergency-response-template');
+      doc = await buildEmergencyResponseDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);
