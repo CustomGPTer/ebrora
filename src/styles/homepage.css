@@ -1394,3 +1394,201 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   A3 GRADIENT FADE TOP — AI Tool Cards
+   Premium cards with soft category gradient fading into white, floating icon
+   on white circle, footer with category dot + hover arrow.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.hp-a3-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white, #fff);
+  border: 1px solid var(--color-border, #E2E8E6);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--color-text, #1A1A1A);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  animation: hp-a3-fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hp-a3-fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hp-a3-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+  border-color: transparent;
+}
+
+/* ── Gradient fade overlay ── */
+.hp-a3-card__gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(180deg, var(--cat-light, rgba(0,0,0,0.04)) 0%, transparent 100%);
+  transition: height 0.3s ease;
+  pointer-events: none;
+}
+.hp-a3-card:hover .hp-a3-card__gradient {
+  height: 80px;
+}
+
+/* ── Card body ── */
+.hp-a3-card__inner {
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hp-a3-card__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Icon — white circle with shadow ── */
+.hp-a3-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+.hp-a3-card:hover .hp-a3-card__icon {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: scale(1.05);
+}
+
+/* ── Badges ── */
+.hp-a3-card__badges {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  padding-top: 0.1rem;
+}
+
+.hp-a3-card__badge--ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 50px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: linear-gradient(135deg, var(--color-gold, #D4A44C), #c99a3f);
+  color: #1a1a1a;
+}
+
+.hp-a3-card__badge--popular {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 50px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--color-primary, #1B5745);
+  color: #fff;
+}
+
+.hp-a3-card__badge--upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 50px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: #EEF2FF;
+  color: #4F46E5;
+}
+
+/* ── Title & desc ── */
+.hp-a3-card__title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 0.3rem;
+}
+
+.hp-a3-card__desc {
+  font-size: 0.72rem;
+  color: var(--color-text-light, #555);
+  line-height: 1.45;
+  flex: 1;
+}
+
+/* ── Footer — category dot + label + hover arrow ── */
+.hp-a3-card__foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.hp-a3-card__dot-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.hp-a3-card__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.hp-a3-card__cat-name {
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #888);
+}
+
+.hp-a3-card__arrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.2s ease;
+}
+
+.hp-a3-card:hover .hp-a3-card__arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Category-specific hover shadows ── */
+.hp-a3-card:hover {
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--cat-color, #000) 10%, transparent);
+}
