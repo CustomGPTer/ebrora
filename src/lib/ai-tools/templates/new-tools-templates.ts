@@ -2,7 +2,7 @@
 // Premium Templates — Remaining 12 new tools
 // Each exported async function builds a Document for its tool.
 // =============================================================================
-import { Document, Paragraph, Table, TextRun, ShadingType } from 'docx';
+import { Document, Paragraph, Table, TableRow, TextRun, ShadingType, AlignmentType, WidthType, BorderStyle, VerticalAlign } from 'docx';
 import * as h from '@/lib/rams/docx-helpers';
 import * as p from './premium-template-engine';
 
@@ -958,28 +958,283 @@ export async function buildCarbonReductionPlanDocument(c: any): Promise<Document
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MANUAL HANDLING RISK ASSESSMENT — Premium, inline title, no cover page
+// MANUAL HANDLING RISK ASSESSMENT — v2 Industry-Leading
+//   1. Single continuous body section (no forced page breaks)
+//   2. Numbered section headings (1.0, 2.0 …)
+//   3. RAG-coloured TILE risk scores and MAC scores
+//   4. Hierarchy level colour coding on control measures
+//   5. Zebra striping on all data tables
+//   6. 10pt body text for print legibility
+//   7. Residual risk RAG pill
+//   8. Consistent green sub-headings within TILE Analysis
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── MH-specific helpers ──────────────────────────────────────────────────────
+const MH_BODY = 20;   // 10pt
+const MH_SMALL = 16;  // 8pt for table cells
+
+function mhNumberedSection(num: string, text: string, accent: string): Paragraph {
+  return new Paragraph({
+    spacing: { before: 360, after: 140 },
+    border: { left: { style: BorderStyle.SINGLE, size: 18, color: accent, space: 6 } },
+    children: [
+      new TextRun({ text: `${num}   ${text.toUpperCase()}`, bold: true, size: 22, font: 'Arial', color: accent }),
+    ],
+  });
+}
+
+function mhSubHeading(text: string, accent: string): Paragraph {
+  return new Paragraph({
+    spacing: { before: 240, after: 100 },
+    children: [
+      new TextRun({ text, bold: true, size: MH_BODY, font: 'Arial', color: accent }),
+    ],
+  });
+}
+
+function mhRagFill(rating: string): string {
+  const r = (rating || '').toLowerCase();
+  if (r === 'high' || r === 'red' || r.includes('red'))   return 'FEE2E2';
+  if (r === 'medium' || r === 'amber')                     return 'FEF3C7';
+  if (r === 'low' || r === 'green')                        return 'D1FAE5';
+  return 'F3F4F6';
+}
+function mhRagText(rating: string): string {
+  const r = (rating || '').toLowerCase();
+  if (r === 'high' || r === 'red' || r.includes('red'))   return 'DC2626';
+  if (r === 'medium' || r === 'amber')                     return 'D97706';
+  if (r === 'low' || r === 'green')                        return '059669';
+  return '6B7280';
+}
+
+function mhHierarchyColour(level: string): { bg: string; fg: string } {
+  const l = (level || '').toLowerCase();
+  if (l.includes('eliminat'))                return { bg: 'D1FAE5', fg: '059669' };
+  if (l.includes('engineer'))                return { bg: 'DBEAFE', fg: '2563EB' };
+  if (l.includes('admin'))                   return { bg: 'FEF3C7', fg: 'D97706' };
+  if (l.includes('ppe') || l.includes('personal')) return { bg: 'F3F4F6', fg: '6B7280' };
+  return { bg: 'FFFFFF', fg: '000000' };
+}
+
+function mhZebraRow(label: string, value: string, labelW: number, valueW: number, idx: number): TableRow {
+  const bg = idx % 2 === 1 ? 'F5F5F5' : 'FFFFFF';
+  return new TableRow({
+    children: [
+      h.dataCell(label, labelW, { bold: true, fontSize: MH_SMALL, fillColor: bg }),
+      h.dataCell(value, valueW, { fontSize: MH_SMALL, fillColor: bg }),
+    ],
+  });
+}
+
+function mhInfoTable(rows: Array<{ label: string; value: string }>): Table {
+  const filtered = rows.filter(r => r.value && r.value.trim());
+  if (filtered.length === 0) return new Table({ width: { size: W, type: WidthType.DXA }, rows: [new TableRow({ children: [h.dataCell('No data', W)] })] });
+  const lw = Math.round(W * 0.35);
+  const vw = W - lw;
+  return new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [lw, vw],
+    rows: filtered.map((r, i) => mhZebraRow(r.label, r.value, lw, vw, i)),
+  });
+}
+
 export async function buildManualHandlingDocument(c: any): Promise<Document> {
   const ACCENT = '7C3AED';
+  const labelW = Math.round(W * 0.35);
+  const valueW = W - labelW;
 
-  const s1: any[] = [
-    ...p.infoSection('Assessment Details', [
-      { label: 'Document Reference',  value: c.documentRef       || '' },
-      { label: 'Assessment Date',     value: c.assessmentDate    || '' },
-      { label: 'Review Date',         value: c.reviewDate        || '' },
-      { label: 'Assessed By',         value: c.assessedBy        || '' },
-      { label: 'Project Name',        value: c.projectName       || '' },
-      { label: 'Site / Address',      value: c.siteAddress       || '' },
-    ], ACCENT),
-    ...p.proseSection('Legal Basis', c.legalBasis, ACCENT),
-    ...p.proseSection('Activity Description', c.activityDescription, ACCENT),
-    ...p.proseSection('Can the Manual Handling Be Avoided?', c.canTaskBeAvoided, ACCENT),
+  // ── TILE risk scoring table with RAG colours ──
+  const tileItems = [
+    { factor: 'Task',        score: c.tileScoring?.taskScore || '',        just: c.tileScoring?.taskJustification || '' },
+    { factor: 'Individual',  score: c.tileScoring?.individualScore || '',  just: c.tileScoring?.individualJustification || '' },
+    { factor: 'Load',        score: c.tileScoring?.loadScore || '',        just: c.tileScoring?.loadJustification || '' },
+    { factor: 'Environment', score: c.tileScoring?.environmentScore || '', just: c.tileScoring?.environmentJustification || '' },
+    { factor: 'OVERALL',     score: c.tileScoring?.overallRisk || '',      just: c.tileScoring?.overallJustification || '' },
   ];
+  const tileCol1 = Math.floor(W * 0.16);
+  const tileCol2 = Math.floor(W * 0.14);
+  const tileCol3 = W - tileCol1 - tileCol2;
+  const tileTable = new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [tileCol1, tileCol2, tileCol3],
+    rows: [
+      new TableRow({ tableHeader: true, children: [
+        h.headerCell('TILE Factor', tileCol1, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Risk Rating', tileCol2, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Justification', tileCol3, { fontSize: MH_SMALL, fillColor: ACCENT }),
+      ] }),
+      ...tileItems.map((item, i) => new TableRow({
+        children: [
+          h.dataCell(item.factor, tileCol1, { bold: true, fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+          h.dataCell(item.score, tileCol2, { bold: true, fontSize: MH_SMALL, fillColor: mhRagFill(item.score), color: mhRagText(item.score), alignment: AlignmentType.CENTER }),
+          h.dataCell(item.just, tileCol3, { fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+        ],
+      })),
+    ],
+  });
 
-  const s2: any[] = [
-    p.sectionBand('TILE Analysis', ACCENT),
-    ...p.infoSection('Task Analysis', [
+  // ── MAC assessment info table with RAG colours ──
+  const macRows = [
+    { label: 'Lift / Lower Score',   value: c.macAssessment?.liftLowerScore    || '' },
+    { label: 'Carry Score',          value: c.macAssessment?.carryScore         || '' },
+    { label: 'Team Handling Score',  value: c.macAssessment?.teamHandlingScore  || '' },
+    { label: 'Overall MAC Category', value: c.macAssessment?.overallMacCategory || '' },
+  ].filter(r => r.value && r.value.trim());
+  const macTable = new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [labelW, valueW],
+    rows: macRows.map((r, i) => {
+      const isRag = /red|amber|green|high|medium|low/i.test(r.value);
+      return new TableRow({
+        children: [
+          h.dataCell(r.label, labelW, { bold: true, fontSize: MH_SMALL, fillColor: i % 2 === 1 ? 'F5F5F5' : 'FFFFFF' }),
+          h.dataCell(r.value, valueW, {
+            bold: isRag, fontSize: MH_SMALL,
+            fillColor: isRag ? mhRagFill(r.value) : (i % 2 === 1 ? 'F5F5F5' : 'FFFFFF'),
+            color: isRag ? mhRagText(r.value) : '000000',
+          }),
+        ],
+      });
+    }),
+  });
+
+  // ── Control measures table with hierarchy colours ──
+  const cmCol1 = Math.floor(W * 0.24);
+  const cmCol2 = Math.floor(W * 0.14);
+  const cmCol3 = W - cmCol1 - cmCol2;
+  const cmItems = c.controlMeasures || [];
+  const cmTable = cmItems.length > 0 ? new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [cmCol1, cmCol2, cmCol3],
+    rows: [
+      new TableRow({ tableHeader: true, children: [
+        h.headerCell('Measure', cmCol1, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Hierarchy Level', cmCol2, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Detail', cmCol3, { fontSize: MH_SMALL, fillColor: ACCENT }),
+      ] }),
+      ...cmItems.map((item: any, i: number) => {
+        const hc = mhHierarchyColour(item.hierarchyLevel || '');
+        return new TableRow({
+          children: [
+            h.dataCell(item.measure || '', cmCol1, { bold: true, fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+            h.dataCell(item.hierarchyLevel || '', cmCol2, { bold: true, fontSize: MH_SMALL, fillColor: hc.bg, color: hc.fg, alignment: AlignmentType.CENTER }),
+            h.dataCell(item.detail || '', cmCol3, { fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+          ],
+        });
+      }),
+    ],
+  }) : null;
+
+  // ── Mechanical aids table ──
+  const maCol1 = Math.floor(W * 0.22);
+  const maCol2 = Math.floor(W * 0.26);
+  const maCol3 = Math.floor(W * 0.26);
+  const maCol4 = W - maCol1 - maCol2 - maCol3;
+  const maItems = c.mechanicalAids || [];
+  const maTable = maItems.length > 0 ? new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [maCol1, maCol2, maCol3, maCol4],
+    rows: [
+      new TableRow({ tableHeader: true, children: [
+        h.headerCell('Aid / Equipment', maCol1, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Application', maCol2, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Benefit', maCol3, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Suitability', maCol4, { fontSize: MH_SMALL, fillColor: ACCENT }),
+      ] }),
+      ...maItems.map((item: any, i: number) => new TableRow({
+        children: [
+          h.dataCell(item.aid || '', maCol1, { bold: true, fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+          h.dataCell(item.application || '', maCol2, { fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+          h.dataCell(item.benefit || '', maCol3, { fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+          h.dataCell(item.suitability || '', maCol4, { fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+        ],
+      })),
+    ],
+  }) : null;
+
+  // ── Training requirements table ──
+  const trCol1 = Math.floor(W * 0.30);
+  const trCol2 = Math.floor(W * 0.22);
+  const trCol3 = Math.floor(W * 0.22);
+  const trCol4 = W - trCol1 - trCol2 - trCol3;
+  const trItems = c.trainingRequirements || [];
+  const trTable = trItems.length > 0 ? new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [trCol1, trCol2, trCol3, trCol4],
+    rows: [
+      new TableRow({ tableHeader: true, children: [
+        h.headerCell('Training Item', trCol1, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Who', trCol2, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Frequency', trCol3, { fontSize: MH_SMALL, fillColor: ACCENT }),
+        h.headerCell('Provider', trCol4, { fontSize: MH_SMALL, fillColor: ACCENT }),
+      ] }),
+      ...trItems.map((item: any, i: number) => new TableRow({
+        children: [
+          h.dataCell(item.trainingItem || '', trCol1, { bold: true, fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+          h.dataCell(item.who || '', trCol2, { fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+          h.dataCell(item.frequency || '', trCol3, { fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+          h.dataCell(item.provider || '', trCol4, { fontSize: MH_SMALL, fillColor: i % 2 === 0 ? 'F5F5F5' : 'FFFFFF' }),
+        ],
+      })),
+    ],
+  }) : null;
+
+  // ── Residual risk RAG pill row ──
+  const residualRisk = c.residualRisk || '';
+  const residualTable = new Table({
+    width: { size: W, type: WidthType.DXA },
+    columnWidths: [labelW, valueW],
+    rows: [
+      new TableRow({
+        children: [
+          h.dataCell('Residual Risk Rating', labelW, { bold: true, fontSize: MH_SMALL }),
+          h.dataCell(residualRisk, valueW, {
+            bold: true, fontSize: MH_SMALL,
+            fillColor: mhRagFill(residualRisk),
+            color: mhRagText(residualRisk),
+            alignment: AlignmentType.CENTER,
+          }),
+        ],
+      }),
+    ],
+  });
+
+  // ── Section counter ──
+  let sec = 1;
+  const n = () => `${sec++}.0`;
+
+  // ── Build single continuous body ──
+  const body: any[] = [
+    // 1.0 Assessment Details
+    mhNumberedSection(n(), 'Assessment Details', ACCENT),
+    mhInfoTable([
+      { label: 'Document Reference',  value: c.documentRef    || '' },
+      { label: 'Assessment Date',     value: c.assessmentDate || '' },
+      { label: 'Review Date',         value: c.reviewDate     || '' },
+      { label: 'Assessed By',         value: c.assessedBy     || '' },
+      { label: 'Project Name',        value: c.projectName    || '' },
+      { label: 'Site / Address',      value: c.siteAddress    || '' },
+    ]),
+    h.spacer(60),
+
+    // 2.0 Legal Basis
+    mhNumberedSection(n(), 'Legal Basis', ACCENT),
+    ...h.prose(c.legalBasis, MH_BODY),
+
+    // 3.0 Activity Description
+    mhNumberedSection(n(), 'Activity Description', ACCENT),
+    ...h.prose(c.activityDescription, MH_BODY),
+
+    // 4.0 Can the Manual Handling Be Avoided?
+    mhNumberedSection(n(), 'Can the Manual Handling Be Avoided?', ACCENT),
+    ...h.prose(c.canTaskBeAvoided, MH_BODY),
+
+    // 5.0 TILE Analysis
+    mhNumberedSection(n(), 'TILE Analysis', ACCENT),
+
+    // 5.1 Task Analysis
+    mhSubHeading('Task Analysis', ACCENT),
+    mhInfoTable([
       { label: 'Description',        value: c.taskAnalysis?.description      || '' },
       { label: 'Frequency',          value: c.taskAnalysis?.frequency        || '' },
       { label: 'Duration',           value: c.taskAnalysis?.duration         || '' },
@@ -989,20 +1244,28 @@ export async function buildManualHandlingDocument(c: any): Promise<Document> {
       { label: 'End Position',       value: c.taskAnalysis?.endPosition      || '' },
       { label: 'Twisting Required',  value: c.taskAnalysis?.twistingRequired ? 'Yes' : 'No' },
       { label: 'Pushing / Pulling',  value: c.taskAnalysis?.pushingPulling   || '' },
-      { label: 'Team Lift',          value: c.taskAnalysis?.teamLift ? 'Yes — ' + (c.taskAnalysis?.numberOfPersons || '') + ' persons' : 'No' },
+      { label: 'Team Lift',          value: c.taskAnalysis?.teamLift ? 'Yes \u2014 ' + (c.taskAnalysis?.numberOfPersons || '') + ' persons' : 'No' },
       { label: 'Rest Breaks',        value: c.taskAnalysis?.restBreaks       || '' },
       { label: 'Repetition Rate',    value: c.taskAnalysis?.repetitionRate   || '' },
-    ], ACCENT),
-    ...p.infoSection('Individual Factors', [
-      { label: 'Training Required',        value: c.individualFactors?.trainingRequired     || '' },
-      { label: 'Fitness Requirements',      value: c.individualFactors?.fitnessRequirements  || '' },
-      { label: 'Known Limitations',         value: c.individualFactors?.knownLimitations     || '' },
+    ]),
+    h.spacer(60),
+
+    // 5.2 Individual Factors
+    mhSubHeading('Individual Factors', ACCENT),
+    mhInfoTable([
+      { label: 'Training Required',        value: c.individualFactors?.trainingRequired       || '' },
+      { label: 'Fitness Requirements',      value: c.individualFactors?.fitnessRequirements    || '' },
+      { label: 'Known Limitations',         value: c.individualFactors?.knownLimitations       || '' },
       { label: 'Pregnancy Considerations',  value: c.individualFactors?.pregnancyConsiderations || '' },
-      { label: 'Young Persons',             value: c.individualFactors?.youngPersons         || '' },
-      { label: 'Aging Workforce',           value: c.individualFactors?.agingWorkforce       || '' },
-      { label: 'Previous Injuries',         value: c.individualFactors?.previousInjuries     || '' },
-    ], ACCENT),
-    ...p.infoSection('Load Characteristics', [
+      { label: 'Young Persons',             value: c.individualFactors?.youngPersons           || '' },
+      { label: 'Aging Workforce',           value: c.individualFactors?.agingWorkforce         || '' },
+      { label: 'Previous Injuries',         value: c.individualFactors?.previousInjuries       || '' },
+    ]),
+    h.spacer(60),
+
+    // 5.3 Load Characteristics
+    mhSubHeading('Load Characteristics', ACCENT),
+    mhInfoTable([
       { label: 'Weight',                   value: c.loadCharacteristics?.weight               || '' },
       { label: 'Dimensions',               value: c.loadCharacteristics?.dimensions           || '' },
       { label: 'Shape',                    value: c.loadCharacteristics?.shape                || '' },
@@ -1012,8 +1275,12 @@ export async function buildManualHandlingDocument(c: any): Promise<Document> {
       { label: 'Temperature Issues',       value: c.loadCharacteristics?.temperatureIssues    || '' },
       { label: 'Contents Predictability',  value: c.loadCharacteristics?.contentsPredictability || '' },
       { label: 'Centre of Gravity',        value: c.loadCharacteristics?.centreOfGravity      || '' },
-    ], ACCENT),
-    ...p.infoSection('Environmental Factors', [
+    ]),
+    h.spacer(60),
+
+    // 5.4 Environmental Factors
+    mhSubHeading('Environmental Factors', ACCENT),
+    mhInfoTable([
       { label: 'Floor Surface',       value: c.environmentalFactors?.floorSurface     || '' },
       { label: 'Space Constraints',   value: c.environmentalFactors?.spaceConstraints || '' },
       { label: 'Lighting',            value: c.environmentalFactors?.lighting         || '' },
@@ -1022,67 +1289,95 @@ export async function buildManualHandlingDocument(c: any): Promise<Document> {
       { label: 'Slopes / Gradients',  value: c.environmentalFactors?.slopes           || '' },
       { label: 'Obstructions',        value: c.environmentalFactors?.obstructions     || '' },
       { label: 'Housekeeping',        value: c.environmentalFactors?.housekeeping     || '' },
-    ], ACCENT),
-  ];
+    ]),
 
-  const s3: any[] = [
-    ...p.dataTableSection('TILE Risk Scoring', [
-      { factor: 'Task',        score: c.tileScoring?.taskScore || '', justification: c.tileScoring?.taskJustification || '' },
-      { factor: 'Individual',  score: c.tileScoring?.individualScore || '', justification: c.tileScoring?.individualJustification || '' },
-      { factor: 'Load',        score: c.tileScoring?.loadScore || '', justification: c.tileScoring?.loadJustification || '' },
-      { factor: 'Environment', score: c.tileScoring?.environmentScore || '', justification: c.tileScoring?.environmentJustification || '' },
-      { factor: 'OVERALL',     score: c.tileScoring?.overallRisk || '', justification: c.tileScoring?.overallJustification || '' },
-    ], [
-      { key: 'factor',        label: 'TILE Factor',    width: Math.floor(W * 0.16) },
-      { key: 'score',         label: 'Risk Rating',    width: Math.floor(W * 0.14) },
-      { key: 'justification', label: 'Justification',  width: W - Math.floor(W * 0.16) - Math.floor(W * 0.14) },
-    ], ACCENT),
-    ...p.infoSection('MAC Assessment (HSE Manual Handling Assessment Chart)', [
-      { label: 'Lift / Lower Score',        value: c.macAssessment?.liftLowerScore       || '' },
-      { label: 'Carry Score',               value: c.macAssessment?.carryScore            || '' },
-      { label: 'Team Handling Score',        value: c.macAssessment?.teamHandlingScore     || '' },
-      { label: 'Overall MAC Category',       value: c.macAssessment?.overallMacCategory    || '' },
-    ], ACCENT),
-    ...p.proseSection('MAC Assessment Narrative', c.macAssessment?.macNarrative, ACCENT),
-  ];
+    // 6.0 TILE Risk Scoring
+    mhNumberedSection(n(), 'TILE Risk Scoring', ACCENT),
+    tileTable,
+    h.spacer(60),
 
-  const s4: any[] = [
-    ...p.dataTableSection('Control Measures', c.controlMeasures || [], [
-      { key: 'measure',        label: 'Measure',          width: Math.floor(W * 0.24) },
-      { key: 'hierarchyLevel', label: 'Hierarchy Level',  width: Math.floor(W * 0.14) },
-      { key: 'detail',         label: 'Detail',           width: W - Math.floor(W * 0.24) - Math.floor(W * 0.14) },
-    ], ACCENT),
-    ...p.dataTableSection('Mechanical Aids & Alternatives', c.mechanicalAids || [], [
-      { key: 'aid',          label: 'Aid / Equipment',  width: Math.floor(W * 0.22) },
-      { key: 'application',  label: 'Application',      width: Math.floor(W * 0.26) },
-      { key: 'benefit',      label: 'Benefit',          width: Math.floor(W * 0.26) },
-      { key: 'suitability',  label: 'Suitability',      width: W - Math.floor(W * 0.22) - Math.floor(W * 0.26) - Math.floor(W * 0.26) },
-    ], ACCENT),
-    ...p.infoSection('Residual Risk', [
-      { label: 'Residual Risk Rating', value: c.residualRisk || '' },
-    ], ACCENT),
-    ...p.proseSection('Residual Risk Justification', c.residualRiskJustification, ACCENT),
-    ...p.dataTableSection('Training Requirements', c.trainingRequirements || [], [
-      { key: 'trainingItem', label: 'Training Item',  width: Math.floor(W * 0.30) },
-      { key: 'who',          label: 'Who',             width: Math.floor(W * 0.22) },
-      { key: 'frequency',    label: 'Frequency',       width: Math.floor(W * 0.22) },
-      { key: 'provider',     label: 'Provider',        width: W - Math.floor(W * 0.30) - Math.floor(W * 0.22) - Math.floor(W * 0.22) },
-    ], ACCENT),
-    ...p.proseSection('Monitoring Arrangements', c.monitoringArrangements, ACCENT),
-    ...p.bulletListSection('Review Triggers', c.reviewTriggers || [], ACCENT),
-    ...p.proseSection('Additional Notes', c.additionalNotes, ACCENT),
-    ...p.signatureBlock([
+    // 7.0 MAC Assessment
+    mhNumberedSection(n(), 'MAC Assessment (HSE Manual Handling Assessment Chart)', ACCENT),
+    macTable,
+    h.spacer(60),
+
+    // 8.0 MAC Assessment Narrative
+    ...(c.macAssessment?.macNarrative ? [
+      mhNumberedSection(n(), 'MAC Assessment Narrative', ACCENT),
+      ...h.prose(c.macAssessment.macNarrative, MH_BODY),
+    ] : []),
+
+    // 9.0 Control Measures
+    ...(cmTable ? [
+      mhNumberedSection(n(), 'Control Measures', ACCENT),
+      cmTable,
+      h.spacer(60),
+    ] : []),
+
+    // 10.0 Mechanical Aids & Alternatives
+    ...(maTable ? [
+      mhNumberedSection(n(), 'Mechanical Aids & Alternatives', ACCENT),
+      maTable,
+      h.spacer(60),
+    ] : []),
+
+    // 11.0 Residual Risk
+    mhNumberedSection(n(), 'Residual Risk', ACCENT),
+    residualTable,
+    h.spacer(60),
+
+    // 12.0 Residual Risk Justification
+    ...(c.residualRiskJustification ? [
+      mhNumberedSection(n(), 'Residual Risk Justification', ACCENT),
+      ...h.prose(c.residualRiskJustification, MH_BODY),
+    ] : []),
+
+    // 13.0 Training Requirements
+    ...(trTable ? [
+      mhNumberedSection(n(), 'Training Requirements', ACCENT),
+      trTable,
+      h.spacer(60),
+    ] : []),
+
+    // 14.0 Monitoring Arrangements
+    ...(c.monitoringArrangements ? [
+      mhNumberedSection(n(), 'Monitoring Arrangements', ACCENT),
+      ...h.prose(c.monitoringArrangements, MH_BODY),
+    ] : []),
+
+    // 15.0 Review Triggers
+    ...((c.reviewTriggers || []).length > 0 ? [
+      mhNumberedSection(n(), 'Review Triggers', ACCENT),
+      ...c.reviewTriggers.map((item: string) => new Paragraph({
+        spacing: { after: 60 },
+        bullet: { level: 0 },
+        children: [new TextRun({ text: item, size: MH_BODY, font: 'Arial' })],
+      })),
+      h.spacer(60),
+    ] : []),
+
+    // 16.0 Additional Notes
+    ...(c.additionalNotes ? [
+      mhNumberedSection(n(), 'Additional Notes', ACCENT),
+      ...h.prose(c.additionalNotes, MH_BODY),
+    ] : []),
+
+    // Document Sign-Off
+    mhNumberedSection(n(), 'Document Sign-Off', ACCENT),
+    h.approvalTable([
       { role: 'Assessed By',  name: c.assessedBy || '' },
       { role: 'Reviewed By',  name: '' },
       { role: 'Approved By',  name: '' },
-    ], ACCENT),
+    ], W),
+    h.spacer(120),
   ];
 
+  // ── Build document: inline title + single continuous body ──
   return p.buildPremiumDocumentInline({
     documentLabel: 'Manual Handling Risk Assessment',
     accentHex: ACCENT,
     classification: 'HEALTH & SAFETY DOCUMENT',
-  }, [s1, s2, s3, s4]);
+  }, [body]);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
