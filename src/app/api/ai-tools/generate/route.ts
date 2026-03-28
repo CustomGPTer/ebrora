@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
-import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import type { AiToolSlug } from '@/lib/ai-tools';
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
       cdmCheckerTemplateSlug?: string;
       confinedSpacesTemplateSlug?: string;
       erpTemplateSlug?: string;
+      incidentReportTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -159,6 +160,8 @@ export async function POST(req: NextRequest) {
       ? getConfinedSpacesTemplateGenerationPrompt(confinedSpacesTemplateSlug as any)
       : (toolSlug === 'emergency-response' && erpTemplateSlug)
       ? getErpTemplateGenerationPrompt(erpTemplateSlug as any)
+      : (toolSlug === 'incident-report' && incidentReportTemplateSlug)
+      ? getIncidentReportTemplateGenerationPrompt(incidentReportTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A
@@ -234,6 +237,11 @@ export async function POST(req: NextRequest) {
     // Inject ERP template slug into content so docx-generator can route it
     if (toolSlug === 'emergency-response' && erpTemplateSlug) {
       documentContent._erpTemplateSlug = erpTemplateSlug;
+    }
+
+    // Inject Incident Report template slug into content so docx-generator can route it
+    if (toolSlug === 'incident-report' && incidentReportTemplateSlug) {
+      documentContent._incidentReportTemplateSlug = incidentReportTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
