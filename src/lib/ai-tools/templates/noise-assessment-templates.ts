@@ -270,7 +270,7 @@ function buildT2(d: NoiseAssessmentData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'SECTION 61 PRIOR CONSENT APPLICATION', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Control of Pollution Act 1974 \u00B7 Prior Consent for Construction Works', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Control of Pollution Act 1974 \u00B7 Prior Consent for Construction Works', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '7f1d1d' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | To: ${d.localAuthority}`, size: SM, font: 'Arial', color: 'fca5a5' })] }));
 
   // 1 Applicant Details
@@ -355,7 +355,7 @@ function buildT3(d: NoiseAssessmentData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'CONSTRUCTION NOISE MONITORING REPORT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'BS 5228-1 \u00B7 Section 61 Compliance \u00B7 Measurement Results', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'BS 5228-1 \u00B7 Section 61 Compliance \u00B7 Measurement Results', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.assessmentDate}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }));
 
   // 1 Summary
@@ -423,7 +423,7 @@ function buildT4(d: NoiseAssessmentData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'CONSTRUCTION NOISE — RESIDENT INFORMATION', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'What to Expect \u00B7 What We\'re Doing \u00B7 How to Contact Us', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'What to Expect \u00B7 What We\'re Doing \u00B7 How to Contact Us', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '334155' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.projectName} | ${d.principalContractor} | ${d.assessmentDate}`, size: SM, font: 'Arial', color: 'cbd5e1' })] }));
 
   // 1 About the Works

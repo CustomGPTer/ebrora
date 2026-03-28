@@ -484,7 +484,7 @@ function buildT2(d: IncidentReportData): (Paragraph | Table)[] {
 
   // Header band
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'RIDDOR INCIDENT INVESTIGATION REPORT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013 \u00B7 F2508 Format', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013 \u00B7 F2508 Format', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '7f1d1d' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.principalContractor} | ${d.incidentDate}`, size: SM, font: 'Arial', color: 'fca5a5' })] }));
 
   // 1.0 Incident Classification
@@ -667,7 +667,7 @@ function buildT3(d: IncidentReportData): (Paragraph | Table)[] {
 
   // Header
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 0 }, children: [new TextRun({ text: 'INCIDENT ROOT CAUSE ANALYSIS', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: 'Structured Investigation \u00B7 5 Whys \u00B7 Contributing Factors \u00B7 Barrier Analysis \u00B7 Systemic Recommendations', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: 'Structured Investigation \u00B7 5 Whys \u00B7 Contributing Factors \u00B7 Barrier Analysis \u00B7 Systemic Recommendations', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '334155' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.principalContractor} | Investigation: ${d.reportDate}`, size: SM, font: 'Arial', color: 'cbd5e1' })] }));
 
   // 1.0 Investigation Summary
@@ -832,7 +832,7 @@ function buildT4(d: IncidentReportData): (Paragraph | Table)[] {
 
   // Header
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ORANGE }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'NEAR MISS / OBSERVATION REPORT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ORANGE }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Early Warning System \u00B7 Proactive Hazard Identification \u00B7 Prevention Before Harm', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ORANGE }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Early Warning System \u00B7 Proactive Hazard Identification \u00B7 Prevention Before Harm', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '78350f' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.principalContractor} | ${d.dateObserved || d.incidentDate}`, size: SM, font: 'Arial', color: 'fcd34d' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER_BG }, alignment: AlignmentType.CENTER, spacing: { after: 120 },
     border: { top: { style: BorderStyle.SINGLE, size: 4, color: AMBER }, bottom: { style: BorderStyle.SINGLE, size: 4, color: AMBER } },

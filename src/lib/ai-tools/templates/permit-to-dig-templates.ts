@@ -474,7 +474,7 @@ function buildT2(d: PermitToDigData): Document {
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Daily Permit to Dig') }, footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER }, spacing: { after: 0 }, children: [new TextRun({ text: 'DAILY PERMIT TO DIG \u2014 ONE SHIFT ONLY', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER_ACCENT }, spacing: { after: 60 }, children: [new TextRun({ text: `Date: ${d.shiftDate || d.issueDate}   |   Shift: ${d.shiftTime || 'Day Shift'}   |   Issued by: ${d.permitIssuer || d.preparedBy}`, size: SM, font: 'Arial', color: 'FEF3C7' })] }),
 
         warningBanner('THIS PERMIT IS VALID FOR ONE SHIFT ONLY', AMBER_BG, AMBER_ACCENT),
@@ -547,7 +547,7 @@ function buildT3(d: PermitToDigData): Document {
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Utility Strike Response') }, footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 0 }, children: [new TextRun({ text: 'UTILITY STRIKE \u2014 EMERGENCY RESPONSE PROCEDURE', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED }, spacing: { after: 60 }, children: [new TextRun({ text: `Date: ${d.issueDate}   |   Prepared: ${d.preparedBy}   |   Client: ${d.client}`, size: SM, font: 'Arial', color: 'FEE2E2' })] }),
 
         warningBanner('IF YOU STRIKE A UTILITY \u2014 STOP ALL WORK IMMEDIATELY', RED_BG, RED_D),
@@ -633,7 +633,7 @@ function buildT4(d: PermitToDigData): Document {
       { properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Underground Service Avoidance Plan') }, footers: { default: h.ebroraFooter() },
         children: [
           new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 0 }, children: [new TextRun({ text: 'UNDERGROUND SERVICE AVOIDANCE PLAN', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-          new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+          new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
           new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY_ACCENT }, spacing: { after: 60 }, children: [new TextRun({ text: `Date: ${d.issueDate}   |   Prepared: ${d.preparedBy}   |   Review: ${d.reviewDate}   |   Client: ${d.client}`, size: SM, font: 'Arial', color: 'e2e8f0' })] }),
           h.spacer(100),
           infoTable([

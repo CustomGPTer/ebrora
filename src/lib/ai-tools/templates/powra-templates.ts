@@ -363,7 +363,7 @@ function buildT2(d: PowraData): Document {
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('POWRA Quick Card') }, footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER }, spacing: { after: 0 }, children: [new TextRun({ text: 'POWRA \u2014 POINT OF WORK RISK ASSESSMENT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef} | ${d.date}`, size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef} | ${d.date}`, size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
 
         // STOP → THINK → ACT
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { before: 120, after: 0 }, alignment: AlignmentType.CENTER,
@@ -463,7 +463,7 @@ function buildT3(d: PowraData): Document {
       { properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('POWRA \u2014 Task Specific') }, footers: { default: h.ebroraFooter() },
         children: [
           new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'POWRA \u2014 TASK-SPECIFIC RISK ASSESSMENT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-          new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+          new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
           new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `Date: ${d.date} ${d.time}   |   Assessed: ${d.assessedBy}   |   Location: ${d.location}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }),
 
           secHead('1.0', 'Task Overview', A),
@@ -520,7 +520,7 @@ function buildT4(d: PowraData): Document {
       { properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('POWRA \u2014 Supervisor Review') }, footers: { default: h.ebroraFooter() },
         children: [
           new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 0 }, children: [new TextRun({ text: 'POWRA \u2014 SUPERVISOR REVIEW', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-          new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+          new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
           new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY_ACCENT }, spacing: { after: 60 }, children: [new TextRun({ text: `Date: ${d.date} ${d.time}   |   Assessed: ${d.assessedBy}   |   Location: ${d.location}`, size: SM, font: 'Arial', color: 'e2e8f0' })] }),
           h.spacer(80),
           infoTable([

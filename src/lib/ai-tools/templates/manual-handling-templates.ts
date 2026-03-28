@@ -344,7 +344,7 @@ function buildT2(d: ManualHandlingData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER_D }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'MAC MANUAL HANDLING ASSESSMENT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'HSE Manual Handling Assessment Charts \u00B7 Colour-Coded Factor Scoring', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'HSE Manual Handling Assessment Charts \u00B7 Colour-Coded Factor Scoring', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '78350f' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.assessedBy} | ${d.assessmentDate}`, size: SM, font: 'Arial', color: 'fcd34d' })] }));
 
   // Task summary
@@ -418,7 +418,7 @@ function buildT3(d: ManualHandlingData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'RAPP — PUSHING & PULLING ASSESSMENT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'HSE Risk Assessment of Pushing and Pulling \u00B7 MHOR 1992', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'HSE Risk Assessment of Pushing and Pulling \u00B7 MHOR 1992', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.assessedBy} | ${d.assessmentDate}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }));
 
   // 1 Operation description
@@ -495,7 +495,7 @@ function buildT4(d: ManualHandlingData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'MANUAL HANDLING — TRAINING & BRIEFING CARD', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Safe Lifting Techniques \u00B7 Weight Guidelines \u00B7 Injury Prevention', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Safe Lifting Techniques \u00B7 Weight Guidelines \u00B7 Injury Prevention', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '334155' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.assessmentDate}`, size: SM, font: 'Arial', color: 'cbd5e1' })] }));
 
   // Task-specific info

@@ -557,7 +557,7 @@ function buildT2(d: CdmData): Document {
       footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'CDM 2015 COMPLIANCE MATRIX', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'Construction (Design and Management) Regulations 2015', size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'Construction (Design and Management) Regulations 2015', size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `Ref: ${d.documentRef}    Project: ${d.projectName}    Date: ${d.assessmentDate}    Overall: ${d.overallComplianceRating}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }),
 
         // Duty holder summary

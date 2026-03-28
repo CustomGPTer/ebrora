@@ -420,7 +420,7 @@ function buildT2(d: LiftPlanData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER_D }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'CRANE OPERATOR BRIEF', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Cab Reference Card \u00B7 Keep With You During Lift', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: AMBER_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Cab Reference Card \u00B7 Keep With You During Lift', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '78350f' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.planDate}`, size: SM, font: 'Arial', color: 'fcd34d' })] }));
 
   // Key data — large print
@@ -505,7 +505,7 @@ function buildT3(d: LiftPlanData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'TANDEM / COMPLEX LIFT PLAN', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'Multi-Crane \u00B7 Load Sharing \u00B7 Synchronised Operations \u00B7 BS 7121-1 Annex C', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'Multi-Crane \u00B7 Load Sharing \u00B7 Synchronised Operations \u00B7 BS 7121-1 Annex C', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.principalContractor} | ${d.planDate}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }));
 
   // 1 Lift Description & Category
@@ -652,7 +652,7 @@ function buildT4(d: LiftPlanData): (Paragraph | Table)[] {
   const els: (Paragraph | Table)[] = [];
 
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 0 }, children: [new TextRun({ text: 'LOLER COMPLIANCE LIFT PLAN', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: 'LOLER 1998 \u00B7 PUWER 1998 \u00B7 BS 7121 \u00B7 Regulatory Compliance Evidence', size: SM, font: 'Arial', color: 'FFFFFFB0' })] }));
+  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: 'LOLER 1998 \u00B7 PUWER 1998 \u00B7 BS 7121 \u00B7 Regulatory Compliance Evidence', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
   els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '334155' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.principalContractor} | ${d.planDate}`, size: SM, font: 'Arial', color: 'cbd5e1' })] }));
 
   // 1 Lift Summary

@@ -876,7 +876,7 @@ function buildT2(d: CoshhData): Document {
           new Paragraph({
             shading: { type: ShadingType.CLEAR, fill: RED_D },
             spacing: { before: 0, after: 0 },
-            children: [new TextRun({ text: '\u26A0 COSHH ASSESSMENT \u2014 HAZARDOUS SUBSTANCE', bold: true, size: SM, font: 'Arial', color: 'FFFFFF80' })],
+            children: [new TextRun({ text: '\u26A0 COSHH ASSESSMENT \u2014 HAZARDOUS SUBSTANCE', bold: true, size: SM, font: 'Arial', color: 'CCCCCC' })],
           }),
           new Paragraph({
             shading: { type: ShadingType.CLEAR, fill: RED_D },
@@ -886,7 +886,7 @@ function buildT2(d: CoshhData): Document {
           new Paragraph({
             shading: { type: ShadingType.CLEAR, fill: RED_D },
             spacing: { after: 80 },
-            children: [new TextRun({ text: 'Control of Substances Hazardous to Health Regulations 2002', size: BODY, font: 'Arial', color: 'FFFFFFC0' })],
+            children: [new TextRun({ text: 'Control of Substances Hazardous to Health Regulations 2002', size: BODY, font: 'Arial', color: 'E6E6E6' })],
           }),
           // Black meta bar
           new Paragraph({
@@ -1195,7 +1195,7 @@ function buildT5(d: CoshhData): Document {
           new Paragraph({
             shading: { type: ShadingType.CLEAR, fill: TEAL },
             spacing: { after: 80 },
-            children: [new TextRun({ text: 'Control of Substances Hazardous to Health Regulations 2002', size: BODY, font: 'Arial', color: 'FFFFFFB0' })],
+            children: [new TextRun({ text: 'Control of Substances Hazardous to Health Regulations 2002', size: BODY, font: 'Arial', color: 'D9D9D9' })],
           }),
           h.spacer(60),
           // Document Control Block

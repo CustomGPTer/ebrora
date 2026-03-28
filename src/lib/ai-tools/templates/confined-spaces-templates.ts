@@ -645,9 +645,9 @@ function buildT2(d: CSData): Document {
     styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Confined Space Assessment') }, footers: { default: h.ebroraFooter() },
       children: [
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 0 }, children: [new TextRun({ text: '\u26A0 CONFINED SPACE ASSESSMENT \u2014 IMMEDIATELY DANGEROUS TO LIFE', bold: true, size: SM, font: 'Arial', color: 'FFFFFF90' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 0 }, children: [new TextRun({ text: '\u26A0 CONFINED SPACE ASSESSMENT \u2014 IMMEDIATELY DANGEROUS TO LIFE', bold: true, size: SM, font: 'Arial', color: 'D0D0D0' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 0 }, children: [new TextRun({ text: d.spaceName || 'Confined Space', bold: true, size: XL + 2, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 HSE L101 ACoP', size: BODY, font: 'Arial', color: 'FFFFFFC0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 HSE L101 ACoP', size: BODY, font: 'Arial', color: 'E6E6E6' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '1a1a1a' }, spacing: { after: 60 }, children: [new TextRun({ text: `Ref: ${d.documentRef}   |   Assessed: ${d.assessmentDate}   |   Assessor: ${d.assessedBy}   |   Review: ${d.reviewDate}`, size: SM, font: 'Arial', color: 'e5e5e5' })] }),
 
         dangerCallout(`\u26A0 DANGER \u2014 THIS SPACE CAN KILL: ${d.hazards.find(hz => hz.category === 'Atmospheric')?.causeSource || 'Atmospheric hazards identified'}. Entry ONLY with valid permit, continuous monitoring, forced ventilation, and rescue standby. MINIMUM 3 PERSONS AT ALL TIMES. LONE WORKING IS ABSOLUTELY PROHIBITED.`),
@@ -805,7 +805,7 @@ function buildT3(d: CSData): Document {
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Confined Space Entry Permit & Assessment') }, footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ORANGE }, spacing: { after: 0 }, children: [new TextRun({ text: 'CONFINED SPACE ENTRY PERMIT & ASSESSMENT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ORANGE }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 HSE L101 ACoP', size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ORANGE }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 HSE L101 ACoP', size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '78350f' }, spacing: { after: 60 }, children: [new TextRun({ text: `Ref: ${d.documentRef}   Space: ${d.spaceName}   Date: ${d.assessmentDate}   Valid: 12 hours max   Min 3 persons`, size: SM, font: 'Arial', color: 'fef3c7' })] }),
 
         secHead('1.0', 'Space & Hazard Summary', A),
@@ -899,7 +899,7 @@ function buildT4(d: CSData): Document {
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Confined Space Assessment & Rescue Plan') }, footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'CONFINED SPACE ASSESSMENT & RESCUE PLAN', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 Regulation 5 \u2014 Rescue Arrangements', size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 Regulation 5 \u2014 Rescue Arrangements', size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `Ref: ${d.documentRef}   Space: ${d.spaceName}   Date: ${d.assessmentDate}   Assessor: ${d.assessedBy}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }),
 
         // 1.0 Summary

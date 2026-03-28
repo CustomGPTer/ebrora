@@ -336,7 +336,7 @@ function buildT2(d: ErpData): Document {
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Emergency Quick Reference') }, footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'SITE EMERGENCY RESPONSE \u2014 QUICK REFERENCE', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef} | ${d.issueDate}`, size: SM, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef} | ${d.issueDate}`, size: SM, font: 'Arial', color: 'D9D9D9' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED }, alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: '\u26A0 IF IN DOUBT \u2014 EVACUATE TO MUSTER POINT \u26A0', bold: true, size: LG + 4, font: 'Arial', color: h.WHITE })] }),
 
         secHead('', 'Emergency Numbers', A),
@@ -400,7 +400,7 @@ function buildT3(d: ErpData): Document {
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Emergency Response Plan — Role Cards') }, footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 0 }, children: [new TextRun({ text: 'EMERGENCY RESPONSE PLAN \u2014 ROLE CARDS', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '334155' }, spacing: { after: 60 }, children: [new TextRun({ text: `Date: ${d.issueDate}   |   Prepared: ${d.preparedBy}   |   Review: ${d.reviewDate}   |   Site: ${d.siteAddress}`, size: SM, font: 'Arial', color: 'cbd5e1' })] }),
 
         secHead('1.0', 'Emergency Contacts & Muster', A),
@@ -461,7 +461,7 @@ function buildT4(d: ErpData): Document {
     sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Emergency Response Plan — Scenario Matrix') }, footers: { default: h.ebroraFooter() },
       children: [
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'EMERGENCY RESPONSE PLAN \u2014 SCENARIO MATRIX', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'FFFFFFB0' })] }),
+        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: `${d.projectName} | ${d.documentRef}`, size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
         new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `Date: ${d.issueDate}   |   Prepared: ${d.preparedBy}   |   Review: ${d.reviewDate}   |   Client: ${d.client}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }),
 
         secHead('1.0', 'Emergency Contacts & Muster', A),
