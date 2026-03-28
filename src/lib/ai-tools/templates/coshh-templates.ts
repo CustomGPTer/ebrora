@@ -481,7 +481,7 @@ function footerLine(): Paragraph {
 // SHARED SECTION BUILDERS — reused across templates
 // ═════════════════════════════════════════════════════════════════════════════
 
-function buildProductIdSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): Paragraph[] {
+function buildProductIdSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): (Paragraph | Table)[] {
   const labelW = Math.round(W * 0.35);
   const valueW = W - labelW;
   return [
@@ -502,7 +502,7 @@ function buildProductIdSection(d: CoshhData, num: string, accent: string, labelB
   ];
 }
 
-function buildCompositionSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildCompositionSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const cols = [
     { text: 'Component', width: Math.round(W * 0.28) },
     { text: 'CAS Number', width: Math.round(W * 0.16) },
@@ -520,7 +520,7 @@ function buildCompositionSection(d: CoshhData, num: string, accent: string, font
   ];
 }
 
-function buildGhsSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): Paragraph[] {
+function buildGhsSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): (Paragraph | Table)[] {
   const labelW = Math.round(W * 0.35);
   const valueW = W - labelW;
   return [
@@ -539,7 +539,7 @@ function buildGhsSection(d: CoshhData, num: string, accent: string, labelBg: str
   ];
 }
 
-function buildExposureSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildExposureSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const cols = [
     { text: 'Route', width: Math.round(W * 0.12) },
     { text: 'Health Effects', width: Math.round(W * 0.36) },
@@ -557,7 +557,7 @@ function buildExposureSection(d: CoshhData, num: string, accent: string, font = 
   ];
 }
 
-function buildWelSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): Paragraph[] {
+function buildWelSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): (Paragraph | Table)[] {
   const welCols = [
     { text: 'Substance', width: Math.round(W * 0.28) },
     { text: 'WEL (8-hr TWA)', width: Math.round(W * 0.22) },
@@ -579,7 +579,7 @@ function buildWelSection(d: CoshhData, num: string, accent: string, labelBg: str
   ];
 }
 
-function buildControlsSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildControlsSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const cols = [
     { text: 'Control Level', width: Math.round(W * 0.18) },
     { text: 'Measure', width: Math.round(W * 0.56) },
@@ -594,7 +594,7 @@ function buildControlsSection(d: CoshhData, num: string, accent: string, font = 
   ];
 }
 
-function buildPpeSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildPpeSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const cols = [
     { text: 'PPE Type', width: Math.round(W * 0.14) },
     { text: 'Specification', width: Math.round(W * 0.28) },
@@ -612,7 +612,7 @@ function buildPpeSection(d: CoshhData, num: string, accent: string, font = 'Aria
   ];
 }
 
-function buildRiskSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildRiskSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const rr = d.riskRating;
   const cols = [
     { text: 'Stage', width: Math.round(W * 0.36) },
@@ -633,7 +633,7 @@ function buildRiskSection(d: CoshhData, num: string, accent: string, font = 'Ari
   ];
 }
 
-function buildHealthSurvSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): Paragraph[] {
+function buildHealthSurvSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): (Paragraph | Table)[] {
   const hs = d.healthSurveillance;
   return [
     secHead(num, 'Health Surveillance', accent, font),
@@ -647,7 +647,7 @@ function buildHealthSurvSection(d: CoshhData, num: string, accent: string, label
   ];
 }
 
-function buildTrainingSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildTrainingSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const cols = [
     { text: 'Training Type', width: Math.round(W * 0.22) },
     { text: 'Content', width: Math.round(W * 0.34) },
@@ -663,7 +663,7 @@ function buildTrainingSection(d: CoshhData, num: string, accent: string, font = 
   ];
 }
 
-function buildFirstAidSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildFirstAidSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const cols = [
     { text: 'Scenario', width: Math.round(W * 0.14) },
     { text: 'Immediate Action', width: Math.round(W * 0.52) },
@@ -678,7 +678,7 @@ function buildFirstAidSection(d: CoshhData, num: string, accent: string, font = 
   ];
 }
 
-function buildSpillSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildSpillSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const cols = [
     { text: 'Step', width: Math.round(W * 0.22) },
     { text: 'Action', width: W - Math.round(W * 0.22) },
@@ -690,7 +690,7 @@ function buildSpillSection(d: CoshhData, num: string, accent: string, font = 'Ar
   ];
 }
 
-function buildStorageSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): Paragraph[] {
+function buildStorageSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): (Paragraph | Table)[] {
   const s = d.storage;
   return [
     secHead(num, 'Storage Requirements', accent, font),
@@ -706,7 +706,7 @@ function buildStorageSection(d: CoshhData, num: string, accent: string, labelBg:
   ];
 }
 
-function buildDisposalSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): Paragraph[] {
+function buildDisposalSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): (Paragraph | Table)[] {
   const disp = d.disposal;
   return [
     secHead(num, 'Disposal & Waste Classification', accent, font),
@@ -720,7 +720,7 @@ function buildDisposalSection(d: CoshhData, num: string, accent: string, labelBg
   ];
 }
 
-function buildTransportSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): Paragraph[] {
+function buildTransportSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): (Paragraph | Table)[] {
   const t = d.transport;
   return [
     secHead(num, 'Transport Information', accent, font),
@@ -732,7 +732,7 @@ function buildTransportSection(d: CoshhData, num: string, accent: string, labelB
   ];
 }
 
-function buildReviewSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): Paragraph[] {
+function buildReviewSection(d: CoshhData, num: string, accent: string, labelBg: string, labelColor: string, font = 'Arial'): (Paragraph | Table)[] {
   const mr = d.monitoringReview;
   return [
     secHead(num, 'Monitoring & Review', accent, font),
@@ -746,7 +746,7 @@ function buildReviewSection(d: CoshhData, num: string, accent: string, labelBg: 
   ];
 }
 
-function buildRefSection(d: CoshhData, num: string, accent: string, font = 'Arial'): Paragraph[] {
+function buildRefSection(d: CoshhData, num: string, accent: string, font = 'Arial'): (Paragraph | Table)[] {
   const cols = [
     { text: 'Reference', width: Math.round(W * 0.38) },
     { text: 'Description', width: W - Math.round(W * 0.38) },
