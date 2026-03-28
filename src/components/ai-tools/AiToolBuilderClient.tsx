@@ -11,6 +11,8 @@ import type {
 
 interface AiToolBuilderClientProps {
   toolConfig: AiToolConfig;
+  /** For TBT multi-template — passed to generate route */
+  tbtTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -42,7 +44,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -260,6 +262,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
           generationId,
           answers: allAnswers,
           description,
+          ...(tbtTemplateSlug ? { tbtTemplateSlug } : {}),
         }),
       });
 
@@ -280,7 +283,7 @@ export default function AiToolBuilderClient({ toolConfig }: AiToolBuilderClientP
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description]);
+  }, [generationId, rounds, description, tbtTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
