@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
-import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import type { AiToolSlug } from '@/lib/ai-tools';
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -42,6 +42,11 @@ export async function POST(req: NextRequest) {
       confinedSpacesTemplateSlug?: string;
       erpTemplateSlug?: string;
       incidentReportTemplateSlug?: string;
+      liftPlanTemplateSlug?: string;
+      manualHandlingTemplateSlug?: string;
+      noiseAssessmentTemplateSlug?: string;
+      permitToDigTemplateSlug?: string;
+      powraTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -162,6 +167,16 @@ export async function POST(req: NextRequest) {
       ? getErpTemplateGenerationPrompt(erpTemplateSlug as any)
       : (toolSlug === 'incident-report' && incidentReportTemplateSlug)
       ? getIncidentReportTemplateGenerationPrompt(incidentReportTemplateSlug as any)
+      : (toolSlug === 'lift-plan' && liftPlanTemplateSlug)
+      ? getLiftPlanTemplateGenerationPrompt(liftPlanTemplateSlug as any)
+      : (toolSlug === 'manual-handling' && manualHandlingTemplateSlug)
+      ? getManualHandlingTemplateGenerationPrompt(manualHandlingTemplateSlug as any)
+      : (toolSlug === 'noise-assessment' && noiseAssessmentTemplateSlug)
+      ? getNoiseAssessmentTemplateGenerationPrompt(noiseAssessmentTemplateSlug as any)
+      : (toolSlug === 'permit-to-dig' && permitToDigTemplateSlug)
+      ? getPermitToDigTemplateGenerationPrompt(permitToDigTemplateSlug as any)
+      : (toolSlug === 'powra' && powraTemplateSlug)
+      ? getPowraTemplateGenerationPrompt(powraTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A
@@ -242,6 +257,31 @@ export async function POST(req: NextRequest) {
     // Inject Incident Report template slug into content so docx-generator can route it
     if (toolSlug === 'incident-report' && incidentReportTemplateSlug) {
       documentContent._incidentReportTemplateSlug = incidentReportTemplateSlug;
+    }
+
+    // Inject Lift Plan template slug into content so docx-generator can route it
+    if (toolSlug === 'lift-plan' && liftPlanTemplateSlug) {
+      documentContent._liftPlanTemplateSlug = liftPlanTemplateSlug;
+    }
+
+    // Inject Manual Handling template slug into content so docx-generator can route it
+    if (toolSlug === 'manual-handling' && manualHandlingTemplateSlug) {
+      documentContent._manualHandlingTemplateSlug = manualHandlingTemplateSlug;
+    }
+
+    // Inject Noise Assessment template slug into content so docx-generator can route it
+    if (toolSlug === 'noise-assessment' && noiseAssessmentTemplateSlug) {
+      documentContent._noiseAssessmentTemplateSlug = noiseAssessmentTemplateSlug;
+    }
+
+    // Inject Permit to Dig template slug into content so docx-generator can route it
+    if (toolSlug === 'permit-to-dig' && permitToDigTemplateSlug) {
+      documentContent._permitToDigTemplateSlug = permitToDigTemplateSlug;
+    }
+
+    // Inject POWRA template slug into content so docx-generator can route it
+    if (toolSlug === 'powra' && powraTemplateSlug) {
+      documentContent._powraTemplateSlug = powraTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
