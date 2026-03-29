@@ -131,6 +131,7 @@ export default withAuth(
           pathname.startsWith('/blog/') ||
           pathname.startsWith('/api/auth') ||
           pathname.startsWith('/api/payments/webhook') ||
+          pathname.startsWith('/api/cron/') ||
           pathname.startsWith('/api/public/') ||
           pathname.startsWith('/api/ai-tools/') ||
           pathname.startsWith('/api/rams/generate-questions') ||
