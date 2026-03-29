@@ -30,6 +30,40 @@ function useTraceOnView(threshold = 0.3) {
 }
 
 /* ──────────────────────────────────────────────
+   RAMS Builder — Sidebar Card
+   (Compact version for side-by-side layouts)
+   ────────────────────────────────────────────── */
+export function RamsBuilderSidebarCard() {
+  const cardRef = useTraceOnView();
+
+  return (
+    <div className="prem-sidebar-wrap prem-trace prem-equal-card rounded-xl overflow-hidden shadow-sm" ref={cardRef}>
+      <div className="bg-gradient-to-r from-[#0f2d22] to-[#1B5745] px-5 py-3 relative overflow-hidden">
+        <div className="flex items-center gap-2.5">
+          <div className="prem-stars-mini">
+            <SparklesIcon className="w-4 h-4 text-emerald-300 relative z-[1]" />
+          </div>
+          <span className="text-sm font-semibold text-white">AI-Powered</span>
+        </div>
+      </div>
+      <div className="prem-sidebar-body p-5 bg-white border border-gray-200 border-t-0 rounded-b-xl">
+        <h4 className="text-sm font-bold text-gray-900">RAMS Builder</h4>
+        <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+          Generate professional Risk Assessments and Method Statements in minutes. 10 document formats, site-specific content, instant Word download.
+        </p>
+        <Link
+          href="/rams-builder"
+          className="prem-sidebar-cta mt-4 flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-[#1B5745] to-[#236b55] text-white text-xs font-semibold rounded-lg hover:brightness-110 transition-all duration-200 hover:-translate-y-0.5"
+        >
+          Try RAMS Builder
+          <ArrowSmIcon />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────
    RAMS Builder — Main Content Banner
    (Below the template grid, full width)
    ────────────────────────────────────────────── */
