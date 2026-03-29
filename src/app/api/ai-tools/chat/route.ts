@@ -20,6 +20,7 @@ import {
   EXPIRY_THRESHOLD_MS,
   AI_TOOL_LIMITS,
   getAiToolLimitByTier,
+  incrementAiToolUsage,
 } from '@/lib/ai-tools';
 import { getConversationPrompt } from '@/lib/ai-tools/system-prompts';
 import type {
@@ -320,6 +321,7 @@ export async function POST(req: NextRequest) {
         },
       });
       generationId = generation.id;
+      await incrementAiToolUsage(userId, toolSlug);
     }
 
     return NextResponse.json({
