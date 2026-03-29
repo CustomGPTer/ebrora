@@ -40,7 +40,7 @@ export default function CoshhTemplatePicker({ onSelect }: CoshhTemplatePickerPro
       return;
     }
     if (templateStatus === 'locked-upgrade') {
-      router.push('/rams-builder/pricing');
+      router.push('/pricing');
       return;
     }
     onSelect(slug);
@@ -60,7 +60,7 @@ export default function CoshhTemplatePicker({ onSelect }: CoshhTemplatePickerPro
           <p>Sign in to access templates and start generating COSHH assessments</p>
         )}
         {isAuthenticated && !isPaid && (
-          <p>Free plan: 2 templates available &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">Upgrade for all 5</a></p>
+          <p>Free plan: 2 templates available &middot; <a href="/pricing" className="template-picker-upgrade-link">Upgrade for all 5</a></p>
         )}
         {isAuthenticated && isPaid && (
           <p>All 5 templates available on your plan</p>
