@@ -116,6 +116,23 @@ function styleCell(
   cell.border = border || thinBorder;
 }
 
+// ─── Dynamic row height from text content ───
+function calcRowHeight(texts: { value: string; colWidth: number }[], fontSize: number = 9, minHeight: number = 30): number {
+  const lineHeight = fontSize + 5;
+  let maxLines = 1;
+  for (const { value, colWidth } of texts) {
+    if (!value) continue;
+    const charsPerLine = Math.max(Math.floor(colWidth * 1.27), 1);
+    const paragraphs = String(value).split(/\n/);
+    let lines = 0;
+    for (const p of paragraphs) {
+      lines += Math.max(Math.ceil(p.length / charsPerLine), 1);
+    }
+    if (lines > maxLines) maxLines = lines;
+  }
+  return Math.max(maxLines * lineHeight + 6, minHeight);
+}
+
 // ─── Section banner ───
 function sectionBanner(ws: ExcelJS.Worksheet, row: number, text: string, colEnd: number = 14) {
   ws.mergeCells(row, 1, row, colEnd);
@@ -136,7 +153,14 @@ function writeItems(ws: ExcelJS.Worksheet, items: ItpItem[], startRow: number): 
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const altFill = i % 2 === 0 ? LIGHT_GREY : WHITE;
-    ws.getRow(r).height = 52;
+    ws.getRow(r).height = calcRowHeight([
+      { value: item.operation, colWidth: 30 },
+      { value: item.controlledBy, colWidth: 20 },
+      { value: item.acceptRejectCriteria, colWidth: 22 },
+      { value: item.specRef, colWidth: 22 },
+      { value: item.records, colWidth: 20 },
+      { value: item.notes, colWidth: 30 },
+    ], 9, 30);
 
     styleCell(ws, r, 1, item.op, bodyBold, altFill, { horizontal: 'center', vertical: 'middle' });
     styleCell(ws, r, 2, item.operation, bodyFont, altFill);
@@ -472,7 +496,9 @@ function buildChecksheet(
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const altFill = i % 2 === 0 ? LIGHT_GREY : WHITE;
-    ws.getRow(r).height = 35;
+    ws.getRow(r).height = calcRowHeight([
+      { value: item.operation, colWidth: 30 },
+    ], 9, 24);
     styleCell(ws, r, 1, item.op, bodyBold, altFill, { horizontal: 'center', vertical: 'middle' });
     styleCell(ws, r, 2, item.operation, bodyFont, altFill);
     for (let c = 3; c <= 6; c++) {
