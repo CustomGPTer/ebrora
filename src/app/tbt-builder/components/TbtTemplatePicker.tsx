@@ -40,7 +40,7 @@ export default function TbtTemplatePicker({ onSelect }: TbtTemplatePickerProps) 
       return;
     }
     if (templateStatus === 'locked-upgrade') {
-      router.push('/rams-builder/pricing');
+      router.push('/pricing');
       return;
     }
     onSelect(slug);
@@ -60,7 +60,7 @@ export default function TbtTemplatePicker({ onSelect }: TbtTemplatePickerProps) 
           <p>Sign in to access templates and start generating toolbox talks</p>
         )}
         {isAuthenticated && !isPaid && (
-          <p>Free plan: 2 templates available &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">Upgrade for all 9</a></p>
+          <p>Free plan: 2 templates available &middot; <a href="/pricing" className="template-picker-upgrade-link">Upgrade for all 9</a></p>
         )}
         {isAuthenticated && isPaid && (
           <p>All 9 templates available on your plan</p>
