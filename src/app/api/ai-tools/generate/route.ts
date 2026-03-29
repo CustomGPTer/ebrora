@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       noiseAssessmentTemplateSlug?: string;
       permitToDigTemplateSlug?: string;
       powraTemplateSlug?: string;
+      scopeTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -281,6 +282,11 @@ export async function POST(req: NextRequest) {
     // Inject POWRA template slug into content so docx-generator can route it
     if (toolSlug === 'powra' && powraTemplateSlug) {
       documentContent._powraTemplateSlug = powraTemplateSlug;
+    }
+
+    // Inject Scope of Works template slug into content so docx-generator can route it
+    if (toolSlug === 'scope-of-works' && scopeTemplateSlug) {
+      documentContent._scopeTemplateSlug = scopeTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
