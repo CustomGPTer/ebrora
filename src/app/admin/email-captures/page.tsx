@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-utils';
 import { EmailCapturesClient } from '@/components/admin/EmailCapturesClient';
 
-export const metadata = { title: 'Email Captures – Admin' };
+export const metadata = { title: 'Registered Emails – Admin' };
 
 interface PageProps {
   searchParams: Promise<{ page?: string; source?: string; search?: string }>;
@@ -18,45 +18,74 @@ export default async function EmailCapturesPage({ searchParams }: PageProps) {
   const pageSize = 30;
   const skip = (page - 1) * pageSize;
 
-  const filter: any = {};
-  if (source !== 'ALL') filter.source = source;
+  // Build user filter
+  const filter: any = { email: { not: null } };
+
   if (search) {
     filter.OR = [
       { email: { contains: search, mode: 'insensitive' } },
       { name: { contains: search, mode: 'insensitive' } },
     ];
+    // When using OR, move the email not-null condition inside each
+    delete filter.email;
+    filter.AND = [
+      { email: { not: null } },
+      {
+        OR: [
+          { email: { contains: search, mode: 'insensitive' } },
+          { name: { contains: search, mode: 'insensitive' } },
+        ],
+      },
+    ];
   }
 
-  const [captures, totalCount, sources] = await Promise.all([
-    prisma.emailCapture.findMany({
+  // Source filtering: map to subscription tiers
+  if (source !== 'ALL') {
+    if (source === 'no-subscription') {
+      filter.subscription = null;
+    } else {
+      filter.subscription = { tier: source };
+    }
+  }
+
+  const [users, totalCount] = await Promise.all([
+    prisma.user.findMany({
       where: filter,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       skip,
       take: pageSize,
+      include: {
+        subscription: { select: { tier: true, status: true } },
+      },
     }),
-    prisma.emailCapture.count({ where: filter }),
-    prisma.emailCapture.groupBy({
-      by: ['source'],
-      _count: { source: true },
-      orderBy: { _count: { source: 'desc' } },
-    }),
+    prisma.user.count({ where: filter }),
+  ]);
+
+  // Count by subscription tier for source filter
+  const [freeCount, standardCount, professionalCount, noSubCount] = await Promise.all([
+    prisma.user.count({ where: { email: { not: null }, subscription: { tier: 'FREE' } } }),
+    prisma.user.count({ where: { email: { not: null }, subscription: { tier: 'STANDARD' } } }),
+    prisma.user.count({ where: { email: { not: null }, subscription: { tier: 'PROFESSIONAL' } } }),
+    prisma.user.count({ where: { email: { not: null }, subscription: null } }),
   ]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  const capturesData = captures.map((c) => ({
-    id: c.id,
-    email: c.email,
-    name: c.name || '',
-    source: c.source || 'unknown',
-    sourceId: c.sourceId || '',
-    createdAt: c.createdAt.toISOString(),
+  const capturesData = users.map((u) => ({
+    id: u.id,
+    email: u.email || '',
+    name: u.name || '',
+    source: u.subscription?.tier || 'no-subscription',
+    sourceId: u.subscription?.status || '',
+    createdAt: u.created_at.toISOString(),
   }));
 
-  const sourceCounts = sources.map((s) => ({
-    source: s.source || 'unknown',
-    count: s._count.source,
-  }));
+  const sourceCounts = [
+    { source: 'FREE', count: freeCount },
+    { source: 'STANDARD', count: standardCount },
+    { source: 'PROFESSIONAL', count: professionalCount },
+    { source: 'no-subscription', count: noSubCount },
+  ].filter((s) => s.count > 0);
 
   return (
     <EmailCapturesClient
