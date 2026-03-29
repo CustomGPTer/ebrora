@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { getUserUsage } from '@/lib/payments/usage-tracker';
+import { getSubscriptionDetails } from '@/lib/payments/paypal-client';
+import { resolveBillingFromPlanId } from '@/lib/payments/plan-config';
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,8 +29,16 @@ export async function GET(request: NextRequest) {
       renewalDate = subscription.current_period_end.toISOString();
     }
 
-    // Determine billing cycle
+    // Determine billing cycle from PayPal subscription
     let billing = 'MONTHLY';
+    if (subscription?.paypal_subscription_id && status === 'ACTIVE') {
+      try {
+        const details = await getSubscriptionDetails(subscription.paypal_subscription_id);
+        billing = resolveBillingFromPlanId(details.plan_id);
+      } catch {
+        // If we can't reach PayPal, default to MONTHLY — non-critical
+      }
+    }
 
     return NextResponse.json({
       tier,
