@@ -62,6 +62,10 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Behavioural Safety", slug: "behavioural-safety", description: "Safety observation cards, BBS audit forms, and positive intervention record templates." },
       { name: "CDM & Legal Compliance", slug: "cdm-and-legal", description: "CDM duty holder checklists, F10 notification trackers, and principal contractor compliance templates." },
       { name: "Seasonal Hazards", slug: "seasonal-hazards", description: "Winter working risk assessments, heat stress checklists, and adverse weather action plan templates." },
+      { name: "Site Inductions", slug: "site-inductions", description: "Contractor and visitor site induction presentations and sign-off templates." },
+      { name: "Toolbox Talks", slug: "toolbox-talks", description: "Toolbox talk presentation templates covering key construction site safety topics." },
+      { name: "Method Statements", slug: "method-statements", description: "RAMS briefing presentations and method statement communication templates." },
+      { name: "Emergency Planning", slug: "emergency-planning", description: "Emergency response procedure briefings and crisis management presentation templates." },
     ],
   },
 
@@ -77,6 +81,7 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Snagging", slug: "snagging", description: "Completion snagging lists and defect correction notices." },
       { name: "Quality Audits", slug: "quality-audits", description: "Internal quality audit checklists aligned with ISO 9001." },
       { name: "Material Compliance", slug: "material-compliance", description: "Material approval requests and test certificate registers." },
+      { name: "Quality Systems", slug: "quality-systems", description: "Quality management system induction presentations and QMS overview templates." },
     ],
   },
 
@@ -96,6 +101,8 @@ export const FT_CATEGORIES: FtCategory[] = [
       // — New from TBT merge —
       { name: "Water Pollution", slug: "water-pollution", description: "Surface water protection checklists, discharge consent monitoring logs, and silt control inspection forms." },
       { name: "Dust & Noise Control", slug: "dust-noise-control", description: "Section 61 consent trackers, noise monitoring logs, and dust suppression inspection checklists." },
+      { name: "Environmental Awareness", slug: "environmental-awareness", description: "Environmental awareness induction presentations and general environmental briefing templates." },
+      { name: "Sustainability", slug: "sustainability", description: "Carbon reduction plan presentations and sustainability strategy briefing templates." },
     ],
   },
 
@@ -128,6 +135,9 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Milestone Trackers", slug: "milestone-trackers", description: "Target vs actual date milestone register templates." },
       { name: "Constraint Logs", slug: "constraint-logs", description: "Planning constraints, blockers, and dependency tracker templates." },
       { name: "Shutdown & Outage Planning", slug: "shutdown-and-outage-planning", description: "Planned shutdown and outage works programme templates." },
+      { name: "Programme Overview", slug: "programme-overview", description: "Project programme overview presentations and master schedule briefing templates." },
+      { name: "Delay Analysis", slug: "delay-analysis", description: "Delay analysis presentations and EOT justification briefing templates." },
+      { name: "Logistics", slug: "logistics", description: "Phasing and logistics plan presentations and site logistics briefing templates." },
     ],
   },
 
@@ -142,6 +152,9 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Variations & Claims", slug: "variations-and-claims", description: "Variation registers and NEC early warning notice templates." },
       { name: "Cost Tracking", slug: "cost-tracking", description: "Cost vs budget trackers and monthly forecast sheet templates." },
       { name: "Subcontractor Payments", slug: "subcontractor-payments", description: "Interim payment certificates and payment application templates." },
+      { name: "Commercial Reports", slug: "commercial-reports", description: "Monthly commercial report presentations and financial summary briefing templates." },
+      { name: "Procurement", slug: "procurement", description: "Subcontractor pre-award presentations and procurement strategy briefing templates." },
+      { name: "Final Account", slug: "final-account", description: "Final account summary presentations and contract closeout briefing templates." },
     ],
   },
 
@@ -157,6 +170,7 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Logistics & Deliveries", slug: "logistics-and-deliveries", description: "Delivery booking sheets and laydown area plan templates." },
       { name: "Site Setup & Security", slug: "site-setup-and-security", description: "Site security checklists and establishment plan templates." },
       { name: "Visitor & Induction", slug: "visitor-and-induction", description: "Visitor sign-in sheets and site induction briefing packs." },
+      { name: "Site Rules", slug: "site-rules", description: "Site rules and conduct briefing presentations and site standards templates." },
     ],
   },
 
@@ -195,6 +209,8 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Fuel & Consumables", slug: "fuel-and-consumables", description: "Daily fuel usage draw-off log templates." },
       // — New from TBT merge —
       { name: "Small Plant & Tools", slug: "small-plant-and-tools", description: "Power tool inspection registers, hand tool check forms, and small plant issue records." },
+      { name: "Plant Safety", slug: "plant-safety", description: "Plant safety induction presentations and general plant awareness briefing templates." },
+      { name: "Operator Competence", slug: "operator-competence", description: "CPCS and operator competence briefing presentations and certification tracking templates." },
     ],
   },
 
@@ -272,6 +288,7 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Transmittals", slug: "transmittals", description: "Standard transmittal form templates." },
       { name: "Correspondence Logs", slug: "correspondence-logs", description: "Inbound/outbound mail tracker templates." },
       { name: "Document Numbering", slug: "document-numbering", description: "Project document numbering convention templates." },
+      { name: "Document Procedures", slug: "document-procedures", description: "Document control procedures briefing presentations and document management process templates." },
     ],
   },
 
@@ -312,6 +329,7 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Practical Completion", slug: "practical-completion", description: "Completion certificates and outstanding works register templates." },
       { name: "As-Built Records", slug: "as-built-records", description: "As-built drawing register and submission tracker templates." },
       { name: "Lessons Learned", slug: "lessons-learned", description: "Structured lessons learned registers and post-project review templates." },
+      { name: "Handover Packs", slug: "handover-packs", description: "Client handover pack presentations and project closeout briefing templates." },
     ],
   },
 
@@ -329,6 +347,7 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "TW Registers", slug: "tw-registers", description: "TWC/TWS approval trackers and permit to load forms." },
       { name: "Design Checklists", slug: "design-checklists", description: "BS 5975 category classification forms and TW design brief templates." },
       { name: "Specific TW Types", slug: "specific-tw-types", description: "Formwork checklists, propping schedules, and trench support inspection forms." },
+      { name: "TW Awareness", slug: "tw-awareness", description: "Temporary works awareness training presentations and BS 5975 overview briefing templates." },
     ],
   },
 
@@ -343,6 +362,7 @@ export const FT_CATEGORIES: FtCategory[] = [
       { name: "Scaffold Design", slug: "scaffold-design", description: "TG20 compliance checklists, scaffold design brief forms, and loading notice templates." },
       { name: "Erection & Dismantling", slug: "erection-and-dismantling", description: "Scaffold erection sequence records, handover certificates, and dismantling method statement templates." },
       { name: "System Scaffolding", slug: "system-scaffolding", description: "System scaffold inspection forms, MEWP scaffold platform checklists, and birdcage scaffold records." },
+      { name: "Scaffold Safety", slug: "scaffold-safety", description: "Scaffold safety awareness presentations and general scaffolding safety briefing templates." },
     ],
   },
 
