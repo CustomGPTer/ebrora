@@ -32,6 +32,8 @@ import type {
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+export const maxDuration = 300; // Vercel Pro allows up to 300s
+
 // Cooldown: 10 seconds between chat rounds per user (in-memory)
 const lastRoundTimestamps = new Map<string, number>();
 const COOLDOWN_CLEANUP_INTERVAL = 5 * 60 * 1000;
