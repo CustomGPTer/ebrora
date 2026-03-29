@@ -19,14 +19,14 @@ export default function IncidentReportTemplatePicker({ onSelect }: Props) {
   const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
   const canAccess = (slug: IncidentReportTemplateSlug): boolean => { if (!isAuthenticated) return false; if (isPaid) return true; return INCIDENT_REPORT_FREE_TEMPLATES.includes(slug); };
   const getStatus = (slug: IncidentReportTemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => { if (!isAuthenticated) return 'locked-auth'; if (canAccess(slug)) return 'available'; return 'locked-upgrade'; };
-  const handleClick = (slug: IncidentReportTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/incident-report-builder'); return; } if (s === 'locked-upgrade') { router.push('/rams-builder/pricing'); return; } onSelect(slug); };
+  const handleClick = (slug: IncidentReportTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/incident-report-builder'); return; } if (s === 'locked-upgrade') { router.push('/pricing'); return; } onSelect(slug); };
 
   return (
     <div className="template-picker-section">
       <div className="template-picker-header">
         <h2>Choose an Incident Report Template</h2>
         {!isAuthenticated && <p>Sign in to access templates and generate incident reports</p>}
-        {isAuthenticated && !isPaid && <p>Incident Report requires a paid plan &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">View plans</a></p>}
+        {isAuthenticated && !isPaid && <p>Incident Report requires a paid plan &middot; <a href="/pricing" className="template-picker-upgrade-link">View plans</a></p>}
         {isAuthenticated && isPaid && <p>All 4 templates available on your plan</p>}
       </div>
       <div className="template-grid-5">
