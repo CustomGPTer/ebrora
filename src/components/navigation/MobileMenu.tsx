@@ -28,7 +28,7 @@ const PRODUCTS = [
   {
     title: "AI Document Tools",
     description: "25+ construction document generators",
-    href: "/products",
+    href: "/",
     badge: null,
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
