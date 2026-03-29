@@ -83,3 +83,40 @@ export function getFormatsAccessByTier(tier: string): 'LIMITED' | 'ALL' {
       return 'LIMITED';
   }
 }
+
+// ── Resolve tier from PayPal plan ID ──
+// Checks ALL configured plan IDs — not just Professional.
+// Returns null if the plan ID doesn't match any known plan.
+
+export function resolveTierFromPlanId(
+  planId: string
+): 'STANDARD' | 'PROFESSIONAL' | null {
+  const standardMonthly = process.env.PAYPAL_PLAN_STANDARD_MONTHLY || '';
+  const standardYearly = process.env.PAYPAL_PLAN_STANDARD_YEARLY || '';
+  const premiumMonthly = process.env.PAYPAL_PLAN_PREMIUM_MONTHLY || '';
+  const premiumYearly = process.env.PAYPAL_PLAN_PREMIUM_YEARLY || '';
+
+  if (planId === premiumMonthly || planId === premiumYearly) {
+    return 'PROFESSIONAL';
+  }
+  if (planId === standardMonthly || planId === standardYearly) {
+    return 'STANDARD';
+  }
+
+  console.warn(`Unknown PayPal plan ID: ${planId}`);
+  return null;
+}
+
+// ── Resolve billing cycle from PayPal plan ID ──
+
+export function resolveBillingFromPlanId(
+  planId: string
+): 'MONTHLY' | 'YEARLY' {
+  const standardYearly = process.env.PAYPAL_PLAN_STANDARD_YEARLY || '';
+  const premiumYearly = process.env.PAYPAL_PLAN_PREMIUM_YEARLY || '';
+
+  if (planId === standardYearly || planId === premiumYearly) {
+    return 'YEARLY';
+  }
+  return 'MONTHLY';
+}
