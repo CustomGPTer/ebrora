@@ -65,7 +65,7 @@ export async function createSubscription(
                                   locale: 'en-GB',
                                   user_action: 'SUBSCRIBE_NOW',
                                   return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/rams-builder`,
-                                  cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/rams-builder/pricing`,
+                                  cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/pricing`,
                       },
                       custom_id: userId,
             }),
