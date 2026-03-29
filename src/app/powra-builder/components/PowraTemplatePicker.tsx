@@ -19,14 +19,14 @@ export default function PowraTemplatePicker({ onSelect }: Props) {
   const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
   const canAccess = (slug: PowraTemplateSlug): boolean => { if (!isAuthenticated) return false; if (isPaid) return true; return POWRA_FREE_TEMPLATES.includes(slug); };
   const getStatus = (slug: PowraTemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => { if (!isAuthenticated) return 'locked-auth'; if (canAccess(slug)) return 'available'; return 'locked-upgrade'; };
-  const handleClick = (slug: PowraTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/powra-builder'); return; } if (s === 'locked-upgrade') { router.push('/rams-builder/pricing'); return; } onSelect(slug); };
+  const handleClick = (slug: PowraTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/powra-builder'); return; } if (s === 'locked-upgrade') { router.push('/pricing'); return; } onSelect(slug); };
 
   return (
     <div className="template-picker-section">
       <div className="template-picker-header">
         <h2>Choose a POWRA Template</h2>
         {!isAuthenticated && <p>Sign in to access templates and generate point of work risk assessments</p>}
-        {isAuthenticated && !isPaid && <p>2 free templates available &middot; Upgrade for all 4 &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">View plans</a></p>}
+        {isAuthenticated && !isPaid && <p>2 free templates available &middot; Upgrade for all 4 &middot; <a href="/pricing" className="template-picker-upgrade-link">View plans</a></p>}
         {isAuthenticated && isPaid && <p>All 4 templates available on your plan</p>}
       </div>
       <div className="template-grid-5">
