@@ -10,6 +10,16 @@ interface ResourcesDropdownProps {
 
 const resources = [
   {
+    title: "Free Templates",
+    description: "Excel, Word and PowerPoint templates for construction teams",
+    href: "/free-templates",
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
+      </svg>
+    ),
+  },
+  {
     title: "Toolbox Talks",
     description: "Free downloadable safety talks across 27 categories",
     href: "/toolbox-talks",
@@ -30,12 +40,12 @@ const resources = [
     ),
   },
   {
-    title: "Free Templates",
-    description: "Excel, Word and PowerPoint templates for construction teams",
-    href: "/free-templates",
+    title: "FAQ",
+    description: "Common questions about Ebrora tools and subscriptions",
+    href: "/faq",
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
       </svg>
     ),
   },
@@ -71,20 +81,6 @@ export function ResourcesDropdown({ isOpen, onClose }: ResourcesDropdownProps) {
             </div>
           </Link>
         ))}
-      </div>
-
-      {/* Bottom CTA */}
-      <div className="bg-gray-50 border-t border-gray-100 px-4 py-2.5">
-        <Link
-          href="/rams-builder"
-          onClick={onClose}
-          className="flex items-center gap-2 text-xs font-semibold text-[#1B5B50] hover:text-[#144840] transition-colors"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Try the RAMS Builder — generate RAMS in minutes
-        </Link>
       </div>
     </div>
   );

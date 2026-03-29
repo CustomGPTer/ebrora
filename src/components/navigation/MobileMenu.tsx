@@ -1,4 +1,5 @@
 // src/components/navigation/MobileMenu.tsx
+// Full-screen overlay with sectioned navigation (Option B)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,35 +12,140 @@ interface MobileMenuProps {
   onClose: () => void;
 }
 
+/* ── Section data ── */
+const PRODUCTS = [
+  {
+    title: "RAMS Builder",
+    description: "Generate full RAMS with AI",
+    href: "/rams-builder",
+    badge: "Flagship",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+      </svg>
+    ),
+  },
+  {
+    title: "AI Document Tools",
+    description: "25+ construction document generators",
+    href: "/products",
+    badge: null,
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Premium Templates",
+    description: "Professional Excel & Word templates",
+    href: "/products",
+    badge: null,
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+      </svg>
+    ),
+  },
+];
+
+const RESOURCES = [
+  {
+    title: "Free Templates",
+    href: "/free-templates",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
+      </svg>
+    ),
+  },
+  {
+    title: "Toolbox Talks",
+    href: "/toolbox-talks",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Free Tools",
+    href: "/tools",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" />
+      </svg>
+    ),
+  },
+];
+
+const COMPANY = [
+  {
+    title: "Blog",
+    href: "/blog",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Pricing",
+    href: "/pricing",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+      </svg>
+    ),
+  },
+  {
+    title: "FAQ",
+    href: "/faq",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+      </svg>
+    ),
+  },
+  {
+    title: "About",
+    href: "/#about",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Contact",
+    href: "/#contact",
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+      </svg>
+    ),
+  },
+];
+
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
-  const [isResourcesExpanded, setIsResourcesExpanded] = useState(false);
-  const [isCompact, setIsCompact] = useState(false);
   const pathname = usePathname();
   const { data: session, status } = useSession();
-
-  // Detect compact vs mobile breakpoint
-  useEffect(() => {
-    function handleResize() {
-      setIsCompact(window.innerWidth >= 768);
-    }
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   function isActive(href: string): boolean {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   }
 
-  const isResourcesActive =
-    isActive("/toolbox-talks") ||
-    isActive("/tools") ||
-    isActive("/free-templates");
+  const itemClass = (href: string) =>
+    `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+      isActive(href)
+        ? "text-[#1B5B50] bg-[#1B5B50]/5"
+        : "text-gray-800 hover:bg-gray-50 active:bg-gray-100"
+    }`;
 
   return (
     <>
-      {/* Backdrop overlay */}
+      {/* Backdrop */}
       <div
         className={`fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -75,228 +181,147 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               Ebrora
             </span>
           </Link>
+          {/* Close — also 48×48 for big fingers */}
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+            className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors -mr-1"
             aria-label="Close menu"
           >
-            <svg
-              className="w-5 h-5 text-gray-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Navigation content */}
+        {/* Scrollable content */}
         <div className="overflow-y-auto h-[calc(100%-4rem)] flex flex-col">
-          <div className="px-4 py-5 space-y-1">
 
-            {/* === COMPACT (768-1023px): Only FAQ and Templates === */}
-            {/* === MOBILE (<768px): All items === */}
-
-            {/* Templates — always visible in hamburger */}
-            <Link
-              href="/products"
-              onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
-                isActive("/products")
-                  ? "text-[#1B5B50] bg-[#1B5B50]/5"
-                  : "text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              <svg className="w-5 h-5 text-[#1B5B50]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-              </svg>
-              <span className="text-base font-medium">Templates</span>
-            </Link>
-
-            {/* FAQ — always visible in hamburger */}
-            <Link
-              href="/faq"
-              onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
-                isActive("/faq")
-                  ? "text-[#1B5B50] bg-[#1B5B50]/5"
-                  : "text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              <svg className="w-5 h-5 text-[#1B5B50]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-              </svg>
-              <span className="text-base font-medium">FAQ</span>
-            </Link>
-
-            {/* Blog — mobile only (<768px) */}
-            {!isCompact && (
-              <Link
-                href="/blog"
-                onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
-                  isActive("/blog")
-                    ? "text-[#1B5B50] bg-[#1B5B50]/5"
-                    : "text-gray-800 hover:bg-gray-50"
-                }`}
-              >
-                <svg className="w-5 h-5 text-[#1B5B50]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
-                </svg>
-                <span className="text-base font-medium">Blog</span>
-              </Link>
-            )}
-
-            {/* Resources accordion — mobile only (<768px) */}
-            {!isCompact && (
-              <div>
-                <button
-                  onClick={() => setIsResourcesExpanded(!isResourcesExpanded)}
-                  className={`flex items-center justify-between w-full px-4 py-3.5 rounded-xl transition-colors ${
-                    isResourcesActive
-                      ? "text-[#1B5B50] bg-[#1B5B50]/5"
-                      : "text-gray-800 hover:bg-gray-50"
-                  }`}
-                  aria-expanded={isResourcesExpanded}
+          {/* ── Products section ── */}
+          <div className="px-4 pt-5 pb-2">
+            <p className="px-4 text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">
+              Products
+            </p>
+            <div className="space-y-0.5">
+              {PRODUCTS.map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  onClick={onClose}
+                  className={itemClass(item.href)}
                 >
-                  <span className="flex items-center gap-3">
-                    <svg className="w-5 h-5 text-[#1B5B50]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-                    </svg>
-                    <span className="text-base font-medium">Resources</span>
+                  <span className="w-9 h-9 rounded-lg bg-[#1B5B50]/8 flex items-center justify-center text-[#1B5B50]/70 shrink-0">
+                    {item.icon}
                   </span>
-                  <svg
-                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                      isResourcesExpanded ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-200 ${
-                    isResourcesExpanded
-                      ? "max-h-60 opacity-100 mt-1"
-                      : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <div className="ml-8 space-y-0.5 py-1">
-                    <Link href="/toolbox-talks" onClick={onClose} className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/toolbox-talks") ? "text-[#1B5B50] bg-[#1B5B50]/5" : "text-gray-600 hover:text-[#1B5B50] hover:bg-gray-50"}`}>
-                      Toolbox Talks
-                    </Link>
-                    <Link href="/tools" onClick={onClose} className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/tools") ? "text-[#1B5B50] bg-[#1B5B50]/5" : "text-gray-600 hover:text-[#1B5B50] hover:bg-gray-50"}`}>
-                      Free Tools
-                    </Link>
-                    <Link href="/free-templates" onClick={onClose} className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/free-templates") ? "text-[#1B5B50] bg-[#1B5B50]/5" : "text-gray-600 hover:text-[#1B5B50] hover:bg-gray-50"}`}>
-                      Free Templates
-                    </Link>
+                  <div className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="text-[15px] font-medium">{item.title}</span>
+                      {item.badge && (
+                        <span className="text-[8px] font-bold uppercase tracking-wider bg-[#1B5B50] text-white px-1.5 py-0.5 rounded">
+                          {item.badge}
+                        </span>
+                      )}
+                    </span>
+                    {item.description && (
+                      <span className="text-xs text-gray-500">{item.description}</span>
+                    )}
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* About — mobile only (<768px) */}
-            {!isCompact && (
-              <Link
-                href="/#about"
-                onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
-                  isActive("/#about")
-                    ? "text-[#1B5B50] bg-[#1B5B50]/5"
-                    : "text-gray-800 hover:bg-gray-50"
-                }`}
-              >
-                <svg className="w-5 h-5 text-[#1B5B50]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                </svg>
-                <span className="text-base font-medium">About</span>
-              </Link>
-            )}
-
-            {/* Contact — mobile only (<768px) */}
-            {!isCompact && (
-              <Link
-                href="/#contact"
-                onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
-                  isActive("/#contact")
-                    ? "text-[#1B5B50] bg-[#1B5B50]/5"
-                    : "text-gray-800 hover:bg-gray-50"
-                }`}
-              >
-                <svg className="w-5 h-5 text-[#1B5B50]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                </svg>
-                <span className="text-base font-medium">Contact</span>
-              </Link>
-            )}
+                </Link>
+              ))}
+            </div>
           </div>
 
-          {/* Bottom section — mobile only: RAMS Builder + Login */}
-          {!isCompact && (
-            <div className="px-4 pb-6 space-y-3 border-t border-gray-100 pt-4">
-              <Link
-                href="/rams-builder"
-                onClick={onClose}
-                className="flex items-center justify-center gap-2 w-full px-4 py-3.5 bg-[#1B5B50] text-white text-sm font-semibold rounded-xl hover:bg-[#144840] transition-colors shadow-sm"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                RAMS Builder
-              </Link>
+          {/* Divider */}
+          <div className="mx-4 border-t border-gray-100 my-2" />
 
-              {status !== "loading" &&
-                (session ? (
-                  <div className="flex gap-2">
-                    <Link
-                      href="/account"
-                      onClick={onClose}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#1B5B50] border border-[#1B5B50]/20 rounded-xl hover:bg-[#1B5B50]/5 transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                      </svg>
-                      Account
-                    </Link>
-                    <button
-                      onClick={() => {
-                        signOut();
-                        onClose();
-                      }}
-                      className="px-4 py-3 text-sm font-medium text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                ) : (
+          {/* ── Resources section ── */}
+          <div className="px-4 pb-2">
+            <p className="px-4 text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">
+              Resources
+            </p>
+            <div className="space-y-0.5">
+              {RESOURCES.map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  onClick={onClose}
+                  className={itemClass(item.href)}
+                >
+                  <span className="text-[#1B5B50]/60">{item.icon}</span>
+                  <span className="text-[15px] font-medium">{item.title}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="mx-4 border-t border-gray-100 my-2" />
+
+          {/* ── Company section ── */}
+          <div className="px-4 pb-4">
+            <p className="px-4 text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">
+              Company
+            </p>
+            <div className="space-y-0.5">
+              {COMPANY.map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  onClick={onClose}
+                  className={itemClass(item.href)}
+                >
+                  <span className="text-[#1B5B50]/60">{item.icon}</span>
+                  <span className="text-[15px] font-medium">{item.title}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Bottom: Auth + tagline ── */}
+          <div className="mt-auto px-4 pb-6 pt-4 border-t border-gray-100 space-y-3">
+            {status !== "loading" && (
+              session ? (
+                <div className="flex gap-2">
+                  <Link
+                    href="/account"
+                    onClick={onClose}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium text-[#1B5B50] border border-[#1B5B50]/20 rounded-xl hover:bg-[#1B5B50]/5 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                    Account
+                  </Link>
+                  <button
+                    onClick={() => { signOut(); onClose(); }}
+                    className="px-4 py-3.5 text-sm font-medium text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
                   <Link
                     href="/auth/login"
                     onClick={onClose}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-medium text-[#1B5B50] border border-[#1B5B50]/20 rounded-xl hover:bg-[#1B5B50]/5 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium text-[#1B5B50] border border-[#1B5B50]/20 rounded-xl hover:bg-[#1B5B50]/5 transition-colors"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-                    </svg>
-                    Login / Register
+                    Login
                   </Link>
-                ))}
+                  <Link
+                    href="/pricing"
+                    onClick={onClose}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-semibold text-white bg-[#1B5B50] rounded-xl hover:bg-[#144840] transition-colors"
+                  >
+                    Get started
+                  </Link>
+                </div>
+              )
+            )}
 
-              <p className="text-xs text-gray-400 text-center leading-relaxed pt-2">
-                Professional construction templates and tools built by site teams, for site teams.
-              </p>
-            </div>
-          )}
+            <p className="text-xs text-gray-400 text-center leading-relaxed pt-1">
+              Professional construction tools built by site teams, for site teams.
+            </p>
+          </div>
         </div>
       </div>
     </>
