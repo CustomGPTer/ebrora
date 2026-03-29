@@ -1,14 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import prisma from '@/lib/prisma';
-import { redirect } from 'next/navigation';
 import { sendEmail } from '@/lib/email/send-email';
 import { welcomeEmail } from '@/lib/email/templates';
 
+// HEAD requests (from email security scanners like Microsoft Safe Links)
+// must return 200 without consuming the token.
+export async function HEAD() {
+  return new NextResponse(null, { status: 200 });
+}
+
+// GET requests redirect to the confirmation page.
+// This handles users who have old-format links or direct API hits.
 export async function GET(request: NextRequest) {
+  const token = request.nextUrl.searchParams.get('token');
+  if (!token) {
+    return NextResponse.json(
+      { error: 'Verification token is missing' },
+      { status: 400 }
+    );
+  }
+
+  // Redirect to the confirmation page — don't consume the token here
+  return NextResponse.redirect(
+    new URL(`/auth/verify-email?token=${token}`, request.url)
+  );
+}
+
+// POST — the actual verification (triggered by the confirmation page button)
+export async function POST(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const token = searchParams.get('token');
+    const body = await request.json();
+    const token = body.token;
 
     if (!token) {
       return NextResponse.json(
@@ -50,7 +73,7 @@ export async function GET(request: NextRequest) {
       });
 
       return NextResponse.json(
-        { error: 'Verification token has expired' },
+        { error: 'Verification token has expired. Please register again.' },
         { status: 400 }
       );
     }
@@ -86,7 +109,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Send welcome email (non-blocking — don't fail verification if email fails)
+    // Send welcome email (non-blocking)
     try {
       const { subject, html } = welcomeEmail(user.name || 'there');
       await sendEmail(user.email, subject, html);
@@ -94,10 +117,7 @@ export async function GET(request: NextRequest) {
       console.error('Failed to send welcome email:', emailError);
     }
 
-    // Redirect to login with success message
-    return NextResponse.redirect(
-      new URL('/auth/login?verified=true', request.url)
-    );
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Email verification error:', error);
     return NextResponse.json(
