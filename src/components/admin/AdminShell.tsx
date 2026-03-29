@@ -21,7 +21,7 @@ const navSections = [
     title: 'Users & Revenue',
     links: [
       { href: '/admin/users', label: 'Users', icon: '👥' },
-      { href: '/admin/email-captures', label: 'Email Captures', icon: '📧' },
+      { href: '/admin/email-captures', label: 'Registered Emails', icon: '📧' },
     ],
   },
   {

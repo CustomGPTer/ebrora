@@ -53,7 +53,7 @@ export function EmailCapturesClient({ captures, currentPage, totalPages, totalCo
   };
 
   const exportCSV = () => {
-    const headers = ['Email', 'Name', 'Source', 'Source ID', 'Date'];
+    const headers = ['Email', 'Name', 'Tier', 'Status', 'Registered'];
     const rows = captures.map((c) => [
       c.email, c.name, c.source, c.sourceId,
       new Date(c.createdAt).toLocaleDateString('en-GB'),
@@ -63,7 +63,7 @@ export function EmailCapturesClient({ captures, currentPage, totalPages, totalCo
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ebrora-email-captures-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `ebrora-registered-emails-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -74,8 +74,8 @@ export function EmailCapturesClient({ captures, currentPage, totalPages, totalCo
     <div>
       <div className="admin-page-heading">
         <div>
-          <h2 className="admin-page-heading__title">Email Captures</h2>
-          <p className="admin-page-heading__subtitle">{totalCount} total captures</p>
+          <h2 className="admin-page-heading__title">Registered Emails</h2>
+          <p className="admin-page-heading__subtitle">{totalCount} registered emails</p>
         </div>
         <button className="admin-btn admin-btn--outline admin-export-btn" onClick={exportCSV}>
           📥 Export CSV
@@ -134,9 +134,9 @@ export function EmailCapturesClient({ captures, currentPage, totalPages, totalCo
               <tr>
                 <th>Email</th>
                 <th>Name</th>
-                <th>Source</th>
-                <th>Content ID</th>
-                <th>Date</th>
+                <th>Tier</th>
+                <th>Status</th>
+                <th>Registered</th>
               </tr>
             </thead>
             <tbody>
@@ -156,7 +156,7 @@ export function EmailCapturesClient({ captures, currentPage, totalPages, totalCo
                   <td colSpan={5}>
                     <div className="admin-empty">
                       <div className="admin-empty__icon">📧</div>
-                      <p className="admin-empty__text">No email captures found</p>
+                      <p className="admin-empty__text">No registered emails found</p>
                     </div>
                   </td>
                 </tr>
