@@ -42,9 +42,9 @@ export default async function AdminDashboard() {
     prisma.generation.count({ where: { created_at: { gte: monthStart } } }),
     prisma.aiToolGeneration.count({ where: { created_at: { gte: todayStart } } }),
     prisma.aiToolGeneration.count({ where: { created_at: { gte: monthStart } } }),
-    prisma.user.count({ where: { email: { not: null } } }),
-    prisma.user.count({ where: { email: { not: null }, created_at: { gte: todayStart } } }),
-    prisma.user.count({ where: { email: { not: null }, created_at: { gte: monthStart } } }),
+    prisma.user.count(),
+    prisma.user.count({ where: { created_at: { gte: todayStart } } }),
+    prisma.user.count({ where: { created_at: { gte: monthStart } } }),
     prisma.contentDownload.count({ where: { downloadedAt: { gte: todayStart } } }).catch(() => 0),
     prisma.contentDownload.count({ where: { downloadedAt: { gte: monthStart } } }).catch(() => 0),
     // Free template downloads specifically
