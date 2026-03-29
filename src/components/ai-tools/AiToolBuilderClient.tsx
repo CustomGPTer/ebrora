@@ -33,6 +33,8 @@ interface AiToolBuilderClientProps {
   permitToDigTemplateSlug?: string;
   /** For POWRA multi-template — passed to generate route */
   powraTemplateSlug?: string;
+  /** For Scope of Works multi-template — passed to generate route */
+  scopeTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -64,7 +66,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -295,6 +297,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           ...(noiseAssessmentTemplateSlug ? { noiseAssessmentTemplateSlug } : {}),
           ...(permitToDigTemplateSlug ? { permitToDigTemplateSlug } : {}),
           ...(powraTemplateSlug ? { powraTemplateSlug } : {}),
+          ...(scopeTemplateSlug ? { scopeTemplateSlug } : {}),
         }),
       });
 
@@ -315,7 +318,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
