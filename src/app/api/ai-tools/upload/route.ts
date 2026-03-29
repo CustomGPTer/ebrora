@@ -32,7 +32,7 @@ import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
 import type { AiToolSlug } from '@/lib/ai-tools/types';
 
-export const maxDuration = 60; // Vercel Pro max
+export const maxDuration = 300; // Vercel Pro allows up to 300s
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -183,12 +183,19 @@ export async function POST(req: NextRequest) {
     // and go straight to document generation.
     const generationPrompt = getGenerationPrompt(toolSlug);
 
+    // Truncate very large documents to stay within model context limits
+    // and avoid timeouts. ~80k chars ≈ 20k tokens — plenty for a thorough review.
+    const MAX_TEXT_CHARS = 80_000;
+    const parsedText = parsed.text.length > MAX_TEXT_CHARS
+      ? parsed.text.slice(0, MAX_TEXT_CHARS) + '\n\n[... document truncated at 80,000 characters for processing ...]'
+      : parsed.text;
+
     const phaseTwoMsg = `UPLOADED FILE: ${fileName} (${parsed.fileType.toUpperCase()})
 FILE SIZE: ${(file.size / 1024).toFixed(0)} KB
 CHARACTER COUNT: ${parsed.characterCount.toLocaleString()}
 
 FULL PARSED CONTENT:
-${parsed.text}
+${parsedText}
 
 Based on the above content, generate the complete ${toolConfig.documentLabel} as specified in the system prompt. Output ONLY valid JSON.`;
 
