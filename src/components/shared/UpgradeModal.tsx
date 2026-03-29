@@ -99,7 +99,7 @@ export default function UpgradeModal({
         {/* Actions */}
         <div className="flex gap-3">
           <Link
-            href="/rams-builder/pricing"
+            href="/pricing"
             className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#1B5745] text-white text-sm font-semibold rounded-lg hover:bg-[#143f33] transition-colors"
           >
             Upgrade Now
