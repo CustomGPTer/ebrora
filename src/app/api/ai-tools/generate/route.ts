@@ -16,6 +16,8 @@ import type { AiToolSlug } from '@/lib/ai-tools';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+export const maxDuration = 300; // Vercel Pro allows up to 300s
+
 const MAX_RETRIES = 2;
 const MAX_TOTAL_ANSWERS = 40;
 
