@@ -34,7 +34,7 @@ export default function CdmCheckerTemplatePicker({ onSelect }: Props) {
   const handleTemplateClick = (slug: CdmCheckerTemplateSlug) => {
     const s = getTemplateStatus(slug);
     if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/cdm-checker-builder'); return; }
-    if (s === 'locked-upgrade') { router.push('/rams-builder/pricing'); return; }
+    if (s === 'locked-upgrade') { router.push('/pricing'); return; }
     onSelect(slug);
   };
 
@@ -43,7 +43,7 @@ export default function CdmCheckerTemplatePicker({ onSelect }: Props) {
       <div className="template-picker-header">
         <h2>Choose a CDM Compliance Template</h2>
         {!isAuthenticated && <p>Sign in to access templates and start generating CDM compliance reports</p>}
-        {isAuthenticated && !isPaid && <p>CDM Compliance Checker requires a paid plan &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">View plans</a></p>}
+        {isAuthenticated && !isPaid && <p>CDM Compliance Checker requires a paid plan &middot; <a href="/pricing" className="template-picker-upgrade-link">View plans</a></p>}
         {isAuthenticated && isPaid && <p>All 4 templates available on your plan</p>}
       </div>
 
