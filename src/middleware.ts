@@ -134,7 +134,6 @@ export default withAuth(
           pathname.startsWith('/api/cron/') ||
           pathname.startsWith('/api/public/') ||
           pathname.startsWith('/api/ai-tools/') ||
-          pathname.startsWith('/api/rams/generate-questions') ||
           pathname.startsWith('/toolbox-talks') ||
           pathname.startsWith('/api/tbt-download') ||
           pathname.startsWith('/auth/') ||
