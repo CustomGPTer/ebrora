@@ -99,7 +99,7 @@ export default withAuth(
           '/terms-of-service',
           '/refund-policy',
           '/rams-builder',
-          '/rams-builder/pricing',
+          '/pricing',
           '/pricing',
           '/contact',
           '/login',
