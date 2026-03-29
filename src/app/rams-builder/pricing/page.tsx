@@ -1,13 +1,5 @@
-import type { Metadata } from 'next';
-import PricingClient from '@/components/rams/PricingClient';
+import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
-export const metadata: Metadata = {
-  title: 'RAMS Builder Pricing — Ebrora',
-  description: 'Choose a plan for the RAMS Builder. Free, Standard, or Premium.',
-};
-
-export default function PricingPage() {
-  return <PricingClient />;
+export default function OldPricingPage() {
+  redirect('/pricing');
 }
