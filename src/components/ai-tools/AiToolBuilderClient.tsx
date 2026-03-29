@@ -432,7 +432,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
             {userLoggedIn ? (
               <>
                 <Link
-                  href="/rams-builder/pricing"
+                  href="/pricing"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',

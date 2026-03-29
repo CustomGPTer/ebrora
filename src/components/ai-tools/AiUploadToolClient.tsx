@@ -272,7 +272,7 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
           </p>
           {upgradeRequired ? (
             <Link
-              href="/rams-builder/pricing"
+              href="/pricing"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-white transition-all"
               style={{ backgroundColor: accentColor }}
             >
