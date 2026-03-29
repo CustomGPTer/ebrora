@@ -29,18 +29,18 @@ const TIERS: TierData[] = [
   {
     tier: 'FREE',
     name: 'Starter',
-    tagline: 'Try the RAMS Builder — no card needed',
+    tagline: 'Try the platform — no card needed',
     monthlyPrice: 0,
     yearlyPrice: 0,
     ramsPerMonth: '1 RAMS / month',
-    formats: '2 formats',
+    formats: '10 AI tool uses / month',
     features: [
-      'Standard 5×5 risk matrix',
-      'H/M/L Simple format',
-      'AI-generated content',
-      'DOCX download',
+      'AI-generated documents (DOCX)',
+      '10 AI tool uses per month',
+      '1 RAMS document per month',
       '2 toolbox talk downloads / month',
       '2 free template downloads / month',
+      '2 RAMS formats (5×5 & H/M/L)',
     ],
     highlighted: false,
     cta: 'Get Started Free',
@@ -48,14 +48,17 @@ const TIERS: TierData[] = [
   {
     tier: 'STANDARD',
     name: 'Standard',
-    tagline: 'For site teams producing regular RAMS',
+    tagline: 'For site teams producing regular documents',
     monthlyPrice: 9.99,
     yearlyPrice: 99.99,
     ramsPerMonth: '10 RAMS / month',
-    formats: 'All 10 formats',
+    formats: '180 AI tool uses / month',
     badge: 'Most Popular',
     features: [
-      'Every risk assessment format',
+      'All 30+ AI construction tools',
+      '180 AI tool uses per month',
+      '10 RAMS documents per month',
+      'All 10 RAMS formats',
       'Company logo on documents',
       '10 toolbox talk downloads / month',
       '20 free template downloads / month',
@@ -73,9 +76,11 @@ const TIERS: TierData[] = [
     monthlyPrice: 19.99,
     yearlyPrice: 199.99,
     ramsPerMonth: '25 RAMS / month',
-    formats: 'All 10 formats',
+    formats: '600 AI tool uses / month',
     features: [
       'Everything in Standard',
+      '600 AI tool uses per month',
+      '25 RAMS documents per month',
       '20 toolbox talk downloads / month',
       '40 free template downloads / month',
       'Highest generation priority',
@@ -95,19 +100,19 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Can I get a refund?',
-    a: 'We offer a 14-day money-back guarantee from the date of your first subscription purchase. After 14 days, no refunds are available. Pay-per-RAMS purchases are non-refundable once generated.',
+    a: 'We offer a 14-day money-back guarantee from the date of your first subscription purchase. After 14 days, no refunds are available.',
   },
   {
-    q: 'Do unused RAMS roll over?',
-    a: 'No. Unused allowances reset at the start of each billing period.',
+    q: 'Do unused allowances roll over?',
+    a: 'No. Unused AI tool uses, RAMS documents, and download allowances reset at the start of each billing period.',
   },
   {
-    q: 'What formats are included in the free tier?',
-    a: 'Free accounts can generate documents in two formats: Standard 5×5 and H/M/L Simple. All 10 formats are unlocked on paid plans and pay-per-RAMS.',
+    q: 'What AI tools are included?',
+    a: 'Paid plans include all 30+ AI construction tools — COSHH assessments, safety alerts, RFIs, incident reports, toolbox talk generator, permit to dig, lift plans, and many more. Free accounts have access to a selection of tools with limited monthly uses.',
   },
   {
     q: 'Can I upload my company logo?',
-    a: 'Yes — on Standard and Professional plans your company logo appears in the document header. Upload it once in your account settings and it applies to all future RAMS.',
+    a: 'Yes — on Standard and Professional plans your company logo appears in document headers. Upload it once in your account settings and it applies to all future documents.',
   },
   {
     q: 'How long are download links available?',
@@ -121,8 +126,10 @@ const COMPARISON_ROWS: {
   standard: string | boolean;
   premium: string | boolean;
 }[] = [
-  { label: 'RAMS per month', free: '1', standard: '10', premium: '25' },
-  { label: 'Risk assessment formats', free: '2', standard: '10', premium: '10' },
+  { label: 'AI tool uses / month', free: '10', standard: '180', premium: '600' },
+  { label: 'AI tools available', free: '10', standard: '30+', premium: '30+' },
+  { label: 'RAMS documents / month', free: '1', standard: '10', premium: '25' },
+  { label: 'RAMS formats', free: '2', standard: '10', premium: '10' },
   { label: 'Toolbox talk downloads / month', free: '2', standard: '10', premium: '20' },
   { label: 'Free template downloads / month', free: '2', standard: '20', premium: '40' },
   { label: 'AI-generated content', free: true, standard: true, premium: true },
@@ -380,7 +387,7 @@ function PricingCard({
         {/* CTA */}
         {data.tier === 'FREE' && !isCurrentPlan ? (
           <Link
-            href={session ? '/rams-builder' : '/auth/register'}
+            href={session ? '/tools' : '/auth/register'}
             className="block w-full py-3.5 text-center text-[0.875rem] font-semibold rounded-lg border-2 transition-all duration-200 hover:shadow-md"
             style={{
               borderColor: 'var(--color-primary)',
@@ -477,7 +484,7 @@ export default function PricingClient() {
             className="text-[0.8rem] font-semibold uppercase tracking-widest mb-4"
             style={{ color: 'var(--color-primary)' }}
           >
-            RAMS Builder Pricing
+            Ebrora Pricing
           </p>
 
           <h1
@@ -491,7 +498,7 @@ export default function PricingClient() {
             className="text-[0.95rem] sm:text-[1.05rem] leading-relaxed max-w-xl mx-auto mb-10"
             style={{ color: 'var(--color-text-light)' }}
           >
-            Generate professional, CDM-compliant RAMS documents in minutes.
+            30+ AI construction tools, RAMS Builder, free templates, and toolbox talks.
             Start free — upgrade when you need more.
           </p>
 
@@ -574,50 +581,6 @@ export default function PricingClient() {
               </p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────
-          4. PAY-PER-RAMS BANNER
-          ───────────────────────────────────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6 sm:px-8 mt-10">
-        <div
-          className="relative overflow-hidden rounded-2xl p-7 sm:p-10"
-          style={{
-            background: 'linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 60%, var(--color-primary-mid) 100%)',
-          }}
-        >
-          {/* Dot pattern overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-              backgroundSize: '20px 20px',
-            }}
-          />
-
-          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-5">
-            <div className="text-center sm:text-left">
-              <h3
-                className="text-lg sm:text-xl font-bold text-white mb-1.5"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                Just need a single RAMS?
-              </h3>
-              <p className="text-white/75 text-[0.85rem] sm:text-[0.9rem] max-w-md">
-                Pay <span className="font-bold text-white">£2.99</span> per document — all 10 formats,
-                company logo included. No subscription.
-              </p>
-            </div>
-            <Link
-              href={session ? '/rams-builder' : '/auth/register'}
-              className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-lg text-[0.85rem] font-semibold transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
-              style={{ background: '#FFFFFF', color: 'var(--color-primary-dark)' }}
-            >
-              Buy Single RAMS — £2.99
-              <ArrowRight />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -795,20 +758,20 @@ export default function PricingClient() {
             className="text-[1.4rem] sm:text-[1.7rem] font-bold mb-3"
             style={{ fontFamily: 'var(--font-display)', color: 'var(--color-primary-dark)' }}
           >
-            Ready to streamline your RAMS?
+            Ready to streamline your site paperwork?
           </h2>
           <p className="text-[0.9rem] mb-7" style={{ color: 'var(--color-text-light)' }}>
-            Join site teams across the UK generating professional risk assessments
-            and method statements in minutes, not hours.
+            Join site teams across the UK generating professional construction documents
+            in minutes, not hours.
           </p>
           <Link
-            href={session ? '/rams-builder' : '/auth/register'}
+            href={session ? '/tools' : '/auth/register'}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg text-[0.9rem] font-semibold transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
             style={{ background: 'var(--color-primary)', color: '#FFFFFF' }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-primary-dark)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-primary)')}
           >
-            {session ? 'Start Generating' : 'Get Started Free'}
+            {session ? 'Explore AI Tools' : 'Get Started Free'}
             <ArrowRight />
           </Link>
         </div>
