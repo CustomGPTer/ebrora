@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Send verification email
-      const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${verificationToken}`;
+      const verifyUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?token=${verificationToken}`;
           const { subject, html } = verificationEmail(name, verifyUrl);
           await sendEmail(email.toLowerCase(), subject, html);
 
