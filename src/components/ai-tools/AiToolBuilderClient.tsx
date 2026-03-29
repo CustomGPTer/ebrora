@@ -176,6 +176,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
     setError(null);
     setStep('generating');
     setGeneratingPhase('questions');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     try {
       const res = await fetch('/api/ai-tools/chat', {
@@ -268,6 +269,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
     setError(null);
     setStep('generating');
     setGeneratingPhase('document');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     try {
       let answerNumber = 0;
@@ -533,6 +535,31 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
             <p className="scope-input-hint">
               {toolConfig.descriptionHint}
             </p>
+
+            {/* Detail quality prompt */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.6rem',
+              padding: '0.75rem 1rem',
+              background: '#F0FAF7',
+              border: '1px solid #D1E9E0',
+              borderRadius: '0.5rem',
+              marginBottom: '1rem',
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B5745" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '1px' }}>
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4M12 8h.01" />
+              </svg>
+              <p style={{
+                fontSize: '0.8rem',
+                color: '#1B5745',
+                lineHeight: '1.5',
+                margin: 0,
+              }}>
+                The more detail you provide, the better your document will be. Include specifics such as location, materials, equipment, site conditions, and any known hazards.
+              </p>
+            </div>
 
             <div className="scope-input-field">
               <textarea
