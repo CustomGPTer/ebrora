@@ -19,30 +19,19 @@ export default async function EmailCapturesPage({ searchParams }: PageProps) {
   const skip = (page - 1) * pageSize;
 
   // Build user filter
-  const filter: any = { email: { not: null } };
+  const filter: any = {};
 
   if (search) {
     filter.OR = [
       { email: { contains: search, mode: 'insensitive' } },
       { name: { contains: search, mode: 'insensitive' } },
     ];
-    // When using OR, move the email not-null condition inside each
-    delete filter.email;
-    filter.AND = [
-      { email: { not: null } },
-      {
-        OR: [
-          { email: { contains: search, mode: 'insensitive' } },
-          { name: { contains: search, mode: 'insensitive' } },
-        ],
-      },
-    ];
   }
 
   // Source filtering: map to subscription tiers
   if (source !== 'ALL') {
     if (source === 'no-subscription') {
-      filter.subscription = null;
+      filter.subscription = { is: null };
     } else {
       filter.subscription = { tier: source };
     }
@@ -63,17 +52,17 @@ export default async function EmailCapturesPage({ searchParams }: PageProps) {
 
   // Count by subscription tier for source filter
   const [freeCount, standardCount, professionalCount, noSubCount] = await Promise.all([
-    prisma.user.count({ where: { email: { not: null }, subscription: { tier: 'FREE' } } }),
-    prisma.user.count({ where: { email: { not: null }, subscription: { tier: 'STANDARD' } } }),
-    prisma.user.count({ where: { email: { not: null }, subscription: { tier: 'PROFESSIONAL' } } }),
-    prisma.user.count({ where: { email: { not: null }, subscription: null } }),
+    prisma.user.count({ where: { subscription: { tier: 'FREE' } } }),
+    prisma.user.count({ where: { subscription: { tier: 'STANDARD' } } }),
+    prisma.user.count({ where: { subscription: { tier: 'PROFESSIONAL' } } }),
+    prisma.user.count({ where: { subscription: { is: null } } }),
   ]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const capturesData = users.map((u) => ({
     id: u.id,
-    email: u.email || '',
+    email: u.email,
     name: u.name || '',
     source: u.subscription?.tier || 'no-subscription',
     sourceId: u.subscription?.status || '',
