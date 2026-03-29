@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { getSubscriptionDetails } from '@/lib/payments/paypal-client';
+import { resolveTierFromPlanId } from '@/lib/payments/plan-config';
 
 /**
- * GET  /api/admin/fix-subscription?email=user@example.com
  * POST /api/admin/fix-subscription  { email: string }
  *
  * Syncs a user's subscription record with the actual PayPal state.
- * Requires ADMIN role.
+ * Requires ADMIN role. POST-only — state-changing operations must not be GET.
  */
 
 async function fixSubscription(email: string) {
@@ -40,13 +40,9 @@ async function fixSubscription(email: string) {
   const paypalStatus = paypalDetails.status;
   const planId = paypalDetails.plan_id;
 
-  // Determine tier from plan ID
-  let tier: 'STANDARD' | 'PROFESSIONAL' = 'STANDARD';
-  const premiumMonthly = process.env.PAYPAL_PLAN_PREMIUM_MONTHLY || '';
-  const premiumYearly = process.env.PAYPAL_PLAN_PREMIUM_YEARLY || '';
-  if (planId === premiumMonthly || planId === premiumYearly) {
-    tier = 'PROFESSIONAL';
-  }
+  // Determine tier from plan ID using shared resolver
+  const resolvedTier = resolveTierFromPlanId(planId);
+  const tier = resolvedTier || 'STANDARD';
 
   // Map PayPal status to our DB status
   let dbStatus: 'ACTIVE' | 'CANCELLED' | 'PAST_DUE' | 'EXPIRED' = 'ACTIVE';
@@ -116,28 +112,10 @@ async function fixSubscription(email: string) {
     paypal: {
       status: paypalStatus,
       planId,
+      resolvedTier: resolvedTier || 'UNKNOWN (defaulted to STANDARD)',
       nextBillingTime: paypalDetails.billing_info?.next_billing_time,
     },
   });
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const email = request.nextUrl.searchParams.get('email');
-    if (!email) {
-      return NextResponse.json(
-        { error: 'Add ?email=user@example.com to the URL' },
-        { status: 400 }
-      );
-    }
-    return await fixSubscription(email);
-  } catch (error) {
-    console.error('Fix subscription error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fix subscription' },
-      { status: 500 }
-    );
-  }
 }
 
 export async function POST(request: NextRequest) {
