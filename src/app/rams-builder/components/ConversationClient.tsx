@@ -199,7 +199,7 @@ export default function ConversationClient({
       {/* Progress indicator */}
       <div className="questionnaire-page-indicator">
         <span>
-          Round {currentRoundNumber} · {totalAsked} questions asked so far
+          Round {currentRoundNumber} · {totalAsked} of 8–15 questions asked
         </span>
       </div>
 
