@@ -78,7 +78,7 @@
    ============================================================================ */
 .hp-hero {
   position: relative;
-  overflow: visible;
+  overflow: clip;
   background: linear-gradient(160deg, #0f2d22 0%, #1B5B50 45%, #1a6b5c 100%);
   padding: 4rem 1.5rem 3.5rem;
   text-align: center;
@@ -248,6 +248,7 @@
   justify-content: center;
   gap: 0.4rem;
   margin-top: 0.6rem;
+  flex-wrap: wrap;
 }
 .hp-filter-pill {
   padding: 0.3rem 0.75rem;
