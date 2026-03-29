@@ -31,7 +31,7 @@ export default function ConfinedSpacesTemplatePicker({ onSelect }: Props) {
   const handleClick = (slug: ConfinedSpacesTemplateSlug) => {
     const s = getStatus(slug);
     if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/confined-spaces-builder'); return; }
-    if (s === 'locked-upgrade') { router.push('/rams-builder/pricing'); return; }
+    if (s === 'locked-upgrade') { router.push('/pricing'); return; }
     onSelect(slug);
   };
 
@@ -40,7 +40,7 @@ export default function ConfinedSpacesTemplatePicker({ onSelect }: Props) {
       <div className="template-picker-header">
         <h2>Choose a Confined Space Template</h2>
         {!isAuthenticated && <p>Sign in to access templates and start generating confined space assessments</p>}
-        {isAuthenticated && !isPaid && <p>Free plan: 2 templates available &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">Upgrade for all 4</a></p>}
+        {isAuthenticated && !isPaid && <p>Free plan: 2 templates available &middot; <a href="/pricing" className="template-picker-upgrade-link">Upgrade for all 4</a></p>}
         {isAuthenticated && isPaid && <p>All 4 templates available on your plan</p>}
       </div>
       <div className="template-grid-5">
