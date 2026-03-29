@@ -29,9 +29,10 @@ const RAMS_LIMITS: Record<string, number> = {
   PROFESSIONAL: 25,
 };
 
-// Absolute max questions across all rounds to prevent runaway conversations
-const MAX_TOTAL_QUESTIONS = 30;
-const MAX_ROUNDS = 6;
+// Question limits: AI judges readiness between MIN and MAX
+const MIN_TOTAL_QUESTIONS = 8;
+const MAX_TOTAL_QUESTIONS = 15;
+const MAX_ROUNDS = 5;
 
 // Answer validation limits
 const MAX_ANSWER_WORDS = 150;
@@ -245,7 +246,8 @@ export async function POST(req: NextRequest) {
       .replace('{{TEMPLATE_SECTIONS}}', sections)
       .replace('{{ROUND_NUMBER}}', String(roundNumber))
       .replace('{{TOTAL_ASKED}}', String(totalQuestionsAsked))
-      .replace('{{MAX_QUESTIONS}}', String(MAX_TOTAL_QUESTIONS));
+      .replaceAll('{{MIN_QUESTIONS}}', String(MIN_TOTAL_QUESTIONS))
+      .replaceAll('{{MAX_QUESTIONS}}', String(MAX_TOTAL_QUESTIONS));
 
     // Build messages array with conversation history
     const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
@@ -282,13 +284,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Add the prompt for the next round
+    // Add the prompt for the next round — enforce minimum before allowing "ready"
+    const belowMinimum = totalQuestionsAsked < MIN_TOTAL_QUESTIONS;
     messages.push({
       role: 'user',
       content:
         roundNumber === 1
           ? 'Based on my work description and the template sections, ask me your first batch of questions.'
-          : 'Based on my answers so far, ask your next batch of follow-up questions — or tell me you have enough information.',
+          : belowMinimum
+            ? `Based on my answers so far, ask your next batch of follow-up questions. You have only asked ${totalQuestionsAsked} questions so far — the minimum is ${MIN_TOTAL_QUESTIONS}. You MUST continue asking questions. Do NOT signal "ready" yet.`
+            : 'Based on my answers so far, ask your next batch of follow-up questions — or tell me you have enough information.',
     });
 
     // AI Call
@@ -308,8 +313,15 @@ export async function POST(req: NextRequest) {
     // Record the cooldown timestamp AFTER successful AI call
     lastRoundTimestamps.set(userId, Date.now());
 
-    // AI signals it has enough info
+    // AI signals it has enough info — enforce minimum server-side
     if (parsed.status === 'ready') {
+      if (totalQuestionsAsked < MIN_TOTAL_QUESTIONS) {
+        // AI tried to finish too early — override and force more questions
+        // This is a safety net; the prompt should prevent this in most cases
+        throw new Error(
+          `Only ${totalQuestionsAsked} questions asked (minimum ${MIN_TOTAL_QUESTIONS}). Please submit again to continue the interview.`
+        );
+      }
       return NextResponse.json({
         status: 'ready',
         roundNumber,
@@ -324,13 +336,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Normalise question IDs (ensure unique)
-    const questions: ConversationQuestion[] = parsed.questions.map(
+    let questions: ConversationQuestion[] = parsed.questions.map(
       (q: any, idx: number) => ({
         id: q.id || `r${roundNumber}q${idx + 1}`,
         question: q.question,
         context: q.context || undefined,
       })
     );
+
+    // Trim questions if they would exceed MAX_TOTAL_QUESTIONS
+    const remaining = MAX_TOTAL_QUESTIONS - totalQuestionsAsked;
+    if (questions.length > remaining) {
+      questions = questions.slice(0, Math.max(remaining, 1));
+    }
 
     const newTotal = totalQuestionsAsked + questions.length;
 
