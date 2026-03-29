@@ -364,8 +364,16 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'scope-of-works') {
-    const { buildScopeOfWorksDocument } = await import('./templates/scope-of-works-template');
-    const doc = await buildScopeOfWorksDocument(content as any);
+    const scopeSlug = (content as any)._scopeTemplateSlug;
+    let doc;
+    if (scopeSlug) {
+      const { buildScopeTemplateDocument } = await import('./templates/scope-of-works-templates');
+      doc = await buildScopeTemplateDocument(content as any, scopeSlug);
+    } else {
+      // Fallback to original single template (backwards compatible)
+      const { buildScopeOfWorksDocument } = await import('./templates/scope-of-works-template');
+      doc = await buildScopeOfWorksDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);
