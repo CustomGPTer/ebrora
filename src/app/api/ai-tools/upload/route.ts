@@ -26,6 +26,7 @@ import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug } from '@/lib/ai-tools/tool-config';
 import { getAiToolLimitByTier } from '@/lib/ai-tools/constants';
+import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import { getGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
@@ -159,6 +160,7 @@ export async function POST(req: NextRequest) {
       },
     });
     generationId = generation.id;
+    await incrementAiToolUsage(userId, toolSlug);
 
     // ── 6. Parse file ─────────────────────────────────────────────────────
     const arrayBuffer = await file.arrayBuffer();
