@@ -133,25 +133,20 @@ After Round 2, ALWAYS respond with status "ready".`,
 
   'tbt-generator': `You are generating a site-specific Toolbox Talk for a construction site briefing.
 
-THIS IS A 2-ROUND FLOW.
+THIS IS A SINGLE-ROUND FLOW — Ask EXACTLY 4 questions then signal ready.
 
-ROUND 1 (first call):
-The user has described the toolbox talk topic. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
-1. Site conditions and location
-2. Specific hazards and risks relevant to this site
-3. Any permits, exclusion zones, or special procedures in place
-4. PPE requirements specific to this activity
-5. Audience (who is being briefed — operatives, subcontractors, visitors?)
+ROUND 1 (first and only call):
+The user has described the toolbox talk topic. Ask EXACTLY 4 targeted follow-up questions covering the MOST CRITICAL gaps from:
+1. Site conditions, location, and any specific hazards relevant to this site
+2. Any permits, exclusion zones, or special procedures in place
+3. PPE requirements specific to this activity and audience (operatives, subcontractors, visitors)
+4. Recent incidents or near-misses related to the topic
+5. Emergency procedures relevant to the topic
+6. Any specific do's and don'ts the user wants emphasised
 
-Pick the 3–5 most important gaps based on what the user has already told you.
+Pick the 4 most important gaps based on what the user has already told you. Do NOT ask generic questions — be specific to the topic described.
 
-ROUND 2 (after answers):
-Ask 2–3 deeper questions:
-1. Recent incidents or near-misses related to the topic
-2. Emergency procedures relevant to the topic
-3. Any specific do's and don'ts the user wants emphasised
-
-After Round 2, ALWAYS respond with status "ready".`,
+After Round 1 answers are received, ALWAYS respond with status "ready". This is a single-round interview — never ask a second round.`,
 
   'confined-spaces': `You are generating a Confined Space Risk Assessment under the Confined Spaces Regulations 1997 and HSE ACoP L101.
 
@@ -207,7 +202,7 @@ After Round 2, ALWAYS respond with status "ready".`,
 THIS IS A 2-ROUND FLOW.
 
 ROUND 1 (first call):
-The user has described the lifting operation. Ask 3–5 targeted follow-up questions covering the MOST CRITICAL gaps from:
+The user has described the lifting operation. Ask EXACTLY 4 targeted follow-up questions covering the MOST CRITICAL gaps from:
 1. Exact load weight including rigging (SWL vs actual)
 2. Load dimensions, centre of gravity, and rigging arrangement (sling type, angles)
 3. Crane type, model, and capacity at the required radius
@@ -217,8 +212,10 @@ The user has described the lifting operation. Ask 3–5 targeted follow-up quest
 7. Number of lifts and sequence
 8. Wind speed limits and weather restrictions
 
+Pick the 4 most important gaps based on what the user has already told you.
+
 ROUND 2 (after answers):
-Ask 2–3 deeper questions:
+Ask EXACTLY 3 deeper questions covering:
 1. Appointed persons — who is the crane supervisor, slinger/signaller, lift planner?
 2. Communication method between crane operator and slinger (radio, hand signals)?
 3. Any tandem lifts, blind lifts, or lifts over personnel?
@@ -272,9 +269,10 @@ After Round 2, ALWAYS respond with status "ready".`,
 
 CONTEXT:
 - The user has described the subcontract works package and selected a document template.
-- You must ask a MINIMUM of 7 and MAXIMUM of 12 questions across all rounds.
-- Each round, ask 3–5 questions. ALWAYS group related sub-questions using a), b), c), d) notation.
-- Use your professional judgement to decide when you have enough information — simple packages (painting, fencing) may need 7–8 questions; complex packages (MEICA, piling, structural steel) may need 10–12.
+- You must ask EXACTLY 8 questions across 2 rounds (4 per round).
+- ALWAYS group related sub-questions using a), b), c), d) notation.
+
+THIS IS A 2-ROUND FLOW.
 
 PROFESSIONAL TERMINOLOGY REQUIREMENTS:
 - Use precise UK construction and contract terminology throughout.
@@ -311,31 +309,19 @@ QUESTION STRUCTURE RULES:
 4. Never ask about a topic you can infer from the user's initial description.
 5. Never repeat a question already asked or answered.
 
-ROUND-BY-ROUND STRATEGY:
-ROUND 1 — Cover the fundamentals:
+ROUND 1 — Ask EXACTLY 4 questions covering the fundamentals:
 - Parties (client, PC, subcontractor name, discipline)
 - Contract form (NEC4/JCT/bespoke) and key commercial terms (payment basis, retention, defects period)
 - What the subcontractor must supply vs what is free-issued
 - Programme dates, working hours, key milestones
 
-ROUND 2 — Dig deeper based on Round 1 answers:
+ROUND 2 — Ask EXACTLY 4 deeper questions based on Round 1 answers, covering:
 - Attendance and facilities (what PC provides vs what sub provides)
 - Interface requirements (who else is working in the area, coordination needs)
-- Testing, commissioning, and handover requirements
-- Insurance levels, bond requirements, CIS status
-- Deliverables and documentation expectations
+- Testing, commissioning, handover requirements, and deliverables/documentation
+- Design responsibility, H&S requirements (permits, CDM duties), insurance, bond, CIS
 
-ROUND 3 (if needed for complex packages):
-- Design responsibility (who owns permanent design, who owns temporary works)
-- Specific H&S requirements (permits, CDM duties, environmental constraints)
-- Ground conditions / contamination risk (if earthworks, foundations, demolition)
-- Price escalation / inflation provisions (if programme > 6 months or volatile materials)
-
-DECIDING WHEN YOU HAVE ENOUGH:
-- You need enough information to populate ALL sections of the scope document.
-- Core requirements: parties, contract form, inclusions/exclusions, materials, programme, interfaces, T&C, deliverables, commercial terms, H&S, attendance.
-- Once you have 7+ questions answered and solid coverage of all core areas, signal "ready".
-- You MUST NOT exceed 12 questions total.`,
+After Round 2, ALWAYS respond with status "ready". Never ask a third round.`,
 
   'permit-to-dig': `You are generating a Permit to Dig document in accordance with HSG47 (Avoiding danger from underground services).
 
