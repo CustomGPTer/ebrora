@@ -19,14 +19,14 @@ export default function PermitToDigTemplatePicker({ onSelect }: Props) {
   const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
   const canAccess = (slug: PermitToDigTemplateSlug): boolean => { if (!isAuthenticated) return false; if (isPaid) return true; return PERMIT_TO_DIG_FREE_TEMPLATES.includes(slug); };
   const getStatus = (slug: PermitToDigTemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => { if (!isAuthenticated) return 'locked-auth'; if (canAccess(slug)) return 'available'; return 'locked-upgrade'; };
-  const handleClick = (slug: PermitToDigTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/permit-to-dig-builder'); return; } if (s === 'locked-upgrade') { router.push('/rams-builder/pricing'); return; } onSelect(slug); };
+  const handleClick = (slug: PermitToDigTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/permit-to-dig-builder'); return; } if (s === 'locked-upgrade') { router.push('/pricing'); return; } onSelect(slug); };
 
   return (
     <div className="template-picker-section">
       <div className="template-picker-header">
         <h2>Choose a Permit to Dig Template</h2>
         {!isAuthenticated && <p>Sign in to access templates and generate permits to dig</p>}
-        {isAuthenticated && !isPaid && <p>2 free templates available &middot; Upgrade for all 4 &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">View plans</a></p>}
+        {isAuthenticated && !isPaid && <p>2 free templates available &middot; Upgrade for all 4 &middot; <a href="/pricing" className="template-picker-upgrade-link">View plans</a></p>}
         {isAuthenticated && isPaid && <p>All 4 templates available on your plan</p>}
       </div>
       <div className="template-grid-5">
