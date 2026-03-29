@@ -91,6 +91,7 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const processingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const submitBtnRef = useRef<HTMLButtonElement>(null);
 
   const accentColor = `#${toolConfig.accentColor}`;
 
@@ -194,6 +195,10 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
     }
     setSelectedFile(file);
     setErrorMessage(null);
+    // Auto-scroll to the submit button so it's obvious
+    setTimeout(() => {
+      submitBtnRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
   }
 
   function handleFileInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -207,6 +212,8 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
 
     setStep('processing');
     setProcessingStep(0);
+    // Scroll to top so the user sees the spinner
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     try {
       const formData = new FormData();
@@ -419,15 +426,19 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
 
           {/* Submit button */}
           <button
+            ref={submitBtnRef}
             onClick={handleUpload}
             disabled={!selectedFile}
-            className="w-full py-3.5 rounded-xl font-semibold text-sm text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            style={{ backgroundColor: selectedFile ? accentColor : '#9CA3AF' }}
+            className={`w-full py-4 rounded-xl font-bold text-base text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 ${selectedFile ? 'animate-pulse ring-2 ring-offset-2 shadow-lg' : ''}`}
+            style={{
+              backgroundColor: selectedFile ? accentColor : '#9CA3AF',
+              ...(selectedFile ? { ringColor: accentColor, animationDuration: '2s' } : {}),
+            }}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
             </svg>
-            {selectedFile ? `Analyse ${selectedFile.name}` : 'Select a file to continue'}
+            {selectedFile ? '⬇ Start AI Review Now — Analyse Your Document' : 'Upload a file above to get started'}
           </button>
         </div>
       </div>
