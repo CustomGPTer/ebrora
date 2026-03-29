@@ -15,11 +15,20 @@ const transporter = nodemailer.createTransport({
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
     try {
+          // Replace placeholder with actual recipient email in unsubscribe links
+          const finalHtml = html.replace(/EMAIL_PLACEHOLDER/g, to);
+
+          const unsubscribeUrl = `https://www.ebrora.com/unsubscribe?email=${encodeURIComponent(to)}`;
+
           await transporter.sendMail({
                   from: `"Ebrora" <${process.env.SMTP_FROM || 'noreply@ebrora.com'}>`,
                   to,
                   subject,
-                  html,
+                  html: finalHtml,
+                  headers: {
+                    'List-Unsubscribe': `<${unsubscribeUrl}>`,
+                    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+                  },
           });
           return true;
     } catch (error) {
