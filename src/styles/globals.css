@@ -4244,6 +4244,12 @@ p {
      gap: 20px;
 }
 
+.template-grid-3 {
+     display: grid;
+     grid-template-columns: repeat(3, 1fr);
+     gap: 20px;
+}
+
 /* --- Card (button reset + styling) --- */
 .tpl-card {
      all: unset;
@@ -4438,6 +4444,7 @@ p {
 /* 768px and below: 2 columns */
 @media (max-width: 768px) {
      .template-grid-5 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+     .template-grid-3 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
      .template-picker-section { max-width: 100%; }
      .tpl-card-desc { -webkit-line-clamp: 2; }
 }
@@ -4445,6 +4452,7 @@ p {
 /* 480px and below: 1 column */
 @media (max-width: 480px) {
      .template-grid-5 { grid-template-columns: 1fr; gap: 12px; }
+     .template-grid-3 { grid-template-columns: 1fr; gap: 12px; }
      .tpl-card-title { font-size: 14px; }
      .tpl-card-desc { font-size: 12px; -webkit-line-clamp: 3; }
 }
