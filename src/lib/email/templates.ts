@@ -48,7 +48,7 @@ export function welcomeEmail(userName: string): { subject: string; html: string 
                 <!-- CTA -->
                 <tr>
                   <td style="padding: 0 30px 30px 30px; text-align: center;">
-                    <a href="https://ebrora.com/rams-builder" style="background-color: #1B5B50; color: #ffffff; padding: 14px 40px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600; font-size: 16px;">
+                    <a href="https://www.ebrora.com/rams-builder" style="background-color: #1B5B50; color: #ffffff; padding: 14px 40px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600; font-size: 16px;">
                       Start Building RAMS
                     </a>
                   </td>
@@ -61,7 +61,7 @@ export function welcomeEmail(userName: string): { subject: string; html: string 
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -130,7 +130,7 @@ export function verificationEmail(userName: string, verifyUrl: string): { subjec
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -205,7 +205,7 @@ export function ramsCompleteEmail(userName: string, formatName: string, download
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -265,7 +265,7 @@ export function ramsFailedEmail(userName: string, formatName: string): { subject
                 <!-- CTA -->
                 <tr>
                   <td style="padding: 0 30px 30px 30px; text-align: center;">
-                    <a href="https://ebrora.com/support" style="background-color: #1B5B50; color: #ffffff; padding: 14px 40px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600; font-size: 16px;">
+                    <a href="https://www.ebrora.com/support" style="background-color: #1B5B50; color: #ffffff; padding: 14px 40px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600; font-size: 16px;">
                       Contact Support
                     </a>
                   </td>
@@ -278,7 +278,7 @@ export function ramsFailedEmail(userName: string, formatName: string): { subject
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -345,7 +345,7 @@ export function subscriptionConfirmEmail(userName: string, tier: string, amount:
                 <!-- CTA -->
                 <tr>
                   <td style="padding: 0 30px 30px 30px; text-align: center;">
-                    <a href="https://ebrora.com/rams-builder" style="background-color: #1B5B50; color: #ffffff; padding: 14px 40px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600; font-size: 16px;">
+                    <a href="https://www.ebrora.com/rams-builder" style="background-color: #1B5B50; color: #ffffff; padding: 14px 40px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600; font-size: 16px;">
                       Back to RAMS Builder
                     </a>
                   </td>
@@ -358,7 +358,7 @@ export function subscriptionConfirmEmail(userName: string, tier: string, amount:
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -418,7 +418,7 @@ export function usageLimitWarningEmail(userName: string, used: number, limit: nu
                 <!-- CTA -->
                 <tr>
                   <td style="padding: 0 30px 30px 30px; text-align: center;">
-                    <a href="https://ebrora.com/rams-builder#pricing" style="background-color: #1B5B50; color: #ffffff; padding: 14px 40px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600; font-size: 16px;">
+                    <a href="https://www.ebrora.com/rams-builder#pricing" style="background-color: #1B5B50; color: #ffffff; padding: 14px 40px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600; font-size: 16px;">
                       View Upgrade Options
                     </a>
                   </td>
@@ -431,7 +431,7 @@ export function usageLimitWarningEmail(userName: string, used: number, limit: nu
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -504,7 +504,7 @@ export function passwordResetEmail(userName: string, resetUrl: string): { subjec
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
