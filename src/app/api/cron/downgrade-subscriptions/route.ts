@@ -1,7 +1,9 @@
 // =============================================================================
 // API: /api/cron/downgrade-subscriptions
-// Runs daily. Finds all subscriptions that are not ACTIVE and sets tier to FREE.
-// Covers CANCELLED, PAST_DUE, and SUSPENDED statuses.
+// Runs daily at 3am UTC. Finds all subscriptions that are not ACTIVE and whose
+// billing period has ended, then sets tier to FREE.
+// Respects grace period: CANCELLED subs with a future current_period_end are
+// left untouched so users keep access until their paid period expires.
 // Configure in vercel.json: { "path": "/api/cron/downgrade-subscriptions", "schedule": "0 3 * * *" }
 // =============================================================================
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,11 +17,20 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Find all non-ACTIVE subscriptions that still have a paid tier
+    const now = new Date();
+
+    // Downgrade non-ACTIVE subscriptions to FREE, but ONLY if:
+    // - current_period_end is null (never set), OR
+    // - current_period_end has passed (grace period expired)
+    // This prevents nuking CANCELLED users who still have paid time remaining.
     const result = await prisma.subscription.updateMany({
       where: {
         status: { not: 'ACTIVE' },
         tier: { not: 'FREE' },
+        OR: [
+          { current_period_end: null },
+          { current_period_end: { lt: now } },
+        ],
       },
       data: {
         tier: 'FREE',
