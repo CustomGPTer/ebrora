@@ -19,14 +19,14 @@ export default function ErpTemplatePicker({ onSelect }: Props) {
   const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
   const canAccess = (slug: ErpTemplateSlug): boolean => { if (!isAuthenticated) return false; if (isPaid) return true; return ERP_FREE_TEMPLATES.includes(slug); };
   const getStatus = (slug: ErpTemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => { if (!isAuthenticated) return 'locked-auth'; if (canAccess(slug)) return 'available'; return 'locked-upgrade'; };
-  const handleClick = (slug: ErpTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/emergency-response-builder'); return; } if (s === 'locked-upgrade') { router.push('/rams-builder/pricing'); return; } onSelect(slug); };
+  const handleClick = (slug: ErpTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/emergency-response-builder'); return; } if (s === 'locked-upgrade') { router.push('/pricing'); return; } onSelect(slug); };
 
   return (
     <div className="template-picker-section">
       <div className="template-picker-header">
         <h2>Choose an Emergency Response Template</h2>
         {!isAuthenticated && <p>Sign in to access templates and generate emergency response plans</p>}
-        {isAuthenticated && !isPaid && <p>Emergency Response requires a paid plan &middot; <a href="/rams-builder/pricing" className="template-picker-upgrade-link">View plans</a></p>}
+        {isAuthenticated && !isPaid && <p>Emergency Response requires a paid plan &middot; <a href="/pricing" className="template-picker-upgrade-link">View plans</a></p>}
         {isAuthenticated && isPaid && <p>All 4 templates available on your plan</p>}
       </div>
       <div className="template-grid-5">
