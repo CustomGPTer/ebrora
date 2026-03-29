@@ -392,7 +392,7 @@ export default function AccountDashboardClient({
                   Excel Templates
                 </Link>
                 <Link
-                  href="/rams-builder/pricing"
+                  href="/pricing"
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   View Pricing
@@ -556,7 +556,7 @@ export default function AccountDashboardClient({
               <h2 className="text-base font-bold text-gray-900 mb-4">Plan Options</h2>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/rams-builder/pricing"
+                  href="/pricing"
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1B5745] text-white text-sm font-semibold rounded-lg hover:bg-[#143f33] transition-colors"
                 >
                   Upgrade Plan
