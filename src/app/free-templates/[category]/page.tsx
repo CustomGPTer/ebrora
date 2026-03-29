@@ -7,9 +7,7 @@ import Link from "next/link";
 import { getCategoryWithFiles } from "@/lib/free-templates";
 import { FT_CATEGORIES } from "@/data/free-template-categories";
 import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
-import { UpsellBanner } from "@/components/shared/UpsellBanner";
-import { ToolboxTalksSidebarCard } from "@/components/shared/PremiumUpsellCards";
-import { RAMS_BUILDER_UPSELL } from "@/data/upsell-config";
+import { ToolboxTalksSidebarCard, RamsBuilderSidebarCard } from "@/components/shared/PremiumUpsellCards";
 
 interface PageProps {
   params: Promise<{ category: string }>;
@@ -221,14 +219,8 @@ export default async function FreeTemplateCategoryPage({
           ))}
         </div>
 
-        <UpsellBanner
-          title={RAMS_BUILDER_UPSELL.title}
-          description={RAMS_BUILDER_UPSELL.description}
-          href={RAMS_BUILDER_UPSELL.gumroadUrl}
-          variant="bottom"
-        />
-
-        <div className="mt-5 max-w-xs">
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
+          <RamsBuilderSidebarCard />
           <ToolboxTalksSidebarCard />
         </div>
       </div>
