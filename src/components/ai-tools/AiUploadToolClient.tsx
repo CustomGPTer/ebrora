@@ -225,7 +225,22 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
         body: formData,
       });
 
-      const data = await res.json();
+      // Safely parse JSON — Vercel timeouts return HTML, not JSON
+      let data: any;
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        // Non-JSON response (Vercel 504 timeout, HTML error page, etc.)
+        if (processingTimerRef.current) clearInterval(processingTimerRef.current);
+        setErrorMessage(
+          res.status === 504
+            ? 'The document took too long to process. Please try a smaller file or try again in a moment.'
+            : `Server error (${res.status}). Please try again.`
+        );
+        setStep('error');
+        return;
+      }
 
       if (!res.ok) {
         if (processingTimerRef.current) clearInterval(processingTimerRef.current);
@@ -239,7 +254,10 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
       setStep('download');
     } catch (err: any) {
       if (processingTimerRef.current) clearInterval(processingTimerRef.current);
-      setErrorMessage(err.message || 'Network error. Please check your connection and try again.');
+      const msg = err.name === 'TypeError'
+        ? 'Network error. Please check your connection and try again.'
+        : (err.message || 'Something went wrong. Please try again.');
+      setErrorMessage(msg);
       setStep('error');
     }
   }
