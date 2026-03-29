@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth-utils';
-import { createSubscription } from '@/lib/payments/paypal-client';
+import { createSubscription, reviseSubscription } from '@/lib/payments/paypal-client';
 import { getPlanConfigByKey } from '@/lib/payments/plan-config';
+import { validateOrigin } from '@/lib/csrf';
+import prisma from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF check
+    if (!validateOrigin(request)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const session = await getSession();
 
     if (!session || !session.user || !session.user.id) {
@@ -38,10 +45,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create subscription with PayPal — returns an approval URL
-    // the user is redirected to PayPal to authorise payment.
-    // Once approved, PayPal fires BILLING.SUBSCRIPTION.ACTIVATED webhook
-    // which writes/updates the subscription record in the database.
+    // Check for an existing active subscription
+    const existingSub = await prisma.subscription.findUnique({
+      where: { user_id: session.user.id },
+      select: {
+        paypal_subscription_id: true,
+        status: true,
+        tier: true,
+      },
+    });
+
+    // If user has an active subscription with a PayPal ID, revise it
+    // instead of creating a new one (prevents "pre-approved payments" error)
+    if (
+      existingSub &&
+      existingSub.paypal_subscription_id &&
+      existingSub.status === 'ACTIVE' &&
+      existingSub.tier !== 'FREE'
+    ) {
+      const { approvalUrl } = await reviseSubscription(
+        existingSub.paypal_subscription_id,
+        planConfig.paypalPlanId
+      );
+
+      return NextResponse.json({ approvalUrl });
+    }
+
+    // No existing active subscription — create a new one
     const { approvalUrl } = await createSubscription(
       planConfig.paypalPlanId,
       session.user.id
