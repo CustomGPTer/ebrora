@@ -5,7 +5,7 @@ import { UsersClient } from '@/components/admin/UsersClient';
 export const metadata = { title: 'User Management – Admin' };
 
 interface PageProps {
-  searchParams: Promise<{ page?: string; tier?: string; search?: string }>;
+  searchParams: Promise<{ page?: string; tier?: string; search?: string; verified?: string }>;
 }
 
 export default async function UsersPage({ searchParams }: PageProps) {
@@ -15,12 +15,18 @@ export default async function UsersPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(params.page || '1'));
   const tier = params.tier || 'ALL';
   const search = params.search || '';
+  const verified = params.verified || 'ALL';
   const pageSize = 20;
   const skip = (page - 1) * pageSize;
 
   const filter: any = {};
   if (tier !== 'ALL') {
     filter.subscription = { tier };
+  }
+  if (verified === 'YES') {
+    filter.email_verified = true;
+  } else if (verified === 'NO') {
+    filter.email_verified = false;
   }
   if (search) {
     filter.OR = [
@@ -69,6 +75,7 @@ export default async function UsersPage({ searchParams }: PageProps) {
       totalCount={totalCount}
       currentTier={tier}
       currentSearch={search}
+      currentVerified={verified}
     />
   );
 }
