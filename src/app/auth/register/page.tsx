@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [emailSendWarning, setEmailSendWarning] = useState(false);
 
   const passwordRequirements = {
     length: password.length >= 8,
@@ -58,6 +59,11 @@ export default function RegisterPage() {
         return;
       }
 
+      // Check if email failed to send
+      if (data.warning) {
+        setEmailSendWarning(true);
+      }
+      
       setShowVerificationMessage(true);
     } catch (err) {
       setError('An unexpected error occurred');
@@ -83,20 +89,34 @@ export default function RegisterPage() {
       <div className="auth-page">
         <div className="auth-card">
           <div className="auth-card__header">
-            <h1 className="page-header">Check Your Email</h1>
-            <p>We've sent a verification link to</p>
-            <p className="text--bold">{email}</p>
+            <h1 className="page-header">{emailSendWarning ? 'Account Created' : 'Check Your Email'}</h1>
+            {!emailSendWarning && (
+              <>
+                <p>We've sent a verification link to</p>
+                <p className="text--bold">{email}</p>
+              </>
+            )}
           </div>
 
-          <div className="alert alert--info">
-            <p>Please click the verification link in the email to confirm your account.</p>
-            <p className="text--small">The link will expire in 24 hours.</p>
-          </div>
+          {emailSendWarning ? (
+            <div className="alert alert--warning" style={{ backgroundColor: '#fef3c7', borderColor: '#f59e0b', color: '#92400e' }}>
+              <p><strong>Your account was created</strong>, but we couldn't send the verification email.</p>
+              <p style={{ marginTop: '0.5rem' }}>Please go to the <Link href="/auth/login" className="link link--primary">login page</Link> and use the "Resend verification email" option.</p>
+            </div>
+          ) : (
+            <div className="alert alert--info">
+              <p>Please click the verification link in the email to confirm your account.</p>
+              <p className="text--small">The link will expire in 24 hours.</p>
+            </div>
+          )}
 
           <div className="auth-card__footer">
             <p>
               <button
-                onClick={() => setShowVerificationMessage(false)}
+                onClick={() => {
+                  setShowVerificationMessage(false);
+                  setEmailSendWarning(false);
+                }}
                 className="link link--primary"
                 type="button"
               >
