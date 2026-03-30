@@ -18,6 +18,7 @@ function LoginForm() {
 
   const verified = searchParams.get('verified');
   const reset = searchParams.get('reset');
+  const callbackUrl = searchParams.get('callbackUrl') || '/rams-builder';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +43,7 @@ function LoginForm() {
           setError('Invalid email or password. Please try again.');
         }
       } else {
-        router.push('/rams-builder');
+        router.push(callbackUrl);
       }
     } catch {
       setError('Something went wrong. Please try again.');
@@ -83,7 +84,7 @@ function LoginForm() {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    await signIn('google', { callbackUrl: '/rams-builder' });
+    await signIn('google', { callbackUrl });
   };
 
   return (
