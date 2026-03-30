@@ -26,12 +26,14 @@ interface Props {
   totalCount: number;
   currentTier: string;
   currentSearch: string;
+  currentVerified: string;
 }
 
-export function UsersClient({ users, currentPage, totalPages, totalCount, currentTier, currentSearch }: Props) {
+export function UsersClient({ users, currentPage, totalPages, totalCount, currentTier, currentSearch, currentVerified }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState(currentSearch);
   const [tier, setTier] = useState(currentTier);
+  const [verified, setVerified] = useState(currentVerified);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [editForm, setEditForm] = useState({ name: '', role: '', tier: '' });
@@ -42,6 +44,7 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (tier !== 'ALL') params.set('tier', tier);
+    if (verified !== 'ALL') params.set('verified', verified);
     params.set('page', '1');
     router.push(`/admin/users?${params.toString()}`);
   };
@@ -51,6 +54,17 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (newTier !== 'ALL') params.set('tier', newTier);
+    if (verified !== 'ALL') params.set('verified', verified);
+    params.set('page', '1');
+    router.push(`/admin/users?${params.toString()}`);
+  };
+
+  const handleVerifiedFilter = (newVerified: string) => {
+    setVerified(newVerified);
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (tier !== 'ALL') params.set('tier', tier);
+    if (newVerified !== 'ALL') params.set('verified', newVerified);
     params.set('page', '1');
     router.push(`/admin/users?${params.toString()}`);
   };
@@ -59,6 +73,7 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (tier !== 'ALL') params.set('tier', tier);
+    if (verified !== 'ALL') params.set('verified', verified);
     params.set('page', pageNum.toString());
     return `/admin/users?${params.toString()}`;
   };
@@ -106,10 +121,30 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
     }
   };
 
+  const handleVerifyEmail = async () => {
+    if (!editingUser) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: editingUser.id, verifyEmail: true }),
+      });
+      if (!res.ok) throw new Error('Failed');
+      // Update local state to reflect verification
+      setEditingUser({ ...editingUser, emailVerified: true });
+      router.refresh();
+    } catch {
+      alert('Error verifying email');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Role', 'Tier', 'Status', 'RAMS', 'AI Tools', 'Auth', 'Joined'];
+    const headers = ['Name', 'Email', 'Role', 'Tier', 'Verified', 'Status', 'RAMS', 'AI Tools', 'Auth', 'Joined'];
     const rows = users.map((u) => [
-      u.name, u.email, u.role, u.tier, u.status,
+      u.name, u.email, u.role, u.tier, u.emailVerified ? 'Yes' : 'No', u.status,
       u.ramsCount, u.aiToolCount, u.authMethod,
       new Date(u.createdAt).toLocaleDateString('en-GB'),
     ]);
@@ -163,6 +198,15 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
           <option value="STANDARD">Standard</option>
           <option value="PROFESSIONAL">Professional</option>
         </select>
+        <select
+          value={verified}
+          onChange={(e) => handleVerifiedFilter(e.target.value)}
+          className="admin-select"
+        >
+          <option value="ALL">All Verified</option>
+          <option value="YES">✓ Verified</option>
+          <option value="NO">✗ Unverified</option>
+        </select>
         <button type="submit" className="admin-btn admin-btn--primary">
           Search
         </button>
@@ -182,6 +226,7 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
                 <th>User</th>
                 <th>Role</th>
                 <th>Tier</th>
+                <th>Verified</th>
                 <th>RAMS</th>
                 <th>AI Tools</th>
                 <th>Auth</th>
@@ -205,6 +250,13 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
                     <span className={`admin-badge ${tierBadgeClass(user.tier)}`}>
                       {user.tier}
                     </span>
+                  </td>
+                  <td>
+                    {user.emailVerified ? (
+                      <span className="admin-badge admin-badge--success" title="Email verified">✓</span>
+                    ) : (
+                      <span className="admin-badge admin-badge--warning" title="Email not verified">✗</span>
+                    )}
                   </td>
                   <td>{user.ramsCount}</td>
                   <td>{user.aiToolCount}</td>
@@ -232,7 +284,7 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={8}>
+                  <td colSpan={9}>
                     <div className="admin-empty">
                       <div className="admin-empty__icon">👥</div>
                       <p className="admin-empty__text">No users found</p>
@@ -332,6 +384,31 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
                   <div className="admin-table__mono" style={{ padding: '0.5rem 0' }}>{editingUser.paypalId}</div>
                 </div>
               )}
+              {/* Email Verification Status */}
+              <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: 'var(--admin-bg-secondary)', borderRadius: '0.5rem' }}>
+                <label className="admin-label">Email Verification</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  {editingUser.emailVerified ? (
+                    <span style={{ color: '#16a34a', fontSize: '0.875rem', fontWeight: 500 }}>
+                      ✓ Email verified
+                    </span>
+                  ) : (
+                    <>
+                      <span style={{ color: '#dc2626', fontSize: '0.875rem' }}>
+                        ✗ Email not verified
+                      </span>
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--success admin-btn--sm"
+                        onClick={handleVerifyEmail}
+                        disabled={loading}
+                      >
+                        {loading ? 'Verifying...' : 'Verify Now'}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="admin-modal__footer">
               <button className="admin-btn admin-btn--outline" onClick={() => setEditingUser(null)}>Cancel</button>
