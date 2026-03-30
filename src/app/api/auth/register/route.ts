@@ -79,17 +79,31 @@ export async function POST(request: NextRequest) {
 
       // Send verification email
       const verifyUrl = `${process.env.NEXTAUTH_URL}/auth/verify-email?token=${verificationToken}`;
-          const { subject, html } = verificationEmail(name, verifyUrl);
-          await sendEmail(email.toLowerCase(), subject, html);
+      const { subject, html } = verificationEmail(name, verifyUrl);
+      const emailSent = await sendEmail(email.toLowerCase(), subject, html);
+
+      if (!emailSent) {
+        console.error(`Failed to send verification email to ${email.toLowerCase()}`);
+        // User is created but email failed - return warning so they know to request resend
+        return NextResponse.json(
+          {
+            success: true,
+            warning: true,
+            message: 'Account created but verification email could not be sent. Please use the resend verification option on the login page.',
+            userId: user.id,
+          },
+          { status: 201 }
+        );
+      }
 
       return NextResponse.json(
         {
-                  success: true,
-                  message: 'Registration successful. Please check your email to verify your account.',
-                  userId: user.id,
+          success: true,
+          message: 'Registration successful. Please check your email to verify your account.',
+          userId: user.id,
         },
         { status: 201 }
-            );
+      );
     } catch (error) {
           if (error instanceof z.ZodError) {
                   return NextResponse.json(
