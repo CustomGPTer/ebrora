@@ -1,26 +1,27 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function ErrorPage() {
+const errorMessages: Record<string, string> = {
+  CredentialsSignin: 'Invalid email or password',
+  EmailSignInError: 'Could not sign in with that email',
+  OAuthSignin: 'Failed to sign in with OAuth provider',
+  OAuthCallback: 'Failed to handle OAuth callback',
+  EmailCreateAccount: 'Could not create account with email',
+  Callback: 'An error occurred during authentication',
+  OAuthAccountNotLinked: 'Email is already registered with a different provider',
+  EmailAccountNotLinked: 'Email is already registered',
+  NoUserFound: 'No account found with that email',
+  ProviderAlreadyLinked: 'This provider is already linked to your account',
+  SessionCallback: 'Session error occurred',
+  SignOutError: 'Failed to sign out',
+};
+
+function ErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
-
-  const errorMessages: Record<string, string> = {
-    CredentialsSignin: 'Invalid email or password',
-    EmailSignInError: 'Could not sign in with that email',
-    OAuthSignin: 'Failed to sign in with OAuth provider',
-    OAuthCallback: 'Failed to handle OAuth callback',
-    EmailCreateAccount: 'Could not create account with email',
-    Callback: 'An error occurred during authentication',
-    OAuthAccountNotLinked: 'Email is already registered with a different provider',
-    EmailAccountNotLinked: 'Email is already registered',
-    NoUserFound: 'No account found with that email',
-    ProviderAlreadyLinked: 'This provider is already linked to your account',
-    SessionCallback: 'Session error occurred',
-    SignOutError: 'Failed to sign out',
-  };
 
   const message = error && errorMessages[error] ? errorMessages[error] : 'An authentication error occurred';
 
@@ -65,5 +66,13 @@ export default function ErrorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ErrorPage() {
+  return (
+    <Suspense fallback={<div className="auth-page"><div className="auth-card">Loading...</div></div>}>
+      <ErrorContent />
+    </Suspense>
   );
 }
