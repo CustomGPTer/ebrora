@@ -611,6 +611,16 @@
   color: var(--admin-danger);
 }
 
+.admin-badge--success {
+  background: var(--admin-success-light);
+  color: var(--admin-success);
+}
+
+.admin-badge--warning {
+  background: #fef3c7;
+  color: #d97706;
+}
+
 /* ============================================================================
    7. BUTTONS
    ============================================================================ */
@@ -661,6 +671,15 @@
 
 .admin-btn--danger:hover:not(:disabled) {
   background: #B91C1C;
+}
+
+.admin-btn--success {
+  background: var(--admin-success);
+  color: var(--admin-white);
+}
+
+.admin-btn--success:hover:not(:disabled) {
+  background: #15803d;
 }
 
 .admin-btn--outline {
