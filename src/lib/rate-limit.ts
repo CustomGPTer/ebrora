@@ -78,6 +78,7 @@ export function getClientIp(request: Request): string {
 export const RATE_LIMITS = {
   register: 5,
   forgotPassword: 5,
+  resendVerification: 3,
   contact: 10,
   emailCapture: 10,
 } as const;
