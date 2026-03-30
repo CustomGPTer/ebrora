@@ -379,23 +379,27 @@ Ask 2–3 deeper questions:
 
 After Round 2, ALWAYS respond with status "ready".`,
 
-  ncr: `You are generating a Non-Conformance Report (NCR) aligned with ISO 9001 quality management principles.
+  ncr: `You are generating a Non-Conformance Report (NCR) aligned with ISO 9001:2015 quality management systems, ISO 45001:2018, and the Construction (Design and Management) Regulations 2015.
+
+This document will be used on audited UK construction and infrastructure projects. It must be thorough, regulation-compliant, and written to a standard that would satisfy a client quality audit or regulatory inspection.
 
 THIS IS A 2-ROUND FLOW.
 
 ROUND 1 (first call):
-The user has described the non-conformance. Ask 3–5 targeted questions covering:
-1. When and where was the non-conformance discovered?
-2. Who discovered it (role, not necessarily name)?
-3. What was the specified requirement (drawing ref, spec clause, BS standard)?
-4. What was the actual condition found (measurements, test results, observations)?
-5. Has the affected work continued or has it been stopped?
+The user has described the non-conformance. Ask 5–6 targeted questions covering:
+1. LOCATION — Exact location including grid reference, chainage, structure/area name, floor/level if applicable. Where precisely on site?
+2. DISCOVERY — When was it discovered (date)? Who found it (name and role)? During what activity (routine inspection, testing, audit, surveillance, hold point, handover)?
+3. SPECIFIED REQUIREMENT — What was the design/specification requirement? Ask for specific drawing reference (e.g. CIV-DRG-101-REV B), specification clause number (e.g. Section 6.3.2), and the BS/EN standard it should comply with (e.g. BS 8500-1:2015, BS EN 1992-1-1).
+4. ACTUAL CONDITION — What was measured or observed? Ask for specific measurements compared to tolerances (e.g. "10mm deviation vs ±5mm permitted"). Were photos taken?
+5. CONTAINMENT — Has work been stopped in the affected area? What immediate actions were taken to prevent the non-conformance spreading or worsening?
+6. PROJECT CONTEXT — Project name, contract reference, discipline (Civils/Structural/Mechanical/Electrical/ICA/Pipework), and who raised the NCR (name and role).
 
 ROUND 2 (after answers):
-Ask 2–3 deeper questions for root cause analysis:
-1. What do you think caused this to happen (materials, method, supervision, design)?
-2. Has this type of non-conformance occurred before on this project?
-3. What immediate containment action has been taken to prevent further non-conforming work?
+Ask 3–4 deeper questions for root cause and corrective planning:
+1. ROOT CAUSE — What do you believe caused this? Probe for systemic issues: Was it materials (delivered out of spec?), method (wrong technique?), supervision (no hold point observed?), training (operatives unfamiliar with requirements?), design (unclear or conflicting information?), or plant/equipment failure?
+2. RECURRENCE — Has this type of non-conformance occurred before on this project or other projects? Is there a pattern?
+3. CORRECTIVE ACTIONS — What specific corrective actions are proposed? Who will be responsible for each? What are realistic target dates? How will each action be verified as complete (re-inspection, re-test, document review)?
+4. PREVENTIVE ACTIONS — What systemic changes will prevent recurrence? Think about procedure updates, toolbox talks, pre-activity briefings, checklists, supervision levels, training programmes.
 
 After Round 2, ALWAYS respond with status "ready".`,
 
@@ -1626,61 +1630,100 @@ Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on.
 }
 Minimum 3 proposed mitigation measures.`,
 
-  ncr: `Generate a Non-Conformance Report JSON aligned with ISO 9001. This is a formal quality document.
+  ncr: `Generate a Non-Conformance Report JSON aligned with ISO 9001:2015, ISO 45001:2018, and CDM 2015. This is a formal auditable quality document for UK construction projects.
+
+QUALITY STANDARDS — Every section must be written as if it will be reviewed by a client quality auditor, external certification body, or regulatory inspector. Use precise technical language. Reference specific standards with full identifiers (e.g. "BS 8500-1:2015+A2:2016" not just "BS 8500"). Include specific measurements with actual vs required values. Name specific roles, not vague references.
+
 {
-  "documentRef": "string (format: NCR-YYYY-NNN)",
+  "documentRef": "string (format: NCR-YYYY-NNN, e.g. NCR-2026-001)",
   "raisedDate": "DD/MM/YYYY",
-  "raisedBy": "string",
+  "raisedBy": "string (full name and role, e.g. 'John Smith (Site Supervisor)')",
   "projectName": "string",
   "siteAddress": "string",
   "contractReference": "string",
   "ncrCategory": "Major | Minor | Observation",
   "discipline": "Civils | Structural | Mechanical | Electrical | ICA | Architectural | Pipework | Other",
-  "nonConformanceDescription": "string (min 200 words — detailed factual description of the non-conformance. What was found, where, when, and by whom)",
-  "location": "string (exact location — grid reference, chainage, structure name, floor level)",
-  "discoveredDuring": "string (routine inspection, testing, audit, surveillance, handover)",
+  "location": "string (exact location — include grid reference if known, chainage, structure/area name, floor/level. Be as precise as possible, e.g. 'Footpath behind UU sign, grid ref: SJ 345 912, Chainage 0+120m')",
+  "discoveredDuring": "string (routine inspection | hold point inspection | testing | audit | surveillance | handover inspection | third-party audit)",
+
+  "nonConformanceDescription": "string (min 250 words, 3 paragraphs minimum — Paragraph 1: What was found, where, when, and by whom. Paragraph 2: Specific measurements or observations showing the deviation from requirements, extent of the affected area, and whether work has continued. Paragraph 3: Whether this has been previously recorded, who has been notified, and what the current status of the affected area is. Write factually — no opinions or assumptions. Use past tense.)",
+
   "specifiedRequirement": {
-    "description": "string (min 100 words — what was required by the design/specification)",
-    "drawingRef": "string",
-    "specClause": "string",
-    "standardRef": "string (BS/EN standard)"
+    "description": "string (min 150 words — State the exact design/specification requirement that has not been met. Reference the specific tolerance, finish standard, material grade, or performance criterion. Reference the applicable BS/EN standard with full designation including year and amendment. Describe the curing, compaction, testing, or installation method that was required. Reference CDM 2015 if health and safety considerations are relevant.)",
+    "drawingRef": "string (specific drawing reference with revision, e.g. 'CIV-DRG-101-REV B')",
+    "specClause": "string (specific clause, e.g. 'Section 6.3.2 — Concrete Footways; Clause 10.2 — Surface Finish')",
+    "standardRef": "string (full BS/EN standard with year and amendment, e.g. 'BS 8500-1:2015+A2:2016')"
   },
+
   "actualCondition": {
-    "description": "string (min 100 words — what was actually found, with measurements/test results)",
-    "measurements": "string (actual vs required values)",
-    "photographicEvidence": "string (photo references or 'To be attached')"
+    "description": "string (min 150 words — Describe exactly what was found with specific measurements, test results, or visual observations. State the measured value vs the specified value. Describe the extent and severity. Note whether photographic evidence was collected. State whether any cracking, spalling, deformation, or secondary defects were observed. Confirm whether further work has been carried out in the affected area since discovery.)",
+    "measurements": "string (specific actual vs required values, e.g. 'Measured deviation: 10mm (actual) vs ±5mm (specified maximum); surface finish: rough/uneven vs smooth/consistent (required)')",
+    "photographicEvidence": "string (photo references or 'To be attached — photos taken at time of inspection')"
   },
+
   "rootCauseAnalysis": {
-    "method": "5 Whys | Fishbone | Other",
-    "analysis": "string (min 150 words — systematic analysis of why the non-conformance occurred)",
-    "rootCause": "string (single sentence identifying the fundamental root cause)",
-    "contributingFactors": ["string"]
+    "method": "5 Whys | Fishbone (Ishikawa) | Fault Tree Analysis",
+    "analysis": "string (min 200 words — Systematic investigation of why the non-conformance occurred. Walk through the RCA methodology step by step. Identify the chain of causation from the immediate failure to the underlying systemic issue. Address materials, methods, supervision, training, plant/equipment, and design information as potential factors. Reference training records, inspection records, or delivery documentation where relevant. The analysis must demonstrate that the root cause has been identified, not just the symptoms.)",
+    "rootCause": "string (single clear sentence identifying the fundamental root cause, e.g. 'Concrete was delivered with insufficient workability and was not checked or adjusted prior to placement.')",
+    "contributingFactors": ["string (each factor must be specific and actionable, e.g. 'No slump test conducted before placement' not just 'Poor testing')"]
   },
+
   "immediateContainmentActions": [
-    { "action": "string", "takenBy": "string", "date": "string", "status": "Complete | In Progress" }
+    {
+      "action": "string (min 30 words — describe exactly what was done to contain the non-conformance and prevent it from spreading or worsening)",
+      "takenBy": "string (name or role)",
+      "date": "DD/MM/YYYY",
+      "status": "Complete | In Progress"
+    }
   ],
+
   "correctiveActions": [
-    { "action": "string", "responsiblePerson": "string", "targetDate": "string", "status": "Open", "verificationMethod": "string" }
+    {
+      "action": "string (min 40 words — specific, measurable action to correct the non-conformance. Not vague — state exactly what will be done, how, and to what standard)",
+      "responsiblePerson": "string (specific role, e.g. 'Site Manager', 'Quality Inspector', 'Training Coordinator')",
+      "targetDate": "DD/MM/YYYY (realistic dates — allow adequate time for the work)",
+      "priority": "High | Medium | Low",
+      "status": "Open",
+      "verificationMethod": "string (min 20 words — how will completion be verified? e.g. 'Re-inspection and measurement using 3m straightedge; photographic record of completed works')"
+    }
   ],
+
   "preventiveActions": [
-    { "action": "string", "responsiblePerson": "string", "targetDate": "string", "status": "Open" }
+    {
+      "action": "string (min 50 words — systemic action to prevent recurrence. Must address the root cause, not just the symptom. Think: procedure updates, training programmes, pre-activity briefings, checklist revisions, supervision level changes, supply chain controls)",
+      "responsiblePerson": "string (specific role)",
+      "targetDate": "DD/MM/YYYY",
+      "priority": "High | Medium | Low",
+      "status": "Open"
+    }
   ],
+
   "disposition": {
     "decision": "Rework | Repair | Use As Is | Reject & Replace | Concession Required",
-    "justification": "string (min 80 words — why this disposition was chosen)",
+    "justification": "string (min 100 words — Explain why this disposition was chosen by reference to the specific standard, specification, and contract requirements. Explain why alternative dispositions were not appropriate. Address durability, safety, appearance, and client expectations. Reference the specific BS/EN standard that the non-conforming work fails to meet.)",
     "designerApprovalRequired": "Yes | No",
     "clientApprovalRequired": "Yes | No"
   },
+
   "closeOutVerification": {
-    "verifiedBy": "string",
-    "verificationDate": "string",
-    "verificationMethod": "string (re-inspection, re-test, document review)",
+    "verifiedBy": "string (leave blank if NCR is still open)",
+    "verificationDate": "string (leave blank if NCR is still open)",
+    "verificationMethod": "string (re-inspection, re-test, document review, or combination)",
     "result": "Closed Out | Remains Open",
-    "evidence": "string"
+    "evidence": "string (leave blank if NCR is still open)"
   },
-  "additionalNotes": "string"
+
+  "additionalNotes": "string (min 40 words — State when this NCR will next be reviewed, what evidence will be attached to the final report, and whether similar issues have been found elsewhere on the project)"
 }
-Minimum 2 containment actions. Minimum 3 corrective actions. Minimum 2 preventive actions. Minimum 3 contributing factors.`,
+
+MANDATORY MINIMUMS:
+- Minimum 2 containment actions (each min 30 words).
+- Minimum 3 corrective actions (each min 40 words) with specific verification methods (each min 20 words).
+- Minimum 2 preventive actions (each min 50 words) that address systemic root causes.
+- Minimum 3 contributing factors that are specific and actionable.
+- All dates must be realistic and in DD/MM/YYYY format.
+- All standard references must include full designation with year (e.g. BS 8500-1:2015+A2:2016, not just BS 8500).
+- The total document content must exceed 1,200 words across all fields combined.`,
 
   'ce-notification': `Generate a Compensation Event Notification JSON for an NEC Engineering and Construction Contract.
 {
