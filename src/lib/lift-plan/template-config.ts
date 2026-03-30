@@ -10,7 +10,7 @@ export const LIFT_PLAN_TEMPLATE_CONFIGS: Record<LiftPlanTemplateSlug, LiftPlanTe
     displayName: 'Ebrora Standard',
     description:
       'The most comprehensive lift plan template available. Green-branded cover page with 22 structured sections covering every aspect of BS 7121 and LOLER 1998 compliance. Includes load details with lifting point assessment, crane specification with thorough examination records, lift geometry with percentage-of-capacity calculation, rigging arrangement with sling angle analysis, ground conditions and outrigger pad sizing, proximity hazard survey, overhead services assessment, exclusion zone dimensions, appointed persons register with competence records, communication arrangements, weather limits, environmental considerations, pre-lift inspection checklist, step-by-step lift sequence, contingency and emergency procedures, risk assessment matrix, regulatory references, approval sign-off, and lift completion record.',
-    pageCount: 6,
+    pageCount: 10,
     layout: 'standard',
     thumbnailPath: '/product-images/lift-plan-templates/thumb-ebrora-standard.jpg',
     previewPaths: [
@@ -20,6 +20,10 @@ export const LIFT_PLAN_TEMPLATE_CONFIGS: Record<LiftPlanTemplateSlug, LiftPlanTe
       '/product-images/lift-plan-templates/preview-ebrora-standard-p4.jpg',
       '/product-images/lift-plan-templates/preview-ebrora-standard-p5.jpg',
       '/product-images/lift-plan-templates/preview-ebrora-standard-p6.jpg',
+      '/product-images/lift-plan-templates/preview-ebrora-standard-p7.jpg',
+      '/product-images/lift-plan-templates/preview-ebrora-standard-p8.jpg',
+      '/product-images/lift-plan-templates/preview-ebrora-standard-p9.jpg',
+      '/product-images/lift-plan-templates/preview-ebrora-standard-p10.jpg',
     ],
     keySections: [
       'Green Branded Cover Page',
@@ -71,7 +75,7 @@ export const LIFT_PLAN_TEMPLATE_CONFIGS: Record<LiftPlanTemplateSlug, LiftPlanTe
     displayName: 'Tandem / Complex Lift',
     description:
       'Teal-accented template specifically designed for tandem lifts (two or more cranes), complex multi-phase lifts, and awkward load operations. Dual crane specifications side-by-side, load sharing percentage calculations, synchronisation plan with timing, inter-crane communication protocol, enhanced ground bearing requirements per crane position, crane interaction zones, what-if failure analysis, multiple lift phase sequencing, and engineering calculations summary.',
-    pageCount: 5,
+    pageCount: 6,
     layout: 'structured',
     thumbnailPath: '/product-images/lift-plan-templates/thumb-tandem-lift.jpg',
     previewPaths: [
@@ -80,6 +84,7 @@ export const LIFT_PLAN_TEMPLATE_CONFIGS: Record<LiftPlanTemplateSlug, LiftPlanTe
       '/product-images/lift-plan-templates/preview-tandem-lift-p3.jpg',
       '/product-images/lift-plan-templates/preview-tandem-lift-p4.jpg',
       '/product-images/lift-plan-templates/preview-tandem-lift-p5.jpg',
+      '/product-images/lift-plan-templates/preview-tandem-lift-p6.jpg',
     ],
     keySections: [
       'Dual Crane Specifications Side-by-Side',
@@ -99,7 +104,7 @@ export const LIFT_PLAN_TEMPLATE_CONFIGS: Record<LiftPlanTemplateSlug, LiftPlanTe
     displayName: 'LOLER Compliance',
     description:
       'Navy-accented regulatory compliance template structured around demonstrating full LOLER 1998 and PUWER 1998 compliance. Regulation-by-regulation compliance checklist, thorough examination records (Reg 9/10), competent person declarations (Reg 8), equipment register with certification status, sling and shackle certification table, lift categorisation (routine/non-routine/complex per BS 7121), previous similar lifts log, defect reporting procedure, post-lift inspection checklist, and regulatory references with cross-referencing.',
-    pageCount: 4,
+    pageCount: 6,
     layout: 'banded',
     thumbnailPath: '/product-images/lift-plan-templates/thumb-loler-compliance.jpg',
     previewPaths: [
@@ -107,6 +112,8 @@ export const LIFT_PLAN_TEMPLATE_CONFIGS: Record<LiftPlanTemplateSlug, LiftPlanTe
       '/product-images/lift-plan-templates/preview-loler-compliance-p2.jpg',
       '/product-images/lift-plan-templates/preview-loler-compliance-p3.jpg',
       '/product-images/lift-plan-templates/preview-loler-compliance-p4.jpg',
+      '/product-images/lift-plan-templates/preview-loler-compliance-p5.jpg',
+      '/product-images/lift-plan-templates/preview-loler-compliance-p6.jpg',
     ],
     keySections: [
       'LOLER Regulation-by-Regulation Checklist',
