@@ -76,7 +76,7 @@ export default function RegisterPage() {
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
     try {
-      await signIn('google', { redirect: true, callbackUrl: '/dashboard' });
+      await signIn('google', { redirect: true, callbackUrl: '/rams-builder' });
     } catch (err) {
       setError('Failed to sign up with Google');
       console.error('Google sign-up error:', err);
@@ -143,7 +143,7 @@ export default function RegisterPage() {
       <div className="auth-card">
         <div className="auth-card__header">
           <h1 className="page-header">Create Account</h1>
-          <p>Get started with Ebrora RAMS Builder</p>
+          <p>Get started with Ebrora — AI tools, templates, and more</p>
         </div>
 
         {error && (
