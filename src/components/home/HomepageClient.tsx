@@ -456,11 +456,10 @@ export default function HomepageClient({
             The Most Powerful AI Construction Tools Available
           </h1>
           <p className="hp-hero__subtitle">
-            Comparable platforms charge £200+ per month for a single tool.
-            Ebrora gives you an entire suite of AI-powered document generators — RAMS,
-            COSHH, ITPs, manual handling, DSE, confined spaces, and more — all built
-            specifically for UK construction by people who actually work on site.
-            Every output is regulation-compliant and ready to use.
+            25+ AI document generators, 1,500+ free toolbox talks, 1,000+ downloadable
+            templates, and a complete RAMS Builder — all on one platform built for
+            UK construction. From RAMS and COSHH to method statements, ITPs, and
+            site inductions, everything your site team needs is here.
           </p>
 
           {/* Site-wide search */}
