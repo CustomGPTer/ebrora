@@ -52,7 +52,12 @@ export async function POST(request: NextRequest) {
 
       const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`;
           const { subject, html } = passwordResetEmail(user.name || 'there', resetUrl);
-          await sendEmail(email.toLowerCase(), subject, html);
+          const emailSent = await sendEmail(email.toLowerCase(), subject, html);
+
+      if (!emailSent) {
+          console.error(`Failed to send password reset email to ${email.toLowerCase()}`);
+          // Still return success to prevent email enumeration, but log the failure
+      }
 
       return NextResponse.json({ success: true });
     } catch (error) {
