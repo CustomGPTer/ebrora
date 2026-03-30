@@ -45,7 +45,7 @@ export async function PATCH(req: NextRequest) {
   try {
     await requireAdmin();
     const body = await req.json();
-    const { userId, name, role, tier } = body;
+    const { userId, name, role, tier, verifyEmail } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'userId required' }, { status: 400 });
@@ -55,6 +55,12 @@ export async function PATCH(req: NextRequest) {
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
     if (role && ['USER', 'ADMIN'].includes(role)) updateData.role = role;
+    
+    // Handle email verification
+    if (verifyEmail === true) {
+      updateData.email_verified = true;
+      updateData.email_verified_at = new Date();
+    }
 
     if (Object.keys(updateData).length > 0) {
       await prisma.user.update({ where: { id: userId }, data: updateData });
