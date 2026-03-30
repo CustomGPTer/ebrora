@@ -9,14 +9,14 @@ import { RAMS_BUILDER_UPSELL } from "@/data/upsell-config";
 export const metadata: Metadata = {
   title: "Free Toolbox Talks for Construction Sites | 60 Categories | Ebrora",
   description:
-    "Download over 1,500 free toolbox talks across 60 health and safety categories for UK construction sites. Covering excavations, working at height, COSHH, confined spaces, pipelines, MEICA and more. PDF format, ready to use on site.",
+    "The UK's largest collection of free construction toolbox talks. Over 1,500 briefings across 60 health and safety categories — excavations, working at height, COSHH, confined spaces, MEICA, and more. PDF format, ready to use on site.",
   alternates: {
     canonical: "https://www.ebrora.com/toolbox-talks",
   },
   openGraph: {
     title: "Free Toolbox Talks for Construction Sites | Ebrora",
     description:
-      "Over 1,500 free toolbox talks across 60 H&S categories. PDF format, ready to brief your site team.",
+      "The UK's largest collection of free construction toolbox talks. 1,500+ briefings across 60 H&S categories, ready to download as PDF.",
     url: "https://www.ebrora.com/toolbox-talks",
     type: "website",
     images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Free Toolbox Talks for Construction Sites | Ebrora",
     description:
-      "Over 1,500 free toolbox talks across 60 health and safety categories. PDF format, ready to use on site.",
+      "The UK's largest collection of free construction toolbox talks. 1,500+ briefings across 60 health and safety categories, ready to download as PDF.",
     images: ["https://www.ebrora.com/og-image.jpg"],
   },
 };
@@ -48,8 +48,8 @@ export default function ToolboxTalksPage() {
             Construction Toolbox Talks
           </h1>
           <p className="text-base sm:text-lg text-emerald-100/80 max-w-2xl mx-auto">
-            Toolbox Talks across {categories.length} categories.
-            Download as PDF, ready to brief your site team.
+            The UK&apos;s largest collection of free construction toolbox talks
+            — {availableCount.toLocaleString()}+ briefings across {categories.length} categories, ready to download as PDF.
           </p>
         </div>
       </section>
