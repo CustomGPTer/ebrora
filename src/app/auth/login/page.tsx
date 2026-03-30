@@ -12,6 +12,9 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
+  const [resendLoading, setResendLoading] = useState(false);
 
   const verified = searchParams.get('verified');
   const reset = searchParams.get('reset');
@@ -19,6 +22,8 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setShowResendVerification(false);
+    setResendMessage('');
     setIsLoading(true);
     try {
       const result = await signIn('credentials', {
@@ -28,8 +33,11 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        if (result.error === 'EmailNotVerified') {
-          setError('Please verify your email address before logging in. Check your inbox for the verification email.');
+        // Check if error contains verification message
+        if (result.error.toLowerCase().includes('verify your email') || 
+            result.error.toLowerCase().includes('verification')) {
+          setError('Please verify your email address before logging in.');
+          setShowResendVerification(true);
         } else {
           setError('Invalid email or password. Please try again.');
         }
@@ -40,6 +48,36 @@ function LoginForm() {
       setError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      setResendMessage('Please enter your email address above first.');
+      return;
+    }
+    
+    setResendLoading(true);
+    setResendMessage('');
+    
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        setResendMessage('Verification email sent! Please check your inbox and spam folder.');
+      } else {
+        setResendMessage(data.error || 'Failed to resend verification email. Please try again.');
+      }
+    } catch {
+      setResendMessage('Failed to resend verification email. Please try again.');
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -72,6 +110,35 @@ function LoginForm() {
           {error && (
             <div className="alert alert--error">
               <p>{error}</p>
+            </div>
+          )}
+
+          {showResendVerification && (
+            <div style={{ marginBottom: '1rem' }}>
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={resendLoading}
+                className="link link--primary"
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  padding: 0,
+                  cursor: resendLoading ? 'wait' : 'pointer',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {resendLoading ? 'Sending...' : 'Resend verification email'}
+              </button>
+              {resendMessage && (
+                <p style={{ 
+                  marginTop: '0.5rem', 
+                  fontSize: '0.875rem',
+                  color: resendMessage.includes('sent') ? '#16a34a' : '#dc2626',
+                }}>
+                  {resendMessage}
+                </p>
+              )}
             </div>
           )}
 
