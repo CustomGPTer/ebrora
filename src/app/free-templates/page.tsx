@@ -15,14 +15,14 @@ export const metadata: Metadata = {
       "Free Construction Templates | Excel, Word & PowerPoint | Ebrora",
   },
   description:
-    "Download free construction templates across 20 categories. Risk assessments, ITPs, Gantt charts, MEICA records, commissioning checklists, and more. Excel, Word, PowerPoint, and PDF — all free for UK construction professionals.",
+    "The UK's largest collection of free construction templates. Risk assessments, ITPs, Gantt charts, MEICA records, commissioning checklists, and more — Excel, Word, PowerPoint, and PDF across 20+ categories.",
   alternates: {
     canonical: "https://www.ebrora.com/free-templates",
   },
   openGraph: {
     title: "Free Construction Templates | Ebrora",
     description:
-      "Free Excel, Word, PowerPoint, and PDF templates for UK construction teams. 20 categories covering H&S, quality, environmental, MEICA, civils, and more.",
+      "The UK's largest collection of free construction templates. Excel, Word, PowerPoint, and PDF across 20+ categories covering H&S, quality, environmental, MEICA, civils, and more.",
     url: "https://www.ebrora.com/free-templates",
     type: "website",
     images: [
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Free Construction Templates | Ebrora",
     description:
-      "Free construction templates across 20 categories. Excel, Word, PowerPoint, and PDF formats.",
+      "The UK's largest collection of free construction templates. Excel, Word, PowerPoint, and PDF across 20+ categories.",
     images: ["https://www.ebrora.com/og-image.jpg"],
   },
 };
@@ -86,8 +86,8 @@ export default function FreeTemplatesPage() {
             Free Construction Templates
           </h1>
           <p className="text-base sm:text-lg text-emerald-100/80 max-w-2xl mx-auto">
-            Professional templates across {categories.length} categories.
-            Excel, Word, PowerPoint, and PDF — ready to use on site.
+            The UK&apos;s largest collection of free construction templates
+            — Excel, Word, PowerPoint, and PDF across {categories.length} categories, ready to use on site.
           </p>
         </div>
       </section>
