@@ -10,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
-import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt, getEarlyWarningTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import type { AiToolSlug } from '@/lib/ai-tools';
 
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       permitToDigTemplateSlug?: string;
       powraTemplateSlug?: string;
       scopeTemplateSlug?: string;
+      earlyWarningTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -179,6 +180,8 @@ export async function POST(req: NextRequest) {
       ? getPermitToDigTemplateGenerationPrompt(permitToDigTemplateSlug as any)
       : (toolSlug === 'powra' && powraTemplateSlug)
       ? getPowraTemplateGenerationPrompt(powraTemplateSlug as any)
+      : (toolSlug === 'early-warning' && earlyWarningTemplateSlug)
+      ? getEarlyWarningTemplateGenerationPrompt(earlyWarningTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A
@@ -289,6 +292,11 @@ export async function POST(req: NextRequest) {
     // Inject Scope of Works template slug into content so docx-generator can route it
     if (toolSlug === 'scope-of-works' && scopeTemplateSlug) {
       documentContent._scopeTemplateSlug = scopeTemplateSlug;
+    }
+
+    // Inject Early Warning template slug into content so docx-generator can route it
+    if (toolSlug === 'early-warning' && earlyWarningTemplateSlug) {
+      documentContent._earlyWarningTemplateSlug = earlyWarningTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
