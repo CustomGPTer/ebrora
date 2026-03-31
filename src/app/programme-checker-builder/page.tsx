@@ -1,18 +1,15 @@
 import type { Metadata } from 'next';
-import { AI_TOOL_CONFIGS } from '@/lib/ai-tools/tool-config';
-// PHASE 4: AiUploadToolClient will be built in Phase 4 (Upload API).
-// Until then this page will render the upload placeholder UI.
-import AiUploadToolClient from '@/components/ai-tools/AiUploadToolClient';
+import ProgrammeCheckerBuilderClient from './components/ProgrammeCheckerBuilderClient';
 
 export const metadata: Metadata = {
-  title: { absolute: 'AI Construction Programme Checker | Ebrora' },
+  title: { absolute: 'AI Construction Programme Checker | 4 Report Templates | Ebrora' },
   description:
-    'Upload your construction programme for an AI-powered review. Logic errors, sequencing gaps, WBS issues, duration anomalies, and NEC/JCT contractual compliance — RAG-scored report.',
+    'Upload your construction programme for an AI-powered review. Choose from 4 report templates — Scoring, Email Summary, RAG Report, or Comprehensive. Logic, sequencing, WBS, critical path, and contractual compliance.',
   alternates: { canonical: 'https://www.ebrora.com/programme-checker-builder' },
   openGraph: {
-    title: 'AI Construction Programme Checker | Ebrora',
+    title: 'AI Construction Programme Checker | 4 Report Templates | Ebrora',
     description:
-      'Upload your programme (PDF, XLSX, XER/XML) for a RAG-rated AI review — logic, sequencing, WBS, critical path, and contractual milestone compliance.',
+      'Upload your programme (PDF, XLSX, XER/XML) and choose a report template. Scoring, Email, RAG, or Comprehensive — AI-powered programme review.',
     url: 'https://www.ebrora.com/programme-checker-builder',
     type: 'website',
     images: [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }],
@@ -20,6 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  const toolConfig = AI_TOOL_CONFIGS['programme-checker'];
-  return <AiUploadToolClient toolConfig={toolConfig} />;
+  return <ProgrammeCheckerBuilderClient />;
 }
