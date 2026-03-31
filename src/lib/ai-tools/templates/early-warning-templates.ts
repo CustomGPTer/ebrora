@@ -100,7 +100,7 @@ function gap(size = 200): Paragraph {
   return new Paragraph({ spacing: { after: size }, children: [] });
 }
 
-function titleBlock(p: Palette, title: string, subtitle?: string, clause?: string): Paragraph[] {
+function titleBlock(p: Palette, title: string, subtitle?: string, clause?: string): (Paragraph | Table)[] {
   const result: Paragraph[] = [
     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 500, after: 60 }, children: [
       new TextRun({ text: title, bold: true, size: 40, font: p.font, color: p.primary }),
@@ -174,14 +174,14 @@ function ebroraFooterLine(p: Palette): Paragraph {
   ] });
 }
 
-function proseSection(p: Palette, text: string | undefined): Paragraph[] {
+function proseSection(p: Palette, text: string | undefined): (Paragraph | Table)[] {
   if (!text) return [];
   return text.split('\n').filter(Boolean).map((line) => bodyPara(p, line));
 }
 
 // ── Template-Specific Builders ───────────────────────────────────
 
-function buildT1ContractorPM(p: Palette, c: any): Paragraph[] {
+function buildT1ContractorPM(p: Palette, c: any): (Paragraph | Table)[] {
   const cost = c.potentialImpactOnCost || {};
   const prog = c.potentialImpactOnProgramme || {};
   const rrm = c.riskReductionMeeting || {};
@@ -229,7 +229,7 @@ function buildT1ContractorPM(p: Palette, c: any): Paragraph[] {
   ];
 }
 
-function buildT2PMContractor(p: Palette, c: any): Paragraph[] {
+function buildT2PMContractor(p: Palette, c: any): (Paragraph | Table)[] {
   const rrm = c.riskReductionMeeting || {};
   return [
     ...titleBlock(p, 'EARLY WARNING NOTICE', 'Issued by Project Manager', `${c.contractForm || 'NEC4 ECC'} — ${c.clauseReference || 'Clause 15.1'}`),
@@ -286,7 +286,7 @@ function buildT2PMContractor(p: Palette, c: any): Paragraph[] {
   ];
 }
 
-function buildT3SubToMC(p: Palette, c: any): Paragraph[] {
+function buildT3SubToMC(p: Palette, c: any): (Paragraph | Table)[] {
   const cost = c.potentialImpactOnCost || {};
   const prog = c.potentialImpactOnProgramme || {};
   return [
@@ -320,7 +320,7 @@ function buildT3SubToMC(p: Palette, c: any): Paragraph[] {
   ];
 }
 
-function buildT4MCToSub(p: Palette, c: any): Paragraph[] {
+function buildT4MCToSub(p: Palette, c: any): (Paragraph | Table)[] {
   return [
     ...titleBlock(p, 'EARLY WARNING NOTICE', 'Issued to Subcontractor', `${c.contractForm || 'NEC4 ECS'} — ${c.clauseReference || 'Clause 15.1'}`),
     sectionHead(p, 'Notice Details'),
@@ -383,7 +383,7 @@ function buildT4MCToSub(p: Palette, c: any): Paragraph[] {
   ];
 }
 
-function buildT5ComprehensiveRisk(p: Palette, c: any): Paragraph[] {
+function buildT5ComprehensiveRisk(p: Palette, c: any): (Paragraph | Table)[] {
   const cost = c.potentialImpactOnCost || {};
   const prog = c.potentialImpactOnProgramme || {};
   const risk = c.riskScoring || {};
@@ -456,7 +456,7 @@ function buildT5ComprehensiveRisk(p: Palette, c: any): Paragraph[] {
   ];
 }
 
-function buildT6HealthSafety(p: Palette, c: any): Paragraph[] {
+function buildT6HealthSafety(p: Palette, c: any): (Paragraph | Table)[] {
   const rrm = c.riskReductionMeeting || {};
   return [
     ...titleBlock(p, 'EARLY WARNING NOTICE', 'Health & Safety Risk', `${c.contractForm || 'NEC4 ECC'} — ${c.clauseReference || 'Clause 15.1'} | CDM Regulations 2015`),
@@ -525,7 +525,7 @@ function buildT6HealthSafety(p: Palette, c: any): Paragraph[] {
   ];
 }
 
-function buildT7DesignTechnical(p: Palette, c: any): Paragraph[] {
+function buildT7DesignTechnical(p: Palette, c: any): (Paragraph | Table)[] {
   const rrm = c.riskReductionMeeting || {};
   return [
     ...titleBlock(p, 'EARLY WARNING NOTICE', 'Design & Technical Risk', `${c.contractForm || 'NEC4 ECC'} — ${c.clauseReference || 'Clause 15.1'} | Design Discrepancy`),
@@ -586,7 +586,7 @@ function buildT7DesignTechnical(p: Palette, c: any): Paragraph[] {
   ];
 }
 
-function buildT8WeatherForceMajeure(p: Palette, c: any): Paragraph[] {
+function buildT8WeatherForceMajeure(p: Palette, c: any): (Paragraph | Table)[] {
   const rrm = c.riskReductionMeeting || {};
   const weather = c.weatherData || {};
   return [
@@ -662,7 +662,7 @@ function buildT8WeatherForceMajeure(p: Palette, c: any): Paragraph[] {
 }
 
 // ── Router ───────────────────────────────────────────────────────
-const BUILDERS: Record<EarlyWarningTemplateSlug, (p: Palette, c: any) => Paragraph[]> = {
+const BUILDERS: Record<EarlyWarningTemplateSlug, (p: Palette, c: any) => (Paragraph | Table)[]> = {
   'nec4-contractor-pm':    buildT1ContractorPM,
   'nec4-pm-contractor':    buildT2PMContractor,
   'nec4-sub-to-mc':        buildT3SubToMC,
