@@ -50,6 +50,39 @@ async function safeJsonParse(res: Response, fallback: string) {
   try { return await res.json(); } catch { return { error: fallback }; }
 }
 
+/* ── Tool-specific detail prompts for the info box ── */
+const TOOL_DETAIL_PROMPTS: Record<string, string> = {
+  'coshh': 'Include the substance name, how it's used, quantities, exposure routes, existing controls, and who is exposed. Mention any ventilation, PPE, or health surveillance already in place.',
+  'itp': 'Include the works being inspected, hold/witness/review points, applicable specifications or standards, acceptance criteria, and responsible parties for each inspection stage.',
+  'manual-handling': 'Describe the load (weight, shape, grip), the task (lifting, carrying, pushing), the environment (space, flooring, temperature), and who performs the activity including frequency and duration.',
+  'dse': 'Describe the workstation setup including chair, desk, screen, keyboard, mouse, lighting, and any accessories. Note how long the user spends at the workstation and any discomfort reported.',
+  'tbt-generator': 'Describe the topic you want covered, the specific site activities it relates to, the audience (trade/role), and any recent incidents or seasonal risks that should be referenced.',
+  'confined-spaces': 'Describe the confined space (type, dimensions, access/egress), the work to be carried out inside, atmospheric hazards, rescue arrangements, and any permits or isolation required.',
+  'incident-report': 'Describe what happened, when and where it occurred, who was involved or injured, immediate actions taken, the root cause if known, and any witness details.',
+  'lift-plan': 'Include the load description and weight, crane/lifting equipment details, lift radius, ground conditions, rigging arrangements, exclusion zones, and weather restrictions.',
+  'emergency-response': 'Describe the site location, type of operations, potential emergencies (fire, flood, chemical spill, injury), muster points, nearest hospital, and key emergency contacts.',
+  'quality-checklist': 'Describe the element or activity being inspected, applicable specifications or drawings, acceptance criteria, test methods, and any hold points or sign-off requirements.',
+  'scope-of-works': 'Include the project name, location, client, key deliverables, programme dates, technical specifications, exclusions, constraints, and any interface or access requirements.',
+  'permit-to-dig': 'Include the dig location, depth and dimensions, purpose of the excavation, known underground services, trial hole results, and any support or shoring requirements.',
+  'powra': 'Describe the specific task, location, weather/ground conditions, nearby hazards, required PPE, plant or equipment in use, and any dynamic risks that may change during the work.',
+  'early-warning': 'Describe the matter that could affect cost, time, or quality. Reference the contract clause, include dates, impacted activities, and any proposed mitigation measures.',
+  'ncr': 'Describe the non-conformance, where and when it was found, the specification or drawing requirement, the actual condition, and any immediate containment actions taken.',
+  'ce-notification': 'Describe the compensation event, the contract clause it falls under, when it occurred, the impact on programme and cost, and supporting evidence or records.',
+  'cdm-checker': 'Describe the project type, phase (design/construction), principal designer and contractor details, client duties undertaken, and any existing CDM documentation in place.',
+  'noise-assessment': 'Include the noise sources (plant, equipment, processes), their locations, exposure durations, existing controls, number of workers exposed, and any noise measurements available.',
+  'quote-generator': 'Include the works to be priced, quantities, unit rates, preliminaries, project location, programme duration, any provisional sums, exclusions, and payment terms.',
+  'safety-alert': 'Describe the safety issue or incident, when and where it happened, the immediate risk, who is affected, required corrective actions, and the urgency/distribution level.',
+  'carbon-footprint': 'Include materials (types and quantities), plant and equipment (type and hours), transport (distances and vehicle types), energy use, and waste volumes for the activity or project.',
+  'delay-notification': 'Describe the delay event, when it started, the affected activities, the impact on programme and completion, the contract clause, and any mitigation actions being taken.',
+  'variation-confirmation': 'Describe the variation to the original scope, the instruction or agreement reference, impact on cost and programme, and any supporting drawings or specifications.',
+  'rfi-generator': 'Describe the information you need, why it is required, the drawing or specification reference, the urgency, and the impact on programme if a response is delayed.',
+  'payment-application': 'Include the contract reference, valuation period, works completed (with quantities and rates), materials on site, variations, retention, and any previous payments received.',
+  'daywork-sheet': 'Include the date, operatives (names, trades, hours), plant and equipment used (type, hours), materials consumed (type, quantity), and a description of the work carried out.',
+  'carbon-reduction-plan': 'Describe your organisation's current emissions baseline, reduction targets, key initiatives (energy, transport, materials, waste), timeline, and any certifications or commitments in place.',
+};
+
+const DEFAULT_DETAIL_PROMPT = 'The more detail you provide, the better your document will be. Include specifics such as location, materials, equipment, site conditions, and any known hazards.';
+
 /* ── Loading steps per phase ── */
 const QUESTION_STEPS = [
   'Analysing your work description...',
@@ -560,7 +593,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
                 lineHeight: '1.5',
                 margin: 0,
               }}>
-                The more detail you provide, the better your document will be. Include specifics such as location, materials, equipment, site conditions, and any known hazards.
+                {TOOL_DETAIL_PROMPTS[toolConfig.slug] || DEFAULT_DETAIL_PROMPT}
               </p>
             </div>
 
