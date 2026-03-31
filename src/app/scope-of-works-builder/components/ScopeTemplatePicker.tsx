@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { SCOPE_TEMPLATE_CONFIGS } from '@/lib/scope/template-config';
 import { SCOPE_TEMPLATE_ORDER } from '@/lib/scope/template-config';
 import type { ScopeTemplateSlug } from '@/lib/scope/types';
+import ScopeTemplatePreviewModal from './ScopeTemplatePreviewModal';
 
 interface ScopeTemplatePickerProps {
   onSelect: (slug: ScopeTemplateSlug) => void;
@@ -14,6 +16,7 @@ interface ScopeTemplatePickerProps {
 export default function ScopeTemplatePicker({ onSelect }: ScopeTemplatePickerProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [previewSlug, setPreviewSlug] = useState<ScopeTemplateSlug | null>(null);
 
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
@@ -36,6 +39,11 @@ export default function ScopeTemplatePicker({ onSelect }: ScopeTemplatePickerPro
       return;
     }
     onSelect(slug);
+  };
+
+  const handlePreviewClick = (e: React.MouseEvent, slug: ScopeTemplateSlug) => {
+    e.stopPropagation();
+    setPreviewSlug(slug);
   };
 
   const templateStatus = getTemplateStatus();
@@ -69,23 +77,35 @@ export default function ScopeTemplatePicker({ onSelect }: ScopeTemplatePickerPro
               className={`tpl-card ${isLocked ? 'tpl-card--locked' : ''}`}
               onClick={() => handleTemplateClick(slug)}
             >
-              {/* Colour swatch header */}
-              <div
-                className="tpl-card-thumb"
-                style={{
-                  background: `linear-gradient(135deg, #${template.accentColor}, #${template.accentColor}dd)`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'column',
-                  gap: '0.25rem',
-                }}
-              >
-                <span style={{ color: '#fff', fontSize: '1.3rem', fontWeight: 700, fontFamily: template.font }}>
-                  {template.displayName}
-                </span>
-                <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}>
-                  {template.font} · {template.pageCount} pages
+              {/* A4 ratio thumbnail */}
+              <div className="tpl-card-thumb">
+                <Image
+                  src={template.thumbnailPath}
+                  alt={`${template.displayName} preview`}
+                  fill
+                  sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
+                  style={{ objectFit: 'cover', objectPosition: 'top' }}
+                />
+
+                {/* Preview pill */}
+                <span
+                  className="tpl-card-preview-pill"
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => handlePreviewClick(e, slug)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handlePreviewClick(e as unknown as React.MouseEvent, slug);
+                    }
+                  }}
+                  title={`Preview ${template.displayName}`}
+                >
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  Preview
                 </span>
 
                 {/* Lock overlay */}
@@ -126,6 +146,14 @@ export default function ScopeTemplatePicker({ onSelect }: ScopeTemplatePickerPro
           );
         })}
       </div>
+
+      {/* Preview modal */}
+      {previewSlug && (
+        <ScopeTemplatePreviewModal
+          template={SCOPE_TEMPLATE_CONFIGS[previewSlug]}
+          onClose={() => setPreviewSlug(null)}
+        />
+      )}
     </div>
   );
 }
