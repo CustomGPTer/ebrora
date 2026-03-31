@@ -459,8 +459,16 @@ export async function generateAiToolDocument(
   // ── New 13 tools — premium templates ──────────────────────────────────────
 
   if (toolSlug === 'programme-checker') {
-    const { buildProgrammeCheckerDocument } = await import('./templates/new-tools-templates');
-    const doc = await buildProgrammeCheckerDocument(content as any);
+    const pcSlug = (content as any)._programmeCheckerTemplateSlug;
+    let doc;
+    if (pcSlug) {
+      const { buildProgrammeCheckerTemplateDocument } = await import('./templates/programme-checker-templates');
+      doc = await buildProgrammeCheckerTemplateDocument(content as any, pcSlug);
+    } else {
+      // Fallback to original single template (backwards compatible)
+      const { buildProgrammeCheckerDocument } = await import('./templates/new-tools-templates');
+      doc = await buildProgrammeCheckerDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }

@@ -17,6 +17,7 @@ import type { NoiseAssessmentTemplateSlug } from '@/lib/noise-assessment/types';
 import type { PermitToDigTemplateSlug } from '@/lib/permit-to-dig/types';
 import type { PowraTemplateSlug } from '@/lib/powra/types';
 import type { EarlyWarningTemplateSlug } from '@/lib/early-warning/types';
+import type { ProgrammeCheckerTemplateSlug } from '@/lib/programme-checker/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -4740,4 +4741,210 @@ CRITICAL: Populate ONLY the fields relevant to the selected template. Always pop
 export function getEarlyWarningTemplateGenerationPrompt(templateSlug: EarlyWarningTemplateSlug): string {
   const styleGuide = EARLY_WARNING_TEMPLATE_STYLE[templateSlug] || EARLY_WARNING_TEMPLATE_STYLE['nec4-contractor-pm'];
   return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nNEC Early Warning Notice\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate an Early Warning Notice JSON with this structure:\n${EARLY_WARNING_SCHEMA}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// Programme Checker — Template-Aware Generation Prompts (4 templates)
+// Each template has a different JSON structure and output style.
+// =============================================================================
+
+const PC_SCORING_SCHEMA = `{
+  "documentRef": "string (format: PCS-YYYY-NNN)",
+  "reviewDate": "DD/MM/YYYY",
+  "reviewedBy": "Ebrora AI Programme Checker",
+  "programmeTitle": "string (extracted from file)",
+  "programmeType": "string",
+  "programmePeriod": { "startDate": "string", "completionDate": "string", "totalDuration": "string" },
+  "overallWeightedScore": "number (0-100, weighted average of all area scores)",
+  "overallGrade": "A+ (95-100) | A (85-94) | B (70-84) | C (55-69) | D (40-54) | F (0-39)",
+  "scoringMethodology": "string (explain weighting: Logic 20%, Durations 15%, WBS 10%, Critical Path 20%, Float 10%, Resources 5%, Milestones 15%, Gaps 5%)",
+  "scoredAreas": [
+    {
+      "area": "string",
+      "weight": "number (percentage weight, all must sum to 100)",
+      "rawScore": "number (0-10)",
+      "weightedScore": "number (rawScore * weight / 10)",
+      "grade": "A+ | A | B | C | D | F",
+      "keyStrengths": ["string"],
+      "keyDeficiencies": ["string"],
+      "improvementActions": ["string"]
+    }
+  ],
+  "rankedDeficiencies": [
+    {
+      "rank": "number",
+      "area": "string",
+      "deficiency": "string",
+      "scoreImpact": "string (how many points lost)",
+      "recommendedFix": "string"
+    }
+  ],
+  "programmeMetrics": {
+    "totalActivities": "string", "milestones": "string", "criticalActivities": "string",
+    "averageFloat": "string", "openEnds": "string"
+  },
+  "improvementPlan": [
+    { "action": "string", "priority": "Immediate | Short-term | Medium-term", "expectedScoreGain": "string" }
+  ],
+  "additionalNotes": "string"
+}
+All 8 areas MUST be scored. Weights must sum to 100. Overall score must be calculated correctly. Minimum 6 ranked deficiencies. Minimum 8 improvement actions.`;
+
+const PC_EMAIL_SCHEMA = `{
+  "documentRef": "string (format: PCE-YYYY-NNN)",
+  "reviewDate": "DD/MM/YYYY",
+  "reviewedBy": "Ebrora AI Programme Checker",
+  "programmeTitle": "string (extracted from file)",
+  "programmeType": "string",
+  "programmePeriod": { "startDate": "string", "completionDate": "string", "totalDuration": "string" },
+  "addressedTo": "Project Manager",
+  "from": "Programme Review Team",
+  "subject": "string (e.g. Programme Review Summary — [Programme Title])",
+  "openingParagraph": "string (min 100 words — professional opening summarising the review, overall assessment, and key concern)",
+  "keyFindings": [
+    { "finding": "string (1-2 sentences)", "severity": "Critical | Significant | Minor" }
+  ],
+  "programmeStatistics": {
+    "totalActivities": "string", "milestones": "string", "criticalActivities": "string",
+    "averageFloat": "string", "openEnds": "string", "overallAssessment": "RED | AMBER | GREEN"
+  },
+  "criticalIssues": [
+    { "issue": "string", "impact": "string", "requiredAction": "string" }
+  ],
+  "recommendedNextSteps": ["string"],
+  "closingParagraph": "string (min 50 words — professional closing, offer to discuss, request meeting if needed)",
+  "signOffName": "Programme Review Team",
+  "signOffTitle": "Ebrora AI Programme Checker"
+}
+Minimum 6 key findings. Minimum 4 critical issues. Minimum 5 recommended next steps. Write in professional formal letter tone — this will be formatted as an email/letter.`;
+
+const PC_RAG_SCHEMA = `{
+  "documentRef": "string (format: PCR-YYYY-NNN)",
+  "reviewDate": "DD/MM/YYYY",
+  "reviewedBy": "Ebrora AI Programme Checker",
+  "programmeTitle": "string (extracted from file, or 'Not stated')",
+  "programmeType": "string (Primavera P6 XER | MS Project XML | Excel | PDF)",
+  "programmePeriod": { "startDate": "string", "completionDate": "string", "totalDuration": "string" },
+  "overallRagRating": "RED | AMBER | GREEN",
+  "overallSummary": "string (min 250 words — executive summary)",
+  "reviewAreas": [
+    {
+      "area": "string",
+      "ragRating": "RED | AMBER | GREEN | NOT ASSESSED",
+      "score": "number (1-10)",
+      "findings": "string (min 150 words)",
+      "issues": ["string"],
+      "recommendations": ["string"]
+    }
+  ],
+  "criticalIssues": [
+    { "priority": "number", "issue": "string", "impact": "string", "recommendation": "string", "ragRating": "RED | AMBER" }
+  ],
+  "recommendedActions": [
+    { "action": "string", "priority": "Immediate | Short-term | Medium-term", "responsible": "string" }
+  ],
+  "programmeMetrics": {
+    "totalActivities": "string", "milestones": "string", "criticalActivities": "string",
+    "averageFloat": "string", "openEnds": "string"
+  },
+  "additionalNotes": "string"
+}
+All 8 review areas: Programme Logic & Dependencies, Duration Analysis, WBS Structure & Activity Hierarchy, Critical Path Integrity, Float Analysis, Resource Loading & Constraints, Contractual Milestone Compliance, Missing Activities & Programme Gaps. Min 6 critical issues. Min 8 recommended actions.`;
+
+const PC_COMPREHENSIVE_SCHEMA = `{
+  "documentRef": "string (format: PCC-YYYY-NNN)",
+  "reviewDate": "DD/MM/YYYY",
+  "reviewedBy": "Ebrora AI Programme Checker",
+  "programmeTitle": "string (extracted from file)",
+  "programmeType": "string",
+  "programmePeriod": { "startDate": "string", "completionDate": "string", "totalDuration": "string" },
+  "overallRagRating": "RED | AMBER | GREEN",
+  "overallWeightedScore": "number (0-100)",
+  "executiveSummary": "string (min 500 words — comprehensive executive summary covering all aspects)",
+  "programmeMetrics": {
+    "totalActivities": "string", "milestones": "string", "criticalActivities": "string",
+    "averageFloat": "string", "openEnds": "string",
+    "logicDensity": "string (relationships per activity ratio)",
+    "criticalPathLength": "string",
+    "nearCriticalActivities": "string (float < 5 days)"
+  },
+  "reviewAreas": [
+    {
+      "area": "string",
+      "ragRating": "RED | AMBER | GREEN | NOT ASSESSED",
+      "score": "number (1-10)",
+      "weight": "number (percentage)",
+      "extendedFindings": "string (min 250 words — detailed analysis with specific activity references)",
+      "issues": ["string"],
+      "recommendations": ["string"],
+      "bestPracticeComparison": "string (how this compares to industry best practice)",
+      "riskLevel": "High | Medium | Low"
+    }
+  ],
+  "riskMatrix": [
+    {
+      "risk": "string",
+      "likelihood": "number (1-5)",
+      "impact": "number (1-5)",
+      "riskScore": "number (likelihood x impact)",
+      "mitigation": "string",
+      "owner": "string"
+    }
+  ],
+  "floatDistribution": {
+    "negative": "string (count and percentage)",
+    "zero": "string",
+    "lessThan5": "string",
+    "fiveTo20": "string",
+    "moreThan20": "string",
+    "analysis": "string (min 100 words)"
+  },
+  "criticalPathNarrative": "string (min 200 words — describe the critical path, key drivers, vulnerabilities)",
+  "resourceLoadingAssessment": "string (min 150 words — resource availability, peaks, conflicts)",
+  "contractualCompliance": {
+    "contractType": "string (NEC4 | JCT | FIDIC | Other | Not stated)",
+    "keyDatesAssessed": [{ "keyDate": "string", "status": "On Track | At Risk | Breached | Not Assessed", "notes": "string" }],
+    "completionDateAssessment": "string",
+    "floatOwnership": "string"
+  },
+  "criticalIssues": [
+    { "priority": "number", "issue": "string", "impact": "string", "recommendation": "string", "ragRating": "RED | AMBER", "owner": "string", "targetDate": "string" }
+  ],
+  "improvementPlan": [
+    { "action": "string", "priority": "Immediate | Short-term | Medium-term", "responsible": "string", "targetDate": "string", "expectedBenefit": "string" }
+  ],
+  "methodology": "string (min 100 words — explain the review methodology, standards referenced, and assessment criteria used)",
+  "additionalNotes": "string"
+}
+All 8 review areas assessed with extended findings (min 250 words each). Min 6 risk matrix items. Min 8 critical issues. Min 10 improvement plan actions. Float distribution must be analysed. Critical path narrative required. This is the most detailed template — maximise content depth.`;
+
+const PC_TEMPLATE_STYLE: Record<ProgrammeCheckerTemplateSlug, string> = {
+  'scoring': `This is the SCORING template. Focus on numerical assessment. Every area must have a clear 0-10 score with explicit justification. Calculate weighted scores accurately. The overall weighted score must be mathematically correct. Rank deficiencies by score impact. Write improvement actions that are specific and measurable — each should state what score improvement is expected. Use precise, data-driven language. Reference specific activities from the programme where possible.`,
+
+  'email-summary': `This is the EMAIL SUMMARY template. Write as a professional formal letter/email addressed to the Project Manager. Use a clear, concise business writing style. The opening paragraph should set context and give the overall assessment immediately. Key findings should be punchy 1-2 sentence bullets. Critical issues should be actionable. The closing should be professional and invite discussion. Do NOT use technical jargon without explanation. This document will be sent as-is to senior stakeholders.`,
+
+  'rag-report': `This is the standard RAG REPORT template. Each review area must have a clear RED, AMBER, or GREEN rating with detailed justification. Findings should reference specific activities, dates, and data from the uploaded programme. Issues should be specific and traceable. Recommendations should be practical and implementable. The executive summary should give the reader the full picture in one read.`,
+
+  'comprehensive': `This is the COMPREHENSIVE template — maximum detail and depth. Every section must be thorough. Extended findings must be 250+ words per area with specific programme references. The executive summary must be 500+ words. Include risk matrix with likelihood/impact scoring. Analyse float distribution with counts and percentages. Write a critical path narrative. Assess contractual compliance including key dates. The improvement plan must have target dates and expected benefits. Reference industry best practice (CIOB, APM, NEC guidance) where relevant. This is a formal programme audit document.`,
+};
+
+export function getProgrammeCheckerTemplateGenerationPrompt(templateSlug: ProgrammeCheckerTemplateSlug): string {
+  const styleGuide = PC_TEMPLATE_STYLE[templateSlug] || PC_TEMPLATE_STYLE['rag-report'];
+  const schemaMap: Record<ProgrammeCheckerTemplateSlug, string> = {
+    'scoring': PC_SCORING_SCHEMA,
+    'email-summary': PC_EMAIL_SCHEMA,
+    'rag-report': PC_RAG_SCHEMA,
+    'comprehensive': PC_COMPREHENSIVE_SCHEMA,
+  };
+  const schema = schemaMap[templateSlug] || PC_RAG_SCHEMA;
+
+  return `You are reviewing a construction programme that has been uploaded and parsed. Analyse the programme thoroughly and generate a professional review document.
+
+--- TEMPLATE STYLE GUIDANCE ---
+${styleGuide}
+
+--- OUTPUT JSON SCHEMA ---
+${schema}
+
+Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }
