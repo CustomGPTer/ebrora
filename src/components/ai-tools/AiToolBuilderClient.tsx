@@ -52,7 +52,7 @@ async function safeJsonParse(res: Response, fallback: string) {
 
 /* ── Tool-specific detail prompts for the info box ── */
 const TOOL_DETAIL_PROMPTS: Record<string, string> = {
-  'coshh': 'Include the substance name, how it's used, quantities, exposure routes, existing controls, and who is exposed. Mention any ventilation, PPE, or health surveillance already in place.',
+  'coshh': 'Include the substance name, usage method, quantities, exposure routes, existing controls, and who is exposed. Mention any ventilation, PPE, or health surveillance already in place.',
   'itp': 'Include the works being inspected, hold/witness/review points, applicable specifications or standards, acceptance criteria, and responsible parties for each inspection stage.',
   'manual-handling': 'Describe the load (weight, shape, grip), the task (lifting, carrying, pushing), the environment (space, flooring, temperature), and who performs the activity including frequency and duration.',
   'dse': 'Describe the workstation setup including chair, desk, screen, keyboard, mouse, lighting, and any accessories. Note how long the user spends at the workstation and any discomfort reported.',
@@ -78,7 +78,7 @@ const TOOL_DETAIL_PROMPTS: Record<string, string> = {
   'rfi-generator': 'Describe the information you need, why it is required, the drawing or specification reference, the urgency, and the impact on programme if a response is delayed.',
   'payment-application': 'Include the contract reference, valuation period, works completed (with quantities and rates), materials on site, variations, retention, and any previous payments received.',
   'daywork-sheet': 'Include the date, operatives (names, trades, hours), plant and equipment used (type, hours), materials consumed (type, quantity), and a description of the work carried out.',
-  'carbon-reduction-plan': 'Describe your organisation's current emissions baseline, reduction targets, key initiatives (energy, transport, materials, waste), timeline, and any certifications or commitments in place.',
+  'carbon-reduction-plan': 'Describe your current organisational emissions baseline, reduction targets, key initiatives (energy, transport, materials, waste), timeline, and any certifications or commitments in place.',
 };
 
 const DEFAULT_DETAIL_PROMPT = 'The more detail you provide, the better your document will be. Include specifics such as location, materials, equipment, site conditions, and any known hazards.';
