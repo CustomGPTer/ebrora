@@ -14,6 +14,9 @@ export const SCOPE_TEMPLATE_CONFIGS: Record<ScopeTemplateSlug, ScopeTemplateConf
     accentColor: '1F4E79',
     style: 'Modern corporate with banded headers and structured tables',
     pageCount: '8–12',
+    thumbnailPath: '/product-images/scope-templates/thumb-corporate-blue.jpg',
+    previewPaths: ['/product-images/scope-templates/preview-corporate-blue-p1.jpg'],
+    keySections: ['Document Control Table', 'Approval Sign-Off', 'Inclusions & Exclusions Tables', 'Commercial Boilerplate Clauses'],
   },
   'formal-contract': {
     slug: 'formal-contract',
@@ -25,6 +28,9 @@ export const SCOPE_TEMPLATE_CONFIGS: Record<ScopeTemplateSlug, ScopeTemplateConf
     accentColor: 'C0392B',
     style: 'Traditional contract format with clause numbering',
     pageCount: '7–10',
+    thumbnailPath: '/product-images/scope-templates/thumb-formal-contract.jpg',
+    previewPaths: ['/product-images/scope-templates/preview-formal-contract-p1.jpg'],
+    keySections: ['Red Clause Numbering', 'Sub-Clause Structure (1.1, 1.2)', 'Formal Approval Table', 'Contract Document Schedule'],
   },
   'executive-navy': {
     slug: 'executive-navy',
@@ -36,6 +42,9 @@ export const SCOPE_TEMPLATE_CONFIGS: Record<ScopeTemplateSlug, ScopeTemplateConf
     accentColor: '00897B',
     style: 'Contemporary executive with full-width section bars',
     pageCount: '8–11',
+    thumbnailPath: '/product-images/scope-templates/thumb-executive-navy.jpg',
+    previewPaths: ['/product-images/scope-templates/preview-executive-navy-p1.jpg'],
+    keySections: ['Navy Cover Block', 'Full-Width Teal Section Bars', 'Banded Data Tables', 'Insurance & Commercial Summary'],
   },
 };
 

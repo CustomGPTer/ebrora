@@ -16,6 +16,9 @@ export interface ScopeTemplateConfig {
   accentColor: string;
   style: string;
   pageCount: string;
+  thumbnailPath: string;
+  previewPaths: string[];
+  keySections: string[];
 }
 
 // ── JSON structure the AI generates ─────────────────────────────
