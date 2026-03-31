@@ -26,7 +26,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'COSHH Assessment',
     descriptionPlaceholder: 'E.g. "Jotun Jotamastic 87 – Jotun Paints" or "Sika MonoTop 610 – Sika UK"',
     descriptionHeading: 'What is the Product?',
-    descriptionHint: 'Enter the exact product name and manufacturer. Our AI will look up the Safety Data Sheet and build a professional COSHH assessment based on the real chemical data for this product.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample: 'Jotun Jotamastic 87 – Jotun Paints',
     keySections: [
       'Product Identification & GHS Classification',
@@ -61,7 +61,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Installation of 300mm diameter ductile iron rising main from new pump station to existing connection chamber. Includes thrust blocks, air valves, washout chambers, chlorination, and pressure testing to 1.5x working pressure."',
     descriptionHeading: 'Describe the Works Being Carried Out',
-    descriptionHint: 'Explain the works package in as much detail as possible — type of work, materials, specifications, testing requirements, and any critical quality hold points.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Installation of 300mm diameter ductile iron rising main from new pump station to existing connection chamber. Includes thrust blocks, air valves, washout chambers, chlorination, and pressure testing to 1.5x working pressure.',
     keySections: [
@@ -96,7 +96,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the manual handling activity. E.g. "Lifting and positioning precast concrete kerbs (45kg each) along a 200m length of new footpath..."',
     descriptionHeading: 'Describe the Manual Handling Task',
-    descriptionHint: 'Explain what is being lifted, carried, pushed or pulled. Include the weight, how often, and the working conditions.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Lifting and positioning precast concrete kerbs (45kg each) along a 200m length of new footpath. Two-person lift from delivery pallet at ground level to trench edge. Uneven ground, slight gradient, repeated lifts throughout the day.',
     keySections: [
@@ -132,7 +132,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the workstation and user. E.g. "Site office portakabin workstation for a project manager using dual monitors, 8 hours per day. Shared desk environment..."',
     descriptionHeading: 'Describe the Workstation',
-    descriptionHint: 'Explain where the workstation is, what equipment is used, and who uses it. Include any existing comfort issues or concerns.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Site office portakabin workstation for a project manager using dual monitors 8 hours per day. Shared desk in an open-plan 10-person portakabin. User wears glasses and reports occasional neck stiffness.',
     keySections: [
@@ -169,7 +169,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the topic or activity for the toolbox talk. E.g. "Working near live underground services during excavation works on an operational wastewater treatment site..."',
     descriptionHeading: 'What is the Toolbox Talk Topic?',
-    descriptionHint: 'Describe the specific activity, hazard, or topic you want to brief your team on. Be as specific to your site as possible.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Working near live underground services (HV cables, gas mains, water mains) during excavation works for new drainage on an operational wastewater treatment site. CAT & Genny scanning required, hand-dig within 500mm of services.',
     keySections: [
@@ -204,7 +204,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the confined space and the work to be carried out. E.g. "Entry into a 4m deep wet well at a wastewater pumping station to replace submersible pump and guide rails..."',
     descriptionHeading: 'Describe the Confined Space Entry',
-    descriptionHint: 'Explain what the confined space is, why entry is needed, and what work will be carried out inside. Include dimensions, access points, and any known hazards.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Entry into a 4m deep wet well at a wastewater pumping station to replace submersible pump and guide rails. Well is 3m × 2m, access via vertical ladder. Known H₂S risk from sewage. Two-person entry team plus top-man. Work duration approximately 6 hours.',
     keySections: [
@@ -241,7 +241,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe what happened. E.g. "Operative struck by falling scaffold tube during dismantling of tower scaffold on the north elevation..."',
     descriptionHeading: 'What Happened?',
-    descriptionHint: 'Describe the incident in your own words — what happened, where, when, who was involved, and what the outcome was.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Operative struck by falling scaffold tube during dismantling of tower scaffold on the north elevation of the storm tank at Salford WwTW. Tube fell approximately 4m, striking the operative on the shoulder. First aid administered on site, operative sent to A&E as precaution.',
     keySections: [
@@ -278,7 +278,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the lift. E.g. "Installation of precast concrete beams (8 tonnes each) using a 50T mobile crane. 12m radius, lifting from delivery vehicle to permanent position at 6m height..."',
     descriptionHeading: 'Describe the Lifting Operation',
-    descriptionHint: 'Explain what is being lifted, the weight, crane type (if known), radius, height, and any proximity hazards.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Installation of precast concrete beams (8 tonnes each) using a 50T mobile crane at Salford WwTW. 12m radius, lifting from delivery vehicle to permanent position at 6m height. Adjacent to operational storm tank. Overhead 11kV power line 30m to the east.',
     keySections: [
@@ -316,7 +316,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the site and its key hazards. E.g. "Operational wastewater treatment works with active construction of new storm tank. Site has deep excavations, confined spaces, H₂S risk, heavy plant, and is adjacent to the Manchester Ship Canal..."',
     descriptionHeading: 'Describe the Site',
-    descriptionHint: 'Explain what the site is, what construction works are underway, the principal hazards, and the nearest hospital.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Operational wastewater treatment works at Salford WwTW with active construction of new storm tank. Deep excavations (up to 8m), confined space entries, H₂S risk from live sewage, 50T mobile crane operations, and HV electrical work. Nearest A&E is Salford Royal Hospital (2 miles). Site access via Frederick Road.',
     keySections: [
@@ -354,7 +354,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the activity to be inspected. E.g. "Concrete pour for 300mm thick reinforced concrete base slab, 15m x 8m, C35/45 concrete with steel fibre reinforcement..."',
     descriptionHeading: 'What Activity Needs Inspecting?',
-    descriptionHint: 'Describe the specific construction activity. Include materials, dimensions, specifications, and any critical quality requirements.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Concrete pour for 300mm thick reinforced concrete base slab, 15m x 8m, C35/45 concrete with steel fibre reinforcement. Pump pour from south side. Rebar to BS 4449 Grade B500B. Power-floated finish. Curing compound application.',
     keySections: [
@@ -390,7 +390,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe what the subcontractor needs to do. E.g. "Supply and install MEICA equipment for a new storm water pumping station — 3 No. submersible pumps, MCC panel, level instrumentation, and all associated pipework..."',
     descriptionHeading: 'What Does the Subcontractor Need to Do?',
-    descriptionHint: 'Describe the works package in detail — what is included, what materials/equipment, approximate quantities, and any known constraints.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Supply and install MEICA equipment for a new storm water pumping station at Salford WwTW. 3 No. submersible pumps (Xylem Flygt NP 3202), MCC panel, ultrasonic level instrumentation, 200mm DI pipework, penstocks, and all associated cabling. Subcontractor to provide commissioning and 12-month defects support.',
     keySections: [
@@ -440,7 +440,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the excavation. E.g. "Trench excavation for 225mm diameter foul sewer, 2.5m deep, along the eastern boundary of the site adjacent to the existing substation..."',
     descriptionHeading: 'Describe the Excavation',
-    descriptionHint: 'Explain where you are digging, the depth, the purpose, and any known services in the area.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Trench excavation for 225mm diameter foul sewer connection, 2.5m deep x 35m long, along the eastern boundary at Salford WwTW. Adjacent to existing 11kV substation. StatMap search shows 6" cast iron water main crossing at chainage 15m. Gas main runs parallel 3m to the east.',
     keySections: [
@@ -477,7 +477,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       "Describe today's task. E.g. \"Excavation of trial holes to locate existing 300mm water main using 3T mini excavator and hand digging within 500mm of services...\"",
     descriptionHeading: 'What Task Are You About to Start?',
-    descriptionHint: "Briefly describe the specific task being carried out today — location, method, plant involved, and any particular concerns.",
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Excavation of trial holes to locate existing 300mm water main using 3T mini excavator and hand digging within 500mm of services. Working adjacent to the live process area at Salford WwTW. 2-man team plus banksman for plant movements.',
     keySections: [
@@ -513,7 +513,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the risk or issue. E.g. "Unforeseen ground conditions encountered during piling — soft alluvial deposits extending 3m deeper than the GI report indicated..."',
     descriptionHeading: 'Describe the Risk or Issue',
-    descriptionHint: 'Explain the matter that could increase cost, delay completion, or impair performance. Include what you know so far and any evidence.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Unforeseen ground conditions encountered during piling for the new storm tank at Salford WwTW. Soft alluvial deposits extending 3m deeper than indicated in the Ground Investigation report. Piling contractor reports current pile design may be insufficient.',
     keySections: [
@@ -549,7 +549,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the non-conformance. E.g. "Concrete test cubes from base slab pour on 15/03/2026 failed to reach specified 28-day strength — results show 31 N/mm² against specified C35/45..."',
     descriptionHeading: 'Describe the Non-Conformance',
-    descriptionHint: 'Explain what has gone wrong — what was specified vs what was delivered/built, where, and when it was discovered.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Concrete test cubes from base slab pour on 15/03/2026 at Salford WwTW failed to reach specified 28-day strength. Results: 31 N/mm² average against specified C35/45 (minimum 35 N/mm²). Pour ref: CP-045. Batch tickets show correct mix ordered. 3 of 6 cubes failed.',
     keySections: [
@@ -587,7 +587,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'Describe the compensation event. E.g. "Client instruction to change storm tank overflow weir level from 42.150m AOD to 42.350m AOD — requires redesign of weir wall, new formwork, and additional concrete..."',
     descriptionHeading: 'Describe the Compensation Event',
-    descriptionHint: 'Explain what happened that you believe constitutes a compensation event under the contract.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Client instruction received 10/03/2026 to change storm tank overflow weir level from 42.150m AOD to 42.350m AOD at Salford WwTW. Requires redesign of weir wall reinforcement, new formwork (existing formwork already fabricated to original level), additional concrete, and re-sequencing of the pour programme.',
     keySections: [
@@ -626,8 +626,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'Programme Review Report',
     descriptionPlaceholder: 'Upload your programme file below (PDF, XLSX, or XER/XML)',
     descriptionHeading: 'Upload Your Programme',
-    descriptionHint:
-      'Upload your construction programme in PDF, Excel (XLSX), or P6/MSP export format (XER or XML). The AI will review logic, sequencing, durations, WBS structure, resource loading, and contractual milestone compliance.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample: '',
     keySections: [
       'Executive Summary & Overall RAG Rating',
@@ -669,8 +668,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "New build wastewater treatment plant extension. £4.2M contract, 18-month programme. Client is United Utilities (commercial client). Principal Contractor is C2V+. PD appointed. Design phase complete, construction phase beginning. 3 subcontractors engaged — groundworks, MEICA, and M&E. Pre-construction information has been issued..."',
     descriptionHeading: 'Describe Your Project',
-    descriptionHint:
-      'Provide as much project context as possible — project type, contract value, programme duration, client type (commercial/domestic), duty holders appointed, current phase, and any known compliance concerns. The AI will identify gaps against CDM 2015 duty holder requirements.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'New build wastewater treatment plant extension at Salford WwTW. £4.2M NEC4 ECC contract, 18-month programme. Commercial client (United Utilities). Principal Contractor is C2V+. PD has been appointed. Design is 90% complete. Construction phase beginning next month. Three subcontractors engaged. F10 notification submitted. Pre-construction information pack issued to PC but not yet distributed to subcontractors.',
     keySections: [
@@ -711,8 +709,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Earthworks and piling for new road bridge abutments, 6 months duration. Working hours 07:30–18:00 Mon–Fri, 07:30–13:00 Sat. Nearest sensitive receptor is a residential terrace at 85m to the north. Plant includes 20T excavator, 360° piling rig (CFA), dumpers, and compactor..."',
     descriptionHeading: 'Describe the Works and Site Conditions',
-    descriptionHint:
-      'Describe the construction activities, plant to be used, working hours, and the location and type of nearest sensitive receptors (residential, schools, hospitals). Include approximate distances to receptors. The AI will assess predicted noise levels using BS 5228-1 methodology.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Earthworks and piling for new road bridge abutments, 6-month programme. Day works 07:30–18:00 Mon–Fri, 07:30–13:00 Sat. Nearest sensitive receptor is residential housing (terraced) at 85m to the north. Beyond that, a primary school at 150m to the east. Plant: 20T excavator, CFA piling rig, twin-drum roller, 3 No. 6T dumpers. Site is in semi-urban area with moderate background noise.',
     keySections: [
@@ -754,8 +751,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Quotation for supply and installation of 450mm diameter HDPE rising main, approximately 380m length, from new pumping station to existing connection chamber. Includes directional drilling under the A57, thrust blocks, air valves, and pressure testing. Client: United Utilities. Main contractor: C2V+. Tender return date: 15/04/2026."',
     descriptionHeading: 'Describe the Works You Are Pricing',
-    descriptionHint:
-      'Describe the scope of works you are quoting for — what you are supplying and/or installing, approximate quantities, key inclusions you want to flag, and any significant exclusions or assumptions. Include client, main contractor, and tender return date if known.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Quotation for supply and installation of 450mm diameter HDPE rising main, 380m length, from new pumping station to existing chamber at Salford WwTW. Includes directional drilling under the A57 (2 No. drives, 45m each), thrust blocks, air valves at high points, washout at low point, and hydraulic pressure testing to 1.5x working pressure. Excludes connection to existing chamber (PC work). Main contractor C2V+. Tender return 15 April 2026.',
     keySections: [
@@ -797,8 +793,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Near miss — banksman stepped into the swing radius of a 20T excavator during lifting operations on the east compound. Operator did not see the banksman as he was in a blind spot. No injury but banksman was struck by the counterweight. Site stopped, investigation underway."',
     descriptionHeading: 'Describe the Incident or Hazard',
-    descriptionHint:
-      'Describe what happened (or what near-miss/hazard was identified), where, when, and what the immediate outcome was. Include enough detail for the AI to build a meaningful alert with genuine lessons learned.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Near miss on 18/03/2026 — banksman stepped into the swing radius of a 20T 360° excavator during an assisted lift operation in the east compound at Salford WwTW. Excavator operator did not see the banksman due to a blind spot on the left-hand side. Banksman was struck by the counterweight housing, causing him to fall. No injury sustained but medical check carried out. All plant operations stopped pending investigation.',
     keySections: [
@@ -837,8 +832,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "New reinforced concrete storm tank, 30m × 20m × 5m deep. 1,800m³ C35/45 concrete, 180T rebar, 2,500m² formwork, 500T imported fill. Plant includes 2 No. 20T excavators (10 weeks), 50T crane (4 weeks). 120km average material haulage. 8,000m³ muck away to licensed tip 15km."',
     descriptionHeading: 'Describe the Construction Works',
-    descriptionHint:
-      'Provide as much detail as possible about materials, quantities, plant, haulage distances, and waste. The more specific you are, the more accurate the carbon assessment. Include concrete mixes, steel grades, earthworks volumes, and key plant types.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'New reinforced concrete storm tank at Salford WwTW. 30m × 20m × 5m deep, 1,800m³ C35/45 concrete (CEM I), 180T B500B rebar, 2,500m² plywood formwork. 12,000m³ excavation — 4,000m³ reuse on site, 8,000m³ muck away to MRE Aggregates Port Salford (15km). Import 500T 6F2 fill, 200T Type 1 sub-base. Plant: 2 No. 20T excavators (10 weeks), 1 No. 50T crane (4 weeks), concrete pumping. Average material haulage 120km.',
     keySections: [
@@ -879,8 +873,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     documentLabel: 'RAMS Review Report',
     descriptionPlaceholder: 'Upload your RAMS document below (PDF, DOCX, or XLSX)',
     descriptionHeading: 'Upload Your RAMS Document',
-    descriptionHint:
-      'Upload your risk assessment and method statement for AI review. Accepted formats: PDF, Word document (.docx), or Excel workbook (.xlsx). The AI will review against HSE guidance (HSG65, GS6), CDM 2015, and construction industry best practice.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample: '',
     keySections: [
       'Document Overview & Summary',
@@ -926,8 +919,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Client-instructed design change to storm tank base slab thickness from 300mm to 450mm received 12/03/2026. Impacts 3 concrete pours already scheduled. Expected delay 3 weeks to Milestone 4 (storm tank base slab completion, contractual date 02/04/2026)."',
     descriptionHeading: 'Describe the Delay Event',
-    descriptionHint:
-      'Describe what happened that has caused or will cause delay. Include the triggering event, when it occurred, which activities are affected, and your estimate of the programme impact. The AI will ask about your contract type and structure the notification accordingly.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Client-instructed design change to storm tank base slab reinforcement — bar spacing changed from 200mm to 150mm centres, increasing rebar quantities by approximately 25%. Instruction received 12/03/2026 (RFI response). Rebar already cut and bent to original design. New material on 3-week lead time. Base slab pours (3 No.) scheduled from 24/03/2026 to 12/04/2026 — all three now delayed. Milestone 4 (base slab completion) contractual date 16/04/2026 at risk.',
     keySections: [
@@ -968,8 +960,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Site instruction from main contractor\'s site manager on 14/03/2026 to extend the gabion retaining wall by an additional 15m. Verbal instruction only — no written order issued. Works will require additional 45T gabion baskets, 15T stone fill, and an estimated 3 additional working days."',
     descriptionHeading: 'Describe the Instructed Variation',
-    descriptionHint:
-      'Describe what you were instructed to do, by whom, when, and whether it was verbal or informal. Include what additional materials, labour, or time are required. The AI will structure a formal confirmation letter seeking written instruction.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Verbal instruction from C2V+ site manager John Smith on 14/03/2026 to extend the eastern gabion retaining wall by an additional 15 linear metres to address an unforeseen bank stability issue. Instruction given on site, no written order. Additional works require 45T gabion baskets (2m × 1m × 1m), 15T Class A stone fill, geotextile liner, and excavation of 120m³ existing ground. Estimated 3 additional working days. Works have commenced on instruction.',
     keySections: [
@@ -1009,8 +1000,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Conflict between drawing C-101 Rev C and Specification Section 5.4.2 regarding pipe bedding material for the 300mm HDPE gravity sewer — drawing shows Type B granular bedding but specification requires Class S selected granular. Clarification needed before pipe laying begins on 28/03/2026."',
     descriptionHeading: 'Describe the Information Required',
-    descriptionHint:
-      'Describe the question or conflict that requires a formal response. Include drawing numbers, specification references, and any programme implications if the response is not received in time.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Conflict between drawing C-101 Rev C and Specification Section 5.4.2 regarding pipe bedding material for the 300mm HDPE gravity sewer. Drawing shows Type B granular bedding (BS EN 1610) but specification requires Class S selected granular to BD 70/03. Pipe laying for this section is programmed from 28/03/2026. Decision required no later than 24/03/2026 to allow material procurement. Incorrect bedding material could affect drain performance certification.',
     keySections: [
@@ -1050,8 +1040,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Interim Application No. 4 for the month ending 31/03/2026. Contract value £385,000. Works to date: 450m of 300mm HDPE rising main laid and tested (75% of 600m total), 1 No. thrust block complete, 2 No. air valve chambers complete. Approved variation for additional directional drilling £18,500. Retention 3%. CIS 20%."',
     descriptionHeading: 'Describe the Application',
-    descriptionHint:
-      'Describe the payment application period, works completed to date with percentages, any approved variations, retention rate, and CIS status. Include contract value and application number. The AI will structure a formal application narrative with supporting schedules.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Interim Application No. 4, valuation date 31/03/2026. Original contract value £385,000 (supply and install 600m 300mm HDPE rising main). Works complete to date: 450m pipe installed and pressure tested (75%), 1 No. concrete thrust block (100%), 2 No. air valve chambers (100%), 0 No. washout chambers (0% — materials on site). Approved variation VO-003: additional DD drive at A57 crossing, agreed value £18,500. Retention 3%. CIS deduction 20%. Previous certified: £186,450. Seeking £89,200 this application.',
     keySections: [
@@ -1094,8 +1083,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Daywork for removal of unforeseen buried brick culvert discovered at chainage 45m during foul sewer excavation on 19/03/2026. 2 No. labourers (8 hours each), 1 No. 3T mini excavator (6 hours), 1 No. 360° concrete breaker attachment (4 hours), waste disposal (2T skip). Works instructed verbally by C2V+ site manager."',
     descriptionHeading: 'Describe the Daywork Activity',
-    descriptionHint:
-      'Describe the activity, who carried it out, what plant was used, what materials were consumed, and who instructed the work. Include date, hours, and any relevant site reference numbers.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Daywork for removal of unforeseen buried brick culvert discovered at chainage 45m during foul sewer trench excavation on 19/03/2026. Works instructed verbally by C2V+ site manager at 09:15. Labour: 2 No. CSCS operatives, 8 hours each. Plant: 1 No. 3T Kubota mini excavator (6 hours), 1 No. hydraulic breaker attachment (4 hours). Materials: 2T skip waste disposal, 5T Type 1 reinstatement fill. Supervision: gang foreman 8 hours. Works complete by 17:30. Daywork reference: DW-047.',
     keySections: [
@@ -1135,8 +1123,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     descriptionPlaceholder:
       'E.g. "Carbon Reduction Plan for Apex Civil Engineering Ltd, a groundworks and civil engineering subcontractor with 45 employees and annual turnover of £8.2M. Works primarily on water/wastewater infrastructure projects in the North West. Scope 1: company vehicles (5 vans, 2 pick-ups) and site plant. Scope 2: office and welfare electricity. Scope 3: supply chain materials and subcontracted works."',
     descriptionHeading: 'Describe Your Organisation',
-    descriptionHint:
-      'Describe your company — size, turnover, sector, types of work, and current carbon position (if known). Include your Scope 1, 2, and 3 emission sources. The AI will structure a PPN 06/21-compliant Carbon Reduction Plan with baseline, targets, and measures.',
+    descriptionHint: 'The more detail you provide here, the better your generated document will be. Our AI tailors every section based on what you write — so specifics make a real difference.',
     descriptionExample:
       'Carbon Reduction Plan for Apex Civil Engineering Ltd. Civil engineering subcontractor, 45 employees, £8.2M annual turnover. Groundworks, drainage, and concrete structures on water infrastructure projects in the North West. Scope 1: 7 company vehicles (HVO-capable), 3 No. site generators, fuel-powered plant (hired). Scope 2: main office (2,400 sq ft, leased) on green electricity tariff. Scope 3: concrete, rebar, aggregates, and HDPE pipe procurement; subcontracted M&E works. Target: net zero by 2045 with 50% reduction by 2030. Currently no formal carbon measurement in place.',
     keySections: [
