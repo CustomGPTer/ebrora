@@ -18,6 +18,8 @@ import type { AiToolConfig } from '@/lib/ai-tools/types';
 
 interface AiUploadToolClientProps {
   toolConfig: AiToolConfig;
+  /** Programme Checker multi-template — passed to upload route */
+  programmeCheckerTemplateSlug?: string;
 }
 
 type UploadStep = 'upload' | 'processing' | 'download' | 'error';
@@ -78,7 +80,7 @@ function DocumentIcon({ className, style }: { className?: string; style?: React.
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientProps) {
+export default function AiUploadToolClient({ toolConfig, programmeCheckerTemplateSlug }: AiUploadToolClientProps) {
   const [step, setStep] = useState<UploadStep>('upload');
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -219,11 +221,20 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('toolSlug', toolConfig.slug);
+      if (programmeCheckerTemplateSlug) {
+        formData.append('programmeCheckerTemplateSlug', programmeCheckerTemplateSlug);
+      }
+
+      // 5-minute client-side timeout to match Vercel maxDuration=300
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
       const res = await fetch('/api/ai-tools/upload', {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       // Safely parse JSON — Vercel timeouts return HTML, not JSON
       let data: any;
@@ -254,7 +265,9 @@ export default function AiUploadToolClient({ toolConfig }: AiUploadToolClientPro
       setStep('download');
     } catch (err: any) {
       if (processingTimerRef.current) clearInterval(processingTimerRef.current);
-      const msg = err.name === 'TypeError'
+      const msg = err.name === 'AbortError'
+        ? 'The request timed out. Please try a smaller file or try again.'
+        : err.name === 'TypeError'
         ? 'Network error. Please check your connection and try again.'
         : (err.message || 'Something went wrong. Please try again.');
       setErrorMessage(msg);
