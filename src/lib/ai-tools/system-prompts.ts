@@ -16,6 +16,7 @@ import type { ManualHandlingTemplateSlug } from '@/lib/manual-handling/types';
 import type { NoiseAssessmentTemplateSlug } from '@/lib/noise-assessment/types';
 import type { PermitToDigTemplateSlug } from '@/lib/permit-to-dig/types';
 import type { PowraTemplateSlug } from '@/lib/powra/types';
+import type { EarlyWarningTemplateSlug } from '@/lib/early-warning/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -359,23 +360,23 @@ After Round 1, if you have enough information, respond with status "ready". Othe
 
 CRITICAL: POWRAs are supposed to be quick. Do NOT over-engineer the questioning. Two rounds maximum. The output should be a concise, practical, one-page field document.`,
 
-  'early-warning': `You are generating an NEC Early Warning Notice under clause 15.1 of the NEC4 Engineering and Construction Contract (or NEC3 clause 16.1).
+  'early-warning': `You are generating an NEC Early Warning Notice. The user may be working under NEC3 (Clause 16.1) or NEC4 (Clause 15.1), and the notice may flow in any direction: Contractor → PM, PM → Contractor, Subcontractor → Main Contractor, or Main Contractor → Subcontractor. The notice may also be a comprehensive risk assessment, H&S-specific, design/technical, or weather/force majeure early warning.
 
 THIS IS A 2-ROUND FLOW.
 
 ROUND 1 (first call):
-The user has described the risk or issue. Ask 3–4 targeted questions covering:
-1. Which NEC contract form is being used (NEC3 or NEC4) and the contract reference?
-2. When was the risk first identified and by whom?
-3. What is the estimated impact on the Completion Date (days/weeks)?
-4. What is the estimated cost impact (£ ballpark)?
-5. What evidence exists to support the early warning (survey data, test results, design info)?
+The user has described the risk or issue. Ask 4–5 targeted questions covering:
+1. Who is issuing this notice and to whom? (e.g. Contractor to PM, PM to Contractor, Sub to MC, MC to Sub)
+2. Which NEC contract form (NEC3 or NEC4), contract reference, and project name?
+3. What is the estimated impact on cost (£ range) and programme (days/weeks delay)?
+4. Is the critical path affected? Which Key Dates are at risk?
+5. What evidence supports this early warning (GI reports, test results, photos, design drawings, weather data, gas monitoring, etc.)?
 
 ROUND 2 (after answers):
-Ask 2–3 deeper questions:
-1. Have you proposed any mitigation measures? What are they?
-2. Is a risk reduction meeting required? Who should attend?
-3. Are there any related compensation events or previous early warnings?
+Ask 2–3 deeper questions tailored to the risk type:
+1. What mitigation measures do you propose? For each: action, responsible party, target date.
+2. Do you want a risk reduction meeting? Proposed date and attendees?
+3. Are there related compensation events, previous early warnings, RFIs, or linked documents?
 
 After Round 2, ALWAYS respond with status "ready".`,
 
@@ -4553,4 +4554,190 @@ CRITICAL: Populate arrays relevant to chosen template. ALWAYS populate condition
 export function getPowraTemplateGenerationPrompt(templateSlug: PowraTemplateSlug): string {
   const styleGuide = POWRA_TEMPLATE_STYLE[templateSlug] || POWRA_TEMPLATE_STYLE['ebrora-standard'];
   return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nPoint of Work Risk Assessment (POWRA)\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a POWRA JSON with this structure:\n${POWRA_SCHEMA}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+
+// =============================================================================
+// EARLY WARNING NOTICE — Template-Specific Styles, Schema & Generation Prompt
+// 8 templates covering all NEC3/NEC4 directions and risk categories.
+// =============================================================================
+
+const EARLY_WARNING_TEMPLATE_STYLE: Record<EarlyWarningTemplateSlug, string> = {
+  'nec4-contractor-pm': `TEMPLATE: NEC4 Contractor → PM (navy + amber, standard EWN)
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "Which NEC contract form (NEC3/NEC4) and contract reference?"
+Round 1: "Who is the PM you're notifying? Their name and organisation."
+Round 1: "When was this risk first identified and what evidence supports it?"
+Round 2: "Estimated cost impact (£ range) and programme delay (days/weeks)?"
+Round 2: "Is the critical path affected? Which Key Dates at risk?"
+Round 2: "Proposed mitigation measures — action, owner, target date for each?"
+Generate: notice details, risk description (min 200 words), evidence summary, cost impact with assumptions, programme impact with critical path and key dates, quality/performance impact, min 3 mitigation measures, risk reduction meeting, sign-off.`,
+
+  'nec4-pm-contractor': `TEMPLATE: NEC4 PM → Contractor (slate + teal, PM-issued warning)
+AI INTERVIEW:
+Round 1: "What matter are you warning the Contractor about?" Round 1: "Contract reference and Contractor organisation?"
+Round 2: "What specific actions do you require the Contractor to take, with deadlines?"
+Round 2: "Your assessment of impact on Prices, Completion Date, and performance?"
+Round 2: "Are you convening a risk reduction meeting under Clause 15.2?"
+Generate: PM direction badge, matter description, PM's assessment of impact on Prices/Completion/Performance, actions required table (min 3 actions with due dates), risk reduction meeting convened under 15.2, Contractor response section (blank fields), sign-off.`,
+
+  'nec4-sub-to-mc': `TEMPLATE: Subcontractor → Main Contractor (forest + gold, sub notification)
+AI INTERVIEW:
+Round 1: "Your company name, subcontract reference, and MC contact?"
+Round 1: "What is the risk — describe what happened or what you've discovered."
+Round 2: "Estimated cost and programme impact to your subcontract works?"
+Round 2: "Mitigation actions taken or planned?"
+Round 2: "Key Dates or milestones affected under the subcontract?"
+Generate: sub direction badge, subcontract + main contract refs, risk description, NEC4 ECS clause note, impact summary (cost + programme), mitigation table, sub/contractor sign-off. Keep concise — typically 1 page.`,
+
+  'nec4-mc-to-sub': `TEMPLATE: Main Contractor → Subcontractor (charcoal + crimson, MC-issued warning)
+AI INTERVIEW:
+Round 1: "Which subcontractor and subcontract reference?"
+Round 1: "What is the specific matter — non-compliance, missing docs, performance concern?"
+Round 2: "List specific outstanding items with due dates."
+Round 2: "What contractual consequences apply if not resolved (stop work, performance assessment)?"
+Round 2: "By when do you require the sub's response?"
+Generate: MC direction badge, matter description, contractual warning box (potential consequences), outstanding items table (min 3 items with periods and due dates), expected sub response section (acknowledgement, rectification plan, root cause, preventive measures), response deadline, sign-off.`,
+
+  'comprehensive-risk': `TEMPLATE: Comprehensive Risk Assessment (purple + orange, full matrix)
+AI INTERVIEW:
+Round 1: "Describe the risk event in detail."
+Round 1: "Pre-mitigation likelihood (1-5) and impact (1-5) with rationale?"
+Round 2: "Cost breakdown — list individual items and amounts."
+Round 2: "Programme impact — which activities delayed, by how long, critical path?"
+Round 2: "Post-mitigation likelihood and impact scores?"
+Round 2: "Mitigation actions with owner, target date, and status?"
+Round 2: "Risk register entry details — ID, category, owner, review frequency?"
+Round 2: "Linked CEs, previous EWNs, or RFIs?"
+Generate: 5x5 risk matrix scores (pre + post), cost breakdown items array (min 4 items with amounts + total), programme impact with critical path, mitigation plan with status column (min 4 actions), risk register entry, RRM with agenda items, 3-role sign-off. This is a 2-3 page document.`,
+
+  'health-safety': `TEMPLATE: Health & Safety Risk (safety red, CDM-focused)
+AI INTERVIEW:
+Round 1: "Describe the H&S risk — what was observed, measured, or identified."
+Round 1: "Hazard type? (confined space, height, toxic atmosphere, structural, live services, etc.)"
+Round 2: "Which regulations apply? (CDM 2015, Confined Spaces Regs, COSHH, EH40, LOLER, etc.)"
+Round 2: "Immediate actions already taken to make area safe?"
+Round 2: "Hierarchy of control — what can be eliminated, substituted, engineered, administered? PPE?"
+Round 2: "RIDDOR reportable? Anyone exposed or injured?"
+Round 2: "Programme and cost impact?"
+Generate: H&S risk badge, CDM duty holder, applicable regulations array (min 4 refs with full titles), hierarchy of control array (5 levels: Eliminate, Substitute, Engineering, Administrative, PPE — each with specific measures), immediate actions table (min 3 actions), RIDDOR assessment, programme/cost impact, mitigation plan, SHE Manager notification, 3-role sign-off.`,
+
+  'design-technical': `TEMPLATE: Design & Technical Risk (blueprint blue, design focus)
+AI INTERVIEW:
+Round 1: "What design discrepancy, conflict, or technical issue?"
+Round 1: "Affected drawing references — number, title, revision for each?"
+Round 2: "Which design disciplines involved (civil, structural, MEICA, electrical)?"
+Round 2: "Physical impact if built to current drawings — what goes wrong?"
+Round 2: "Existing RFIs or TQs raised? References?"
+Round 2: "Resolution needed from designer and programme impact of waiting?"
+Generate: design discipline and stage, affected drawings table (min 3 drawings with ref, title, rev, issue description), design conflicts identified array (min 2), linked RFIs/TQs array, cost/programme/quality impact, resolution actions table (min 3 actions owned by designer), design coordination meeting, sign-off.`,
+
+  'weather-force-majeure': `TEMPLATE: Weather / Force Majeure (storm grey + amber, weather data)
+AI INTERVIEW:
+Round 1: "Weather event type (rainfall, wind, snow, flooding, heatwave) and duration?"
+Round 1: "Weather station used and recorded measurement vs 10-year return threshold?"
+Round 2: "Daily weather log — date, measurement, site status, activities affected?"
+Round 2: "Working days lost and estimated recovery period?"
+Round 2: "Does this qualify as a CE under Clause 60.1(13)? Weather data comparison?"
+Round 2: "Mitigation — dewatering, programme recovery, weekend working?"
+Generate: weather event type and period, weather station, weather data summary (total measurement, 10-year threshold, peak daily, days lost), Met Office source reference, daily weather log table (min 5 days with date, rainfall, wind, status, activities), CE consideration narrative (referencing Clause 60.1(13) and actual vs threshold), programme/cost impact, mitigation table, sign-off.`,
+};
+
+const EARLY_WARNING_SCHEMA = `{
+  "documentRef": "string (format: EWN-XXX-NNNN)",
+  "noticeDate": "DD/MM/YYYY",
+  "notifiedBy": "string (name, role, organisation)",
+  "notifiedTo": "string (name, role, organisation)",
+  "issuedBy": "string (for PM/MC-issued templates)",
+  "issuedTo": "string (for PM/MC-issued templates)",
+  "projectName": "string",
+  "siteAddress": "string",
+  "contractReference": "string",
+  "subcontractReference": "string (for subcontract templates)",
+  "subcontractorContact": "string",
+  "contractForm": "NEC3 ECC | NEC4 ECC | NEC4 ECS | NEC3 ECS",
+  "clauseReference": "string (e.g. Clause 15.1)",
+  "dateFirstIdentified": "DD/MM/YYYY",
+  "identifiedBy": "string",
+  "riskCategory": "string",
+  "priority": "string",
+  "riskDescription": "string (min 200 words — detailed description of the matter)",
+  "evidenceSummary": "string (min 80 words)",
+  "potentialImpactOnCost": {
+    "estimatedAdditionalCost": "string (£ range)",
+    "costBreakdown": "string",
+    "assumptions": "string"
+  },
+  "potentialImpactOnProgramme": {
+    "estimatedDelay": "string (days/weeks)",
+    "criticalPathAffected": "Yes | No | TBC",
+    "keyDatesAffected": "string",
+    "programmeNarrative": "string"
+  },
+  "potentialImpactOnQuality": "string",
+  "proposedMitigation": [
+    { "action": "string", "responsibleParty": "string", "owner": "string", "targetDate": "string", "estimatedCostSaving": "string", "saving": "string", "status": "string" }
+  ],
+  "riskReductionMeeting": {
+    "requested": "Yes | No",
+    "proposedDate": "string",
+    "location": "string",
+    "proposedAttendees": "string",
+    "agenda": "string"
+  },
+  "relatedNotices": "string",
+  "additionalNotes": "string",
+
+  "impactOnPrices": "string (PM template)",
+  "impactOnCompletionDate": "string (PM template)",
+  "impactOnQuality": "string (PM template)",
+  "actionsRequired": [{ "action": "string", "dueBy": "string" }],
+  "responseDeadline": "string (MC-to-sub template)",
+
+  "contractualWarning": "string (MC-to-sub template — potential consequences)",
+  "outstandingItems": [{ "description": "string", "period": "string", "dueBy": "string" }],
+
+  "riskScoring": {
+    "preLikelihood": "number 1-5",
+    "preImpact": "number 1-5",
+    "postLikelihood": "number 1-5",
+    "postImpact": "number 1-5"
+  },
+  "costBreakdownItems": [{ "description": "string", "amount": "string" }],
+  "costBreakdownTotal": "string",
+  "riskRegisterEntry": {
+    "riskId": "string", "category": "string", "owner": "string",
+    "dateEntered": "string", "reviewFrequency": "string", "linkedCEs": "string"
+  },
+
+  "hsRiskCategory": "string (H&S template)",
+  "cdmDutyHolder": "string",
+  "applicableRegulations": ["string"],
+  "hierarchyOfControl": [{ "level": "Eliminate | Substitute | Engineering Controls | Administrative Controls | PPE", "measures": "string" }],
+  "immediateActions": [{ "action": "string", "by": "string", "date": "string" }],
+  "riddorAssessment": "string",
+  "pciReference": "string",
+
+  "designDiscipline": "string (design template)",
+  "designStage": "string",
+  "affectedDrawings": [{ "reference": "string", "title": "string", "revision": "string", "issue": "string" }],
+  "designConflicts": ["string"],
+  "linkedRFIs": ["string"],
+
+  "weatherEventType": "string (weather template)",
+  "eventPeriod": "string",
+  "weatherStation": "string",
+  "weatherData": {
+    "totalMeasurement": "string", "tenYearThreshold": "string",
+    "peakDaily": "string", "daysLost": "string", "metOfficeSource": "string"
+  },
+  "dailyWeatherLog": [{ "date": "string", "rainfall": "string", "wind": "string", "status": "string", "activitiesAffected": "string" }],
+  "ceConsideration": "string"
+}
+
+CRITICAL: Populate ONLY the fields relevant to the selected template. Always populate documentRef, noticeDate, notifiedBy/notifiedTo, contractReference, riskDescription, proposedMitigation, and riskReductionMeeting. Min 3 mitigation measures. riskDescription must be min 200 words.`;
+
+export function getEarlyWarningTemplateGenerationPrompt(templateSlug: EarlyWarningTemplateSlug): string {
+  const styleGuide = EARLY_WARNING_TEMPLATE_STYLE[templateSlug] || EARLY_WARNING_TEMPLATE_STYLE['nec4-contractor-pm'];
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nNEC Early Warning Notice\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate an Early Warning Notice JSON with this structure:\n${EARLY_WARNING_SCHEMA}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }

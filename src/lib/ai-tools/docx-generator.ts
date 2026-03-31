@@ -410,8 +410,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'early-warning') {
-    const { buildEarlyWarningDocument } = await import('./templates/early-warning-template');
-    const doc = await buildEarlyWarningDocument(content as any);
+    const ewSlug = (content as any)._earlyWarningTemplateSlug;
+    let doc;
+    if (ewSlug) {
+      const { buildEarlyWarningTemplateDocument } = await import('./templates/early-warning-templates');
+      doc = await buildEarlyWarningTemplateDocument(content as any, ewSlug);
+    } else {
+      const { buildEarlyWarningDocument } = await import('./templates/early-warning-template');
+      doc = await buildEarlyWarningDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);
