@@ -28,6 +28,7 @@ import { getAiToolConfig, isValidAiToolSlug } from '@/lib/ai-tools/tool-config';
 import { getAiToolLimitByTier } from '@/lib/ai-tools/constants';
 import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import { getGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getProgrammeCheckerTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
 import type { AiToolSlug } from '@/lib/ai-tools/types';
@@ -74,6 +75,7 @@ export async function POST(req: NextRequest) {
 
     const toolSlugRaw = formData.get('toolSlug') as string | null;
     const file = formData.get('file') as File | null;
+    const programmeCheckerTemplateSlug = formData.get('programmeCheckerTemplateSlug') as string | null;
 
     if (!toolSlugRaw || !file) {
       return NextResponse.json({ error: 'Missing toolSlug or file.' }, { status: 400 });
@@ -181,7 +183,9 @@ export async function POST(req: NextRequest) {
     // ── 7. AI Generation — Generate JSON document content ──────────────
     // Upload tools are single-round: skip the conversation phase entirely
     // and go straight to document generation.
-    const generationPrompt = getGenerationPrompt(toolSlug);
+    const generationPrompt = (toolSlug === 'programme-checker' && programmeCheckerTemplateSlug)
+      ? getProgrammeCheckerTemplateGenerationPrompt(programmeCheckerTemplateSlug as any)
+      : getGenerationPrompt(toolSlug);
 
     // Truncate very large documents to stay within model context limits
     // and avoid timeouts. ~80k chars ≈ 20k tokens — plenty for a thorough review.
@@ -235,6 +239,10 @@ Based on the above content, generate the complete ${toolConfig.documentLabel} as
     }
 
     // ── 9. Generate docx ──────────────────────────────────────────────────
+    // Embed template slug so the docx generator routes to the right builder
+    if (toolSlug === 'programme-checker' && programmeCheckerTemplateSlug) {
+      documentContent._programmeCheckerTemplateSlug = programmeCheckerTemplateSlug;
+    }
     const docBuffer = await generateAiToolDocument(toolSlug, documentContent);
 
     // ── 10. Upload to Vercel Blob ─────────────────────────────────────────
