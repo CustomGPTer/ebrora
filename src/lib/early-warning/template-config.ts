@@ -7,7 +7,7 @@ import { EarlyWarningTemplateConfig, EarlyWarningTemplateSlug } from './types';
 export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, EarlyWarningTemplateConfig> = {
   'nec4-contractor-pm': {
     slug: 'nec4-contractor-pm',
-    displayName: 'Contractor → PM',
+    displayName: 'Contractor \u2192 PM',
     description:
       'Standard NEC4 Clause 15.1 early warning notice from Contractor to Project Manager. Risk description, evidence summary, cost and programme impact tables, mitigation measures with responsible parties and target dates, risk reduction meeting request, and dual sign-off.',
     pageCount: 2,
@@ -15,12 +15,13 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
     thumbnailPath: '/product-images/early-warning-templates/thumb-nec4-contractor-pm.jpg',
     previewPaths: [
       '/product-images/early-warning-templates/preview-nec4-contractor-pm-p1.jpg',
+      '/product-images/early-warning-templates/preview-nec4-contractor-pm-p2.jpg',
     ],
     keySections: [
       'Notice Details (Ref, Date, Parties)',
       'NEC4 Clause 15.1 Reference',
       'Risk Description & Evidence',
-      'Potential Impact on Cost (£ Range)',
+      'Potential Impact on Cost (\u00a3 Range)',
       'Potential Impact on Programme',
       'Key Dates at Risk',
       'Proposed Mitigation Measures',
@@ -31,7 +32,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
 
   'nec4-pm-contractor': {
     slug: 'nec4-pm-contractor',
-    displayName: 'PM → Contractor',
+    displayName: 'PM \u2192 Contractor',
     description:
       'Project Manager\u2013issued early warning to the Contractor under NEC4 Clause 15.1. Includes the PM\'s assessment of impact on Prices, Completion Date and performance, actions required of the Contractor with deadlines, risk reduction meeting convened under Clause 15.2, and a structured Contractor response section.',
     pageCount: 2,
@@ -39,6 +40,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
     thumbnailPath: '/product-images/early-warning-templates/thumb-nec4-pm-contractor.jpg',
     previewPaths: [
       '/product-images/early-warning-templates/preview-nec4-pm-contractor-p1.jpg',
+      '/product-images/early-warning-templates/preview-nec4-pm-contractor-p2.jpg',
     ],
     keySections: [
       'PM \u2192 Contractor Direction Badge',
@@ -53,7 +55,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
 
   'nec4-sub-to-mc': {
     slug: 'nec4-sub-to-mc',
-    displayName: 'Subcontractor → MC',
+    displayName: 'Subcontractor \u2192 MC',
     description:
       'Subcontractor notification to Main Contractor under NEC4 Engineering & Construction Subcontract Clause 15.1. Compact format with impact cards showing cost and programme estimates, mitigation table, clause reference note, and subcontractor/contractor sign-off.',
     pageCount: 1,
@@ -75,7 +77,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
 
   'nec4-mc-to-sub': {
     slug: 'nec4-mc-to-sub',
-    displayName: 'MC → Subcontractor',
+    displayName: 'MC \u2192 Subcontractor',
     description:
       'Main Contractor\u2013issued early warning to a Subcontractor. Includes a contractual warning box highlighting potential consequences (stop work instruction, performance assessment), outstanding documentation table with deadlines, structured subcontractor response section with root cause and preventive measures.',
     pageCount: 2,
@@ -83,6 +85,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
     thumbnailPath: '/product-images/early-warning-templates/thumb-nec4-mc-to-sub.jpg',
     previewPaths: [
       '/product-images/early-warning-templates/preview-nec4-mc-to-sub-p1.jpg',
+      '/product-images/early-warning-templates/preview-nec4-mc-to-sub-p2.jpg',
     ],
     keySections: [
       'MC \u2192 Sub Direction Badge',
@@ -100,7 +103,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
     displayName: 'Comprehensive Risk',
     description:
       'Full risk assessment early warning with 5\u00d75 risk matrix, pre/post-mitigation scoring, itemised cost breakdown table, programme impact visualisation, detailed mitigation plan with status tracking, risk register entry, and risk reduction meeting with structured agenda.',
-    pageCount: 3,
+    pageCount: 2,
     layout: 'comprehensive',
     thumbnailPath: '/product-images/early-warning-templates/thumb-comprehensive-risk.jpg',
     previewPaths: [
@@ -131,6 +134,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
     previewPaths: [
       '/product-images/early-warning-templates/preview-health-safety-p1.jpg',
       '/product-images/early-warning-templates/preview-health-safety-p2.jpg',
+      '/product-images/early-warning-templates/preview-health-safety-p3.jpg',
     ],
     keySections: [
       'H&S Risk Category Badge',
@@ -155,6 +159,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
     thumbnailPath: '/product-images/early-warning-templates/thumb-design-technical.jpg',
     previewPaths: [
       '/product-images/early-warning-templates/preview-design-technical-p1.jpg',
+      '/product-images/early-warning-templates/preview-design-technical-p2.jpg',
     ],
     keySections: [
       'Design Discipline & Stage',
@@ -178,6 +183,7 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
     thumbnailPath: '/product-images/early-warning-templates/thumb-weather-force-majeure.jpg',
     previewPaths: [
       '/product-images/early-warning-templates/preview-weather-force-majeure-p1.jpg',
+      '/product-images/early-warning-templates/preview-weather-force-majeure-p2.jpg',
     ],
     keySections: [
       'Weather Event Type & Period',
