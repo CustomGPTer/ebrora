@@ -35,6 +35,8 @@ interface AiToolBuilderClientProps {
   powraTemplateSlug?: string;
   /** For Scope of Works multi-template — passed to generate route */
   scopeTemplateSlug?: string;
+  /** For Early Warning multi-template — passed to generate route */
+  earlyWarningTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -66,7 +68,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -300,6 +302,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           ...(permitToDigTemplateSlug ? { permitToDigTemplateSlug } : {}),
           ...(powraTemplateSlug ? { powraTemplateSlug } : {}),
           ...(scopeTemplateSlug ? { scopeTemplateSlug } : {}),
+          ...(earlyWarningTemplateSlug ? { earlyWarningTemplateSlug } : {}),
         }),
       });
 
@@ -320,7 +323,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
