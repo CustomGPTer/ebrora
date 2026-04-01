@@ -86,7 +86,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
     // Fallback if AI tool tables don't exist yet
     const tier = subscription?.plan || 'FREE';
     const fallbackLimit = tier === 'PROFESSIONAL' ? 20 : tier === 'STANDARD' ? 6 : 1;
-    const restrictedOnFree = new Set(['itp', 'incident-report', 'lift-plan', 'emergency-response', 'scope-of-works', 'early-warning', 'ncr', 'programme-checker', 'cdm-checker', 'noise-assessment', 'quote-generator', 'safety-alert', 'carbon-footprint', 'rams-review', 'delay-notification', 'variation-confirmation', 'rfi-generator', 'payment-application', 'daywork-sheet', 'carbon-reduction-plan']);
+    const restrictedOnFree = new Set(['itp', 'incident-report', 'lift-plan', 'emergency-response', 'scope-of-works', 'early-warning', 'ncr', 'programme-checker', 'cdm-checker', 'noise-assessment', 'quote-generator', 'safety-alert', 'carbon-footprint', 'rams-review', 'delay-notification', 'variation-confirmation', 'rfi-generator', 'payment-application', 'daywork-sheet', 'carbon-reduction-plan', 'wah-assessment', 'wbv-assessment', 'riddor-report', 'traffic-management', 'waste-management', 'invasive-species']);
     const fl = (slug: string) => (tier === 'FREE' && restrictedOnFree.has(slug)) ? 0 : fallbackLimit;
     aiToolUsage = {
       'coshh': { used: 0, limit: fl('coshh') },
@@ -118,9 +118,16 @@ export default async function AccountPage({ searchParams }: PageProps) {
       'payment-application': { used: 0, limit: fl('payment-application') },
       'daywork-sheet': { used: 0, limit: fl('daywork-sheet') },
       'carbon-reduction-plan': { used: 0, limit: fl('carbon-reduction-plan') },
+      'wah-assessment': { used: 0, limit: fl('wah-assessment') },
+      'wbv-assessment': { used: 0, limit: fl('wbv-assessment') },
+      'riddor-report': { used: 0, limit: fl('riddor-report') },
+      'traffic-management': { used: 0, limit: fl('traffic-management') },
+      'waste-management': { used: 0, limit: fl('waste-management') },
+      'invasive-species': { used: 0, limit: fl('invasive-species') },
     };
   }
 
+  // ── Recent RAMS generations ──
   const recentGenerations = await prisma.generation.findMany({
     where: { user_id: session.user.id },
     select: {
@@ -135,14 +142,53 @@ export default async function AccountPage({ searchParams }: PageProps) {
     take: 10,
   });
 
-  const generations = recentGenerations.map((gen) => ({
+  const ramsDocuments = recentGenerations.map((gen) => ({
     id: gen.id,
     formatName: gen.format_id,
+    source: 'RAMS' as const,
+    toolSlug: null as string | null,
     status: gen.status,
     createdAt: gen.created_at.toISOString(),
     fileUrl: gen.blobUrl,
     isExpired: gen.expiresAt ? new Date() > gen.expiresAt : false,
   }));
+
+  // ── Recent AI tool generations ──
+  let aiToolDocuments: typeof ramsDocuments = [];
+  try {
+    const recentAiGens = await (prisma as any).aiToolGeneration.findMany({
+      where: { user_id: session.user.id },
+      select: {
+        id: true,
+        tool_slug: true,
+        status: true,
+        created_at: true,
+        blob_url: true,
+        expires_at: true,
+        filename: true,
+      },
+      orderBy: { created_at: 'desc' },
+      take: 20,
+    });
+
+    aiToolDocuments = recentAiGens.map((gen: any) => ({
+      id: gen.id,
+      formatName: gen.filename || gen.tool_slug,
+      source: 'AI_TOOL' as const,
+      toolSlug: gen.tool_slug as string,
+      status: gen.status,
+      createdAt: gen.created_at.toISOString(),
+      fileUrl: gen.blob_url,
+      isExpired: gen.expires_at ? new Date() > gen.expires_at : false,
+    }));
+  } catch {
+    // AI tool generation table may not exist yet — graceful fallback
+  }
+
+  // Merge and sort by date (newest first), take top 20
+  const generations = [...ramsDocuments, ...aiToolDocuments]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 20);
 
   const savedDetails = user.saved_details
     ? {
