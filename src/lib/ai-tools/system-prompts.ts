@@ -831,6 +831,10 @@ RULES:
 - Be thorough and specific — generic boilerplate content is not acceptable.
 - All text fields should contain complete, professional prose suitable for a formal document.
 - Minimum content: every text field should contain at least 2-3 substantive sentences.
+
+- MINIMUM CONTENT QUALITY: Every prose field must contain specific, site-relevant detail — not generic boilerplate. Reference applicable UK regulations, British Standards, and HSE guidance by name and number. Use professional UK construction terminology throughout.
+- LEGAL COMPLIANCE: Every document must reference the specific regulations that mandate it. Include regulation names, section/clause numbers, and year of enactment.
+- NO THIN SECTIONS: If a minimum word count is specified, treat it as an absolute minimum — exceed it where the content warrants it. A section with fewer words than specified is a failure.
 - PARAGRAPH BREAKS: In all long text fields (100+ words), use double newlines (\\n\\n) to separate distinct paragraphs. Never write one continuous block of text — break content into readable paragraphs of 3-5 sentences each.`;
 
 // ---------------------------------------------------------------------------
@@ -883,7 +887,7 @@ JSON structure:
   },
   "emergencyProcedures": "string (min 100 words — fire, major spill, personnel exposure, evacuation)",
   "trainingRequirements": "string (min 80 words — what training operatives need before using this product)",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 CRITICAL: Use real SDS data for this product. The hazard classifications, H-statements, WELs, and first aid measures must match the actual manufacturer's Safety Data Sheet. This is a legal compliance document.`,
@@ -913,9 +917,9 @@ JSON structure:
   "preWorks": [
     {
       "op": "1.0",
-      "operation": "string (what is being inspected/checked)",
+      "operation": "string (min 40 words — detailed description of what is being inspected or tested, including the specific quality requirement being verified)",
       "controlledBy": "string (position/role, e.g. 'Site Agent / Principal Contractor')",
-      "acceptRejectCriteria": "string (specific pass/fail criteria)",
+      "acceptRejectCriteria": "string (min 40 words — specific measurable accept/reject criteria with tolerances, standards references, and test methods)",
       "frequency": "string (e.g. 'Prior to works', 'Each section')",
       "specRef": "string (BS/EN standard, contract spec, method statement reference)",
       "records": "string (what records are produced — certificates, checklists, permits)",
@@ -923,7 +927,7 @@ JSON structure:
       "contractor": "S|I|W|H|R|O",
       "client": "S|I|W|H|R|O",
       "designer": "S|I|W|H|R|O",
-      "notes": "string (brief practical note)"
+      "notes": "string (min 40 words — practical note covering safety considerations, weather dependencies, or coordination requirements)"
     }
   ],
   "duringWorks": [
@@ -961,6 +965,8 @@ JSON structure:
 }
 
 REQUIREMENTS — READ CAREFULLY:
+
+MANDATORY OVERVIEW: The ITP must include an "itpOverview" field (min 200 words) describing the works package, applicable standards, and quality management approach.
 
 COMPREHENSIVENESS IS MANDATORY. An ITP is a quality assurance document that must account for EVERY inspection and test point across the full lifecycle of the works. If something gets built, poured, installed, connected, tested, or handed over — it needs a line in the ITP. A thin ITP is a useless ITP.
 
@@ -1154,7 +1160,7 @@ FIELD-BY-FIELD RULES
   ],
   "monitoringArrangements": "string (min 100 words — how the assessment will be monitored, who will supervise, incident reporting, health surveillance triggers)",
   "reviewTriggers": ["string — events that would trigger a review (e.g. change in task, new equipment, incident, complaint, change in personnel)"],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 6 control measures following hierarchy of control. Minimum 3 mechanical aids considered. Minimum 3 training requirements. Minimum 5 review triggers. All TILE justifications must be specific to this task, not generic.`,
 
@@ -1168,13 +1174,13 @@ Minimum 6 control measures following hierarchy of control. Minimum 3 mechanical 
   "jobTitle": "string",
   "location": "string",
   "workstation": {
-    "display": { "type": "string", "size": "string", "position": "string", "brightness": "string", "issues": "string" },
-    "keyboard": { "type": "string", "position": "string", "issues": "string" },
-    "mouse": { "type": "string", "position": "string", "issues": "string" },
-    "chair": { "type": "string", "adjustable": "boolean", "armrests": "string", "lumbarSupport": "string", "issues": "string" },
-    "desk": { "type": "string", "height": "string", "surface": "string", "legRoom": "string", "issues": "string" },
-    "lighting": { "type": "string", "glare": "string", "reflections": "string", "issues": "string" },
-    "environment": { "temperature": "string", "noise": "string", "space": "string", "issues": "string" }
+    "display": { "type": "string", "size": "string", "position": "string", "brightness": "string", "issues": "string (min 40 words — specific issues identified and corrective actions recommended)" },
+    "keyboard": { "type": "string", "position": "string", "issues": "string (min 30 words)" },
+    "mouse": { "type": "string", "position": "string", "issues": "string (min 30 words)" },
+    "chair": { "type": "string", "adjustable": "boolean", "armrests": "string", "lumbarSupport": "string", "issues": "string (min 40 words)" },
+    "desk": { "type": "string", "height": "string", "surface": "string", "legRoom": "string", "issues": "string (min 30 words)" },
+    "lighting": { "type": "string", "glare": "string", "reflections": "string", "issues": "string (min 30 words)" },
+    "environment": { "temperature": "string", "noise": "string", "space": "string", "issues": "string (min 30 words)" }
   },
   "workPattern": {
     "hoursAtScreen": "string",
@@ -1187,11 +1193,11 @@ Minimum 6 control measures following hierarchy of control. Minimum 3 mechanical 
     "otherConcerns": "string"
   },
   "assessmentFindings": [
-    { "area": "string", "finding": "string", "risk": "High | Medium | Low", "recommendation": "string", "priority": "Immediate | Short-term | Medium-term", "responsible": "string" }
+    { "area": "string", "finding": "string (min 60 words — specific finding with evidence)", "risk": "High | Medium | Low", "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)", "priority": "Immediate | Short-term | Medium-term", "responsible": "string" }
   ],
   "overallRisk": "High | Medium | Low",
-  "actionPlan": "string (min 200 words)",
-  "additionalNotes": "string"
+  "actionPlan": "string (min 350 words)",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 8 assessment findings.`,
 
@@ -1203,23 +1209,23 @@ Minimum 8 assessment findings.`,
   "projectName": "string",
   "siteAddress": "string",
   "topic": "string",
-  "introduction": "string (80-120 words — concise, get to the point. Why this topic matters today, what happened recently, what the team needs to know)",
+  "introduction": "string (min 200 words — clear explanation of why this topic matters on this specific project. Reference recent incidents, HSE statistics, or regulatory requirements. Set the scene for why every operative needs to pay attention, what happened recently, what the team needs to know)",
   "keyHazards": [
-    { "hazard": "string (min 30 words — specific hazard description, not generic)", "consequence": "string (min 30 words — realistic worst-case outcome)", "likelihood": "High | Medium | Low" }
+    { "hazard": "string (min 80 words — specific hazard description with real-world context, referencing industry incidents or HSE data where relevant)", "consequence": "string (min 80 words — realistic worst-case outcome including injury type, severity, potential for fatality, and recovery implications)", "likelihood": "High | Medium | Low" }
   ],
   "controlMeasures": [
-    { "measure": "string (short name)", "detail": "string (min 30 words — specific, practical control with who/what/how)" }
+    { "measure": "string (min 30 words — control measure name and brief description)", "detail": "string (min 80 words — specific, practical control measure explaining who is responsible, what equipment or procedure is required, how it is implemented, and how compliance is checked)" }
   ],
   "dosAndDonts": {
     "dos": ["string (min 5 items — specific positive actions)"],
     "donts": ["string (min 5 items — specific prohibited actions)"]
   },
-  "emergencyProcedures": "string (100-200 words — step-by-step with responsibilities: who calls 999, who administers first aid, who secures the area, who notifies management, escalation procedure)",
+  "emergencyProcedures": "string (min 250 words — comprehensive step-by-step emergency procedure with named responsibilities: who calls 999, who administers first aid, who secures the area, who notifies management, escalation procedure)",
   "discussionPoints": ["string — open questions to check understanding and encourage team input"],
   "keyTakeaways": ["string — 3-5 critical points to remember"],
   "ppeRequired": ["string — specific PPE items required for this activity"],
   "relevantStandards": ["string — regulations, HSE guidance, BS standards, ACoPs"],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 5 key hazards (add more if the topic warrants it). Minimum 6 control measures. Minimum 4 discussion points. Each hazard and control measure item must contain at least 30 words of specific, practical content — no generic one-liners.`,
 
@@ -1261,10 +1267,10 @@ Minimum 5 key hazards (add more if the topic warrants it). Minimum 6 control mea
     }
   ],
   "physicalHazards": [
-    { "hazard": "string", "risk": "High | Medium | Low", "controlMeasure": "string (min 30 words)", "residualRisk": "High | Medium | Low" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "risk": "High | Medium | Low", "controlMeasure": "string (min 30 words)", "residualRisk": "High | Medium | Low" }
   ],
   "biologicalHazards": [
-    { "hazard": "string (e.g. Leptospirosis, E.coli, Legionella)", "source": "string", "controlMeasure": "string" }
+    { "hazard": "string (e.g. Leptospirosis, E.coli, Legionella)", "source": "string", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)" }
   ],
   "safeSystemOfWork": "string (min 400 words — detailed step-by-step safe system of work from pre-entry checks through to space handback. Reference permit stages, gas clearance, ventilation establishment, communication checks, and emergency standby confirmation)",
   "entrySequence": [
@@ -1321,7 +1327,7 @@ Minimum 5 key hazards (add more if the topic warrants it). Minimum 6 control mea
     { "item": "string (e.g. Full body harness EN 361)", "standard": "string (EN/BS standard)", "checkRequired": "string (pre-use inspection requirement)" }
   ],
   "equipmentRequired": [
-    { "item": "string", "purpose": "string", "inspectionRequired": "string (LOLER, PUWER, or visual inspection requirement)" }
+    { "item": "string", "purpose": "string (min 120 words — detailed purpose of the excavation including the works it supports and why it is required)", "inspectionRequired": "string (LOLER, PUWER, or visual inspection requirement)" }
   ],
   "isolationRequirements": [
     { "service": "string (e.g. incoming flow, electrical supply, mechanical drive, chemical dosing)", "isolationMethod": "string (LOTO, valve closure, blank/spade, physical disconnection)", "verifiedBy": "string (role)" }
@@ -1330,7 +1336,7 @@ Minimum 5 key hazards (add more if the topic warrants it). Minimum 6 control mea
   "overallRiskRating": "High | Medium | Low",
   "riskRatingJustification": "string (min 80 words — explain the overall risk rating considering all identified hazards and controls)",
   "reviewTriggers": ["string — events that trigger a review (e.g. change in space conditions, incident, change in work scope, personnel change, new hazard identified)"],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL as a minimum). Minimum 5 physical hazards. Minimum 2 biological hazards for wastewater environments. Minimum 8 entry sequence steps. Minimum 3 alternative methods considered. Minimum 4 PPE items with standards. Minimum 3 equipment items. Minimum 5 personnel roles. Minimum 5 review triggers. All prose sections must be specific to this confined space, not generic.`,
 
@@ -1345,7 +1351,7 @@ Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL
   "siteAddress": "string",
   "incidentType": "Injury | Near Miss | Dangerous Occurrence | Environmental | Property Damage",
   "severity": "Fatal | Major | Over-7-Day | RIDDOR Specified | Minor | Near Miss",
-  "incidentSummary": "string (min 250 words — detailed factual account of what happened, in chronological order)",
+  "incidentSummary": "string (min 350 words — detailed factual account of what happened, in chronological order)",
   "exactLocation": "string",
   "personsInvolved": [
     {
@@ -1360,7 +1366,7 @@ Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL
   "witnesses": [
     { "name": "string", "role": "string", "employer": "string" }
   ],
-  "activityAtTimeOfIncident": "string (min 100 words — what work was being carried out)",
+  "activityAtTimeOfIncident": "string (min 180 words — what work was being carried out)",
   "ramsInPlace": "string (reference number and title of relevant RAMS/permits)",
   "environmentalConditions": "string (weather, lighting, ground conditions, temperature)",
   "immediateCauses": [
@@ -1373,7 +1379,7 @@ Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL
     "why3": "string",
     "why4": "string",
     "why5": "string",
-    "rootCause": "string (min 100 words — the fundamental root cause identified)"
+    "rootCause": "string (min 180 words — the fundamental root cause identified)"
   },
   "riddorAssessment": {
     "isRiddorReportable": "Yes | No | To Be Confirmed",
@@ -1389,8 +1395,8 @@ Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL
   "preventiveActions": [
     { "action": "string", "responsiblePerson": "string", "targetDate": "string", "status": "Open" }
   ],
-  "lessonsLearned": "string (min 150 words — what can be learned and applied to future works)",
-  "additionalNotes": "string"
+  "lessonsLearned": "string (min 200 words — what can be learned and applied to future works)",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 3 immediate causes. Minimum 4 corrective actions. Minimum 3 preventive actions.`,
 
@@ -1402,7 +1408,7 @@ Minimum 3 immediate causes. Minimum 4 corrective actions. Minimum 3 preventive a
   "preparedBy": "string",
   "projectName": "string",
   "siteAddress": "string",
-  "liftDescription": "string (min 200 words — detailed description of the lifting operation including purpose, sequence, and method)",
+  "liftDescription": "string (min 300 words — detailed description of the lifting operation including purpose, sequence, and method)",
   "loadDetails": {
     "description": "string",
     "weight": "string (include rigging weight)",
@@ -1442,7 +1448,7 @@ Minimum 3 immediate causes. Minimum 4 corrective actions. Minimum 3 preventive a
   },
   "exclusionZones": "string (min 100 words — describe the exclusion zone setup, barriers, signage, banksmen positions)",
   "proximityHazards": [
-    { "hazard": "string", "distance": "string", "controlMeasure": "string" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "distance": "string", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)" }
   ],
   "appointedPersons": {
     "liftPlanner": "string",
@@ -1458,11 +1464,11 @@ Minimum 3 immediate causes. Minimum 4 corrective actions. Minimum 3 preventive a
     "otherRestrictions": "string"
   },
   "riskAssessment": [
-    { "hazard": "string", "risk": "string", "likelihood": "High | Medium | Low", "severity": "High | Medium | Low", "controlMeasure": "string", "residualRisk": "High | Medium | Low" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "risk": "string", "likelihood": "High | Medium | Low", "severity": "High | Medium | Low", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)", "residualRisk": "High | Medium | Low" }
   ],
   "contingencyProcedures": "string (min 100 words — what happens if the lift cannot proceed, load snagging, crane breakdown, sudden weather change)",
-  "emergencyProcedures": "string (min 80 words)",
-  "additionalNotes": "string"
+  "emergencyProcedures": "string (min 150 words)",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 5 proximity hazards. Minimum 6 risk assessment items.`,
 
@@ -1521,8 +1527,8 @@ Minimum 5 proximity hazards. Minimum 6 risk assessment items.`,
   "siteSpecificEmergencies": [
     { "scenario": "string", "procedure": "string" }
   ],
-  "trainingAndDrills": "string (min 80 words — emergency drill frequency, induction requirements, competency)",
-  "additionalNotes": "string"
+  "trainingAndDrills": "string (min 150 words — emergency procedures including crane failure, load drop, power failure, personnel injury, and communication protocol. Include specific emergency contact numbers and nearest A&E with travel time drill frequency, induction requirements, competency)",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 6 key contacts. Minimum 3 site-specific emergencies. Key contacts must include: Site Manager, Project Manager, H&S Advisor, Principal Contractor, Client, First Aider.`,
 
@@ -1533,18 +1539,19 @@ Minimum 6 key contacts. Minimum 3 site-specific emergencies. Key contacts must i
   "preparedBy": "string",
   "projectName": "string",
   "siteAddress": "string",
-  "activityDescription": "string (min 150 words — detailed description of the activity being inspected)",
-  "drawingReferences": "string",
-  "specificationReferences": "string",
+  "activityDescription": "string (min 250 words — detailed description of the activity being inspected, including location, materials, equipment, applicable standards, and quality objectives)",
+  "drawingReferences": "string (min 60 words — list all applicable drawings with revision numbers)",
+  "specificationReferences": "string (min 60 words — list all applicable specifications, standards, and client requirements with clause references)",
   "preActivityChecks": [
     {
       "ref": "string (P1, P2, etc.)",
-      "checkItem": "string (specific, measurable check)",
-      "acceptanceCriteria": "string (measurable pass/fail criteria)",
+      "sectionIntro": "string (min 60 words — overview of this inspection phase and applicable standards)",
+      "checkItem": "string (min 40 words — specific, measurable inspection check with clear pass/fail threshold)",
+      "acceptanceCriteria": "string (min 40 words — measurable acceptance criteria referencing specification clause numbers and permitted tolerances)",
       "standardRef": "string (BS/EN reference)",
       "isHoldPoint": "boolean",
       "result": "Pass | Fail | N/A",
-      "comments": "string"
+      "comments": "string (min 40 words — inspector notes on compliance, observations, and any required follow-up actions)"
     }
   ],
   "duringActivityChecks": [
@@ -1556,7 +1563,7 @@ Minimum 6 key contacts. Minimum 3 site-specific emergencies. Key contacts must i
       "frequency": "string (continuous, each layer, each pour, etc.)",
       "isHoldPoint": "boolean",
       "result": "Pass | Fail | N/A",
-      "comments": "string"
+      "comments": "string (min 40 words — inspector notes on compliance, observations, and any required follow-up actions)"
     }
   ],
   "postActivityChecks": [
@@ -1567,7 +1574,7 @@ Minimum 6 key contacts. Minimum 3 site-specific emergencies. Key contacts must i
       "standardRef": "string",
       "isHoldPoint": "boolean",
       "result": "Pass | Fail | N/A",
-      "comments": "string"
+      "comments": "string (min 40 words — inspector notes on compliance, observations, and any required follow-up actions)"
     }
   ],
   "materialVerification": [
@@ -1583,9 +1590,9 @@ Minimum 6 key contacts. Minimum 3 site-specific emergencies. Key contacts must i
     "inspectedBy": "string",
     "date": "string",
     "result": "Accepted | Accepted with Observations | Rejected | Re-inspect Required",
-    "comments": "string"
+    "comments": "string (min 40 words — inspector notes on compliance, observations, and any required follow-up actions)"
   },
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 6 pre-activity checks. Minimum 8 during-activity checks. Minimum 4 post-activity checks. Minimum 3 testing requirements. All acceptance criteria MUST be specific and measurable — never "to specification" or "as design". Cite real BS/EN standards.`,
 
@@ -1619,19 +1626,19 @@ JSON STRUCTURE:
   "discipline": "string",
   "preparedBy": "string (use user's name if given, otherwise 'Project Manager')",
   "contractForm": "string (e.g. 'NEC4 ECS, Option A — Priced Contract with Activity Schedule')",
-  "contractBasisNotes": "string (min 40 words — precedence of documents, which conditions apply)",
+  "contractBasisNotes": "string (min 120 words — precedence of documents, which conditions apply)",
   "contractDocuments": ["string array — list all documents forming the subcontract"],
-  "scopeOverview": "string (min 80 words — comprehensive description of the works, objectives, standards, and context)",
+  "scopeOverview": "string (min 200 words — comprehensive description of the works, objectives, standards, and context)",
   "inclusions": [
-    { "no": "1", "item": "string (short title)", "detail": "string (min 20 words — precise description)" }
+    { "no": "1", "item": "string (short title)", "detail": "string (min 60 words — precise description)" }
   ],
   "exclusions": [
-    { "no": "1", "item": "string", "detail": "string (min 15 words)" }
+    { "no": "1", "item": "string", "detail": "string (min 60 words)" }
   ],
-  "designResponsibility": "string (min 60 words — who owns permanent design, temporary works, RFI process)",
-  "materialsEquipment": "string (min 60 words — what the sub supplies, certification requirements)",
+  "designResponsibility": "string (min 120 words — who owns permanent design, temporary works, RFI process)",
+  "materialsEquipment": "string (min 120 words — what the sub supplies, certification requirements)",
   "freeIssueItems": "string (what the PC provides, or 'No items are free-issued')",
-  "materialApprovalProcess": "string (min 30 words — submittal process, lead times)",
+  "materialApprovalProcess": "string (min 80 words — submittal process, lead times)",
   "attendance": [
     { "item": "string", "providedBy": "string (PC or Sub name)", "notes": "string" }
   ],
@@ -1639,15 +1646,15 @@ JSON STRUCTURE:
   "programmeCompletion": "DD/MM/YYYY",
   "workingHours": "string",
   "keyMilestones": "string (list key milestones with target weeks or dates)",
-  "programmeNotes": "string (min 40 words — programme submission and update requirements)",
+  "programmeNotes": "string (min 100 words — programme submission and update requirements)",
   "interfaces": [
     { "interfaceWith": "string", "description": "string", "responsibility": "string" }
   ],
-  "testingCommissioning": "string (min 60 words — specific tests, standards, witness requirements)",
+  "testingCommissioning": "string (min 120 words — specific tests, standards, witness requirements)",
   "deliverables": [
     { "document": "string", "requiredBy": "string", "format": "string" }
   ],
-  "healthSafetyEnvironmental": "string (min 60 words — CDM duties, RAMS, permits, environmental, waste)",
+  "healthSafetyEnvironmental": "string (min 140 words — CDM duties, RAMS, permits, environmental, waste)",
   "paymentBasis": "string (e.g. 'NEC4 Option A — Activity Schedule')",
   "paymentCycle": "string (e.g. 'Monthly')",
   "applicationDate": "string (e.g. '25th of each month')",
@@ -1667,9 +1674,9 @@ JSON STRUCTURE:
   "cisStatus": "string (e.g. 'Gross payment status')",
   "disputeNominatingBody": "string (e.g. 'RICS')",
   "governingLaw": "string (e.g. 'England and Wales')",
-  "groundConditions": "string (min 40 words) or null",
-  "priceEscalation": "string (min 40 words) or null",
-  "contaminationRisk": "string (min 40 words) or null"
+  "groundConditions": "string (min 80 words) or null",
+  "priceEscalation": "string (min 80 words) or null",
+  "contaminationRisk": "string (min 80 words) or null"
 }`,
 
   'permit-to-dig': `Generate a Permit to Dig JSON with this structure. Reference HSG47 (Avoiding danger from underground services) throughout.
@@ -1684,7 +1691,7 @@ JSON STRUCTURE:
     "location": "string (exact location description)",
     "gridReference": "string",
     "purpose": "string",
-    "method": "string (machine dig, hand dig, vacuum excavation)",
+    "method": "string (min 80 words — detailed excavation methodology including equipment type, dig sequence, and hand-dig zones around services)",
     "depth": "string",
     "length": "string",
     "width": "string",
@@ -1714,9 +1721,9 @@ JSON STRUCTURE:
     "lastCalibration": "string",
     "scanCompleted": "boolean",
     "scanDate": "string",
-    "scanFindings": "string (min 80 words)"
+    "scanFindings": "string (min 120 words)"
   },
-  "handDigZones": "string (min 100 words — where hand digging is required, distances from services, method to be used within hand-dig zone)",
+  "handDigZones": "string (min 150 words — where hand digging is required, distances from services, method to be used within hand-dig zone)",
   "safeDIggingMethod": "string (min 200 words — step-by-step safe digging method covering approach to known and unknown services, spotting techniques, and machine restrictions)",
   "supervisionArrangements": {
     "excavationSupervisor": "string",
@@ -1733,14 +1740,14 @@ JSON STRUCTURE:
     "string"
   ],
   "riskAssessment": [
-    { "hazard": "string", "controlMeasure": "string", "riskRating": "High | Medium | Low" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)", "riskRating": "High | Medium | Low" }
   ],
   "signOff": {
     "issuedBy": "string",
     "receivedBy": "string",
     "date": "string"
   },
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 3 services identified (even if described as 'None identified — treat as live'). Minimum 6 permit conditions. Minimum 5 risk assessment items.`,
 
@@ -1753,21 +1760,21 @@ Minimum 3 services identified (even if described as 'None identified — treat a
   "projectName": "string",
   "siteAddress": "string",
   "location": "string (exact location on site)",
-  "taskDescription": "string (min 80 words — clear description of today's specific task)",
+  "taskDescription": "string (min 200 words — comprehensive description of the specific task including location, equipment, materials, duration, number of operatives, and environmental conditions. Reference the parent RAMS and any applicable permits)",
   "ramsReference": "string (reference number of the RAMS covering this activity)",
   "permitReferences": "string (any permits in place)",
   "conditions": {
-    "weather": "string",
-    "groundConditions": "string",
-    "lighting": "string",
-    "accessEgress": "string"
+    "weather": "string (min 30 words — current conditions and forecast for the shift)",
+    "groundConditions": "string (min 30 words — surface type, stability, slope, wet/dry, proximity to excavations)",
+    "lighting": "string (min 20 words — natural/artificial, adequacy, task lighting requirements)",
+    "accessEgress": "string (min 30 words — access route, obstructions, emergency egress, welfare location)"
   },
   "hazards": [
     {
-      "hazard": "string",
-      "consequence": "string",
+      "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)",
+      "consequence": "string (min 30 words — realistic consequence and severity)",
       "riskBefore": "High | Medium | Low",
-      "controlMeasure": "string",
+      "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)",
       "riskAfter": "High | Medium | Low"
     }
   ],
@@ -1779,7 +1786,7 @@ Minimum 3 services identified (even if described as 'None identified — treat a
   "teamSignOn": [
     { "name": "string", "role": "string", "signature": "string", "understood": "Yes" }
   ],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on. Keep ALL text concise — this is a field document, not a report.`,
 
@@ -1794,20 +1801,20 @@ Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on.
   "contractForm": "NEC3 ECC | NEC4 ECC",
   "clauseReference": "string (e.g. 'Clause 15.1' for NEC4 or 'Clause 16.1' for NEC3)",
   "notifiedTo": "string (Project Manager name/role)",
-  "riskDescription": "string (min 250 words — detailed description of the matter that could increase the total of the Prices, delay Completion, delay meeting a Key Date, or impair the performance of the works in use)",
+  "riskDescription": "string (min 350 words — detailed description of the matter that could increase the total of the Prices, delay Completion, delay meeting a Key Date, or impair the performance of the works in use)",
   "dateFirstIdentified": "DD/MM/YYYY",
   "identifiedBy": "string",
-  "evidenceSummary": "string (min 100 words — what evidence exists: survey data, test results, design information, photographs, correspondence)",
+  "evidenceSummary": "string (min 180 words — what evidence exists: survey data, test results, design information, photographs, correspondence)",
   "potentialImpactOnCost": {
     "estimatedAdditionalCost": "string (£ figure or range)",
-    "costBreakdown": "string (min 80 words — labour, plant, materials, subcontractor, preliminaries)",
+    "costBreakdown": "string (min 150 words — labour, plant, materials, subcontractor, preliminaries)",
     "assumptions": "string"
   },
   "potentialImpactOnProgramme": {
     "estimatedDelay": "string (days/weeks)",
     "criticalPathAffected": "Yes | No | To Be Confirmed",
     "keyDatesAffected": "string",
-    "programmeNarrative": "string (min 80 words — explain the programme impact)"
+    "programmeNarrative": "string (min 150 words — explain the programme impact)"
   },
   "potentialImpactOnQuality": "string (how could this affect the performance of the works in use)",
   "proposedMitigation": [
@@ -1819,7 +1826,7 @@ Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on.
     "proposedAttendees": "string"
   },
   "relatedNotices": "string (previous early warnings or compensation events related to this matter)",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 3 proposed mitigation measures.`,
 
@@ -1893,7 +1900,7 @@ QUALITY STANDARDS — Every section must be written as if it will be reviewed by
 
   "disposition": {
     "decision": "Rework | Repair | Use As Is | Reject & Replace | Concession Required",
-    "justification": "string (min 100 words — Explain why this disposition was chosen by reference to the specific standard, specification, and contract requirements. Explain why alternative dispositions were not appropriate. Address durability, safety, appearance, and client expectations. Reference the specific BS/EN standard that the non-conforming work fails to meet.)",
+    "justification": "string (min 200 words — Explain why this disposition was chosen by reference to the specific standard, specification, and contract requirements. Explain why alternative dispositions were not appropriate. Address durability, safety, appearance, and client expectations. Reference the specific BS/EN standard that the non-conforming work fails to meet.)",
     "designerApprovalRequired": "Yes | No",
     "clientApprovalRequired": "Yes | No"
   },
@@ -1964,7 +1971,7 @@ MANDATORY MINIMUMS:
     { "document": "string", "reference": "string", "status": "Attached | To Follow" }
   ],
   "relatedNotices": "string (related early warnings, previous CEs, or other notifications)",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 4 supporting evidence items. The entitlement basis must correctly cite NEC clause numbers and demonstrate understanding of the contract mechanism.`,
 
@@ -2065,7 +2072,7 @@ JSON structure:
       "priority": "number (1 = most critical)",
       "issue": "string",
       "impact": "string",
-      "recommendation": "string",
+      "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)",
       "ragRating": "RED | AMBER"
     }
   ],
@@ -2083,7 +2090,7 @@ JSON structure:
     "averageFloat": "string",
     "openEnds": "string"
   },
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 6 critical issues. Minimum 8 recommended actions. All 8 review areas must be assessed.`,
 
@@ -2097,7 +2104,7 @@ JSON structure:
   "assessedBy": "string",
   "projectName": "string",
   "siteAddress": "string",
-  "projectOverview": "string (min 200 words)",
+  "projectOverview": "string (min 280 words)",
   "notificationStatus": {
     "f10Required": "Yes | No | To Be Confirmed",
     "f10Submitted": "Yes | No | Pending",
@@ -2134,7 +2141,7 @@ JSON structure:
           "status": "Compliant | Partial | Non-Compliant | Not Applicable | Unknown",
           "finding": "string (specific finding for this project)",
           "gap": "string",
-          "recommendation": "string"
+          "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)"
         }
       ]
     },
@@ -2146,9 +2153,9 @@ JSON structure:
           "duty": "string",
           "regulation": "string",
           "status": "Compliant | Partial | Non-Compliant | Not Applicable | Unknown",
-          "finding": "string",
+          "finding": "string (min 60 words — specific finding with evidence)",
           "gap": "string",
-          "recommendation": "string"
+          "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)"
         }
       ]
     },
@@ -2160,9 +2167,9 @@ JSON structure:
           "duty": "string",
           "regulation": "string",
           "status": "Compliant | Partial | Non-Compliant | Not Applicable | Unknown",
-          "finding": "string",
+          "finding": "string (min 60 words — specific finding with evidence)",
           "gap": "string",
-          "recommendation": "string"
+          "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)"
         }
       ]
     },
@@ -2174,9 +2181,9 @@ JSON structure:
           "duty": "string",
           "regulation": "string",
           "status": "Compliant | Partial | Non-Compliant | Not Applicable | Unknown",
-          "finding": "string",
+          "finding": "string (min 60 words — specific finding with evidence)",
           "gap": "string",
-          "recommendation": "string"
+          "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)"
         }
       ]
     },
@@ -2188,9 +2195,9 @@ JSON structure:
           "duty": "string",
           "regulation": "string",
           "status": "Compliant | Partial | Non-Compliant | Not Applicable | Unknown",
-          "finding": "string",
+          "finding": "string (min 60 words — specific finding with evidence)",
           "gap": "string",
-          "recommendation": "string"
+          "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)"
         }
       ]
     }
@@ -2224,7 +2231,7 @@ JSON structure:
       "gap": "string",
       "regulation": "string",
       "potentialConsequence": "string",
-      "recommendation": "string"
+      "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)"
     }
   ],
   "complianceRoadmap": [
@@ -2237,7 +2244,7 @@ JSON structure:
   ],
   "overallComplianceRating": "Satisfactory | Requires Improvement | Unsatisfactory",
   "narrativeSummary": "string (min 300 words — professional narrative gap analysis. Assess the overall CDM compliance position, explain the most significant gaps and their implications, and set out priorities for the project team. Write as an experienced CDM Coordinator would write for a client or project director audience)",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 6 duties per duty holder for PC and PD. Minimum 5 identified gaps. Minimum 8 compliance roadmap actions.`,
 
@@ -2254,7 +2261,7 @@ JSON structure:
   "projectName": "string",
   "siteAddress": "string",
   "assessmentBasis": "BS 5228-1:2009+A1:2014",
-  "projectDescription": "string (min 200 words)",
+  "projectDescription": "string (min 280 words)",
   "workingHours": {
     "weekdayStart": "string",
     "weekdayFinish": "string",
@@ -2303,7 +2310,7 @@ JSON structure:
         "predictedLevel": "string",
         "bs5228Category": "string (Category A — Negligible / B — Minor / C — Moderate / D — Significant)",
         "impactRating": "Negligible | Minor | Moderate | Significant",
-        "justification": "string (min 80 words)"
+        "justification": "string (min 140 words)"
       }
     ],
     "overallImpact": "Negligible | Minor | Moderate | Significant"
@@ -2314,7 +2321,7 @@ JSON structure:
     "vibrationSources": ["string"],
     "sensitiveStructures": "string",
     "predictedVibrationLevels": "string (PPV mm/s)",
-    "assessmentNarrative": "string (min 100 words)"
+    "assessmentNarrative": "string (min 160 words)"
   },
   "mitigationMeasures": [
     {
@@ -2338,10 +2345,10 @@ JSON structure:
     "locations": ["string"],
     "equipment": "string (Type 1 or Type 2 SLM to BS EN 61672)"
   },
-  "complaintsManagement": "string (min 100 words)",
+  "complaintsManagement": "string (min 160 words)",
   "localAuthorityNotification": "string (Section 61 CoPA 1974 recommendation)",
   "conclusions": "string (min 200 words)",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 4 plant inventory items. Minimum 2 sensitive receptors. Noise predictions for all receptors.`,
 
@@ -2415,7 +2422,7 @@ JSON structure:
   "qualifications": "string (min 150 words — any additional qualifications or alternative proposals)",
   "organisationProfile": "string (min 100 words — company profile, relevant experience, key personnel)",
   "validityStatement": "string",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 10 BoQ line items with realistic quantities. Minimum 10 inclusions. Minimum 8 exclusions. Minimum 8 assumptions.`,
 
@@ -2432,7 +2439,7 @@ JSON structure:
   "preparedBy": "string",
   "approvedBy": "string",
   "alertHeadline": "string (punchy, specific — max 12 words, e.g. 'Banksman struck by excavator counterweight — blind spot fatality risk')",
-  "incidentSummary": "string (min 200 words — clear factual account in plain English. Chronological sequence. What was being done, what went wrong, outcome, what could have happened if slightly different)",
+  "incidentSummary": "string (min 300 words — clear factual account in plain English. Chronological sequence. What was being done, what went wrong, outcome, what could have happened if slightly different)",
   "whatHappened": {
     "location": "string",
     "date": "DD/MM/YYYY",
@@ -2442,7 +2449,7 @@ JSON structure:
     "personsInvolved": "string",
     "outcome": "string"
   },
-  "potentialConsequences": "string (min 100 words — worst-case scenario if circumstances had been marginally different. Be explicit about the severity)",
+  "potentialConsequences": "string (min 180 words — worst-case scenario if circumstances had been marginally different. Be explicit about the severity)",
   "immediateCauses": [
     {
       "cause": "string",
@@ -2470,13 +2477,13 @@ JSON structure:
       "howToVerify": "string"
     }
   ],
-  "regulatoryContext": "string (min 100 words — relevant legislation and HSE guidance: PUWER 1998, LOLER 1998, CDM 2015, etc. What the regulations require)",
+  "regulatoryContext": "string (min 180 words — relevant legislation and HSE guidance: PUWER 1998, LOLER 1998, CDM 2015, etc. What the regulations require)",
   "distributionInstructions": "string",
   "briefingRecord": {
     "instruction": "string",
     "signatureColumns": ["Name", "Role", "Employer", "Date", "Signature"]
   },
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 3 immediate causes. Minimum 2 underlying factors. Minimum 3 lessons learned. Minimum 5 preventive actions.`,
 
@@ -2502,7 +2509,7 @@ JSON structure:
   "siteAddress": "string",
   "methodology": "ICE v3.2 (University of Bath Inventory of Carbon and Energy, Version 3.2)",
   "scopeBoundary": "Modules A1-A5 per PAS 2080:2023",
-  "projectDescription": "string (min 200 words)",
+  "projectDescription": "string (min 280 words)",
   "materialsCarbonA1A3": [
     {
       "material": "string",
@@ -2557,7 +2564,7 @@ JSON structure:
     "carbonPerM2": "string (if applicable)",
     "carbonPerM3Concrete": "string (if applicable)"
   },
-  "hotspotAnalysis": "string (min 200 words — top 3 carbon hotspots by category, why they dominate, comparison to industry benchmarks)",
+  "hotspotAnalysis": "string (min 280 words — top 3 carbon hotspots by category, why they dominate, comparison to industry benchmarks)",
   "carbonReductionOpportunities": [
     {
       "opportunity": "string",
@@ -2567,9 +2574,9 @@ JSON structure:
       "detail": "string (min 80 words — how achieved, commercial implications, constraints)"
     }
   ],
-  "residualCarbonConsiderations": "string (min 100 words)",
-  "assessmentLimitations": "string (min 80 words)",
-  "additionalNotes": "string"
+  "residualCarbonConsiderations": "string (min 160 words)",
+  "assessmentLimitations": "string (min 140 words)",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 8 materials. Minimum 3 transport entries. Minimum 4 carbon reduction opportunities. All calculations must be internally consistent.`,
 
@@ -2587,7 +2594,7 @@ JSON structure:
   "originalDocumentRevision": "string",
   "originalDocumentDate": "string",
   "producedByCompany": "string (extracted from RAMS or 'Not stated')",
-  "documentOverview": "string (min 200 words — summary of what the RAMS covers, who it was written for, general quality and professionalism assessment)",
+  "documentOverview": "string (min 300 words — summary of what the RAMS covers, who it was written for, general quality and professionalism assessment)",
   "checklistItems": [
     {
       "no": 1,
@@ -2600,22 +2607,22 @@ JSON structure:
     {
       "legislation": "string",
       "status": "Compliant | Partial | Non-Compliant | Not Applicable",
-      "finding": "string",
-      "recommendation": "string"
+      "finding": "string (min 60 words — specific finding with evidence)",
+      "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)"
     }
   ],
   "priorityRecommendations": [
     {
       "priority": "number (1 = highest)",
       "criticality": "Must Resolve Before Work Commences | Should Resolve | Improvement Opportunity",
-      "finding": "string",
-      "recommendation": "string",
+      "finding": "string (min 60 words — specific finding with evidence)",
+      "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)",
       "regulatoryBasis": "string"
     }
   ],
   "overallVerdict": {
     "verdict": "Approved — Suitable for Use | Conditionally Approved — Amendments Required Before Works Commence | Not Approved — Significant Revisions Required Before Resubmission",
-    "summary": "string (min 200 words — direct and professional overall assessment. State clearly whether suitable for use, what must be fixed before approval, what improvements would significantly raise quality)"
+    "summary": "string (min 300 words — direct and professional overall assessment. State clearly whether suitable for use, what must be fixed before approval, what improvements would significantly raise quality)"
   }
 }
 
@@ -2714,7 +2721,7 @@ JSON structure:
     { "document": "string", "reference": "string", "status": "Attached | To Follow" }
   ],
   "closingParagraph": "string",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 3 affected activities. Minimum 4 supporting documents. Clause numbers must be correct for the stated contract form.`,
 
@@ -2770,7 +2777,7 @@ JSON structure:
     { "document": "string", "reference": "string", "status": "Attached | To Follow" }
   ],
   "closingParagraph": "string",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 3 supporting documents. Clause numbers must be correct for stated contract form.`,
 
@@ -2798,7 +2805,7 @@ JSON structure:
     }
   ],
   "detailedQuestion": "string (min 200 words — specific questions numbered if multiple. Precise about what decision is needed and in what format)",
-  "background": "string (min 150 words — context: what work, why needed, what has been considered, any partial information)",
+  "background": "string (min 250 words — context: what work, why needed, what has been considered, any partial information)",
   "proposedSolution": {
     "proposed": "boolean",
     "description": "string"
@@ -2812,7 +2819,7 @@ JSON structure:
   "contractualReference": "string (clause for information provision, e.g. NEC4 Cl 27.1 or JCT SBC Cl 2.12)",
   "distribution": ["string"],
   "responseFormat": "string",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 3 relevant documents. Minimum 2 activities at risk. Programme implication must include specific activity names and dates.`,
 
@@ -2889,7 +2896,7 @@ JSON structure:
     "amountDueThisApplication": "string (£)",
     "amountDueInWords": "string"
   },
-  "supportingNarrative": "string (min 200 words — professional valuation narrative: progress of works, basis of measurements, variation status, points for contract administrator to note)",
+  "supportingNarrative": "string (min 500 words — professional valuation narrative: progress of works, basis of measurements, variation status, points for contract administrator to note)",
   "pendingVariations": [
     {
       "voRef": "string",
@@ -2905,7 +2912,7 @@ JSON structure:
     "anticipatedReleaseDate": "string"
   },
   "supportingDocumentsList": ["string"],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 8 BoQ line items. Minimum 2 variations. All financial calculations must be internally consistent.`,
 
@@ -2928,7 +2935,7 @@ JSON structure:
     "instructionDate": "DD/MM/YYYY",
     "instructionTime": "string"
   },
-  "activityDescription": "string (min 150 words — what was done, why necessary, where on site, programme activity or drawing references)",
+  "activityDescription": "string (min 400 words — comprehensive description of what was done, why it was necessary, where on site, which programme activity or drawing it relates to, what resources were required, and why it could not be valued under the contract rates)",
   "labourRecord": [
     {
       "operativeRef": "string",
@@ -2989,7 +2996,7 @@ JSON structure:
     "totalDayworkValue": "string (£)",
     "totalDayworkInWords": "string"
   },
-  "cecaScheduleNotes": "string (min 100 words — which CECA Schedule edition, how rates established, any agreed uplift percentages)",
+  "cecaScheduleNotes": "string (min 250 words — which CECA Schedule edition, how rates established, any agreed uplift percentages)",
   "supportingEvidence": [
     { "document": "string", "reference": "string", "status": "Attached | To Follow" }
   ],
@@ -2998,7 +3005,7 @@ JSON structure:
     "received": { "name": "string", "role": "string (Main Contractor Representative)", "date": "string", "signature": "For signature", "accepted": "For acceptance" },
     "notes": "Acceptance of this daywork sheet constitutes agreement that the resources described were employed on the works specified. Acceptance does not constitute agreement of the instruction to carry out dayworks."
   },
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }`,
 
   'carbon-reduction-plan': `Generate a Carbon Reduction Plan compliant with PPN 06/21 (Cabinet Office, effective 30 September 2021).
@@ -3110,7 +3117,7 @@ JSON structure:
     "signOffStatement": "string (formal board-level declaration of commitment)",
     "signature": "For signature"
   },
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Net zero commitment MUST reference 2050. Board sign-off mandatory per PPN 06/21. Minimum 3 completed initiatives. Minimum 5 planned initiatives. Minimum 5 Scope 3 categories.`,
 
@@ -3128,22 +3135,22 @@ JSON structure:
   "siteAddress": "string",
   "client": "string",
   "principalContractor": "string",
-  "taskDescription": "string (min 150 words — detailed description of the WAH activity, referencing WAH Regs 2005 Reg 4 duty to avoid, prevent, mitigate)",
+  "taskDescription": "string (min 250 words — detailed description of the WAH activity including specific location, working height, access equipment, task duration, and environmental conditions. Reference WAH Regs 2005 Reg 4 duty to avoid, prevent, and mitigate falls from height)",
   "location": "string",
   "workingHeight": "string (e.g. '12m above ground level')",
   "accessMethod": "string (scaffold / MEWP / podium / ladder / rope access / other)",
-  "accessJustification": "string (min 80 words — justification under hierarchy of control: why this access method was selected over alternatives)",
+  "accessJustification": "string (min 150 words — detailed justification under the hierarchy of control explaining why each level was considered and why the selected access method is the safest reasonably practicable option. Reference WAH Regs 2005 Reg 6 and relevant Schedules)",
   "duration": "string",
   "frequency": "string",
   "hierarchyOfControl": {
-    "avoidance": "string (min 60 words — can the work be done at ground level? If not, why not? Reg 6(2))",
-    "prevention": "string (min 80 words — measures to prevent falls: edge protection, scaffolding, MEWP with guardrails. Reg 6(3), Schedule 1-6)",
-    "mitigation": "string (min 60 words — measures to minimise distance/consequences of fall: safety nets, harnesses, airbags. Reg 6(4))"
+    "avoidance": "string (min 100 words — detailed assessment of whether work at height can be avoided entirely. If not, explain why ground-level alternatives were considered and rejected. Reference Reg 6(2))",
+    "prevention": "string (min 150 words — comprehensive fall prevention measures including collective protection, personal protection, equipment specifications, and inspection requirements. Reference Reg 6(3) and applicable Schedules 1-6)",
+    "mitigation": "string (min 100 words — fall mitigation measures including equipment type, attachment points, maximum fall distance, and rescue implications. Reference Reg 6(4))"
   },
   "hazards": [
     {
       "ref": "string",
-      "hazard": "string",
+      "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)",
       "whoAtRisk": "string",
       "likelihoodBefore": "number (1-5)",
       "severityBefore": "number (1-5)",
@@ -3157,12 +3164,12 @@ JSON structure:
   "equipmentRequired": [
     { "item": "string", "specification": "string", "inspectionRequired": "string" }
   ],
-  "rescuePlan": "string (min 120 words — specific rescue procedure: how will a suspended/fallen operative be recovered? Time target, equipment, trained personnel. Reg 9)",
+  "rescuePlan": "string (min 200 words — specific rescue procedure detailing: who will perform the rescue, what equipment is available, where it is located, maximum rescue time target, communication method, and how the procedure has been rehearsed. Reference WAH Regs 2005 Reg 9 and HSE guidance INDG401)",
   "competencyRequirements": [
     { "role": "string", "qualification": "string", "verified": "string" }
   ],
-  "weatherRestrictions": "string (min 60 words — wind speed limits, rain/ice policy, visibility requirements. Reg 4(1)(b), Schedule 4)",
-  "emergencyProcedures": "string (min 80 words — emergency contacts, nearest A&E, first aid arrangements, communication method at height)",
+  "weatherRestrictions": "string (min 120 words — weather restrictions including specific wind speed abort limits, rain/ice policy, temperature limits, visibility minimums, and lightning procedure. Reference WAH Regs 2005 Reg 4(1)(b) and Schedule 4)",
+  "emergencyProcedures": "string (min 150 words — emergency procedures including nearest A&E with travel time, first aid provision, communication method between ground and height, emergency services access route, and assembly point. Include specific emergency contact numbers)",
   "additionalControls": "string",
   "signOff": [
     { "role": "string", "name": "string" }
@@ -3182,8 +3189,8 @@ JSON structure:
   "siteAddress": "string",
   "client": "string",
   "principalContractor": "string",
-  "assessmentScope": "string (min 100 words — overview of what work/equipment is being assessed and why)",
-  "regulatoryContext": "string (min 80 words — reference Control of Vibration at Work Regs 2005, L140 guidance, EAV 0.5 m/s², ELV 1.15 m/s²)",
+  "assessmentScope": "string (min 180 words — comprehensive overview of the assessment scope including all equipment types, operative roles, ground conditions, and project context. Explain why this assessment is required under the Control of Vibration at Work Regulations 2005)",
+  "regulatoryContext": "string (min 150 words — detailed regulatory context referencing the Control of Vibration at Work Regulations 2005, HSE guidance L140, EAV 0.5 m/s², ELV 1.15 m/s²)",
   "operatives": [
     {
       "name": "string (or 'Operative 1' etc.)",
@@ -3210,17 +3217,17 @@ JSON structure:
       "typicalTasks": "string"
     }
   ],
-  "exposureSummary": "string (min 100 words — summary of A(8) values across all equipment, comparison against EAV and ELV, identification of highest-risk activities)",
+  "exposureSummary": "string (min 180 words — comprehensive exposure summary comparing all A(8) calculations against EAV (0.5 m/s²) and ELV (1.15 m/s²), identifying highest-risk equipment/activities, and assessing cumulative exposure for operatives using multiple machines)",
   "controlMeasures": [
     { "ref": "string", "measure": "string", "responsibility": "string", "targetDate": "string" }
   ],
-  "controlNarrative": "string (min 120 words — detailed explanation of control strategy: job rotation, speed limits, ground preparation, machine selection, seat maintenance, rest breaks)",
-  "healthSurveillance": "string (min 100 words — health surveillance requirements under Reg 7: who needs it, what it involves, frequency, record keeping, referral criteria)",
+  "controlNarrative": "string (min 200 words — detailed control strategy covering: job rotation schedules with maximum continuous exposure times, speed restrictions on haul routes, ground preparation measures, machine selection criteria, seat inspection and maintenance regime, rest break requirements, and management responsibilities for enforcement)",
+  "healthSurveillance": "string (min 180 words — health surveillance programme under Reg 7 including: who requires surveillance, Tier 1-3 assessment process, frequency of assessments, questionnaire content, referral criteria to occupational health, record keeping requirements, and action triggers for abnormal results)",
   "actionPlan": [
     { "action": "string", "priority": "string (HIGH/MEDIUM/LOW)", "responsible": "string", "targetDate": "string" }
   ],
-  "monitoringArrangements": "string (min 60 words — how exposure will be monitored ongoing, trigger for reassessment)",
-  "additionalNotes": "string"
+  "monitoringArrangements": "string (min 120 words — ongoing monitoring arrangements including frequency of exposure reviews, trigger events for reassessment, equipment for field measurement, record keeping, and management review schedule)",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 2 equipment assessments. Minimum 4 control measures. Minimum 3 action plan items. A(8) calculations must be mathematically correct. Always state EAV (0.5 m/s²) and ELV (1.15 m/s²) explicitly.`,
 
@@ -3237,7 +3244,7 @@ JSON structure:
   "client": "string",
   "principalContractor": "string",
   "riddorClassification": "string (Death / Specified Injury / Over-7-Day Incapacitation / Dangerous Occurrence / Occupational Disease)",
-  "riddorJustification": "string (min 60 words — why this classification applies, referencing RIDDOR 2013 Schedule 1, 2, or 3 as appropriate)",
+  "riddorJustification": "string (min 120 words — detailed justification for the RIDDOR classification, referencing the specific paragraph of Schedule 1, 2, or 3 of RIDDOR 2013 that applies. Explain why this incident meets the reporting threshold and the statutory timeframe for notification)",
   "hseNotification": {
     "reported": "boolean",
     "referenceNumber": "string",
@@ -3267,14 +3274,14 @@ JSON structure:
     "returnedToWork": "boolean",
     "daysAbsent": "number"
   },
-  "incidentDescription": "string (min 250 words — detailed factual narrative of exactly what happened, step by step, from the moments before the incident to the aftermath. Include positions, actions, equipment, and environmental factors)",
+  "incidentDescription": "string (min 350 words — detailed factual narrative of exactly what happened, step by step, from the moments before the incident to the aftermath. Include positions of all persons involved, actions being undertaken, equipment in use, environmental and weather conditions, supervision arrangements, and the immediate response. Write as a chronological account suitable for HSE investigation review)",
   "immediateActions": [
     "string (minimum 5 — first aid, scene preservation, notifications, stand-down, equipment isolation)"
   ],
   "rootCauseAnalysis": {
     "immediateCauses": ["string (min 3 — the direct physical causes: unsafe act, unsafe condition, equipment failure)"],
     "underlyingCauses": ["string (min 3 — system failures: supervision gap, training deficiency, RAMS non-compliance, inadequate planning, resource pressure)"],
-    "rootCause": "string (min 100 words — the fundamental organisational or systemic failure that allowed the incident chain to develop)"
+    "rootCause": "string (min 180 words — the fundamental organisational or systemic failure that allowed the incident chain to develop)"
   },
   "correctiveActions": [
     {
@@ -3286,11 +3293,11 @@ JSON structure:
       "status": "string (Open / In Progress / Complete)"
     }
   ],
-  "lessonsLearned": "string (min 120 words — key lessons, what should change, how this will be communicated across the organisation)",
+  "lessonsLearned": "string (min 200 words — key lessons learned including what systemic changes are required, how the lessons will be communicated (toolbox talks, safety alerts, management briefings), timeline for implementation, and how effectiveness will be measured)",
   "distributionList": ["string (minimum 4 — who receives this report: client, PC safety team, HSE, company director)"],
-  "witnessStatementsSummary": "string (min 60 words — summary of witness accounts without identifying individuals)",
+  "witnessStatementsSummary": "string (min 120 words — summary of witness accounts including number of witnesses, their roles and positions relative to the incident, key observations from each, and any conflicting accounts. Do not identify individuals by name)",
   "scenePreservation": "string (was the scene preserved? Photos taken? Evidence secured?)",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 5 immediate actions. Minimum 3 immediate causes. Minimum 3 underlying causes. Minimum 5 corrective actions. The incident description must be a detailed factual narrative — not bullet points. Root cause analysis must go beyond surface-level causes.`,
 
@@ -3308,7 +3315,7 @@ JSON structure:
   "siteAddress": "string",
   "client": "string",
   "principalContractor": "string",
-  "worksDescription": "string (min 150 words — detailed description of the works requiring TM, including road details, classification, speed limit, AADT)",
+  "worksDescription": "string (min 250 words — comprehensive description of the works requiring traffic management, including road name, classification, speed limit, carriageway type, AADT, adjacent land use, pedestrian routes, and public transport routes affected. Reference Chapter 8 and HSG144 requirements)",
   "tmType": "string (Lane Closure / Road Closure / Contraflow / Footway Closure / Site Access Only / Multi-Phase)",
   "roadDetails": {
     "roadName": "string",
@@ -3323,20 +3330,20 @@ JSON structure:
   "signSchedule": [
     { "ref": "string", "sign": "string", "tsrgdRef": "string", "location": "string", "quantity": "number" }
   ],
-  "phasingPlan": "string (min 120 words — sequencing of TM setup, works phases, and removal. Include taper lengths and safety zones)",
-  "vehicleManagement": "string (min 100 words — vehicle routes, turning areas, speed limits within works, banksman positions)",
-  "pedestrianManagement": "string (min 80 words — footway diversions, temporary crossings, guarding, tactile paving)",
-  "emergencyAccess": "string (min 60 words — how emergency vehicles access the works area and pass through)",
+  "phasingPlan": "string (min 200 words — detailed phasing plan covering TM setup sequence, works phases with durations, sign placement order, taper lengths per Chapter 8 Table A1, safety zone dimensions, lane widths, and removal procedure. Include timing for each phase)",
+  "vehicleManagement": "string (min 180 words — vehicle management plan covering designated routes, turning areas, speed limits within the works, banksman positions and communication, reversing procedures, plant/vehicle segregation, and delivery vehicle management. Reference HSG144)",
+  "pedestrianManagement": "string (min 150 words — pedestrian management plan including footway diversion routes, temporary crossings with dropped kerbs and tactile paving, barrier types and heights, lighting requirements, signage for pedestrians, and provisions for wheelchair/pushchair users and visually impaired persons)",
+  "emergencyAccess": "string (min 120 words — emergency vehicle access arrangements including how blue-light vehicles will be accommodated, minimum carriageway width maintained, communication procedure with emergency services, and contingency for rapid TM removal if required)",
   "publicTransport": "string (bus stop relocations, diversions, operator notification)",
   "riskAssessment": [
-    { "hazard": "string", "risk": "string", "control": "string", "residualRisk": "string" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "risk": "string", "control": "string", "residualRisk": "string" }
   ],
   "operativeRoles": [
     { "role": "string", "responsibility": "string", "qualification": "string" }
   ],
-  "communicationPlan": "string (min 60 words — advance warning, letter drops, VMS boards, social media)",
+  "communicationPlan": "string (min 120 words — communication plan including advance warning signage, letter drops to affected properties, VMS board locations, local authority notification, public transport operator liaison, social media/website updates, and emergency contact details for the public)",
   "monitoringArrangements": "string",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 8 signs in schedule. Minimum 5 risk assessment entries. Minimum 4 operative roles. Reference Chapter 8 and TSRGD numbers for all signs.`,
 
@@ -3352,8 +3359,8 @@ JSON structure:
   "siteAddress": "string",
   "client": "string",
   "principalContractor": "string",
-  "projectOverview": "string (min 120 words — project type, scale, key activities, programme duration)",
-  "regulatoryContext": "string (min 80 words — EPA 1990, Waste Regs 2011, duty of care, waste hierarchy obligations)",
+  "projectOverview": "string (min 200 words — comprehensive project overview including type, scale, key construction activities, programme duration, estimated total waste volumes, and how the waste management plan relates to the project environmental management system)",
+  "regulatoryContext": "string (min 150 words — regulatory context referencing EPA 1990 Section 34, Waste (England and Wales) Regulations 2011, Environmental Protection (Duty of Care) Regulations 1991, Hazardous Waste Regulations 2005, and the waste hierarchy under the Waste Framework Directive. Include specific legal obligations and penalties for non-compliance)",
   "wasteStreams": [
     {
       "stream": "string",
@@ -3365,21 +3372,21 @@ JSON structure:
       "disposalRoute": "string (Recycling / Recovery / Landfill / Licensed Facility)"
     }
   ],
-  "wasteHierarchy": "string (min 100 words — how the project applies Prevention, Reuse, Recycling, Recovery, Disposal — with specific examples for each level)",
-  "segregationPlan": "string (min 80 words — skip types, colours, locations, labelling, operative responsibilities)",
+  "wasteHierarchy": "string (min 200 words — detailed application of the waste hierarchy with specific examples at each level: Prevention (design for material efficiency, just-in-time ordering), Reuse (site-won materials, temporary works), Recycling (segregation targets by stream), Recovery (energy from waste where applicable), and Disposal (last resort, licensed facilities only). Include measurable targets for each level — with specific examples for each level)",
+  "segregationPlan": "string (min 150 words — detailed segregation plan covering skip/container types, colour coding, labelling requirements, designated locations on site plan, operative responsibilities, contamination procedures, and how segregation compliance will be monitored and enforced)",
   "carrierRegister": [
     { "carrier": "string", "licenceNumber": "string", "wasteTypes": "string", "expiryDate": "string" }
   ],
   "facilityRegister": [
     { "facility": "string", "permitNumber": "string", "wasteTypes": "string", "location": "string" }
   ],
-  "transferNoteLog": "string (min 60 words — how transfer notes / consignment notes will be recorded, stored, and audited)",
+  "transferNoteLog": "string (min 120 words — transfer note management process covering: who completes them, how they are checked, where records are stored, retention period (minimum 2 years, 3 years for hazardous), audit frequency, and corrective actions for non-compliance)",
   "minimisationTargets": [
     { "target": "string", "measure": "string", "kpi": "string" }
   ],
   "contaminatedLand": "string (any contaminated material, classification required, disposal route)",
-  "monitoringSchedule": "string (min 60 words — weekly skip audits, monthly reporting, quarterly reviews)",
-  "additionalNotes": "string"
+  "monitoringSchedule": "string (min 120 words — monitoring schedule including weekly skip audits with contamination checks, monthly waste data reporting, quarterly management reviews against targets, annual plan review, and reporting format for client/project team)",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 6 waste streams with EWC codes. Minimum 2 carriers. Minimum 2 facilities. Minimum 3 minimisation targets. EWC codes must be realistic 6-digit codes for UK construction waste.`,
 
@@ -3412,7 +3419,7 @@ JSON structure:
     "proximityToWatercourse": "string",
     "proximityToBoundary": "string"
   },
-  "legalFramework": "string (min 120 words — Wildlife & Countryside Act 1981 s.14, EPA 1990, Anti-social Behaviour Crime and Policing Act 2014 for knotweed, penalties for causing spread, duty of care for disposal)",
+  "legalFramework": "string (min 200 words — comprehensive legal framework referencing Wildlife & Countryside Act 1981 s.14, EPA 1990, Anti-social Behaviour Crime and Policing Act 2014 for knotweed, penalties for causing spread, duty of care for disposal)",
   "planningConditions": "string (any planning conditions relating to invasive species)",
   "treatmentMethodology": {
     "method": "string (Herbicide / Excavation / On-site Burial / Root Barrier / Combination)",
@@ -3420,7 +3427,7 @@ JSON structure:
     "programme": "string (treatment schedule — seasons, number of applications, monitoring intervals)",
     "contractor": "string (specialist contractor details if applicable)"
   },
-  "biosecurityProtocol": "string (min 100 words — tool cleaning, boot wash, vehicle wheel wash, designated access routes, contamination zones, PPE requirements)",
+  "biosecurityProtocol": "string (min 180 words — detailed biosecurity protocol covering tool cleaning procedures, boot wash station locations and disinfectant type, vehicle wheel wash requirements, PPE disposal, contamination zone demarcation, and enforcement responsibilities, vehicle wheel wash, designated access routes, contamination zones, PPE requirements)",
   "disposalRoute": {
     "method": "string (Licensed landfill / On-site burial cell / Specialist contractor)",
     "facility": "string (if off-site — name, permit number, location)",
@@ -3431,9 +3438,9 @@ JSON structure:
   "monitoringSchedule": [
     { "visit": "string", "date": "string", "purpose": "string" }
   ],
-  "completionCriteria": "string (min 80 words — what constitutes successful eradication, how many years of negative monitoring, who signs off)",
-  "operativeBriefing": "string (min 60 words — toolbox talk content, what operatives need to know, what to do if species found in new location)",
-  "additionalNotes": "string"
+  "completionCriteria": "string (min 150 words — detailed completion criteria including what constitutes successful eradication, number of consecutive growing seasons with negative monitoring results required, independent ecologist sign-off requirements, and post-completion monitoring obligations, how many years of negative monitoring, who signs off)",
+  "operativeBriefing": "string (min 120 words — operative briefing content including species identification key features, legal consequences of causing spread, practical dos and don'ts, reporting procedure for new discoveries, and biosecurity measures to follow, what operatives need to know, what to do if species found in new location)",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Legal framework must reference specific Acts and Sections. Treatment methodology must be species-appropriate. Monitoring schedule minimum 5 visits. Biosecurity protocol must be practical and enforceable.`,
 };
@@ -3495,7 +3502,7 @@ const TBT_BASE_SCHEMA = `{
   "keyTakeaways": ["string — 3-5 critical points"],
   "ppeRequired": ["string"],
   "relevantStandards": ["string"],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 MINIMUMS: 5+ hazards, 6+ controls, 4+ discussion points, 5+ do's, 5+ don'ts. Each hazard/control must have 30+ words. Add more items if the topic warrants it.`;
 
@@ -3706,7 +3713,7 @@ const COSHH_EXPANDED_SCHEMA = `{
       "description": "string (what it covers)"
     }
   ],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 MINIMUMS: 4+ composition rows (including water/balance), 4 exposure routes (inhalation, skin, eyes, ingestion), 2+ WEL rows, 5 control measures (one per hierarchy level), 5+ PPE items, 4+ training types, 4+ first aid scenarios, 5+ spill response steps, 6+ regulatory references.
@@ -3842,7 +3849,7 @@ const CONFINED_SPACES_EXPANDED_SCHEMA = `{
     { "space": "string", "connectionType": "string (pipe size, type)", "isolationMethod": "string", "gasMigrationRisk": "High | Medium | Low", "status": "Isolated | Not Isolated" }
   ],
   "hazards": [
-    { "category": "Atmospheric | Physical | Biological | Mechanical | Environmental", "hazard": "string", "causeSource": "string (min 20 words)", "severity": "Fatal | Serious | Moderate | Minor", "likelihood": "High | Medium | Low" }
+    { "category": "Atmospheric | Physical | Biological | Mechanical | Environmental", "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "causeSource": "string (min 20 words)", "severity": "Fatal | Serious | Moderate | Minor", "likelihood": "High | Medium | Low" }
   ],
   "historicalReadings": [
     { "date": "DD MMM YYYY", "o2": "string (%)", "h2s": "string (ppm)", "lel": "string (%)", "co": "string (ppm)", "conditions": "string", "recordedBy": "string" }
@@ -3864,7 +3871,7 @@ const CONFINED_SPACES_EXPANDED_SCHEMA = `{
     { "system": "string", "method": "string", "isolationPoint": "string (ID/tag)", "verifiedBy": "string", "lockOff": "string" }
   ],
   "simops": [
-    { "activity": "string", "potentialImpact": "string", "controlMeasure": "string", "risk": "High | Medium | Low", "acceptable": "Yes (controlled) | No" }
+    { "activity": "string", "potentialImpact": "string", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)", "risk": "High | Medium | Low", "acceptable": "Yes (controlled) | No" }
   ],
   "entrySteps": [
     { "step": "string", "action": "string", "responsibility": "string", "verification": "string" }
@@ -3942,7 +3949,7 @@ const CONFINED_SPACES_EXPANDED_SCHEMA = `{
   "regulatoryReferences": [
     { "reference": "string", "description": "string" }
   ],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 MINIMUMS: 4+ atmospheric params (O₂, H₂S, LEL, CO minimum), 7+ hazards, 5+ adjacent spaces for WwTW, 2+ historical readings, 4+ SIMOPS, 8+ isolations, 8+ entry steps, 6+ PPE items, 7+ rescue steps, 4+ extraction steps, 4+ multi-casualty scenarios, 10+ rescue equipment items, 5+ comms cascade entries, 7+ post-incident steps, 5+ emergency scenarios, 4+ competency roles, 19+ pre-entry checklist items, 7+ regulatory references.
@@ -4102,7 +4109,7 @@ const ERP_SCHEMA = `{
   "regulatoryReferences": [
     { "reference": "string", "description": "string" }
   ],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 CRITICAL RULES:
@@ -4277,14 +4284,14 @@ const INCIDENT_REPORT_SCHEMA = `{
     { "type": "string", "description": "string (min 15 words)", "collectedBy": "string", "date": "string" }
   ],
   "preRiskRatings": [
-    { "hazard": "string", "severity": "string", "likelihood": "string", "rating": "string (e.g. '6 MED')", "ratingLevel": "HIGH | MEDIUM | LOW" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "severity": "string", "likelihood": "string", "rating": "string (e.g. '6 MED')", "ratingLevel": "HIGH | MEDIUM | LOW" }
   ],
   "postRiskRatings": [
-    { "hazard": "string", "severity": "string", "likelihood": "string", "rating": "string", "ratingLevel": "HIGH | MEDIUM | LOW" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "severity": "string", "likelihood": "string", "rating": "string", "ratingLevel": "HIGH | MEDIUM | LOW" }
   ],
   "riskJustification": "string (min 30 words — why the rating changed)",
   "targetRatings": [
-    { "hazard": "string", "severity": "string", "targetLikelihood": "string", "targetRating": "string", "controlsRequired": "string" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "severity": "string", "targetLikelihood": "string", "targetRating": "string", "controlsRequired": "string" }
   ],
   "correctiveActions": [
     { "action": "string (min 15 words)", "priority": "IMMEDIATE | SHORT-TERM | LONG-TERM", "owner": "string (specific role)", "dueDate": "string", "status": "CLOSED | IN PROGRESS | PLANNED", "verifiedBy": "string (or '—')", "kpi": "string (measurable verification)", "f2508Linked": "Yes | No" }
@@ -4306,7 +4313,7 @@ const INCIDENT_REPORT_SCHEMA = `{
     { "ref": "string (S1, S2...)", "recommendation": "string (min 20 words)", "systemElement": "string", "owner": "string", "timeline": "string" }
   ],
   "localRecs": [
-    { "ref": "string (L1, L2...)", "recommendation": "string", "owner": "string", "dueDate": "string", "status": "CLOSED | IN PROGRESS | PLANNED" }
+    { "ref": "string (L1, L2...)", "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)", "owner": "string", "dueDate": "string", "status": "CLOSED | IN PROGRESS | PLANNED" }
   ],
   "mgmtGaps": [
     { "gap": "string (G1, G2...)", "systemElement": "string", "description": "string (min 20 words)", "standardRef": "string (e.g. 'ISO 45001 §6.1')", "priority": "HIGH | MEDIUM | LOW" }
@@ -4330,7 +4337,7 @@ const INCIDENT_REPORT_SCHEMA = `{
   ],
   "potentialOutcomeStatement": "string (min 30 words — what could have happened, including energy/force calculations if relevant)",
   "hazardIdents": [
-    { "hazard": "string", "description": "string (min 15 words)", "riskLevel": "HIGH | MEDIUM | LOW", "currentControls": "string" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "description": "string (min 15 words)", "riskLevel": "HIGH | MEDIUM | LOW", "currentControls": "string" }
   ],
   "immediateActionsTaken": [
     { "action": "string", "priority": "string", "owner": "string (who took the action)", "dueDate": "string (time taken)", "status": "string (outcome)", "verifiedBy": "", "kpi": "", "f2508Linked": "" }
@@ -4361,7 +4368,7 @@ const INCIDENT_REPORT_SCHEMA = `{
   "regulatoryReferences": [
     { "reference": "string", "description": "string" }
   ],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 CRITICAL RULES:
@@ -4508,7 +4515,7 @@ const LIFT_PLAN_SCHEMA = `{
     "groundSurvey": "string", "groundPrep": "string"
   },
   "proximityHazards": [
-    { "hazard": "string", "distance": "string", "mitigation": "string (min 15 words)", "riskLevel": "HIGH | MEDIUM | LOW" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "distance": "string", "mitigation": "string (min 15 words)", "riskLevel": "HIGH | MEDIUM | LOW" }
   ],
   "overheadServices": [
     { "service": "string (e.g. '11kV power line')", "height": "string", "owner": "string", "clearance": "string", "mitigation": "string" }
@@ -4538,16 +4545,16 @@ const LIFT_PLAN_SCHEMA = `{
     { "scenario": "string", "action": "string (min 15 words)", "responsibility": "string", "equipment": "string" }
   ],
   "riskEntries": [
-    { "hazard": "string", "severity": "string (1-5)", "likelihood": "string (1-5)", "riskRating": "string (e.g. '12 HIGH')", "ratingLevel": "HIGH | MEDIUM | LOW", "controlMeasures": "string (min 15 words)", "residualRating": "string", "residualLevel": "HIGH | MEDIUM | LOW" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "severity": "string (1-5)", "likelihood": "string (1-5)", "riskRating": "string (e.g. '12 HIGH')", "ratingLevel": "HIGH | MEDIUM | LOW", "controlMeasures": "string (min 15 words)", "residualRating": "string", "residualLevel": "HIGH | MEDIUM | LOW" }
   ],
   "liftPhases": [
     { "phase": "string (1, 2...)", "description": "string", "crane1Action": "string", "crane2Action": "string", "loadShare1": "string (%)", "loadShare2": "string (%)", "signalMethod": "string", "abortCriteria": "string" }
   ],
   "craneInteractions": [
-    { "zone": "string", "hazard": "string", "separation": "string", "control": "string" }
+    { "zone": "string", "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "separation": "string", "control": "string" }
   ],
   "whatIfScenarios": [
-    { "scenario": "string (e.g. 'Crane 2 hydraulic failure mid-lift')", "consequence": "string", "response": "string", "prevention": "string" }
+    { "scenario": "string (e.g. 'Crane 2 hydraulic failure mid-lift')", "consequence": "string (min 30 words — realistic consequence and severity)", "response": "string", "prevention": "string" }
   ],
   "lolerChecks": [
     { "regulation": "string (e.g. 'Reg 4')", "requirement": "string", "compliance": "COMPLIANT | NON-COMPLIANT | N/A", "evidence": "string" }
@@ -4569,7 +4576,7 @@ const LIFT_PLAN_SCHEMA = `{
   "regulatoryReferences": [
     { "reference": "string", "description": "string" }
   ],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 CRITICAL RULES:
@@ -4741,7 +4748,7 @@ const MANUAL_HANDLING_SCHEMA = `{
   "regulatoryReferences": [
     { "reference": "string", "description": "string" }
   ],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 CRITICAL RULES:
@@ -4898,7 +4905,7 @@ const NOISE_ASSESSMENT_SCHEMA = `{
   "section61Declaration": "string (formal declaration text)",
   "contactName": "string", "contactPhone": "string", "contactEmail": "string",
   "regulatoryReferences": [{ "reference": "string", "description": "string" }],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 CRITICAL RULES:
@@ -4983,7 +4990,7 @@ const PERMIT_TO_DIG_SCHEMA = `{
   "notificationCascade": [{ "order": "string", "role": "string", "name": "string", "number": "string", "when": "string" }],
   "strikeSteps": [{ "step": "string", "action": "string", "responsibility": "string" }],
   "investigationItems": [{ "question": "string", "response": "string" }],
-  "riddorAssessment": "string", "lessonsLearned": [{ "finding": "string", "action": "string", "responsible": "string", "dueDate": "DD/MM/YYYY" }],
+  "riddorAssessment": "string", "lessonsLearned": [{ "finding": "string (min 60 words — specific finding with evidence)", "action": "string", "responsible": "string", "dueDate": "DD/MM/YYYY" }],
   "scenePreservation": "string", "avoidanceStatement": "string", "pas128Classification": "string",
   "excavationZones": [{ "zone": "string", "location": "string", "serviceDensity": "High | Medium | Low", "servicesPresent": "string", "permitRequired": true, "specialMeasures": "string" }],
   "safeDigRules": ["string"], "competenceRegister": [{ "name": "string", "role": "string", "catCert": "string", "certExpiry": "DD/MM/YYYY", "lastAssessed": "DD/MM/YYYY" }],
@@ -4994,7 +5001,7 @@ const PERMIT_TO_DIG_SCHEMA = `{
   "servicesInAreaToday": "string", "permitIssuer": "string", "permitIssuerRole": "string",
   "permitValidity": "string", "extensionProcedure": "string",
   "regulatoryReferences": [{ "reference": "string", "description": "string" }],
-  "signOffRoles": [{ "role": "string", "name": "string" }], "additionalNotes": "string"
+  "signOffRoles": [{ "role": "string", "name": "string" }], "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 CRITICAL: Populate arrays relevant to chosen template. ALWAYS populate regulatoryReferences and signOffRoles. Gas: 0800 111 999. Electric: 105. Hand-dig: 500 mm per HSG47.`;
@@ -5046,22 +5053,22 @@ const POWRA_SCHEMA = `{
   "location": "string", "ramsReference": "string", "permitReferences": "string",
   "taskDescription": "string (min 80 words)",
   "conditions": { "weather": "string", "groundConditions": "string", "lighting": "string", "accessEgress": "string", "overhead": "string", "adjacentWork": "string" },
-  "hazards": [{ "hazard": "string", "consequence": "string", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string (min 15 words)", "riskAfter": "High | Medium | Low" }],
+  "hazards": [{ "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "consequence": "string (min 30 words — realistic consequence and severity)", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string (min 15 words)", "riskAfter": "High | Medium | Low" }],
   "ppeRequired": ["string"], "stopConditions": ["string"], "reassessmentTriggers": ["string"],
   "emergencyArrangements": "string",
   "teamSignOn": [{ "name": "string", "role": "string", "employer": "string", "briefed": true }],
   "hazardChecklist": [{ "item": "string", "checked": true }],
   "controlsSummary": "string",
-  "taskPhases": [{ "phase": "string", "description": "string", "hazards": [{ "hazard": "string", "consequence": "string", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string", "riskAfter": "High | Medium | Low" }], "plantEquipment": "string", "permitsRequired": "string", "stopConditions": ["string"] }],
+  "taskPhases": [{ "phase": "string", "description": "string", "hazards": [{ "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "consequence": "string (min 30 words — realistic consequence and severity)", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)", "riskAfter": "High | Medium | Low" }], "plantEquipment": "string", "permitsRequired": "string", "stopConditions": ["string"] }],
   "plantRegister": [{ "item": "string", "checkCompleted": true, "operator": "string", "restrictions": "string" }],
   "permitsCrossRef": [{ "type": "string", "reference": "string", "issuer": "string", "validity": "string" }],
   "competencyChecks": [{ "item": "string", "verified": true, "verifiedBy": "string" }],
   "environmentalConsiderations": "string",
   "monitoringItems": [{ "item": "string", "frequency": "string", "responsibility": "string", "action": "string" }],
   "closeOutItems": [{ "item": "string", "completed": true, "signedBy": "string" }],
-  "lessonsLearned": [{ "finding": "string", "action": "string", "responsible": "string" }],
+  "lessonsLearned": [{ "finding": "string (min 60 words — specific finding with evidence)", "action": "string", "responsible": "string" }],
   "regulatoryReferences": [{ "reference": "string", "description": "string" }],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
 CRITICAL: Populate arrays relevant to chosen template. ALWAYS populate conditions, teamSignOn, stopConditions. Risk ratings MUST show improvement. Controls must be SPECIFIC and ACTIONABLE. Hazards must be task-specific.`;
@@ -5201,7 +5208,7 @@ const EARLY_WARNING_SCHEMA = `{
     "agenda": "string"
   },
   "relatedNotices": "string",
-  "additionalNotes": "string",
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)",
 
   "impactOnPrices": "string (PM template)",
   "impactOnCompletionDate": "string (PM template)",
@@ -5300,7 +5307,7 @@ const PC_SCORING_SCHEMA = `{
   "improvementPlan": [
     { "action": "string", "priority": "Immediate | Short-term | Medium-term", "expectedScoreGain": "string" }
   ],
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 All 8 areas MUST be scored. Weights must sum to 100. Overall score must be calculated correctly. Minimum 6 ranked deficiencies. Minimum 8 improvement actions.`;
 
@@ -5352,7 +5359,7 @@ const PC_RAG_SCHEMA = `{
     }
   ],
   "criticalIssues": [
-    { "priority": "number", "issue": "string", "impact": "string", "recommendation": "string", "ragRating": "RED | AMBER" }
+    { "priority": "number", "issue": "string", "impact": "string", "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)", "ragRating": "RED | AMBER" }
   ],
   "recommendedActions": [
     { "action": "string", "priority": "Immediate | Short-term | Medium-term", "responsible": "string" }
@@ -5361,7 +5368,7 @@ const PC_RAG_SCHEMA = `{
     "totalActivities": "string", "milestones": "string", "criticalActivities": "string",
     "averageFloat": "string", "openEnds": "string"
   },
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 All 8 review areas: Programme Logic & Dependencies, Duration Analysis, WBS Structure & Activity Hierarchy, Critical Path Integrity, Float Analysis, Resource Loading & Constraints, Contractual Milestone Compliance, Missing Activities & Programme Gaps. Min 6 critical issues. Min 8 recommended actions.`;
 
@@ -5422,13 +5429,13 @@ const PC_COMPREHENSIVE_SCHEMA = `{
     "floatOwnership": "string"
   },
   "criticalIssues": [
-    { "priority": "number", "issue": "string", "impact": "string", "recommendation": "string", "ragRating": "RED | AMBER", "owner": "string", "targetDate": "string" }
+    { "priority": "number", "issue": "string", "impact": "string", "recommendation": "string (min 60 words — actionable recommendation with priority and responsible party)", "ragRating": "RED | AMBER", "owner": "string", "targetDate": "string" }
   ],
   "improvementPlan": [
     { "action": "string", "priority": "Immediate | Short-term | Medium-term", "responsible": "string", "targetDate": "string", "expectedBenefit": "string" }
   ],
   "methodology": "string (min 100 words — explain the review methodology, standards referenced, and assessment criteria used)",
-  "additionalNotes": "string"
+  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 All 8 review areas assessed with extended findings (min 250 words each). Min 6 risk matrix items. Min 8 critical issues. Min 10 improvement plan actions. Float distribution must be analysed. Critical path narrative required. This is the most detailed template — maximise content depth.`;
 
