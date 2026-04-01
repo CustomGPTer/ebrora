@@ -9,25 +9,25 @@ import { getAllAvailableTalks } from '@/data/tbt-structure';
 import { getAllTemplatesForSearch } from '@/lib/free-templates';
 
 export const metadata: Metadata = {
-  title: 'Ebrora | AI Construction Document Generators, Templates & Toolbox Talks for UK Sites',
+  title: 'Ebrora | AI Construction Document Generators, Excel Templates & Toolbox Talks for UK Sites',
   description:
-    'The UK construction industry\'s most powerful AI toolkit. 8 AI document generators including RAMS, COSHH, ITP, DSE & more — plus 55+ Excel templates and 1,500+ free toolbox talks. Built by site teams, for site teams.',
+    'The UK construction industry\'s most powerful AI toolkit. 35+ AI document generators including RAMS, COSHH, RIDDOR, Working at Height & more — plus 750+ downloadable templates and 1,500+ free toolbox talks. Built by site teams, for site teams.',
   alternates: {
     canonical: 'https://www.ebrora.com',
   },
   openGraph: {
-    title: 'Ebrora | AI-Powered Construction Document Generators',
+    title: 'Ebrora | AI-Powered Construction Document Generators & Excel Templates',
     description:
-      '8 AI document generators, 55+ Excel templates, 1,500+ free toolbox talks. Enterprise-grade tools at a fraction of the cost — built for UK construction professionals.',
+      '35+ AI document generators, 750+ professional Excel templates, 1,500+ free toolbox talks. Enterprise-grade tools at a fraction of the cost — built for UK construction professionals.',
     url: 'https://www.ebrora.com',
     type: 'website',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ebrora | AI-Powered Construction Document Generators',
+    title: 'Ebrora | AI-Powered Construction Document Generators & Excel Templates',
     description:
-      '8 AI document generators, 55+ Excel templates, 1,500+ free toolbox talks. Enterprise-grade tools for UK construction professionals.',
+      '35+ AI document generators, 750+ professional Excel templates, 1,500+ free toolbox talks. Enterprise-grade tools for UK construction professionals.',
     images: ['/og-image.jpg'],
   },
 };
@@ -38,7 +38,7 @@ const homepageSchema = {
   name: 'Ebrora',
   url: 'https://www.ebrora.com',
   description:
-    'The UK construction industry\'s most powerful AI toolkit. 8 AI document generators including RAMS, COSHH, ITP, DSE and more — plus premium Excel templates and 1,500+ free toolbox talks.',
+    'The UK construction industry\'s most powerful AI toolkit. 35+ AI document generators including RAMS, COSHH, RIDDOR, Working at Height and more — plus 750+ professional Excel templates and 1,500+ free toolbox talks.',
 };
 
 const organizationSchema = {

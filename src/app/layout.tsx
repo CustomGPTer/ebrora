@@ -25,15 +25,15 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.ebrora.com'),
   title: {
-    default: 'Construction Excel Templates for UK Sites | Ebrora',
+    default: 'AI Construction Document Generators & Excel Templates | Ebrora',
     template: '%s | Ebrora',
   },
   description:
-    'Download professional Excel templates for UK construction and civil engineering. CDM 2015 compliant, instant download, no signup required.',
+    'AI-powered document generators and professional Excel templates for UK construction. 35+ AI tools, RAMS Builder, 750+ templates, 1,500+ free toolbox talks. Built by site teams, for site teams.',
   openGraph: {
-    title: 'Construction Excel Templates for UK Sites | Ebrora',
+    title: 'AI Construction Document Generators & Excel Templates | Ebrora',
     description:
-      'Professional Excel templates for UK construction and civil engineering. CDM 2015 compliant. Instant download, no signup required.',
+      'AI-powered document generators and professional Excel templates for UK construction. 35+ AI tools, RAMS Builder, 750+ templates, 1,500+ toolbox talks.',
     url: 'https://www.ebrora.com',
     siteName: 'Ebrora',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Construction Excel Templates for UK Sites | Ebrora',
+    title: 'AI Construction Document Generators & Excel Templates | Ebrora',
     description:
-      'Professional Excel templates for UK construction and civil engineering. CDM 2015 compliant. Instant download, no signup required.',
+      'AI-powered document generators and professional Excel templates for UK construction. 35+ AI tools, RAMS Builder, 750+ templates, 1,500+ toolbox talks.',
     images: ['/og-image.jpg'],
   },
   icons: {
@@ -76,7 +76,7 @@ const organizationSchema = {
   url: 'https://www.ebrora.com',
   logo: 'https://www.ebrora.com/og-image.jpg',
   description:
-    'Professional Excel templates built specifically for UK construction and civil engineering professionals. CDM 2015 compliant tools for site managers, engineers, and project teams.',
+    'AI-powered construction document generators and professional Excel templates for UK site teams. 35+ AI tools including RAMS Builder, COSHH, RIDDOR, and Working at Height — plus 750+ downloadable templates and 1,500+ free toolbox talks.',
   email: 'hello@ebrora.com',
   address: { '@type': 'PostalAddress', addressCountry: 'GB' },
   sameAs: [
@@ -92,7 +92,7 @@ const websiteSchema = {
   name: 'Ebrora',
   url: 'https://www.ebrora.com',
   description:
-    'Professional Excel templates for UK construction and civil engineering. Instant download, no signup required.',
+    'AI-powered construction document generators, professional Excel templates, and 1,500+ free toolbox talks for UK construction professionals.',
 };
 
 export default function RootLayout({
