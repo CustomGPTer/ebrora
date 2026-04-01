@@ -18,7 +18,7 @@ export const FAQ_DATA: FAQSection[] = [
       {
         id: 'ai-1',
         question: 'What are the AI tools and how do they work?',
-        answer: 'Ebrora offers 29 AI-powered document generators covering Health & Safety, Quality, Commercial, and Programme categories. You describe your work or upload a document, answer a few tailored questions, and the AI generates a professional, regulation-compliant document in minutes. Tools include RAMS Builder, COSHH Assessment, ITP Builder, Lift Plan, CE Notification, and many more.'
+        answer: 'Ebrora offers 35 AI-powered document generators covering Health & Safety, Quality, Commercial, and Programme categories. You describe your work or upload a document, answer a few tailored questions, and the AI generates a professional, regulation-compliant document in minutes. Tools include RAMS Builder, COSHH Assessment, ITP Builder, Lift Plan, CE Notification, Working at Height Assessment, RIDDOR Report, Traffic Management Plan, and many more.'
       },
       {
         id: 'ai-2',
