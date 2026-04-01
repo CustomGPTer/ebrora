@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import QuoteBuilderClient from './components/QuoteBuilderClient';
+import { BreadcrumbNav } from '@/components/shared/BreadcrumbNav';
 
 export const metadata: Metadata = {
   title: { absolute: 'AI Quotation Builder | 4 Templates | Ebrora' },
@@ -44,6 +45,9 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
+      <div className="max-w-[1200px] mx-auto px-6 pt-4">
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Commercial", href: "/products" }, { label: "Quotation Generator" }]} />
+      </div>
       <QuoteBuilderClient />
     </>
   );
