@@ -219,7 +219,7 @@ const HUB_CARDS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 0v.375" />
       </svg>
     ),
-    stat: '55+',
+    stat: '750+',
     statLabel: 'templates',
     accent: 'hp-card--templates',
   },
@@ -453,10 +453,10 @@ export default function HomepageClient({
             Enterprise-Grade AI — Fraction of the Cost
           </span>
           <h1 className="hp-hero__title">
-            The Most Powerful AI Construction Tools Available
+            AI-Powered RAMS, Risk Assessments &amp; Construction Documents for UK Sites
           </h1>
           <p className="hp-hero__subtitle">
-            25+ AI document generators, 1,500+ free toolbox talks, 1,000+ downloadable
+            35+ AI document generators, 1,500+ free toolbox talks, 750+ downloadable
             templates, and a complete RAMS Builder — all on one platform built for
             UK construction. Free to use. Just sign in and start generating.
           </p>
@@ -684,7 +684,7 @@ export default function HomepageClient({
                 </svg>
                 Enterprise-Grade AI — Fraction of the Cost
               </span>
-              <h2 className="hp-rams__title">The Most Powerful AI Construction Tools Available</h2>
+              <h2 className="hp-rams__title">AI-Powered RAMS, Risk Assessments &amp; Construction Documents</h2>
               <p className="hp-rams__desc">
                 Comparable platforms charge £200+ per month for a single tool.
                 Ebrora gives you an entire suite of AI-powered document generators — RAMS,
