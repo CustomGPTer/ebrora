@@ -31,6 +31,7 @@ import { getGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { getProgrammeCheckerTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
+import { wrapUploadContent, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import type { AiToolSlug } from '@/lib/ai-tools/types';
 
 export const maxDuration = 300; // Vercel Pro allows up to 300s
@@ -194,14 +195,20 @@ export async function POST(req: NextRequest) {
       ? parsed.text.slice(0, MAX_TEXT_CHARS) + '\n\n[... document truncated at 80,000 characters for processing ...]'
       : parsed.text;
 
-    const phaseTwoMsg = `UPLOADED FILE: ${fileName} (${parsed.fileType.toUpperCase()})
-FILE SIZE: ${(file.size / 1024).toFixed(0)} KB
-CHARACTER COUNT: ${parsed.characterCount.toLocaleString()}
+    // Injection detection on uploaded content
+    const uploadPatterns = detectInjectionPatterns(parsedText.slice(0, 5000));
+    if (uploadPatterns.length > 0) {
+      logInjectionAttempt(userId, toolSlug, 'uploaded-file', uploadPatterns);
+    }
 
-FULL PARSED CONTENT:
-${parsedText}
-
-Based on the above content, generate the complete ${toolConfig.documentLabel} as specified in the system prompt. Output ONLY valid JSON.`;
+    const phaseTwoMsg = wrapUploadContent(
+      fileName,
+      parsed.fileType,
+      file.size,
+      parsed.characterCount,
+      parsedText,
+      toolConfig.documentLabel
+    );
 
     let documentContent: any = null;
     const MAX_RETRIES = 2;
@@ -269,33 +276,6 @@ Based on the above content, generate the complete ${toolConfig.documentLabel} as
         completed_at: new Date(),
       },
     });
-
-    // ── 12. Increment usage ───────────────────────────────────────────────
-    try {
-      const monthStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
-      const existing = await (prisma as any).aiToolUsage.findFirst({
-        where: { user_id: userId, tool_slug: toolSlug, billing_period_start: monthStart },
-      });
-      if (existing) {
-        await (prisma as any).aiToolUsage.update({
-          where: { id: existing.id },
-          data: { generations_count: { increment: 1 } },
-        });
-      } else {
-        await (prisma as any).aiToolUsage.create({
-          data: {
-            user_id: userId,
-            tool_slug: toolSlug,
-            billing_period_start: monthStart,
-            billing_period_end: new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0),
-            generations_count: 1,
-            generations_limit: monthLimit,
-          },
-        });
-      }
-    } catch (usageErr) {
-      console.warn('[Upload] Failed to increment usage:', usageErr);
-    }
 
     return NextResponse.json({
       generationId,
