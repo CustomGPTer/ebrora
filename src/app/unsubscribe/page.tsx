@@ -21,7 +21,7 @@ function UnsubscribeContent() {
       <div className="auth-page">
         <div className="auth-card">
           <div className="auth-card__header">
-            <h1 className="page-header">Unsubscribed</h1>
+            <h2 className="page-header">Unsubscribed</h2>
           </div>
           <div className="verify-message">
             <p>
@@ -93,7 +93,7 @@ export default function UnsubscribePage() {
       <div className="auth-page">
         <div className="auth-card">
           <div className="auth-card__header">
-            <h1 className="page-header">Loading...</h1>
+            <h2 className="page-header">Loading...</h2>
           </div>
         </div>
       </div>
