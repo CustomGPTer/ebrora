@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -57,6 +57,10 @@ export async function POST(req: NextRequest) {
       trafficTemplateSlug?: string;
       wasteTemplateSlug?: string;
       invasiveTemplateSlug?: string;
+      ceTemplateSlug?: string;
+      delayTemplateSlug?: string;
+      variationTemplateSlug?: string;
+      rfiTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -339,6 +343,26 @@ export async function POST(req: NextRequest) {
     // Inject Invasive Species template slug
     if (toolSlug === 'invasive-species' && invasiveTemplateSlug) {
       documentContent._invasiveTemplateSlug = invasiveTemplateSlug;
+    }
+
+    // Inject CE Notification template slug
+    if (toolSlug === 'ce-notification' && ceTemplateSlug) {
+      documentContent._ceTemplateSlug = ceTemplateSlug;
+    }
+
+    // Inject Delay Notification template slug
+    if (toolSlug === 'delay-notification' && delayTemplateSlug) {
+      documentContent._delayTemplateSlug = delayTemplateSlug;
+    }
+
+    // Inject Variation Confirmation template slug
+    if (toolSlug === 'variation-confirmation' && variationTemplateSlug) {
+      documentContent._variationTemplateSlug = variationTemplateSlug;
+    }
+
+    // Inject RFI Generator template slug
+    if (toolSlug === 'rfi-generator' && rfiTemplateSlug) {
+      documentContent._rfiTemplateSlug = rfiTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
