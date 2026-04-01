@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ProgrammeCheckerBuilderClient from './components/ProgrammeCheckerBuilderClient';
+import { BreadcrumbNav } from '@/components/shared/BreadcrumbNav';
 
 export const metadata: Metadata = {
   title: { absolute: 'AI Construction Programme Checker | 4 Report Templates | Ebrora' },
@@ -16,6 +17,37 @@ export const metadata: Metadata = {
   },
 };
 
+
+const toolSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Ebrora AI Construction Programme Checker',
+  applicationCategory: 'BusinessApplication',
+  description: 'Upload your construction programme for an AI-powered review. Choose from 4 report templates — Scoring, Email Summary, RAG Report, or Comprehensive. Logic, sequencing, WBS, critical path, and contractual compliance.',
+  url: 'https://www.ebrora.com/programme-checker-builder',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'GBP',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Ebrora',
+    url: 'https://www.ebrora.com',
+  },
+};
 export default function Page() {
-  return <ProgrammeCheckerBuilderClient />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
+      />
+      <div className="max-w-[1200px] mx-auto px-6 pt-4">
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Programme", href: "/products" }, { label: "Construction Programme Checker" }]} />
+      </div>
+      <ProgrammeCheckerBuilderClient />
+    </>
+  );
 }
