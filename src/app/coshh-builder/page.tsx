@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'AI COSHH Assessment Builder | 5 Templates | Ebrora',
   },
   description: 'AI-powered COSHH assessment generator with 5 professional templates for UK construction. 18-section assessments covering composition, GHS classification, exposure limits, PPE, health surveillance, and regulatory compliance.',
-  alternates: {
+  alternates: {h
     canonical: 'https://www.ebrora.com/coshh-builder',
   },
   openGraph: {
@@ -53,7 +53,7 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
       <div className="max-w-[1200px] mx-auto px-6 pt-4">
-        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Health & Safety", href: "/products" }, { label: "COSHH Assessment" }]} />
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/" }, { label: "Health & Safety" }, { label: "COSHH Assessment" }]} />
       </div>
       <CoshhBuilderClient />
     </>
