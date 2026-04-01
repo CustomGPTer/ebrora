@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import TbtBuilderClient from './components/TbtBuilderClient';
+import { BreadcrumbNav } from '@/components/shared/BreadcrumbNav';
 
 export const metadata: Metadata = {
   title: {
@@ -51,6 +52,9 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
+      <div className="max-w-[1200px] mx-auto px-6 pt-4">
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Health & Safety", href: "/products" }, { label: "Toolbox Talk Generator" }]} />
+      </div>
       <TbtBuilderClient />
     </>
   );
