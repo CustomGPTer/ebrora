@@ -23,15 +23,24 @@ export const AI_TOOL_LIMITS: Record<string, number> = {
  * All 13 new tools are also restricted (Standard+ only).
  */
 export const RESTRICTED_FREE_TOOLS: Set<string> = new Set([
-  // Existing restricted tools
+  // Original 16 — all restricted
+  'coshh',
   'itp',
+  'manual-handling',
+  'dse',
+  'tbt-generator',
+  'confined-spaces',
   'incident-report',
   'lift-plan',
   'emergency-response',
+  'quality-checklist',
   'scope-of-works',
+  'permit-to-dig',
+  'powra',
   'early-warning',
   'ncr',
-  // New 13 — all restricted to Standard+ tier
+  'ce-notification',
+  // New 13 — all restricted
   'programme-checker',
   'cdm-checker',
   'noise-assessment',
@@ -45,6 +54,14 @@ export const RESTRICTED_FREE_TOOLS: Set<string> = new Set([
   'payment-application',
   'daywork-sheet',
   'carbon-reduction-plan',
+  // Batch 1 — Mandated H&S tools
+  'wah-assessment',
+  'wbv-assessment',
+  'riddor-report',
+  // Batch 2 — Environmental & Transport
+  'traffic-management',
+  'waste-management',
+  'invasive-species',
 ]);
 
 /** Get the monthly generation limit for a given tier and tool */
