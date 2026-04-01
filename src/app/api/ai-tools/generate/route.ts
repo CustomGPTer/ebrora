@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
       wahTemplateSlug?: string;
       wbvTemplateSlug?: string;
       riddorTemplateSlug?: string;
+      trafficTemplateSlug?: string;
+      wasteTemplateSlug?: string;
+      invasiveTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -321,6 +324,21 @@ export async function POST(req: NextRequest) {
     // Inject RIDDOR Report template slug
     if (toolSlug === 'riddor-report' && riddorTemplateSlug) {
       documentContent._riddorTemplateSlug = riddorTemplateSlug;
+    }
+
+    // Inject Traffic Management template slug
+    if (toolSlug === 'traffic-management' && trafficTemplateSlug) {
+      documentContent._trafficTemplateSlug = trafficTemplateSlug;
+    }
+
+    // Inject Waste Management template slug
+    if (toolSlug === 'waste-management' && wasteTemplateSlug) {
+      documentContent._wasteTemplateSlug = wasteTemplateSlug;
+    }
+
+    // Inject Invasive Species template slug
+    if (toolSlug === 'invasive-species' && invasiveTemplateSlug) {
+      documentContent._invasiveTemplateSlug = invasiveTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
