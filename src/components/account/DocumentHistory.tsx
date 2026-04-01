@@ -2,15 +2,77 @@
 
 import Link from 'next/link';
 
+/** Unified generation — covers both RAMS and AI tool documents */
+interface Generation {
+  id: string;
+  formatName: string;
+  source: 'RAMS' | 'AI_TOOL';
+  toolSlug: string | null;
+  status: string;
+  createdAt: string;
+  fileUrl: string | null;
+  isExpired: boolean;
+}
+
 interface DocumentHistoryProps {
-  generations: Array<{
-    id: string;
-    formatName: string;
-    status: string;
-    createdAt: string;
-    fileUrl: string | null;
-    isExpired: boolean;
-  }>;
+  generations: Generation[];
+}
+
+/** Humanise a tool slug → display label */
+const TOOL_LABELS: Record<string, string> = {
+  'coshh': 'COSHH Assessment',
+  'itp': 'ITP',
+  'manual-handling': 'Manual Handling RA',
+  'dse': 'DSE Assessment',
+  'tbt-generator': 'Toolbox Talk',
+  'confined-spaces': 'Confined Space RA',
+  'incident-report': 'Incident Report',
+  'lift-plan': 'Lift Plan',
+  'emergency-response': 'Emergency Response',
+  'quality-checklist': 'Quality Checklist',
+  'scope-of-works': 'Scope of Works',
+  'permit-to-dig': 'Permit to Dig',
+  'powra': 'POWRA',
+  'early-warning': 'Early Warning',
+  'ncr': 'NCR',
+  'ce-notification': 'CE Notification',
+  'programme-checker': 'Programme Checker',
+  'cdm-checker': 'CDM Compliance',
+  'noise-assessment': 'Noise Assessment',
+  'quote-generator': 'Quotation',
+  'safety-alert': 'Safety Alert',
+  'carbon-footprint': 'Carbon Footprint',
+  'rams-review': 'RAMS Review',
+  'delay-notification': 'Delay Notification',
+  'variation-confirmation': 'Variation Confirmation',
+  'rfi-generator': 'RFI',
+  'payment-application': 'Payment Application',
+  'daywork-sheet': 'Daywork Sheet',
+  'carbon-reduction-plan': 'Carbon Reduction Plan',
+  'wah-assessment': 'Working at Height RA',
+  'wbv-assessment': 'WBV Assessment',
+  'riddor-report': 'RIDDOR Report',
+  'traffic-management': 'Traffic Management',
+  'waste-management': 'Waste Management',
+  'invasive-species': 'Invasive Species RA',
+};
+
+function getDisplayName(gen: Generation): string {
+  if (gen.source === 'RAMS') return gen.formatName || 'RAMS';
+  if (gen.toolSlug && TOOL_LABELS[gen.toolSlug]) return TOOL_LABELS[gen.toolSlug];
+  if (gen.toolSlug) {
+    return gen.toolSlug
+      .split('-')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  }
+  return gen.formatName || 'Document';
+}
+
+function getBuilderRoute(gen: Generation): string {
+  if (gen.source === 'RAMS') return `/rams-builder?regenerate=${gen.id}`;
+  if (gen.toolSlug) return `/${gen.toolSlug}-builder`;
+  return '/';
 }
 
 export default function DocumentHistory({ generations }: DocumentHistoryProps) {
@@ -34,6 +96,8 @@ export default function DocumentHistory({ generations }: DocumentHistoryProps) {
         return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'FAILED':
         return 'bg-red-50 text-red-700 border-red-200';
+      case 'EXPIRED':
+        return 'bg-gray-50 text-gray-500 border-gray-200';
       default:
         return 'bg-gray-50 text-gray-600 border-gray-200';
     }
@@ -50,8 +114,12 @@ export default function DocumentHistory({ generations }: DocumentHistoryProps) {
         <p className="text-sm text-gray-500">
           No documents generated yet.{' '}
           <Link href="/rams-builder" className="text-[#1B5745] font-medium hover:text-[#143f33]">
-            Start building a RAMS document.
-          </Link>
+            Start building a RAMS
+          </Link>{' '}
+          or try one of our{' '}
+          <Link href="/pricing" className="text-[#1B5745] font-medium hover:text-[#143f33]">
+            35 AI document tools
+          </Link>.
         </p>
       </div>
     );
@@ -62,7 +130,8 @@ export default function DocumentHistory({ generations }: DocumentHistoryProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-100">
-            <th className="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Format</th>
+            <th className="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Document</th>
+            <th className="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide hidden md:table-cell">Source</th>
             <th className="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Status</th>
             <th className="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide hidden sm:table-cell">Date</th>
             <th className="text-right py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Actions</th>
@@ -70,8 +139,24 @@ export default function DocumentHistory({ generations }: DocumentHistoryProps) {
         </thead>
         <tbody className="divide-y divide-gray-50">
           {generations.map((gen) => (
-            <tr key={gen.id} className="hover:bg-gray-50/50 transition-colors">
-              <td className="py-3 px-3 font-medium text-gray-900">{gen.formatName}</td>
+            <tr key={`${gen.source}-${gen.id}`} className="hover:bg-gray-50/50 transition-colors">
+              <td className="py-3 px-3 font-medium text-gray-900">
+                {getDisplayName(gen)}
+                <span className="md:hidden ml-2 text-[10px] font-semibold text-gray-400 uppercase">
+                  {gen.source === 'RAMS' ? 'RAMS' : 'AI'}
+                </span>
+              </td>
+              <td className="py-3 px-3 hidden md:table-cell">
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide border ${
+                    gen.source === 'RAMS'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-blue-50 text-blue-700 border-blue-200'
+                  }`}
+                >
+                  {gen.source === 'RAMS' ? 'RAMS Builder' : 'AI Tool'}
+                </span>
+              </td>
               <td className="py-3 px-3">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${getStatusStyles(gen.status)}`}>
                   {gen.status.charAt(0).toUpperCase() + gen.status.slice(1).toLowerCase()}
@@ -96,7 +181,7 @@ export default function DocumentHistory({ generations }: DocumentHistoryProps) {
                 )}
                 {gen.status.toUpperCase() === 'FAILED' && (
                   <Link
-                    href={`/rams-builder?regenerate=${gen.id}`}
+                    href={getBuilderRoute(gen)}
                     className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-md hover:bg-gray-200 transition-colors"
                   >
                     Retry

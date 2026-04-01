@@ -23,6 +23,8 @@ interface Subscription {
 interface Generation {
   id: string;
   formatName: string;
+  source: 'RAMS' | 'AI_TOOL';
+  toolSlug: string | null;
   status: string;
   createdAt: string;
   fileUrl: string | null;
@@ -101,7 +103,7 @@ const TABS: { key: TabType; label: string; icon: React.ReactNode }[] = [
   },
 ];
 
-/** All 29 AI tools grouped by category — drives account dashboard usage grid */
+/** All 35 AI tools grouped by category — drives account dashboard usage grid */
 type DashToolCategory = 'Health & Safety' | 'Quality' | 'Commercial' | 'Programme';
 
 interface DashToolEntry { slug: string; label: string; href: string; }
@@ -122,6 +124,12 @@ const AI_TOOL_CATEGORIES: Record<DashToolCategory, DashToolEntry[]> = {
     { slug: 'noise-assessment',   label: 'Noise Assessment',      href: '/noise-assessment-builder' },
     { slug: 'safety-alert',       label: 'Safety Alert',          href: '/safety-alert-builder' },
     { slug: 'rams-review',        label: 'RAMS Review',           href: '/rams-review-builder' },
+    { slug: 'wah-assessment',     label: 'Working at Height RA',  href: '/wah-assessment-builder' },
+    { slug: 'wbv-assessment',     label: 'WBV Assessment',        href: '/wbv-assessment-builder' },
+    { slug: 'riddor-report',      label: 'RIDDOR Report',         href: '/riddor-report-builder' },
+    { slug: 'traffic-management', label: 'Traffic Management',    href: '/traffic-management-builder' },
+    { slug: 'waste-management',   label: 'Waste Management',      href: '/waste-management-builder' },
+    { slug: 'invasive-species',   label: 'Invasive Species RA',   href: '/invasive-species-builder' },
   ],
   'Quality': [
     { slug: 'itp',               label: 'ITP',                   href: '/itp-builder' },
@@ -424,7 +432,7 @@ export default function AccountDashboardClient({
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="mb-4">
                 <h2 className="text-base font-bold text-gray-900">My Documents</h2>
-                <p className="text-sm text-gray-500 mt-1">View and download your recently generated RAMS documents.</p>
+                <p className="text-sm text-gray-500 mt-1">View and download your recently generated RAMS and AI tool documents.</p>
               </div>
               <DocumentHistory generations={generations} />
             </div>
@@ -519,7 +527,7 @@ export default function AccountDashboardClient({
 
                 {/* All AI tools — grouped by category */}
                 <div className="pt-3 border-t border-gray-100">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">AI Document Generators (29 tools)</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">AI Document Generators (35 tools)</p>
                   <div className="space-y-5">
                     {DASH_ALL_CATEGORIES.map((category) => {
                       const tools = AI_TOOL_CATEGORIES[category];
