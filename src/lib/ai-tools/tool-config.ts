@@ -1264,6 +1264,119 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     textareaRows: 7,
     warningText: 'Please provide at least {min} words to describe the incident.',
   },
+
+  // ── Batch 2 — Environmental & Transport ──────────────────────────────────
+
+  'traffic-management': {
+    slug: 'traffic-management',
+    name: 'Traffic Management Plan Builder',
+    shortName: 'Traffic Management',
+    category: 'Health & Safety',
+    description:
+      'Create professional traffic management plans compliant with Chapter 8, HSG144, and the Safety at Street Works Code of Practice. Generates sign schedules, phasing plans, vehicle/pedestrian segregation, and risk assessments for highway and site operations.',
+    route: '/traffic-management-builder',
+    pageTitle: 'AI Traffic Management Plan Builder | Ebrora',
+    metaDescription:
+      'AI-powered traffic management plan builder. Chapter 8, HSG144, and NRSWA compliant. Sign schedules, phasing plans, and risk assessments.',
+    documentLabel: 'Traffic Management Plan',
+    descriptionPlaceholder:
+      'E.g. "Temporary lane closure on the A580 East Lancashire Road for kerb replacement works. 400m working length, nearside lane closure with taper..."',
+    descriptionHeading: 'Describe the Traffic Management Requirements',
+    descriptionHint: 'Include the road/site, type of works, road classification, traffic volumes if known, duration, and any special requirements like pedestrian diversions or emergency access.',
+    descriptionExample:
+      'Temporary lane closure on the A580 East Lancashire Road (dual carriageway, 40mph limit, ~18,000 AADT) for 200m of kerb replacement works. Nearside lane closure with 50m taper, works duration 5 days. Pedestrian footway maintained throughout. Night works not required. Bus stop relocation needed for 2 stops within the working length.',
+    keySections: [
+      'Works Description & Road Details',
+      'TM Layout & Sign Schedule',
+      'Phasing & Sequencing',
+      'Vehicle / Pedestrian Segregation',
+      'Speed Management',
+      'Emergency Access',
+      'Risk Assessment',
+      'Operative Roles & Responsibilities',
+    ],
+    accentColor: '065F46',
+    iconType: 'clipboard',
+    premiumTemplate: true,
+    maxWords: 150,
+    minWords: 15,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the traffic management requirements.',
+  },
+
+  'waste-management': {
+    slug: 'waste-management',
+    name: 'Waste Management Plan Builder',
+    shortName: 'Waste Management',
+    category: 'Health & Safety',
+    description:
+      'Create site waste management plans compliant with EPA 1990 s.34 duty of care requirements. Generates waste stream forecasts, segregation strategies, carrier/facility registers, transfer note tracking, and waste minimisation targets. Mandatory in Wales and Scotland.',
+    route: '/waste-management-builder',
+    pageTitle: 'AI Site Waste Management Plan Builder | Ebrora',
+    metaDescription:
+      'AI-powered site waste management plan builder. EPA 1990 compliant with waste forecasting, duty of care chain, and carrier register.',
+    documentLabel: 'Site Waste Management Plan',
+    descriptionPlaceholder:
+      'E.g. "Residential development of 120 dwellings on a greenfield site. Earthworks, foundations, substructure, superstructure, and external works over 18 months..."',
+    descriptionHeading: 'Describe the Project and Waste Sources',
+    descriptionHint: 'Include the project type, scale, key materials, demolition if any, ground conditions, and any contamination. The more you provide, the more accurate the waste forecast.',
+    descriptionExample:
+      'New-build residential development of 120 dwellings on a 4.5 hectare greenfield site in Leeds. Earthworks (25,000m³ cut, 18,000m³ fill), RC foundations, timber frame superstructure, brick/render external walls. No demolition. 18-month programme. Some localised made ground requiring classification before disposal.',
+    keySections: [
+      'Project Overview',
+      'Waste Stream Forecast',
+      'Waste Hierarchy Compliance',
+      'Segregation Strategy',
+      'Carrier & Facility Register',
+      'Transfer Note Log',
+      'Waste Minimisation Targets',
+      'Monitoring & Reporting',
+    ],
+    accentColor: '0F766E',
+    iconType: 'clipboard',
+    premiumTemplate: true,
+    maxWords: 150,
+    minWords: 15,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the project and waste sources.',
+  },
+
+  'invasive-species': {
+    slug: 'invasive-species',
+    name: 'Invasive Species Management Plan Builder',
+    shortName: 'Invasive Species',
+    category: 'Health & Safety',
+    description:
+      'Create invasive species management plans compliant with the Wildlife & Countryside Act 1981 and Environmental Protection Act 1990. Covers species identification, treatment methodology, biosecurity protocols, disposal routes, and monitoring schedules for Japanese knotweed, giant hogweed, Himalayan balsam, and other Schedule 9 species.',
+    route: '/invasive-species-builder',
+    pageTitle: 'AI Invasive Species Management Plan Builder | Ebrora',
+    metaDescription:
+      'AI-powered invasive species management plan builder. Wildlife & Countryside Act 1981 compliant. Japanese knotweed, giant hogweed, and Schedule 9 species.',
+    documentLabel: 'Invasive Species Management Plan',
+    descriptionPlaceholder:
+      'E.g. "Japanese knotweed identified along 80m of the southern boundary of a development site. Mature stands up to 3m high, rhizome spread estimated at 7m..."',
+    descriptionHeading: 'Describe the Invasive Species and Site',
+    descriptionHint: 'Include the species, extent of infestation, location on site, proximity to works/watercourses, and any treatment already attempted.',
+    descriptionExample:
+      'Japanese knotweed (Fallopia japonica) identified along 80m of the southern boundary of a residential development site in Warrington. Mature stands up to 3m high with rhizome spread estimated at 7m from visible growth. Within 15m of the River Mersey. Planning condition requires eradication plan before groundworks commence. No previous treatment attempted.',
+    keySections: [
+      'Species Identification',
+      'Extent & Location Mapping',
+      'Legal Framework',
+      'Treatment Methodology',
+      'Biosecurity Protocol',
+      'Disposal Route',
+      'Monitoring Schedule',
+      'Completion Criteria',
+    ],
+    accentColor: '166534',
+    iconType: 'clipboard',
+    premiumTemplate: true,
+    maxWords: 150,
+    minWords: 15,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the invasive species and site.',
+  },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -1284,6 +1397,8 @@ export const AI_TOOL_ORDER: AiToolSlug[] = [
   'daywork-sheet', 'carbon-reduction-plan',
   // Batch 1 — Mandated
   'wah-assessment', 'wbv-assessment', 'riddor-report',
+  // Batch 2 — Environmental & Transport
+  'traffic-management', 'waste-management', 'invasive-species',
 ];
 
 /** Tools grouped by category — for homepage grid and account dashboard */
@@ -1293,6 +1408,7 @@ export const AI_TOOLS_BY_CATEGORY: Record<string, AiToolSlug[]> = {
     'incident-report', 'lift-plan', 'emergency-response', 'permit-to-dig',
     'powra', 'cdm-checker', 'noise-assessment', 'safety-alert', 'rams-review',
     'wah-assessment', 'wbv-assessment', 'riddor-report',
+    'traffic-management', 'waste-management', 'invasive-species',
   ],
   'Quality': [
     'itp', 'quality-checklist', 'ncr',

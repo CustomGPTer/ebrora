@@ -547,6 +547,36 @@ export async function generateAiToolDocument(
     }
   }
 
+  if (toolSlug === 'traffic-management') {
+    const slug = (content as any)._trafficTemplateSlug;
+    if (slug) {
+      const { buildTrafficTemplateDocument } = await import('./templates/traffic-management-templates');
+      const doc = await buildTrafficTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
+  }
+
+  if (toolSlug === 'waste-management') {
+    const slug = (content as any)._wasteTemplateSlug;
+    if (slug) {
+      const { buildWasteTemplateDocument } = await import('./templates/waste-management-templates');
+      const doc = await buildWasteTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
+  }
+
+  if (toolSlug === 'invasive-species') {
+    const slug = (content as any)._invasiveTemplateSlug;
+    if (slug) {
+      const { buildInvasiveTemplateDocument } = await import('./templates/invasive-species-templates');
+      const doc = await buildInvasiveTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
+  }
+
   if (toolSlug === 'safety-alert') {
     const { buildSafetyAlertDocument } = await import('./templates/new-tools-templates');
     const doc = await buildSafetyAlertDocument(content as any);

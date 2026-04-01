@@ -47,7 +47,11 @@ export type AiToolSlug =
   // ── Batch 1 — Mandated tools ─────────────────────────────────────────────
   | 'wah-assessment'
   | 'wbv-assessment'
-  | 'riddor-report';
+  | 'riddor-report'
+  // ── Batch 2 — Environmental & Transport ──────────────────────────────────
+  | 'traffic-management'
+  | 'waste-management'
+  | 'invasive-species';
 
 /** Metadata for each AI tool */
 export interface AiToolConfig {

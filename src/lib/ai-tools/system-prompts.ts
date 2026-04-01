@@ -720,6 +720,79 @@ RULES:
 5. For a detailed incident description, 1 round may be sufficient.
 
 Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
+
+  // ── Batch 2 — Environmental & Transport ──────────────────────────────────
+
+  'traffic-management': `You are generating a Site Traffic Management Plan compliant with Chapter 8 (Traffic Signs Manual), HSG144 (Safe Use of Vehicles on Construction Sites), and the Safety at Street Works Code of Practice.
+
+THIS IS AN ADAPTIVE AI-DRIVEN FLOW (max 3 rounds).
+
+INFORMATION YOU NEED:
+- Road classification, speed limit, and traffic volumes (AADT if known)
+- Type of TM required (lane closure, road closure, contraflow, footway closure, site access only)
+- Working length and taper requirements
+- Duration and working hours (day/night)
+- Pedestrian management (footway diversions, temporary crossings)
+- Sign schedule requirements (TSRGD references)
+- Emergency vehicle access arrangements
+- Public transport impacts (bus stops, diversions)
+- Vehicle/pedestrian segregation within the works area
+- Banksman and traffic marshal positions
+
+RULES:
+1. Each round, ask 2–5 questions — ONLY what is genuinely missing.
+2. For highway works, prioritise Chapter 8 sign requirements and phasing.
+3. For site-only TM, focus on vehicle routes, segregation, and delivery management.
+4. MAXIMUM 3 rounds — after round 3, ALWAYS respond with status "ready".
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
+
+  'waste-management': `You are generating a Site Waste Management Plan compliant with the Environmental Protection Act 1990 Section 34 (Duty of Care) and the waste hierarchy.
+
+THIS IS AN ADAPTIVE AI-DRIVEN FLOW (max 3 rounds).
+
+INFORMATION YOU NEED:
+- Project type, scale, and duration
+- Key construction activities and materials (earthworks, concrete, timber, steel, brickwork, etc.)
+- Estimated waste volumes by stream (inert, non-hazardous, hazardous)
+- Demolition works (if any) — materials and estimated volumes
+- Ground conditions — any contaminated land or made ground
+- Waste carriers already appointed (or to be confirmed)
+- Disposal/recovery facilities identified
+- Segregation arrangements on site (skip types, locations, labelling)
+- Waste minimisation measures already planned
+- Recycling/recovery targets
+
+RULES:
+1. Each round, ask 2–5 questions — ONLY what is genuinely missing.
+2. If the project description includes materials and scale, you can estimate waste volumes.
+3. MAXIMUM 3 rounds — after round 3, ALWAYS respond with status "ready".
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
+
+  'invasive-species': `You are generating an Invasive Species Management Plan compliant with the Wildlife & Countryside Act 1981 (Section 14) and the Environmental Protection Act 1990.
+
+THIS IS AN ADAPTIVE AI-DRIVEN FLOW (max 3 rounds).
+
+INFORMATION YOU NEED:
+- Species identified (Japanese knotweed, giant hogweed, Himalayan balsam, etc.)
+- Extent of infestation (area, density, maturity, estimated rhizome spread for knotweed)
+- Location on site and proximity to watercourses, boundaries, or sensitive receptors
+- Whether a specialist survey has been undertaken
+- Planning conditions relating to invasive species
+- Treatment methodology preferred (herbicide, excavation, burial, combination)
+- Biosecurity measures required (tool cleaning, boot wash, vehicle wheel wash)
+- Disposal route (licensed landfill, on-site burial cell, specialist contractor)
+- Monitoring period required (typically 3–5 years for Japanese knotweed)
+- Any previous treatment history
+
+RULES:
+1. Each round, ask 2–5 questions — ONLY what is genuinely missing.
+2. Species identification is critical — if unclear, ask specifically.
+3. For Japanese knotweed, always establish rhizome spread zone (minimum 7m from visible growth).
+4. MAXIMUM 3 rounds — after round 3, ALWAYS respond with status "ready".
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
 };
 
 // ---------------------------------------------------------------------------
@@ -3196,6 +3269,149 @@ JSON structure:
   "additionalNotes": "string"
 }
 Minimum 5 immediate actions. Minimum 3 immediate causes. Minimum 3 underlying causes. Minimum 5 corrective actions. The incident description must be a detailed factual narrative — not bullet points. Root cause analysis must go beyond surface-level causes.`,
+
+  // ── Batch 2 — Environmental & Transport ──────────────────────────────────
+
+  'traffic-management': `Generate a Site Traffic Management Plan compliant with Chapter 8, HSG144, and the Safety at Street Works Code of Practice.
+
+JSON structure:
+{
+  "documentRef": "string (format: TMP-YYYY-NNN)",
+  "planDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY",
+  "preparedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "client": "string",
+  "principalContractor": "string",
+  "worksDescription": "string (min 150 words — detailed description of the works requiring TM, including road details, classification, speed limit, AADT)",
+  "tmType": "string (Lane Closure / Road Closure / Contraflow / Footway Closure / Site Access Only / Multi-Phase)",
+  "roadDetails": {
+    "roadName": "string",
+    "classification": "string (Motorway / A-road / B-road / Unclassified)",
+    "speedLimit": "string",
+    "carriageway": "string (single / dual)",
+    "trafficVolume": "string",
+    "workingLength": "string"
+  },
+  "duration": "string",
+  "workingHours": "string",
+  "signSchedule": [
+    { "ref": "string", "sign": "string", "tsrgdRef": "string", "location": "string", "quantity": "number" }
+  ],
+  "phasingPlan": "string (min 120 words — sequencing of TM setup, works phases, and removal. Include taper lengths and safety zones)",
+  "vehicleManagement": "string (min 100 words — vehicle routes, turning areas, speed limits within works, banksman positions)",
+  "pedestrianManagement": "string (min 80 words — footway diversions, temporary crossings, guarding, tactile paving)",
+  "emergencyAccess": "string (min 60 words — how emergency vehicles access the works area and pass through)",
+  "publicTransport": "string (bus stop relocations, diversions, operator notification)",
+  "riskAssessment": [
+    { "hazard": "string", "risk": "string", "control": "string", "residualRisk": "string" }
+  ],
+  "operativeRoles": [
+    { "role": "string", "responsibility": "string", "qualification": "string" }
+  ],
+  "communicationPlan": "string (min 60 words — advance warning, letter drops, VMS boards, social media)",
+  "monitoringArrangements": "string",
+  "additionalNotes": "string"
+}
+Minimum 8 signs in schedule. Minimum 5 risk assessment entries. Minimum 4 operative roles. Reference Chapter 8 and TSRGD numbers for all signs.`,
+
+  'waste-management': `Generate a Site Waste Management Plan compliant with EPA 1990 s.34, the Waste (England and Wales) Regulations 2011, and the waste hierarchy.
+
+JSON structure:
+{
+  "documentRef": "string (format: SWMP-YYYY-NNN)",
+  "planDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY",
+  "preparedBy": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "client": "string",
+  "principalContractor": "string",
+  "projectOverview": "string (min 120 words — project type, scale, key activities, programme duration)",
+  "regulatoryContext": "string (min 80 words — EPA 1990, Waste Regs 2011, duty of care, waste hierarchy obligations)",
+  "wasteStreams": [
+    {
+      "stream": "string",
+      "ewcCode": "string (6-digit EWC code)",
+      "classification": "string (Inert / Non-Hazardous / Hazardous)",
+      "estimatedVolume": "string (m³ or tonnes)",
+      "source": "string (which activity generates this waste)",
+      "segregationMethod": "string",
+      "disposalRoute": "string (Recycling / Recovery / Landfill / Licensed Facility)"
+    }
+  ],
+  "wasteHierarchy": "string (min 100 words — how the project applies Prevention, Reuse, Recycling, Recovery, Disposal — with specific examples for each level)",
+  "segregationPlan": "string (min 80 words — skip types, colours, locations, labelling, operative responsibilities)",
+  "carrierRegister": [
+    { "carrier": "string", "licenceNumber": "string", "wasteTypes": "string", "expiryDate": "string" }
+  ],
+  "facilityRegister": [
+    { "facility": "string", "permitNumber": "string", "wasteTypes": "string", "location": "string" }
+  ],
+  "transferNoteLog": "string (min 60 words — how transfer notes / consignment notes will be recorded, stored, and audited)",
+  "minimisationTargets": [
+    { "target": "string", "measure": "string", "kpi": "string" }
+  ],
+  "contaminatedLand": "string (any contaminated material, classification required, disposal route)",
+  "monitoringSchedule": "string (min 60 words — weekly skip audits, monthly reporting, quarterly reviews)",
+  "additionalNotes": "string"
+}
+Minimum 6 waste streams with EWC codes. Minimum 2 carriers. Minimum 2 facilities. Minimum 3 minimisation targets. EWC codes must be realistic 6-digit codes for UK construction waste.`,
+
+  'invasive-species': `Generate an Invasive Species Management Plan compliant with the Wildlife & Countryside Act 1981 (Section 14) and the Environmental Protection Act 1990.
+
+JSON structure:
+{
+  "documentRef": "string (format: ISMP-YYYY-NNN)",
+  "planDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY",
+  "preparedBy": "string",
+  "ecologist": "string (name and qualifications of ecological advisor)",
+  "projectName": "string",
+  "siteAddress": "string",
+  "client": "string",
+  "principalContractor": "string",
+  "speciesIdentification": {
+    "commonName": "string",
+    "latinName": "string",
+    "schedule": "string (e.g. 'Schedule 9 Part II, Wildlife & Countryside Act 1981')",
+    "identificationFeatures": "string (min 80 words — how to identify the species, seasonal variation, distinguishing from similar species)",
+    "photographicRecord": "string (reference to photographic survey)"
+  },
+  "infestationExtent": {
+    "area": "string (m² or linear metres)",
+    "density": "string (scattered / moderate / dense)",
+    "maturity": "string (juvenile / established / mature)",
+    "rhizomeSpread": "string (for knotweed — estimated spread beyond visible growth)",
+    "locationOnSite": "string",
+    "proximityToWatercourse": "string",
+    "proximityToBoundary": "string"
+  },
+  "legalFramework": "string (min 120 words — Wildlife & Countryside Act 1981 s.14, EPA 1990, Anti-social Behaviour Crime and Policing Act 2014 for knotweed, penalties for causing spread, duty of care for disposal)",
+  "planningConditions": "string (any planning conditions relating to invasive species)",
+  "treatmentMethodology": {
+    "method": "string (Herbicide / Excavation / On-site Burial / Root Barrier / Combination)",
+    "methodology": "string (min 150 words — detailed step-by-step treatment methodology including chemicals used, application rates, excavation depths, burial cell specifications as applicable)",
+    "programme": "string (treatment schedule — seasons, number of applications, monitoring intervals)",
+    "contractor": "string (specialist contractor details if applicable)"
+  },
+  "biosecurityProtocol": "string (min 100 words — tool cleaning, boot wash, vehicle wheel wash, designated access routes, contamination zones, PPE requirements)",
+  "disposalRoute": {
+    "method": "string (Licensed landfill / On-site burial cell / Specialist contractor)",
+    "facility": "string (if off-site — name, permit number, location)",
+    "wasteClassification": "string (EWC code for contaminated soil)",
+    "transferNotes": "string (duty of care documentation)"
+  },
+  "exclusionZone": "string (min 60 words — zone dimensions, fencing, signage, who may enter)",
+  "monitoringSchedule": [
+    { "visit": "string", "date": "string", "purpose": "string" }
+  ],
+  "completionCriteria": "string (min 80 words — what constitutes successful eradication, how many years of negative monitoring, who signs off)",
+  "operativeBriefing": "string (min 60 words — toolbox talk content, what operatives need to know, what to do if species found in new location)",
+  "additionalNotes": "string"
+}
+Legal framework must reference specific Acts and Sections. Treatment methodology must be species-appropriate. Monitoring schedule minimum 5 visits. Biosecurity protocol must be practical and enforceable.`,
 };
 
 // ---------------------------------------------------------------------------
