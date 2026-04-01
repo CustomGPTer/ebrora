@@ -36,7 +36,7 @@ export default function Page() { return (
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
       <div className="max-w-[1200px] mx-auto px-6 pt-4">
-        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Health & Safety", href: "/products" }, { label: "Working at Height Assessment Builder" }]} />
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/" }, { label: "Health & Safety" }, { label: "Working at Height Assessment Builder" }]} />
       </div>
       <WahBuilderClient />
     </>
