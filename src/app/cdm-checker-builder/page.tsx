@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import CdmCheckerBuilderClient from './components/CdmCheckerBuilderClient';
+import { BreadcrumbNav } from '@/components/shared/BreadcrumbNav';
 
 export const metadata: Metadata = {
   title: { absolute: 'AI CDM 2015 Compliance Checker | 4 Templates | Ebrora' },
@@ -27,6 +28,9 @@ export default function Page() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }} />
+      <div className="max-w-[1200px] mx-auto px-6 pt-4">
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Health & Safety", href: "/products" }, { label: "CDM Compliance Checker" }]} />
+      </div>
       <CdmCheckerBuilderClient />
     </>
   );
