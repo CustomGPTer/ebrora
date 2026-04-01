@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -51,6 +51,9 @@ export async function POST(req: NextRequest) {
       scopeTemplateSlug?: string;
       earlyWarningTemplateSlug?: string;
       quoteTemplateSlug?: string;
+      wahTemplateSlug?: string;
+      wbvTemplateSlug?: string;
+      riddorTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -303,6 +306,21 @@ export async function POST(req: NextRequest) {
     // Inject Quotation Builder template slug into content so docx-generator can route it
     if (toolSlug === 'quote-generator' && quoteTemplateSlug) {
       documentContent._quoteTemplateSlug = quoteTemplateSlug;
+    }
+
+    // Inject WAH Assessment template slug
+    if (toolSlug === 'wah-assessment' && wahTemplateSlug) {
+      documentContent._wahTemplateSlug = wahTemplateSlug;
+    }
+
+    // Inject WBV Assessment template slug
+    if (toolSlug === 'wbv-assessment' && wbvTemplateSlug) {
+      documentContent._wbvTemplateSlug = wbvTemplateSlug;
+    }
+
+    // Inject RIDDOR Report template slug
+    if (toolSlug === 'riddor-report' && riddorTemplateSlug) {
+      documentContent._riddorTemplateSlug = riddorTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
