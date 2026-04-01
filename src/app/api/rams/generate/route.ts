@@ -18,6 +18,7 @@ import {
   getWordCountChecks,
   buildRetryPrompt,
 } from '@/lib/rams/rich-body-text';
+import { wrapGenerateInput, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -115,12 +116,13 @@ export async function POST(req: NextRequest) {
       throw new Error(`No generation prompt for template: ${templateSlug}`);
     }
 
-    // Build the user message with description + all Q&A
-    const answersText = answers
-      .map((a) => `Q: ${a.question}\nA: ${a.answer}`)
-      .join('\n\n');
+    // Build the user message with description + all Q&A (sanitised)
+    const descPatterns = detectInjectionPatterns(workDescription);
+    if (descPatterns.length > 0) {
+      logInjectionAttempt(session.user.id, 'rams-generate', 'description', descPatterns);
+    }
 
-    const userMessage = `WORK DESCRIPTION (provided by user):\n${workDescription}\n\nINTERVIEW ANSWERS (${answers.length} questions answered):\n${answersText}`;
+    const userMessage = wrapGenerateInput(workDescription, answers);
 
     // AI Call 2 with retry loop for word count validation
     let documentContent: any = null;
