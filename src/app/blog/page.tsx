@@ -28,6 +28,28 @@ export const metadata: Metadata = {
     },
 };
 
+const blogSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Ebrora Blog — Construction Safety & RAMS Guides',
+  description:
+    'Expert guides on construction safety, RAMS templates, risk assessments and method statements. Practical tips for UK site managers and civil engineers.',
+  url: 'https://www.ebrora.com/blog',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Ebrora',
+    url: 'https://www.ebrora.com',
+  },
+};
+
 export default function BlogPage() {
-    return <BlogListingClient posts={POSTS} categories={BLOG_CATEGORIES} />;
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+        />
+        <BlogListingClient posts={POSTS} categories={BLOG_CATEGORIES} />
+      </>
+    );
 }
