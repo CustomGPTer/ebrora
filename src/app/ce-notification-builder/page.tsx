@@ -1,21 +1,11 @@
 import type { Metadata } from 'next';
-import AiToolBuilderClient from '@/components/ai-tools/AiToolBuilderClient';
-import { AI_TOOL_CONFIGS } from '@/lib/ai-tools/tool-config';
+import CeBuilderClient from './components/CeBuilderClient';
 
 export const metadata: Metadata = {
-  title: { absolute: 'AI Compensation Event Notification Generator | Ebrora' },
-  description: 'AI-powered NEC compensation event notification generator. Clause references, impact assessment, entitlement argument.',
+  title: { absolute: 'AI Compensation Event Notification Builder | 3 Templates | Ebrora' },
+  description: 'AI-powered compensation event notification builder with 3 professional templates for UK construction.',
   alternates: { canonical: 'https://www.ebrora.com/ce-notification-builder' },
-  openGraph: {
-    title: 'AI Compensation Event Notification Generator | Ebrora',
-    description: 'AI-powered NEC compensation event notification generator. Clause references, impact assessment, entitlement argument.',
-    url: 'https://www.ebrora.com/ce-notification-builder',
-    type: 'website',
-    images: [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }],
-  },
+  openGraph: { title: 'AI Compensation Event Notification Builder | Ebrora', description: 'Compensation Event Notification with 3 templates.', url: 'https://www.ebrora.com/ce-notification-builder', type: 'website', images: [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }] },
 };
 
-export default function Page() {
-  const toolConfig = AI_TOOL_CONFIGS['ce-notification'];
-  return <AiToolBuilderClient toolConfig={toolConfig} />;
-}
+export default function Page() { return <CeBuilderClient />; }
