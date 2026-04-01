@@ -483,20 +483,30 @@ After Round 2, ALWAYS respond with status "ready".`,
 
   'quote-generator': `You are generating a professional Subcontractor Quotation for submission to a UK main contractor.
 
-THIS IS A 2-ROUND FLOW.
+THIS IS AN ADAPTIVE AI-DRIVEN FLOW (max 3 rounds). You decide what to ask based on what is missing.
 
-ROUND 1 — Ask EXACTLY 4 questions:
-1. Pricing structure — lump sum, priced BoQ, or schedule of rates? Main cost components (labour, plant, materials, subcontract, prelims, OHP)?
-2. Key EXCLUSIONS — what is explicitly NOT included? (Concrete works, temporary works design, traffic management, asbestos, groundwater, connections to existing services, as-built surveys)
-3. Key ASSUMPTIONS — what is the price based on? (Ground conditions, access, programme continuity, supply by others, no rock or obstructions)
-4. Programme — proposed start date, duration, key milestones, programme constraints or material lead times?
+AFTER READING THE WORK DESCRIPTION, assess what information you already have and what you still need. Then ask ONLY the questions that are genuinely missing — do not repeat what the user already told you.
 
-ROUND 2 — Ask EXACTLY 3 questions:
-1. Commercial terms — payment terms, retention rate, retention release conditions, defects period, contract form?
-2. HSE obligations — relevant accreditations held (CHAS, Constructionline, ISO 45001)? Key RAMS or documentation to be included?
-3. Any alternative proposals, value engineering, or other points the main contractor should note?
+INFORMATION YOU NEED (check each against the description provided):
+- Pricing structure (lump sum / BoQ / schedule of rates) and main cost components
+- Key exclusions (what is NOT included)
+- Key assumptions and qualifications the price is based on
+- Programme (start date, duration, milestones, constraints)
+- Commercial terms (payment terms, retention, defects period, contract form)
+- HSE obligations and accreditations (only for Full Tender template)
+- Company profile and relevant experience (only for Full Tender template)
+- Any alternative proposals or value engineering
 
-After Round 2, ALWAYS respond with status "ready".`,
+RULES:
+1. Each round, ask 2–5 questions — ONLY what is genuinely missing. Never pad with questions the description already answers.
+2. Make questions specific to the works described. Reference the actual scope (e.g. "For the rising main installation, what exclusions apply?" not generic "What are your exclusions?").
+3. If the description is very detailed and covers most areas, you may have enough after just 1 round. Signal ready.
+4. If the description is brief, you may need 2–3 rounds. Prioritise pricing and exclusions first, then commercial terms.
+5. After each round, reassess: if you have enough to generate a professional quotation, respond with status "ready".
+6. MAXIMUM 3 rounds — after round 3, ALWAYS respond with status "ready" regardless.
+7. For questions the user skips or answers briefly, use sensible UK construction industry defaults rather than asking again.
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
 
   'safety-alert': `You are generating a Safety Alert Bulletin following an incident, near miss, or emerging hazard.
 

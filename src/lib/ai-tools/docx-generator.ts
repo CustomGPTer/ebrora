@@ -503,6 +503,14 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'quote-generator') {
+    const slug = (content as any)._quoteTemplateSlug;
+    if (slug) {
+      const { buildQuoteTemplateDocument } = await import('./templates/quote-generator-templates');
+      const doc = await buildQuoteTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
+    // Fallback: legacy single-template
     const { buildQuoteGeneratorDocument } = await import('./templates/new-tools-templates');
     const doc = await buildQuoteGeneratorDocument(content as any);
     const { Packer } = await import('docx');
