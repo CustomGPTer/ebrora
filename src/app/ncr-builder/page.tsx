@@ -45,7 +45,7 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
       <div className="max-w-[1200px] mx-auto px-6 pt-4">
-        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Quality", href: "/products" }, { label: "NCR Generator" }]} />
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/" }, { label: "Quality" }, { label: "NCR Generator" }]} />
       </div>
       <AiToolBuilderClient toolConfig={toolConfig} />
     </>
