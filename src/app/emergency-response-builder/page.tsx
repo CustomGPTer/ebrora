@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ErpBuilderClient from './components/ErpBuilderClient';
+import { BreadcrumbNav } from '@/components/shared/BreadcrumbNav';
 
 export const metadata: Metadata = {
   title: { absolute: 'AI Emergency Response Plan Generator | 4 Templates | Ebrora' },
@@ -14,4 +15,35 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() { return <ErpBuilderClient />; }
+
+const toolSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Ebrora AI Emergency Response Plan Generator',
+  applicationCategory: 'BusinessApplication',
+  description: 'AI-powered emergency response plan generator with 4 professional templates. Fire, medical, environmental, and site-specific scenarios — CDM compliant.',
+  url: 'https://www.ebrora.com/emergency-response-builder',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'GBP',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Ebrora',
+    url: 'https://www.ebrora.com',
+  },
+};
+export default function Page() { return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
+      />
+      <div className="max-w-[1200px] mx-auto px-6 pt-4">
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Health & Safety", href: "/products" }, { label: "Emergency Response Plan Generator" }]} />
+      </div>
+      <ErpBuilderClient />
+    </>
+  ); }
