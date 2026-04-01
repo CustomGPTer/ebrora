@@ -17,8 +17,7 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
       '/product-images/noise-assessment-templates/preview-ebrora-standard-p1.jpg',
       '/product-images/noise-assessment-templates/preview-ebrora-standard-p2.jpg',
       '/product-images/noise-assessment-templates/preview-ebrora-standard-p3.jpg',
-      '/product-images/noise-assessment-templates/preview-ebrora-standard-p4.jpg',
-      '/product-images/noise-assessment-templates/preview-ebrora-standard-p5.jpg',
+      '/product-images/noise-assessment-templates/preview-ebrora-standard-p4.jpg'
     ],
     keySections: [
       'Green Branded Cover Page',
@@ -31,7 +30,7 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
       'Mitigation Measures Hierarchy',
       'Noise Monitoring Plan',
       'Vibration Screening (BS 5228-2)',
-      'Working Hours Analysis',
+      'Working Hours Analysis'
     ],
   },
 
@@ -45,9 +44,7 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
     thumbnailPath: '/product-images/noise-assessment-templates/thumb-section-61.jpg',
     previewPaths: [
       '/product-images/noise-assessment-templates/preview-section-61-p1.jpg',
-      '/product-images/noise-assessment-templates/preview-section-61-p2.jpg',
-      '/product-images/noise-assessment-templates/preview-section-61-p3.jpg',
-      '/product-images/noise-assessment-templates/preview-section-61-p4.jpg',
+      '/product-images/noise-assessment-templates/preview-section-61-p2.jpg'
     ],
     keySections: [
       'Applicant & Site Details (LA Format)',
@@ -58,7 +55,7 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
       'Proposed Noise Limits at Boundary',
       'Monitoring Methodology & Locations',
       'Complaint Handling Procedure',
-      'Section 61 Declaration',
+      'Section 61 Declaration'
     ],
   },
 
@@ -72,9 +69,7 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
     thumbnailPath: '/product-images/noise-assessment-templates/thumb-monitoring-report.jpg',
     previewPaths: [
       '/product-images/noise-assessment-templates/preview-monitoring-report-p1.jpg',
-      '/product-images/noise-assessment-templates/preview-monitoring-report-p2.jpg',
-      '/product-images/noise-assessment-templates/preview-monitoring-report-p3.jpg',
-      '/product-images/noise-assessment-templates/preview-monitoring-report-p4.jpg',
+      '/product-images/noise-assessment-templates/preview-monitoring-report-p2.jpg'
     ],
     keySections: [
       'Monitoring Locations & Grid References',
@@ -85,7 +80,7 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
       'Weather Conditions Log',
       'Corrective Actions for Exceedances',
       'Trend Analysis',
-      'Compliance Summary',
+      'Compliance Summary'
     ],
   },
 
@@ -99,8 +94,7 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
     thumbnailPath: '/product-images/noise-assessment-templates/thumb-resident-communication.jpg',
     previewPaths: [
       '/product-images/noise-assessment-templates/preview-resident-communication-p1.jpg',
-      '/product-images/noise-assessment-templates/preview-resident-communication-p2.jpg',
-      '/product-images/noise-assessment-templates/preview-resident-communication-p3.jpg',
+      '/product-images/noise-assessment-templates/preview-resident-communication-p2.jpg'
     ],
     keySections: [
       'Plain English Works Summary',
@@ -110,7 +104,7 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
       'What We\'re Doing to Reduce Noise',
       'Project Timeline (Noisy Phases)',
       'How to Make a Complaint',
-      'Dedicated Contact Details',
+      'Dedicated Contact Details'
     ],
   },
 };
