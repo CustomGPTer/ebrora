@@ -21,7 +21,7 @@ const resources = [
   },
   {
     title: "Toolbox Talks",
-    description: "Free downloadable safety talks across 27 categories",
+    description: "Free downloadable safety talks across 60 categories",
     href: "/toolbox-talks",
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

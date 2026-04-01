@@ -22,7 +22,7 @@ const products = [
   },
   {
     title: "AI Document Tools",
-    description: "25+ tools — COSHH, ITPs, lift plans, permits, and more",
+    description: "35+ tools — COSHH, ITPs, lift plans, permits, and more",
     href: "/",
     badge: null,
     icon: (
