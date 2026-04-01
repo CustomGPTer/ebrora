@@ -1,6 +1,6 @@
 // =============================================================================
 // AI Tools — Tool Configuration
-// Central config for all 29 AI document generators.
+// Central config for all 35 AI document generators.
 // Each tool has one output template (unlike RAMS which has 10).
 // New 13 tools use premiumTemplate: true for enhanced docx output.
 // =============================================================================
@@ -1384,7 +1384,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
 // Ordered arrays — existing 16 first, then new 13
 // ─────────────────────────────────────────────────────────────
 
-/** Ordered array of all 29 tool slugs for display */
+/** Ordered array of all 35 tool slugs for display */
 export const AI_TOOL_ORDER: AiToolSlug[] = [
   // Existing 16
   'coshh', 'itp', 'manual-handling', 'dse', 'tbt-generator',

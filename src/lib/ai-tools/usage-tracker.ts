@@ -2,7 +2,7 @@
 // AI Tools — Usage Tracker
 // Tracks generations per tool, per user, per month.
 // Completely separate from RAMS Builder usage tracking.
-// Covers all 29 tools (16 existing + 13 new).
+// Covers all 35 tools (16 existing + 13 new + 6 batch additions).
 // =============================================================================
 import prisma from '@/lib/prisma';
 import { getAiToolLimitByTier } from './constants';
@@ -101,7 +101,7 @@ export async function checkAiToolUsageLimit(
   };
 }
 
-/** All 29 tool slugs — used by getAllAiToolUsage and account dashboard */
+/** All 35 tool slugs — used by getAllAiToolUsage and account dashboard */
 export const ALL_AI_TOOL_SLUGS: AiToolSlug[] = [
   // Existing 16
   'coshh',
@@ -134,6 +134,14 @@ export const ALL_AI_TOOL_SLUGS: AiToolSlug[] = [
   'payment-application',
   'daywork-sheet',
   'carbon-reduction-plan',
+  // Batch 1 — Mandated H&S tools
+  'wah-assessment',
+  'wbv-assessment',
+  'riddor-report',
+  // Batch 2 — Environmental & Transport
+  'traffic-management',
+  'waste-management',
+  'invasive-species',
 ];
 
 export async function getAllAiToolUsage(

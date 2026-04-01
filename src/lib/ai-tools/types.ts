@@ -1,6 +1,6 @@
 // =============================================================================
 // AI Tools — Shared Type Definitions
-// All 29 AI tools share these types.
+// All 35 AI tools share these types.
 // RAMS Builder remains untouched — its own types stay in /lib/rams/types.ts
 // =============================================================================
 
@@ -11,7 +11,7 @@ export type AiToolCategory =
   | 'Commercial'
   | 'Programme';
 
-/** All 29 AI tool slugs (excludes RAMS which has its own system) */
+/** All 35 AI tool slugs (excludes RAMS which has its own system) */
 export type AiToolSlug =
   // ── Existing 16 ──────────────────────────────────────────────────────────
   | 'coshh'
