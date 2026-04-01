@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
       powraTemplateSlug?: string;
       scopeTemplateSlug?: string;
       earlyWarningTemplateSlug?: string;
+      quoteTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -297,6 +298,11 @@ export async function POST(req: NextRequest) {
     // Inject Early Warning template slug into content so docx-generator can route it
     if (toolSlug === 'early-warning' && earlyWarningTemplateSlug) {
       documentContent._earlyWarningTemplateSlug = earlyWarningTemplateSlug;
+    }
+
+    // Inject Quotation Builder template slug into content so docx-generator can route it
+    if (toolSlug === 'quote-generator' && quoteTemplateSlug) {
+      documentContent._quoteTemplateSlug = quoteTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
