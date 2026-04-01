@@ -18,7 +18,7 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
       '/product-images/manual-handling-templates/preview-ebrora-standard-p2.jpg',
       '/product-images/manual-handling-templates/preview-ebrora-standard-p3.jpg',
       '/product-images/manual-handling-templates/preview-ebrora-standard-p4.jpg',
-      '/product-images/manual-handling-templates/preview-ebrora-standard-p5.jpg',
+      '/product-images/manual-handling-templates/preview-ebrora-standard-p5.jpg'
     ],
     keySections: [
       'Green Branded Cover Page',
@@ -30,7 +30,7 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
       'RAG-Rated Risk Scoring Matrix',
       'Hierarchy of Control Measures',
       'Mechanical Aid Alternatives',
-      'Residual Risk Rating & Monitoring',
+      'Residual Risk Rating & Monitoring'
     ],
   },
 
@@ -44,9 +44,7 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
     thumbnailPath: '/product-images/manual-handling-templates/thumb-mac-assessment.jpg',
     previewPaths: [
       '/product-images/manual-handling-templates/preview-mac-assessment-p1.jpg',
-      '/product-images/manual-handling-templates/preview-mac-assessment-p2.jpg',
-      '/product-images/manual-handling-templates/preview-mac-assessment-p3.jpg',
-      '/product-images/manual-handling-templates/preview-mac-assessment-p4.jpg',
+      '/product-images/manual-handling-templates/preview-mac-assessment-p2.jpg'
     ],
     keySections: [
       'MAC Factor Scoring Table',
@@ -56,7 +54,7 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
       'Grip Quality & Floor Surface',
       'Carrying Distance Score',
       'Overall MAC Score & Priority Level',
-      'Factor-Linked Control Measures',
+      'Factor-Linked Control Measures'
     ],
   },
 
@@ -70,9 +68,7 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
     thumbnailPath: '/product-images/manual-handling-templates/thumb-rapp-assessment.jpg',
     previewPaths: [
       '/product-images/manual-handling-templates/preview-rapp-assessment-p1.jpg',
-      '/product-images/manual-handling-templates/preview-rapp-assessment-p2.jpg',
-      '/product-images/manual-handling-templates/preview-rapp-assessment-p3.jpg',
-      '/product-images/manual-handling-templates/preview-rapp-assessment-p4.jpg',
+      '/product-images/manual-handling-templates/preview-rapp-assessment-p2.jpg'
     ],
     keySections: [
       'Push/Pull Operation Description',
@@ -83,7 +79,7 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
       'Initial vs Sustained Force',
       'RAPP Factor Scoring',
       'Push/Pull-Specific Controls',
-      'Mechanical Alternatives',
+      'Mechanical Alternatives'
     ],
   },
 
@@ -97,8 +93,7 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
     thumbnailPath: '/product-images/manual-handling-templates/thumb-training-briefing.jpg',
     previewPaths: [
       '/product-images/manual-handling-templates/preview-training-briefing-p1.jpg',
-      '/product-images/manual-handling-templates/preview-training-briefing-p2.jpg',
-      '/product-images/manual-handling-templates/preview-training-briefing-p3.jpg',
+      '/product-images/manual-handling-templates/preview-training-briefing-p2.jpg'
     ],
     keySections: [
       'Safe Lifting Technique Steps',
@@ -108,7 +103,7 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
       'When to Ask for Help',
       'Mechanical Aids Available',
       'Reporting Procedure',
-      'Attendance Register',
+      'Attendance Register'
     ],
   },
 };
