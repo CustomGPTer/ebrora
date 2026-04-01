@@ -458,8 +458,7 @@ export default function HomepageClient({
           <p className="hp-hero__subtitle">
             25+ AI document generators, 1,500+ free toolbox talks, 1,000+ downloadable
             templates, and a complete RAMS Builder — all on one platform built for
-            UK construction. From RAMS and COSHH to method statements, ITPs, and
-            site inductions, everything your site team needs is here.
+            UK construction. Free to use. Just sign in and start generating.
           </p>
 
           {/* Site-wide search */}
