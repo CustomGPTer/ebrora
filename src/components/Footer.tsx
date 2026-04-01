@@ -6,9 +6,9 @@ export function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300 pt-14 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 lg:gap-10">
           {/* Brand Column */}
-          <div>
+          <div className="col-span-2 md:col-span-4 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <span
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#1B5B50] flex items-center justify-center text-white text-xs sm:text-sm font-bold shrink-0"
@@ -24,7 +24,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-xs sm:text-sm text-gray-400 leading-relaxed mb-4 sm:mb-5">
-              Professional Excel templates built specifically for construction and civil engineering professionals.
+              AI-powered document generators and professional Excel templates built for UK construction and civil engineering teams.
             </p>
             <div className="flex items-center gap-2 sm:gap-3">
               <a
@@ -63,6 +63,28 @@ export function Footer() {
             </div>
           </div>
 
+          {/* Products Column */}
+          <div>
+            <h4 className="text-white text-xs sm:text-sm font-semibold uppercase tracking-wider mb-3 sm:mb-4">Products</h4>
+            <div className="flex flex-col gap-2 sm:gap-2.5">
+              <Link href="/rams-builder" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">RAMS Builder</Link>
+              <Link href="/products" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">AI Tools</Link>
+              <Link href="/products" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Excel Templates</Link>
+              <Link href="/pricing" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Pricing</Link>
+            </div>
+          </div>
+
+          {/* Resources Column */}
+          <div>
+            <h4 className="text-white text-xs sm:text-sm font-semibold uppercase tracking-wider mb-3 sm:mb-4">Resources</h4>
+            <div className="flex flex-col gap-2 sm:gap-2.5">
+              <Link href="/free-templates" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Free Templates</Link>
+              <Link href="/toolbox-talks" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Toolbox Talks</Link>
+              <Link href="/blog" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Blog</Link>
+              <Link href="/tools" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Free Tools</Link>
+            </div>
+          </div>
+
           {/* Company Column */}
           <div>
             <h4 className="text-white text-xs sm:text-sm font-semibold uppercase tracking-wider mb-3 sm:mb-4">Company</h4>
@@ -78,7 +100,6 @@ export function Footer() {
           <div>
             <h4 className="text-white text-xs sm:text-sm font-semibold uppercase tracking-wider mb-3 sm:mb-4">Legal</h4>
             <div className="flex flex-col gap-2 sm:gap-2.5">
-              <Link href="/faq" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Help Centre</Link>
               <Link href="/refund-policy" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Refund Policy</Link>
               <Link href="/terms-of-service" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
               <Link href="/privacy-policy" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
