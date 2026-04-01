@@ -23,6 +23,7 @@ import {
   incrementAiToolUsage,
 } from '@/lib/ai-tools';
 import { getConversationPrompt } from '@/lib/ai-tools/system-prompts';
+import { wrapDescription, wrapAnswers, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import type {
   AiToolSlug,
   AiToolChatRequest,
@@ -225,12 +226,18 @@ export async function POST(req: NextRequest) {
     // Build system prompt
     const systemPrompt = getConversationPrompt(toolSlug);
 
+    // Injection detection — log suspicious patterns but don't block
+    const descPatterns = detectInjectionPatterns(description);
+    if (descPatterns.length > 0) {
+      logInjectionAttempt(userId, toolSlug, 'description', descPatterns);
+    }
+
     // Build messages array with conversation history
     const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
       { role: 'system', content: systemPrompt },
       {
         role: 'user',
-        content: `Document type: ${toolConfig.documentLabel}\n\nWork description:\n${description}`,
+        content: wrapDescription(description, toolConfig.documentLabel),
       },
     ];
 
@@ -250,9 +257,16 @@ export async function POST(req: NextRequest) {
           const answersText = round.answers
             .map((a) => `${a.id}: ${a.answer}`)
             .join('\n');
+
+          // Log injection patterns in answers
+          const answerPatterns = detectInjectionPatterns(answersText);
+          if (answerPatterns.length > 0) {
+            logInjectionAttempt(userId, toolSlug, `answers-round-${round.roundNumber}`, answerPatterns);
+          }
+
           messages.push({
             role: 'user',
-            content: `Answers to round ${round.roundNumber}:\n${answersText}`,
+            content: wrapAnswers(round.roundNumber, answersText),
           });
         }
       }
