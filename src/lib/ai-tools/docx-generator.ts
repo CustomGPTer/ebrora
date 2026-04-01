@@ -433,6 +433,13 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'ce-notification') {
+    const slug = (content as any)._ceTemplateSlug;
+    if (slug) {
+      const { buildCeTemplateDocument } = await import('./templates/ce-notification-templates');
+      const doc = await buildCeTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
     const { buildCeNotificationDocument } = await import('./templates/ce-notification-template');
     const doc = await buildCeNotificationDocument(content as any);
     const { Packer } = await import('docx');
@@ -599,6 +606,13 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'delay-notification') {
+    const slug = (content as any)._delayTemplateSlug;
+    if (slug) {
+      const { buildDelayTemplateDocument } = await import('./templates/delay-notification-templates');
+      const doc = await buildDelayTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
     const { buildDelayNotificationDocument } = await import('./templates/new-tools-templates');
     const doc = await buildDelayNotificationDocument(content as any);
     const { Packer } = await import('docx');
@@ -606,6 +620,13 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'variation-confirmation') {
+    const slug = (content as any)._variationTemplateSlug;
+    if (slug) {
+      const { buildVariationTemplateDocument } = await import('./templates/variation-confirmation-templates');
+      const doc = await buildVariationTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
     const { buildVariationConfirmationDocument } = await import('./templates/new-tools-templates');
     const doc = await buildVariationConfirmationDocument(content as any);
     const { Packer } = await import('docx');
@@ -613,6 +634,13 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'rfi-generator') {
+    const slug = (content as any)._rfiTemplateSlug;
+    if (slug) {
+      const { buildRfiTemplateDocument } = await import('./templates/rfi-generator-templates');
+      const doc = await buildRfiTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
     const { buildRfiGeneratorDocument } = await import('./templates/new-tools-templates');
     const doc = await buildRfiGeneratorDocument(content as any);
     const { Packer } = await import('docx');

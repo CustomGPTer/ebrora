@@ -602,6 +602,7 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     ],
     accentColor: '1D4ED8',
     iconType: 'pound',
+    premiumTemplate: true,
     maxWords: 150,
     minWords: 10,
     textareaRows: 6,
