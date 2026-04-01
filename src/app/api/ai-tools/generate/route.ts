@@ -12,6 +12,7 @@ import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
 import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt, getEarlyWarningTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
+import { wrapGenerateInput, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import type { AiToolSlug } from '@/lib/ai-tools';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -195,12 +196,13 @@ export async function POST(req: NextRequest) {
       ? getEarlyWarningTemplateGenerationPrompt(earlyWarningTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
-    // Build user message with description + all Q&A
-    const answersText = answers
-      .map((a) => `Q: ${a.question}\nA: ${a.answer}`)
-      .join('\n\n');
+    // Build user message with description + all Q&A (sanitised)
+    const descPatterns = detectInjectionPatterns(workDescription || '');
+    if (descPatterns.length > 0) {
+      logInjectionAttempt(session.user.id, toolSlug, 'generate-description', descPatterns);
+    }
 
-    const userMessage = `WORK DESCRIPTION (provided by user):\n${workDescription}\n\nINTERVIEW ANSWERS (${answers.length} questions answered):\n${answersText}`;
+    const userMessage = wrapGenerateInput(workDescription || '', answers);
 
     // AI Call with retry loop
     let documentContent: any = null;
