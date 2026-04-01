@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import PowraBuilderClient from './components/PowraBuilderClient';
+import { BreadcrumbNav } from '@/components/shared/BreadcrumbNav';
 
 export const metadata: Metadata = {
   title: { absolute: 'AI POWRA Generator | 4 Templates | Point of Work Risk Assessment | Ebrora' },
@@ -14,4 +15,35 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() { return <PowraBuilderClient />; }
+
+const toolSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Ebrora AI POWRA Generator',
+  applicationCategory: 'BusinessApplication',
+  description: 'AI-powered POWRA generator with 4 professional templates. Hazard matrix, RAG rating, stop conditions, team sign-on — MHSW 1999 compliant.',
+  url: 'https://www.ebrora.com/powra-builder',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'GBP',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Ebrora',
+    url: 'https://www.ebrora.com',
+  },
+};
+export default function Page() { return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
+      />
+      <div className="max-w-[1200px] mx-auto px-6 pt-4">
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Health & Safety", href: "/products" }, { label: "POWRA Generator" }]} />
+      </div>
+      <PowraBuilderClient />
+    </>
+  ); }
