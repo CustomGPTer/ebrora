@@ -53,7 +53,7 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
       <div className="max-w-[1200px] mx-auto px-6 pt-4">
-        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Health & Safety", href: "/products" }, { label: "Toolbox Talk Generator" }]} />
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/" }, { label: "Health & Safety" }, { label: "Toolbox Talk Generator" }]} />
       </div>
       <TbtBuilderClient />
     </>
