@@ -30,13 +30,34 @@ export const metadata: Metadata = {
   },
 };
 
+const productsSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Premium Construction Excel Templates',
+  description:
+    'Browse our full range of professional Excel templates for UK construction and civil engineering. RAMS, COSHH, Gantt charts, inspection registers and more.',
+  url: 'https://www.ebrora.com/products',
+  numberOfItems: PRODUCTS.length,
+  publisher: {
+    '@type': 'Organization',
+    name: 'Ebrora',
+    url: 'https://www.ebrora.com',
+  },
+};
+
 export default function ProductsPage() {
   return (
-    <SearchProvider>
-      <HeroSection products={PRODUCTS} />
-      <TrustBar />
-      <ProductSection products={PRODUCTS} categories={CATEGORIES} />
-      <FeaturesSection />
-    </SearchProvider>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productsSchema) }}
+      />
+      <SearchProvider>
+        <HeroSection products={PRODUCTS} />
+        <TrustBar />
+        <ProductSection products={PRODUCTS} categories={CATEGORIES} />
+        <FeaturesSection />
+      </SearchProvider>
+    </>
   );
 }
