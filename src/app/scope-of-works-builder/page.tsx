@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ScopeBuilderClient from './components/ScopeBuilderClient';
+import { BreadcrumbNav } from '@/components/shared/BreadcrumbNav';
 
 export const metadata: Metadata = {
   title: { absolute: 'AI Scope of Works Builder | 3 Templates | Ebrora' },
@@ -44,6 +45,9 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
+      <div className="max-w-[1200px] mx-auto px-6 pt-4">
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "Commercial", href: "/products" }, { label: "Scope of Works" }]} />
+      </div>
       <ScopeBuilderClient />
     </>
   );
