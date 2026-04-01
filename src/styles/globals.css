@@ -4251,6 +4251,12 @@ p {
      gap: 20px;
 }
 
+.template-grid-4 {
+     display: grid;
+     grid-template-columns: repeat(4, 1fr);
+     gap: 20px;
+}
+
 /* --- Card (button reset + styling) --- */
 .tpl-card {
      all: unset;
@@ -4295,6 +4301,22 @@ p {
      height: 100%;
      object-fit: cover;
      object-position: top;
+}
+
+/* Detail level badge */
+.tpl-card-detail-badge {
+     position: absolute;
+     top: 6px;
+     left: 6px;
+     padding: 2px 8px;
+     border-radius: 4px;
+     font-size: 11px;
+     font-weight: 700;
+     color: #fff;
+     letter-spacing: 0.3px;
+     text-transform: uppercase;
+     pointer-events: none;
+     z-index: 2;
 }
 
 /* Preview pill (replaces old page count pill) */
@@ -4440,12 +4462,14 @@ p {
 /* 1024px and below: 3 columns */
 @media (max-width: 1024px) {
      .template-grid-5 { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+     .template-grid-4 { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
 
 /* 768px and below: 2 columns */
 @media (max-width: 768px) {
      .template-grid-5 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
      .template-grid-3 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+     .template-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
      .template-picker-section { max-width: 100%; }
      .tpl-card-desc { -webkit-line-clamp: 2; }
 }
@@ -4454,6 +4478,7 @@ p {
 @media (max-width: 480px) {
      .template-grid-5 { grid-template-columns: 1fr; gap: 12px; }
      .template-grid-3 { grid-template-columns: 1fr; gap: 12px; }
+     .template-grid-4 { grid-template-columns: 1fr; gap: 12px; }
      .tpl-card-title { font-size: 14px; }
      .tpl-card-desc { font-size: 12px; -webkit-line-clamp: 3; }
 }
