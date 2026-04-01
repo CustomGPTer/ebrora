@@ -57,7 +57,7 @@ export default function RamsBuilderPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ramsBuilderSchema) }}
       />
       <div className="max-w-[1200px] mx-auto px-6 pt-4">
-        <BreadcrumbNav items={[{ label: "AI Tools", href: "/products" }, { label: "RAMS", href: "/products" }, { label: "RAMS Builder" }]} />
+        <BreadcrumbNav items={[{ label: "AI Tools", href: "/" }, { label: "RAMS" }, { label: "RAMS Builder" }]} />
       </div>
       <RamsLandingClient />
     </>
