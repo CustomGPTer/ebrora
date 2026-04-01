@@ -45,6 +45,12 @@ interface AiToolBuilderClientProps {
   wbvTemplateSlug?: string;
   /** For RIDDOR Report multi-template — passed to generate route */
   riddorTemplateSlug?: string;
+  /** For Traffic Management multi-template — passed to generate route */
+  trafficTemplateSlug?: string;
+  /** For Waste Management multi-template — passed to generate route */
+  wasteTemplateSlug?: string;
+  /** For Invasive Species multi-template — passed to generate route */
+  invasiveTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -109,7 +115,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -348,6 +354,9 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           ...(wahTemplateSlug ? { wahTemplateSlug } : {}),
           ...(wbvTemplateSlug ? { wbvTemplateSlug } : {}),
           ...(riddorTemplateSlug ? { riddorTemplateSlug } : {}),
+          ...(trafficTemplateSlug ? { trafficTemplateSlug } : {}),
+          ...(wasteTemplateSlug ? { wasteTemplateSlug } : {}),
+          ...(invasiveTemplateSlug ? { invasiveTemplateSlug } : {}),
         }),
       });
 
@@ -368,7 +377,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
