@@ -43,7 +43,11 @@ export type AiToolSlug =
   | 'rfi-generator'
   | 'payment-application'
   | 'daywork-sheet'
-  | 'carbon-reduction-plan';
+  | 'carbon-reduction-plan'
+  // ── Batch 1 — Mandated tools ─────────────────────────────────────────────
+  | 'wah-assessment'
+  | 'wbv-assessment'
+  | 'riddor-report';
 
 /** Metadata for each AI tool */
 export interface AiToolConfig {

@@ -636,6 +636,90 @@ ROUND 2 — Ask EXACTLY 3 questions:
 3. Net zero target — target date, science-based or company-defined? Interim 2030 target (% reduction vs baseline)?
 
 After Round 2, ALWAYS respond with status "ready".`,
+
+  // ── Batch 1 — Mandated tools ─────────────────────────────────────────────
+
+  'wah-assessment': `You are generating a Working at Height Risk Assessment compliant with the Work at Height Regulations 2005.
+
+THIS IS AN ADAPTIVE AI-DRIVEN FLOW (max 3 rounds). You decide what to ask based on what is missing.
+
+AFTER READING THE WORK DESCRIPTION, assess what information you already have and what you still need. Then ask ONLY the questions that are genuinely missing.
+
+INFORMATION YOU NEED (check each against the description provided):
+- Exact working height and any variations across the task
+- Access method (scaffold, MEWP, podium, ladder, rope access) and justification under the hierarchy of control
+- Duration and frequency of the WAH activity
+- Edge protection arrangements and fall arrest systems
+- Fragile surface risks (rooflight, asbestos cement, corroded metalwork)
+- Falling object risks to those below
+- Weather restrictions and wind speed limits
+- Rescue plan — how will a fallen/suspended operative be recovered within minutes?
+- Competency requirements (IPAF, PASMA, harness training, scaffold inspection)
+- Specific environmental hazards (overhead power lines, adjacent traffic, confined areas)
+
+RULES:
+1. Each round, ask 2–5 questions — ONLY what is genuinely missing. Never pad with questions the description already answers.
+2. Make questions specific to the actual task described. Reference the real scope.
+3. If the description is detailed, you may have enough after 1 round. Signal ready.
+4. MAXIMUM 3 rounds — after round 3, ALWAYS respond with status "ready".
+5. For anything skipped, use sensible UK construction defaults.
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
+
+  'wbv-assessment': `You are generating a Whole Body Vibration Assessment compliant with the Control of Vibration at Work Regulations 2005.
+
+THIS IS AN ADAPTIVE AI-DRIVEN FLOW (max 3 rounds). You decide what to ask based on what is missing.
+
+AFTER READING THE WORK DESCRIPTION, assess what information you already have and what you still need.
+
+INFORMATION YOU NEED:
+- Machine types, models, and ages (vibration magnitude varies significantly by machine)
+- Manufacturer-declared vibration values (m/s²) if known — or the AI will use typical values
+- Daily exposure duration per operative (actual seat time, not shift length)
+- Ground conditions (smooth tarmac vs rough terrain vs broken ground significantly affects WBV)
+- Seat type and condition (suspension seat, mechanical seat, no suspension)
+- Number of operatives affected
+- Any existing control measures (job rotation, speed limits, ground preparation, rest breaks)
+- Health surveillance arrangements already in place
+- Any operatives with pre-existing back conditions
+
+RULES:
+1. Each round, ask 2–5 questions — ONLY what is genuinely missing.
+2. If machine types and exposure durations are given, you may need only 1 round.
+3. MAXIMUM 3 rounds — after round 3, ALWAYS respond with status "ready".
+4. Use HSE-published typical vibration magnitudes where manufacturer data not provided.
+5. Always calculate A(8) and compare against EAV (0.5 m/s²) and ELV (1.15 m/s²).
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
+
+  'riddor-report': `You are generating a RIDDOR Report compliant with the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013.
+
+THIS IS AN ADAPTIVE AI-DRIVEN FLOW (max 3 rounds). You decide what to ask based on what is missing.
+
+AFTER READING THE INCIDENT DESCRIPTION, assess what information you already have and what you still need.
+
+INFORMATION YOU NEED:
+- RIDDOR category (the AI should determine this from the description: death / specified injury / over-7-day / dangerous occurrence / occupational disease)
+- Injured person details (name, age, occupation, employer, length of service)
+- Exact date, time, and location of the incident
+- Nature and severity of injury (fracture type, amputation, hospitalisation, etc.)
+- Detailed sequence of events leading to the incident
+- Immediate causes (unsafe act, unsafe condition, equipment failure)
+- Underlying/root causes (supervision gap, training gap, RAMS non-compliance, time pressure)
+- Immediate actions taken after the incident
+- Witness details (not names, but how many, their roles)
+- Whether the scene was preserved
+- HSE notification details (if already reported: reference number, date, method)
+- Whether the injured person has returned to work
+
+RULES:
+1. Each round, ask 2–5 questions — ONLY what is genuinely missing.
+2. The incident description often contains most of what you need. Don't re-ask what's already stated.
+3. Prioritise injury classification and root cause analysis questions.
+4. MAXIMUM 3 rounds — after round 3, ALWAYS respond with status "ready".
+5. For a detailed incident description, 1 round may be sufficient.
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
 };
 
 // ---------------------------------------------------------------------------
@@ -2932,6 +3016,186 @@ JSON structure:
   "additionalNotes": "string"
 }
 Net zero commitment MUST reference 2050. Board sign-off mandatory per PPN 06/21. Minimum 3 completed initiatives. Minimum 5 planned initiatives. Minimum 5 Scope 3 categories.`,
+
+  // ── Batch 1 — Mandated tools ─────────────────────────────────────────────
+
+  'wah-assessment': `Generate a Working at Height Risk Assessment compliant with the Work at Height Regulations 2005.
+
+JSON structure:
+{
+  "documentRef": "string (format: WAH-YYYY-NNN)",
+  "assessmentDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY (max 12 months from assessment)",
+  "assessor": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "client": "string",
+  "principalContractor": "string",
+  "taskDescription": "string (min 150 words — detailed description of the WAH activity, referencing WAH Regs 2005 Reg 4 duty to avoid, prevent, mitigate)",
+  "location": "string",
+  "workingHeight": "string (e.g. '12m above ground level')",
+  "accessMethod": "string (scaffold / MEWP / podium / ladder / rope access / other)",
+  "accessJustification": "string (min 80 words — justification under hierarchy of control: why this access method was selected over alternatives)",
+  "duration": "string",
+  "frequency": "string",
+  "hierarchyOfControl": {
+    "avoidance": "string (min 60 words — can the work be done at ground level? If not, why not? Reg 6(2))",
+    "prevention": "string (min 80 words — measures to prevent falls: edge protection, scaffolding, MEWP with guardrails. Reg 6(3), Schedule 1-6)",
+    "mitigation": "string (min 60 words — measures to minimise distance/consequences of fall: safety nets, harnesses, airbags. Reg 6(4))"
+  },
+  "hazards": [
+    {
+      "ref": "string",
+      "hazard": "string",
+      "whoAtRisk": "string",
+      "likelihoodBefore": "number (1-5)",
+      "severityBefore": "number (1-5)",
+      "riskRatingBefore": "string (L/M/H)",
+      "controlMeasures": "string (min 40 words)",
+      "likelihoodAfter": "number (1-5)",
+      "severityAfter": "number (1-5)",
+      "riskRatingAfter": "string (L/M/H)"
+    }
+  ],
+  "equipmentRequired": [
+    { "item": "string", "specification": "string", "inspectionRequired": "string" }
+  ],
+  "rescuePlan": "string (min 120 words — specific rescue procedure: how will a suspended/fallen operative be recovered? Time target, equipment, trained personnel. Reg 9)",
+  "competencyRequirements": [
+    { "role": "string", "qualification": "string", "verified": "string" }
+  ],
+  "weatherRestrictions": "string (min 60 words — wind speed limits, rain/ice policy, visibility requirements. Reg 4(1)(b), Schedule 4)",
+  "emergencyProcedures": "string (min 80 words — emergency contacts, nearest A&E, first aid arrangements, communication method at height)",
+  "additionalControls": "string",
+  "signOff": [
+    { "role": "string", "name": "string" }
+  ]
+}
+Minimum 6 hazards in risk matrix. Minimum 4 equipment items. Minimum 3 competency requirements. All prose fields must be substantive — no single-sentence entries. Reference WAH Regs 2005 Schedule numbers where applicable.`,
+
+  'wbv-assessment': `Generate a Whole Body Vibration Assessment compliant with the Control of Vibration at Work Regulations 2005.
+
+JSON structure:
+{
+  "documentRef": "string (format: WBV-YYYY-NNN)",
+  "assessmentDate": "DD/MM/YYYY",
+  "reviewDate": "DD/MM/YYYY",
+  "assessor": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "client": "string",
+  "principalContractor": "string",
+  "assessmentScope": "string (min 100 words — overview of what work/equipment is being assessed and why)",
+  "regulatoryContext": "string (min 80 words — reference Control of Vibration at Work Regs 2005, L140 guidance, EAV 0.5 m/s², ELV 1.15 m/s²)",
+  "operatives": [
+    {
+      "name": "string (or 'Operative 1' etc.)",
+      "role": "string",
+      "experienceYears": "number"
+    }
+  ],
+  "equipmentAssessments": [
+    {
+      "ref": "string",
+      "machineType": "string",
+      "makeModel": "string",
+      "age": "string",
+      "seatType": "string (suspension / mechanical / none)",
+      "seatCondition": "string",
+      "vibrationMagnitude": "number (m/s² — manufacturer-declared or HSE typical value)",
+      "vibrationSource": "string (manufacturer SDS / HSE database / field measurement)",
+      "dailyExposureHours": "number",
+      "a8Calculation": "number (m/s² — calculated A(8) = magnitude × √(exposure/8))",
+      "eavExceeded": "boolean",
+      "elvExceeded": "boolean",
+      "riskRating": "string (LOW / MEDIUM / HIGH)",
+      "groundConditions": "string",
+      "typicalTasks": "string"
+    }
+  ],
+  "exposureSummary": "string (min 100 words — summary of A(8) values across all equipment, comparison against EAV and ELV, identification of highest-risk activities)",
+  "controlMeasures": [
+    { "ref": "string", "measure": "string", "responsibility": "string", "targetDate": "string" }
+  ],
+  "controlNarrative": "string (min 120 words — detailed explanation of control strategy: job rotation, speed limits, ground preparation, machine selection, seat maintenance, rest breaks)",
+  "healthSurveillance": "string (min 100 words — health surveillance requirements under Reg 7: who needs it, what it involves, frequency, record keeping, referral criteria)",
+  "actionPlan": [
+    { "action": "string", "priority": "string (HIGH/MEDIUM/LOW)", "responsible": "string", "targetDate": "string" }
+  ],
+  "monitoringArrangements": "string (min 60 words — how exposure will be monitored ongoing, trigger for reassessment)",
+  "additionalNotes": "string"
+}
+Minimum 2 equipment assessments. Minimum 4 control measures. Minimum 3 action plan items. A(8) calculations must be mathematically correct. Always state EAV (0.5 m/s²) and ELV (1.15 m/s²) explicitly.`,
+
+  'riddor-report': `Generate a RIDDOR Report compliant with the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013.
+
+JSON structure:
+{
+  "documentRef": "string (format: RIDDOR-YYYY-NNN)",
+  "reportDate": "DD/MM/YYYY",
+  "reporter": "string",
+  "reporterRole": "string",
+  "projectName": "string",
+  "siteAddress": "string",
+  "client": "string",
+  "principalContractor": "string",
+  "riddorClassification": "string (Death / Specified Injury / Over-7-Day Incapacitation / Dangerous Occurrence / Occupational Disease)",
+  "riddorJustification": "string (min 60 words — why this classification applies, referencing RIDDOR 2013 Schedule 1, 2, or 3 as appropriate)",
+  "hseNotification": {
+    "reported": "boolean",
+    "referenceNumber": "string",
+    "dateNotified": "string",
+    "method": "string (Online F2508 / Telephone / Written)"
+  },
+  "incidentDetails": {
+    "date": "DD/MM/YYYY",
+    "time": "HH:MM",
+    "exactLocation": "string",
+    "activityUnderway": "string",
+    "weatherConditions": "string",
+    "lightingConditions": "string"
+  },
+  "injuredPerson": {
+    "name": "string",
+    "age": "number",
+    "gender": "string",
+    "occupation": "string",
+    "employer": "string",
+    "lengthOfService": "string",
+    "trainingRecords": "string",
+    "natureOfInjury": "string",
+    "bodyPartAffected": "string",
+    "hospitalised": "boolean",
+    "hospitalName": "string",
+    "returnedToWork": "boolean",
+    "daysAbsent": "number"
+  },
+  "incidentDescription": "string (min 250 words — detailed factual narrative of exactly what happened, step by step, from the moments before the incident to the aftermath. Include positions, actions, equipment, and environmental factors)",
+  "immediateActions": [
+    "string (minimum 5 — first aid, scene preservation, notifications, stand-down, equipment isolation)"
+  ],
+  "rootCauseAnalysis": {
+    "immediateCauses": ["string (min 3 — the direct physical causes: unsafe act, unsafe condition, equipment failure)"],
+    "underlyingCauses": ["string (min 3 — system failures: supervision gap, training deficiency, RAMS non-compliance, inadequate planning, resource pressure)"],
+    "rootCause": "string (min 100 words — the fundamental organisational or systemic failure that allowed the incident chain to develop)"
+  },
+  "correctiveActions": [
+    {
+      "ref": "string",
+      "action": "string",
+      "type": "string (Immediate / Short-term / Long-term)",
+      "responsible": "string",
+      "targetDate": "string",
+      "status": "string (Open / In Progress / Complete)"
+    }
+  ],
+  "lessonsLearned": "string (min 120 words — key lessons, what should change, how this will be communicated across the organisation)",
+  "distributionList": ["string (minimum 4 — who receives this report: client, PC safety team, HSE, company director)"],
+  "witnessStatementsSummary": "string (min 60 words — summary of witness accounts without identifying individuals)",
+  "scenePreservation": "string (was the scene preserved? Photos taken? Evidence secured?)",
+  "additionalNotes": "string"
+}
+Minimum 5 immediate actions. Minimum 3 immediate causes. Minimum 3 underlying causes. Minimum 5 corrective actions. The incident description must be a detailed factual narrative — not bullet points. Root cause analysis must go beyond surface-level causes.`,
 };
 
 // ---------------------------------------------------------------------------

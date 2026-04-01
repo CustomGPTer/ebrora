@@ -517,6 +517,36 @@ export async function generateAiToolDocument(
     return Buffer.from(await Packer.toBuffer(doc));
   }
 
+  if (toolSlug === 'wah-assessment') {
+    const slug = (content as any)._wahTemplateSlug;
+    if (slug) {
+      const { buildWahTemplateDocument } = await import('./templates/wah-assessment-templates');
+      const doc = await buildWahTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
+  }
+
+  if (toolSlug === 'wbv-assessment') {
+    const slug = (content as any)._wbvTemplateSlug;
+    if (slug) {
+      const { buildWbvTemplateDocument } = await import('./templates/wbv-assessment-templates');
+      const doc = await buildWbvTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
+  }
+
+  if (toolSlug === 'riddor-report') {
+    const slug = (content as any)._riddorTemplateSlug;
+    if (slug) {
+      const { buildRiddorTemplateDocument } = await import('./templates/riddor-report-templates');
+      const doc = await buildRiddorTemplateDocument(content as any, slug);
+      const { Packer } = await import('docx');
+      return Buffer.from(await Packer.toBuffer(doc));
+    }
+  }
+
   if (toolSlug === 'safety-alert') {
     const { buildSafetyAlertDocument } = await import('./templates/new-tools-templates');
     const doc = await buildSafetyAlertDocument(content as any);

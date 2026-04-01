@@ -1149,6 +1149,121 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     textareaRows: 7,
     warningText: 'Please provide at least {min} words to describe your organisation.',
   },
+
+  // ── Batch 1 — Mandated tools ─────────────────────────────────────────────
+
+  'wah-assessment': {
+    slug: 'wah-assessment',
+    name: 'Working at Height Assessment Builder',
+    shortName: 'WAH Assessment',
+    category: 'Health & Safety',
+    description:
+      'Create legally compliant working at height risk assessments under the Work at Height Regulations 2005. Generates hierarchy of control analysis, hazard identification, equipment requirements, rescue plans, and competency records — ready for the site safety file.',
+    route: '/wah-assessment-builder',
+    pageTitle: 'AI Working at Height Assessment Builder | Ebrora',
+    metaDescription:
+      'AI-powered working at height risk assessment builder. WAH Regs 2005 compliant with hierarchy of control, rescue plan, and competency matrix. HSE audit-ready.',
+    documentLabel: 'Working at Height Assessment',
+    descriptionPlaceholder:
+      'E.g. "Installation of cladding panels at 12m height on the east elevation using a 45m cherry picker MEWP. 3-man team including banksman. Adjacent to live traffic on the A6..."',
+    descriptionHeading: 'Describe the Working at Height Activity',
+    descriptionHint: 'Include the task, height, access method, location, duration, and any nearby hazards. The more detail you provide, the more tailored your assessment will be.',
+    descriptionExample:
+      'Installation of cladding panels at 12m height on the east elevation of Building 3 using a Genie Z-45 articulating boom MEWP. 3-man team: 1 MEWP operator (IPAF 3b), 1 banksman, 1 ground-level labourer. Adjacent to live A6 carriageway with concrete jersey barriers in place. Works over 3 days, 07:00–17:00.',
+    keySections: [
+      'Task & Location Details',
+      'Height & Access Method',
+      'Hierarchy of Control (Avoid / Prevent / Mitigate)',
+      'Hazard Identification & Risk Matrix',
+      'Equipment Requirements',
+      'Rescue Plan',
+      'Competency Requirements',
+      'Weather Restrictions',
+      'Emergency Procedures',
+    ],
+    accentColor: '065F46',
+    iconType: 'hardhat',
+    premiumTemplate: true,
+    maxWords: 150,
+    minWords: 15,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the working at height activity.',
+  },
+
+  'wbv-assessment': {
+    slug: 'wbv-assessment',
+    name: 'Whole Body Vibration Assessment Builder',
+    shortName: 'WBV Assessment',
+    category: 'Health & Safety',
+    description:
+      'Create whole body vibration assessments under the Control of Vibration at Work Regulations 2005. Generates equipment exposure profiles, A(8) daily exposure calculations against EAV (0.5 m/s²) and ELV (1.15 m/s²) thresholds, control measures, and health surveillance requirements.',
+    route: '/wbv-assessment-builder',
+    pageTitle: 'AI Whole Body Vibration Assessment Builder | Ebrora',
+    metaDescription:
+      'AI-powered WBV assessment builder. Control of Vibration at Work Regs 2005 compliant with A(8) exposure calculations, EAV/ELV thresholds, and health surveillance.',
+    documentLabel: 'Whole Body Vibration Assessment',
+    descriptionPlaceholder:
+      'E.g. "Excavator operators using 13T and 20T tracked excavators for bulk earthworks over a 6-week programme. Operatives working 10-hour shifts with approximately 7 hours seat time per day..."',
+    descriptionHeading: 'Describe the Vibration Exposure',
+    descriptionHint: 'Include machine types, operator roles, typical daily exposure duration, ground conditions, and any existing control measures already in place.',
+    descriptionExample:
+      'Three excavator operators using Volvo EC140 (13T) and Komatsu PC210 (20T) tracked excavators for bulk earthworks at Salford WwTW. 10-hour shifts with approximately 7 hours seat time per day. Working on mixed ground — clay over sandstone with occasional rock. Programme duration 6 weeks. Machines fitted with suspension seats.',
+    keySections: [
+      'Operative & Equipment Details',
+      'Vibration Magnitude Data',
+      'Daily Exposure Duration',
+      'A(8) Exposure Calculation',
+      'EAV / ELV Threshold Comparison',
+      'Control Measures',
+      'Health Surveillance Requirements',
+      'Action Plan & Review',
+    ],
+    accentColor: '0F766E',
+    iconType: 'clipboard',
+    premiumTemplate: true,
+    maxWords: 150,
+    minWords: 15,
+    textareaRows: 6,
+    warningText: 'Please provide at least {min} words to describe the vibration exposure.',
+  },
+
+  'riddor-report': {
+    slug: 'riddor-report',
+    name: 'RIDDOR Report Builder',
+    shortName: 'RIDDOR Report',
+    category: 'Health & Safety',
+    description:
+      'Generate RIDDOR-compliant incident reports under the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013. Covers all RIDDOR categories: fatalities, specified injuries, over-7-day incapacitation, dangerous occurrences, and occupational diseases. Includes root cause analysis and corrective action planning.',
+    route: '/riddor-report-builder',
+    pageTitle: 'AI RIDDOR Report Builder | Ebrora',
+    metaDescription:
+      'AI-powered RIDDOR report builder for UK construction. Compliant with RIDDOR 2013. Covers specified injuries, dangerous occurrences, root cause analysis, and corrective actions.',
+    documentLabel: 'RIDDOR Report',
+    descriptionPlaceholder:
+      'E.g. "Operative fell approximately 2.4m from an unsecured scaffold platform while carrying materials. Sustained a fracture to the left wrist and was taken to hospital by ambulance..."',
+    descriptionHeading: 'Describe the Incident',
+    descriptionHint: 'Include what happened, when, where, who was involved, and the nature of any injuries. The AI will determine the RIDDOR classification and generate appropriate sections.',
+    descriptionExample:
+      'On 28/03/2026 at approximately 14:30, an operative (steel fixer, age 34) fell approximately 2.4m from the second lift of scaffolding on the north elevation of the pump house at Salford WwTW. The edge protection had been removed by others and not replaced. The operative sustained a displaced fracture to the left wrist (Colles fracture) and was taken to Salford Royal Hospital by ambulance. He was detained overnight and has been absent from work since the incident.',
+    keySections: [
+      'RIDDOR Classification',
+      'Incident Details (Date / Time / Location)',
+      'Injured Person Details',
+      'Incident Description',
+      'Immediate Actions Taken',
+      'Root Cause Analysis',
+      'Corrective Actions',
+      'Lessons Learned',
+      'HSE Notification Record',
+    ],
+    accentColor: 'B91C1C',
+    iconType: 'alert',
+    premiumTemplate: true,
+    maxWords: 200,
+    minWords: 20,
+    textareaRows: 7,
+    warningText: 'Please provide at least {min} words to describe the incident.',
+  },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -1167,6 +1282,8 @@ export const AI_TOOL_ORDER: AiToolSlug[] = [
   'safety-alert', 'carbon-footprint', 'rams-review', 'delay-notification',
   'variation-confirmation', 'rfi-generator', 'payment-application',
   'daywork-sheet', 'carbon-reduction-plan',
+  // Batch 1 — Mandated
+  'wah-assessment', 'wbv-assessment', 'riddor-report',
 ];
 
 /** Tools grouped by category — for homepage grid and account dashboard */
@@ -1175,6 +1292,7 @@ export const AI_TOOLS_BY_CATEGORY: Record<string, AiToolSlug[]> = {
     'coshh', 'manual-handling', 'dse', 'tbt-generator', 'confined-spaces',
     'incident-report', 'lift-plan', 'emergency-response', 'permit-to-dig',
     'powra', 'cdm-checker', 'noise-assessment', 'safety-alert', 'rams-review',
+    'wah-assessment', 'wbv-assessment', 'riddor-report',
   ],
   'Quality': [
     'itp', 'quality-checklist', 'ncr',
