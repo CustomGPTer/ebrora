@@ -39,48 +39,64 @@ function buildInfoTable(p: Palette, rows: [string, string][]): Table { return ne
 function buildBulletList(p: Palette, items: string[]): Paragraph[] { return (items || []).map(item => new Paragraph({ spacing: { after: 60 }, indent: { left: 280 }, children: [new TextRun({ text: '•  ', font: p.font, size: p.bodySize, color: p.accent }), new TextRun({ text: item, font: p.font, size: p.bodySize, color: p.dark })] })); }
 
 function buildCover(slug: CeTemplateSlug, p: Palette, d: any): (Paragraph | Table)[] {
-  if (slug === 'formal-letter') return [gap(200), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 400, bottom: 400, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }), new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'D1FAE5' })] }), new Paragraph({ children: [new TextRun({ text: `${d.documentRef || ''}  |  ${d.notificationDate || d.confirmationDate || d.rfiDate || d.noticeDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] })] })] })] }), gap(300)];
-  if (slug === 'corporate') return [gap(400), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 350, bottom: 350, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 40, color: 'FFFFFF' })] }), new Paragraph({ children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] })] })] })] }), gap(300)];
+  if (slug === 'formal-letter') return [gap(200), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 400, bottom: 400, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }), new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d2.projectName || '', font: p.font, size: 22, color: 'D1FAE5' })] }), new Paragraph({ children: [new TextRun({ text: `${d2.documentRef || ''}  |  ${d2.notificationDate || d2.confirmationDate || d2.rfiDate || d2.noticeDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] })] })] })] }), gap(300)];
+  if (slug === 'corporate') return [gap(400), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 350, bottom: 350, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 40, color: 'FFFFFF' })] }), new Paragraph({ children: [new TextRun({ text: d2.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] })] })] })] }), gap(300)];
   return [];
 }
 
 export async function buildCeTemplateDocument(content: any, templateSlug: CeTemplateSlug): Promise<Document> {
   const p = PALETTES[templateSlug]; const d = content;
+  // Normalize schema field names to docx engine field names
+  const n: any = { ...d };
+  n.addressee = d.notifiedTo || d.addressee || '';
+  n.ceClause = d.compensationEventClause || d.ceClause || '';
+  n.contractRef = d.contractReference || d.contractRef || '';
+  n.contractor = d.notifiedBy || d.contractor || '';
+  n.preparedBy = d.notifiedBy || d.preparedBy || '';
+  n.contractualBasis = d.entitlementBasis || d.contractualBasis || '';
+  n.costImpact = d.costNarrative || d.costImplications?.narrative || d.costImpact || '';
+  n.programmeImpact = d.programmeNarrative || d.programmeImpact?.narrative || d.programmeImpact || '';
+  n.requiredActions = typeof d.quotationRequirements === 'object' ? JSON.stringify(d.quotationRequirements) : d.quotationRequirements || d.requiredActions || '';
+  n.supportingEvidence = d.supportingEvidence || [];
+  n.notificationDate = d.notificationDate || d.letterDate || '';
+  n.eventDescription = d.eventDescription || '';
+  const d2 = n;
+
   const children: (Paragraph | Table)[] = [];
   const cover = buildCover(templateSlug, p, d);
   if (cover.length > 0) { children.push(...cover); children.push(new Paragraph({ children: [new PageBreak()] })); }
 
   children.push(sectionHead(templateSlug, p, 1, 'Notification Details'));
-  children.push(buildInfoTable(p, [['Document Reference', d.documentRef || ''], ['Date', d.notificationDate || ''], ['Contract Reference', d.contractRef || ''], ['Project', d.projectName || ''], ['Site Address', d.siteAddress || ''], ['Contractor', d.contractor || ''], ['Addressed To', d.addressee || ''], ['CE Clause Reference', d.ceClause || '']]));
+  children.push(buildInfoTable(p, [['Document Reference', d2.documentRef || ''], ['Date', d2.notificationDate || ''], ['Contract Reference', d2.contractRef || ''], ['Project', d2.projectName || ''], ['Site Address', d2.siteAddress || ''], ['Contractor', d2.contractor || ''], ['Addressed To', d2.addressee || ''], ['CE Clause Reference', d2.ceClause || '']]));
   children.push(gap());
-  if (d.eventDescription) {
+  if (d2.eventDescription) {
     children.push(sectionHead(templateSlug, p, 2, 'Event Description'));
-    for (const para of (d.eventDescription as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.eventDescription as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.contractualBasis) {
+  if (d2.contractualBasis) {
     children.push(sectionHead(templateSlug, p, 3, 'Contractual Basis'));
-    for (const para of (d.contractualBasis as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.contractualBasis as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.programmeImpact) {
+  if (d2.programmeImpact) {
     children.push(sectionHead(templateSlug, p, 4, 'Programme Impact'));
-    for (const para of (d.programmeImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.programmeImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.costImpact) {
+  if (d2.costImpact) {
     children.push(sectionHead(templateSlug, p, 5, 'Cost Impact'));
-    for (const para of (d.costImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.costImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.supportingEvidence?.length) {
+  if (d2.supportingEvidence?.length) {
     children.push(sectionHead(templateSlug, p, 6, 'Supporting Evidence'));
-    children.push(...buildBulletList(p, d.supportingEvidence));
+    children.push(...buildBulletList(p, d2.supportingEvidence));
     children.push(gap());
   }
-  if (d.requiredActions) {
+  if (d2.requiredActions) {
     children.push(sectionHead(templateSlug, p, 7, 'Required Actions'));
-    for (const para of (d.requiredActions as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.requiredActions as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
 
@@ -89,7 +105,7 @@ export async function buildCeTemplateDocument(content: any, templateSlug: CeTemp
   const sigCw = [2200, 3200, 1800, W - 7200];
   children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: sigCw, rows: [
     new TableRow({ children: [hdrCell(p, 'Role', sigCw[0]), hdrCell(p, 'Name', sigCw[1]), hdrCell(p, 'Signature', sigCw[2]), hdrCell(p, 'Date', sigCw[3])] }),
-    altRow(p, [['Prepared By', sigCw[0], { bold: true }], [d.preparedBy || d.raisedBy || '', sigCw[1]], ['', sigCw[2]], ['', sigCw[3]]], 0),
+    altRow(p, [['Prepared By', sigCw[0], { bold: true }], [d2.preparedBy || d2.raisedBy || '', sigCw[1]], ['', sigCw[2]], ['', sigCw[3]]], 0),
   ] }));
 
   children.push(gap(300));
@@ -97,7 +113,7 @@ export async function buildCeTemplateDocument(content: any, templateSlug: CeTemp
   children.push(gap(80));
   children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Generated by Ebrora — ebrora.com', font: p.font, size: 18, color: p.accent })] }));
 
-  const hdr = new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
+  const hdr = new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d2.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
   const ftr = new Footer({ children: [new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'NEC4 Compliant', font: p.font, size: 16, color: p.mid }), new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }), new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
   return new Document({ styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } }, sections: [{ properties: { page: { size: { width: h.A4_WIDTH, height: h.A4_HEIGHT }, margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL } } }, headers: { default: hdr }, footers: { default: ftr }, children }] });
 }

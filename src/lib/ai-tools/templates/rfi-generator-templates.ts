@@ -39,48 +39,63 @@ function buildInfoTable(p: Palette, rows: [string, string][]): Table { return ne
 function buildBulletList(p: Palette, items: string[]): Paragraph[] { return (items || []).map(item => new Paragraph({ spacing: { after: 60 }, indent: { left: 280 }, children: [new TextRun({ text: '•  ', font: p.font, size: p.bodySize, color: p.accent }), new TextRun({ text: item, font: p.font, size: p.bodySize, color: p.dark })] })); }
 
 function buildCover(slug: RfiTemplateSlug, p: Palette, d: any): (Paragraph | Table)[] {
-  if (slug === 'formal-letter') return [gap(200), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 400, bottom: 400, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'REQUEST FOR INFORMATION', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }), new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'D1FAE5' })] }), new Paragraph({ children: [new TextRun({ text: `${d.documentRef || ''}  |  ${d.notificationDate || d.confirmationDate || d.rfiDate || d.noticeDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] })] })] })] }), gap(300)];
-  if (slug === 'corporate') return [gap(400), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 350, bottom: 350, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'REQUEST FOR INFORMATION', bold: true, font: p.font, size: 40, color: 'FFFFFF' })] }), new Paragraph({ children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] })] })] })] }), gap(300)];
+  if (slug === 'formal-letter') return [gap(200), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 400, bottom: 400, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'REQUEST FOR INFORMATION', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }), new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d2.projectName || '', font: p.font, size: 22, color: 'D1FAE5' })] }), new Paragraph({ children: [new TextRun({ text: `${d2.documentRef || ''}  |  ${d2.notificationDate || d2.confirmationDate || d2.rfiDate || d2.noticeDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] })] })] })] }), gap(300)];
+  if (slug === 'corporate') return [gap(400), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 350, bottom: 350, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'REQUEST FOR INFORMATION', bold: true, font: p.font, size: 40, color: 'FFFFFF' })] }), new Paragraph({ children: [new TextRun({ text: d2.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] })] })] })] }), gap(300)];
   return [];
 }
 
 export async function buildRfiTemplateDocument(content: any, templateSlug: RfiTemplateSlug): Promise<Document> {
   const p = PALETTES[templateSlug]; const d = content;
+  const n: any = { ...d };
+  n.addressee = d.directedTo || d.addressee || '';
+  n.contractRef = d.contractReference || d.contractRef || '';
+  n.priority = d.rfiSubject || d.priority || '';
+  n.responseRequiredBy = d.requiredResponseDate || d.responseRequiredBy || '';
+  n.question = d.detailedQuestion || d.question || '';
+  n.background = d.background || d.querySummary || '';
+  n.drawingReferences = d.relevantDocuments || d.drawingReferences || [];
+  n.programmeImpact = d.programmeNarrative || (d.programmeImplication && typeof d.programmeImplication === 'object' ? d.programmeImplication.narrative || '' : d.programmeImplication) || d.programmeImpact || '';
+  n.proposedSolution = typeof d.proposedSolution === 'object' ? d.proposed || '' : d.proposedSolution || d.proposed || '';
+  n.attachments = d.relevantDocuments || d.attachments || [];
+  n.preparedBy = d.raisedBy || d.preparedBy || '';
+  n.rfiDate = d.rfiDate || '';
+  const d2 = n;
+
   const children: (Paragraph | Table)[] = [];
   const cover = buildCover(templateSlug, p, d);
   if (cover.length > 0) { children.push(...cover); children.push(new Paragraph({ children: [new PageBreak()] })); }
 
   children.push(sectionHead(templateSlug, p, 1, 'RFI Details'));
-  children.push(buildInfoTable(p, [['RFI Reference', d.documentRef || ''], ['Date', d.rfiDate || ''], ['Project', d.projectName || ''], ['Contract Reference', d.contractRef || ''], ['Addressed To', d.addressee || ''], ['Response Required By', d.responseRequiredBy || ''], ['Priority', d.priority || '']]));
+  children.push(buildInfoTable(p, [['RFI Reference', d2.documentRef || ''], ['Date', d2.rfiDate || ''], ['Project', d2.projectName || ''], ['Contract Reference', d2.contractRef || ''], ['Addressed To', d2.addressee || ''], ['Response Required By', d2.responseRequiredBy || ''], ['Priority', d2.priority || '']]));
   children.push(gap());
-  if (d.background) {
+  if (d2.background) {
     children.push(sectionHead(templateSlug, p, 2, 'Background & Context'));
-    for (const para of (d.background as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.background as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.question) {
+  if (d2.question) {
     children.push(sectionHead(templateSlug, p, 3, 'Request for Information'));
-    for (const para of (d.question as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.question as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.drawingReferences?.length) {
+  if (d2.drawingReferences?.length) {
     children.push(sectionHead(templateSlug, p, 4, 'Drawing & Document References'));
-    children.push(...buildBulletList(p, d.drawingReferences));
+    children.push(...buildBulletList(p, d2.drawingReferences));
     children.push(gap());
   }
-  if (d.programmeImpact) {
+  if (d2.programmeImpact) {
     children.push(sectionHead(templateSlug, p, 5, 'Programme Impact of Non-Response'));
-    for (const para of (d.programmeImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.programmeImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.proposedSolution) {
+  if (d2.proposedSolution) {
     children.push(sectionHead(templateSlug, p, 6, 'Proposed Solution'));
-    for (const para of (d.proposedSolution as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.proposedSolution as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.attachments?.length) {
+  if (d2.attachments?.length) {
     children.push(sectionHead(templateSlug, p, 7, 'Attachments'));
-    children.push(...buildBulletList(p, d.attachments));
+    children.push(...buildBulletList(p, d2.attachments));
     children.push(gap());
   }
 
@@ -89,7 +104,7 @@ export async function buildRfiTemplateDocument(content: any, templateSlug: RfiTe
   const sigCw = [2200, 3200, 1800, W - 7200];
   children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: sigCw, rows: [
     new TableRow({ children: [hdrCell(p, 'Role', sigCw[0]), hdrCell(p, 'Name', sigCw[1]), hdrCell(p, 'Signature', sigCw[2]), hdrCell(p, 'Date', sigCw[3])] }),
-    altRow(p, [['Prepared By', sigCw[0], { bold: true }], [d.preparedBy || d.raisedBy || '', sigCw[1]], ['', sigCw[2]], ['', sigCw[3]]], 0),
+    altRow(p, [['Prepared By', sigCw[0], { bold: true }], [d2.preparedBy || d2.raisedBy || '', sigCw[1]], ['', sigCw[2]], ['', sigCw[3]]], 0),
   ] }));
 
   children.push(gap(300));
@@ -97,7 +112,7 @@ export async function buildRfiTemplateDocument(content: any, templateSlug: RfiTe
   children.push(gap(80));
   children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Generated by Ebrora — ebrora.com', font: p.font, size: 18, color: p.accent })] }));
 
-  const hdr = new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'REQUEST FOR INFORMATION', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
+  const hdr = new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'REQUEST FOR INFORMATION', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d2.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
   const ftr = new Footer({ children: [new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'Formal RFI', font: p.font, size: 16, color: p.mid }), new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }), new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
   return new Document({ styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } }, sections: [{ properties: { page: { size: { width: h.A4_WIDTH, height: h.A4_HEIGHT }, margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL } } }, headers: { default: hdr }, footers: { default: ftr }, children }] });
 }

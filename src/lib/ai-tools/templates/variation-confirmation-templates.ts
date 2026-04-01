@@ -39,48 +39,63 @@ function buildInfoTable(p: Palette, rows: [string, string][]): Table { return ne
 function buildBulletList(p: Palette, items: string[]): Paragraph[] { return (items || []).map(item => new Paragraph({ spacing: { after: 60 }, indent: { left: 280 }, children: [new TextRun({ text: '•  ', font: p.font, size: p.bodySize, color: p.accent }), new TextRun({ text: item, font: p.font, size: p.bodySize, color: p.dark })] })); }
 
 function buildCover(slug: VariationTemplateSlug, p: Palette, d: any): (Paragraph | Table)[] {
-  if (slug === 'formal-letter') return [gap(200), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 400, bottom: 400, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'VARIATION CONFIRMATION', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }), new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'D1FAE5' })] }), new Paragraph({ children: [new TextRun({ text: `${d.documentRef || ''}  |  ${d.notificationDate || d.confirmationDate || d.rfiDate || d.noticeDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] })] })] })] }), gap(300)];
-  if (slug === 'corporate') return [gap(400), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 350, bottom: 350, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'VARIATION CONFIRMATION', bold: true, font: p.font, size: 40, color: 'FFFFFF' })] }), new Paragraph({ children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] })] })] })] }), gap(300)];
+  if (slug === 'formal-letter') return [gap(200), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 400, bottom: 400, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'VARIATION CONFIRMATION', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }), new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d2.projectName || '', font: p.font, size: 22, color: 'D1FAE5' })] }), new Paragraph({ children: [new TextRun({ text: `${d2.documentRef || ''}  |  ${d2.notificationDate || d2.confirmationDate || d2.rfiDate || d2.noticeDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] })] })] })] }), gap(300)];
+  if (slug === 'corporate') return [gap(400), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 350, bottom: 350, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'VARIATION CONFIRMATION', bold: true, font: p.font, size: 40, color: 'FFFFFF' })] }), new Paragraph({ children: [new TextRun({ text: d2.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] })] })] })] }), gap(300)];
   return [];
 }
 
 export async function buildVariationTemplateDocument(content: any, templateSlug: VariationTemplateSlug): Promise<Document> {
   const p = PALETTES[templateSlug]; const d = content;
+  const n: any = { ...d };
+  n.addressee = d.toParty || d.addressee || '';
+  n.contractRef = d.contractReference || d.contractRef || '';
+  n.confirmationDate = d.letterDate || d.confirmationDate || '';
+  n.verbalInstruction = d.descriptionOfVariation || d.verbalInstruction || '';
+  n.scopeChange = d.descriptionOfVariation || d.scopeChange || '';
+  n.costImpact = d.costBreakdownNarrative || d.costImpact || '';
+  n.timeImpact = d.timeImpactNarrative || d.timeImpact || '';
+  n.contractualBasis = d.contractualEntitlement || d.contractualBasis || '';
+  n.actionRequired = d.requestForWrittenInstruction || d.actionRequired || '';
+  n.preparedBy = d.fromParty || d.preparedBy || '';
+  n.siteAddress = d.projectAddress || d.siteAddress || '';
+  n.contractForm = d.contractForm || '';
+  const d2 = n;
+
   const children: (Paragraph | Table)[] = [];
   const cover = buildCover(templateSlug, p, d);
   if (cover.length > 0) { children.push(...cover); children.push(new Paragraph({ children: [new PageBreak()] })); }
 
   children.push(sectionHead(templateSlug, p, 1, 'Confirmation Details'));
-  children.push(buildInfoTable(p, [['Document Reference', d.documentRef || ''], ['Date', d.confirmationDate || ''], ['Contract Form', d.contractForm || ''], ['Contract Reference', d.contractRef || ''], ['Project', d.projectName || ''], ['Site Address', d.siteAddress || ''], ['Addressed To', d.addressee || '']]));
+  children.push(buildInfoTable(p, [['Document Reference', d2.documentRef || ''], ['Date', d2.confirmationDate || ''], ['Contract Form', d2.contractForm || ''], ['Contract Reference', d2.contractRef || ''], ['Project', d2.projectName || ''], ['Site Address', d2.siteAddress || ''], ['Addressed To', d2.addressee || '']]));
   children.push(gap());
-  if (d.verbalInstruction) {
+  if (d2.verbalInstruction) {
     children.push(sectionHead(templateSlug, p, 2, 'Verbal Instruction Record'));
-    for (const para of (d.verbalInstruction as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.verbalInstruction as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.scopeChange) {
+  if (d2.scopeChange) {
     children.push(sectionHead(templateSlug, p, 3, 'Scope of Varied Works'));
-    for (const para of (d.scopeChange as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.scopeChange as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.costImpact) {
+  if (d2.costImpact) {
     children.push(sectionHead(templateSlug, p, 4, 'Cost Impact'));
-    for (const para of (d.costImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.costImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.timeImpact) {
+  if (d2.timeImpact) {
     children.push(sectionHead(templateSlug, p, 5, 'Time Impact'));
-    for (const para of (d.timeImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.timeImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.contractualBasis) {
+  if (d2.contractualBasis) {
     children.push(sectionHead(templateSlug, p, 6, 'Contractual Basis'));
-    for (const para of (d.contractualBasis as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.contractualBasis as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
-  if (d.actionRequired) {
+  if (d2.actionRequired) {
     children.push(sectionHead(templateSlug, p, 7, 'Action Required — Formal Written Instruction'));
-    for (const para of (d.actionRequired as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
+    for (const para of (d2.actionRequired as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
     children.push(gap());
   }
 
@@ -89,7 +104,7 @@ export async function buildVariationTemplateDocument(content: any, templateSlug:
   const sigCw = [2200, 3200, 1800, W - 7200];
   children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: sigCw, rows: [
     new TableRow({ children: [hdrCell(p, 'Role', sigCw[0]), hdrCell(p, 'Name', sigCw[1]), hdrCell(p, 'Signature', sigCw[2]), hdrCell(p, 'Date', sigCw[3])] }),
-    altRow(p, [['Prepared By', sigCw[0], { bold: true }], [d.preparedBy || d.raisedBy || '', sigCw[1]], ['', sigCw[2]], ['', sigCw[3]]], 0),
+    altRow(p, [['Prepared By', sigCw[0], { bold: true }], [d2.preparedBy || d2.raisedBy || '', sigCw[1]], ['', sigCw[2]], ['', sigCw[3]]], 0),
   ] }));
 
   children.push(gap(300));
@@ -97,7 +112,7 @@ export async function buildVariationTemplateDocument(content: any, templateSlug:
   children.push(gap(80));
   children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Generated by Ebrora — ebrora.com', font: p.font, size: 18, color: p.accent })] }));
 
-  const hdr = new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'VARIATION CONFIRMATION', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
+  const hdr = new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'VARIATION CONFIRMATION', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d2.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
   const ftr = new Footer({ children: [new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'Written Record of Verbal Instruction', font: p.font, size: 16, color: p.mid }), new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }), new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
   return new Document({ styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } }, sections: [{ properties: { page: { size: { width: h.A4_WIDTH, height: h.A4_HEIGHT }, margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL } } }, headers: { default: hdr }, footers: { default: ftr }, children }] });
 }
