@@ -1,21 +1,50 @@
 import type { Metadata } from 'next';
-import AiToolBuilderClient from '@/components/ai-tools/AiToolBuilderClient';
-import { AI_TOOL_CONFIGS } from '@/lib/ai-tools/tool-config';
+import QuoteBuilderClient from './components/QuoteBuilderClient';
 
 export const metadata: Metadata = {
-  title: { absolute: 'AI Subcontractor Quotation Generator | Ebrora' },
-  description: 'Generate professional subcontractor quotations for Tier 1 main contractors. BoQ breakdown, inclusions, exclusions, programme, and commercial terms — submission ready.',
+  title: { absolute: 'AI Quotation Builder | 4 Templates | Ebrora' },
+  description:
+    'AI-powered subcontractor quotation builder with 4 professional templates — from full tender submissions to quick budget estimates. BoQ breakdown, inclusions, exclusions, programme, and commercial terms.',
   alternates: { canonical: 'https://www.ebrora.com/quote-generator-builder' },
   openGraph: {
-    title: 'AI Subcontractor Quotation Generator | Ebrora',
-    description: 'Professional subcontractor quotations with BoQ, inclusions, exclusions, and commercial terms formatted to Tier 1 standards.',
+    title: 'AI Quotation Builder | 4 Templates | Ebrora',
+    description:
+      'Professional subcontractor quotations with 4 template styles. BoQ, inclusions, exclusions, and commercial terms formatted to Tier 1 standards.',
     url: 'https://www.ebrora.com/quote-generator-builder',
     type: 'website',
     images: [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }],
   },
 };
 
+const toolSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Ebrora AI Quotation Builder',
+  applicationCategory: 'BusinessApplication',
+  description:
+    'AI-powered subcontractor quotation builder with 4 professional templates for UK construction. Generates tender submissions with BoQ, inclusions, exclusions, programme, and commercial terms.',
+  url: 'https://www.ebrora.com/quote-generator-builder',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'GBP',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Ebrora',
+    url: 'https://www.ebrora.com',
+  },
+};
+
 export default function Page() {
-  const toolConfig = AI_TOOL_CONFIGS['quote-generator'];
-  return <AiToolBuilderClient toolConfig={toolConfig} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
+      />
+      <QuoteBuilderClient />
+    </>
+  );
 }
