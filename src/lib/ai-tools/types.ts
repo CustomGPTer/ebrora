@@ -144,6 +144,7 @@ export interface AiToolChatRequest {
   toolSlug: AiToolSlug;
   description: string;
   rounds: AiToolConversationRound[];
+  crpTemplateSlug?: string;
 }
 
 /** Response from /api/ai-tools/chat */
