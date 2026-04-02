@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'AI COSHH Assessment Builder | 5 Templates | Ebrora',
   },
   description: 'AI-powered COSHH assessment generator with 5 professional templates for UK construction. 18-section assessments covering composition, GHS classification, exposure limits, PPE, health surveillance, and regulatory compliance.',
-  alternates: {h
+  alternates: {
     canonical: 'https://www.ebrora.com/coshh-builder',
   },
   openGraph: {
