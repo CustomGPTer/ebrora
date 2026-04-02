@@ -61,6 +61,14 @@ interface AiToolBuilderClientProps {
   rfiTemplateSlug?: string;
   /** For Carbon Reduction Plan multi-template — passed to chat + generate routes */
   crpTemplateSlug?: string;
+  /** For Carbon Footprint multi-template — passed to chat + generate routes */
+  carbonFootprintTemplateSlug?: string;
+  /** For Daywork Sheet multi-template — passed to chat + generate routes */
+  dayworkSheetTemplateSlug?: string;
+  /** For NCR multi-template — passed to chat + generate routes */
+  ncrTemplateSlug?: string;
+  /** For Safety Alert multi-template — passed to chat + generate routes */
+  safetyAlertTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -125,7 +133,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug, carbonFootprintTemplateSlug, dayworkSheetTemplateSlug, ncrTemplateSlug, safetyAlertTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -246,6 +254,10 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           description,
           rounds: [],
           ...(crpTemplateSlug ? { crpTemplateSlug } : {}),
+          ...(carbonFootprintTemplateSlug ? { carbonFootprintTemplateSlug } : {}),
+          ...(dayworkSheetTemplateSlug ? { dayworkSheetTemplateSlug } : {}),
+          ...(ncrTemplateSlug ? { ncrTemplateSlug } : {}),
+          ...(safetyAlertTemplateSlug ? { safetyAlertTemplateSlug } : {}),
         }),
       });
 
@@ -298,6 +310,10 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           description,
           rounds: allRounds,
           ...(crpTemplateSlug ? { crpTemplateSlug } : {}),
+          ...(carbonFootprintTemplateSlug ? { carbonFootprintTemplateSlug } : {}),
+          ...(dayworkSheetTemplateSlug ? { dayworkSheetTemplateSlug } : {}),
+          ...(ncrTemplateSlug ? { ncrTemplateSlug } : {}),
+          ...(safetyAlertTemplateSlug ? { safetyAlertTemplateSlug } : {}),
         }),
       });
 
@@ -374,6 +390,10 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           ...(variationTemplateSlug ? { variationTemplateSlug } : {}),
           ...(rfiTemplateSlug ? { rfiTemplateSlug } : {}),
           ...(crpTemplateSlug ? { crpTemplateSlug } : {}),
+          ...(carbonFootprintTemplateSlug ? { carbonFootprintTemplateSlug } : {}),
+          ...(dayworkSheetTemplateSlug ? { dayworkSheetTemplateSlug } : {}),
+          ...(ncrTemplateSlug ? { ncrTemplateSlug } : {}),
+          ...(safetyAlertTemplateSlug ? { safetyAlertTemplateSlug } : {}),
         }),
       });
 
@@ -394,7 +414,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug, carbonFootprintTemplateSlug, dayworkSheetTemplateSlug, ncrTemplateSlug, safetyAlertTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
