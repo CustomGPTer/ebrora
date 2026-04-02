@@ -93,11 +93,11 @@ function footerLine() { return h.bodyText('— End of Document —', SM, { itali
 function buildT1(d: SaData): Document {
   const sec: Paragraph[] = [];
   sec.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: '⚠ SAFETY ALERT', bold: true, size: TTL, color: EBRORA })] }));
-  sec.push(h.infoTable(W, [
+  sec.push(h.infoTable([
     { label: 'Alert Ref', value: d.alertRef }, { label: 'Date', value: d.alertDate },
     { label: 'Classification', value: d.classification }, { label: 'Project', value: d.projectName },
     { label: 'Site', value: d.siteLocation }, { label: 'Client', value: d.client },
-  ]));
+  ], W));
   sec.push(h.sectionHeading('Incident Summary'));
   sec.push(...h.prose(d.incidentSummary));
   sec.push(h.sectionHeading('What Happened — Timeline'));
@@ -124,7 +124,7 @@ function buildT1(d: SaData): Document {
   sec.push(h.sectionHeading('Distribution & Briefing Confirmation'));
   sec.push(h.bodyText(`Scope: ${d.distributionScope} | Method: ${d.briefingMethod}`, SM));
   if (d.distributionList.length > 0) {
-    sec.push(h.briefingRecordTable(W, d.distributionList.map((dl: any) => ({ name: dl.name, role: dl.role || dl.organisation, date: dl.date || '' }))));
+    sec.push(h.briefingRecordTable(Math.max(d.distributionList.length, 5), W));
   }
   if (d.additionalNotes) { sec.push(h.sectionHeading('Additional Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
@@ -144,10 +144,10 @@ function buildT2(d: SaData): Document {
   sec.push(h.spacer(100));
   sec.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 100, after: 200 }, shading: { type: ShadingType.CLEAR, fill: RED_BG }, children: [new TextRun({ text: d.incidentSummary || 'INCIDENT DETAILS', bold: true, size: LG, color: RED_DARK })] }));
   // Info bar
-  sec.push(h.infoTable(W, [
+  sec.push(h.infoTable([
     { label: 'Ref', value: d.alertRef }, { label: 'Date', value: d.incidentDate },
     { label: 'Site', value: d.siteLocation || d.projectName },
-  ]));
+  ], W));
   sec.push(h.spacer(100));
   // Immediate actions
   sec.push(new Paragraph({ spacing: { after: 80 }, shading: { type: ShadingType.CLEAR, fill: RED_BG }, children: [new TextRun({ text: '  IMMEDIATE ACTIONS REQUIRED:', bold: true, size: LG, color: RED })] }));
@@ -174,10 +174,10 @@ function buildT2(d: SaData): Document {
 function buildT3(d: SaData): Document {
   const sec: Paragraph[] = [];
   sec.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 150 }, children: [new TextRun({ text: 'SAFETY LESSONS LEARNED', bold: true, size: TTL, color: TEAL })] }));
-  sec.push(h.infoTable(W, [
+  sec.push(h.infoTable([
     { label: 'Alert Ref', value: d.alertRef }, { label: 'Date', value: d.alertDate },
     { label: 'Type', value: d.classification }, { label: 'Site', value: d.siteLocation || d.projectName },
-  ]));
+  ], W));
   sec.push(h.spacer(100));
   // The Story
   sec.push(h.sectionHeading('The Story — What Happened', LG, TEAL));
@@ -207,7 +207,7 @@ function buildT3(d: SaData): Document {
   sec.push(h.sectionHeading('Operative Acknowledgement', LG, TEAL));
   sec.push(h.bodyText('I confirm I have been briefed on this safety alert and understand the lessons and actions.', SM));
   sec.push(h.spacer(80));
-  sec.push(h.briefingRecordTable(W, [{ name: '', role: '', date: '' }, { name: '', role: '', date: '' }, { name: '', role: '', date: '' }, { name: '', role: '', date: '' }, { name: '', role: '', date: '' }]));
+  sec.push(h.briefingRecordTable(5, W));
   if (d.additionalNotes) { sec.push(h.sectionHeading('Additional Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
 
@@ -221,12 +221,12 @@ function buildT4(d: SaData): Document {
   const sec: Paragraph[] = [];
   // Cover info
   sec.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: 'FORMAL INVESTIGATION REPORT', bold: true, size: TTL, color: CHARCOAL })] }));
-  sec.push(h.infoTable(W, [
+  sec.push(h.infoTable([
     { label: 'Alert/Incident Ref', value: d.alertRef }, { label: 'Date of Incident', value: d.incidentDate },
     { label: 'Classification', value: d.classification }, { label: 'Severity', value: d.severity },
     { label: 'Project', value: d.projectName }, { label: 'Site', value: d.siteLocation },
     { label: 'Investigation Lead', value: d.investigationLead }, { label: 'RIDDOR Reportable', value: d.riddorReportable },
-  ]));
+  ], W));
   sec.push(h.spacer(100));
   // Timeline
   sec.push(h.sectionHeading('1. Detailed Timeline Reconstruction', LG, CHARCOAL));

@@ -81,13 +81,13 @@ function dataTable(headers: { text: string; width: number }[], rows: any[][], co
 function footerLine() { return h.bodyText('— End of Document —', SM, { italic: true, color: '999999' }); }
 
 function ncrInfoBlock(d: NcrData) {
-  return h.infoTable(W, [
+  return h.infoTable([
     { label: 'NCR Ref', value: d.ncrRef }, { label: 'Date', value: d.ncrDate },
     { label: 'Category', value: d.ncrCategory }, { label: 'Severity', value: d.severity },
     { label: 'Project', value: d.projectName }, { label: 'Contract', value: d.contractRef },
     { label: 'Discipline', value: d.discipline }, { label: 'Raised By', value: d.raisedBy },
     { label: 'Location', value: d.location },
-  ]);
+  ], W);
 }
 
 function correctiveActionsTable(d: NcrData, color = EBRORA) {
@@ -125,7 +125,7 @@ function buildT1(d: NcrData): Document {
   sec.push(h.bodyText(`Close-Out Date: ${d.closeOutDate || '________'} | Verified By: ${d.closeOutBy || '________'}`, SM));
   if (d.closeOutEvidence) sec.push(h.bodyText(`Evidence: ${d.closeOutEvidence}`, SM));
   sec.push(h.sectionHeading('9. Sign-Off'));
-  sec.push(h.approvalTable(W, d.approvalChain.map((a: any) => ({ role: a.role, name: a.name, date: a.date }))));
+  sec.push(h.approvalTable(d.approvalChain.map((a: any) => ({ role: a.role, name: a.name, date: a.date })), W));
   if (d.additionalNotes) { sec.push(h.sectionHeading('10. Additional Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
 
@@ -213,11 +213,11 @@ function buildT3(d: NcrData): Document {
 function buildT4(d: NcrData): Document {
   const sec: Paragraph[] = [];
   sec.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 150 }, children: [new TextRun({ text: 'NCR — COMPACT CLOSE-OUT', bold: true, size: XL, color: GREY_COMP })] }));
-  sec.push(h.infoTable(W, [
+  sec.push(h.infoTable([
     { label: 'NCR Ref', value: d.ncrRef }, { label: 'Date', value: d.ncrDate },
     { label: 'Severity', value: d.severity || 'Minor' }, { label: 'Project', value: d.projectName },
     { label: 'Location', value: d.location }, { label: 'Raised By', value: d.raisedBy },
-  ]));
+  ], W));
   sec.push(h.sectionHeading('Defect', LG, GREY_COMP));
   sec.push(...h.prose(d.actualCondition));
   sec.push(h.bodyText(`Spec: ${d.specClause || d.drawingRef || 'N/A'}`, SM));
@@ -239,12 +239,12 @@ function buildT4(d: NcrData): Document {
 function buildT5(d: NcrData): Document {
   const sec: Paragraph[] = [];
   sec.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: 'SUPPLIER / SUBCONTRACTOR NCR', bold: true, size: TTL, color: ORANGE })] }));
-  sec.push(h.infoTable(W, [
+  sec.push(h.infoTable([
     { label: 'NCR Ref', value: d.ncrRef }, { label: 'Date', value: d.ncrDate },
     { label: 'Supplier', value: d.supplierName }, { label: 'Contact', value: d.supplierContact },
     { label: 'PO Ref', value: d.poRef }, { label: 'Delivery Note', value: d.deliveryNoteRef },
     { label: 'Project', value: d.projectName }, { label: 'Severity', value: d.severity },
-  ]));
+  ], W));
   sec.push(h.sectionHeading('1. Non-Conformance Against Specification', LG, ORANGE));
   sec.push(h.bodyText(`Required: ${d.specRequirement}`, SM));
   sec.push(h.bodyText(`Actual: ${d.actualCondition}`, SM));
@@ -263,7 +263,7 @@ function buildT5(d: NcrData): Document {
   sec.push(h.sectionHeading('6. Corrective Actions', LG, ORANGE));
   sec.push(correctiveActionsTable(d, ORANGE) as any);
   sec.push(h.sectionHeading('7. Sign-Off'));
-  sec.push(h.approvalTable(W, d.approvalChain.map((a: any) => ({ role: a.role, name: a.name, date: a.date }))));
+  sec.push(h.approvalTable(d.approvalChain.map((a: any) => ({ role: a.role, name: a.name, date: a.date })), W));
   if (d.additionalNotes) { sec.push(h.sectionHeading('8. Additional Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
 

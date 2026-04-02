@@ -90,13 +90,13 @@ function dataTable(headers: { text: string; width: number }[], rows: any[][], co
 function footerLine() { return h.bodyText('— End of Document —', SM, { italic: true, color: '999999' }); }
 
 function dwInfoBlock(d: DwData, extras: { label: string; value: string }[] = []) {
-  return h.infoTable(W, [
+  return h.infoTable([
     { label: 'Daywork Ref', value: d.dayworkRef }, { label: 'Date', value: d.dayworkDate },
     { label: 'Project', value: d.projectName }, { label: 'Contract', value: d.contractRef },
     { label: 'Instructed By', value: d.instructedBy }, { label: 'Instruction Ref', value: d.instructionRef },
     { label: 'Activity', value: d.activityDescription }, { label: 'Location', value: d.location },
     ...extras,
-  ]);
+  ], W);
 }
 
 function labourTable(d: DwData, color = EBRORA) {
@@ -121,19 +121,19 @@ function materialsTable(d: DwData, color = EBRORA) {
 }
 
 function totalsBlock(d: DwData) {
-  return h.infoTable(W, [
+  return h.infoTable([
     { label: 'Labour', value: `£${d.labourTotal}` }, { label: 'Plant', value: `£${d.plantTotal}` },
     { label: 'Materials', value: `£${d.materialsTotal}` }, { label: 'Supervision', value: `£${d.supervisionTotal || '0.00'}` },
     { label: 'OH&P', value: `£${d.overheadsTotal || '0.00'} (${d.overheadsPercentage || '0'}%)` },
     { label: 'GRAND TOTAL', value: `£${d.grandTotal}` },
-  ]);
+  ], W);
 }
 
 function signOffBlock(d: DwData) {
-  return h.approvalTable(W, [
-    { role: 'Contractor', name: d.contractorSignName || '________', date: d.contractorSignDate || '________' },
-    { role: 'Client/RE', name: d.clientSignName || '________', date: d.clientSignDate || '________' },
-  ]);
+  return h.approvalTable([
+    { role: 'Contractor', name: d.contractorSignName || '________' },
+    { role: 'Client/RE', name: d.clientSignName || '________' },
+  ], W);
 }
 
 // ═══ T1 — Ebrora Standard ═══
@@ -212,10 +212,10 @@ function buildT4(d: DwData): Document {
 function buildT5(d: DwData): Document {
   const sec: Paragraph[] = [];
   sec.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: 'DAYWORK — SITE RECORD', bold: true, size: XL, color: GREY_COMP })] }));
-  sec.push(h.infoTable(W, [
+  sec.push(h.infoTable([
     { label: 'Ref', value: d.dayworkRef }, { label: 'Date', value: d.dayworkDate },
     { label: 'Project', value: d.projectName }, { label: 'Instructed By', value: d.instructedBy },
-  ]));
+  ], W));
   sec.push(h.bodyText(d.activityDescription, SM));
   sec.push(h.sectionHeading('Labour', BODY, GREY_COMP)); sec.push(labourTable(d, GREY_COMP) as any);
   sec.push(h.sectionHeading('Plant', BODY, GREY_COMP)); sec.push(plantTable(d, GREY_COMP) as any);
@@ -249,12 +249,12 @@ function buildT6(d: DwData): Document {
   }
   sec.push(h.sectionHeading('Totals', LG, NAVY)); sec.push(totalsBlock(d) as any);
   sec.push(h.sectionHeading('4-Person Verification', LG, NAVY));
-  sec.push(h.approvalTable(W, [
-    { role: 'Foreman', name: d.contractorSignName || '________', date: d.contractorSignDate || '________' },
-    { role: 'Site Agent', name: '________', date: '________' },
-    { role: 'QS', name: d.qsSignName || '________', date: d.qsSignDate || '________' },
-    { role: 'Client Rep', name: d.clientSignName || '________', date: d.clientSignDate || '________' },
-  ]));
+  sec.push(h.approvalTable([
+    { role: 'Foreman', name: d.contractorSignName || '________' },
+    { role: 'Site Agent', name: '________' },
+    { role: 'QS', name: d.qsSignName || '________' },
+    { role: 'Client Rep', name: d.clientSignName || '________' },
+  ], W));
   if (d.additionalNotes) { sec.push(h.sectionHeading('Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
   return new Document({ sections: [{ properties: { page: { margin: { top: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL } } }, headers: { default: h.ebroraHeader('Daywork Audit Trail') }, footers: { default: h.ebroraFooter() }, children: sec }] });
@@ -280,7 +280,7 @@ function buildT7(d: DwData): Document {
   sec.push(h.sectionHeading('Totals', LG, ORANGE)); sec.push(totalsBlock(d) as any);
   if (d.cumulativeTotal) sec.push(h.bodyText(`Cumulative Daywork Total: £${d.cumulativeTotal}`, BODY, { bold: true, color: ORANGE }));
   sec.push(h.sectionHeading('Commercial Manager Sign-Off'));
-  sec.push(h.approvalTable(W, [{ role: 'Commercial Manager', name: d.contractorSignName || '________', date: d.contractorSignDate || '________' }]));
+  sec.push(h.approvalTable([{ role: 'Commercial Manager', name: d.contractorSignName || '________' }], W));
   if (d.additionalNotes) { sec.push(h.sectionHeading('Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
   return new Document({ sections: [{ properties: { page: { margin: { top: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL } } }, headers: { default: h.ebroraHeader('Subcontractor Valuation') }, footers: { default: h.ebroraFooter() }, children: sec }] });
@@ -290,10 +290,10 @@ function buildT7(d: DwData): Document {
 function buildT8(d: DwData): Document {
   const sec: Paragraph[] = [];
   sec.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 150 }, children: [new TextRun({ text: 'WEEKLY DAYWORK SUMMARY', bold: true, size: TTL, color: TEAL })] }));
-  sec.push(h.infoTable(W, [
+  sec.push(h.infoTable([
     { label: 'Week Commencing', value: d.weekCommencing || d.dayworkDate }, { label: 'Project', value: d.projectName },
     { label: 'Contract Ref', value: d.contractRef }, { label: 'Daywork Sheets', value: d.dailySheetRefs.join(', ') || d.dayworkRef },
-  ]));
+  ], W));
   if (d.dailySummary.length > 0) {
     sec.push(h.sectionHeading('Daily Breakdown', LG, TEAL));
     const dw = [Math.round(W*0.18), Math.round(W*0.20), Math.round(W*0.20), Math.round(W*0.20), W - Math.round(W*0.18) - Math.round(W*0.20) - Math.round(W*0.20) - Math.round(W*0.20)];
