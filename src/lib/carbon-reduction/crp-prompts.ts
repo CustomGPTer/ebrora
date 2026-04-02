@@ -1,8 +1,6 @@
 // =============================================================================
 // CARBON REDUCTION PLAN — Template-Specific Prompts
-// =============================================================================
-// ADD these functions to the END of src/lib/ai-tools/system-prompts.ts
-// ALSO update the import in chat/route.ts and generate/route.ts
+// Standalone file — imported by chat/route.ts and generate/route.ts
 // =============================================================================
 
 import type { CrpTemplateSlug } from '@/lib/carbon-reduction/types';
