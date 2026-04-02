@@ -23,6 +23,7 @@ import {
   incrementAiToolUsage,
 } from '@/lib/ai-tools';
 import { getConversationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getCrpTemplateConversationPrompt } from '@/lib/carbon-reduction/crp-prompts';
 import { wrapDescription, wrapAnswers, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import type {
   AiToolSlug,
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body: AiToolChatRequest = await req.json();
-    const { toolSlug, description, rounds } = body;
+    const { toolSlug, description, rounds, crpTemplateSlug } = body;
 
     // Validate tool slug
     if (!toolSlug || !isValidAiToolSlug(toolSlug)) {
@@ -224,7 +225,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Build system prompt
-    const systemPrompt = getConversationPrompt(toolSlug);
+    const systemPrompt = (toolSlug === 'carbon-reduction-plan' && crpTemplateSlug)
+      ? getCrpTemplateConversationPrompt(crpTemplateSlug as any)
+      : getConversationPrompt(toolSlug);
 
     // Injection detection — log suspicious patterns but don't block
     const descPatterns = detectInjectionPatterns(description);
