@@ -12,6 +12,8 @@ import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
 import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt, getEarlyWarningTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { getCrpTemplateGenerationPrompt } from '@/lib/carbon-reduction/crp-prompts';
+import { getCeTemplateGenerationPrompt, getDelayTemplateGenerationPrompt, getVariationTemplateGenerationPrompt, getRfiTemplateGenerationPrompt } from '@/lib/ai-tools/commercial-prompts';
+import { getScopeTemplateGenerationPrompt, getQuoteTemplateGenerationPrompt, getRiddorTemplateGenerationPrompt, getTrafficTemplateGenerationPrompt, getWasteTemplateGenerationPrompt, getInvasiveTemplateGenerationPrompt, getWahTemplateGenerationPrompt, getWbvTemplateGenerationPrompt } from '@/lib/ai-tools/remaining-tool-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { wrapGenerateInput, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import type { AiToolSlug } from '@/lib/ai-tools';
@@ -198,6 +200,30 @@ export async function POST(req: NextRequest) {
       ? getEarlyWarningTemplateGenerationPrompt(earlyWarningTemplateSlug as any)
       : (toolSlug === 'carbon-reduction-plan' && crpTemplateSlug)
       ? getCrpTemplateGenerationPrompt(crpTemplateSlug as any)
+      : (toolSlug === 'ce-notification' && ceTemplateSlug)
+      ? getCeTemplateGenerationPrompt(ceTemplateSlug as any)
+      : (toolSlug === 'delay-notification' && delayTemplateSlug)
+      ? getDelayTemplateGenerationPrompt(delayTemplateSlug as any)
+      : (toolSlug === 'variation-confirmation' && variationTemplateSlug)
+      ? getVariationTemplateGenerationPrompt(variationTemplateSlug as any)
+      : (toolSlug === 'rfi-generator' && rfiTemplateSlug)
+      ? getRfiTemplateGenerationPrompt(rfiTemplateSlug as any)
+      : (toolSlug === 'scope-of-works' && scopeTemplateSlug)
+      ? getScopeTemplateGenerationPrompt(scopeTemplateSlug as any)
+      : (toolSlug === 'quote-generator' && quoteTemplateSlug)
+      ? getQuoteTemplateGenerationPrompt(quoteTemplateSlug as any)
+      : (toolSlug === 'riddor-report' && riddorTemplateSlug)
+      ? getRiddorTemplateGenerationPrompt(riddorTemplateSlug as any)
+      : (toolSlug === 'traffic-management' && trafficTemplateSlug)
+      ? getTrafficTemplateGenerationPrompt(trafficTemplateSlug as any)
+      : (toolSlug === 'waste-management' && wasteTemplateSlug)
+      ? getWasteTemplateGenerationPrompt(wasteTemplateSlug as any)
+      : (toolSlug === 'invasive-species' && invasiveTemplateSlug)
+      ? getInvasiveTemplateGenerationPrompt(invasiveTemplateSlug as any)
+      : (toolSlug === 'wah-assessment' && wahTemplateSlug)
+      ? getWahTemplateGenerationPrompt(wahTemplateSlug as any)
+      : (toolSlug === 'wbv-assessment' && wbvTemplateSlug)
+      ? getWbvTemplateGenerationPrompt(wbvTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A (sanitised)
