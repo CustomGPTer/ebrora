@@ -1,0 +1,110 @@
+// =============================================================================
+// Carbon Reduction Plan Builder — Template Configuration
+// =============================================================================
+import type { CrpTemplateSlug, CrpTemplateConfig } from './types';
+
+export const CRP_TEMPLATE_CONFIGS: Record<CrpTemplateSlug, CrpTemplateConfig> = {
+  'ppn-0621-standard': {
+    slug: 'ppn-0621-standard',
+    displayName: 'PPN 06/21 Standard',
+    tagline: 'UK Government mandated format',
+    description:
+      'GOV.UK green palette, structured to PPN 06/21 mandatory headings. Arial font, green header bands, banded data tables. Required for all UK public sector contracts over £5M annual value. Covers commitment, baseline, current emissions, reduction measures, and board sign-off.',
+    font: 'Arial',
+    accentColor: '00703C',
+    style: 'Government green with structured compliance tables',
+    pageCount: '8–12',
+    thumbnailPath: '/product-images/crp-templates/thumb-crp-ppn0621.jpg',
+    previewPaths: ['/product-images/crp-templates/preview-crp-ppn0621-p1.jpg'],
+    keySections: [
+      'PPN 06/21 Compliance Declaration',
+      'Net Zero Commitment Statement',
+      'Baseline Emissions Footprint',
+      'Current Scope 1, 2 & 3 Emissions',
+      'Emissions Reduction Initiatives',
+      'Carbon Reduction Targets (2030 & Net Zero)',
+      'Supply Chain Engagement',
+      'Reporting & Measurement Framework',
+      'Board-Level Sign-Off',
+    ],
+  },
+  'sbti-aligned': {
+    slug: 'sbti-aligned',
+    displayName: 'SBTi Aligned',
+    tagline: 'Science-based near & long-term targets',
+    description:
+      'Deep corporate navy with blue-to-teal gradient accent bar. Calibri font, KPI summary boxes, info strip. Structured around SBTi near-term (1.5°C) and long-term target methodology. Ideal for Tier 1 framework bids requiring science-based credentials.',
+    font: 'Calibri',
+    accentColor: '1A3C6E',
+    style: 'Corporate navy with gradient accents and KPI boxes',
+    pageCount: '10–14',
+    thumbnailPath: '/product-images/crp-templates/thumb-crp-sbti.jpg',
+    previewPaths: ['/product-images/crp-templates/preview-crp-sbti-p1.jpg'],
+    keySections: [
+      'Organisational Boundary',
+      'SBTi Target Summary (Near & Long-Term)',
+      'Temperature Pathway Alignment (1.5°C / Well-Below 2°C)',
+      'Scope 1 & 2 Emissions Analysis',
+      'Scope 3 Screening & Material Categories',
+      'Target Validation Status',
+      'Decarbonisation Pathway & KPIs',
+      'Annual Progress Tracking',
+      'Board Governance & Accountability',
+    ],
+  },
+  'iso-14064-compliant': {
+    slug: 'iso-14064-compliant',
+    displayName: 'ISO 14064 Compliant',
+    tagline: 'International GHG verification standard',
+    description:
+      'Charcoal headers with deep red clause numbering, Cambria font. Formal ISO clause structure (1.1, 1.2) with quantification methodology and verification-ready data tables. Reads like an auditable technical document — ideal for clients requiring third-party verified carbon reporting.',
+    font: 'Cambria',
+    accentColor: 'C0392B',
+    style: 'Formal clause-numbered with verification tables',
+    pageCount: '9–13',
+    thumbnailPath: '/product-images/crp-templates/thumb-crp-iso14064.jpg',
+    previewPaths: ['/product-images/crp-templates/preview-crp-iso14064-p1.jpg'],
+    keySections: [
+      'Organisational Boundary & Consolidation Approach',
+      'GHG Source Identification (ISO 14064-1 Clause 5.2)',
+      'Quantification Methodology & Emission Factors',
+      'Base Year Emissions & Recalculation Policy',
+      'Current Period GHG Inventory',
+      'Uncertainty Assessment',
+      'Reduction Targets & Planned Actions',
+      'Verification Readiness Statement (ISO 14064-3)',
+      'Document Control & Revision History',
+    ],
+  },
+  'ghg-protocol-corporate': {
+    slug: 'ghg-protocol-corporate',
+    displayName: 'GHG Protocol Corporate',
+    tagline: 'Comprehensive emissions reporting',
+    description:
+      'Dark teal cover block with lighter teal section bars. Calibri font, scope-grouped inventory tables, reduction roadmap bar chart. Full GHG Protocol Corporate Standard structure — 15-category Scope 3 screening, inventory boundaries, and stepped reduction roadmap.',
+    font: 'Calibri',
+    accentColor: '00897B',
+    style: 'Contemporary teal with scope-grouped data tables',
+    pageCount: '11–15',
+    thumbnailPath: '/product-images/crp-templates/thumb-crp-ghg-protocol.jpg',
+    previewPaths: ['/product-images/crp-templates/preview-crp-ghg-protocol-p1.jpg'],
+    keySections: [
+      'Company Profile & Inventory Boundaries',
+      'Consolidation Approach (Operational Control)',
+      'GHG Inventory Summary (All Scopes)',
+      'Scope 3 Category Screening (15 Categories)',
+      'Data Quality & Emission Factor Sources',
+      'Reduction Roadmap (Baseline → Net Zero)',
+      'Completed & Planned Initiatives',
+      'Supply Chain Decarbonisation Strategy',
+      'Reporting Cycle & Governance',
+    ],
+  },
+};
+
+export const CRP_TEMPLATE_ORDER: CrpTemplateSlug[] = [
+  'ppn-0621-standard',
+  'sbti-aligned',
+  'iso-14064-compliant',
+  'ghg-protocol-corporate',
+];
