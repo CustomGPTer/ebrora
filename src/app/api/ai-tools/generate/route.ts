@@ -11,6 +11,7 @@ import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
 import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt, getEarlyWarningTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
+import { getCrpTemplateGenerationPrompt } from '@/lib/carbon-reduction/crp-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { wrapGenerateInput, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import type { AiToolSlug } from '@/lib/ai-tools';
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest) {
       delayTemplateSlug?: string;
       variationTemplateSlug?: string;
       rfiTemplateSlug?: string;
+      crpTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -194,6 +196,8 @@ export async function POST(req: NextRequest) {
       ? getPowraTemplateGenerationPrompt(powraTemplateSlug as any)
       : (toolSlug === 'early-warning' && earlyWarningTemplateSlug)
       ? getEarlyWarningTemplateGenerationPrompt(earlyWarningTemplateSlug as any)
+      : (toolSlug === 'carbon-reduction-plan' && crpTemplateSlug)
+      ? getCrpTemplateGenerationPrompt(crpTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A (sanitised)
@@ -365,6 +369,11 @@ export async function POST(req: NextRequest) {
     // Inject RFI Generator template slug
     if (toolSlug === 'rfi-generator' && rfiTemplateSlug) {
       documentContent._rfiTemplateSlug = rfiTemplateSlug;
+    }
+
+    // Inject Carbon Reduction Plan template slug
+    if (toolSlug === 'carbon-reduction-plan' && crpTemplateSlug) {
+      documentContent._crpTemplateSlug = crpTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
