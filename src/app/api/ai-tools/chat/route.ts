@@ -24,6 +24,10 @@ import {
 } from '@/lib/ai-tools';
 import { getConversationPrompt } from '@/lib/ai-tools/system-prompts';
 import { getCrpTemplateConversationPrompt } from '@/lib/carbon-reduction/crp-prompts';
+import { getCarbonFootprintTemplateConversationPrompt } from '@/lib/carbon-footprint/cf-prompts';
+import { getDayworkSheetTemplateConversationPrompt } from '@/lib/daywork-sheet/dw-prompts';
+import { getNcrTemplateConversationPrompt } from '@/lib/ncr/ncr-prompts';
+import { getSafetyAlertTemplateConversationPrompt } from '@/lib/safety-alert/sa-prompts';
 import { wrapDescription, wrapAnswers, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import type {
   AiToolSlug,
@@ -95,7 +99,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body: AiToolChatRequest = await req.json();
-    const { toolSlug, description, rounds, crpTemplateSlug } = body;
+    const { toolSlug, description, rounds, crpTemplateSlug, carbonFootprintTemplateSlug, dayworkSheetTemplateSlug, ncrTemplateSlug, safetyAlertTemplateSlug } = body;
 
     // Validate tool slug
     if (!toolSlug || !isValidAiToolSlug(toolSlug)) {
@@ -227,6 +231,14 @@ export async function POST(req: NextRequest) {
     // Build system prompt
     const systemPrompt = (toolSlug === 'carbon-reduction-plan' && crpTemplateSlug)
       ? getCrpTemplateConversationPrompt(crpTemplateSlug as any)
+      : (toolSlug === 'carbon-footprint' && carbonFootprintTemplateSlug)
+      ? getCarbonFootprintTemplateConversationPrompt(carbonFootprintTemplateSlug as any)
+      : (toolSlug === 'daywork-sheet' && dayworkSheetTemplateSlug)
+      ? getDayworkSheetTemplateConversationPrompt(dayworkSheetTemplateSlug as any)
+      : (toolSlug === 'ncr' && ncrTemplateSlug)
+      ? getNcrTemplateConversationPrompt(ncrTemplateSlug as any)
+      : (toolSlug === 'safety-alert' && safetyAlertTemplateSlug)
+      ? getSafetyAlertTemplateConversationPrompt(safetyAlertTemplateSlug as any)
       : getConversationPrompt(toolSlug);
 
     // Injection detection — log suspicious patterns but don't block
