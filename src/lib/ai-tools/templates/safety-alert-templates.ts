@@ -97,7 +97,7 @@ function buildT1(d: SaData): Document {
     { label: 'Alert Ref', value: d.alertRef }, { label: 'Date', value: d.alertDate },
     { label: 'Classification', value: d.classification }, { label: 'Project', value: d.projectName },
     { label: 'Site', value: d.siteLocation }, { label: 'Client', value: d.client },
-  ], W));
+  ], W) as any);
   sec.push(h.sectionHeading('Incident Summary'));
   sec.push(...h.prose(d.incidentSummary));
   sec.push(h.sectionHeading('What Happened — Timeline'));
@@ -124,7 +124,7 @@ function buildT1(d: SaData): Document {
   sec.push(h.sectionHeading('Distribution & Briefing Confirmation'));
   sec.push(h.bodyText(`Scope: ${d.distributionScope} | Method: ${d.briefingMethod}`, SM));
   if (d.distributionList.length > 0) {
-    sec.push(h.briefingRecordTable(Math.max(d.distributionList.length, 5), W));
+    sec.push(h.briefingRecordTable(Math.max(d.distributionList.length, 5), W) as any);
   }
   if (d.additionalNotes) { sec.push(h.sectionHeading('Additional Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
@@ -147,7 +147,7 @@ function buildT2(d: SaData): Document {
   sec.push(h.infoTable([
     { label: 'Ref', value: d.alertRef }, { label: 'Date', value: d.incidentDate },
     { label: 'Site', value: d.siteLocation || d.projectName },
-  ], W));
+  ], W) as any);
   sec.push(h.spacer(100));
   // Immediate actions
   sec.push(new Paragraph({ spacing: { after: 80 }, shading: { type: ShadingType.CLEAR, fill: RED_BG }, children: [new TextRun({ text: '  IMMEDIATE ACTIONS REQUIRED:', bold: true, size: LG, color: RED })] }));
@@ -177,7 +177,7 @@ function buildT3(d: SaData): Document {
   sec.push(h.infoTable([
     { label: 'Alert Ref', value: d.alertRef }, { label: 'Date', value: d.alertDate },
     { label: 'Type', value: d.classification }, { label: 'Site', value: d.siteLocation || d.projectName },
-  ], W));
+  ], W) as any);
   sec.push(h.spacer(100));
   // The Story
   sec.push(h.sectionHeading('The Story — What Happened', LG, TEAL));
@@ -207,7 +207,7 @@ function buildT3(d: SaData): Document {
   sec.push(h.sectionHeading('Operative Acknowledgement', LG, TEAL));
   sec.push(h.bodyText('I confirm I have been briefed on this safety alert and understand the lessons and actions.', SM));
   sec.push(h.spacer(80));
-  sec.push(h.briefingRecordTable(5, W));
+  sec.push(h.briefingRecordTable(5, W) as any);
   if (d.additionalNotes) { sec.push(h.sectionHeading('Additional Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
 
@@ -226,7 +226,7 @@ function buildT4(d: SaData): Document {
     { label: 'Classification', value: d.classification }, { label: 'Severity', value: d.severity },
     { label: 'Project', value: d.projectName }, { label: 'Site', value: d.siteLocation },
     { label: 'Investigation Lead', value: d.investigationLead }, { label: 'RIDDOR Reportable', value: d.riddorReportable },
-  ], W));
+  ], W) as any);
   sec.push(h.spacer(100));
   // Timeline
   sec.push(h.sectionHeading('1. Detailed Timeline Reconstruction', LG, CHARCOAL));

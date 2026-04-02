@@ -125,7 +125,7 @@ function buildT1(d: NcrData): Document {
   sec.push(h.bodyText(`Close-Out Date: ${d.closeOutDate || '________'} | Verified By: ${d.closeOutBy || '________'}`, SM));
   if (d.closeOutEvidence) sec.push(h.bodyText(`Evidence: ${d.closeOutEvidence}`, SM));
   sec.push(h.sectionHeading('9. Sign-Off'));
-  sec.push(h.approvalTable(d.approvalChain.map((a: any) => ({ role: a.role, name: a.name, date: a.date })), W));
+  sec.push(h.approvalTable(d.approvalChain.map((a: any) => ({ role: a.role, name: a.name, date: a.date })), W) as any);
   if (d.additionalNotes) { sec.push(h.sectionHeading('10. Additional Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
 
@@ -217,7 +217,7 @@ function buildT4(d: NcrData): Document {
     { label: 'NCR Ref', value: d.ncrRef }, { label: 'Date', value: d.ncrDate },
     { label: 'Severity', value: d.severity || 'Minor' }, { label: 'Project', value: d.projectName },
     { label: 'Location', value: d.location }, { label: 'Raised By', value: d.raisedBy },
-  ], W));
+  ], W) as any);
   sec.push(h.sectionHeading('Defect', LG, GREY_COMP));
   sec.push(...h.prose(d.actualCondition));
   sec.push(h.bodyText(`Spec: ${d.specClause || d.drawingRef || 'N/A'}`, SM));
@@ -244,7 +244,7 @@ function buildT5(d: NcrData): Document {
     { label: 'Supplier', value: d.supplierName }, { label: 'Contact', value: d.supplierContact },
     { label: 'PO Ref', value: d.poRef }, { label: 'Delivery Note', value: d.deliveryNoteRef },
     { label: 'Project', value: d.projectName }, { label: 'Severity', value: d.severity },
-  ], W));
+  ], W) as any);
   sec.push(h.sectionHeading('1. Non-Conformance Against Specification', LG, ORANGE));
   sec.push(h.bodyText(`Required: ${d.specRequirement}`, SM));
   sec.push(h.bodyText(`Actual: ${d.actualCondition}`, SM));
@@ -263,7 +263,7 @@ function buildT5(d: NcrData): Document {
   sec.push(h.sectionHeading('6. Corrective Actions', LG, ORANGE));
   sec.push(correctiveActionsTable(d, ORANGE) as any);
   sec.push(h.sectionHeading('7. Sign-Off'));
-  sec.push(h.approvalTable(d.approvalChain.map((a: any) => ({ role: a.role, name: a.name, date: a.date })), W));
+  sec.push(h.approvalTable(d.approvalChain.map((a: any) => ({ role: a.role, name: a.name, date: a.date })), W) as any);
   if (d.additionalNotes) { sec.push(h.sectionHeading('8. Additional Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
 

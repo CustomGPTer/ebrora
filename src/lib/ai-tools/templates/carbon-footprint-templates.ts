@@ -188,7 +188,7 @@ function buildT1(d: CfData): Document {
   if (d.additionalNotes) { sections.push(h.sectionHeading('11. Additional Notes')); sections.push(...h.prose(d.additionalNotes)); }
   // Sign-off
   sections.push(h.sectionHeading('12. Sign-Off & Review'));
-  sections.push(h.approvalTable((d.approvalChain || []).map((a: any) => ({ role: a.role, name: a.name, date: a.date })), W));
+  sections.push(h.approvalTable((d.approvalChain || []).map((a: any) => ({ role: a.role, name: a.name, date: a.date })), W) as any);
   sections.push(h.spacer(200));
   sections.push(footerLine());
 
@@ -293,7 +293,7 @@ function buildT3(d: CfData): Document {
   sections.push(h.infoTable([
     { label: 'Project', value: d.projectName }, { label: 'Ref', value: d.documentRef },
     { label: 'Date', value: d.assessmentDate }, { label: 'Assessor', value: d.assessedBy },
-  ], W));
+  ], W) as any);
   sections.push(h.spacer(100));
   sections.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 150 }, children: [new TextRun({ text: 'CARBON FOOTPRINT SUMMARY', bold: true, size: XL, color: '374151' })] }));
 

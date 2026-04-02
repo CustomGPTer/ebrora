@@ -215,7 +215,7 @@ function buildT5(d: DwData): Document {
   sec.push(h.infoTable([
     { label: 'Ref', value: d.dayworkRef }, { label: 'Date', value: d.dayworkDate },
     { label: 'Project', value: d.projectName }, { label: 'Instructed By', value: d.instructedBy },
-  ], W));
+  ], W) as any);
   sec.push(h.bodyText(d.activityDescription, SM));
   sec.push(h.sectionHeading('Labour', BODY, GREY_COMP)); sec.push(labourTable(d, GREY_COMP) as any);
   sec.push(h.sectionHeading('Plant', BODY, GREY_COMP)); sec.push(plantTable(d, GREY_COMP) as any);
@@ -254,7 +254,7 @@ function buildT6(d: DwData): Document {
     { role: 'Site Agent', name: '________' },
     { role: 'QS', name: d.qsSignName || '________' },
     { role: 'Client Rep', name: d.clientSignName || '________' },
-  ], W));
+  ], W) as any);
   if (d.additionalNotes) { sec.push(h.sectionHeading('Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
   return new Document({ sections: [{ properties: { page: { margin: { top: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL } } }, headers: { default: h.ebroraHeader('Daywork Audit Trail') }, footers: { default: h.ebroraFooter() }, children: sec }] });
@@ -280,7 +280,7 @@ function buildT7(d: DwData): Document {
   sec.push(h.sectionHeading('Totals', LG, ORANGE)); sec.push(totalsBlock(d) as any);
   if (d.cumulativeTotal) sec.push(h.bodyText(`Cumulative Daywork Total: £${d.cumulativeTotal}`, BODY, { bold: true, color: ORANGE }));
   sec.push(h.sectionHeading('Commercial Manager Sign-Off'));
-  sec.push(h.approvalTable([{ role: 'Commercial Manager', name: d.contractorSignName || '________' }], W));
+  sec.push(h.approvalTable([{ role: 'Commercial Manager', name: d.contractorSignName || '________' }], W) as any);
   if (d.additionalNotes) { sec.push(h.sectionHeading('Notes')); sec.push(...h.prose(d.additionalNotes)); }
   sec.push(h.spacer(200)); sec.push(footerLine());
   return new Document({ sections: [{ properties: { page: { margin: { top: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL } } }, headers: { default: h.ebroraHeader('Subcontractor Valuation') }, footers: { default: h.ebroraFooter() }, children: sec }] });
@@ -293,7 +293,7 @@ function buildT8(d: DwData): Document {
   sec.push(h.infoTable([
     { label: 'Week Commencing', value: d.weekCommencing || d.dayworkDate }, { label: 'Project', value: d.projectName },
     { label: 'Contract Ref', value: d.contractRef }, { label: 'Daywork Sheets', value: d.dailySheetRefs.join(', ') || d.dayworkRef },
-  ], W));
+  ], W) as any);
   if (d.dailySummary.length > 0) {
     sec.push(h.sectionHeading('Daily Breakdown', LG, TEAL));
     const dw = [Math.round(W*0.18), Math.round(W*0.20), Math.round(W*0.20), Math.round(W*0.20), W - Math.round(W*0.18) - Math.round(W*0.20) - Math.round(W*0.20) - Math.round(W*0.20)];
