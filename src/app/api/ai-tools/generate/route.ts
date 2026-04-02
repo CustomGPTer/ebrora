@@ -12,6 +12,10 @@ import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
 import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt, getEarlyWarningTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { getCrpTemplateGenerationPrompt } from '@/lib/carbon-reduction/crp-prompts';
+import { getCarbonFootprintTemplateGenerationPrompt } from '@/lib/carbon-footprint/cf-prompts';
+import { getDayworkSheetTemplateGenerationPrompt } from '@/lib/daywork-sheet/dw-prompts';
+import { getNcrTemplateGenerationPrompt } from '@/lib/ncr/ncr-prompts';
+import { getSafetyAlertTemplateGenerationPrompt } from '@/lib/safety-alert/sa-prompts';
 import { getCeTemplateGenerationPrompt, getDelayTemplateGenerationPrompt, getVariationTemplateGenerationPrompt, getRfiTemplateGenerationPrompt } from '@/lib/ai-tools/commercial-prompts';
 import { getScopeTemplateGenerationPrompt, getQuoteTemplateGenerationPrompt, getRiddorTemplateGenerationPrompt, getTrafficTemplateGenerationPrompt, getWasteTemplateGenerationPrompt, getInvasiveTemplateGenerationPrompt, getWahTemplateGenerationPrompt, getWbvTemplateGenerationPrompt } from '@/lib/ai-tools/template-generation-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
@@ -37,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request
     const body = await req.json();
-    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug } = body as {
+    const { generationId, answers, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug, carbonFootprintTemplateSlug, dayworkSheetTemplateSlug, ncrTemplateSlug, safetyAlertTemplateSlug } = body as {
       generationId: string;
       answers: { number: number; question: string; answer: string }[];
       description?: string;
@@ -66,6 +70,10 @@ export async function POST(req: NextRequest) {
       variationTemplateSlug?: string;
       rfiTemplateSlug?: string;
       crpTemplateSlug?: string;
+      carbonFootprintTemplateSlug?: string;
+      dayworkSheetTemplateSlug?: string;
+      ncrTemplateSlug?: string;
+      safetyAlertTemplateSlug?: string;
     };
     bodyGenerationId = generationId;
 
@@ -224,6 +232,14 @@ export async function POST(req: NextRequest) {
       ? getWahTemplateGenerationPrompt(wahTemplateSlug as any)
       : (toolSlug === 'wbv-assessment' && wbvTemplateSlug)
       ? getWbvTemplateGenerationPrompt(wbvTemplateSlug as any)
+      : (toolSlug === 'carbon-footprint' && carbonFootprintTemplateSlug)
+      ? getCarbonFootprintTemplateGenerationPrompt(carbonFootprintTemplateSlug as any)
+      : (toolSlug === 'daywork-sheet' && dayworkSheetTemplateSlug)
+      ? getDayworkSheetTemplateGenerationPrompt(dayworkSheetTemplateSlug as any)
+      : (toolSlug === 'ncr' && ncrTemplateSlug)
+      ? getNcrTemplateGenerationPrompt(ncrTemplateSlug as any)
+      : (toolSlug === 'safety-alert' && safetyAlertTemplateSlug)
+      ? getSafetyAlertTemplateGenerationPrompt(safetyAlertTemplateSlug as any)
       : getGenerationPrompt(toolSlug);
 
     // Build user message with description + all Q&A (sanitised)
@@ -400,6 +416,26 @@ export async function POST(req: NextRequest) {
     // Inject Carbon Reduction Plan template slug
     if (toolSlug === 'carbon-reduction-plan' && crpTemplateSlug) {
       documentContent._crpTemplateSlug = crpTemplateSlug;
+    }
+
+    // Inject Carbon Footprint template slug
+    if (toolSlug === 'carbon-footprint' && carbonFootprintTemplateSlug) {
+      documentContent._carbonFootprintTemplateSlug = carbonFootprintTemplateSlug;
+    }
+
+    // Inject Daywork Sheet template slug
+    if (toolSlug === 'daywork-sheet' && dayworkSheetTemplateSlug) {
+      documentContent._dayworkSheetTemplateSlug = dayworkSheetTemplateSlug;
+    }
+
+    // Inject NCR template slug
+    if (toolSlug === 'ncr' && ncrTemplateSlug) {
+      documentContent._ncrTemplateSlug = ncrTemplateSlug;
+    }
+
+    // Inject Safety Alert template slug
+    if (toolSlug === 'safety-alert' && safetyAlertTemplateSlug) {
+      documentContent._safetyAlertTemplateSlug = safetyAlertTemplateSlug;
     }
 
     if (toolSlug === 'itp') {
