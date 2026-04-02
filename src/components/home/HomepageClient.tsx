@@ -456,9 +456,9 @@ export default function HomepageClient({
             AI-Powered RAMS, Risk Assessments &amp; Construction Documents for UK Sites
           </h1>
           <p className="hp-hero__subtitle">
-            35+ AI document generators, 1,500+ free toolbox talks, 750+ downloadable
-            templates, and a complete RAMS Builder — all on one platform built for
-            UK construction. Free to use. Just sign in and start generating.
+            35+ AI document generators, 1,500+ free toolbox talks, 1,000+ downloadable
+            templates, and a complete RAMS Builder - all on one platform built for
+            UK construction. Just sign in and start generating.
           </p>
 
           {/* Site-wide search */}
