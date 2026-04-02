@@ -145,6 +145,10 @@ export interface AiToolChatRequest {
   description: string;
   rounds: AiToolConversationRound[];
   crpTemplateSlug?: string;
+  carbonFootprintTemplateSlug?: string;
+  dayworkSheetTemplateSlug?: string;
+  ncrTemplateSlug?: string;
+  safetyAlertTemplateSlug?: string;
 }
 
 /** Response from /api/ai-tools/chat */

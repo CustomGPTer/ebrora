@@ -425,8 +425,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'ncr') {
-    const { buildNcrDocument } = await import('./templates/ncr-template');
-    const doc = await buildNcrDocument(content as any);
+    const ncrSlug = (content as any)._ncrTemplateSlug;
+    let doc;
+    if (ncrSlug) {
+      const { buildNcrTemplateDocument } = await import('./templates/ncr-templates');
+      doc = await buildNcrTemplateDocument(content as any, ncrSlug);
+    } else {
+      const { buildNcrDocument } = await import('./templates/ncr-template');
+      doc = await buildNcrDocument(content as any);
+    }
     const { Packer } = await import('docx');
     const buffer = await Packer.toBuffer(doc);
     return Buffer.from(buffer);
@@ -585,15 +592,29 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'safety-alert') {
-    const { buildSafetyAlertDocument } = await import('./templates/new-tools-templates');
-    const doc = await buildSafetyAlertDocument(content as any);
+    const saSlug = (content as any)._safetyAlertTemplateSlug;
+    let doc;
+    if (saSlug) {
+      const { buildSafetyAlertTemplateDocument } = await import('./templates/safety-alert-templates');
+      doc = await buildSafetyAlertTemplateDocument(content as any, saSlug);
+    } else {
+      const { buildSafetyAlertDocument } = await import('./templates/new-tools-templates');
+      doc = await buildSafetyAlertDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }
 
   if (toolSlug === 'carbon-footprint') {
-    const { buildCarbonFootprintDocument } = await import('./templates/new-tools-templates');
-    const doc = await buildCarbonFootprintDocument(content as any);
+    const cfSlug = (content as any)._carbonFootprintTemplateSlug;
+    let doc;
+    if (cfSlug) {
+      const { buildCarbonFootprintTemplateDocument } = await import('./templates/carbon-footprint-templates');
+      doc = await buildCarbonFootprintTemplateDocument(content as any, cfSlug);
+    } else {
+      const { buildCarbonFootprintDocument } = await import('./templates/new-tools-templates');
+      doc = await buildCarbonFootprintDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }
@@ -655,8 +676,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'daywork-sheet') {
-    const { buildDayworkSheetDocument } = await import('./templates/new-tools-templates');
-    const doc = await buildDayworkSheetDocument(content as any);
+    const dwSlug = (content as any)._dayworkSheetTemplateSlug;
+    let doc;
+    if (dwSlug) {
+      const { buildDayworkSheetTemplateDocument } = await import('./templates/daywork-sheet-templates');
+      doc = await buildDayworkSheetTemplateDocument(content as any, dwSlug);
+    } else {
+      const { buildDayworkSheetDocument } = await import('./templates/new-tools-templates');
+      doc = await buildDayworkSheetDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }

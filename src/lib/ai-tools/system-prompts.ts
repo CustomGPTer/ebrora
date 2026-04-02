@@ -822,7 +822,7 @@ Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "
 // ---------------------------------------------------------------------------
 // Generation prompt preamble (shared)
 // ---------------------------------------------------------------------------
-const GENERATION_PREAMBLE = `You are Ebrora's AI document generator. Using the interview data provided, generate a comprehensive, regulation-compliant document in JSON format.
+export const GENERATION_PREAMBLE = `You are Ebrora's AI document generator. Using the interview data provided, generate a comprehensive, regulation-compliant document in JSON format.
 
 RULES:
 - Output ONLY valid JSON — no markdown, no code fences, no commentary.
@@ -840,7 +840,7 @@ RULES:
 // ---------------------------------------------------------------------------
 // Tool-specific generation JSON schemas
 // ---------------------------------------------------------------------------
-const TOOL_GENERATION_SCHEMAS: Record<AiToolSlug, string> = {
+export const TOOL_GENERATION_SCHEMAS: Record<AiToolSlug, string> = {
   coshh: `Generate a COSHH Assessment for a SINGLE product/substance. You MUST use your knowledge of this product's actual Safety Data Sheet (SDS) to populate the technical fields — hazard classification, H-statements, exposure limits, health effects, first aid, etc. Do NOT make up chemical data. If you are unsure about a specific value, state "Refer to manufacturer SDS" rather than guessing.
 
 JSON structure:
