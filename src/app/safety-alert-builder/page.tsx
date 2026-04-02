@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import AiToolBuilderClient from '@/components/ai-tools/AiToolBuilderClient';
-import { AI_TOOL_CONFIGS } from '@/lib/ai-tools/tool-config';
+import SafetyAlertBuilderClient from './components/SafetyAlertBuilderClient';
 import { BreadcrumbNav } from '@/components/shared/BreadcrumbNav';
 
 export const metadata: Metadata = {
@@ -37,7 +36,6 @@ const toolSchema = {
   },
 };
 export default function Page() {
-  const toolConfig = AI_TOOL_CONFIGS['safety-alert'];
   return (
     <>
       <script
@@ -47,7 +45,7 @@ export default function Page() {
       <div className="max-w-[1200px] mx-auto px-6 pt-4">
         <BreadcrumbNav items={[{ label: "AI Tools", href: "/" }, { label: "Health & Safety" }, { label: "Safety Alert Generator" }]} />
       </div>
-      <AiToolBuilderClient toolConfig={toolConfig} />
+      <SafetyAlertBuilderClient />
     </>
   );
 }
