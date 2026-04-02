@@ -59,6 +59,8 @@ interface AiToolBuilderClientProps {
   variationTemplateSlug?: string;
   /** For RFI Generator multi-template — passed to generate route */
   rfiTemplateSlug?: string;
+  /** For Carbon Reduction Plan multi-template — passed to chat + generate routes */
+  crpTemplateSlug?: string;
 }
 
 /* ── Helpers ── */
@@ -123,7 +125,7 @@ const DOCUMENT_STEPS = [
 
 const MAX_WORDS_PER_ANSWER = 100;
 
-export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug }: AiToolBuilderClientProps) {
+export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug }: AiToolBuilderClientProps) {
   // Per-tool limits with sensible defaults
   const MAX_WORDS = toolConfig.maxWords ?? 200;
   const MIN_WORDS = toolConfig.minWords ?? 3;
@@ -243,6 +245,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           toolSlug: toolConfig.slug,
           description,
           rounds: [],
+          ...(crpTemplateSlug ? { crpTemplateSlug } : {}),
         }),
       });
 
@@ -294,6 +297,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           toolSlug: toolConfig.slug,
           description,
           rounds: allRounds,
+          ...(crpTemplateSlug ? { crpTemplateSlug } : {}),
         }),
       });
 
@@ -369,6 +373,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
           ...(delayTemplateSlug ? { delayTemplateSlug } : {}),
           ...(variationTemplateSlug ? { variationTemplateSlug } : {}),
           ...(rfiTemplateSlug ? { rfiTemplateSlug } : {}),
+          ...(crpTemplateSlug ? { crpTemplateSlug } : {}),
         }),
       });
 
@@ -389,7 +394,7 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
       setError(err.message);
       setStep('conversation');
     }
-  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug]);
+  }, [generationId, rounds, description, tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug, confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug, liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug, permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug, earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug, wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug, wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug, delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug, crpTemplateSlug]);
 
   /* ── Start over ── */
   const handleStartOver = useCallback(() => {
