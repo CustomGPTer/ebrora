@@ -177,20 +177,25 @@ export default function AccountDashboardClient({
   const [activeTab, setActiveTab] = useState<TabType>(initialTab as TabType);
 
   // RAMS limits
-  const ramsLimit = subscription?.plan === 'PROFESSIONAL' ? 25 : subscription?.plan === 'STANDARD' ? 10 : 1;
-  const ramsPercentage = Math.min((generationCount / ramsLimit) * 100, 100);
+  const ramsLimit = subscription?.plan === 'UNLIMITED' ? 9999 : subscription?.plan === 'PROFESSIONAL' ? 15 : (subscription?.plan === 'STARTER' || subscription?.plan === 'STANDARD') ? 5 : 1;
+  const ramsPercentage = ramsLimit >= 9999 ? 0 : Math.min((generationCount / ramsLimit) * 100, 100);
 
   // TBT limits
-  const tbtLimit = subscription?.plan === 'PROFESSIONAL' ? 20 : subscription?.plan === 'STANDARD' ? 10 : 2;
-  const tbtPercentage = Math.min((tbtDownloadCount / tbtLimit) * 100, 100);
+  const tbtLimit = subscription?.plan === 'UNLIMITED' ? 9999 : subscription?.plan === 'PROFESSIONAL' ? 20 : (subscription?.plan === 'STARTER' || subscription?.plan === 'STANDARD') ? 10 : 1;
+  const tbtPercentage = tbtLimit >= 9999 ? 0 : Math.min((tbtDownloadCount / tbtLimit) * 100, 100);
 
   // Template limits
-  const templateLimit = subscription?.plan === 'PROFESSIONAL' ? 40 : subscription?.plan === 'STANDARD' ? 20 : 2;
-  const templatePercentage = Math.min((templateDownloadCount / templateLimit) * 100, 100);
+  const templateLimit = subscription?.plan === 'UNLIMITED' ? 9999 : subscription?.plan === 'PROFESSIONAL' ? 30 : (subscription?.plan === 'STARTER' || subscription?.plan === 'STANDARD') ? 10 : 1;
+  const templatePercentage = templateLimit >= 9999 ? 0 : Math.min((templateDownloadCount / templateLimit) * 100, 100);
 
-  const planLabel = subscription?.plan
-    ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1).toLowerCase()
-    : 'Free';
+  // Display label — normalise STANDARD → Starter
+  const rawLabel = subscription?.plan || 'FREE';
+  const planLabel = rawLabel === 'STANDARD' ? 'Starter'
+    : rawLabel === 'UNLIMITED' && (ramsLimit >= 9999) ? 'Unlimited'
+    : rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1).toLowerCase();
+
+  // Display helper: show ∞ instead of 9999
+  const dl = (v: number) => v >= 9999 ? '∞' : String(v);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -259,7 +264,7 @@ export default function AccountDashboardClient({
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">RAMS Generated</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {generationCount} <span className="text-base font-normal text-gray-400">/ {ramsLimit}</span>
+                  {generationCount} <span className="text-base font-normal text-gray-400">/ {dl(ramsLimit)}</span>
                 </p>
                 <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
@@ -277,7 +282,7 @@ export default function AccountDashboardClient({
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Toolbox Talks</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {tbtDownloadCount} <span className="text-base font-normal text-gray-400">/ {tbtLimit}</span>
+                  {tbtDownloadCount} <span className="text-base font-normal text-gray-400">/ {dl(tbtLimit)}</span>
                 </p>
                 <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
@@ -295,7 +300,7 @@ export default function AccountDashboardClient({
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Free Templates</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {templateDownloadCount} <span className="text-base font-normal text-gray-400">/ {templateLimit}</span>
+                  {templateDownloadCount} <span className="text-base font-normal text-gray-400">/ {dl(templateLimit)}</span>
                 </p>
                 <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
@@ -350,7 +355,7 @@ export default function AccountDashboardClient({
                               <p className="text-[11px] font-semibold text-gray-500 mb-1 leading-tight group-hover:text-gray-800 transition-colors truncate">{label}</p>
                               <p className="text-lg font-bold text-gray-900 leading-none">
                                 {usage.used}
-                                <span className="text-xs font-normal text-gray-400 ml-0.5">/{usage.limit}</span>
+                                <span className="text-xs font-normal text-gray-400 ml-0.5">/{usage.limit >= 9999 ? "∞" : usage.limit}</span>
                               </p>
                               <div className="mt-1.5 h-1 bg-gray-100 rounded-full overflow-hidden">
                                 <div
@@ -498,7 +503,7 @@ export default function AccountDashboardClient({
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <Link href="/rams-builder" className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">RAMS Generated</Link>
-                    <span className="text-sm text-gray-500">{generationCount} / {ramsLimit}</span>
+                    <span className="text-sm text-gray-500">{generationCount} / {dl(ramsLimit)}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-500" style={{ width: `${ramsPercentage}%`, backgroundColor: ramsPercentage > 80 ? '#dc2626' : '#1B5745' }} />
@@ -508,7 +513,7 @@ export default function AccountDashboardClient({
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <Link href="/toolbox-talks" className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">Toolbox Talk Downloads</Link>
-                    <span className="text-sm text-gray-500">{tbtDownloadCount} / {tbtLimit}</span>
+                    <span className="text-sm text-gray-500">{tbtDownloadCount} / {dl(tbtLimit)}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-500" style={{ width: `${tbtPercentage}%`, backgroundColor: tbtPercentage > 80 ? '#dc2626' : '#1B5745' }} />
@@ -518,7 +523,7 @@ export default function AccountDashboardClient({
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <Link href="/templates" className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">Free Template Downloads</Link>
-                    <span className="text-sm text-gray-500">{templateDownloadCount} / {templateLimit}</span>
+                    <span className="text-sm text-gray-500">{templateDownloadCount} / {dl(templateLimit)}</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-500" style={{ width: `${templatePercentage}%`, backgroundColor: templatePercentage > 80 ? '#dc2626' : '#1B5745' }} />
@@ -542,7 +547,7 @@ export default function AccountDashboardClient({
                               <div key={slug} className="mb-2">
                                 <div className="flex items-center justify-between mb-1">
                                   <Link href={href} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">{label}</Link>
-                                  <span className="text-xs text-gray-500">{usage.used} / {usage.limit}</span>
+                                  <span className="text-xs text-gray-500">{usage.used} / {usage.limit >= 9999 ? "∞" : usage.limit}</span>
                                 </div>
                                 <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
                                   <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: pct > 80 ? '#dc2626' : accent } as React.CSSProperties} />
