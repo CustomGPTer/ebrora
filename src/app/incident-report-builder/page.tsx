@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Incident Report Generator | 4 Templates | Ebrora',
+    description: 'AI-powered incident report with 4 templates: standard, RIDDOR focused, root cause analysis, and near miss/observation.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
