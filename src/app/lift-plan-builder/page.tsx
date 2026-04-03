@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Lift Plan Generator | 4 Templates | Ebrora',
+    description: 'AI-powered lift plan with 4 templates: comprehensive, crane operator brief, tandem/complex lift, and LOLER compliance.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
