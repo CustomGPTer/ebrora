@@ -44,3 +44,8 @@ export {
   getGlobalAiUsage,
   checkGlobalAiUsageLimit,
 } from './usage-tracker';
+
+export {
+  isValidTemplateSlug,
+  findInvalidTemplateSlug,
+} from './validate-template-slugs';
