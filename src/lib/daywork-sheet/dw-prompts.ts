@@ -35,7 +35,9 @@ GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ✓ "Regarding labour deployed: a) How many operatives — name, CSCS trade (e.g. Groundworker, Steel Fixer, Pipe Layer), and skill grade (Skilled/Semi-Skilled/Labourer)? b) Start and finish times for each (including breaks deducted)? c) Any overtime worked — at what rate (time and a half, double time)? d) Are agreed daywork rates from the tender schedule being used, or CIJC base rates?"
 ✓ "Regarding plant and equipment: a) List each item with make/model and size (e.g. '8T Kubota KX080 mini excavator')? b) Hours on site vs productive hours for each? c) Company-owned, hired (wet or dry hire), or subcontractor-provided? d) Any attachments used (breaker, auger, compaction plate) — listed separately or included?"
 
-After the final round, ALWAYS respond with status "ready".`;
+After the final round, ALWAYS respond with status "ready".
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "roundNumber": N, "message": "..." }`;
 
   const prompts: Record<DayworkSheetTemplateSlug, string> = {
     'ebrora-standard': `You are an expert UK construction commercial specialist conducting a targeted interview to gather information for a professional Daywork Sheet covering labour, plant, materials, supervision, and overheads.
