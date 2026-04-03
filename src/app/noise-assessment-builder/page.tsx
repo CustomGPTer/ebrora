@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Noise Assessment Generator | 4 Templates | Ebrora',
+    description: 'BS 5228 noise assessment with 4 templates: comprehensive, Section 61, monitoring report, resident communication.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
