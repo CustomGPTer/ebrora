@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Safety Alert Generator for Construction | Ebrora',
+    description: 'Generate professional safety alert bulletins from incidents and near misses. Lessons learned, preventive actions, and distribution record.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   return (
