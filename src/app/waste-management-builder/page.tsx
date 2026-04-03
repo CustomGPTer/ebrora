@@ -21,6 +21,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Waste Management Plan Builder | Ebrora',
+    description: 'Professional waste management plan documents.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
