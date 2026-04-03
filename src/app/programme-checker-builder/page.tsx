@@ -36,6 +36,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Construction Programme Checker | 4 Report Templates | Ebrora',
+    description: 'Upload your programme (PDF, XLSX, XER/XML) and choose a report template. Scoring, Email, RAG, or Comprehensive — AI-powered programme review.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   return (
