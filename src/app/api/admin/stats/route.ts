@@ -26,15 +26,19 @@ export async function GET(req: NextRequest) {
     // Calculate subscription breakdown
     const subscriptionsByTier = {
       FREE: activeSubscriptions.filter((s) => s.tier === 'FREE').length,
+      STARTER: activeSubscriptions.filter((s) => s.tier === 'STARTER').length,
       STANDARD: activeSubscriptions.filter((s) => s.tier === 'STANDARD').length,
       PROFESSIONAL: activeSubscriptions.filter((s) => s.tier === 'PROFESSIONAL').length,
+      UNLIMITED: activeSubscriptions.filter((s) => s.tier === 'UNLIMITED').length,
     };
 
     // Estimate revenue from active subscriptions
     const pricing: Record<string, number> = {
       FREE: 0,
-      STANDARD: 9.99,
-      PROFESSIONAL: 29.99,
+      STARTER: 9.99,
+      STANDARD: 9.99,    // legacy — same price as Starter
+      PROFESSIONAL: 24.99,
+      UNLIMITED: 49.99,
     };
 
     const estimatedRevenue = activeSubscriptions.reduce((sum, sub) => {
