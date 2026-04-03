@@ -18,7 +18,9 @@ function LoginForm() {
 
   const verified = searchParams.get('verified');
   const reset = searchParams.get('reset');
-  const callbackUrl = searchParams.get('callbackUrl') || '/rams-builder';
+  // Security: only allow relative paths to prevent open redirect via ?callbackUrl=https://evil.com
+  const rawCallback = searchParams.get('callbackUrl') || '/rams-builder';
+  const callbackUrl = rawCallback.startsWith('/') && !rawCallback.startsWith('//') ? rawCallback : '/rams-builder';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
