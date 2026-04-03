@@ -28,6 +28,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Compensation Event Notification Builder | Ebrora',
+    description: 'Compensation Event Notification with 3 templates.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
