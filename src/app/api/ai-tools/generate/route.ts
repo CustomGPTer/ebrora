@@ -20,6 +20,7 @@ import { getCeTemplateGenerationPrompt, getDelayTemplateGenerationPrompt, getVar
 import { getScopeTemplateGenerationPrompt, getQuoteTemplateGenerationPrompt, getRiddorTemplateGenerationPrompt, getTrafficTemplateGenerationPrompt, getWasteTemplateGenerationPrompt, getInvasiveTemplateGenerationPrompt, getWahTemplateGenerationPrompt, getWbvTemplateGenerationPrompt } from '@/lib/ai-tools/template-generation-prompts';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { wrapGenerateInput, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
+import { findInvalidTemplateSlug } from '@/lib/ai-tools/validate-template-slugs';
 import type { AiToolSlug } from '@/lib/ai-tools';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -118,6 +119,26 @@ export async function POST(req: NextRequest) {
     const toolSlug = generation.tool_slug as AiToolSlug;
     if (!isValidAiToolSlug(toolSlug)) {
       return NextResponse.json({ error: 'Invalid tool.' }, { status: 400 });
+    }
+
+    // Validate template slugs against allowlist
+    const invalidSlug = findInvalidTemplateSlug(toolSlug, {
+      tbtTemplateSlug, coshhTemplateSlug, cdmCheckerTemplateSlug,
+      confinedSpacesTemplateSlug, erpTemplateSlug, incidentReportTemplateSlug,
+      liftPlanTemplateSlug, manualHandlingTemplateSlug, noiseAssessmentTemplateSlug,
+      permitToDigTemplateSlug, powraTemplateSlug, scopeTemplateSlug,
+      earlyWarningTemplateSlug, quoteTemplateSlug, wahTemplateSlug,
+      wbvTemplateSlug, riddorTemplateSlug, trafficTemplateSlug,
+      wasteTemplateSlug, invasiveTemplateSlug, ceTemplateSlug,
+      delayTemplateSlug, variationTemplateSlug, rfiTemplateSlug,
+      crpTemplateSlug, carbonFootprintTemplateSlug, dayworkSheetTemplateSlug,
+      ncrTemplateSlug, safetyAlertTemplateSlug,
+    });
+    if (invalidSlug) {
+      return NextResponse.json(
+        { error: 'Invalid template selected.' },
+        { status: 400 }
+      );
     }
 
     // Independent tier limit check (prevents replay attacks bypassing chat check)
