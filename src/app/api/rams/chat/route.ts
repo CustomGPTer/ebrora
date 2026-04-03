@@ -18,11 +18,10 @@ import {
 } from '@/lib/rams/types';
 import { wrapDescription, wrapAnswers, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import { getRamsLimitByTier } from '@/lib/payments/plan-config';
+import { FREE_TEMPLATES } from '@/lib/rams/template-config';
+import { getRamsUsageThisMonth } from '@/lib/rams/usage';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-// Free tier: first 2 templates only
-const FREE_TEMPLATES: TemplateSlug[] = ['standard-5x5', 'simple-hml'];
 
 // RAMS per month per subscription tier — uses shared config
 // getRamsLimitByTier handles FREE/STARTER/STANDARD/PROFESSIONAL/UNLIMITED
@@ -33,7 +32,7 @@ const MAX_TOTAL_QUESTIONS = 15;
 const MAX_ROUNDS = 5;
 
 // Answer validation limits
-const MAX_ANSWER_WORDS = 150;
+const MAX_ANSWER_WORDS = 100;
 const MAX_ANSWERS_PER_ROUND = 8;
 
 // Cooldown: 10 seconds between chat rounds per user (in-memory — resets on cold start)
@@ -117,7 +116,7 @@ export async function POST(req: NextRequest) {
 
     // Validate description word count
     const descWords = description.trim().split(/\s+/).length;
-    if (descWords > 110) {
+    if (descWords > 100) {
       return NextResponse.json(
         { error: 'Description must be 100 words or fewer' },
         { status: 400 }
@@ -186,17 +185,7 @@ export async function POST(req: NextRequest) {
     // Usage limit check (only on first round — count from QUEUED, exclude EXPIRED)
     if (!rounds || rounds.length === 0) {
       const monthLimit = getRamsLimitByTier(tier);
-      const nowDate = new Date();
-      const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
-      const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
-
-      const usageThisMonth = await prisma.generation.count({
-        where: {
-          user_id: user.id,
-          created_at: { gte: periodStart, lte: periodEnd },
-          status: { in: ['COMPLETED', 'PROCESSING', 'QUEUED'] },
-        },
-      });
+      const usageThisMonth = await getRamsUsageThisMonth(user.id);
 
       if (usageThisMonth >= monthLimit) {
         return NextResponse.json(
