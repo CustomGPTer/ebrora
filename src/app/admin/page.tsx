@@ -76,7 +76,7 @@ export default async function AdminDashboard() {
     UNLIMITED: paidUnlimited,
   };
 
-  const pricing: Record<string, number> = { FREE: 0, STANDARD: 9.99, PROFESSIONAL: 29.99 };
+  const pricing: Record<string, number> = { FREE: 0, STARTER: 9.99, STANDARD: 9.99, PROFESSIONAL: 24.99, UNLIMITED: 49.99 };
   const estimatedRevenue = activeSubscriptions.reduce((sum, sub) => sum + (pricing[sub.tier] || 0), 0);
 
   // ── Signups over last 30 days (for chart) ──
