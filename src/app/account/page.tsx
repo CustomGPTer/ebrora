@@ -2,7 +2,8 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth-utils';
-import { getAllAiToolUsage, getGlobalAiUsage } from '@/lib/ai-tools/usage-tracker';
+import { getAllAiToolUsage } from '@/lib/ai-tools/usage-tracker';
+import { getGlobalAiLimitByTier } from '@/lib/ai-tools/constants';
 import AccountDashboardClient from '@/components/account/AccountDashboardClient';
 
 export const metadata: Metadata = {
@@ -78,27 +79,26 @@ export default async function AccountPage({ searchParams }: PageProps) {
     }),
   ]);
 
-  // AI tool global usage (shared cap across all tools)
-  let aiToolGlobalUsage: { used: number; limit: number };
-  try {
-    const globalData = await getGlobalAiUsage(session.user.id);
-    aiToolGlobalUsage = { used: globalData.used, limit: globalData.limit };
-  } catch {
-    const tier = subscription?.plan || 'FREE';
-    const fallbackLimit = tier === 'UNLIMITED' ? 9999 : tier === 'PROFESSIONAL' ? 150 : (tier === 'STARTER' || tier === 'STANDARD') ? 30 : 1;
-    aiToolGlobalUsage = { used: 0, limit: fallbackLimit };
-  }
+  // AI tool usage — per-tool counts + global total (shared cap across all tools)
+  const tier = subscription?.plan || 'FREE';
+  const aiToolGlobalLimit = getGlobalAiLimitByTier(tier);
 
-  // AI tool per-tool breakdown (just counts, no per-tool limits)
-  let aiToolUsage: Record<string, number>;
+  let aiToolUsage: Record<string, number> = {};
+  let aiToolGlobalUsed = 0;
+
   try {
     const raw = await getAllAiToolUsage(session.user.id);
-    aiToolUsage = Object.fromEntries(
-      Object.entries(raw).map(([slug, data]) => [slug, data.used])
-    );
-  } catch {
-    aiToolUsage = {};
+    for (const [slug, data] of Object.entries(raw)) {
+      const used = data?.used ?? 0;
+      aiToolUsage[slug] = used;
+      aiToolGlobalUsed += used;
+    }
+  } catch (err) {
+    console.error('[account] Failed to load AI tool usage:', err);
+    // Fallback: empty usage, 0 global used
   }
+
+  const aiToolGlobalUsage = { used: aiToolGlobalUsed, limit: aiToolGlobalLimit };
 
   // ── Recent RAMS generations ──
   const recentGenerations = await prisma.generation.findMany({
