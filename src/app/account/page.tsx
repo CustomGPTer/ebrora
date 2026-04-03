@@ -121,7 +121,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
   }));
 
   // ── Recent AI tool generations ──
-  let aiToolDocuments: typeof ramsDocuments = [];
+  let aiToolDocuments: Array<Omit<(typeof ramsDocuments)[number], 'source'> & { source: 'RAMS' | 'AI_TOOL' }> = [];
   try {
     const recentAiGens = await prisma.aiToolGeneration.findMany({
       where: { user_id: session.user.id },
