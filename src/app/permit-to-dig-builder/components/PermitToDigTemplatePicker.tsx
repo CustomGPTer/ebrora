@@ -16,7 +16,7 @@ export default function PermitToDigTemplatePicker({ onSelect }: Props) {
   const [previewSlug, setPreviewSlug] = useState<PermitToDigTemplateSlug | null>(null);
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
   const canAccess = (slug: PermitToDigTemplateSlug): boolean => { if (!isAuthenticated) return false; if (isPaid) return true; return PERMIT_TO_DIG_FREE_TEMPLATES.includes(slug); };
   const getStatus = (slug: PermitToDigTemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => { if (!isAuthenticated) return 'locked-auth'; if (canAccess(slug)) return 'available'; return 'locked-upgrade'; };
   const handleClick = (slug: PermitToDigTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/permit-to-dig-builder'); return; } if (s === 'locked-upgrade') { router.push('/pricing'); return; } onSelect(slug); };
