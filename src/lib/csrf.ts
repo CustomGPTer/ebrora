@@ -18,19 +18,13 @@ if (process.env.NODE_ENV !== 'production') {
  * Check the Origin (or Referer) header against allowed origins.
  * Returns true if the request origin is trusted.
  *
- * Skips check for:
- * - Requests with no Origin AND no Referer (e.g. server-to-server, curl)
- *   These are allowed because they can't carry cookies cross-site.
+ * Rejects requests with no Origin AND no Referer by default.
+ * Server-to-server callers (webhooks, cron) should be excluded from
+ * CSRF checks at the route level, not via a blanket null-origin bypass.
  */
 export function validateOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
-
-  // No Origin and no Referer — likely not a browser request (API client, cURL, etc.)
-  // These can't perform CSRF because they don't attach cookies automatically.
-  if (!origin && !referer) {
-    return true;
-  }
 
   // Check Origin header first (most reliable)
   if (origin) {
@@ -47,5 +41,7 @@ export function validateOrigin(request: Request): boolean {
     }
   }
 
+  // No Origin AND no Referer — reject by default.
+  // All modern browsers send at least one of these on form/fetch requests.
   return false;
 }
