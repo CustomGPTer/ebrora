@@ -26,6 +26,9 @@ const MAX_RETRIES = 3;
 const MAX_TOTAL_ANSWERS = 40;
 
 export async function POST(req: NextRequest) {
+  // Declared at function scope so the catch block can mark FAILED
+  let failsafeGenerationId: string | null = null;
+
   try {
     // Auth check
     const session = await getServerSession(authOptions);
@@ -48,6 +51,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Store for the catch block before any async work that could throw
+    failsafeGenerationId = generationId;
+
     // Max total answers check
     if (answers.length > MAX_TOTAL_ANSWERS) {
       return NextResponse.json(
@@ -56,10 +62,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate answer word counts (max 100 each, with small buffer)
+    // Validate answer word counts (max 100 each)
     for (const a of answers) {
       const wc = a.answer.trim().split(/\s+/).length;
-      if (wc > 110) {
+      if (wc > 100) {
         return NextResponse.json(
           { error: `Answer ${a.number} exceeds 100-word limit` },
           { status: 400 }
@@ -215,26 +221,21 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       generationId,
-      downloadUrl: blob.url,
       filename,
       expiresAt: expiresAt.toISOString(),
     });
   } catch (error: any) {
     console.error('Document generation error:', error);
 
-    // Update status to failed if we have a generationId
-    try {
-      const body = await req
-        .clone()
-        .json()
-        .catch(() => null);
-      if (body?.generationId) {
+    // Mark generation as FAILED using the ID captured before processing
+    if (failsafeGenerationId) {
+      try {
         await prisma.generation.update({
-          where: { id: body.generationId },
+          where: { id: failsafeGenerationId },
           data: { status: 'FAILED' },
         });
-      }
-    } catch {}
+      } catch {}
+    }
 
     return NextResponse.json(
       { error: error.message || 'Failed to generate document' },
