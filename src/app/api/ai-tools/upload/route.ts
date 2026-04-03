@@ -32,6 +32,7 @@ import { getProgrammeCheckerTemplateGenerationPrompt } from '@/lib/ai-tools/syst
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
 import { wrapUploadContent, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
+import { isValidTemplateSlug } from '@/lib/ai-tools/validate-template-slugs';
 import type { AiToolSlug } from '@/lib/ai-tools/types';
 
 export const maxDuration = 300; // Vercel Pro allows up to 300s
@@ -88,6 +89,11 @@ export async function POST(req: NextRequest) {
 
     const toolSlug = toolSlugRaw as AiToolSlug;
     const toolConfig = getAiToolConfig(toolSlug);
+
+    // Validate template slug against allowlist
+    if (programmeCheckerTemplateSlug && !isValidTemplateSlug(toolSlug, programmeCheckerTemplateSlug)) {
+      return NextResponse.json({ error: 'Invalid template selected.' }, { status: 400 });
+    }
 
     // ── 3. Validate file ──────────────────────────────────────────────────
     if (file.size > MAX_FILE_SIZE) {
