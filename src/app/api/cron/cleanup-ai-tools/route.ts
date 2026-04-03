@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
   try {
     // Find all expired AI tool generations with blob URLs
-    const expired = await (prisma as any).aiToolGeneration.findMany({
+    const expired = await prisma.aiToolGeneration.findMany({
       where: {
         expires_at: { lt: new Date() },
         blob_url: { not: null },
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
           await del(gen.blob_url);
         }
 
-        await (prisma as any).aiToolGeneration.update({
+        await prisma.aiToolGeneration.update({
           where: { id: gen.id },
           data: {
             blob_url: null,
