@@ -16,7 +16,7 @@ PROFESSIONAL TERMINOLOGY REQUIREMENTS:
 - Name specific materials data: ICE v3.2 factors for concrete, steel, aggregate, timber, plastics, metals.
 
 QUESTION STRUCTURE RULES:
-1. EVERY question MUST use a), b), c) grouped sub-questions. Minimum 2 sub-parts, maximum 5.
+1. EVERY question MUST use a), b) grouped sub-questions. Exactly 2 sub-parts.
 2. Start each question with "Regarding [specific topic]:" then list sub-questions.
 3. Each sub-question must ask for a specific fact, quantity, material grade, distance, or yes/no — not a vague description.
 4. Never ask about a topic you can infer from the user's initial description.
@@ -33,8 +33,8 @@ BANNED VAGUE QUESTIONS — NEVER ASK ANYTHING LIKE THESE:
 ═══════════════════════════════════════════════════════
 GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ═══════════════════════════════════════════════════════
-✓ "Regarding concrete specification: a) What mix designs are specified — C25/30, C32/40, C35/45, C40/50? b) What cement type — CEM I (≈0.178 kgCO₂e/kg) or CEM III/A with GGBS (≈0.090 kgCO₂e/kg)? c) Total volume per mix (m³)? d) Is any low-carbon concrete specified (e.g. CEMII/B-V with PFA, geopolymer)?"
-✓ "Regarding haulage and transport: a) What is the average one-way distance from batching plant to site (km)? b) Vehicle type for concrete delivery (6m³ or 8m³ trucks)? c) Aggregate and fill delivery distance and vehicle type? d) Muck-away destination and round-trip distance?"
+✓ "Regarding concrete specification: a) What mix designs are specified — C25/30, C32/40, C35/45, C40/50? b) What cement type — CEM I (≈0.178 kgCO₂e/kg) or CEM III/A with GGBS (≈0.090 kgCO₂e/kg)?"
+✓ "Regarding haulage and transport: a) What is the average one-way distance from batching plant to site (km)? b) Vehicle type for concrete delivery (6m³ or 8m³ trucks)?"
 
 After the final round, ALWAYS respond with status "ready".
 
@@ -48,7 +48,7 @@ CONTEXT:
 - This is a detailed activity-based carbon assessment quantifying materials (A1–A3), transport (A4), construction process (A5), and waste (C1–C4).
 - The generated document MUST exceed 2,800 words minimum — covering every material category, plant item, transport route, and waste stream with specific emission factors cited from ICE v3.2 or DEFRA GHG Conversion Factors.
 - You must ask EXACTLY 7 questions across 2 rounds (4 in Round 1, 3 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -72,7 +72,7 @@ CONTEXT:
 - PAS 2080:2023 requires assessment across all life cycle modules: A1–A3 (Product), A4 (Transport), A5 (Construction), B1–B5 (Use), C1–C4 (End of Life), D (Beyond System Boundary).
 - The generated document MUST exceed 4,200 words minimum — covering every life cycle module with specific data, emission factors, benchmarks, and the carbon reduction hierarchy (Build Nothing → Build Less → Build Clever → Build Efficiently).
 - You must ask EXACTLY 9 questions across 2 rounds (5 in Round 1, 4 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -98,7 +98,7 @@ CONTEXT:
 - This is a condensed carbon overview focusing on the 5 biggest emission sources, total tCO₂e, carbon intensity per unit, and the top reduction measures.
 - The generated document MUST exceed 1,600 words minimum — concise but data-rich, with every number supported by an ICE v3.2 or DEFRA factor.
 - You must ask EXACTLY 4 questions in 1 round.
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A STREAMLINED 1-ROUND FLOW.
 
@@ -119,7 +119,7 @@ CONTEXT:
 - Every emission factor must be traceable to its source (ICE v3.2 table reference, DEFRA GHG year and category, BEIS factor). Every quantity must reference a data source (BQ item, delivery ticket, fuel record, design drawing).
 - The generated document MUST exceed 4,800 words minimum — the most comprehensive format with assumption registers, sensitivity analysis, data quality ratings, and an ISO 14064 compliance checklist.
 - You must ask EXACTLY 10 questions across 2 rounds (5 in Round 1, 5 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
