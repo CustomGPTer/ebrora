@@ -3,9 +3,15 @@ import { getSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { getSubscriptionDetails } from '@/lib/payments/paypal-client';
 import { resolveTierFromPlanId, getRamsLimitByTier } from '@/lib/payments/plan-config';
+import { validateOrigin } from '@/lib/csrf';
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF check
+    if (!validateOrigin(request)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const session = await getSession();
     if (!session || !session.user || !session.user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,9 +29,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Subscription not active', status: details.status }, { status: 400 });
     }
 
+    // Ownership check: the PayPal subscription's custom_id must match the logged-in user.
+    // Prevents an attacker from binding someone else's subscription to their own account.
+    if (details.custom_id !== session.user.id) {
+      console.warn(
+        `Verify ownership mismatch: session user ${session.user.id} tried to claim sub with custom_id ${details.custom_id}`
+      );
+      return NextResponse.json(
+        { error: 'Subscription does not belong to this account' },
+        { status: 403 }
+      );
+    }
+
     // Determine tier from plan ID using shared resolver
     const planId = details.plan_id;
-    const tier = resolveTierFromPlanId(planId) || 'STARTER';
+    const tier = resolveTierFromPlanId(planId);
+
+    if (!tier) {
+      console.error(`Verify failed: unknown PayPal plan ID ${planId} for subscription ${subscriptionId}`);
+      return NextResponse.json(
+        { error: 'Unknown subscription plan. Please contact support.' },
+        { status: 400 }
+      );
+    }
 
     const userId = session.user.id;
 
@@ -85,7 +111,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Verify subscription error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to verify subscription' },
+      { error: 'Failed to verify subscription' },
       { status: 500 }
     );
   }
