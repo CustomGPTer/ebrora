@@ -22,7 +22,7 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
 
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
 
   const canAccessTemplate = (slug: TemplateSlug): boolean => {
     if (!isAuthenticated) return false;
