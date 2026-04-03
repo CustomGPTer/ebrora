@@ -148,10 +148,13 @@ export function DownloadGateModal({
                     Free
                   </th>
                   <th className="text-center px-2 py-2.5 font-semibold text-[#1B5745] bg-[#1B5745]/5">
-                    Standard
+                    Starter
                   </th>
                   <th className="text-center px-2 py-2.5 font-semibold text-gray-700">
                     Pro
+                  </th>
+                  <th className="text-center px-2 py-2.5 font-semibold text-gray-700">
+                    Unlimited
                   </th>
                 </tr>
               </thead>
@@ -159,25 +162,31 @@ export function DownloadGateModal({
                 <tr>
                   <td className="px-3 py-2 text-gray-600">Templates</td>
                   <td className="text-center px-2 py-2 text-gray-900 font-medium">
-                    5/mo
+                    1/mo
                   </td>
                   <td className="text-center px-2 py-2 text-[#1B5745] font-bold bg-[#1B5745]/5">
+                    10/mo
+                  </td>
+                  <td className="text-center px-2 py-2 text-gray-900 font-medium">
                     30/mo
                   </td>
                   <td className="text-center px-2 py-2 text-gray-900 font-medium">
-                    50/mo
+                    ∞
                   </td>
                 </tr>
                 <tr>
                   <td className="px-3 py-2 text-gray-600">Toolbox Talks</td>
                   <td className="text-center px-2 py-2 text-gray-900 font-medium">
-                    4/mo
+                    1/mo
                   </td>
                   <td className="text-center px-2 py-2 text-[#1B5745] font-bold bg-[#1B5745]/5">
+                    10/mo
+                  </td>
+                  <td className="text-center px-2 py-2 text-gray-900 font-medium">
                     20/mo
                   </td>
                   <td className="text-center px-2 py-2 text-gray-900 font-medium">
-                    40/mo
+                    ∞
                   </td>
                 </tr>
                 <tr>
@@ -186,22 +195,28 @@ export function DownloadGateModal({
                     1/mo
                   </td>
                   <td className="text-center px-2 py-2 text-[#1B5745] font-bold bg-[#1B5745]/5">
-                    10/mo
+                    5/mo
                   </td>
                   <td className="text-center px-2 py-2 text-gray-900 font-medium">
-                    25/mo
+                    15/mo
+                  </td>
+                  <td className="text-center px-2 py-2 text-gray-900 font-medium">
+                    ∞
                   </td>
                 </tr>
                 <tr>
-                  <td className="px-3 py-2 text-gray-600">Free Tools</td>
-                  <td className="text-center px-2 py-2 text-gray-400">
-                    Unlimited
+                  <td className="px-3 py-2 text-gray-600">AI Documents</td>
+                  <td className="text-center px-2 py-2 text-gray-900 font-medium">
+                    1/mo
                   </td>
-                  <td className="text-center px-2 py-2 text-gray-400 bg-[#1B5745]/5">
-                    Unlimited
+                  <td className="text-center px-2 py-2 text-[#1B5745] font-bold bg-[#1B5745]/5">
+                    30/mo
                   </td>
-                  <td className="text-center px-2 py-2 text-gray-400">
-                    Unlimited
+                  <td className="text-center px-2 py-2 text-gray-900 font-medium">
+                    150/mo
+                  </td>
+                  <td className="text-center px-2 py-2 text-gray-900 font-medium">
+                    ∞
                   </td>
                 </tr>
                 <tr>
@@ -213,7 +228,10 @@ export function DownloadGateModal({
                     £9.99/mo
                   </td>
                   <td className="text-center px-2 py-2 text-gray-900 font-medium">
-                    £19.99/mo
+                    £24.99/mo
+                  </td>
+                  <td className="text-center px-2 py-2 text-gray-900 font-medium">
+                    £49.99/mo
                   </td>
                 </tr>
               </tbody>
