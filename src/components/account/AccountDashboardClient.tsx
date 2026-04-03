@@ -49,7 +49,8 @@ interface AccountDashboardClientProps {
   generations: Generation[];
   savedDetails: SavedDetails | null;
   initialTab?: string;
-  aiToolUsage: Record<string, { used: number; limit: number }>;
+  aiToolUsage: Record<string, number>;
+  aiToolGlobalUsage: { used: number; limit: number };
 }
 
 type TabType = 'overview' | 'documents' | 'saved-details' | 'subscription' | 'settings';
@@ -173,6 +174,7 @@ export default function AccountDashboardClient({
   savedDetails,
   initialTab = 'overview',
   aiToolUsage,
+  aiToolGlobalUsage,
 }: AccountDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab as TabType);
 
@@ -187,6 +189,9 @@ export default function AccountDashboardClient({
   // Template limits
   const templateLimit = subscription?.plan === 'UNLIMITED' ? 9999 : subscription?.plan === 'PROFESSIONAL' ? 30 : (subscription?.plan === 'STARTER' || subscription?.plan === 'STANDARD') ? 10 : 1;
   const templatePercentage = templateLimit >= 9999 ? 0 : Math.min((templateDownloadCount / templateLimit) * 100, 100);
+
+  // AI Tools global cap
+  const aiToolPercentage = aiToolGlobalUsage.limit >= 9999 ? 0 : Math.min((aiToolGlobalUsage.used / Math.max(aiToolGlobalUsage.limit, 1)) * 100, 100);
 
   // Display label — normalise STANDARD → Starter
   const rawLabel = subscription?.plan || 'FREE';
@@ -250,7 +255,7 @@ export default function AccountDashboardClient({
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Stat cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Plan card */}
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Current Plan</p>
@@ -276,6 +281,24 @@ export default function AccountDashboardClient({
                   />
                 </div>
                 <p className="text-[11px] text-gray-400 mt-1.5">per month</p>
+              </div>
+
+              {/* AI Tools global usage */}
+              <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">AI Tools</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {aiToolGlobalUsage.used} <span className="text-base font-normal text-gray-400">/ {dl(aiToolGlobalUsage.limit)}</span>
+                </p>
+                <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${aiToolPercentage}%`,
+                      backgroundColor: aiToolPercentage > 80 ? '#dc2626' : '#1B5745',
+                    }}
+                  />
+                </div>
+                <p className="text-[11px] text-gray-400 mt-1.5">total across all tools / month</p>
               </div>
 
               {/* TBT downloads */}
@@ -319,7 +342,7 @@ export default function AccountDashboardClient({
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-base font-bold text-gray-900">AI Tool Usage This Period</h2>
-                <p className="text-xs text-gray-400">Limits reset monthly</p>
+                <p className="text-xs text-gray-400">{aiToolGlobalUsage.used} / {dl(aiToolGlobalUsage.limit)} total used &middot; Resets monthly</p>
               </div>
               <div className="space-y-6">
                 {DASH_ALL_CATEGORIES.map((category) => {
@@ -342,9 +365,9 @@ export default function AccountDashboardClient({
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                         {tools.map(({ slug, label, href }) => {
-                          const usage = aiToolUsage[slug] || { used: 0, limit: 1 };
-                          const pct = Math.min((usage.used / Math.max(usage.limit, 1)) * 100, 100);
-                          const isAtLimit = usage.used >= usage.limit && usage.limit > 0;
+                          const used = aiToolUsage[slug] || 0;
+                          const globalLimit = Math.max(aiToolGlobalUsage.limit, 1);
+                          const pct = aiToolGlobalUsage.limit >= 9999 ? 0 : Math.min((used / globalLimit) * 100, 100);
                           return (
                             <Link
                               key={slug}
@@ -354,13 +377,13 @@ export default function AccountDashboardClient({
                             >
                               <p className="text-[11px] font-semibold text-gray-500 mb-1 leading-tight group-hover:text-gray-800 transition-colors truncate">{label}</p>
                               <p className="text-lg font-bold text-gray-900 leading-none">
-                                {usage.used}
-                                <span className="text-xs font-normal text-gray-400 ml-0.5">/{usage.limit >= 9999 ? "∞" : usage.limit}</span>
+                                {used}
+                                <span className="text-xs font-normal text-gray-400 ml-0.5">{used === 1 ? ' use' : ' uses'}</span>
                               </p>
                               <div className="mt-1.5 h-1 bg-gray-100 rounded-full overflow-hidden">
                                 <div
                                   className="h-full rounded-full transition-all duration-500"
-                                  style={{ width: `${pct}%`, backgroundColor: isAtLimit ? '#dc2626' : accent }}
+                                  style={{ width: `${pct}%`, backgroundColor: accent }}
                                 />
                               </div>
                             </Link>
@@ -530,9 +553,20 @@ export default function AccountDashboardClient({
                   </div>
                 </div>
 
-                {/* All AI tools — grouped by category */}
+                {/* AI Tools — global cap */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Link href="/tools" className="text-sm font-medium text-gray-700 hover:text-[#1B5745] transition-colors">AI Tools (all tools combined)</Link>
+                    <span className="text-sm text-gray-500">{aiToolGlobalUsage.used} / {dl(aiToolGlobalUsage.limit)}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${aiToolPercentage}%`, backgroundColor: aiToolPercentage > 80 ? '#dc2626' : '#1B5745' }} />
+                  </div>
+                </div>
+
+                {/* Per-tool breakdown — grouped by category */}
                 <div className="pt-3 border-t border-gray-100">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">AI Document Generators (35 tools)</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">AI Tool Breakdown (35 tools &middot; {aiToolGlobalUsage.used}/{dl(aiToolGlobalUsage.limit)} global cap)</p>
                   <div className="space-y-5">
                     {DASH_ALL_CATEGORIES.map((category) => {
                       const tools = AI_TOOL_CATEGORIES[category];
@@ -541,16 +575,17 @@ export default function AccountDashboardClient({
                         <div key={category}>
                           <p className="text-[11px] font-bold uppercase tracking-wide mb-2" style={{ color: accent } as React.CSSProperties}>{category}</p>
                           {tools.map(({ slug, label, href }) => {
-                            const usage = aiToolUsage[slug] || { used: 0, limit: 1 };
-                            const pct = Math.min((usage.used / Math.max(usage.limit, 1)) * 100, 100);
+                            const used = aiToolUsage[slug] || 0;
+                            const globalLimit = Math.max(aiToolGlobalUsage.limit, 1);
+                            const pct = aiToolGlobalUsage.limit >= 9999 ? 0 : Math.min((used / globalLimit) * 100, 100);
                             return (
                               <div key={slug} className="mb-2">
                                 <div className="flex items-center justify-between mb-1">
                                   <Link href={href} className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">{label}</Link>
-                                  <span className="text-xs text-gray-500">{usage.used} / {usage.limit >= 9999 ? "∞" : usage.limit}</span>
+                                  <span className="text-xs text-gray-500">{used}{used > 0 ? ` use${used === 1 ? '' : 's'}` : ''}</span>
                                 </div>
                                 <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
-                                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: pct > 80 ? '#dc2626' : accent } as React.CSSProperties} />
+                                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: accent } as React.CSSProperties} />
                                 </div>
                               </div>
                             );
@@ -561,7 +596,7 @@ export default function AccountDashboardClient({
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-gray-400 mt-4">Download limits reset on a rolling 30-day basis. AI tool limits reset monthly.</p>
+              <p className="text-xs text-gray-400 mt-4">Download limits reset on a rolling 30-day basis. AI tool limits reset monthly (shared across all tools).</p>
             </div>
 
             {/* Plan options */}
