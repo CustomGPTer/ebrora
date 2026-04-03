@@ -1,7 +1,7 @@
 // =============================================================================
 // API: /api/ai-tools/chat
 // Conversational multi-turn question flow for all AI tools.
-// Cloned from /api/rams/chat — adapted for multi-tool with separate limits.
+// Cloned from /api/rams/chat — adapted for multi-tool with GLOBAL usage cap.
 // RAMS Builder is NOT affected — it keeps its own routes.
 // =============================================================================
 import { NextRequest, NextResponse } from 'next/server';
@@ -169,17 +169,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Usage limit check (only on first round — per tool, per month)
+    // Usage limit check (only on first round — GLOBAL cap across all tools)
     if (!rounds || rounds.length === 0) {
       const monthLimit = getAiToolLimitByTier(tier, toolSlug);
       const nowDate = new Date();
       const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
       const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
 
+      // Global count: all AI tool generations this month (not per-tool)
       const usageThisMonth = await (prisma as any).aiToolGeneration.count({
         where: {
           user_id: user.id,
-          tool_slug: toolSlug,
           created_at: { gte: periodStart, lte: periodEnd },
           status: { in: ['COMPLETED', 'PROCESSING', 'QUEUED'] },
         },
@@ -192,8 +192,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error: isRestricted
-              ? `The ${toolConfig.shortName} is available on Standard and Professional plans.`
-              : `You've used all ${monthLimit} ${toolConfig.shortName} generation${monthLimit === 1 ? '' : 's'} for this month.`,
+              ? `The ${toolConfig.shortName} requires a paid plan.`
+              : `You've used all ${monthLimit} AI document generation${monthLimit === 1 ? '' : 's'} for this month.`,
             limitReached: true,
             used: usageThisMonth,
             limit: monthLimit,
