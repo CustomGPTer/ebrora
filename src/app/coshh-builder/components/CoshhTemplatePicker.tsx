@@ -19,7 +19,7 @@ export default function CoshhTemplatePicker({ onSelect }: CoshhTemplatePickerPro
 
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
 
   const canAccessTemplate = (slug: CoshhTemplateSlug): boolean => {
     if (!isAuthenticated) return false;
