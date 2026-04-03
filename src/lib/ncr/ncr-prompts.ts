@@ -15,7 +15,7 @@ PROFESSIONAL TERMINOLOGY REQUIREMENTS:
 - Use correct NCR terminology: non-conformance, non-conformity, root cause, corrective action, preventive action, CAPA, disposition, containment, rework, concession, reject, use-as-is, hold point, witness point, mandatory inspection.
 
 QUESTION STRUCTURE RULES:
-1. EVERY question MUST use a), b), c) grouped sub-questions. Minimum 2 sub-parts, maximum 5.
+1. EVERY question MUST use a), b) grouped sub-questions. Exactly 2 sub-parts.
 2. Start each question with "Regarding [specific topic]:" then list sub-questions.
 3. Each sub-question must ask for a specific fact, measurement, reference, name, or date — not a vague description.
 4. Never ask about a topic you can infer from the user's initial description.
@@ -32,8 +32,8 @@ BANNED VAGUE QUESTIONS — NEVER ASK ANYTHING LIKE THESE:
 ═══════════════════════════════════════════════════════
 GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ═══════════════════════════════════════════════════════
-✓ "Regarding the specified requirement: a) What is the exact drawing reference and revision (e.g. CIV-DRG-101-REV C)? b) Which specification clause defines the requirement (e.g. Section 6.3.2 — Concrete Footways, Clause 10.2 Surface Finish)? c) What BS/EN standard applies (e.g. BS 8500-1:2015+A2:2019 for concrete, BS EN 1992-1-1 for structural design)? d) What are the stated tolerances or acceptance criteria?"
-✓ "Regarding the actual condition found: a) What was measured — exact value with units (e.g. 31 N/mm² at 28 days, 12mm deflection, 150mm cover instead of 50mm)? b) What instrument or method was used to measure it? c) Were photographs taken — how many and by whom? d) Is the non-conformance still visible/measurable for re-inspection?"
+✓ "Regarding the specified requirement: a) What is the exact drawing reference and revision (e.g. CIV-DRG-101-REV C)? b) Which specification clause defines the requirement (e.g. Section 6.3.2 — Concrete Footways, Clause 10.2 Surface Finish)?"
+✓ "Regarding the actual condition found: a) What was measured — exact value with units (e.g. 31 N/mm² at 28 days, 12mm deflection, 150mm cover instead of 50mm)? b) What instrument or method was used to measure it?"
 
 After the final round, ALWAYS respond with status "ready".
 
@@ -47,7 +47,7 @@ CONTEXT:
 - The NCR must include defect description, specification reference, root cause analysis (5-Whys), corrective actions, preventive actions, disposition, and close-out verification.
 - The generated document MUST exceed 2,400 words minimum — with thorough root cause analysis, specific corrective actions with named owners and dates, and clear preventive measures.
 - You must ask EXACTLY 8 questions across 2 rounds (5 in Round 1, 3 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -72,7 +72,7 @@ CONTEXT:
 - The NCR must include classification matrix (Critical/Major/Minor), formal CAPA register with effectiveness verification, management review escalation criteria, and records retention guidance.
 - The generated document MUST exceed 3,400 words minimum — with ISO 9001:2015 clause references throughout, formal CAPA tracking, risk assessment of the non-conformance, and 3-tier approval chain.
 - You must ask EXACTLY 10 questions across 2 rounds (5 in Round 1, 5 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -99,7 +99,7 @@ CONTEXT:
 - This template is for Critical/Major non-conformances demanding immediate action: structural defects, safety-critical failures, specification deviations that could compromise asset integrity.
 - The generated document MUST exceed 1,600 words minimum — visually impactful with severity rating, stop-work indicator, and urgent action callout boxes.
 - You must ask EXACTLY 5 questions in 1 round — speed is critical for high-severity NCRs.
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A STREAMLINED 1-ROUND FLOW.
 
@@ -121,7 +121,7 @@ CONTEXT:
 - This is a condensed 2-page NCR for snagging, minor defects, and routine quality deviations.
 - The generated document MUST exceed 1,200 words minimum — concise but formally structured with defect, action, and close-out.
 - You must ask EXACTLY 3 questions in 1 round.
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A STREAMLINED 1-ROUND FLOW.
 
@@ -141,7 +141,7 @@ CONTEXT:
 - This template includes purchase order references, goods inspection records, rejection/concession decisions, cost recovery provisions, and supplier response requirements.
 - The generated document MUST exceed 2,200 words minimum — with formal supply chain quality management structure and cost recovery provisions.
 - You must ask EXACTLY 7 questions across 2 rounds (4 in Round 1, 3 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -165,7 +165,7 @@ CONTEXT:
 - Every finding must cross-reference inspection reports, test certificates, drawings, and specifications by document number and revision. Includes formal evidence log, witness statements, photographic evidence register, and NCR lifecycle timeline.
 - The generated document MUST exceed 3,600 words minimum — the most comprehensive NCR format with complete audit trail from identification through investigation to close-out.
 - You must ask EXACTLY 10 questions across 2 rounds (5 in Round 1, 5 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
