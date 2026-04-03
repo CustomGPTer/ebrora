@@ -177,6 +177,30 @@ export default function AccountDashboardClient({
   aiToolGlobalUsage,
 }: AccountDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab as TabType);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const [cancelSuccess, setCancelSuccess] = useState(false);
+
+  const handleCancelSubscription = async () => {
+    setCancelLoading(true);
+    setCancelError(null);
+    try {
+      const res = await fetch('/api/payments/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'User requested cancellation from account page' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to cancel subscription');
+      setCancelSuccess(true);
+      setTimeout(() => window.location.reload(), 2000);
+    } catch (err: any) {
+      setCancelError(err.message || 'Something went wrong');
+    } finally {
+      setCancelLoading(false);
+    }
+  };
 
   // RAMS limits
   const ramsLimit = subscription?.plan === 'UNLIMITED' ? 9999 : subscription?.plan === 'PROFESSIONAL' ? 15 : (subscription?.plan === 'STARTER' || subscription?.plan === 'STANDARD') ? 5 : 1;
@@ -609,14 +633,92 @@ export default function AccountDashboardClient({
                 >
                   Upgrade Plan
                 </Link>
-                <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors">
-                  Downgrade Plan
-                </button>
-                <button className="inline-flex items-center gap-2 px-5 py-2.5 text-red-600 text-sm font-semibold rounded-lg border border-red-200 hover:bg-red-50 transition-colors">
-                  Cancel Subscription
-                </button>
+                {subscription && subscription.plan !== 'FREE' && subscription.plan !== 'STARTER' && subscription.plan !== 'STANDARD' && (
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Downgrade Plan
+                  </Link>
+                )}
+                {subscription && subscription.status !== 'CANCELLED' && subscription.plan !== 'FREE' && (
+                  <button
+                    onClick={() => setShowCancelModal(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-red-600 text-sm font-semibold rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
+                  >
+                    Cancel Subscription
+                  </button>
+                )}
+                {subscription?.status === 'CANCELLED' && (
+                  <p className="text-sm text-amber-600 font-medium self-center">
+                    Your subscription is cancelled and will end on{' '}
+                    {subscription.currentPeriodEnd
+                      ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                      : 'the end of your billing period'}
+                    .
+                  </p>
+                )}
               </div>
             </div>
+
+            {/* Cancel confirmation modal */}
+            {showCancelModal && (
+              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => !cancelLoading && setShowCancelModal(false)}>
+                <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                  {cancelSuccess ? (
+                    <div className="text-center py-4">
+                      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">Subscription Cancelled</h3>
+                      <p className="text-sm text-gray-600">You&apos;ll keep access until the end of your current billing period. Refreshing&hellip;</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                          <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">Cancel Subscription</h3>
+                          <p className="text-sm text-gray-500">This will cancel your {planLabel} plan</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">Are you sure you want to cancel? You&apos;ll keep access to all {planLabel} features until the end of your current billing period.</p>
+                      <p className="text-sm text-gray-600 mb-6">After that, your account will revert to the Free plan.</p>
+                      {cancelError && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{cancelError}</div>
+                      )}
+                      <div className="flex gap-3 justify-end">
+                        <button
+                          onClick={() => setShowCancelModal(false)}
+                          disabled={cancelLoading}
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                        >
+                          Keep Subscription
+                        </button>
+                        <button
+                          onClick={handleCancelSubscription}
+                          disabled={cancelLoading}
+                          className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {cancelLoading ? (
+                            <>
+                              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                              Cancelling…
+                            </>
+                          ) : 'Yes, Cancel'}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
