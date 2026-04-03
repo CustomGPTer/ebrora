@@ -1,19 +1,19 @@
-import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-utils';
-import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  req: NextRequest,
+  { params }: { params: { id: string } }
 ) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
   }
 
-  const { id } = await params;
   const generation = await prisma.generation.findUnique({
-    where: { id },
+    where: { id: params.id },
     select: { status: true, blobUrl: true, error_message: true, user_id: true },
   });
 
