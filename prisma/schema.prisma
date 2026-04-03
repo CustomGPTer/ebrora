@@ -385,6 +385,7 @@ model ToolboxTalk {
   downloads ContentDownload[]
 
   @@unique([categoryId, slug])
+  @@index([categoryId])
   @@map("toolbox_talks")
 }
 
@@ -429,6 +430,7 @@ model FreeTemplate {
   downloads ContentDownload[]
 
   @@unique([categoryId, slug])
+  @@index([categoryId])
   @@map("free_templates")
 }
 
@@ -476,6 +478,8 @@ model ContentDownload {
   downloadedAt   DateTime      @default(now())
 
   @@index([userId, contentType, downloadedAt])
+  @@index([toolboxTalkId])
+  @@index([freeTemplateId])
   @@map("content_downloads")
 }
 
@@ -502,7 +506,7 @@ model AiToolGeneration {
   description   String?   @db.Text
   questions     String?   @db.Text // JSON string of questions asked
   answers       String?   @db.Text // JSON string of answers provided
-  status        String    @default("QUEUED") // QUEUED | PROCESSING | COMPLETED | FAILED | EXPIRED
+  status        GenerationStatus @default(QUEUED)
   error_message String?
   blob_url      String?
   blob_pathname String?
