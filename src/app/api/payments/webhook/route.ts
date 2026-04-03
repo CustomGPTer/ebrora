@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { validateWebhookSignature, getSubscriptionDetails } from '@/lib/payments/paypal-client';
-import { resolveTierFromPlanId } from '@/lib/payments/plan-config';
+import { resolveTierFromPlanId, getRamsLimitByTier } from '@/lib/payments/plan-config';
 import { sendSubscriptionConfirmationEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
@@ -112,10 +112,10 @@ export async function POST(request: NextRequest) {
 
 // ── Helpers ──
 
-function determineTier(planId: string): 'STANDARD' | 'PROFESSIONAL' {
+function determineTier(planId: string): 'STARTER' | 'PROFESSIONAL' | 'UNLIMITED' {
   const resolved = resolveTierFromPlanId(planId);
-  // Fall back to STANDARD if plan ID is unrecognised (logged in resolveTierFromPlanId)
-  return resolved || 'STANDARD';
+  // Fall back to STARTER if plan ID is unrecognised (logged in resolveTierFromPlanId)
+  return resolved || 'STARTER';
 }
 
 // ── Subscription activated / updated / re-activated ──
@@ -175,7 +175,7 @@ async function handleSubscriptionActivated(resource: any): Promise<void> {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const ramsLimit = tier === 'PROFESSIONAL' ? 25 : 10;
+    const ramsLimit = getRamsLimitByTier(tier);
 
     const existingUsage = await prisma.usageRecord.findFirst({
       where: {
