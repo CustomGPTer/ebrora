@@ -6,9 +6,9 @@
 export const SITE_CONFIG = {
   name: 'Ebrora',
   domain: 'ebrora.com',
-  url: process.env.NEXT_PUBLIC_APP_URL || 'https://ebrora.com',
+  url: process.env.NEXT_PUBLIC_APP_URL || 'https://www.ebrora.com',
   description:
-    'Professional Excel templates for UK construction industry. Generate RAMS documents instantly.',
+    'AI-powered document generators and professional Excel templates for UK construction. 35+ AI tools, RAMS Builder, 750+ templates, 1,500+ free toolbox talks. Built by site teams, for site teams.',
   email: 'hello@ebrora.com',
   ga4Id: 'G-ZVPRYV7LNX',
   locale: 'en-GB',
