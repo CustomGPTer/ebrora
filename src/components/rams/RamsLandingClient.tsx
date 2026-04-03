@@ -50,13 +50,15 @@ export default function RamsLandingClient() {
   } = {
     monthly: {
       free: { price: '£0', cta: 'Get Started Free' },
-      standard: { price: '£9.99', cta: 'Start Standard' },
-      professional: { price: '£19.99', cta: 'Start Professional' },
+      starter: { price: '£9.99', cta: 'Start Starter' },
+      professional: { price: '£24.99', cta: 'Start Professional' },
+      unlimited: { price: '£49.99', cta: 'Start Unlimited' },
     },
     yearly: {
       free: { price: '£0', cta: 'Get Started Free' },
-      standard: { price: '£95.90', badgePrice: '£7.99/mo', badgeText: 'Save 20%', cta: 'Start Standard' },
-      professional: { price: '£191.90', badgePrice: '£15.99/mo', badgeText: 'Save 20%', cta: 'Start Professional' },
+      starter: { price: '£99.99', badgePrice: '£8.33/mo', badgeText: 'Save 17%', cta: 'Start Starter' },
+      professional: { price: '£249.99', badgePrice: '£20.83/mo', badgeText: 'Save 17%', cta: 'Start Professional' },
+      unlimited: { price: '£499.99', badgePrice: '£41.67/mo', badgeText: 'Save 17%', cta: 'Start Unlimited' },
     },
   };
 
@@ -227,7 +229,7 @@ export default function RamsLandingClient() {
           </div>
 
           {/* Pricing Cards */}
-          <div className="pricing-grid">
+          <div className="pricing-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
             {/* FREE Card */}
             <div className="pricing-card pricing-card--free">
               <div className="card-header">
@@ -239,9 +241,9 @@ export default function RamsLandingClient() {
 
               <ul className="features-list">
                 <li>1 RAMS per month</li>
-                <li>2 basic formats (Standard 5×5, H/M/L Simple)</li>
+                <li>1 AI document per month</li>
+                <li>2 basic formats</li>
                 <li>No company logo</li>
-                <li>Standard generation</li>
               </ul>
 
               <Link href="/auth/register" className="btn btn--outline btn--block">
@@ -249,36 +251,36 @@ export default function RamsLandingClient() {
               </Link>
             </div>
 
-            {/* STANDARD Card (Most Popular) */}
+            {/* STARTER Card (Most Popular) */}
             <div className="pricing-card pricing-card--standard pricing-card--featured">
               <div className="popular-badge">Most Popular</div>
 
               <div className="card-header">
-                <h3 className="card-title">Standard</h3>
+                <h3 className="card-title">Starter</h3>
                 <div className="card-price">
                   <span className="price">
-                    {currentPricing.standard.price}
+                    {currentPricing.starter.price}
                   </span>
                   <span className="billing-period">{billingText}</span>
-                  {billingPeriod === 'yearly' && currentPricing.standard.badgePrice && (
-                    <span className="monthly-equiv">({currentPricing.standard.badgePrice})</span>
+                  {billingPeriod === 'yearly' && currentPricing.starter.badgePrice && (
+                    <span className="monthly-equiv">({currentPricing.starter.badgePrice})</span>
                   )}
                 </div>
-                {billingPeriod === 'yearly' && currentPricing.standard.badgeText && (
-                  <span className="save-badge">{currentPricing.standard.badgeText}</span>
+                {billingPeriod === 'yearly' && currentPricing.starter.badgeText && (
+                  <span className="save-badge">{currentPricing.starter.badgeText}</span>
                 )}
               </div>
 
               <ul className="features-list">
-                <li>10 RAMS per month</li>
+                <li>5 RAMS per month</li>
+                <li>30 AI documents per month</li>
                 <li>All 10 formats</li>
                 <li>Company logo on documents</li>
-                <li>Priority generation</li>
                 <li>14-day money-back guarantee</li>
               </ul>
 
               <Link href="/auth/register" className="btn btn--primary btn--block">
-                {currentPricing.standard.cta}
+                {currentPricing.starter.cta}
               </Link>
             </div>
 
@@ -301,16 +303,46 @@ export default function RamsLandingClient() {
               </div>
 
               <ul className="features-list">
-                <li>25 RAMS per month</li>
+                <li>15 RAMS per month</li>
+                <li>150 AI documents per month</li>
                 <li>All 10 formats</li>
                 <li>Company logo on documents</li>
-                <li>Priority generation</li>
-                <li>14-day money-back guarantee</li>
-                <li>Email support</li>
+                <li>Priority email & chat support</li>
               </ul>
 
               <Link href="/auth/register" className="btn btn--primary btn--block">
                 {currentPricing.professional.cta}
+              </Link>
+            </div>
+
+            {/* UNLIMITED Card */}
+            <div className="pricing-card pricing-card--professional">
+              <div className="card-header">
+                <h3 className="card-title">Unlimited</h3>
+                <div className="card-price">
+                  <span className="price">
+                    {currentPricing.unlimited.price}
+                  </span>
+                  <span className="billing-period">{billingText}</span>
+                  {billingPeriod === 'yearly' && currentPricing.unlimited.badgePrice && (
+                    <span className="monthly-equiv">({currentPricing.unlimited.badgePrice})</span>
+                  )}
+                </div>
+                {billingPeriod === 'yearly' && currentPricing.unlimited.badgeText && (
+                  <span className="save-badge">{currentPricing.unlimited.badgeText}</span>
+                )}
+              </div>
+
+              <ul className="features-list">
+                <li>Unlimited RAMS</li>
+                <li>Unlimited AI documents</li>
+                <li>All 10 formats</li>
+                <li>Company logo on documents</li>
+                <li>Dedicated priority queue</li>
+              </ul>
+
+              <Link href="/auth/register" className="btn btn--primary btn--block">
+                {currentPricing.unlimited.cta}
               </Link>
             </div>
           </div>

@@ -8,7 +8,7 @@ import { RAMS_FORMATS } from '@/data/rams-formats';
 
 interface QuestionnaireClientProps {
   userId: string;
-  userTier: 'FREE' | 'STANDARD' | 'PROFESSIONAL';
+  userTier: 'FREE' | 'STARTER' | 'STANDARD' | 'PROFESSIONAL' | 'UNLIMITED';
 }
 
 interface Question {
@@ -362,7 +362,7 @@ export default function QuestionnaireClient({
         {showLockedMessage && (
           <div className="polite-message polite-message--info">
             <p>
-              This format is available on the Standard plan.{' '}
+              This format is available on the Starter plan and above.{' '}
               <a href="/rams-builder#pricing" className="polite-message__link">
                 Upgrade to access all 10 formats
               </a>

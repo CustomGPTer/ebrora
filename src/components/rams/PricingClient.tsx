@@ -9,7 +9,7 @@ import Link from 'next/link';
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type BillingPeriod = 'monthly' | 'yearly';
-type Tier = 'FREE' | 'STANDARD' | 'PROFESSIONAL';
+type Tier = 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'UNLIMITED';
 
 interface TierData {
   tier: Tier;
@@ -18,7 +18,7 @@ interface TierData {
   monthlyPrice: number;
   yearlyPrice: number;
   ramsPerMonth: string;
-  formats: string;
+  aiUses: string;
   features: string[];
   highlighted: boolean;
   badge?: string;
@@ -28,61 +28,61 @@ interface TierData {
 const TIERS: TierData[] = [
   {
     tier: 'FREE',
-    name: 'Starter',
-    tagline: 'Try the platform — no card needed',
+    name: 'Free',
+    tagline: 'Try every tool — no card needed',
     monthlyPrice: 0,
     yearlyPrice: 0,
     ramsPerMonth: '1 RAMS / month',
-    formats: '10 AI tool uses / month',
+    aiUses: '1 AI document / month',
     features: [
-      'AI-generated documents (DOCX)',
-      '10 AI tool uses per month',
+      'Access to all 35 AI tools',
+      '1 AI document per month',
       '1 RAMS document per month',
-      '2 toolbox talk downloads / month',
-      '2 free template downloads / month',
+      '1 toolbox talk download / month',
+      '1 free template download / month',
       '2 RAMS formats (5×5 & H/M/L)',
     ],
     highlighted: false,
     cta: 'Get Started Free',
   },
   {
-    tier: 'STANDARD',
-    name: 'Standard',
+    tier: 'STARTER',
+    name: 'Starter',
     tagline: 'For site teams producing regular documents',
     monthlyPrice: 9.99,
     yearlyPrice: 99.99,
-    ramsPerMonth: '10 RAMS / month',
-    formats: '180 AI tool uses / month',
+    ramsPerMonth: '5 RAMS / month',
+    aiUses: '30 AI documents / month',
     badge: 'Most Popular',
     features: [
-      'All 30+ AI construction tools',
-      '180 AI tool uses per month',
-      '10 RAMS documents per month',
+      'All 35 AI construction tools',
+      '30 AI documents per month',
+      '5 RAMS documents per month',
       'All 10 RAMS formats',
       'Company logo on documents',
       '10 toolbox talk downloads / month',
-      '20 free template downloads / month',
+      '10 free template downloads / month',
       'Priority AI generation',
       'Email support',
       '14-day money-back guarantee',
     ],
     highlighted: true,
-    cta: 'Start Standard Plan',
+    cta: 'Start Starter Plan',
   },
   {
     tier: 'PROFESSIONAL',
     name: 'Professional',
     tagline: 'For busy project teams and contractors',
-    monthlyPrice: 19.99,
-    yearlyPrice: 199.99,
-    ramsPerMonth: '25 RAMS / month',
-    formats: '600 AI tool uses / month',
+    monthlyPrice: 24.99,
+    yearlyPrice: 249.99,
+    ramsPerMonth: '15 RAMS / month',
+    aiUses: '150 AI documents / month',
     features: [
-      'Everything in Standard',
-      '600 AI tool uses per month',
-      '25 RAMS documents per month',
+      'Everything in Starter',
+      '150 AI documents per month',
+      '15 RAMS documents per month',
       '20 toolbox talk downloads / month',
-      '40 free template downloads / month',
+      '30 free template downloads / month',
       'Highest generation priority',
       'Priority email & chat support',
       'Bulk generation queue',
@@ -90,6 +90,27 @@ const TIERS: TierData[] = [
     ],
     highlighted: false,
     cta: 'Start Professional Plan',
+  },
+  {
+    tier: 'UNLIMITED',
+    name: 'Unlimited',
+    tagline: 'For H&S managers and consultancies',
+    monthlyPrice: 49.99,
+    yearlyPrice: 499.99,
+    ramsPerMonth: 'Unlimited RAMS',
+    aiUses: 'Unlimited AI documents',
+    features: [
+      'Everything in Professional',
+      'Unlimited AI documents',
+      'Unlimited RAMS documents',
+      'Unlimited toolbox talk downloads',
+      'Unlimited template downloads',
+      'Dedicated priority queue',
+      'Priority email & chat support',
+      '14-day money-back guarantee',
+    ],
+    highlighted: false,
+    cta: 'Start Unlimited Plan',
   },
 ];
 
@@ -104,42 +125,47 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Do unused allowances roll over?',
-    a: 'No. Unused AI tool uses, RAMS documents, and download allowances reset at the start of each billing period.',
+    a: 'No. Unused AI documents, RAMS documents, and download allowances reset at the start of each billing period.',
   },
   {
     q: 'What AI tools are included?',
-    a: 'Paid plans include all 30+ AI construction tools — COSHH assessments, safety alerts, RFIs, incident reports, toolbox talk generator, permit to dig, lift plans, and many more. Free accounts have access to a selection of tools with limited monthly uses.',
+    a: 'All plans — including Free — have access to every AI tool: COSHH assessments, safety alerts, RFIs, incident reports, toolbox talk generator, permit to dig, lift plans, and 28 more. The difference is how many documents you can generate per month.',
   },
   {
     q: 'Can I upload my company logo?',
-    a: 'Yes — on Standard and Professional plans your company logo appears in document headers. Upload it once in your account settings and it applies to all future documents.',
+    a: 'Yes — on Starter, Professional, and Unlimited plans your company logo appears in document headers. Upload it once in your account settings and it applies to all future documents.',
   },
   {
     q: 'How long are download links available?',
     a: 'Download links expire after 24 hours. We also email you the link, so check your inbox if you need it later.',
+  },
+  {
+    q: 'What counts as an "AI document"?',
+    a: 'Each time you complete the AI interview and generate a downloadable document (COSHH, lift plan, incident report, etc.), that counts as one AI document use. Chat rounds during the interview do not count — only the final generation.',
   },
 ];
 
 const COMPARISON_ROWS: {
   label: string;
   free: string | boolean;
-  standard: string | boolean;
-  premium: string | boolean;
+  starter: string | boolean;
+  professional: string | boolean;
+  unlimited: string | boolean;
 }[] = [
-  { label: 'AI tool uses / month', free: '10', standard: '180', premium: '600' },
-  { label: 'AI tools available', free: '10', standard: '30+', premium: '30+' },
-  { label: 'RAMS documents / month', free: '1', standard: '10', premium: '25' },
-  { label: 'RAMS formats', free: '2', standard: '10', premium: '10' },
-  { label: 'Toolbox talk downloads / month', free: '2', standard: '10', premium: '20' },
-  { label: 'Free template downloads / month', free: '2', standard: '20', premium: '40' },
-  { label: 'AI-generated content', free: true, standard: true, premium: true },
-  { label: 'DOCX download', free: true, standard: true, premium: true },
-  { label: 'Company logo on docs', free: false, standard: true, premium: true },
-  { label: 'Priority generation', free: false, standard: true, premium: true },
-  { label: 'Bulk generation queue', free: false, standard: false, premium: true },
-  { label: 'Email support', free: false, standard: true, premium: true },
-  { label: 'Chat support', free: false, standard: false, premium: true },
-  { label: '14-day money-back guarantee', free: false, standard: true, premium: true },
+  { label: 'AI documents / month', free: '1', starter: '30', professional: '150', unlimited: 'Unlimited' },
+  { label: 'AI tools available', free: '35', starter: '35', professional: '35', unlimited: '35' },
+  { label: 'RAMS documents / month', free: '1', starter: '5', professional: '15', unlimited: 'Unlimited' },
+  { label: 'RAMS formats', free: '2', starter: '10', professional: '10', unlimited: '10' },
+  { label: 'Toolbox talk downloads / month', free: '1', starter: '10', professional: '20', unlimited: 'Unlimited' },
+  { label: 'Free template downloads / month', free: '1', starter: '10', professional: '30', unlimited: 'Unlimited' },
+  { label: 'AI-generated content', free: true, starter: true, professional: true, unlimited: true },
+  { label: 'DOCX download', free: true, starter: true, professional: true, unlimited: true },
+  { label: 'Company logo on docs', free: false, starter: true, professional: true, unlimited: true },
+  { label: 'Priority generation', free: false, starter: true, professional: true, unlimited: true },
+  { label: 'Bulk generation queue', free: false, starter: false, professional: true, unlimited: true },
+  { label: 'Email support', free: false, starter: true, professional: true, unlimited: true },
+  { label: 'Chat support', free: false, starter: false, professional: true, unlimited: true },
+  { label: '14-day money-back guarantee', free: false, starter: true, professional: true, unlimited: true },
 ];
 
 const SOCIAL_PROOF = [
@@ -302,7 +328,7 @@ function PricingCard({
           : isHovered
           ? 'var(--shadow-md)'
           : 'var(--shadow-sm)',
-        transform: data.highlighted ? 'scale(1.03)' : undefined,
+        transform: data.highlighted ? 'scale(1.02)' : undefined,
       }}
     >
       {data.badge && (
@@ -314,26 +340,26 @@ function PricingCard({
         </div>
       )}
 
-      <div className="p-7 sm:p-8 flex flex-col flex-1">
+      <div className="p-6 sm:p-7 flex flex-col flex-1">
         {/* Tier name + tagline */}
-        <div className="mb-5">
+        <div className="mb-4">
           <h3
-            className="text-[1.15rem] font-bold mb-1"
+            className="text-[1.05rem] font-bold mb-1"
             style={{ fontFamily: 'var(--font-display)', color: 'var(--color-primary-dark)' }}
           >
             {data.name}
           </h3>
-          <p className="text-[0.8rem]" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-[0.78rem]" style={{ color: 'var(--color-text-muted)' }}>
             {data.tagline}
           </p>
         </div>
 
         {/* Price */}
-        <div className="mb-5">
+        <div className="mb-4">
           <div className="flex items-baseline gap-0.5">
             <span className="text-sm font-medium" style={{ color: 'var(--color-text-muted)' }}>£</span>
             <span
-              className="text-[2.5rem] leading-none font-bold tracking-tight"
+              className="text-[2.2rem] leading-none font-bold tracking-tight"
               style={{ fontFamily: 'var(--font-display)', color: 'var(--color-primary)' }}
             >
               {formatPrice(price)}
@@ -343,41 +369,41 @@ function PricingCard({
             </span>
           </div>
           {billingPeriod === 'yearly' && saving && (
-            <p className="text-xs font-semibold mt-1.5" style={{ color: 'var(--color-gold)' }}>
+            <p className="text-xs font-semibold mt-1" style={{ color: 'var(--color-gold)' }}>
               {saving}
             </p>
           )}
           {billingPeriod === 'yearly' && data.tier !== 'FREE' && (
-            <p className="text-[0.75rem] mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+            <p className="text-[0.72rem] mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
               £{(data.yearlyPrice / 12).toFixed(2)}/mo billed annually
             </p>
           )}
         </div>
 
         {/* Allowance pills */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-1.5 mb-5">
           <span
-            className="inline-flex items-center px-3 py-1 rounded-full text-[0.75rem] font-semibold"
+            className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.7rem] font-semibold"
             style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)' }}
           >
             {data.ramsPerMonth}
           </span>
           <span
-            className="inline-flex items-center px-3 py-1 rounded-full text-[0.75rem] font-semibold"
+            className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.7rem] font-semibold"
             style={{ background: 'var(--color-gold-light)', color: '#9A7B38' }}
           >
-            {data.formats}
+            {data.aiUses}
           </span>
         </div>
 
         {/* Feature list */}
-        <ul className="space-y-3 mb-8 flex-1">
+        <ul className="space-y-2.5 mb-7 flex-1">
           {data.features.map((feature, i) => (
-            <li key={i} className="flex items-start gap-2.5">
+            <li key={i} className="flex items-start gap-2">
               <span className="flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }}>
                 <CheckIcon />
               </span>
-              <span className="text-[0.85rem]" style={{ color: 'var(--color-text-light)' }}>
+              <span className="text-[0.8rem]" style={{ color: 'var(--color-text-light)' }}>
                 {feature}
               </span>
             </li>
@@ -388,7 +414,7 @@ function PricingCard({
         {data.tier === 'FREE' && !isCurrentPlan ? (
           <Link
             href={session ? '/tools' : '/auth/register'}
-            className="block w-full py-3.5 text-center text-[0.875rem] font-semibold rounded-lg border-2 transition-all duration-200 hover:shadow-md"
+            className="block w-full py-3 text-center text-[0.85rem] font-semibold rounded-lg border-2 transition-all duration-200 hover:shadow-md"
             style={{
               borderColor: 'var(--color-primary)',
               color: 'var(--color-primary)',
@@ -413,7 +439,7 @@ function PricingCard({
                 : handleUpgrade
             }
             disabled={isDisabled}
-            className={`w-full py-3.5 text-[0.875rem] font-semibold rounded-lg transition-all duration-200 ${
+            className={`w-full py-3 text-[0.85rem] font-semibold rounded-lg transition-all duration-200 ${
               isCurrentPlan ? 'cursor-default' : 'hover:shadow-md active:scale-[0.98]'
             }`}
             style={{
@@ -454,22 +480,18 @@ export default function PricingClient() {
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly');
   const { data: session } = useSession();
 
-  /* Would be fetched from user subscription data */
   const currentPlan: Tier | null = null;
 
   return (
     <div style={{ background: 'var(--color-white)' }}>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          1. HERO — headline, subtitle, billing toggle
-          ───────────────────────────────────────────────────────────────── */}
+      {/* ─── 1. HERO ─── */}
       <section
         className="relative overflow-hidden"
         style={{
           background: 'linear-gradient(175deg, var(--color-off-white) 0%, var(--color-primary-light) 50%, var(--color-off-white) 100%)',
         }}
       >
-        {/* Soft decorative shapes */}
         <div
           className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-[0.035]"
           style={{ background: 'var(--color-primary)' }}
@@ -479,7 +501,7 @@ export default function PricingClient() {
           style={{ background: 'var(--color-gold)' }}
         />
 
-        <div className="relative max-w-5xl mx-auto px-6 sm:px-8 pt-14 sm:pt-20 pb-10 sm:pb-14 text-center">
+        <div className="relative max-w-6xl mx-auto px-6 sm:px-8 pt-14 sm:pt-20 pb-10 sm:pb-14 text-center">
           <p
             className="text-[0.8rem] font-semibold uppercase tracking-widest mb-4"
             style={{ color: 'var(--color-primary)' }}
@@ -498,7 +520,7 @@ export default function PricingClient() {
             className="text-[0.95rem] sm:text-[1.05rem] leading-relaxed max-w-xl mx-auto mb-10"
             style={{ color: 'var(--color-text-light)' }}
           >
-            30+ AI construction tools, RAMS Builder, free templates, and toolbox talks.
+            35 AI construction tools, RAMS Builder, free templates, and toolbox talks.
             Start free — upgrade when you need more.
           </p>
 
@@ -544,11 +566,9 @@ export default function PricingClient() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          2. PRICING CARDS
-          ───────────────────────────────────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6 sm:px-8 -mt-1">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-7 items-start">
+      {/* ─── 2. PRICING CARDS ─── */}
+      <section className="max-w-6xl mx-auto px-6 sm:px-8 -mt-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 items-start">
           {TIERS.map((tier) => (
             <PricingCard
               key={tier.tier}
@@ -560,9 +580,7 @@ export default function PricingClient() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          3. SOCIAL PROOF BAR
-          ───────────────────────────────────────────────────────────────── */}
+      {/* ─── 3. SOCIAL PROOF BAR ─── */}
       <section className="max-w-5xl mx-auto px-6 sm:px-8 mt-14">
         <div
           className="grid grid-cols-2 sm:grid-cols-4 gap-6 py-8 px-6 rounded-xl"
@@ -584,10 +602,8 @@ export default function PricingClient() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          5. FEATURE COMPARISON TABLE
-          ───────────────────────────────────────────────────────────────── */}
-      <section className="max-w-4xl mx-auto px-6 sm:px-8 mt-20">
+      {/* ─── 4. FEATURE COMPARISON TABLE ─── */}
+      <section className="max-w-5xl mx-auto px-6 sm:px-8 mt-20">
         <div className="text-center mb-10">
           <h2
             className="text-[1.5rem] sm:text-[1.8rem] font-bold mb-2"
@@ -601,41 +617,44 @@ export default function PricingClient() {
         </div>
 
         <div className="overflow-x-auto -mx-6 sm:mx-0">
-          <div className="min-w-[540px] px-6 sm:px-0">
-            <table className="w-full text-[0.85rem]">
+          <div className="min-w-[640px] px-6 sm:px-0">
+            <table className="w-full text-[0.82rem]">
               <thead>
                 <tr className="border-b-2" style={{ borderColor: 'var(--color-primary)' }}>
-                  <th className="text-left py-4 pr-4 font-semibold" style={{ color: 'var(--color-text)', width: '40%' }}>
+                  <th className="text-left py-4 pr-3 font-semibold" style={{ color: 'var(--color-text)', width: '32%' }}>
                     Feature
                   </th>
-                  <th className="text-center py-4 px-3 font-semibold" style={{ color: 'var(--color-text)' }}>
-                    Starter
+                  <th className="text-center py-4 px-2 font-semibold" style={{ color: 'var(--color-text)' }}>
+                    Free
                   </th>
                   <th
-                    className="text-center py-4 px-3 font-semibold rounded-t-lg"
+                    className="text-center py-4 px-2 font-semibold rounded-t-lg"
                     style={{ color: 'var(--color-primary-dark)', background: 'var(--color-primary-light)' }}
                   >
-                    Standard
+                    Starter
                   </th>
-                  <th className="text-center py-4 px-3 font-semibold" style={{ color: 'var(--color-text)' }}>
+                  <th className="text-center py-4 px-2 font-semibold" style={{ color: 'var(--color-text)' }}>
                     Professional
+                  </th>
+                  <th className="text-center py-4 px-2 font-semibold" style={{ color: 'var(--color-text)' }}>
+                    Unlimited
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARISON_ROWS.map((row, i) => (
                   <tr key={i} className="border-b" style={{ borderColor: 'var(--color-border)' }}>
-                    <td className="py-3 pr-4" style={{ color: 'var(--color-text-light)' }}>
+                    <td className="py-3 pr-3" style={{ color: 'var(--color-text-light)' }}>
                       {row.label}
                     </td>
-                    {(['free', 'standard', 'premium'] as const).map((col) => {
+                    {(['free', 'starter', 'professional', 'unlimited'] as const).map((col) => {
                       const val = row[col];
                       return (
                         <td
                           key={col}
-                          className="text-center py-3 px-3"
+                          className="text-center py-3 px-2"
                           style={{
-                            background: col === 'standard' ? 'var(--color-primary-light)' : undefined,
+                            background: col === 'starter' ? 'var(--color-primary-light)' : undefined,
                           }}
                         >
                           {typeof val === 'boolean' ? (
@@ -662,9 +681,7 @@ export default function PricingClient() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          6. TRUST BADGES
-          ───────────────────────────────────────────────────────────────── */}
+      {/* ─── 5. TRUST BADGES ─── */}
       <section className="mt-20 py-12" style={{ background: 'var(--color-off-white)' }}>
         <div className="max-w-4xl mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
@@ -720,9 +737,7 @@ export default function PricingClient() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          7. FAQ
-          ───────────────────────────────────────────────────────────────── */}
+      {/* ─── 6. FAQ ─── */}
       <section className="max-w-2xl mx-auto px-6 sm:px-8 py-16 sm:py-20">
         <div className="text-center mb-10">
           <h2
@@ -749,9 +764,7 @@ export default function PricingClient() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────
-          8. BOTTOM CTA
-          ───────────────────────────────────────────────────────────────── */}
+      {/* ─── 7. BOTTOM CTA ─── */}
       <section className="py-14" style={{ background: 'var(--color-primary-light)' }}>
         <div className="max-w-xl mx-auto px-6 sm:px-8 text-center">
           <h2
