@@ -15,7 +15,7 @@ export default function NoiseAssessmentTemplatePicker({ onSelect }: Props) {
   const [previewSlug, setPreviewSlug] = useState<NoiseAssessmentTemplateSlug | null>(null);
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
   const canAccess = (slug: NoiseAssessmentTemplateSlug): boolean => { if (!isAuthenticated) return false; if (isPaid) return true; return NOISE_ASSESSMENT_FREE_TEMPLATES.includes(slug); };
   const getStatus = (slug: NoiseAssessmentTemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => { if (!isAuthenticated) return 'locked-auth'; if (canAccess(slug)) return 'available'; return 'locked-upgrade'; };
   const handleClick = (slug: NoiseAssessmentTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/noise-assessment-builder'); return; } if (s === 'locked-upgrade') { router.push('/pricing'); return; } onSelect(slug); };
