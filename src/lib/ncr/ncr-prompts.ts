@@ -35,7 +35,9 @@ GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ✓ "Regarding the specified requirement: a) What is the exact drawing reference and revision (e.g. CIV-DRG-101-REV C)? b) Which specification clause defines the requirement (e.g. Section 6.3.2 — Concrete Footways, Clause 10.2 Surface Finish)? c) What BS/EN standard applies (e.g. BS 8500-1:2015+A2:2019 for concrete, BS EN 1992-1-1 for structural design)? d) What are the stated tolerances or acceptance criteria?"
 ✓ "Regarding the actual condition found: a) What was measured — exact value with units (e.g. 31 N/mm² at 28 days, 12mm deflection, 150mm cover instead of 50mm)? b) What instrument or method was used to measure it? c) Were photographs taken — how many and by whom? d) Is the non-conformance still visible/measurable for re-inspection?"
 
-After the final round, ALWAYS respond with status "ready".`;
+After the final round, ALWAYS respond with status "ready".
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "roundNumber": N, "message": "..." }`;
 
   const prompts: Record<NcrTemplateSlug, string> = {
     'ebrora-standard': `You are an expert UK construction quality manager conducting a targeted interview to gather information for a comprehensive Non-Conformance Report aligned with ISO 9001:2015 and CDM 2015.
