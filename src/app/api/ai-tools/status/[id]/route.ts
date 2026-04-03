@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorised' }, { status: 401 });
     }
 
-    const generation = await (prisma as any).aiToolGeneration.findUnique({
+    const generation = await prisma.aiToolGeneration.findUnique({
       where: { id: params.id },
       select: {
         id: true,
