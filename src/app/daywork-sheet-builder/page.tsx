@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Daywork Sheet Generator | Ebrora',
+    description: 'CECA-compliant daywork sheets with labour, plant, materials, and overheads — structured for Tier 1 acceptance and countersignature.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   return (
