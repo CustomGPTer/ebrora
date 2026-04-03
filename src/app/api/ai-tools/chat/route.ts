@@ -29,6 +29,7 @@ import { getDayworkSheetTemplateConversationPrompt } from '@/lib/daywork-sheet/d
 import { getNcrTemplateConversationPrompt } from '@/lib/ncr/ncr-prompts';
 import { getSafetyAlertTemplateConversationPrompt } from '@/lib/safety-alert/sa-prompts';
 import { wrapDescription, wrapAnswers, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
+import { findInvalidTemplateSlug } from '@/lib/ai-tools/validate-template-slugs';
 import type {
   AiToolSlug,
   AiToolChatRequest,
@@ -105,6 +106,18 @@ export async function POST(req: NextRequest) {
     if (!toolSlug || !isValidAiToolSlug(toolSlug)) {
       return NextResponse.json(
         { error: 'Invalid tool specified.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate template slugs against allowlist
+    const invalidSlug = findInvalidTemplateSlug(toolSlug, {
+      crpTemplateSlug, carbonFootprintTemplateSlug, dayworkSheetTemplateSlug,
+      ncrTemplateSlug, safetyAlertTemplateSlug,
+    });
+    if (invalidSlug) {
+      return NextResponse.json(
+        { error: 'Invalid template selected.' },
         { status: 400 }
       );
     }
