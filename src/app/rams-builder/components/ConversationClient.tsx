@@ -42,6 +42,7 @@ export default function ConversationClient({
   const [error, setError] = useState<string | null>(null);
   const [readyMessage, setReadyMessage] = useState<string | null>(null);
   const [generationId] = useState(initialGenerationId);
+  const [hasUsedAddMore, setHasUsedAddMore] = useState(false);
 
   const currentRoundRef = useRef<HTMLDivElement>(null);
   const config = TEMPLATE_CONFIGS[templateSlug];
@@ -141,6 +142,7 @@ export default function ConversationClient({
   // User wants to provide more info even though AI said "ready"
   const handleAddMore = useCallback(async () => {
     setReadyMessage(null);
+    setHasUsedAddMore(true);
     setIsLoading(true);
     setError(null);
 
@@ -287,9 +289,11 @@ export default function ConversationClient({
             <button className="rams-primary-btn" onClick={handleGenerate}>
               Generate My RAMS →
             </button>
-            <button className="rams-secondary-btn" onClick={handleAddMore}>
-              I want to add more detail
-            </button>
+            {!hasUsedAddMore && (
+              <button className="rams-secondary-btn" onClick={handleAddMore}>
+                I want to add more detail
+              </button>
+            )}
           </div>
         </div>
       )}

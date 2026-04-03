@@ -4,12 +4,9 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { TEMPLATE_CONFIGS, TEMPLATE_ORDER } from '@/lib/rams/template-config';
+import { TEMPLATE_CONFIGS, TEMPLATE_ORDER, FREE_TEMPLATES } from '@/lib/rams/template-config';
 import { TemplateSlug } from '@/lib/rams/types';
 import TemplatePreviewModal from './TemplatePreviewModal';
-
-// Free tier: first 2 templates only
-const FREE_TEMPLATES: TemplateSlug[] = ['standard-5x5', 'simple-hml'];
 
 interface TemplatePickerProps {
   onSelect: (templateId: string) => void;

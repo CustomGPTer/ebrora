@@ -143,10 +143,20 @@ export default function RamsLandingClient() {
       }
 
       const data = await res.json();
+
+      // Fetch the download URL through the auth-gated download endpoint
+      // so the raw blob URL is never exposed in the generate response
+      const dlRes = await fetch(`/api/rams/download/${data.generationId}`);
+      if (!dlRes.ok) {
+        const dlData = await safeJsonParse(dlRes, 'Failed to retrieve download link.');
+        throw new Error(dlData.error || 'Failed to retrieve download link');
+      }
+      const dlData = await dlRes.json();
+
       setDownloadData({
-        downloadUrl: data.downloadUrl,
-        filename: data.filename,
-        expiresAt: data.expiresAt,
+        downloadUrl: dlData.downloadUrl,
+        filename: dlData.filename || data.filename,
+        expiresAt: dlData.expiresAt || data.expiresAt,
         generationId: data.generationId,
       });
       setStep('download');
