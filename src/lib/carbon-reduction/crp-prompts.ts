@@ -36,7 +36,9 @@ GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ✓ "Regarding your Scope 1 direct emissions: a) How many company vehicles are in your fleet, and what fuel types do they run on (diesel, petrol, HVO, electric)? b) Do you operate any site generators or stationary combustion plant — if so, approximate annual fuel consumption in litres? c) Is there any gas heating at your offices or depots? d) Do you use any refrigerants (e.g. air conditioning, cold stores) that may have fugitive emissions?"
 ✓ "Regarding your current carbon governance: a) Who holds board-level accountability for carbon reduction — name and title? b) Do you have an existing Environmental Management System (ISO 14001 or similar)? c) Is carbon reporting currently included in your annual report or board papers?"
 
-After the final round, ALWAYS respond with status "ready".`;
+After the final round, ALWAYS respond with status "ready".
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "roundNumber": N, "message": "..." }`;
 
   const prompts: Record<CrpTemplateSlug, string> = {
     'ppn-0621-standard': `You are an expert UK carbon reporting and sustainability specialist conducting a targeted interview to gather information for a PPN 06/21 compliant Carbon Reduction Plan.
