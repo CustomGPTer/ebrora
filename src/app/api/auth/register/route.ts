@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma';
 import { sendEmail } from '@/lib/email/send-email';
 import { verificationEmail } from '@/lib/email/templates';
 import { rateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
+import { validateOrigin } from '@/lib/csrf';
 
 const registerSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -23,6 +24,11 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
+          // CSRF origin validation
+          if (!validateOrigin(request)) {
+                  return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
+          }
+
           // Rate limit: 5 registrations per IP per hour
           const ip = getClientIp(request);
           const { allowed, retryAfterMs } = rateLimit(ip, 'register', RATE_LIMITS.register);
@@ -42,10 +48,15 @@ export async function POST(request: NextRequest) {
       });
 
       if (existingUser) {
+              // Return same response shape as success to prevent email enumeration.
+              // User can discover account exists via login or forgot-password flow.
               return NextResponse.json(
-                { error: 'Email already registered' },
-                { status: 400 }
-                      );
+                {
+                  success: true,
+                  message: 'Registration successful. Please check your email to verify your account.',
+                },
+                { status: 201 }
+              );
       }
 
       const salt = await bcrypt.genSalt(12);
@@ -90,7 +101,6 @@ export async function POST(request: NextRequest) {
             success: true,
             warning: true,
             message: 'Account created but verification email could not be sent. Please use the resend verification option on the login page.',
-            userId: user.id,
           },
           { status: 201 }
         );
@@ -100,7 +110,6 @@ export async function POST(request: NextRequest) {
         {
           success: true,
           message: 'Registration successful. Please check your email to verify your account.',
-          userId: user.id,
         },
         { status: 201 }
       );
