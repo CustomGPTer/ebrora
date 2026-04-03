@@ -40,8 +40,8 @@ export default async function AdminDashboard() {
     prisma.subscription.findMany({ where: { status: 'ACTIVE' } }),
     prisma.generation.count({ where: { created_at: { gte: todayStart } } }),
     prisma.generation.count({ where: { created_at: { gte: monthStart } } }),
-    prisma.aiToolGeneration.count({ where: { created_at: { gte: todayStart } } }),
-    prisma.aiToolGeneration.count({ where: { created_at: { gte: monthStart } } }),
+    prisma.aiToolGeneration.count({ where: { created_at: { gte: todayStart } } }).catch(() => 0),
+    prisma.aiToolGeneration.count({ where: { created_at: { gte: monthStart } } }).catch(() => 0),
     prisma.user.count(),
     prisma.user.count({ where: { created_at: { gte: todayStart } } }),
     prisma.user.count({ where: { created_at: { gte: monthStart } } }),
@@ -54,7 +54,7 @@ export default async function AdminDashboard() {
     prisma.generation.count({ where: { status: 'FAILED', created_at: { gte: monthStart } } }),
     prisma.subscription.count({ where: { status: 'PAST_DUE' } }),
     // Count users with paid subscriptions (active)
-    prisma.subscription.count({ where: { status: 'ACTIVE', tier: { in: ['STARTER', 'STANDARD', 'PROFESSIONAL', 'UNLIMITED'] } } }),
+    prisma.subscription.count({ where: { status: 'ACTIVE', tier: { in: ['STARTER', 'STANDARD', 'PROFESSIONAL', 'UNLIMITED'] } } }).catch(() => 0),
   ]);
 
   // ── Subscription Breakdown ──
@@ -122,7 +122,7 @@ export default async function AdminDashboard() {
       take: 15,
       orderBy: { created_at: 'desc' },
       include: { user: { select: { name: true, email: true } } },
-    }),
+    }).catch(() => []),
     prisma.contentDownload.findMany({
       take: 15,
       orderBy: { downloadedAt: 'desc' },
