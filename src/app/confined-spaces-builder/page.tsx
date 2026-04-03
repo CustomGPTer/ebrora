@@ -22,6 +22,12 @@ const toolSchema = {
   url: 'https://www.ebrora.com/confined-spaces-builder', operatingSystem: 'Web',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
   publisher: { '@type': 'Organization', name: 'Ebrora', url: 'https://www.ebrora.com' },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Confined Space Assessment Builder | 4 Templates | Ebrora',
+    description: 'AI-powered confined space assessment with 4 templates including permit-style and rescue-focused formats.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function Page() {
