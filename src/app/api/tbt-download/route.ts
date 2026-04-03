@@ -8,6 +8,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TIER_LIMITS } from "@/lib/constants";
+import { resolveEffectiveTier } from "@/lib/payments/resolve-tier";
 
 // ─── In-memory IP rate limiter (abuse prevention, not primary limit) ─────────
 const IP_DAILY_LIMIT = 10; // generous daily cap per IP as abuse prevention
@@ -79,9 +80,7 @@ export async function POST(request: NextRequest) {
       include: { subscription: true },
     });
 
-    const tier = (user?.subscription?.status === "ACTIVE"
-      ? user.subscription.tier
-      : "FREE") as keyof typeof TIER_LIMITS;
+    const tier = resolveEffectiveTier(user?.subscription) as keyof typeof TIER_LIMITS;
 
     const limits = TIER_LIMITS[tier] || TIER_LIMITS.FREE;
     const monthlyLimit = limits.tbtDownloadsPerMonth;
@@ -235,9 +234,7 @@ export async function GET(request: NextRequest) {
     include: { subscription: true },
   });
 
-  const tier = (user?.subscription?.status === "ACTIVE"
-    ? user.subscription.tier
-    : "FREE") as keyof typeof TIER_LIMITS;
+  const tier = resolveEffectiveTier(user?.subscription) as keyof typeof TIER_LIMITS;
 
   const limits = TIER_LIMITS[tier] || TIER_LIMITS.FREE;
   const monthlyLimit = limits.tbtDownloadsPerMonth;
