@@ -35,11 +35,6 @@ function ErrorContent() {
 
         <div className="alert alert--error">
           <p>{message}</p>
-          {error && (
-            <p className="text--small">
-              Error code: <code>{error}</code>
-            </p>
-          )}
         </div>
 
         <div className="error-actions">
