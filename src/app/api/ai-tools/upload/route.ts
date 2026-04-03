@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
 
     if (monthLimit === 0) {
       return NextResponse.json({
-        error: 'This tool requires a Standard or Professional subscription. Please upgrade to access it.',
+        error: 'This tool requires a paid subscription. Please upgrade to access it.',
         upgradeRequired: true,
       }, { status: 403 });
     }
@@ -137,10 +137,10 @@ export async function POST(req: NextRequest) {
     const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
     const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
 
+    // Global count: all AI tool generations this month (not per-tool)
     const usageThisMonth = await (prisma as any).aiToolGeneration.count({
       where: {
         user_id: userId,
-        tool_slug: toolSlug,
         created_at: { gte: periodStart, lte: periodEnd },
         status: { in: ['COMPLETED', 'PROCESSING', 'QUEUED'] },
       },
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
 
     if (usageThisMonth >= monthLimit) {
       return NextResponse.json({
-        error: `You have reached your monthly limit of ${monthLimit} ${toolConfig.shortName} generations. Resets on the 1st of next month.`,
+        error: `You have reached your monthly limit of ${monthLimit} AI document generation${monthLimit === 1 ? '' : 's'}. Resets on the 1st of next month.`,
         limitReached: true,
       }, { status: 429 });
     }
