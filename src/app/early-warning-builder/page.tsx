@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Early Warning Notice Builder | 8 NEC Templates | Ebrora',
+    description: 'AI-powered NEC early warning notice builder with 8 professional templates. All contract directions, risk categories, and detail levels — NEC3/NEC4 compliant.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   return (
