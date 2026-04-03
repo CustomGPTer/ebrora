@@ -145,10 +145,10 @@ export async function POST(req: NextRequest) {
     const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
     const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
 
+    // Global count: all AI tool generations this month (not per-tool)
     const usageThisMonth = await (prisma as any).aiToolGeneration.count({
       where: {
         user_id: session.user.id,
-        tool_slug: toolSlug,
         created_at: { gte: periodStart, lte: periodEnd },
         status: { in: ['COMPLETED', 'PROCESSING', 'QUEUED'] },
         id: { not: generationId }, // exclude current generation being processed
@@ -164,8 +164,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: monthLimit === 0
-            ? `The ${toolConfig.shortName} is available on Standard and Professional plans.`
-            : `You've reached your monthly limit for ${toolConfig.shortName}.`,
+            ? `The ${toolConfig.shortName} requires a paid plan.`
+            : `You've reached your monthly AI document limit.`,
           limitReached: true,
         },
         { status: 429 }
