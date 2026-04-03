@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Manual Handling Assessment | 4 Templates | Ebrora',
+    description: 'AI-powered manual handling assessment with 4 templates: TILE methodology, MAC scoring, RAPP assessment, and training card.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
