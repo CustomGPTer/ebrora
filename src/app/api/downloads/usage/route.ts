@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { TIER_LIMITS } from '@/lib/constants';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 import type { SubscriptionTier } from '@prisma/client';
 
 /**
@@ -89,9 +90,7 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const tier: SubscriptionTier = user.subscription?.status === 'ACTIVE'
-      ? user.subscription.tier
-      : 'FREE';
+    const tier: SubscriptionTier = resolveEffectiveTier(user.subscription);
 
     const usage = await getUsageCounts(session.user.id, tier);
 
@@ -129,9 +128,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const tier: SubscriptionTier = user.subscription?.status === 'ACTIVE'
-      ? user.subscription.tier
-      : 'FREE';
+    const tier: SubscriptionTier = resolveEffectiveTier(user.subscription);
 
     const limits = TIER_LIMITS[tier] || TIER_LIMITS.FREE;
     const limitKey = contentType === 'TOOLBOX_TALK' ? 'tbtDownloadsPerMonth' : 'templateDownloadsPerMonth';
