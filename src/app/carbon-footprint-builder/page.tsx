@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Construction Carbon Footprint Generator | Ebrora',
+    description: 'ICE v3.2 carbon footprint assessments for UK construction — materials, plant, transport, waste quantified with reduction opportunities identified.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   return (
