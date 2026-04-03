@@ -53,15 +53,16 @@ export default async function AdminDashboard() {
     prisma.contentDownload.count({ where: { contentType: 'FREE_TEMPLATE' } }).catch(() => 0),
     prisma.generation.count({ where: { status: 'FAILED', created_at: { gte: monthStart } } }),
     prisma.subscription.count({ where: { status: 'PAST_DUE' } }),
-    // Count users with STANDARD or PROFESSIONAL subscriptions (active)
-    prisma.subscription.count({ where: { status: 'ACTIVE', tier: { in: ['STANDARD', 'PROFESSIONAL'] } } }),
+    // Count users with paid subscriptions (active)
+    prisma.subscription.count({ where: { status: 'ACTIVE', tier: { in: ['STARTER', 'STANDARD', 'PROFESSIONAL', 'UNLIMITED'] } } }),
   ]);
 
   // ── Subscription Breakdown ──
   // Count each tier from active subscriptions for consistency
   const freeCount = activeSubscriptions.filter((s) => s.tier === 'FREE').length;
-  const paidStandard = activeSubscriptions.filter((s) => s.tier === 'STANDARD').length;
+  const paidStarter = activeSubscriptions.filter((s) => s.tier === 'STARTER' || s.tier === 'STANDARD').length;
   const paidProfessional = activeSubscriptions.filter((s) => s.tier === 'PROFESSIONAL').length;
+  const paidUnlimited = activeSubscriptions.filter((s) => s.tier === 'UNLIMITED').length;
   
   // Also count users without any subscription (treat as FREE)
   const usersWithSubscriptions = await prisma.subscription.count();
@@ -69,8 +70,10 @@ export default async function AdminDashboard() {
 
   const tierBreakdown = {
     FREE: freeCount + usersWithoutSubscription,
-    STANDARD: paidStandard,
+    STARTER: paidStarter,
+    STANDARD: 0, // Legacy — all migrated to STARTER
     PROFESSIONAL: paidProfessional,
+    UNLIMITED: paidUnlimited,
   };
 
   const pricing: Record<string, number> = { FREE: 0, STANDARD: 9.99, PROFESSIONAL: 29.99 };
