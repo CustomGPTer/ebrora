@@ -3,6 +3,8 @@ import { z } from 'zod';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { validateOrigin } from '@/lib/csrf';
 
 const schema = z.object({
     token: z.string().min(1, 'Token is required'),
@@ -25,6 +27,21 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
+          // CSRF origin validation
+          if (!validateOrigin(request)) {
+                  return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
+          }
+
+          // Rate limit: 10 reset attempts per IP per hour
+          const ip = getClientIp(request);
+          const { allowed, retryAfterMs } = rateLimit(ip, 'reset-password', 10);
+          if (!allowed) {
+                  return NextResponse.json(
+                    { error: 'Too many attempts. Please try again later.' },
+                    { status: 429, headers: { 'Retry-After': String(Math.ceil(retryAfterMs / 1000)) } }
+                  );
+          }
+
           const body = await request.json();
           const { token, password } = schema.parse(body);
 
