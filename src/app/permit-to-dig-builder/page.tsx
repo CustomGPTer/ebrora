@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Permit to Dig Generator | 4 Templates | Ebrora',
+    description: 'AI-powered permit to dig with 4 templates: comprehensive HSG47, daily shift card, utility strike response, and avoidance plan.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
