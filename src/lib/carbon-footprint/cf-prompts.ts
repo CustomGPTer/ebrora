@@ -36,7 +36,9 @@ GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ✓ "Regarding concrete specification: a) What mix designs are specified — C25/30, C32/40, C35/45, C40/50? b) What cement type — CEM I (≈0.178 kgCO₂e/kg) or CEM III/A with GGBS (≈0.090 kgCO₂e/kg)? c) Total volume per mix (m³)? d) Is any low-carbon concrete specified (e.g. CEMII/B-V with PFA, geopolymer)?"
 ✓ "Regarding haulage and transport: a) What is the average one-way distance from batching plant to site (km)? b) Vehicle type for concrete delivery (6m³ or 8m³ trucks)? c) Aggregate and fill delivery distance and vehicle type? d) Muck-away destination and round-trip distance?"
 
-After the final round, ALWAYS respond with status "ready".`;
+After the final round, ALWAYS respond with status "ready".
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "roundNumber": N, "message": "..." }`;
 
   const prompts: Record<CarbonFootprintTemplateSlug, string> = {
     'ebrora-standard': `You are an expert UK construction carbon measurement specialist conducting a targeted interview to gather information for a comprehensive Construction Carbon Footprint Assessment using ICE v3.2 emission factors.
