@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { sendEmail } from '@/lib/email/send-email';
 import { welcomeEmail } from '@/lib/email/templates';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { validateOrigin } from '@/lib/csrf';
 
 // HEAD requests (from email security scanners like Microsoft Safe Links)
 // must return 200 without consuming the token.
@@ -30,6 +32,21 @@ export async function GET(request: NextRequest) {
 // POST — the actual verification (triggered by the confirmation page button)
 export async function POST(request: NextRequest) {
   try {
+    // CSRF origin validation
+    if (!validateOrigin(request)) {
+      return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
+    }
+
+    // Rate limit: 10 verification attempts per IP per hour
+    const ip = getClientIp(request);
+    const { allowed, retryAfterMs } = rateLimit(ip, 'verify-email', 10);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(retryAfterMs / 1000)) } }
+      );
+    }
+
     const body = await request.json();
     const token = body.token;
 
