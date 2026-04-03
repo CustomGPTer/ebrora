@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma';
 import { sendEmail } from '@/lib/email/send-email';
 import { passwordResetEmail } from '@/lib/email/templates';
 import { rateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
+import { validateOrigin } from '@/lib/csrf';
 
 const schema = z.object({
     email: z.string().email('Invalid email address'),
@@ -12,6 +13,11 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
+          // CSRF origin validation
+          if (!validateOrigin(request)) {
+                  return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
+          }
+
           // Rate limit: 5 reset requests per IP per hour
           const ip = getClientIp(request);
           const { allowed, retryAfterMs } = rateLimit(ip, 'forgot-password', RATE_LIMITS.forgotPassword);
