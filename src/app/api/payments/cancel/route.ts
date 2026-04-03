@@ -31,8 +31,13 @@ export async function POST(request: NextRequest) {
                                             );
             }
 
-            const body = (await request.json()) as { reason?: string };
-                    const reason = body.reason || 'User requested cancellation';
+            let reason = 'User requested cancellation';
+            try {
+              const body = (await request.json()) as { reason?: string };
+              if (body.reason) reason = body.reason;
+            } catch {
+              // Empty or malformed body is fine — use default reason
+            }
 
             // Cancel subscription with PayPal
             const cancelled = await cancelSubscription(subscription.paypal_subscription_id, reason);
