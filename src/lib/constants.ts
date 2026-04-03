@@ -40,35 +40,59 @@ export const RAMS_CONFIG = {
 export const TIER_LIMITS = {
   FREE: {
     ramsPerMonth: 1,
-    templateDownloadsPerMonth: 2,
-    tbtDownloadsPerMonth: 2,
+    aiToolUsesPerMonth: 1,
+    templateDownloadsPerMonth: 1,
+    tbtDownloadsPerMonth: 1,
     formats: 2,
     maxLogoSize: 1024 * 1024, // 1MB
     storageHours: 24,
   },
-  STANDARD: {
-    ramsPerMonth: 10,
-    templateDownloadsPerMonth: 20,
+  STARTER: {
+    ramsPerMonth: 5,
+    aiToolUsesPerMonth: 30,
+    templateDownloadsPerMonth: 10,
     tbtDownloadsPerMonth: 10,
     formats: 10,
     maxLogoSize: 2 * 1024 * 1024, // 2MB
-    storageHours: 24, // all tiers: 24-hour download window
+    storageHours: 24,
+  },
+  // Legacy alias — existing STANDARD subscribers map here until Batch 7 migration
+  STANDARD: {
+    ramsPerMonth: 5,
+    aiToolUsesPerMonth: 30,
+    templateDownloadsPerMonth: 10,
+    tbtDownloadsPerMonth: 10,
+    formats: 10,
+    maxLogoSize: 2 * 1024 * 1024, // 2MB
+    storageHours: 24,
   },
   PROFESSIONAL: {
-    ramsPerMonth: 25,
-    templateDownloadsPerMonth: 40,
+    ramsPerMonth: 15,
+    aiToolUsesPerMonth: 150,
+    templateDownloadsPerMonth: 30,
     tbtDownloadsPerMonth: 20,
     formats: 10,
     maxLogoSize: 5 * 1024 * 1024, // 5MB
-    storageHours: 24, // all tiers: 24-hour download window
+    storageHours: 24,
   },
-  ENTERPRISE: {
-    ramsPerMonth: 'unlimited',
-    templateDownloadsPerMonth: 'unlimited',
-    tbtDownloadsPerMonth: 'unlimited',
+  UNLIMITED: {
+    ramsPerMonth: 9999,
+    aiToolUsesPerMonth: 9999,
+    templateDownloadsPerMonth: 9999,
+    tbtDownloadsPerMonth: 9999,
     formats: 10,
     maxLogoSize: 10 * 1024 * 1024, // 10MB
-    storageHours: 24, // all tiers: 24-hour download window
+    storageHours: 24,
+  },
+  // Legacy placeholder — kept so any old ENTERPRISE references don't crash
+  ENTERPRISE: {
+    ramsPerMonth: 9999,
+    aiToolUsesPerMonth: 9999,
+    templateDownloadsPerMonth: 9999,
+    tbtDownloadsPerMonth: 9999,
+    formats: 10,
+    maxLogoSize: 10 * 1024 * 1024,
+    storageHours: 24,
   },
 } as const;
 
