@@ -19,7 +19,7 @@ export default function CarbonFootprintTemplatePicker({ onSelect }: CarbonFootpr
 
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
 
   const canAccessTemplate = (slug: CarbonFootprintTemplateSlug): boolean => {
     if (!isAuthenticated) return false;
