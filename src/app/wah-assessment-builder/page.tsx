@@ -28,6 +28,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Working at Height Assessment Builder | Ebrora',
+    description: 'WAH Regs 2005 compliant risk assessments with 4 professional templates.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
