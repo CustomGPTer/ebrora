@@ -307,9 +307,21 @@ model UsageRecord {
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@unique([user_id, billing_period_start])
   @@index([user_id])
   @@index([billing_period_start])
   @@map("usage_records")
+}
+
+// Webhook Idempotency — prevents duplicate processing of PayPal webhook events
+model WebhookEvent {
+  id              String   @id @default(cuid())
+  transmission_id String   @unique
+  event_type      String
+  processed_at    DateTime @default(now())
+
+  @@index([transmission_id])
+  @@map("webhook_events")
 }
 
 // Logo Model
