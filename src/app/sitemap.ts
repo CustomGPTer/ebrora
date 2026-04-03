@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const builderSlugs = discoverBuilderPages();
   const builderPages: MetadataRoute.Sitemap = builderSlugs.map((slug) => ({
     url: `${baseUrl}/${slug}`,
-    lastModified: new Date(),
+    lastModified: new Date('2025-06-01'),
     changeFrequency: 'monthly' as const,
     priority: 0.9,
   }));
@@ -53,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
       {
                 url: `${baseUrl}/faq`,
-                lastModified: new Date(),
+                lastModified: new Date('2025-06-01'),
                 changeFrequency: 'monthly',
                 priority: 0.7,
       },
@@ -65,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
       {
                 url: `${baseUrl}/pricing`,
-                lastModified: new Date(),
+                lastModified: new Date('2025-06-01'),
                 changeFrequency: 'monthly',
                 priority: 0.8,
       },
@@ -77,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
       {
                 url: `${baseUrl}/tools`,
-                lastModified: new Date(),
+                lastModified: new Date('2025-06-01'),
                 changeFrequency: 'monthly',
                 priority: 0.7,
       },
@@ -89,19 +89,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
       {
                 url: `${baseUrl}/privacy-policy`,
-                lastModified: new Date(),
+                lastModified: new Date('2025-01-01'),
                 changeFrequency: 'yearly',
                 priority: 0.3,
       },
       {
                 url: `${baseUrl}/terms-of-service`,
-                lastModified: new Date(),
+                lastModified: new Date('2025-01-01'),
                 changeFrequency: 'yearly',
                 priority: 0.3,
       },
       {
                 url: `${baseUrl}/refund-policy`,
-                lastModified: new Date(),
+                lastModified: new Date('2025-01-01'),
                 changeFrequency: 'yearly',
                 priority: 0.3,
       },

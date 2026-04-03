@@ -68,33 +68,6 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.ebrora.com' },
 };
 
-// Schema.org JSON-LD for Organization + WebSite
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Ebrora',
-  url: 'https://www.ebrora.com',
-  logo: 'https://www.ebrora.com/og-image.jpg',
-  description:
-    'AI-powered construction document generators and professional Excel templates for UK site teams. 35+ AI tools including RAMS Builder, COSHH, RIDDOR, and Working at Height — plus 750+ downloadable templates and 1,500+ free toolbox talks.',
-  email: 'hello@ebrora.com',
-  address: { '@type': 'PostalAddress', addressCountry: 'GB' },
-  sameAs: [
-    'https://www.linkedin.com/in/ebrora/',
-    'https://x.com/EbroraSheets',
-    'https://www.youtube.com/channel/UCQy-rQ3Ye1kIPpT19A1c0lg',
-  ],
-};
-
-const websiteSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'Ebrora',
-  url: 'https://www.ebrora.com',
-  description:
-    'AI-powered construction document generators, professional Excel templates, and 1,500+ free toolbox talks for UK construction professionals.',
-};
-
 export default function RootLayout({
   children,
 }: {
@@ -105,19 +78,6 @@ export default function RootLayout({
       <head>
         {/* Sitemap */}
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-        {/* Schema.org */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteSchema),
-          }}
-        />
       </head>
       <body>
         <AuthProvider>

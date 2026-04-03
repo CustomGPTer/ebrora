@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/admin/', '/auth/', '/account/']
+      disallow: ['/api/', '/admin/', '/auth/', '/account/', '/unsubscribe/']
     },
     sitemap: 'https://www.ebrora.com/sitemap.xml'
   };
