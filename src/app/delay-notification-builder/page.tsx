@@ -28,6 +28,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Delay Notification Builder | Ebrora',
+    description: 'Delay Notification with 3 templates.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
