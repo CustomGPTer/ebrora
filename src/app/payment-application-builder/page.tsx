@@ -35,6 +35,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Payment Application Generator | Ebrora',
+    description: 'Professional interim payment applications with BoQ, variations, retention, and CIS — formatted to Tier 1 submission standards.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   const toolConfig = AI_TOOL_CONFIGS['payment-application'];
