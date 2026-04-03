@@ -35,6 +35,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Quality Inspection Checklist Generator | Ebrora',
+    description: 'AI-powered quality inspection checklist generator. Activity-specific with hold points, acceptance criteria, and standards.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   const toolConfig = AI_TOOL_CONFIGS['quality-checklist'];
