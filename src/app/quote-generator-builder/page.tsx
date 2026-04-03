@@ -36,6 +36,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Quotation Builder | 4 Templates | Ebrora',
+    description: 'Professional subcontractor quotations with 4 template styles. BoQ, inclusions, exclusions, and commercial terms formatted to Tier 1 standards.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function Page() {
