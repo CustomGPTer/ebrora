@@ -28,6 +28,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Variation Confirmation Builder | Ebrora',
+    description: 'Variation Confirmation with 3 templates.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
