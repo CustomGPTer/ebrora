@@ -9,6 +9,7 @@ const PAYPAL_SECRET = process.env.PAYPAL_SECRET || '';
 
 let cachedAccessToken: string | null = null;
 let tokenExpiry: number | null = null;
+let tokenRefreshPromise: Promise<string> | null = null;
 
 async function getAccessToken(): Promise<string> {
   const now = Date.now();
@@ -16,6 +17,20 @@ async function getAccessToken(): Promise<string> {
     return cachedAccessToken;
   }
 
+  // Mutex: if a refresh is already in flight, wait for it instead of firing another
+  if (tokenRefreshPromise) {
+    return tokenRefreshPromise;
+  }
+
+  tokenRefreshPromise = refreshAccessToken().finally(() => {
+    tokenRefreshPromise = null;
+  });
+
+  return tokenRefreshPromise;
+}
+
+async function refreshAccessToken(): Promise<string> {
+  const now = Date.now();
   const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64');
 
   const response = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
@@ -224,6 +239,27 @@ export async function validateWebhookSignature(
   transmissionTime: string,
   certUrl: string
 ): Promise<boolean> {
+  // Validate cert_url is from PayPal before forwarding to verification endpoint
+  try {
+    const certUrlObj = new URL(certUrl);
+    const hostname = certUrlObj.hostname.toLowerCase();
+    if (
+      !hostname.endsWith('.paypal.com') &&
+      !hostname.endsWith('.symantec.com') &&
+      !hostname.endsWith('.verisign.com')
+    ) {
+      console.warn(`Rejected webhook: cert_url hostname not PayPal — ${hostname}`);
+      return false;
+    }
+    if (certUrlObj.protocol !== 'https:') {
+      console.warn(`Rejected webhook: cert_url is not HTTPS — ${certUrl}`);
+      return false;
+    }
+  } catch {
+    console.warn(`Rejected webhook: invalid cert_url — ${certUrl}`);
+    return false;
+  }
+
   const accessToken = await getAccessToken();
 
   const response = await fetch(`${PAYPAL_BASE}/v1/notifications/verify-webhook-signature`, {

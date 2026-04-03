@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { getRamsLimitByTier } from './plan-config';
+import { resolveEffectiveTier } from './resolve-tier';
 
 export async function getUserUsage(
   userId: string
@@ -8,7 +9,9 @@ export async function getUserUsage(
     where: { user_id: userId },
   });
 
-  const tier = subscription?.tier || 'FREE';
+  // Use resolveEffectiveTier to respect subscription status.
+  // PAST_DUE / SUSPENDED / expired CANCELLED users correctly resolve to FREE.
+  const tier = resolveEffectiveTier(subscription);
   const limit = getRamsLimitByTier(tier);
 
   // Count generations this month
@@ -43,41 +46,35 @@ export async function incrementUsage(userId: string): Promise<boolean> {
   const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
 
   try {
-    // Find existing usage record for this month
-    const existing = await prisma.usageRecord.findFirst({
-      where: {
-        user_id: userId,
-        billing_period_start: monthStart,
-      },
+    // Get effective tier (respects subscription status)
+    const subscription = await prisma.subscription.findUnique({
+      where: { user_id: userId },
     });
+    const tier = resolveEffectiveTier(subscription);
+    const ramsLimit = getRamsLimitByTier(tier);
 
-    if (existing) {
-      await prisma.usageRecord.update({
-        where: { id: existing.id },
-        data: {
-          rams_generated: {
-            increment: 1,
-          },
-        },
-      });
-    } else {
-      // Get user's subscription to determine limit
-      const subscription = await prisma.subscription.findUnique({
-        where: { user_id: userId },
-      });
-      const tier = subscription?.tier || 'FREE';
-      const ramsLimit = getRamsLimitByTier(tier);
-
-      await prisma.usageRecord.create({
-        data: {
+    // Atomic upsert — relies on @@unique([user_id, billing_period_start])
+    // Prevents race condition where two concurrent requests both create a record
+    await prisma.usageRecord.upsert({
+      where: {
+        user_id_billing_period_start: {
           user_id: userId,
           billing_period_start: monthStart,
-          billing_period_end: monthEnd,
-          rams_generated: 1,
-          rams_limit: ramsLimit,
         },
-      });
-    }
+      },
+      update: {
+        rams_generated: {
+          increment: 1,
+        },
+      },
+      create: {
+        user_id: userId,
+        billing_period_start: monthStart,
+        billing_period_end: monthEnd,
+        rams_generated: 1,
+        rams_limit: ramsLimit,
+      },
+    });
 
     return true;
   } catch (error) {
