@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Emergency Response Plan Generator | 4 Templates | Ebrora',
+    description: 'AI-powered ERP with 4 templates: standard, quick reference, role-based, and multi-scenario flowcharts.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
