@@ -16,7 +16,7 @@ export default function WbvTemplatePicker({ onSelect }: Props) {
   const [previewSlug, setPreviewSlug] = useState<WbvTemplateSlug | null>(null);
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
 
   const getStatus = (): 'available' | 'locked-auth' | 'locked-upgrade' => {
     if (!isAuthenticated) return 'locked-auth';
