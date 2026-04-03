@@ -7,13 +7,41 @@ import Link from 'next/link';
 function UnsubscribeContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
+  const token = searchParams.get('token');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleUnsubscribe = async () => {
-    // For now, just acknowledge — all current Ebrora emails are transactional.
-    // When marketing emails are added, wire this to an API route that sets
-    // a user preference flag in the database.
-    setSubmitted(true);
+    if (!email || !token) {
+      setError('Invalid unsubscribe link. Please use the link from your email.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to unsubscribe. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -61,17 +89,50 @@ function UnsubscribeContent() {
           </p>
         </div>
 
+        {error && (
+          <div
+            style={{
+              color: '#d32f2f',
+              fontSize: '14px',
+              margin: '16px 0',
+              padding: '12px',
+              background: '#fef2f2',
+              borderRadius: '6px',
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {(!email || !token) && !error && (
+          <div
+            style={{
+              color: '#d32f2f',
+              fontSize: '14px',
+              margin: '16px 0',
+              padding: '12px',
+              background: '#fef2f2',
+              borderRadius: '6px',
+            }}
+          >
+            Invalid unsubscribe link. Please use the link from your email.
+          </div>
+        )}
+
         <div style={{ textAlign: 'center', margin: '24px 0' }}>
           <button
             onClick={handleUnsubscribe}
+            disabled={loading || !email || !token}
             className="btn btn--primary"
             style={{
               padding: '14px 40px',
               fontSize: '16px',
               fontWeight: 600,
+              cursor: loading || !email || !token ? 'not-allowed' : 'pointer',
+              opacity: loading || !email || !token ? 0.7 : 1,
             }}
           >
-            Unsubscribe
+            {loading ? 'Processing…' : 'Unsubscribe'}
           </button>
         </div>
 
