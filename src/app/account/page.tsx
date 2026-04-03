@@ -123,7 +123,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
   // ── Recent AI tool generations ──
   let aiToolDocuments: typeof ramsDocuments = [];
   try {
-    const recentAiGens = await (prisma as any).aiToolGeneration.findMany({
+    const recentAiGens = await prisma.aiToolGeneration.findMany({
       where: { user_id: session.user.id },
       select: {
         id: true,
