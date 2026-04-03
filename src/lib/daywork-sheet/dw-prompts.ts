@@ -15,7 +15,7 @@ PROFESSIONAL TERMINOLOGY REQUIREMENTS:
 - Use correct daywork terminology: prime cost, percentage additions, daywork rate, instruction, contemporaneous record, countersignature, productive hours, idle time, standing time.
 
 QUESTION STRUCTURE RULES:
-1. EVERY question MUST use a), b), c) grouped sub-questions. Minimum 2 sub-parts, maximum 5.
+1. EVERY question MUST use a), b) grouped sub-questions. Exactly 2 sub-parts.
 2. Start each question with "Regarding [specific topic]:" then list sub-questions.
 3. Each sub-question must ask for a specific fact, name, rate, time, or reference — not a vague description.
 4. Never ask about a topic you can infer from the user's initial description.
@@ -32,8 +32,8 @@ BANNED VAGUE QUESTIONS — NEVER ASK ANYTHING LIKE THESE:
 ═══════════════════════════════════════════════════════
 GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ═══════════════════════════════════════════════════════
-✓ "Regarding labour deployed: a) How many operatives — name, CSCS trade (e.g. Groundworker, Steel Fixer, Pipe Layer), and skill grade (Skilled/Semi-Skilled/Labourer)? b) Start and finish times for each (including breaks deducted)? c) Any overtime worked — at what rate (time and a half, double time)? d) Are agreed daywork rates from the tender schedule being used, or CIJC base rates?"
-✓ "Regarding plant and equipment: a) List each item with make/model and size (e.g. '8T Kubota KX080 mini excavator')? b) Hours on site vs productive hours for each? c) Company-owned, hired (wet or dry hire), or subcontractor-provided? d) Any attachments used (breaker, auger, compaction plate) — listed separately or included?"
+✓ "Regarding labour deployed: a) How many operatives — name, CSCS trade (e.g. Groundworker, Steel Fixer, Pipe Layer), and skill grade (Skilled/Semi-Skilled/Labourer)? b) Start and finish times for each (including breaks deducted)?"
+✓ "Regarding plant and equipment: a) List each item with make/model and size (e.g. '8T Kubota KX080 mini excavator')? b) Hours on site vs productive hours for each?"
 
 After the final round, ALWAYS respond with status "ready".
 
@@ -47,7 +47,7 @@ CONTEXT:
 - This is an all-purpose daywork record suitable for any UK construction contract form.
 - The generated document MUST exceed 1,800 words minimum — with fully itemised labour, plant, and materials tables, instruction details, running totals, and dual sign-off.
 - You must ask EXACTLY 5 questions across 2 rounds (3 in Round 1, 2 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -69,7 +69,7 @@ CONTEXT:
 - The CECA Schedule of Dayworks (2011 Edition) governs daywork pricing in civil engineering contracts. Labour is priced using CIJC Working Rule Agreement classifications. Plant uses CECA percentage additions. Materials at invoice cost plus contractual percentage.
 - The generated document MUST exceed 2,200 words minimum — with CECA-formatted tables showing CIJC grades, CECA percentage additions, and contractual markup calculations.
 - You must ask EXACTLY 6 questions across 2 rounds (4 in Round 1, 2 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -92,7 +92,7 @@ CONTEXT:
 - The RICS Definition of Prime Cost (3rd Edition) governs daywork pricing under JCT contracts. Labour at prime cost (actual wages + employer costs) plus percentage addition. Plant at competitive hire rates or RICS schedule. Materials at net invoice cost plus percentage.
 - The generated document MUST exceed 2,200 words minimum — with RICS prime cost calculations, JCT clause references, and Architect/Contract Administrator instruction cross-references.
 - You must ask EXACTLY 6 questions across 2 rounds (4 in Round 1, 2 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -115,7 +115,7 @@ CONTEXT:
 - NEC4 does not formally use "daywork" — compensation events are valued using Defined Cost (Schedule of Cost Components or Short Schedule) plus Fee. This template produces a day-level cost record structured to support a CE quotation or PM assessment under clauses 62–63.
 - The generated document MUST exceed 2,400 words minimum — with Defined Cost calculations, Fee percentage application, and quotation cross-references per NEC4 clause structure.
 - You must ask EXACTLY 6 questions across 2 rounds (3 in Round 1, 3 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -138,7 +138,7 @@ CONTEXT:
 - This is a single-page quick-capture daywork sheet designed to be filled in on site, photographed, and submitted. No cover page, minimal formatting.
 - The generated document MUST exceed 1,000 words minimum — concise but complete, with every labour, plant, and material item captured with enough detail to value later.
 - You must ask EXACTLY 3 questions in 1 round.
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A STREAMLINED 1-ROUND FLOW.
 
@@ -158,7 +158,7 @@ CONTEXT:
 - Every line item must cross-reference a supporting document (instruction, diary, photo, delivery ticket, hire invoice). The 4-person verification chain (Foreman → Site Agent → QS → Client Rep) must be fully populated.
 - The generated document MUST exceed 3,200 words minimum — with document control, photographic evidence register, contemporaneous diary extracts, and dispute-readiness notes.
 - You must ask EXACTLY 8 questions across 2 rounds (4 in Round 1, 4 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -183,7 +183,7 @@ CONTEXT:
 - This template compares submitted rates vs agreed/negotiated rates with variance columns, cumulative totals, and contra-charge provisions.
 - The generated document MUST exceed 1,600 words minimum — with side-by-side rate comparison tables and commercial assessment commentary.
 - You must ask EXACTLY 5 questions across 2 rounds (3 in Round 1, 2 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -205,7 +205,7 @@ CONTEXT:
 - This template aggregates daily records into a Monday–Friday grid showing labour hours, plant hours, and material costs per day with weekly totals.
 - The generated document MUST exceed 2,000 words minimum — with daily breakdowns, weekly totals, cumulative running totals, and weekly certification.
 - You must ask EXACTLY 5 questions across 2 rounds (3 in Round 1, 2 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
