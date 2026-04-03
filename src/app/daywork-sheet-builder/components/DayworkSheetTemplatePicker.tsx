@@ -19,7 +19,7 @@ export default function DayworkSheetTemplatePicker({ onSelect }: DayworkSheetTem
 
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
 
   const canAccessTemplate = (slug: DayworkSheetTemplateSlug): boolean => {
     if (!isAuthenticated) return false;
