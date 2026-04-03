@@ -12,14 +12,22 @@ interface UpgradeModalProps {
   tier: string;
 }
 
+// Normalise legacy STANDARD → STARTER for display
+function displayTier(tier: string): string {
+  if (tier === 'STANDARD') return 'STARTER';
+  return tier;
+}
+
 export default function UpgradeModal({
   isOpen,
   onClose,
   contentType,
   used,
   limit,
-  tier,
+  tier: rawTier,
 }: UpgradeModalProps) {
+  const tier = displayTier(rawTier);
+
   // Close on Escape key
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -30,6 +38,34 @@ export default function UpgradeModal({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  // Build tier options based on current tier (only show upgrades)
+  const upgradeOptions: { name: string; limit: string; price: string; highlight: boolean }[] = [];
+
+  if (tier === 'FREE') {
+    upgradeOptions.push({
+      name: 'Starter',
+      limit: contentType === 'toolbox talk' ? '10' : '10',
+      price: '£9.99/mo',
+      highlight: false,
+    });
+  }
+  if (tier === 'FREE' || tier === 'STARTER') {
+    upgradeOptions.push({
+      name: 'Professional',
+      limit: contentType === 'toolbox talk' ? '20' : '30',
+      price: '£24.99/mo',
+      highlight: tier === 'STARTER',
+    });
+  }
+  if (tier !== 'UNLIMITED') {
+    upgradeOptions.push({
+      name: 'Unlimited',
+      limit: 'Unlimited',
+      price: '£49.99/mo',
+      highlight: tier === 'PROFESSIONAL',
+    });
+  }
 
   return (
     <div
@@ -66,7 +102,7 @@ export default function UpgradeModal({
           Download limit reached
         </h3>
         <p className="text-sm text-gray-600 leading-relaxed mb-1">
-          You&rsquo;ve used all {limit} of your free {contentType} downloads this month ({used}/{limit}).
+          You&rsquo;ve used all {limit} of your {contentType} downloads this month ({used}/{limit}).
         </p>
         <p className="text-sm text-gray-500 leading-relaxed mb-6">
           Upgrade your plan to unlock more downloads and access premium features.
@@ -74,26 +110,24 @@ export default function UpgradeModal({
 
         {/* Upgrade tiers */}
         <div className="space-y-3 mb-6">
-          {tier !== 'STANDARD' && (
-            <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-gray-50">
+          {upgradeOptions.map((opt) => (
+            <div
+              key={opt.name}
+              className="flex items-center justify-between p-3 rounded-lg border"
+              style={{
+                borderColor: opt.highlight ? '#1B5745' : '#e5e7eb',
+                background: opt.highlight ? '#f0f9f6' : '#f9fafb',
+              }}
+            >
               <div>
-                <p className="text-sm font-semibold text-gray-900">Standard</p>
+                <p className="text-sm font-semibold text-gray-900">{opt.name}</p>
                 <p className="text-xs text-gray-500">
-                  {contentType === 'toolbox talk' ? '10' : '20'} {contentType}s/month
+                  {opt.limit} {opt.limit === 'Unlimited' ? '' : `${contentType}s/month`}
                 </p>
               </div>
-              <span className="text-sm font-bold text-[#1B5745]">£9.99/mo</span>
+              <span className="text-sm font-bold text-[#1B5745]">{opt.price}</span>
             </div>
-          )}
-          <div className="flex items-center justify-between p-3 rounded-lg border border-[#1B5745] bg-[#f0f9f6]">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Professional</p>
-              <p className="text-xs text-gray-500">
-                {contentType === 'toolbox talk' ? '20' : '40'} {contentType}s/month
-              </p>
-            </div>
-            <span className="text-sm font-bold text-[#1B5745]">£19.99/mo</span>
-          </div>
+          ))}
         </div>
 
         {/* Actions */}
