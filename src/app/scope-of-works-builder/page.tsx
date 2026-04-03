@@ -36,6 +36,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Scope of Works Builder | 3 Templates | Ebrora',
+    description: 'AI-powered scope of works generator with 3 professional templates for UK construction subcontracts.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function Page() {
