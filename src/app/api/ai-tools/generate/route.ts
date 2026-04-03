@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch the generation record
-    const generation = await (prisma as any).aiToolGeneration.findUnique({
+    const generation = await prisma.aiToolGeneration.findUnique({
       where: { id: generationId },
     });
 
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
 
     // Paid tier: require active subscription
     if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
-      await (prisma as any).aiToolGeneration.update({
+      await prisma.aiToolGeneration.update({
         where: { id: generationId },
         data: { status: 'FAILED', error_message: 'Subscription not active' },
       });
@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
     const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
 
     // Global count: all AI tool generations this month (not per-tool)
-    const usageThisMonth = await (prisma as any).aiToolGeneration.count({
+    const usageThisMonth = await prisma.aiToolGeneration.count({
       where: {
         user_id: session.user.id,
         created_at: { gte: periodStart, lte: periodEnd },
@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
 
     if (usageThisMonth >= monthLimit) {
       const toolConfig = getAiToolConfig(toolSlug);
-      await (prisma as any).aiToolGeneration.update({
+      await prisma.aiToolGeneration.update({
         where: { id: generationId },
         data: { status: 'FAILED', error_message: 'Monthly limit exceeded' },
       });
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
     const workDescription = description || generation.description || '';
 
     // Update status to PROCESSING
-    await (prisma as any).aiToolGeneration.update({
+    await prisma.aiToolGeneration.update({
       where: { id: generationId },
       data: { status: 'PROCESSING', answers: JSON.stringify(answers) },
     });
@@ -488,7 +488,7 @@ export async function POST(req: NextRequest) {
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     // Update generation record
-    await (prisma as any).aiToolGeneration.update({
+    await prisma.aiToolGeneration.update({
       where: { id: generationId },
       data: {
         status: 'COMPLETED',
@@ -512,7 +512,7 @@ export async function POST(req: NextRequest) {
     // Update status to FAILED
     if (bodyGenerationId) {
       try {
-        await (prisma as any).aiToolGeneration.update({
+        await prisma.aiToolGeneration.update({
           where: { id: bodyGenerationId },
           data: { status: 'FAILED', error_message: error.message?.substring(0, 500) },
         });
