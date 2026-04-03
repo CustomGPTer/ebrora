@@ -20,7 +20,7 @@ export default function CeTemplatePicker({ onSelect }: CeTemplatePickerProps) {
 
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
 
   const getTemplateStatus = (): 'available' | 'locked-auth' | 'locked-upgrade' => {
     if (!isAuthenticated) return 'locked-auth';
