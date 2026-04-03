@@ -22,7 +22,7 @@ export async function getAiToolUsage(
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const record = await (prisma as any).aiToolUsage.findFirst({
+  const record = await prisma.aiToolUsage.findFirst({
     where: {
       user_id: userId,
       tool_slug: toolSlug,
@@ -50,7 +50,7 @@ export async function incrementAiToolUsage(
   const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
 
   try {
-    const existing = await (prisma as any).aiToolUsage.findFirst({
+    const existing = await prisma.aiToolUsage.findFirst({
       where: {
         user_id: userId,
         tool_slug: toolSlug,
@@ -59,7 +59,7 @@ export async function incrementAiToolUsage(
     });
 
     if (existing) {
-      await (prisma as any).aiToolUsage.update({
+      await prisma.aiToolUsage.update({
         where: { id: existing.id },
         data: { generations_count: { increment: 1 } },
       });
@@ -70,7 +70,7 @@ export async function incrementAiToolUsage(
       const tier = subscription?.tier || 'FREE';
       const limit = getAiToolLimitByTier(tier, toolSlug);
 
-      await (prisma as any).aiToolUsage.create({
+      await prisma.aiToolUsage.create({
         data: {
           user_id: userId,
           tool_slug: toolSlug,
@@ -155,7 +155,7 @@ export async function getAllAiToolUsage(
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const records = await (prisma as any).aiToolUsage.findMany({
+  const records = await prisma.aiToolUsage.findMany({
     where: {
       user_id: userId,
       billing_period_start: {
@@ -198,7 +198,7 @@ export async function getGlobalAiUsage(
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
-  const used = await (prisma as any).aiToolGeneration.count({
+  const used = await prisma.aiToolGeneration.count({
     where: {
       user_id: userId,
       created_at: { gte: periodStart, lte: periodEnd },
