@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth-utils';
 import { getAllAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import { getGlobalAiLimitByTier } from '@/lib/ai-tools/constants';
+import { getRamsUsageThisMonth } from '@/lib/rams/usage';
 import AccountDashboardClient from '@/components/account/AccountDashboardClient';
 
 export const metadata: Metadata = {
@@ -50,14 +51,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
       }
     : null;
 
-  const generationCount = await prisma.generation.count({
-    where: {
-      user_id: session.user.id,
-      created_at: {
-        gte: subscription?.currentPeriodStart || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      },
-    },
-  });
+  const generationCount = await getRamsUsageThisMonth(session.user.id);
 
   // Download counts for rolling 30-day window
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
