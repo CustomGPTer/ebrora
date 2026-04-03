@@ -1,67 +1,36 @@
 // =============================================================================
 // AI Tools — Constants
 // Usage limits are SEPARATE from RAMS Builder.
-// RAMS keeps its own limits (1 Free / 10 Standard / 25 Pro).
-// These apply PER TOOL — each tool gets its own monthly allowance.
+// RAMS keeps its own limits (1 Free / 5 Starter / 15 Pro / unlimited Unlimited).
+//
+// PRICING REBUILD — GLOBAL CAP MODEL
+// Single global monthly cap across ALL tools combined.
+// Free users can access ANY tool but are limited to 1 total use per month.
 // =============================================================================
 
-/** AI tool generation limits per subscription tier (per tool, per month) */
+/**
+ * AI tool generation limits per subscription tier.
+ * GLOBAL monthly caps across all tools combined.
+ * STANDARD is a legacy alias for STARTER.
+ */
 export const AI_TOOL_LIMITS: Record<string, number> = {
   FREE: 1,
-  STANDARD: 6,
-  PROFESSIONAL: 20,
+  STARTER: 30,
+  STANDARD: 30,        // legacy alias → same as STARTER
+  PROFESSIONAL: 150,
+  UNLIMITED: 9999,     // effectively unlimited (soft daily rate limit enforced separately)
 };
 
 /**
- * Tools that are NOT available on the FREE tier (limit = 0).
- * These require Standard or Professional to use.
- *
- * Original restricted tools (7):
- *   itp, incident-report, lift-plan, emergency-response,
- *   scope-of-works, early-warning, ncr
- *
- * All 13 new tools are also restricted (Standard+ only).
+ * Tools restricted from FREE tier.
+ * 
+ * CLEARED in Batch 2: Free users now access ALL tools with a global cap of 1
+ * use per month. The cap itself is the restriction — no tool-level gating.
+ * This improves conversion: users see every tool, try one, then hit the wall.
  */
 export const RESTRICTED_FREE_TOOLS: Set<string> = new Set([
-  // Original 16 — all restricted
-  'coshh',
-  'itp',
-  'manual-handling',
-  'dse',
-  'tbt-generator',
-  'confined-spaces',
-  'incident-report',
-  'lift-plan',
-  'emergency-response',
-  'quality-checklist',
-  'scope-of-works',
-  'permit-to-dig',
-  'powra',
-  'early-warning',
-  'ncr',
-  'ce-notification',
-  // New 13 — all restricted
-  'programme-checker',
-  'cdm-checker',
-  'noise-assessment',
-  'quote-generator',
-  'safety-alert',
-  'carbon-footprint',
-  'rams-review',
-  'delay-notification',
-  'variation-confirmation',
-  'rfi-generator',
-  'payment-application',
-  'daywork-sheet',
-  'carbon-reduction-plan',
-  // Batch 1 — Mandated H&S tools
-  'wah-assessment',
-  'wbv-assessment',
-  'riddor-report',
-  // Batch 2 — Environmental & Transport
-  'traffic-management',
-  'waste-management',
-  'invasive-species',
+  // Empty — all tools accessible on all tiers.
+  // The global usage cap (1 for Free) is the restriction.
 ]);
 
 /** Get the monthly generation limit for a given tier and tool */
@@ -70,6 +39,14 @@ export function getAiToolLimitByTier(tier: string, toolSlug?: string): number {
   if ((!tier || tier === 'FREE') && toolSlug && RESTRICTED_FREE_TOOLS.has(toolSlug)) {
     return 0;
   }
+  return AI_TOOL_LIMITS[tier] ?? AI_TOOL_LIMITS.FREE;
+}
+
+/**
+ * Get the GLOBAL monthly AI tool cap for a tier (ignores tool slug).
+ * Primary limit check function for the global cap model.
+ */
+export function getGlobalAiLimitByTier(tier: string): number {
   return AI_TOOL_LIMITS[tier] ?? AI_TOOL_LIMITS.FREE;
 }
 

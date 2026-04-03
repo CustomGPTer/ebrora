@@ -5,7 +5,7 @@
 // Covers all 35 tools (16 existing + 13 new + 6 batch additions).
 // =============================================================================
 import prisma from '@/lib/prisma';
-import { getAiToolLimitByTier } from './constants';
+import { getAiToolLimitByTier, getGlobalAiLimitByTier } from './constants';
 import type { AiToolSlug } from './types';
 
 export async function getAiToolUsage(
@@ -176,4 +176,46 @@ export async function getAllAiToolUsage(
   }
 
   return result;
+}
+
+// =============================================================================
+// GLOBAL USAGE — counts ALL tool generations combined per month
+// Primary limit enforcement for the global cap model (Batch 2+).
+// Uses AiToolGeneration table (source of truth) not AiToolUsage counters.
+// =============================================================================
+
+export async function getGlobalAiUsage(
+  userId: string
+): Promise<{ used: number; limit: number; tier: string }> {
+  const subscription = await prisma.subscription.findUnique({
+    where: { user_id: userId },
+  });
+
+  const tier = subscription?.tier || 'FREE';
+  const limit = getGlobalAiLimitByTier(tier);
+
+  const now = new Date();
+  const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+  const used = await (prisma as any).aiToolGeneration.count({
+    where: {
+      user_id: userId,
+      created_at: { gte: periodStart, lte: periodEnd },
+      status: { in: ['COMPLETED', 'PROCESSING', 'QUEUED'] },
+    },
+  });
+
+  return { used, limit, tier };
+}
+
+export async function checkGlobalAiUsageLimit(
+  userId: string
+): Promise<{ allowed: boolean; remaining: number }> {
+  const usage = await getGlobalAiUsage(userId);
+  const remaining = Math.max(0, usage.limit - usage.used);
+  return {
+    allowed: usage.used < usage.limit,
+    remaining,
+  };
 }

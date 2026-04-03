@@ -25,6 +25,7 @@ export {
 export {
   AI_TOOL_LIMITS,
   getAiToolLimitByTier,
+  getGlobalAiLimitByTier,
   MAX_TOTAL_QUESTIONS,
   MAX_ROUNDS,
   MAX_ANSWER_WORDS,
@@ -40,4 +41,6 @@ export {
   incrementAiToolUsage,
   checkAiToolUsageLimit,
   getAllAiToolUsage,
+  getGlobalAiUsage,
+  checkGlobalAiUsageLimit,
 } from './usage-tracker';
