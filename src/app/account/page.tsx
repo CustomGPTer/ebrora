@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth-utils';
-import { getAllAiToolUsage } from '@/lib/ai-tools/usage-tracker';
+import { getAllAiToolUsage, getGlobalAiUsage } from '@/lib/ai-tools/usage-tracker';
 import AccountDashboardClient from '@/components/account/AccountDashboardClient';
 
 export const metadata: Metadata = {
@@ -78,53 +78,26 @@ export default async function AccountPage({ searchParams }: PageProps) {
     }),
   ]);
 
-  // AI tool usage (COSHH, ITP, Manual Handling, TBT Generator, etc.)
-  let aiToolUsage: Record<string, { used: number; limit: number }>;
+  // AI tool global usage (shared cap across all tools)
+  let aiToolGlobalUsage: { used: number; limit: number };
   try {
-    aiToolUsage = await getAllAiToolUsage(session.user.id);
+    const globalData = await getGlobalAiUsage(session.user.id);
+    aiToolGlobalUsage = { used: globalData.used, limit: globalData.limit };
   } catch {
-    // Fallback if AI tool tables don't exist yet
     const tier = subscription?.plan || 'FREE';
     const fallbackLimit = tier === 'UNLIMITED' ? 9999 : tier === 'PROFESSIONAL' ? 150 : (tier === 'STARTER' || tier === 'STANDARD') ? 30 : 1;
-    const restrictedOnFree = new Set<string>([]); // All tools now accessible on all tiers — global cap is the restriction
-    const fl = (slug: string) => (tier === 'FREE' && restrictedOnFree.has(slug)) ? 0 : fallbackLimit;
-    aiToolUsage = {
-      'coshh': { used: 0, limit: fl('coshh') },
-      'itp': { used: 0, limit: fl('itp') },
-      'manual-handling': { used: 0, limit: fl('manual-handling') },
-      'dse': { used: 0, limit: fl('dse') },
-      'tbt-generator': { used: 0, limit: fl('tbt-generator') },
-      'confined-spaces': { used: 0, limit: fl('confined-spaces') },
-      'incident-report': { used: 0, limit: fl('incident-report') },
-      'lift-plan': { used: 0, limit: fl('lift-plan') },
-      'emergency-response': { used: 0, limit: fl('emergency-response') },
-      'quality-checklist': { used: 0, limit: fl('quality-checklist') },
-      'scope-of-works': { used: 0, limit: fl('scope-of-works') },
-      'permit-to-dig': { used: 0, limit: fl('permit-to-dig') },
-      'powra': { used: 0, limit: fl('powra') },
-      'early-warning': { used: 0, limit: fl('early-warning') },
-      'ncr': { used: 0, limit: fl('ncr') },
-      'ce-notification': { used: 0, limit: fl('ce-notification') },
-      'programme-checker': { used: 0, limit: fl('programme-checker') },
-      'cdm-checker': { used: 0, limit: fl('cdm-checker') },
-      'noise-assessment': { used: 0, limit: fl('noise-assessment') },
-      'quote-generator': { used: 0, limit: fl('quote-generator') },
-      'safety-alert': { used: 0, limit: fl('safety-alert') },
-      'carbon-footprint': { used: 0, limit: fl('carbon-footprint') },
-      'rams-review': { used: 0, limit: fl('rams-review') },
-      'delay-notification': { used: 0, limit: fl('delay-notification') },
-      'variation-confirmation': { used: 0, limit: fl('variation-confirmation') },
-      'rfi-generator': { used: 0, limit: fl('rfi-generator') },
-      'payment-application': { used: 0, limit: fl('payment-application') },
-      'daywork-sheet': { used: 0, limit: fl('daywork-sheet') },
-      'carbon-reduction-plan': { used: 0, limit: fl('carbon-reduction-plan') },
-      'wah-assessment': { used: 0, limit: fl('wah-assessment') },
-      'wbv-assessment': { used: 0, limit: fl('wbv-assessment') },
-      'riddor-report': { used: 0, limit: fl('riddor-report') },
-      'traffic-management': { used: 0, limit: fl('traffic-management') },
-      'waste-management': { used: 0, limit: fl('waste-management') },
-      'invasive-species': { used: 0, limit: fl('invasive-species') },
-    };
+    aiToolGlobalUsage = { used: 0, limit: fallbackLimit };
+  }
+
+  // AI tool per-tool breakdown (just counts, no per-tool limits)
+  let aiToolUsage: Record<string, number>;
+  try {
+    const raw = await getAllAiToolUsage(session.user.id);
+    aiToolUsage = Object.fromEntries(
+      Object.entries(raw).map(([slug, data]) => [slug, data.used])
+    );
+  } catch {
+    aiToolUsage = {};
   }
 
   // ── Recent RAMS generations ──
@@ -219,6 +192,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
         savedDetails={savedDetails}
         initialTab={tab}
         aiToolUsage={aiToolUsage}
+        aiToolGlobalUsage={aiToolGlobalUsage}
       />
     </main>
   );
