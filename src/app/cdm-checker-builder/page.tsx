@@ -22,6 +22,12 @@ const toolSchema = {
   url: 'https://www.ebrora.com/cdm-checker-builder', operatingSystem: 'Web',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
   publisher: { '@type': 'Organization', name: 'Ebrora', url: 'https://www.ebrora.com' },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI CDM 2015 Compliance Checker | 4 Templates | Ebrora',
+    description: 'AI-powered CDM 2015 compliance gap analysis with 4 professional templates.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function Page() {
