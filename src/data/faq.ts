@@ -33,12 +33,12 @@ export const FAQ_DATA: FAQSection[] = [
       {
         id: 'ai-4',
         question: 'How many AI documents can I generate?',
-        answer: 'Free users can generate 3 documents per month across all AI tools. Standard subscribers get 30 documents per month, and Professional subscribers get unlimited generations. Document limits reset on your billing date each month.'
+        answer: 'Free users can generate 1 AI document per month across all tools. Starter subscribers get 30, Professional get 150, and Unlimited subscribers have no cap. Limits reset on your billing date each month.'
       },
       {
         id: 'ai-5',
         question: 'Which AI tools are available on the Free plan?',
-        answer: 'Free users have access to most AI tools including RAMS Builder, COSHH Assessment, Manual Handling, DSE, Toolbox Talk Generator, Confined Spaces, Incident Report, Lift Plan, and more. Some advanced tools like Programme Checker, RAMS Review, and commercial letter generators are restricted to Standard and Professional plans.'
+        answer: 'All users — including Free — have access to every AI tool: COSHH assessments, manual handling, DSE, toolbox talk generator, confined spaces, incident reports, lift plans, and 28 more. The difference between plans is how many documents you can generate per month.'
       },
       {
         id: 'ai-6',
@@ -162,7 +162,7 @@ export const FAQ_DATA: FAQSection[] = [
       {
         id: 'account-1',
         question: 'What subscription plans are available?',
-        answer: 'We offer three tiers: Free (3 AI documents/month, access to most tools), Standard at £9.99/month (30 AI documents/month, all tools, priority support), and Professional at £24.99/month (unlimited AI documents, all tools, priority support, early access to new features).'
+        answer: 'We offer four tiers: Free (1 AI document/month, access to all tools), Starter at £9.99/month (30 AI documents/month, all tools, priority support), Professional at £24.99/month (150 AI documents/month, all tools, priority support), and Unlimited at £49.99/month (unlimited documents, all tools, dedicated priority queue).'
       },
       {
         id: 'account-2',
