@@ -305,7 +305,7 @@ export default function AiUploadToolClient({ toolConfig, programmeCheckerTemplat
           <h2 className="text-xl font-bold text-gray-900 mb-2">{toolConfig.name}</h2>
           <p className="text-gray-500 text-sm mb-6">
             {upgradeRequired
-              ? 'This tool is available on Standard and Professional plans.'
+              ? 'This tool is available on Starter, Professional, and Unlimited plans.'
               : 'Please sign in to use this tool.'}
           </p>
           {upgradeRequired ? (

@@ -512,8 +512,8 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
             marginBottom: '0.5rem',
           }}>
             {userLoggedIn ? (
-              <>The {toolConfig.shortName} is available on our <strong style={{ color: '#1B5745' }}>Standard</strong> and <strong style={{ color: '#1B5745' }}>Professional</strong> plans.
-            Upgrade to generate unlimited {toolConfig.documentLabel.toLowerCase()}s with full AI-powered interviews and professional document output.</>
+              <>The {toolConfig.shortName} is available on our <strong style={{ color: '#1B5745' }}>Starter</strong>, <strong style={{ color: '#1B5745' }}>Professional</strong>, and <strong style={{ color: '#1B5745' }}>Unlimited</strong> plans.
+            Upgrade to generate more {toolConfig.documentLabel.toLowerCase()}s with full AI-powered interviews and professional document output.</>
             ) : (
               <>You must be logged in to use the {toolConfig.shortName}. Create a free account or sign in to get started.</>
             )}
