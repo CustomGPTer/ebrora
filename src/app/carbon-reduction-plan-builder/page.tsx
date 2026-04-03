@@ -33,6 +33,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Carbon Reduction Plan Generator | 4 Templates | Ebrora',
+    description: 'AI-powered Carbon Reduction Plan builder with 4 regulatory templates — PPN 06/21, SBTi, ISO 14064, GHG Protocol. Professional documents for public sector and framework bids.',
+    images: ['/og-image.jpg'],
+  },
 };
 
 export default function Page() {
