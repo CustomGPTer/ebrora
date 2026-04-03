@@ -18,6 +18,9 @@ interface SubscriptionRecord {
  * - ACTIVE subscription → use the stored tier.
  * - CANCELLED with current_period_end in the future → use stored tier (grace period).
  * - Everything else (CANCELLED past expiry, PAST_DUE, SUSPENDED, no record) → FREE.
+ *
+ * Note: STANDARD is a legacy tier equivalent to STARTER. Both are treated identically
+ * by all limit-checking code. STANDARD will be migrated to STARTER in Batch 7.
  */
 export function resolveEffectiveTier(
   subscription: SubscriptionRecord | null | undefined
@@ -40,4 +43,22 @@ export function resolveEffectiveTier(
   }
 
   return 'FREE';
+}
+
+/**
+ * Check if a tier is a paid tier (any tier above FREE).
+ * Treats STANDARD (legacy) same as STARTER.
+ */
+export function isPaidTier(tier: SubscriptionTier | string): boolean {
+  return tier !== 'FREE';
+}
+
+/**
+ * Normalise legacy tier names.
+ * STANDARD → STARTER for display purposes.
+ * All other tiers pass through unchanged.
+ */
+export function normaliseTierForDisplay(tier: string): string {
+  if (tier === 'STANDARD') return 'STARTER';
+  return tier;
 }
