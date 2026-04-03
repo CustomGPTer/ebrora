@@ -51,10 +51,12 @@ export default async function EmailCapturesPage({ searchParams }: PageProps) {
   ]);
 
   // Count by subscription tier for source filter
-  const [freeCount, standardCount, professionalCount, noSubCount] = await Promise.all([
+  const [freeCount, starterCount, standardCount, professionalCount, unlimitedCount, noSubCount] = await Promise.all([
     prisma.user.count({ where: { subscription: { tier: 'FREE' } } }),
+    prisma.user.count({ where: { subscription: { tier: 'STARTER' } } }),
     prisma.user.count({ where: { subscription: { tier: 'STANDARD' } } }),
     prisma.user.count({ where: { subscription: { tier: 'PROFESSIONAL' } } }),
+    prisma.user.count({ where: { subscription: { tier: 'UNLIMITED' } } }),
     prisma.user.count({ where: { subscription: { is: null } } }),
   ]);
 
@@ -71,8 +73,9 @@ export default async function EmailCapturesPage({ searchParams }: PageProps) {
 
   const sourceCounts = [
     { source: 'FREE', count: freeCount },
-    { source: 'STANDARD', count: standardCount },
+    { source: 'STARTER', count: starterCount + standardCount },
     { source: 'PROFESSIONAL', count: professionalCount },
+    { source: 'UNLIMITED', count: unlimitedCount },
     { source: 'no-subscription', count: noSubCount },
   ].filter((s) => s.count > 0);
 
