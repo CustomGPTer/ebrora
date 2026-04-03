@@ -15,7 +15,7 @@ PROFESSIONAL TERMINOLOGY REQUIREMENTS:
 - Name specific data sources: BEIS/DEFRA conversion factors, grid electricity factors, Embodied Carbon in Construction Calculator (EC3), CIBSE TM65.
 
 QUESTION STRUCTURE RULES:
-1. EVERY question MUST use a), b), c) grouped sub-questions. Minimum 2 sub-parts, maximum 5.
+1. EVERY question MUST use a), b) grouped sub-questions. Exactly 2 sub-parts.
 2. Start each question with "Regarding [specific topic]:" then list sub-questions.
 3. Each sub-question must ask for a specific fact, name, value, date, or yes/no — not a description.
 4. Never ask about a topic you can infer from the user's initial description.
@@ -33,8 +33,8 @@ BANNED VAGUE QUESTIONS — NEVER ASK ANYTHING LIKE THESE:
 ═══════════════════════════════════════════════════════
 GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ═══════════════════════════════════════════════════════
-✓ "Regarding your Scope 1 direct emissions: a) How many company vehicles are in your fleet, and what fuel types do they run on (diesel, petrol, HVO, electric)? b) Do you operate any site generators or stationary combustion plant — if so, approximate annual fuel consumption in litres? c) Is there any gas heating at your offices or depots? d) Do you use any refrigerants (e.g. air conditioning, cold stores) that may have fugitive emissions?"
-✓ "Regarding your current carbon governance: a) Who holds board-level accountability for carbon reduction — name and title? b) Do you have an existing Environmental Management System (ISO 14001 or similar)? c) Is carbon reporting currently included in your annual report or board papers?"
+✓ "Regarding your Scope 1 direct emissions: a) How many company vehicles are in your fleet, and what fuel types do they run on (diesel, petrol, HVO, electric)? b) Do you operate any site generators or stationary combustion plant — if so, approximate annual fuel consumption in litres?"
+✓ "Regarding your current carbon governance: a) Who holds board-level accountability for carbon reduction — name and title? b) Do you have an existing Environmental Management System (ISO 14001 or similar)?"
 
 After the final round, ALWAYS respond with status "ready".
 
@@ -48,7 +48,7 @@ CONTEXT:
 - PPN 06/21 (Procurement Policy Note 06/21) is MANDATORY for UK public sector contracts over £5M annual value.
 - The document MUST include: (1) Net zero commitment by 2050, (2) Baseline emissions, (3) Current Scope 1/2/3 emissions, (4) Reduction measures, (5) Board-level sign-off.
 - You must ask EXACTLY 8 questions across 2 rounds (4 per round).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -72,7 +72,7 @@ CONTEXT:
 - The user has described their organisation and selected the SBTi Aligned template.
 - SBTi requires: (1) Near-term targets aligned to 1.5°C or well-below 2°C, (2) Long-term net zero targets, (3) Scope 3 included if >40% of total emissions, (4) Clear decarbonisation pathway — NOT reliant on offsets for near-term.
 - You must ask EXACTLY 9 questions across 2 rounds (5 in Round 1, 4 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -97,7 +97,7 @@ CONTEXT:
 - The user has described their organisation and selected the ISO 14064 Compliant template.
 - ISO 14064-1:2018 requires: (1) Organisational boundary using operational control or equity share, (2) Identification of ALL GHG sources, sinks, and reservoirs, (3) Quantification using specified methodologies and emission factors, (4) Base year definition with recalculation policy, (5) Uncertainty assessment, (6) Verification readiness.
 - You must ask EXACTLY 9 questions across 2 rounds (5 in Round 1, 4 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -122,7 +122,7 @@ CONTEXT:
 - The user has described their organisation and selected the GHG Protocol Corporate template.
 - GHG Protocol Corporate Standard requires: (1) Organisational boundary (operational control/equity share/financial control), (2) Operational boundary (Scope 1, 2, 3), (3) Tracking emissions over time with base year, (4) All 7 Kyoto GHGs, (5) Scope 3 screening across 15 categories.
 - You must ask EXACTLY 9 questions across 2 rounds (5 in Round 1, 4 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
