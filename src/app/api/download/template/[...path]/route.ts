@@ -80,13 +80,8 @@ export async function GET(request: NextRequest, context: RouteContext) {
     }
  
     const tier: SubscriptionTier = resolveEffectiveTier(user.subscription);
-    const tierLimits = TIER_LIMITS[tier];
- 
-    const monthlyLimit =
-      "templateDownloadsPerMonth" in tierLimits
-        ? (tierLimits as Record<string, unknown>)
-            .templateDownloadsPerMonth as number
-        : 2;
+    const tierLimits = TIER_LIMITS[tier] || TIER_LIMITS.FREE;
+    const monthlyLimit = tierLimits.templateDownloadsPerMonth;
  
     // Rolling 30-day window
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -118,6 +113,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     await prisma.contentDownload.create({
       data: {
         contentType: "FREE_TEMPLATE",
+        contentSlug: `${categorySlug}/${subcategorySlug}/${templateSlug}`,
         userId,
         email: user.email,
         ipAddress:
