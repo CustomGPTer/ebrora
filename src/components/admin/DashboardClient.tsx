@@ -20,7 +20,7 @@ interface DashboardData {
   lastMonthSignups: number;
   activeSubscriptions: number;
   estimatedRevenue: number;
-  tierBreakdown: { FREE: number; STANDARD: number; PROFESSIONAL: number };
+  tierBreakdown: { FREE: number; STARTER: number; STANDARD: number; PROFESSIONAL: number; UNLIMITED: number };
   todayGenerations: number;
   monthGenerations: number;
   todayAiToolUses: number;
@@ -49,7 +49,8 @@ export function DashboardClient({ data }: Props) {
   const chartRef = useRef<HTMLCanvasElement>(null);
 
   const visibleAlerts = data.alerts.filter((a) => !dismissedAlerts.includes(a.id));
-  const totalTier = data.tierBreakdown.FREE + data.tierBreakdown.STANDARD + data.tierBreakdown.PROFESSIONAL;
+  const starterCount = (data.tierBreakdown.STARTER || 0) + (data.tierBreakdown.STANDARD || 0);
+  const totalTier = data.tierBreakdown.FREE + starterCount + data.tierBreakdown.PROFESSIONAL + (data.tierBreakdown.UNLIMITED || 0);
 
   // ── Signup Chart ──
   useEffect(() => {
@@ -309,11 +310,15 @@ export function DashboardClient({ data }: Props) {
                   />
                   <div
                     className="admin-tier-bar__segment admin-tier-bar__segment--standard"
-                    style={{ width: `${(data.tierBreakdown.STANDARD / totalTier) * 100}%` }}
+                    style={{ width: `${(starterCount / totalTier) * 100}%` }}
                   />
                   <div
                     className="admin-tier-bar__segment admin-tier-bar__segment--professional"
                     style={{ width: `${(data.tierBreakdown.PROFESSIONAL / totalTier) * 100}%` }}
+                  />
+                  <div
+                    className="admin-tier-bar__segment"
+                    style={{ width: `${((data.tierBreakdown.UNLIMITED || 0) / totalTier) * 100}%`, background: 'var(--admin-gold, #D4A44C)' }}
                   />
                 </div>
 
@@ -325,13 +330,18 @@ export function DashboardClient({ data }: Props) {
                   </div>
                   <div className="admin-tier-legend__item">
                     <div className="admin-tier-legend__dot" style={{ background: 'var(--admin-info)' }} />
-                    <span className="admin-tier-legend__count">{data.tierBreakdown.STANDARD}</span>
-                    <span className="admin-tier-legend__label">Standard</span>
+                    <span className="admin-tier-legend__count">{starterCount}</span>
+                    <span className="admin-tier-legend__label">Starter</span>
                   </div>
                   <div className="admin-tier-legend__item">
                     <div className="admin-tier-legend__dot" style={{ background: 'var(--admin-gold)' }} />
                     <span className="admin-tier-legend__count">{data.tierBreakdown.PROFESSIONAL}</span>
                     <span className="admin-tier-legend__label">Professional</span>
+                  </div>
+                  <div className="admin-tier-legend__item">
+                    <div className="admin-tier-legend__dot" style={{ background: '#8B5CF6' }} />
+                    <span className="admin-tier-legend__count">{data.tierBreakdown.UNLIMITED || 0}</span>
+                    <span className="admin-tier-legend__label">Unlimited</span>
                   </div>
                 </div>
               </>

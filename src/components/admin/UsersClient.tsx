@@ -160,7 +160,9 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
 
   const tierBadgeClass = (t: string) => {
     switch (t) {
+      case 'UNLIMITED': return 'admin-badge--professional';
       case 'PROFESSIONAL': return 'admin-badge--professional';
+      case 'STARTER': return 'admin-badge--standard';
       case 'STANDARD': return 'admin-badge--standard';
       default: return 'admin-badge--free';
     }
@@ -195,8 +197,9 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
         >
           <option value="ALL">All Tiers</option>
           <option value="FREE">Free</option>
-          <option value="STANDARD">Standard</option>
+          <option value="STARTER">Starter</option>
           <option value="PROFESSIONAL">Professional</option>
+          <option value="UNLIMITED">Unlimited</option>
         </select>
         <select
           value={verified}
@@ -374,8 +377,9 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
                   style={{ width: '100%' }}
                 >
                   <option value="FREE">Free</option>
-                  <option value="STANDARD">Standard</option>
+                  <option value="STARTER">Starter</option>
                   <option value="PROFESSIONAL">Professional</option>
+                  <option value="UNLIMITED">Unlimited</option>
                 </select>
               </div>
               {editingUser.paypalId && (
