@@ -35,7 +35,9 @@ GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ✓ "Regarding the immediate and underlying causes: a) What was the direct physical cause — the unsafe act, unsafe condition, or equipment failure that directly led to the event? b) What underlying factors contributed — was the RAMS/method statement followed? Was a pre-start briefing conducted? Was the task covered by a current POWRA? c) Were there any organisational factors — time pressure, staffing levels, supervision gaps, unclear communication?"
 ✓ "Regarding the response timeline: a) What time did the event occur? b) Who was first on scene (name and role)? c) Was the area made safe — how? d) Was first aid administered? e) What time were the site manager and H&S advisor notified?"
 
-After the final round, ALWAYS respond with status "ready".`;
+After the final round, ALWAYS respond with status "ready".
+
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "roundNumber": N, "message": "..." }`;
 
   const prompts: Record<SafetyAlertTemplateSlug, string> = {
     'ebrora-standard': `You are an expert UK construction health and safety professional conducting a targeted interview to gather information for a professional Safety Alert Bulletin for distribution across site teams.
