@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Non-Conformance Report Generator | Ebrora',
+    description: 'AI-powered NCR generator. Defect description, root cause analysis, corrective actions, disposition — ISO 9001 aligned.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   return (
