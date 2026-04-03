@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { getSubscriptionDetails } from '@/lib/payments/paypal-client';
-import { resolveTierFromPlanId } from '@/lib/payments/plan-config';
+import { resolveTierFromPlanId, getRamsLimitByTier } from '@/lib/payments/plan-config';
 
 /**
  * POST /api/admin/fix-subscription  { email: string }
@@ -40,9 +40,8 @@ async function fixSubscription(email: string) {
   const paypalStatus = paypalDetails.status;
   const planId = paypalDetails.plan_id;
 
-  // Determine tier from plan ID using shared resolver
   const resolvedTier = resolveTierFromPlanId(planId);
-  const tier = resolvedTier || 'STANDARD';
+  const tier = resolvedTier || 'STARTER';
 
   // Map PayPal status to our DB status
   let dbStatus: 'ACTIVE' | 'CANCELLED' | 'PAST_DUE' | 'EXPIRED' = 'ACTIVE';
@@ -75,7 +74,7 @@ async function fixSubscription(email: string) {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const ramsLimit = tier === 'PROFESSIONAL' ? 25 : 10;
+  const ramsLimit = getRamsLimitByTier(tier);
 
   const existingUsage = await prisma.usageRecord.findFirst({
     where: { user_id: user.id, billing_period_start: monthStart },
@@ -112,7 +111,7 @@ async function fixSubscription(email: string) {
     paypal: {
       status: paypalStatus,
       planId,
-      resolvedTier: resolvedTier || 'UNKNOWN (defaulted to STANDARD)',
+      resolvedTier: resolvedTier || 'UNKNOWN (defaulted to STARTER)',
       nextBillingTime: paypalDetails.billing_info?.next_billing_time,
     },
   });
