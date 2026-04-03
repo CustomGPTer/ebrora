@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { TemplateSlug } from '@/lib/rams/types';
 import { TEMPLATE_CONFIGS } from '@/lib/rams/template-config';
@@ -148,8 +148,10 @@ function StandaloneGenerating({
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const pollCountRef = useRef(0);
 
   const steps = STANDALONE_STEPS;
+  const MAX_POLLS = 60; // 60 × 3s = 3 minutes
 
   useEffect(() => {
     // Step animation timer
@@ -159,6 +161,12 @@ function StandaloneGenerating({
 
     // Poll status
     const pollStatus = async () => {
+      pollCountRef.current += 1;
+      if (pollCountRef.current > MAX_POLLS) {
+        setError('Generation is taking longer than expected. Please refresh the page or try again.');
+        return;
+      }
+
       try {
         const response = await fetch(`/api/rams/status/${generationId}`);
         if (!response.ok) throw new Error('Failed to fetch status');
