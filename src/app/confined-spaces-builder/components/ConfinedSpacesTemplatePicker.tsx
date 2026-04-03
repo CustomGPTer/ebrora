@@ -16,7 +16,7 @@ export default function ConfinedSpacesTemplatePicker({ onSelect }: Props) {
   const [previewSlug, setPreviewSlug] = useState<ConfinedSpacesTemplateSlug | null>(null);
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
 
   const canAccess = (slug: ConfinedSpacesTemplateSlug): boolean => {
     if (!isAuthenticated) return false;
