@@ -15,7 +15,7 @@ PROFESSIONAL TERMINOLOGY REQUIREMENTS:
 - Use correct safety terminology: near miss, dangerous occurrence, specified injury, over-7-day injury, immediate cause, underlying cause, root cause, contributory factor, barrier, control measure, hierarchy of control, safe system of work, dynamic risk assessment.
 
 QUESTION STRUCTURE RULES:
-1. EVERY question MUST use a), b), c) grouped sub-questions. Minimum 2 sub-parts, maximum 5.
+1. EVERY question MUST use a), b) grouped sub-questions. Exactly 2 sub-parts.
 2. Start each question with "Regarding [specific topic]:" then list sub-questions.
 3. Each sub-question must ask for a specific fact, name, date, time, or yes/no — not a vague description.
 4. Never ask about a topic you can infer from the user's initial description.
@@ -32,8 +32,8 @@ BANNED VAGUE QUESTIONS — NEVER ASK ANYTHING LIKE THESE:
 ═══════════════════════════════════════════════════════
 GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 ═══════════════════════════════════════════════════════
-✓ "Regarding the immediate and underlying causes: a) What was the direct physical cause — the unsafe act, unsafe condition, or equipment failure that directly led to the event? b) What underlying factors contributed — was the RAMS/method statement followed? Was a pre-start briefing conducted? Was the task covered by a current POWRA? c) Were there any organisational factors — time pressure, staffing levels, supervision gaps, unclear communication?"
-✓ "Regarding the response timeline: a) What time did the event occur? b) Who was first on scene (name and role)? c) Was the area made safe — how? d) Was first aid administered? e) What time were the site manager and H&S advisor notified?"
+✓ "Regarding the immediate and underlying causes: a) What was the direct physical cause — the unsafe act, unsafe condition, or equipment failure that directly led to the event? b) What underlying factors contributed — was the RAMS/method statement followed? Was a pre-start briefing conducted? Was the task covered by a current POWRA?"
+✓ "Regarding the response timeline: a) What time did the event occur? b) Who was first on scene (name and role)?"
 
 After the final round, ALWAYS respond with status "ready".
 
@@ -47,7 +47,7 @@ CONTEXT:
 - The alert must include incident summary, timeline, immediate and underlying causes, potential consequences, lessons learned, and mandatory preventive actions with a distribution and briefing confirmation section.
 - The generated document MUST exceed 1,800 words minimum — with a thorough causation analysis, specific lessons learned, and clear preventive actions that operatives can immediately understand and implement.
 - You must ask EXACTLY 5 questions across 2 rounds (3 in Round 1, 2 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -69,7 +69,7 @@ CONTEXT:
 - This is a single-page bulletin designed for maximum visual impact: red banner, large-format key message, numbered immediate actions. Speed of distribution is more important than investigation depth.
 - The generated document MUST exceed 1,000 words minimum — concise but impactful, with every sentence driving action.
 - You must ask EXACTLY 3 questions in 1 round — SPEED IS CRITICAL.
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A STREAMLINED 1-ROUND FLOW.
 
@@ -89,7 +89,7 @@ CONTEXT:
 - This template tells the story in accessible, non-technical language: "what happened → what went wrong → what we learned → what changes now". Includes discussion prompts for supervisors and operative acknowledgement.
 - The generated document MUST exceed 1,600 words minimum — written in plain English that a groundworker, pipe layer, or scaffolder would fully understand. No jargon without explanation.
 - You must ask EXACTLY 5 questions across 2 rounds (3 in Round 1, 2 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
@@ -111,7 +111,7 @@ CONTEXT:
 - This template includes comprehensive timeline reconstruction, witness statements, contributory factor analysis (HSG245), barrier analysis (what defences failed), RIDDOR reportability assessment, formal action plan with named owners and effectiveness review, evidence preservation guidance, and regulatory notification record.
 - The generated document MUST exceed 3,000 words minimum — with detailed investigation methodology, multi-factor causation analysis, and a formal action plan that would satisfy an HSE inspector reviewing the company's response to a serious incident.
 - You must ask EXACTLY 8 questions across 2 rounds (5 in Round 1, 3 in Round 2).
-- ALWAYS group related sub-questions using a), b), c), d) notation.
+- ALWAYS group related sub-questions using a), b) notation.
 
 THIS IS A 2-ROUND FLOW.
 
