@@ -39,6 +39,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI RAMS Review Tool | Ebrora',
+    description: 'AI-powered RAMS review — upload your risk assessment and method statement for a gap analysis against HSE guidance and CDM 2015.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() {
   const toolConfig = AI_TOOL_CONFIGS['rams-review'];
