@@ -393,7 +393,7 @@ export interface GenerationRecord {
   questions: GeneratedQuestion[];
   answers: AnsweredQuestion[];
   blobUrl: string | null;
-  status: 'QUESTIONS_GENERATED' | 'GENERATING_DOCUMENT' | 'COMPLETE' | 'FAILED';
+  status: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'EXPIRED';
   expiresAt: Date | null;
   createdAt: Date;
 }

@@ -206,6 +206,9 @@ export const TEMPLATE_ORDER: TemplateSlug[] = [
   'step-by-step',
 ];
 
+/** Free tier: first 2 templates only — single source of truth */
+export const FREE_TEMPLATES: TemplateSlug[] = ['standard-5x5', 'simple-hml'];
+
 /** Helper to get config by slug */
 export function getTemplateConfig(slug: TemplateSlug): TemplateConfig {
   return TEMPLATE_CONFIGS[slug];
