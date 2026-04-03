@@ -697,7 +697,7 @@ export default function HomepageClient({
                 <li>H&amp;S, Quality, Commercial, and Programme tools</li>
                 <li>CDM 2015, COSHH Regs, NEC, JCT &amp; BS compliant outputs</li>
                 <li>Download as professional Word and Excel documents</li>
-                <li>Standard from £9.99/month — Standard &amp; Professional plans</li>
+                <li>Plans from £9.99/month — Starter, Professional &amp; Unlimited</li>
               </ul>
               <Link href="/rams-builder" className="hp-rams__cta">
                 Try RAMS Builder Free
