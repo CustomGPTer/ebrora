@@ -60,6 +60,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Idempotency: reject duplicate webhook deliveries.
+    // PayPal retries aggressively — without this, the same event processes multiple times.
+    try {
+      const alreadyProcessed = await prisma.webhookEvent.findUnique({
+        where: { transmission_id: transmissionId },
+      });
+
+      if (alreadyProcessed) {
+        console.log(`Duplicate webhook ${transmissionId} (${eventType}) — skipping`);
+        return NextResponse.json({ received: true });
+      }
+    } catch (dedupeError) {
+      // If the dedup check fails (e.g. table doesn't exist yet), log and continue.
+      // Better to double-process than to reject a valid webhook.
+      console.warn('Webhook dedup check failed, continuing:', dedupeError);
+    }
+
     switch (eventType) {
       case 'BILLING.SUBSCRIPTION.CREATED': {
         // Subscription created but not yet approved — log only
@@ -100,6 +117,19 @@ export async function POST(request: NextRequest) {
         console.log(`Unhandled webhook event: ${eventType}`);
     }
 
+    // Record this event so duplicate deliveries are skipped
+    try {
+      await prisma.webhookEvent.create({
+        data: {
+          transmission_id: transmissionId,
+          event_type: eventType,
+        },
+      });
+    } catch (dedupeError) {
+      // Unique constraint violation = another request already recorded it — safe to ignore
+      console.log(`Webhook event ${transmissionId} already recorded (race with concurrent delivery)`);
+    }
+
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('Webhook processing error:', error);
@@ -112,10 +142,12 @@ export async function POST(request: NextRequest) {
 
 // ── Helpers ──
 
-function determineTier(planId: string): 'STARTER' | 'PROFESSIONAL' | 'UNLIMITED' {
+function determineTier(planId: string): 'STARTER' | 'PROFESSIONAL' | 'UNLIMITED' | null {
   const resolved = resolveTierFromPlanId(planId);
-  // Fall back to STARTER if plan ID is unrecognised (logged in resolveTierFromPlanId)
-  return resolved || 'STARTER';
+  if (!resolved) {
+    console.error(`CRITICAL: Unknown PayPal plan ID in webhook: ${planId}. Skipping tier assignment.`);
+  }
+  return resolved;
 }
 
 // ── Subscription activated / updated / re-activated ──
@@ -132,6 +164,11 @@ async function handleSubscriptionActivated(resource: any): Promise<void> {
 
     const planId = resource.plan_id;
     const tier = determineTier(planId);
+
+    if (!tier) {
+      console.error(`Cannot activate subscription ${subscriptionId}: unknown plan_id ${planId}`);
+      return;
+    }
 
     // Fetch subscription details from PayPal to get the billing period end date
     let periodEnd: Date | undefined;
@@ -257,10 +294,26 @@ async function handleSubscriptionCancelled(resource: any): Promise<void> {
     // Set status to CANCELLED — tier stays intact.
     // The resolve-tier logic + cron will handle the eventual downgrade to FREE
     // once current_period_end has passed.
+    //
+    // If current_period_end was never set (e.g. activation webhook failed to fetch
+    // billing details), fetch it now so the cron doesn't immediately downgrade.
+    let periodEndUpdate: { current_period_end: Date } | Record<string, never> = {};
+    if (!existingSub.current_period_end) {
+      try {
+        const details = await getSubscriptionDetails(subscriptionId);
+        if (details.billing_info?.next_billing_time) {
+          periodEndUpdate = { current_period_end: new Date(details.billing_info.next_billing_time) };
+        }
+      } catch (detailsError) {
+        console.error(`Failed to fetch period end for cancelled sub ${subscriptionId}:`, detailsError);
+      }
+    }
+
     await prisma.subscription.update({
       where: { id: existingSub.id },
       data: {
         status: 'CANCELLED',
+        ...periodEndUpdate,
       },
     });
 
@@ -367,7 +420,7 @@ async function handlePaymentCompleted(resource: any): Promise<void> {
       return;
     }
 
-    const subscription = await prisma.subscription.findFirst({
+    const subscription = await prisma.subscription.findUnique({
       where: { paypal_subscription_id: billingAgreementId },
     });
 
