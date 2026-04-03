@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { getSubscriptionDetails } from '@/lib/payments/paypal-client';
-import { resolveTierFromPlanId } from '@/lib/payments/plan-config';
+import { resolveTierFromPlanId, getRamsLimitByTier } from '@/lib/payments/plan-config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Determine tier from plan ID using shared resolver
     const planId = details.plan_id;
-    const tier = resolveTierFromPlanId(planId) || 'STANDARD';
+    const tier = resolveTierFromPlanId(planId) || 'STARTER';
 
     const userId = session.user.id;
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const ramsLimit = tier === 'PROFESSIONAL' ? 25 : 10;
+    const ramsLimit = getRamsLimitByTier(tier);
 
     const existingUsage = await prisma.usageRecord.findFirst({
       where: { user_id: userId, billing_period_start: monthStart },
