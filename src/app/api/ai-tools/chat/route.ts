@@ -60,7 +60,7 @@ function cleanupCooldownMap() {
 async function expireAbandonedGenerations() {
   const cutoff = new Date(Date.now() - EXPIRY_THRESHOLD_MS);
   try {
-    await (prisma as any).aiToolGeneration.updateMany({
+    await prisma.aiToolGeneration.updateMany({
       where: {
         status: { in: ['QUEUED', 'PROCESSING'] },
         created_at: { lt: cutoff },
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
       const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
 
       // Global count: all AI tool generations this month (not per-tool)
-      const usageThisMonth = await (prisma as any).aiToolGeneration.count({
+      const usageThisMonth = await prisma.aiToolGeneration.count({
         where: {
           user_id: user.id,
           created_at: { gte: periodStart, lte: periodEnd },
@@ -355,7 +355,7 @@ export async function POST(req: NextRequest) {
     // If first round, create the generation record as QUEUED
     let generationId: string | undefined;
     if (roundNumber === 1) {
-      const generation = await (prisma as any).aiToolGeneration.create({
+      const generation = await prisma.aiToolGeneration.create({
         data: {
           user_id: userId,
           tool_slug: toolSlug,
