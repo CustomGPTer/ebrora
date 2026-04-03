@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -479,11 +480,77 @@ function PricingCard({
 export default function PricingClient() {
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly');
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
 
-  const currentPlan: Tier | null = null;
+  const [currentPlan, setCurrentPlan] = useState<Tier | null>(null);
+  const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
+
+  // Fetch user's current subscription on mount
+  const fetchSubscriptionStatus = useCallback(async () => {
+    if (!session?.user) return;
+    try {
+      const res = await fetch('/api/payments/status');
+      if (!res.ok) return;
+      const data = (await res.json()) as { tier?: string };
+      if (data.tier && data.tier !== 'FREE') {
+        setCurrentPlan(data.tier as Tier);
+      }
+    } catch {
+      // Non-critical — pricing page still works, just won't highlight current plan
+    }
+  }, [session?.user]);
+
+  useEffect(() => {
+    fetchSubscriptionStatus();
+  }, [fetchSubscriptionStatus]);
+
+  // Handle PayPal return: auto-verify subscription when user returns with ?subscribed=true or ?upgraded=true
+  useEffect(() => {
+    const subscribed = searchParams.get('subscribed');
+    const upgraded = searchParams.get('upgraded');
+    const subId = searchParams.get('subscription_id');
+
+    if ((subscribed === 'true' || upgraded === 'true') && subId && session?.user) {
+      setVerifyMessage('Verifying your subscription…');
+
+      fetch('/api/payments/verify-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscriptionId: subId }),
+      })
+        .then(async (res) => {
+          if (res.ok) {
+            const data = (await res.json()) as { tier?: string };
+            setVerifyMessage(`Subscription confirmed — you're on ${data.tier || 'a paid'} plan!`);
+            if (data.tier) setCurrentPlan(data.tier as Tier);
+          } else {
+            setVerifyMessage('Subscription is being processed. It may take a minute to activate.');
+          }
+        })
+        .catch(() => {
+          setVerifyMessage('Subscription is being processed. It may take a minute to activate.');
+        })
+        .finally(() => {
+          // Clear URL params without navigation
+          window.history.replaceState({}, '', '/pricing');
+          // Clear message after a few seconds
+          setTimeout(() => setVerifyMessage(null), 6000);
+        });
+    }
+  }, [searchParams, session?.user]);
 
   return (
     <div style={{ background: 'var(--color-white)' }}>
+
+      {/* ─── Verification notification ─── */}
+      {verifyMessage && (
+        <div
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-lg text-[0.85rem] font-semibold shadow-lg animate-fade-in"
+          style={{ background: 'var(--color-primary)', color: '#FFFFFF' }}
+        >
+          {verifyMessage}
+        </div>
+      )}
 
       {/* ─── 1. HERO ─── */}
       <section
