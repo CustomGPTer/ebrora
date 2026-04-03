@@ -16,8 +16,10 @@ enum Role {
 
 enum SubscriptionTier {
   FREE
-  STANDARD
+  STARTER
+  STANDARD      // Legacy — will be migrated to STARTER in Batch 7
   PROFESSIONAL
+  UNLIMITED
 }
 
 enum SubscriptionStatus {
