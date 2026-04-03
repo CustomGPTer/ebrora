@@ -16,7 +16,7 @@ export function welcomeEmail(userName: string): { subject: string; html: string 
                 <tr style="background-color: #1B5B50;">
                   <td style="padding: 30px; text-align: center;">
                     <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">E Ebrora</h1>
-                    <p style="color: #D4A44C; margin: 5px 0 0 0; font-size: 12px; letter-spacing: 1px;">RISK ASSESSMENT MANAGEMENT</p>
+                    <p style="color: #D4A44C; margin: 5px 0 0 0; font-size: 12px; letter-spacing: 1px;">CONSTRUCTION DOCUMENT PLATFORM</p>
                   </td>
                 </tr>
 
@@ -61,7 +61,7 @@ export function welcomeEmail(userName: string): { subject: string; html: string 
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="{{UNSUBSCRIBE_URL}}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -130,7 +130,7 @@ export function verificationEmail(userName: string, verifyUrl: string): { subjec
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="{{UNSUBSCRIBE_URL}}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -205,7 +205,7 @@ export function ramsCompleteEmail(userName: string, formatName: string, download
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="{{UNSUBSCRIBE_URL}}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -278,7 +278,7 @@ export function ramsFailedEmail(userName: string, formatName: string): { subject
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="{{UNSUBSCRIBE_URL}}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -358,7 +358,7 @@ export function subscriptionConfirmEmail(userName: string, tier: string, amount:
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="{{UNSUBSCRIBE_URL}}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -431,7 +431,7 @@ export function usageLimitWarningEmail(userName: string, used: number, limit: nu
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="{{UNSUBSCRIBE_URL}}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -504,7 +504,7 @@ export function passwordResetEmail(userName: string, resetUrl: string): { subjec
                       © 2026 Ebrora. All rights reserved.
                     </p>
                     <p style="color: #999999; margin: 0; font-size: 11px;">
-                      <a href="https://www.ebrora.com/unsubscribe?email=${encodeURIComponent('EMAIL_PLACEHOLDER')}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
+                      <a href="{{UNSUBSCRIBE_URL}}" style="color: #666666; text-decoration: none;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
