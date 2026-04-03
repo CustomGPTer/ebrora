@@ -465,6 +465,7 @@ enum ContentType {
 model ContentDownload {
   id              String          @id @default(cuid())
   contentType     ContentType
+  contentSlug     String?         // Identifies which specific item was downloaded (e.g. template slug, TBT ref)
   toolboxTalkId   String?
   toolboxTalk     ToolboxTalk?    @relation(fields: [toolboxTalkId], references: [id], onDelete: SetNull)
   freeTemplateId  String?
@@ -474,6 +475,7 @@ model ContentDownload {
   ipAddress       String?
   downloadedAt    DateTime        @default(now())
 
+  @@index([userId, contentType, downloadedAt])
   @@map("content_downloads")
 }
 
