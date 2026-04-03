@@ -67,7 +67,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Update subscription tier if provided
-    if (tier && ['FREE', 'STANDARD', 'PROFESSIONAL'].includes(tier)) {
+    if (tier && ['FREE', 'STARTER', 'STANDARD', 'PROFESSIONAL', 'UNLIMITED'].includes(tier)) {
       await prisma.subscription.upsert({
         where: { user_id: userId },
         update: { tier: tier as any },
