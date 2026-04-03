@@ -16,7 +16,7 @@ export default function PowraTemplatePicker({ onSelect }: Props) {
   const [previewSlug, setPreviewSlug] = useState<PowraTemplateSlug | null>(null);
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
   const canAccess = (slug: PowraTemplateSlug): boolean => { if (!isAuthenticated) return false; if (isPaid) return true; return POWRA_FREE_TEMPLATES.includes(slug); };
   const getStatus = (slug: PowraTemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => { if (!isAuthenticated) return 'locked-auth'; if (canAccess(slug)) return 'available'; return 'locked-upgrade'; };
   const handleClick = (slug: PowraTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/powra-builder'); return; } if (s === 'locked-upgrade') { router.push('/pricing'); return; } onSelect(slug); };
