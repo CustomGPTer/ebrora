@@ -16,7 +16,7 @@ export default function ErpTemplatePicker({ onSelect }: Props) {
   const [previewSlug, setPreviewSlug] = useState<ErpTemplateSlug | null>(null);
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
-  const isPaid = userPlan === 'STANDARD' || userPlan === 'PROFESSIONAL';
+  const isPaid = userPlan !== 'FREE';
   const canAccess = (slug: ErpTemplateSlug): boolean => { if (!isAuthenticated) return false; if (isPaid) return true; return ERP_FREE_TEMPLATES.includes(slug); };
   const getStatus = (slug: ErpTemplateSlug): 'available' | 'locked-auth' | 'locked-upgrade' => { if (!isAuthenticated) return 'locked-auth'; if (canAccess(slug)) return 'available'; return 'locked-upgrade'; };
   const handleClick = (slug: ErpTemplateSlug) => { const s = getStatus(slug); if (s === 'locked-auth') { router.push('/auth/login?callbackUrl=/emergency-response-builder'); return; } if (s === 'locked-upgrade') { router.push('/pricing'); return; } onSelect(slug); };
