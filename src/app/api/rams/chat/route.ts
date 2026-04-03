@@ -17,18 +17,15 @@ import {
   ConversationQuestion,
 } from '@/lib/rams/types';
 import { wrapDescription, wrapAnswers, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
+import { getRamsLimitByTier } from '@/lib/payments/plan-config';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Free tier: first 2 templates only
 const FREE_TEMPLATES: TemplateSlug[] = ['standard-5x5', 'simple-hml'];
 
-// RAMS per month per subscription tier
-const RAMS_LIMITS: Record<string, number> = {
-  FREE: 1,
-  STANDARD: 10,
-  PROFESSIONAL: 25,
-};
+// RAMS per month per subscription tier — uses shared config
+// getRamsLimitByTier handles FREE/STARTER/STANDARD/PROFESSIONAL/UNLIMITED
 
 // Question limits: AI judges readiness between MIN and MAX
 const MIN_TOTAL_QUESTIONS = 8;
@@ -188,7 +185,7 @@ export async function POST(req: NextRequest) {
 
     // Usage limit check (only on first round — count from QUEUED, exclude EXPIRED)
     if (!rounds || rounds.length === 0) {
-      const monthLimit = RAMS_LIMITS[tier] ?? 1;
+      const monthLimit = getRamsLimitByTier(tier);
       const nowDate = new Date();
       const periodStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
       const periodEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59);
