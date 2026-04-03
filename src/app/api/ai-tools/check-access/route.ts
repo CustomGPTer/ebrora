@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
-    const usedThisMonth = await (prisma as any).aiToolGeneration.count({
+    const usedThisMonth = await prisma.aiToolGeneration.count({
       where: {
         user_id: session.user.id,
         created_at: { gte: periodStart, lte: periodEnd },
