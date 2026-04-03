@@ -85,8 +85,8 @@ export default async function AccountPage({ searchParams }: PageProps) {
   } catch {
     // Fallback if AI tool tables don't exist yet
     const tier = subscription?.plan || 'FREE';
-    const fallbackLimit = tier === 'PROFESSIONAL' ? 20 : tier === 'STANDARD' ? 6 : 1;
-    const restrictedOnFree = new Set(['itp', 'incident-report', 'lift-plan', 'emergency-response', 'scope-of-works', 'early-warning', 'ncr', 'programme-checker', 'cdm-checker', 'noise-assessment', 'quote-generator', 'safety-alert', 'carbon-footprint', 'rams-review', 'delay-notification', 'variation-confirmation', 'rfi-generator', 'payment-application', 'daywork-sheet', 'carbon-reduction-plan', 'wah-assessment', 'wbv-assessment', 'riddor-report', 'traffic-management', 'waste-management', 'invasive-species']);
+    const fallbackLimit = tier === 'UNLIMITED' ? 9999 : tier === 'PROFESSIONAL' ? 150 : (tier === 'STARTER' || tier === 'STANDARD') ? 30 : 1;
+    const restrictedOnFree = new Set<string>([]); // All tools now accessible on all tiers — global cap is the restriction
     const fl = (slug: string) => (tier === 'FREE' && restrictedOnFree.has(slug)) ? 0 : fallbackLimit;
     aiToolUsage = {
       'coshh': { used: 0, limit: fl('coshh') },
