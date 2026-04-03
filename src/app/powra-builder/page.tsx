@@ -34,6 +34,12 @@ const toolSchema = {
     name: 'Ebrora',
     url: 'https://www.ebrora.com',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI POWRA Generator | 4 Templates | Ebrora',
+    description: 'AI-powered POWRA with 4 templates: comprehensive, quick card, task-specific, and supervisor review.',
+    images: ['/og-image.jpg'],
+  },
 };
 export default function Page() { return (
     <>
