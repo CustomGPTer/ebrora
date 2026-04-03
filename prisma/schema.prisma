@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -17,7 +17,7 @@ enum Role {
 enum SubscriptionTier {
   FREE
   STARTER
-  STANDARD      // Legacy — will be migrated to STARTER in Batch 7
+  STANDARD // Legacy — will be migrated to STARTER in Batch 7
   PROFESSIONAL
   UNLIMITED
 }
@@ -61,18 +61,18 @@ enum PromptType {
 
 // NextAuth.js Tables (following @auth/prisma-adapter conventions)
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String  @map("user_id")
-  type               String
-  provider           String
-  providerAccountId  String  @map("provider_account_id")
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -101,17 +101,17 @@ model VerificationToken {
 
 // Core User Model (extended)
 model User {
-  id                  String   @id @default(cuid())
-  email               String   @unique
+  id                  String    @id @default(cuid())
+  email               String    @unique
   name                String?
   password_hash       String?
-  google_id           String?  @unique
-  email_verified      Boolean  @default(false)
+  google_id           String?   @unique
+  email_verified      Boolean   @default(false)
   email_verified_at   DateTime?
-  role                Role     @default(USER)
-  onboarding_complete Boolean  @default(false)
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  role                Role      @default(USER)
+  onboarding_complete Boolean   @default(false)
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
 
   // Relations
   accounts            Account[]
@@ -131,15 +131,15 @@ model User {
 
 // Subscription Model
 model Subscription {
-  id                      String             @id @default(cuid())
-  user_id                 String             @unique
-  tier                    SubscriptionTier   @default(FREE)
-  status                  SubscriptionStatus @default(ACTIVE)
-  paypal_subscription_id  String?            @unique
-  current_period_start    DateTime?
-  current_period_end      DateTime?
-  created_at              DateTime           @default(now())
-  updated_at              DateTime           @updatedAt
+  id                     String             @id @default(cuid())
+  user_id                String             @unique
+  tier                   SubscriptionTier   @default(FREE)
+  status                 SubscriptionStatus @default(ACTIVE)
+  paypal_subscription_id String?            @unique
+  current_period_start   DateTime?
+  current_period_end     DateTime?
+  created_at             DateTime           @default(now())
+  updated_at             DateTime           @updatedAt
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
@@ -160,14 +160,14 @@ model Generation {
   retry_count       Int              @default(0)
   created_at        DateTime         @default(now())
   completed_at      DateTime?
-  questions         String?   @db.Text
-  answers           String?   @db.Text
+  questions         String?          @db.Text
+  answers           String?          @db.Text
   blobUrl           String?
   blobPathname      String?
   filename          String?
   expiresAt         DateTime?
 
-  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
   rams_format RamsFormat @relation(fields: [format_id], references: [id], onDelete: Restrict)
 
   @@index([user_id])
@@ -183,13 +183,13 @@ model RamsFormat {
   id              String   @id @default(cuid())
   name            String
   slug            String   @unique
-  scoring_type    String   // e.g., "5x5", "HML", "RPN"
+  scoring_type    String // e.g., "5x5", "HML", "RPN"
   description     String?
   is_free         Boolean  @default(false)
   enabled         Boolean  @default(true)
-  columns         Json?    // JSON configuration for columns
-  sections        Json?    // JSON configuration for sections
-  placeholder_map Json?    // JSON mapping placeholders to values
+  columns         Json? // JSON configuration for columns
+  sections        Json? // JSON configuration for sections
+  placeholder_map Json? // JSON mapping placeholders to values
   template_path   String?
   preview_image   String?
   order           Int      @default(0)
@@ -197,7 +197,7 @@ model RamsFormat {
   updated_at      DateTime @updatedAt
 
   // Relations
-  generations Generation[]
+  generations    Generation[]
   system_prompts SystemPrompt[]
 
   @@index([slug])
@@ -209,16 +209,16 @@ model RamsFormat {
 
 // Question Model
 model Question {
-  id             String        @id @default(cuid())
-  text           String
-  field_type     FieldType
-  options        Json?         // JSON array of options (for DROPDOWN type)
-  word_limit     Int?
-  group          QuestionGroup
-  display_order  Int
-  active         Boolean       @default(true)
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
+  id            String        @id @default(cuid())
+  text          String
+  field_type    FieldType
+  options       Json? // JSON array of options (for DROPDOWN type)
+  word_limit    Int?
+  group         QuestionGroup
+  display_order Int
+  active        Boolean       @default(true)
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
 
   @@index([group])
   @@index([display_order])
@@ -245,14 +245,14 @@ model SavedDetails {
 
 // System Prompt Model
 model SystemPrompt {
-  id          String     @id @default(cuid())
-  type        PromptType
-  format_id   String?
-  content     String     @db.Text
-  version     Int        @default(1)
-  active      Boolean    @default(true)
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
+  id         String     @id @default(cuid())
+  type       PromptType
+  format_id  String?
+  content    String     @db.Text
+  version    Int        @default(1)
+  active     Boolean    @default(true)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
 
   rams_format RamsFormat? @relation(fields: [format_id], references: [id], onDelete: SetNull)
 
@@ -264,17 +264,17 @@ model SystemPrompt {
 
 // Promo Code Model
 model PromoCode {
-  id                String      @id @default(cuid())
-  code              String      @unique
-  discount_type     DiscountType
-  discount_value    Float
-  expires_at        DateTime?
-  usage_limit       Int?
-  times_used        Int         @default(0)
-  applicable_tiers  Json?       // JSON array of applicable tiers
-  active            Boolean     @default(true)
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
+  id               String       @id @default(cuid())
+  code             String       @unique
+  discount_type    DiscountType
+  discount_value   Float
+  expires_at       DateTime?
+  usage_limit      Int?
+  times_used       Int          @default(0)
+  applicable_tiers Json? // JSON array of applicable tiers
+  active           Boolean      @default(true)
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
 
   @@index([code])
   @@index([active])
@@ -283,12 +283,12 @@ model PromoCode {
 
 // Cross-Sell Tag Model
 model CrossSellTag {
-  id            String   @id @default(cuid())
-  keyword       String   @unique
-  product_name  String
-  product_url   String
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  id           String   @id @default(cuid())
+  keyword      String   @unique
+  product_name String
+  product_url  String
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
   @@index([keyword])
   @@map("cross_sell_tags")
@@ -355,7 +355,7 @@ model Logo {
 model ToolboxCategory {
   id          String        @id @default(cuid())
   code        String        @unique // e.g. "02.02.01"
-  name        String        // e.g. "Working at Height"
+  name        String // e.g. "Working at Height"
   slug        String        @unique // e.g. "working-at-height"
   description String?
   order       Int           @default(0)
@@ -367,22 +367,22 @@ model ToolboxCategory {
 }
 
 model ToolboxTalk {
-  id          String           @id @default(cuid())
+  id          String          @id @default(cuid())
   categoryId  String
-  category    ToolboxCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  title       String           // e.g. "Ladder Safety Essentials"
-  slug        String           // e.g. "ladder-safety-essentials"
+  category    ToolboxCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  title       String // e.g. "Ladder Safety Essentials"
+  slug        String // e.g. "ladder-safety-essentials"
   description String?
-  fileName    String?          // original file name
-  blobUrl     String?          // Vercel Blob URL
-  fileSize    Int?             // bytes
-  isFree      Boolean          @default(true)
-  isPublished Boolean          @default(true)
-  order       Int              @default(0)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  fileName    String? // original file name
+  blobUrl     String? // Vercel Blob URL
+  fileSize    Int? // bytes
+  isFree      Boolean         @default(true)
+  isPublished Boolean         @default(true)
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
-  downloads   ContentDownload[]
+  downloads ContentDownload[]
 
   @@unique([categoryId, slug])
   @@map("toolbox_talks")
@@ -397,14 +397,14 @@ enum TemplateFormat {
 }
 
 model FreeTemplateCategory {
-  id          String           @id @default(cuid())
-  name        String           // e.g. "Health & Safety"
-  slug        String           // e.g. "health-and-safety"
-  format      TemplateFormat   // EXCEL, WORD, or POWERPOINT
+  id          String         @id @default(cuid())
+  name        String // e.g. "Health & Safety"
+  slug        String // e.g. "health-and-safety"
+  format      TemplateFormat // EXCEL, WORD, or POWERPOINT
   description String?
-  order       Int              @default(0)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  order       Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   templates   FreeTemplate[]
 
   @@unique([format, slug])
@@ -412,21 +412,21 @@ model FreeTemplateCategory {
 }
 
 model FreeTemplate {
-  id          String                @id @default(cuid())
+  id          String               @id @default(cuid())
   categoryId  String
-  category    FreeTemplateCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category    FreeTemplateCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   title       String
   slug        String
   description String?
   fileName    String?
   blobUrl     String?
   fileSize    Int?
-  isPublished Boolean               @default(true)
-  order       Int                   @default(0)
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
+  isPublished Boolean              @default(true)
+  order       Int                  @default(0)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 
-  downloads   ContentDownload[]
+  downloads ContentDownload[]
 
   @@unique([categoryId, slug])
   @@map("free_templates")
@@ -441,13 +441,13 @@ enum ToolStatus {
 
 model FreeTool {
   id          String     @id @default(cuid())
-  name        String     // e.g. "Manual Handling Risk Score Calculator"
+  name        String // e.g. "Manual Handling Risk Score Calculator"
   slug        String     @unique // e.g. "manual-handling-calculator"
   description String?
-  features    String?    // comma-separated key features
+  features    String? // comma-separated key features
   status      ToolStatus @default(COMING_SOON)
-  route       String?    // e.g. "/tools/manual-handling-calculator"
-  gumroadUrl  String?    // link to the Excel version on Gumroad
+  route       String? // e.g. "/tools/manual-handling-calculator"
+  gumroadUrl  String? // link to the Excel version on Gumroad
   order       Int        @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -463,17 +463,17 @@ enum ContentType {
 }
 
 model ContentDownload {
-  id              String          @id @default(cuid())
-  contentType     ContentType
-  contentSlug     String?         // Identifies which specific item was downloaded (e.g. template slug, TBT ref)
-  toolboxTalkId   String?
-  toolboxTalk     ToolboxTalk?    @relation(fields: [toolboxTalkId], references: [id], onDelete: SetNull)
-  freeTemplateId  String?
-  freeTemplate    FreeTemplate?   @relation(fields: [freeTemplateId], references: [id], onDelete: SetNull)
-  userId          String?
-  email           String?
-  ipAddress       String?
-  downloadedAt    DateTime        @default(now())
+  id             String        @id @default(cuid())
+  contentType    ContentType
+  contentSlug    String? // Identifies which specific item was downloaded (e.g. template slug, TBT ref)
+  toolboxTalkId  String?
+  toolboxTalk    ToolboxTalk?  @relation(fields: [toolboxTalkId], references: [id], onDelete: SetNull)
+  freeTemplateId String?
+  freeTemplate   FreeTemplate? @relation(fields: [freeTemplateId], references: [id], onDelete: SetNull)
+  userId         String?
+  email          String?
+  ipAddress      String?
+  downloadedAt   DateTime      @default(now())
 
   @@index([userId, contentType, downloadedAt])
   @@map("content_downloads")
@@ -483,8 +483,8 @@ model EmailCapture {
   id        String   @id @default(cuid())
   email     String
   name      String?
-  source    String?  // e.g. "toolbox-talk-download", "free-template-download", "tool-notify"
-  sourceId  String?  // the content ID that triggered the capture
+  source    String? // e.g. "toolbox-talk-download", "free-template-download", "tool-notify"
+  sourceId  String? // the content ID that triggered the capture
   createdAt DateTime @default(now())
 
   @@map("email_captures")
@@ -496,20 +496,20 @@ model EmailCapture {
 // ============================================================
 
 model AiToolGeneration {
-  id              String   @id @default(cuid())
-  user_id         String
-  tool_slug       String   // e.g. "coshh", "itp", "manual-handling"
-  description     String?  @db.Text
-  questions       String?  @db.Text  // JSON string of questions asked
-  answers         String?  @db.Text  // JSON string of answers provided
-  status          String   @default("QUEUED") // QUEUED | PROCESSING | COMPLETED | FAILED | EXPIRED
-  error_message   String?
-  blob_url        String?
-  blob_pathname   String?
-  filename        String?
-  expires_at      DateTime?
-  created_at      DateTime @default(now())
-  completed_at    DateTime?
+  id            String    @id @default(cuid())
+  user_id       String
+  tool_slug     String // e.g. "coshh", "itp", "manual-handling"
+  description   String?   @db.Text
+  questions     String?   @db.Text // JSON string of questions asked
+  answers       String?   @db.Text // JSON string of answers provided
+  status        String    @default("QUEUED") // QUEUED | PROCESSING | COMPLETED | FAILED | EXPIRED
+  error_message String?
+  blob_url      String?
+  blob_pathname String?
+  filename      String?
+  expires_at    DateTime?
+  created_at    DateTime  @default(now())
+  completed_at  DateTime?
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
@@ -523,15 +523,15 @@ model AiToolGeneration {
 }
 
 model AiToolUsage {
-  id                    String   @id @default(cuid())
-  user_id               String
-  tool_slug             String   // e.g. "coshh", "itp", "manual-handling"
-  billing_period_start  DateTime
-  billing_period_end    DateTime
-  generations_count     Int      @default(0)
-  generations_limit     Int
-  created_at            DateTime @default(now())
-  updated_at            DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  user_id              String
+  tool_slug            String // e.g. "coshh", "itp", "manual-handling"
+  billing_period_start DateTime
+  billing_period_end   DateTime
+  generations_count    Int      @default(0)
+  generations_limit    Int
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
@@ -540,4 +540,18 @@ model AiToolUsage {
   @@index([tool_slug])
   @@index([billing_period_start])
   @@map("ai_tool_usage")
+}
+
+// ============================================================
+// MARKETING UNSUBSCRIBE — Stores email addresses that have
+// opted out of marketing emails via the signed unsubscribe link.
+// ============================================================
+
+model MarketingUnsubscribe {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("marketing_unsubscribes")
 }
