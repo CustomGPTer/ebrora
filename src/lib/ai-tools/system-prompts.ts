@@ -890,7 +890,14 @@ JSON structure:
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
-CRITICAL: Use real SDS data for this product. The hazard classifications, H-statements, WELs, and first aid measures must match the actual manufacturer's Safety Data Sheet. This is a legal compliance document.`,
+CRITICAL: Use real SDS data for this product. The hazard classifications, H-statements, WELs, and first aid measures must match the actual manufacturer's Safety Data Sheet. This is a legal compliance document.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays or blank structured fields.
+- Names for assessedBy: leave blank if not provided by the user. Never invent names.
+- All risk ratings must be numerically calculated and internally consistent.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability — do not write as a single block.
+- hazardStatements, controlMeasures, ppeRequirements arrays must never be empty.`,
 
   itp: `Generate an Inspection & Test Plan as JSON. This will be rendered into a professional Excel spreadsheet with three sections: Pre-Works, During Works, and Closeout/Review.
 
@@ -1162,7 +1169,14 @@ FIELD-BY-FIELD RULES
   "reviewTriggers": ["string — events that would trigger a review (e.g. change in task, new equipment, incident, complaint, change in personnel)"],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 6 control measures following hierarchy of control. Minimum 3 mechanical aids considered. Minimum 3 training requirements. Minimum 5 review triggers. All TILE justifications must be specific to this task, not generic.`,
+Minimum 6 control measures following hierarchy of control. Minimum 3 mechanical aids considered. Minimum 3 training requirements. Minimum 5 review triggers. All TILE justifications must be specific to this task, not generic.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- TILE analysis must have all four components (Task, Individual, Load, Environment) with specific justifications.
+- MAC/RAPP scores must be numerically calculated and internally consistent.
+- Names for assessedBy: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   dse: `Generate a DSE Assessment JSON with this structure:
 {
@@ -1199,7 +1213,14 @@ Minimum 6 control measures following hierarchy of control. Minimum 3 mechanical 
   "actionPlan": "string (min 350 words)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 8 assessment findings.`,
+Minimum 8 assessment findings.
+
+CRITICAL RULES:
+- You MUST populate EVERY field in the workstation object — display, keyboard, mouse, chair, desk, lighting, environment must ALL have their sub-fields populated with specific observations, not generic text.
+- Every workstation component must have an 'issues' field with specific findings, not empty.
+- assessmentFindings array must have minimum 8 entries with substantive finding and recommendation text.
+- Names for assessedBy, userName: leave blank if not provided by the user. Never invent names.
+- actionPlan must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'tbt-generator': `Generate a Toolbox Talk JSON with this structure:
 {
@@ -1227,7 +1248,13 @@ Minimum 8 assessment findings.`,
   "relevantStandards": ["string — regulations, HSE guidance, BS standards, ACoPs"],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 5 key hazards (add more if the topic warrants it). Minimum 6 control measures. Minimum 4 discussion points. Each hazard and control measure item must contain at least 30 words of specific, practical content — no generic one-liners.`,
+Minimum 5 key hazards (add more if the topic warrants it). Minimum 6 control measures. Minimum 4 discussion points. Each hazard and control measure item must contain at least 30 words of specific, practical content — no generic one-liners.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- keyHazards and controlMeasures must be specific to the topic, not generic safety boilerplate.
+- Names for deliveredBy: leave blank if not provided by the user. Never invent names.
+- Write in plain English accessible to operatives — this is a site briefing document.`,
 
   'confined-spaces': `Generate a Confined Space Risk Assessment JSON with this structure:
 {
@@ -1338,7 +1365,13 @@ Minimum 5 key hazards (add more if the topic warrants it). Minimum 6 control mea
   "reviewTriggers": ["string — events that trigger a review (e.g. change in space conditions, incident, change in work scope, personnel change, new hazard identified)"],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL as a minimum). Minimum 5 physical hazards. Minimum 2 biological hazards for wastewater environments. Minimum 8 entry sequence steps. Minimum 3 alternative methods considered. Minimum 4 PPE items with standards. Minimum 3 equipment items. Minimum 5 personnel roles. Minimum 5 review triggers. All prose sections must be specific to this confined space, not generic.`,
+Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL as a minimum). Minimum 5 physical hazards. Minimum 2 biological hazards for wastewater environments. Minimum 8 entry sequence steps. Minimum 3 alternative methods considered. Minimum 4 PPE items with standards. Minimum 3 equipment items. Minimum 5 personnel roles. Minimum 5 review triggers. All prose sections must be specific to this confined space, not generic.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays or blank structured fields.
+- Names for assessedBy: leave blank if not provided by the user. Never invent names.
+- All risk ratings must be numerically calculated (L × S) and internally consistent.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'incident-report': `Generate an Incident Investigation Report JSON with this structure:
 {
@@ -1398,7 +1431,14 @@ Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL
   "lessonsLearned": "string (min 200 words — what can be learned and applied to future works)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 immediate causes. Minimum 4 corrective actions. Minimum 3 preventive actions.`,
+Minimum 3 immediate causes. Minimum 4 corrective actions. Minimum 3 preventive actions.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays or blank structured fields.
+- incidentDescription must be a detailed factual narrative with paragraph breaks (use \\n\\n), not a single block of text.
+- Names for investigationLead, personsInvolved: leave blank if not provided by the user. Never invent names.
+- RIDDOR fields must be populated based on the incident severity described — do not leave blank.
+- immediateActionsTaken, correctiveActions, preventiveActions must all have substantive entries.`,
 
   'lift-plan': `Generate a Lift Plan JSON with this structure. Reference BS 7121 and LOLER 1998 throughout.
 {
@@ -1470,7 +1510,14 @@ Minimum 3 immediate causes. Minimum 4 corrective actions. Minimum 3 preventive a
   "emergencyProcedures": "string (min 150 words)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 5 proximity hazards. Minimum 6 risk assessment items.`,
+Minimum 5 proximity hazards. Minimum 6 risk assessment items.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- All weights, radii, and capacities must be numerically calculated and internally consistent.
+- Names for appointed persons: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.
+- liftSequence steps must be specific to the lift described, not generic boilerplate.`,
 
   'emergency-response': `Generate an Emergency Response Plan JSON with this structure:
 {
@@ -1530,7 +1577,14 @@ Minimum 5 proximity hazards. Minimum 6 risk assessment items.`,
   "trainingAndDrills": "string (min 150 words — emergency procedures including crane failure, load drop, power failure, personnel injury, and communication protocol. Include specific emergency contact numbers and nearest A&E with travel time drill frequency, induction requirements, competency)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 6 key contacts. Minimum 3 site-specific emergencies. Key contacts must include: Site Manager, Project Manager, H&S Advisor, Principal Contractor, Client, First Aider.`,
+Minimum 6 key contacts. Minimum 3 site-specific emergencies. Key contacts must include: Site Manager, Project Manager, H&S Advisor, Principal Contractor, Client, First Aider.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- keyContacts must have name (leave blank if not provided), role, and contact number for each entry.
+- emergencyScenarios must be site-specific, not generic boilerplate.
+- Names: leave blank if not provided by the user. Never invent names or phone numbers.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'quality-checklist': `Generate a Quality Inspection Checklist JSON with this structure. The checklist must be activity-specific and field-ready — an engineer should be able to pick this up and use it on site immediately.
 {
@@ -1749,7 +1803,14 @@ JSON STRUCTURE:
   },
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 services identified (even if described as 'None identified — treat as live'). Minimum 6 permit conditions. Minimum 5 risk assessment items.`,
+Minimum 3 services identified (even if described as 'None identified — treat as live'). Minimum 6 permit conditions. Minimum 5 risk assessment items.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- statSearches must list all utility providers with completion status and dates.
+- riskAssessment items must be specific to the excavation described, not generic.
+- Names for preparedBy, permitHolder: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   powra: `Generate a Point of Work Risk Assessment (POWRA) JSON. This is a CONCISE, one-page field document — keep it practical and focused.
 {
@@ -1788,7 +1849,13 @@ Minimum 3 services identified (even if described as 'None identified — treat a
   ],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on. Keep ALL text concise — this is a field document, not a report.`,
+Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on. Keep ALL text concise — this is a field document, not a report.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- Risk ratings must be numerically calculated (L × S) and internally consistent.
+- Names for assessedBy, teamMembers: leave blank if not provided by the user. Never invent names.
+- This is a field document — keep content concise and practical, not verbose.`,
 
   'early-warning': `Generate an NEC Early Warning Notice JSON with this structure:
 {
@@ -1828,7 +1895,14 @@ Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on.
   "relatedNotices": "string (previous early warnings or compensation events related to this matter)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 proposed mitigation measures.`,
+Minimum 3 proposed mitigation measures.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays or blank structured fields.
+- proposedMitigation array must have action, responsibleParty, targetDate, and estimatedCostSaving for each entry.
+- riskDescription and evidenceSummary must contain paragraph breaks (use \\n\\n) for readability.
+- Names: leave blank if not provided by the user. Never invent names.
+- All cost estimates must be realistic and internally consistent.`,
 
   ncr: `Generate a Non-Conformance Report JSON aligned with ISO 9001:2015, ISO 45001:2018, and CDM 2015. This is a formal auditable quality document for UK construction projects.
 
@@ -1923,7 +1997,15 @@ MANDATORY MINIMUMS:
 - Minimum 3 contributing factors that are specific and actionable.
 - All dates must be realistic and in DD/MM/YYYY format.
 - All standard references must include full designation with year (e.g. BS 8500-1:2015+A2:2016, not just BS 8500).
-- The total document content must exceed 1,200 words across all fields combined.`,
+- The total document content must exceed 1,200 words across all fields combined.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays or blank structured fields.
+- nonConformanceDescription must be a detailed factual narrative with paragraph breaks (use \\n\\n).
+- Root cause analysis must be specific to the NCR described, not generic quality boilerplate.
+- Names for raisedBy, discoveredBy: leave blank if not provided by the user. Never invent names.
+- correctiveActions and preventiveActions arrays must never be empty.
+- NCR category (Major/Minor/Observation) must match the severity of the non-conformance described.`,
 
   'ce-notification': `Generate a Compensation Event Notification JSON for an NEC Engineering and Construction Contract.
 {
@@ -1973,7 +2055,14 @@ MANDATORY MINIMUMS:
   "relatedNotices": "string (related early warnings, previous CEs, or other notifications)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 4 supporting evidence items. The entitlement basis must correctly cite NEC clause numbers and demonstrate understanding of the contract mechanism.`,
+Minimum 4 supporting evidence items. The entitlement basis must correctly cite NEC clause numbers and demonstrate understanding of the contract mechanism.
+
+CRITICAL RULES:
+- You MUST populate EVERY field in the JSON. Never return empty strings for structured fields when data has been provided during the interview.
+- programmeImpact and costImplications must have fully populated sub-fields AND narrative text.
+- Names: leave blank if not provided by the user. Never invent names.
+- eventDescription must contain paragraph breaks (use \\n\\n) for readability — do not write as a single block.
+- supportingEvidence array must never be empty.`,
 
   // ── NEW 13 TOOLS — GENERATION SCHEMAS ────────────────────────────────────
 
@@ -2092,7 +2181,15 @@ JSON structure:
   },
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 6 critical issues. Minimum 8 recommended actions. All 8 review areas must be assessed.`,
+Minimum 6 critical issues. Minimum 8 recommended actions. All 8 review areas must be assessed.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- reviewAreas must have all 8 areas assessed with findings, issues, and recommendations.
+- RAG ratings must be justified by the findings — not randomly assigned.
+- Scores must be 1-10 and consistent with the RAG rating.
+- Names for reviewedBy: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'cdm-checker': `Generate a CDM 2015 Compliance Gap Analysis. Reference the Construction (Design and Management) Regulations 2015, HSE L153 guidance (Managing health and safety in construction), and HSE guidance note HSG224 throughout.
 
@@ -2246,7 +2343,13 @@ JSON structure:
   "narrativeSummary": "string (min 300 words — professional narrative gap analysis. Assess the overall CDM compliance position, explain the most significant gaps and their implications, and set out priorities for the project team. Write as an experienced CDM Coordinator would write for a client or project director audience)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 6 duties per duty holder for PC and PD. Minimum 5 identified gaps. Minimum 8 compliance roadmap actions.`,
+Minimum 6 duties per duty holder for PC and PD. Minimum 5 identified gaps. Minimum 8 compliance roadmap actions.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays or blank structured fields.
+- Names for assessedBy, duty holder names: leave blank if not provided by the user. Never invent names.
+- All findings and recommendations must be specific to the project described, not generic boilerplate.
+- The narrativeSummary must be a professional narrative, not a list of bullet points.`,
 
   'noise-assessment': `Generate a Construction Noise Assessment aligned with BS 5228-1:2009+A1:2014 and where applicable BS 5228-2:2009+A1:2014.
 
@@ -2350,7 +2453,14 @@ JSON structure:
   "conclusions": "string (min 200 words)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 4 plant inventory items. Minimum 2 sensitive receptors. Noise predictions for all receptors.`,
+Minimum 4 plant inventory items. Minimum 2 sensitive receptors. Noise predictions for all receptors.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- noisePredictions must include calculations showing BS 5228 formula working (Lp = SWL - 20log10(r) - 8).
+- sensitiveReceptors must have distance, direction, and type for each entry.
+- Names for assessedBy: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'quote-generator': `Generate a professional Subcontractor Quotation formatted to Tier 1 main contractor submission standards.
 
@@ -2424,7 +2534,14 @@ JSON structure:
   "validityStatement": "string",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 10 BoQ line items with realistic quantities. Minimum 10 inclusions. Minimum 8 exclusions. Minimum 8 assumptions.`,
+Minimum 10 BoQ line items with realistic quantities. Minimum 10 inclusions. Minimum 8 exclusions. Minimum 8 assumptions.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- All BoQ line items must have rate AND quantity with a calculated amount (rate × quantity).
+- priceSummary totals must sum correctly from the BoQ items.
+- Names for preparedBy: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'safety-alert': `Generate a Safety Alert Bulletin for immediate distribution. Write in plain English accessible to operatives. Be impactful, specific, and immediately actionable.
 
@@ -2485,7 +2602,14 @@ JSON structure:
   },
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 immediate causes. Minimum 2 underlying factors. Minimum 3 lessons learned. Minimum 5 preventive actions.`,
+Minimum 3 immediate causes. Minimum 2 underlying factors. Minimum 3 lessons learned. Minimum 5 preventive actions.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- actions array must have specific, actionable items — not generic safety platitudes.
+- incidentDescription must contain paragraph breaks (use \\n\\n) for readability.
+- Names: leave blank if not provided by the user. Never invent names.
+- Write in plain English accessible to operatives — this is a site-distributed bulletin.`,
 
   'carbon-footprint': `Generate a Construction Carbon Footprint Assessment using ICE v3.2 emission factors.
 
@@ -2504,81 +2628,104 @@ JSON structure:
 {
   "documentRef": "string (format: CF-YYYY-NNN)",
   "assessmentDate": "DD/MM/YYYY",
-  "assessedBy": "string",
+  "assessedBy": "string — leave blank if not provided by user",
   "projectName": "string",
   "siteAddress": "string",
+  "client": "string — leave blank if not provided by user",
+  "principalContractor": "string — leave blank if not provided by user",
   "methodology": "ICE v3.2 (University of Bath Inventory of Carbon and Energy, Version 3.2)",
-  "scopeBoundary": "Modules A1-A5 per PAS 2080:2023",
-  "projectDescription": "string (min 280 words)",
-  "materialsCarbonA1A3": [
+  "assessmentScope": "string (min 280 words — project description, scope boundary, modules assessed per PAS 2080:2023)",
+  "systemBoundary": "Modules A1-A5 per PAS 2080:2023",
+  "functionalUnit": "string",
+  "designLife": "string (e.g. 60 years)",
+  "materials": [
     {
       "material": "string",
       "quantity": "string (tonnes or m³)",
-      "massKg": "string",
-      "iceV32Factor": "string (kgCO2e/kg)",
-      "totalCarbonKgCO2e": "string",
-      "totalCarbonTCO2e": "string",
-      "notes": "string"
+      "unit": "string (kg, tonnes, m³)",
+      "emissionFactor": "string (kgCO2e/kg — from ICE v3.2)",
+      "source": "string (e.g. ICE v3.2 Table X.X)",
+      "tco2e": "string (calculated: quantity × emissionFactor / 1000)"
     }
   ],
-  "transportA4": [
+  "plant": [
     {
-      "material": "string",
-      "mass": "string (tonnes)",
+      "item": "string (plant name)",
+      "fuelType": "string (Diesel, Electric, etc.)",
+      "hours": "string (operating hours)",
+      "consumption": "string (estimated fuel litres)",
+      "emissionFactor": "2.68 kgCO2e/litre (BEIS)",
+      "tco2e": "string (calculated)"
+    }
+  ],
+  "transport": [
+    {
+      "description": "string (material being transported)",
+      "loads": "string (number of loads)",
       "distance": "string (km one-way)",
-      "vehicleType": "string",
+      "vehicleType": "string (HGV type)",
       "emissionFactor": "string (kgCO2e/tonne-km)",
-      "totalCarbonKgCO2e": "string",
-      "totalCarbonTCO2e": "string"
+      "tco2e": "string (calculated)"
     }
   ],
-  "constructionProcessA5": {
-    "plantFuelUse": [
-      {
-        "plantItem": "string",
-        "operatingHours": "string",
-        "estimatedFuelLitres": "string",
-        "dieselFactor": "2.68 kgCO2e/litre (BEIS)",
-        "totalCarbonKgCO2e": "string",
-        "totalCarbonTCO2e": "string"
-      }
-    ],
-    "waste": [
-      {
-        "wasteType": "string",
-        "volume": "string",
-        "disposalRoute": "Landfill | Licensed tip | Recycling | Reuse on site",
-        "emissionFactor": "string",
-        "totalCarbonKgCO2e": "string",
-        "totalCarbonTCO2e": "string"
-      }
-    ]
-  },
-  "carbonSummary": {
-    "materialsCarbonTCO2e": "string",
-    "transportCarbonTCO2e": "string",
-    "constructionProcessCarbonTCO2e": "string",
-    "wasteCarbonTCO2e": "string",
-    "totalGrossCarbonTCO2e": "string",
-    "totalGrossCarbonKgCO2e": "string",
-    "carbonPerM2": "string (if applicable)",
-    "carbonPerM3Concrete": "string (if applicable)"
-  },
-  "hotspotAnalysis": "string (min 280 words — top 3 carbon hotspots by category, why they dominate, comparison to industry benchmarks)",
-  "carbonReductionOpportunities": [
+  "waste": [
     {
-      "opportunity": "string",
-      "category": "Materials | Transport | Plant | Waste | Design",
-      "estimatedSaving": "string (tCO2e or %)",
-      "implementationDifficulty": "Low | Medium | High",
-      "detail": "string (min 80 words — how achieved, commercial implications, constraints)"
+      "wasteType": "string",
+      "quantity": "string (tonnes or m³)",
+      "disposalRoute": "Landfill | Licensed tip | Recycling | Reuse on site",
+      "emissionFactor": "string",
+      "tco2e": "string (calculated)"
     }
   ],
-  "residualCarbonConsiderations": "string (min 160 words)",
-  "assessmentLimitations": "string (min 140 words)",
+  "carbonSummary": [
+    {
+      "category": "string (e.g. Materials A1-A3, Transport A4, Construction Process A5, Waste)",
+      "tco2e": "string",
+      "percentage": "string (% of total)"
+    }
+  ],
+  "totalCo2e": "string (sum of all categories)",
+  "carbonIntensity": "string (e.g. kgCO2e/m² or kgCO2e/m³ concrete)",
+  "hotspots": [
+    {
+      "rank": "string (1, 2, 3...)",
+      "source": "string (hotspot description)",
+      "tco2e": "string",
+      "percentage": "string",
+      "reductionOpportunity": "string"
+    }
+  ],
+  "reductionMeasures": [
+    {
+      "measure": "string",
+      "potentialSaving": "string (tCO2e or %)",
+      "feasibility": "Low | Medium | High",
+      "recommendation": "string (min 80 words — how achieved, commercial implications, constraints)"
+    }
+  ],
+  "regulatoryReferences": [
+    {
+      "reference": "string (standard/regulation name)",
+      "description": "string"
+    }
+  ],
+  "approvalChain": [
+    {
+      "role": "string",
+      "name": "string — leave blank if not provided",
+      "qualification": "string",
+      "date": "string"
+    }
+  ],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 8 materials. Minimum 3 transport entries. Minimum 4 carbon reduction opportunities. All calculations must be internally consistent.`,
+
+CRITICAL RULES:
+- You MUST populate EVERY array with real data. Never return empty arrays.
+- Every field in the JSON must be populated. Do not leave structured fields blank while putting data only in prose.
+- All tco2e values must be numerically calculated and internally consistent.
+- Names for assessedBy, client, principalContractor: leave blank if not provided by the user. Never invent names.
+Minimum 8 materials. Minimum 3 transport entries. Minimum 3 hotspots. Minimum 4 carbon reduction opportunities.`,
 
   'rams-review': `You are reviewing an uploaded RAMS document. Analyse it thoroughly against HSE guidance (HSG65, L153 CDM 2015), Management of Health and Safety at Work Regulations 1999, CDM 2015, and UK construction industry best practice.
 
@@ -2678,7 +2825,14 @@ REGULATORY COMPLIANCE: Include at minimum these regulations where applicable (ma
 - Electricity at Work Regulations 1989
 - HSG65 Managing for Health and Safety
 
-Minimum 8 regulatory items. Minimum 6 priority recommendations.`,
+Minimum 8 regulatory items. Minimum 6 priority recommendations.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- checklistItems must each have a justified Yes/No/N/A status with explanation.
+- N/A items must explain why the item is not applicable to this specific task.
+- priorityRecommendations must be actionable and specific to the RAMS content reviewed.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'delay-notification': `Generate a formal Delay Notification Letter. Professionally formatted, legally precise, protecting contractual entitlement.
 
@@ -2723,7 +2877,14 @@ JSON structure:
   "closingParagraph": "string",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 affected activities. Minimum 4 supporting documents. Clause numbers must be correct for the stated contract form.`,
+Minimum 3 affected activities. Minimum 4 supporting documents. Clause numbers must be correct for the stated contract form.
+
+CRITICAL RULES:
+- You MUST populate EVERY section. Never skip sections or leave them empty — all 8 sections (Notice Details through Required Actions) must have substantive content.
+- Section numbering must be sequential (1-8) with no gaps.
+- programmeImpact, contractualBasis, delayEvent, mitigationMeasures must all contain paragraph breaks (use \\n\\n) — never write as a single block.
+- Names: leave blank if not provided by the user. Never invent names.
+- The sign-off must use the company name provided, not a made-up individual name.`,
 
   'variation-confirmation': `Generate a formal Variation Confirmation Letter creating a written record of a verbal instruction and requesting formal written instruction.
 
@@ -2779,7 +2940,13 @@ JSON structure:
   "closingParagraph": "string",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 supporting documents. Clause numbers must be correct for stated contract form.`,
+Minimum 3 supporting documents. Clause numbers must be correct for stated contract form.
+
+CRITICAL RULES:
+- You MUST populate EVERY section. Never skip sections or leave them empty.
+- Section numbering must be sequential with no gaps.
+- Names: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'rfi-generator': `Generate a formal Request for Information. Concise, technically precise, structured to compel a prompt response.
 
@@ -2821,7 +2988,14 @@ JSON structure:
   "responseFormat": "string",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 relevant documents. Minimum 2 activities at risk. Programme implication must include specific activity names and dates.`,
+Minimum 3 relevant documents. Minimum 2 activities at risk. Programme implication must include specific activity names and dates.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- detailedQuestion must be technically precise and specific to the information gap.
+- relevantDocuments array must list specific drawing numbers, specification clauses, or document references.
+- Names for raisedBy: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'payment-application': `Generate a formal Interim Payment Application compliant with HGCRA 1996 (as amended 2009), formatted to Tier 1 submission standards.
 
@@ -2914,7 +3088,14 @@ JSON structure:
   "supportingDocumentsList": ["string"],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 8 BoQ line items. Minimum 2 variations. All financial calculations must be internally consistent.`,
+Minimum 8 BoQ line items. Minimum 2 variations. All financial calculations must be internally consistent.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- All financial values must be numerically calculated: BoQ amounts = rate × quantity, totals must sum correctly.
+- valuationSummary must have all sub-fields populated with calculated values.
+- Names for submittedBy: leave blank if not provided by the user. Never invent names.
+- supportingNarrative must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'daywork-sheet': `Generate a Daywork Sheet compliant with CECA Schedule of Dayworks (2011 Edition). Every entry must be specific, accurate, and auditable.
 
@@ -3006,7 +3187,16 @@ JSON structure:
     "notes": "Acceptance of this daywork sheet constitutes agreement that the resources described were employed on the works specified. Acceptance does not constitute agreement of the instruction to carry out dayworks."
   },
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
-}`,
+}
+
+CRITICAL RULES:
+- You MUST populate the labour, plant, and materials arrays with real entries based on the activity described. Never return empty arrays — a daywork sheet with no recorded resources is commercially useless.
+- Every labour entry must have name (leave blank if not provided), trade, hours, and rate with a calculated total.
+- Every plant entry must have description, hours, rate, and calculated total.
+- Every material entry must have description, quantity, unit, unitCost, and calculated total.
+- labourTotal, plantTotal, materialsTotal, grandTotal must be numerically calculated and internally consistent.
+- activityDescription must contain paragraph breaks (use \\n\\n) — do not write as a single block of text.
+- Names: leave blank if not provided by the user. Never invent names for signatories.`,
 
   'carbon-reduction-plan': `Generate a Carbon Reduction Plan compliant with PPN 06/21 (Cabinet Office, effective 30 September 2021).
 
@@ -3175,7 +3365,13 @@ JSON structure:
     { "role": "string", "name": "string" }
   ]
 }
-Minimum 6 hazards in risk matrix. Minimum 4 equipment items. Minimum 3 competency requirements. All prose fields must be substantive — no single-sentence entries. Reference WAH Regs 2005 Schedule numbers where applicable.`,
+Minimum 6 hazards in risk matrix. Minimum 4 equipment items. Minimum 3 competency requirements. All prose fields must be substantive — no single-sentence entries. Reference WAH Regs 2005 Schedule numbers where applicable.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- Risk ratings must be numerically calculated (L × S) and internally consistent.
+- Names for assessedBy: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'wbv-assessment': `Generate a Whole Body Vibration Assessment compliant with the Control of Vibration at Work Regulations 2005.
 
@@ -3229,7 +3425,13 @@ JSON structure:
   "monitoringArrangements": "string (min 120 words — ongoing monitoring arrangements including frequency of exposure reviews, trigger events for reassessment, equipment for field measurement, record keeping, and management review schedule)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 2 equipment assessments. Minimum 4 control measures. Minimum 3 action plan items. A(8) calculations must be mathematically correct. Always state EAV (0.5 m/s²) and ELV (1.15 m/s²) explicitly.`,
+Minimum 2 equipment assessments. Minimum 4 control measures. Minimum 3 action plan items. A(8) calculations must be mathematically correct. Always state EAV (0.5 m/s²) and ELV (1.15 m/s²) explicitly.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- All A(8) values must be mathematically calculated and internally consistent.
+- Names for assessedBy: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   'riddor-report': `Generate a RIDDOR Report compliant with the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013.
 
@@ -3442,7 +3644,14 @@ JSON structure:
   "operativeBriefing": "string (min 120 words — operative briefing content including species identification key features, legal consequences of causing spread, practical dos and don'ts, reporting procedure for new discoveries, and biosecurity measures to follow, what operatives need to know, what to do if species found in new location)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Legal framework must reference specific Acts and Sections. Treatment methodology must be species-appropriate. Monitoring schedule minimum 5 visits. Biosecurity protocol must be practical and enforceable.`,
+Legal framework must reference specific Acts and Sections. Treatment methodology must be species-appropriate. Monitoring schedule minimum 5 visits. Biosecurity protocol must be practical and enforceable.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- speciesIdentification must have commonName, latinName, schedule, and identificationFeatures all populated.
+- monitoringSchedule must have minimum 5 entries with visit, date, and purpose.
+- Names for preparedBy, ecologist: leave blank if not provided by the user. Never invent names.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 };
 
 // ---------------------------------------------------------------------------
@@ -5466,6 +5675,17 @@ ${styleGuide}
 
 --- OUTPUT JSON SCHEMA ---
 ${schema}
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- reviewAreas must cover all 8 areas with findings, issues, and recommendations for each.
+- RAG ratings must be justified by the findings — not randomly assigned.
+- Scores must be 1-10 and consistent with the RAG rating (RED = 1-3, AMBER = 4-6, GREEN = 7-10).
+- All mathematical calculations (weighted scores, percentages, totals) must be correct and internally consistent.
+- Names for reviewedBy: use "Ebrora AI Programme Checker" unless the user provides a name.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.
+- Reference specific activities, dates, and data from the uploaded programme wherever possible.
+- Never fabricate programme data — if information is not available, state "Not stated in programme".
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }

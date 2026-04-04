@@ -204,7 +204,14 @@ JSON structure:
   "distributionList": ["string (minimum ${templateSlug === 'quick-notification' ? 3 : 4})"],
   "additionalNotes": "string (min ${mw(100, factor)} words)"
 }
-Minimum ${templateSlug === 'quick-notification' ? 3 : 5} corrective actions. The incident description must be a detailed factual narrative — not bullet points. Root cause analysis must go beyond surface-level causes.`;
+Minimum ${templateSlug === 'quick-notification' ? 3 : 5} corrective actions. The incident description must be a detailed factual narrative — not bullet points. Root cause analysis must go beyond surface-level causes.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- incidentDescription must contain paragraph breaks for readability — never a single block of text.
+- Names for reportedBy, injuredPerson.name: leave blank if not provided by the user. Never invent names.
+- RIDDOR classification must match the injury/occurrence described.
+- All corrective actions must have owner and dueDate populated.`;
 }
 
 

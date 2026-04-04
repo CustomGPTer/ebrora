@@ -725,6 +725,13 @@ export async function generateAiToolDocument(
     return Buffer.from(await Packer.toBuffer(doc));
   }
 
+  // DSE Assessment — dedicated template
+  if (toolSlug === 'dse') {
+    const { buildDseDocument } = await import('./templates/dse-template');
+    const doc = await buildDseDocument(content as any);
+    return Buffer.from(await Packer.toBuffer(doc));
+  }
+
   // Generic fallback for tools without a dedicated template
   const config = getAiToolConfig(toolSlug);
 
