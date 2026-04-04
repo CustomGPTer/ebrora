@@ -9,23 +9,6 @@ const ACCENT = '7C3AED';
 const W = h.A4_CONTENT_WIDTH;
 
 export async function buildCdmCheckerDocument(c: any): Promise<Document> {
-  const cover = p.buildCoverPageChildren({
-    documentLabel: 'CDM 2015 Compliance Gap Analysis',
-    accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.siteAddress,
-    preparedBy: c.assessedBy,
-    date: c.assessmentDate,
-    reviewDate: c.reviewDate,
-    classification: 'HEALTH & SAFETY COMPLIANCE DOCUMENT',
-    extraFields: [
-      ['Overall Rating', c.overallComplianceRating || ''],
-      ['CDM Standard', 'Construction (Design and Management) Regulations 2015'],
-      ['HSE Reference', 'L153 — Managing health and safety in construction'],
-    ],
-  });
-
   // ── Section 1: Project Overview & Notification ───────────────────────────
   const s1: any[] = [
     ...p.proseSection('Project Overview', c.projectOverview, ACCENT),
@@ -121,8 +104,23 @@ export async function buildCdmCheckerDocument(c: any): Promise<Document> {
     ], ACCENT),
   ];
 
-  return p.buildPremiumDocument(
-    { documentLabel: 'CDM 2015 Compliance Gap Analysis', accentHex: ACCENT, documentRef: c.documentRef, projectName: c.projectName, date: c.assessmentDate },
+  // Prepend metadata info table to first body section
+  const metaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Project Name',       value: c.projectName || '' },
+      { label: 'Site Address',       value: c.siteAddress || '' },
+      { label: 'Prepared By',        value: c.assessedBy || '' },
+      { label: 'Date',               value: c.assessmentDate || '' },
+      { label: 'Review Date',        value: c.reviewDate || '' },
+      { label: 'Overall Rating',     value: c.overallComplianceRating || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...metaInfo);
+
+  return p.buildPremiumDocumentInline(
+    { documentLabel: 'CDM 2015 Compliance Gap Analysis', accentHex: ACCENT, classification: 'HEALTH & SAFETY COMPLIANCE DOCUMENT' },
     [s1, s2, s3, s4]
   );
 }

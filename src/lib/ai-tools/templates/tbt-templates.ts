@@ -274,14 +274,14 @@ function buildT1(d: TbtData): Document {
         footers: { default: h.ebroraFooter() },
         children: [
           // Cover
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 600, after: 100 }, children: [
+          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 80, after: 100 }, children: [
             new TextRun({ text: 'TOOLBOX TALK', bold: true, size: 44, font: 'Arial', color: EBRORA }),
           ]}),
           new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [
             new TextRun({ text: 'Site Safety Briefing', size: 22, font: 'Arial', color: TEAL_D }),
           ]}),
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 400 }, border: { bottom: { style: BorderStyle.SINGLE, size: 3, color: TEAL } }, children: [] }),
-          new Paragraph({ spacing: { before: 100, after: 300 }, shading: { type: ShadingType.CLEAR, fill: TEAL }, children: [
+          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 150 }, border: { bottom: { style: BorderStyle.SINGLE, size: 3, color: TEAL } }, children: [] }),
+          new Paragraph({ spacing: { before: 50, after: 150 }, shading: { type: ShadingType.CLEAR, fill: TEAL }, children: [
             new TextRun({ text: `  ${d.topic.toUpperCase()}  `, bold: true, size: 28, font: 'Arial', color: 'FFFFFF' }),
           ]}),
           h.sectionHeading('Project Information'),
@@ -310,14 +310,7 @@ function buildT1(d: TbtData): Document {
             { role: 'Delivered By', name: d.deliveredBy },
             { role: 'Reviewed By', name: '' },
           ], W),
-        ],
-      },
-      // Content pages
-      {
-        properties: { ...h.PORTRAIT_SECTION },
-        headers: { default: h.ebroraHeader() },
-        footers: { default: h.ebroraFooter() },
-        children: [
+
           sectionHead('Introduction', EBRORA),
           ...h.prose(d.introduction),
           h.spacer(200),
@@ -326,13 +319,7 @@ function buildT1(d: TbtData): Document {
           h.spacer(200),
           sectionHead('PPE Requirements', EBRORA),
           ...ppeList(d),
-        ],
-      },
-      {
-        properties: { ...h.PORTRAIT_SECTION },
-        headers: { default: h.ebroraHeader() },
-        footers: { default: h.ebroraFooter() },
-        children: [
+
           sectionHead('Control Measures', EBRORA),
           ...(d.controlMeasures.length > 0 ? [controlTable(d, EBRORA)] : []),
           h.spacer(240),
@@ -340,13 +327,7 @@ function buildT1(d: TbtData): Document {
           ...d.dosAndDonts.dos.map(x => doBullet(x)),
           h.spacer(120),
           ...d.dosAndDonts.donts.map(x => dontBullet(x)),
-        ],
-      },
-      {
-        properties: { ...h.PORTRAIT_SECTION },
-        headers: { default: h.ebroraHeader() },
-        footers: { default: h.ebroraFooter() },
-        children: [
+
           sectionHead('Emergency Procedures', EBRORA),
           ...h.prose(d.emergencyProcedures),
           h.spacer(200),
@@ -411,13 +392,7 @@ function buildT2(d: TbtData): Document {
           // PPE
           leftBorderSection('PPE Requirements', RED),
           ...ppeList(d),
-        ],
-      },
-      {
-        properties: { ...h.PORTRAIT_SECTION },
-        headers: { default: h.ebroraHeader() },
-        footers: { default: h.ebroraFooter() },
-        children: [
+
           leftBorderSection('Control Measures', RED),
           ...(d.controlMeasures.length > 0 ? [controlTable(d, RED)] : []),
           h.spacer(200),

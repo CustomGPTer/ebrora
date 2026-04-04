@@ -177,7 +177,26 @@ async function buildScoringDocument(c: any): Promise<Document> {
     ...p.signatureBlock([{ role: "Reviewed by", name: "" }, { role: "Date", name: "" }], ACCENT),
   ];
 
-  return p.buildPremiumDocument(cover, [s1, s2, s3]);
+  // Prepend metadata to first section
+  const t1Meta: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Programme',          value: c.programmeTitle || 'Programme Review' },
+      { label: 'Reviewed By',        value: c.reviewedBy || '' },
+      { label: 'Date',               value: c.reviewDate || '' },
+      { label: 'Programme Type',     value: c.programmeType || '' },
+      { label: 'Period',             value: `${c.programmePeriod?.startDate || ''} – ${c.programmePeriod?.completionDate || ''}` },
+      { label: 'Overall Score',      value: `${c.overallWeightedScore || 0}% (${c.overallGrade || 'N/A'})` },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...t1Meta);
+
+  return p.buildPremiumDocumentInline({
+    documentLabel: 'Programme Scoring Report',
+    accentHex: ACCENT,
+    classification: 'PROGRAMME SCORING ASSESSMENT',
+  }, [s1, s2, s3]);
 }
 
 // =============================================================================
@@ -265,7 +284,25 @@ async function buildEmailSummaryDocument(c: any): Promise<Document> {
     new Paragraph({ children: [new TextRun({ text: c.signOffTitle || 'Ebrora AI Programme Checker', size: SM, font: 'Calibri', color: GREY })] }),
   ];
 
-  return p.buildPremiumDocument(cover, [s1, s2]);
+  // Prepend metadata to first section
+  const t2Meta: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Programme',          value: c.programmeTitle || 'Programme Review' },
+      { label: 'Reviewed By',        value: c.reviewedBy || '' },
+      { label: 'Date',               value: c.reviewDate || '' },
+      { label: 'Addressed To',       value: c.addressedTo || 'Project Manager' },
+      { label: 'Assessment',         value: c.programmeStatistics?.overallAssessment || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...t2Meta);
+
+  return p.buildPremiumDocumentInline({
+    documentLabel: 'Programme Review — Email Summary',
+    accentHex: ACCENT,
+    classification: 'PROGRAMME REVIEW CORRESPONDENCE',
+  }, [s1, s2]);
 }
 
 // =============================================================================
@@ -331,7 +368,26 @@ async function buildRagReportDocument(c: any): Promise<Document> {
     ...p.signatureBlock([{ role: "Reviewed by", name: "" }, { role: "Date", name: "" }], ACCENT),
   ];
 
-  return p.buildPremiumDocument(cover, [s1, s2, s3]);
+  // Prepend metadata to first section
+  const t3Meta: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Programme',          value: c.programmeTitle || 'Programme Review' },
+      { label: 'Reviewed By',        value: c.reviewedBy || '' },
+      { label: 'Date',               value: c.reviewDate || '' },
+      { label: 'Programme Type',     value: c.programmeType || '' },
+      { label: 'Period',             value: `${c.programmePeriod?.startDate || ''} – ${c.programmePeriod?.completionDate || ''}` },
+      { label: 'Overall RAG',        value: c.overallRagRating || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...t3Meta);
+
+  return p.buildPremiumDocumentInline({
+    documentLabel: 'Programme Review Report',
+    accentHex: ACCENT,
+    classification: 'PROGRAMME MANAGEMENT DOCUMENT',
+  }, [s1, s2, s3]);
 }
 
 // =============================================================================
@@ -480,7 +536,27 @@ async function buildComprehensiveDocument(c: any): Promise<Document> {
 
   s4.push(...p.signatureBlock([{ role: "Programme Manager", name: "" }, { role: "Project Manager", name: "" }, { role: "Planner", name: "" }], ACCENT));
 
-  return p.buildPremiumDocument(cover, [s1, s2, s3, s4]);
+  // Prepend metadata to first section
+  const t4Meta: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Programme',          value: c.programmeTitle || 'Programme Review' },
+      { label: 'Reviewed By',        value: c.reviewedBy || '' },
+      { label: 'Date',               value: c.reviewDate || '' },
+      { label: 'Programme Type',     value: c.programmeType || '' },
+      { label: 'Period',             value: `${c.programmePeriod?.startDate || ''} – ${c.programmePeriod?.completionDate || ''}` },
+      { label: 'Overall RAG',        value: c.overallRagRating || '' },
+      { label: 'Overall Score',      value: `${c.overallWeightedScore || 'N/A'}%` },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...t4Meta);
+
+  return p.buildPremiumDocumentInline({
+    documentLabel: 'Comprehensive Programme Audit',
+    accentHex: ACCENT,
+    classification: 'PROGRAMME AUDIT DOCUMENT',
+  }, [s1, s2, s3, s4]);
 }
 
 // =============================================================================

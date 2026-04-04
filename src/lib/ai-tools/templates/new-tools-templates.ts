@@ -77,7 +77,26 @@ export async function buildProgrammeCheckerDocument(c: any): Promise<Document> {
     ], ACCENT),
   ];
 
-  return p.buildPremiumDocument(cover, [s1, s2, s3]);
+  // Prepend metadata to first section
+  const pcMetaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Programme',          value: c.programmeTitle || 'Programme Review' },
+      { label: 'Reviewed By',        value: c.reviewedBy || '' },
+      { label: 'Date',               value: c.reviewDate || '' },
+      { label: 'Programme Type',     value: c.programmeType || '' },
+      { label: 'Period',             value: `${c.programmePeriod?.startDate || ''} – ${c.programmePeriod?.completionDate || ''}` },
+      { label: 'Overall RAG Rating', value: c.overallRagRating || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...pcMetaInfo);
+
+  return p.buildPremiumDocumentInline({
+    documentLabel: 'Programme Review Report',
+    accentHex: ACCENT,
+    classification: 'PROGRAMME MANAGEMENT DOCUMENT',
+  }, [s1, s2, s3]);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -142,16 +161,25 @@ export async function buildNoiseAssessmentDocument(c: any): Promise<Document> {
     ...p.proseSection('Conclusions', c.conclusions, ACCENT),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata info table to first body section
+  const naMetaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Project Name',       value: c.projectName || '' },
+      { label: 'Site / Address',     value: c.siteAddress || '' },
+      { label: 'Prepared By',        value: c.assessedBy || '' },
+      { label: 'Date',               value: c.assessmentDate || '' },
+      { label: 'Standard',           value: 'BS 5228-1:2009+A1:2014' },
+      { label: 'Overall Impact',     value: c.impactAssessment?.overallImpact || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...naMetaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Construction Noise Assessment',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.siteAddress,
-    preparedBy: c.assessedBy,
-    date: c.assessmentDate,
     classification: 'ENVIRONMENTAL ASSESSMENT',
-    extraFields: [['Standard', 'BS 5228-1:2009+A1:2014'], ['Overall Impact', c.impactAssessment?.overallImpact || '']],
   }, [s1, s2, s3]);
 }
 
@@ -228,16 +256,25 @@ export async function buildQuoteGeneratorDocument(c: any): Promise<Document> {
     ...p.signatureBlock([{ role: 'Authorised Signatory', name: c.preparedBy || '' }], ACCENT),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata to first section
+  const qgMetaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Project Name',       value: c.projectName || '' },
+      { label: 'Site / Address',     value: c.projectAddress || '' },
+      { label: 'Prepared By',        value: c.preparedBy || '' },
+      { label: 'Date',               value: c.quotationDate || '' },
+      { label: 'Main Contractor',    value: c.mainContractor || '' },
+      { label: 'Total Tender Sum',   value: c.priceSummary?.totalTenderSum || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...qgMetaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Subcontractor Quotation',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.projectAddress,
-    preparedBy: c.preparedBy,
-    date: c.quotationDate,
     classification: 'COMMERCIAL IN CONFIDENCE',
-    extraFields: [['Main Contractor', c.mainContractor || ''], ['Total Tender Sum', c.priceSummary?.totalTenderSum || '']],
   }, [s1, s2, s3, s4]);
 }
 
@@ -378,16 +415,24 @@ export async function buildCarbonFootprintDocument(c: any): Promise<Document> {
     ...p.proseSection('Limitations & Assumptions', c.assessmentLimitations, ACCENT),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata info table to first body section
+  const cfMetaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Project Name',       value: c.projectName || '' },
+      { label: 'Site / Address',     value: c.siteAddress || '' },
+      { label: 'Prepared By',        value: c.assessedBy || '' },
+      { label: 'Date',               value: c.assessmentDate || '' },
+      { label: 'Total Gross Carbon', value: c.carbonSummary?.totalGrossCarbonTCO2e ? `${c.carbonSummary.totalGrossCarbonTCO2e} tCO₂e` : '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...cfMetaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Construction Carbon Footprint Assessment',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.siteAddress,
-    preparedBy: c.assessedBy,
-    date: c.assessmentDate,
     classification: 'ENVIRONMENTAL ASSESSMENT — ICE v3.2',
-    extraFields: [['Total Gross Carbon', `${c.carbonSummary?.totalGrossCarbonTCO2e || '—'} tCO₂e`]],
   }, [s1, s2, s3]);
 }
 
@@ -726,16 +771,25 @@ export async function buildDelayNotificationDocument(c: any): Promise<Document> 
     ...p.signatureBlock([{ role: 'Signed', name: c.fromParty || '' }], ACCENT),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata info table to first body section
+  const metaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Project Name',       value: c.projectName || '' },
+      { label: 'Site / Address',     value: c.projectAddress || '' },
+      { label: 'Prepared By',        value: c.fromParty || '' },
+      { label: 'Date',               value: c.letterDate || '' },
+      { label: 'Contract Form',      value: c.contractForm || '' },
+      { label: 'Notification Clause', value: c.notificationClause || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...metaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Delay Notification Letter',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.projectAddress,
-    preparedBy: c.fromParty,
-    date: c.letterDate,
     classification: 'COMMERCIAL — CONTRACTUAL NOTICE',
-    extraFields: [['Contract Form', c.contractForm || ''], ['Notification Clause', c.notificationClause || '']],
   }, [s1, s2]);
 }
 
@@ -801,15 +855,23 @@ export async function buildVariationConfirmationDocument(c: any): Promise<Docume
     ...p.signatureBlock([{ role: 'Signed', name: c.fromParty || '' }], ACCENT),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata info table to first body section
+  const vcMetaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Project Name',       value: c.projectName || '' },
+      { label: 'Prepared By',        value: c.fromParty || '' },
+      { label: 'Date',               value: c.letterDate || '' },
+      { label: 'Contract Form',      value: c.contractForm || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...vcMetaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Variation Confirmation Letter',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    preparedBy: c.fromParty,
-    date: c.letterDate,
     classification: 'COMMERCIAL — CONTRACTUAL NOTICE',
-    extraFields: [['Contract Form', c.contractForm || '']],
   }, [s1, s2]);
 }
 
@@ -858,16 +920,25 @@ export async function buildRfiGeneratorDocument(c: any): Promise<Document> {
     ...p.bulletListSection('Distribution', c.distribution || [], ACCENT),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata to first section
+  const rfiMetaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference',    value: c.documentRef || '' },
+      { label: 'Project Name',          value: c.projectName || '' },
+      { label: 'Site / Address',        value: c.projectAddress || '' },
+      { label: 'Raised By',             value: c.raisedBy || '' },
+      { label: 'Date',                  value: c.rfiDate || '' },
+      { label: 'Required Response Date', value: c.requiredResponseDate || '' },
+      { label: 'Directed To',           value: c.directedTo || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...rfiMetaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Request for Information (RFI)',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.projectAddress,
-    preparedBy: c.raisedBy,
-    date: c.rfiDate,
     classification: 'TECHNICAL INFORMATION REQUEST',
-    extraFields: [['Required Response Date', c.requiredResponseDate || ''], ['Directed To', c.directedTo || '']],
   }, [s1, s2]);
 }
 
@@ -943,19 +1014,25 @@ export async function buildPaymentApplicationDocument(c: any): Promise<Document>
     ], ACCENT),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata info table to first body section
+  const paMetaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Project Name',       value: c.projectName || '' },
+      { label: 'Site / Address',     value: c.projectAddress || '' },
+      { label: 'Submitted By',       value: c.submittedBy || '' },
+      { label: 'Valuation Date',     value: c.valuationDate || '' },
+      { label: 'Application Number', value: c.applicationNumber || '' },
+      { label: 'Amount Due',         value: c.valuationSummary?.amountDueThisApplication || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...paMetaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Interim Payment Application',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.projectAddress,
-    preparedBy: c.submittedBy,
-    date: c.valuationDate,
     classification: 'COMMERCIAL IN CONFIDENCE',
-    extraFields: [
-      ['Application Number', c.applicationNumber || ''],
-      ['Amount Due This Application', c.valuationSummary?.amountDueThisApplication || ''],
-    ],
   }, [s1, s2, s3]);
 }
 
@@ -1032,19 +1109,25 @@ export async function buildDayworkSheetDocument(c: any): Promise<Document> {
     ...h.prose(c.signatureBlock?.notes || ''),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata info table to first body section
+  const metaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Project Name',       value: c.projectName || '' },
+      { label: 'Site / Address',     value: c.projectAddress || '' },
+      { label: 'Prepared By',        value: c.subcontractor || '' },
+      { label: 'Date',               value: c.dayworkDate || '' },
+      { label: 'Main Contractor',    value: c.mainContractor || '' },
+      { label: 'Total Daywork Value', value: c.dayworkSummary?.totalDayworkValue || '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...metaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Daywork Sheet',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.projectName,
-    siteAddress: c.projectAddress,
-    preparedBy: c.subcontractor,
-    date: c.dayworkDate,
     classification: 'CECA SCHEDULE OF DAYWORKS 2011',
-    extraFields: [
-      ['Main Contractor', c.mainContractor || ''],
-      ['Total Daywork Value', c.dayworkSummary?.totalDayworkValue || ''],
-    ],
   }, [s1, s2, s3]);
 }
 
@@ -1138,20 +1221,26 @@ export async function buildCarbonReductionPlanDocument(c: any): Promise<Document
     h.approvalTable([{ role: c.boardSignOff?.signatoryTitle || 'Director', name: c.boardSignOff?.signatoryName || '' }], W),
   ];
 
-  return p.buildPremiumDocument({
+  // Prepend metadata info table to first body section
+  const metaInfo: any[] = [
+    h.infoTable([
+      { label: 'Document Reference', value: c.documentRef || '' },
+      { label: 'Organisation',       value: c.organisationName || '' },
+      { label: 'Site / Address',     value: c.organisationAddress || '' },
+      { label: 'Prepared By',        value: c.boardSignOff?.signatoryName || '' },
+      { label: 'Date',               value: c.publicationDate || '' },
+      { label: 'Review Date',        value: c.reviewDate || '' },
+      { label: 'Net Zero Target',    value: c.netZeroCommitment?.targetYear || '' },
+      { label: 'Total Current Emissions', value: c.currentEmissions?.totalCurrentEmissions ? `${c.currentEmissions.totalCurrentEmissions} tCO₂e` : '' },
+    ], W),
+    h.spacer(100),
+  ];
+  s1.unshift(...metaInfo);
+
+  return p.buildPremiumDocumentInline({
     documentLabel: 'Carbon Reduction Plan',
     accentHex: ACCENT,
-    documentRef: c.documentRef,
-    projectName: c.organisationName,
-    siteAddress: c.organisationAddress,
-    preparedBy: c.boardSignOff?.signatoryName,
-    date: c.publicationDate,
-    reviewDate: c.reviewDate,
     classification: 'PPN 06/21 COMPLIANT CARBON REDUCTION PLAN',
-    extraFields: [
-      ['Net Zero Target',    `${c.netZeroCommitment?.targetYear || ''}`],
-      ['Total Current Emissions', `${c.currentEmissions?.totalCurrentEmissions || '—'} tCO₂e`],
-    ],
   }, [s1, s2, s3]);
 }
 
