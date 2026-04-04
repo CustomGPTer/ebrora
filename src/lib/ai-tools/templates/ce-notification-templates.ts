@@ -54,8 +54,8 @@ export async function buildCeTemplateDocument(content: any, templateSlug: CeTemp
   n.contractor = d.notifiedBy || d.contractor || '';
   n.preparedBy = d.notifiedBy || d.preparedBy || '';
   n.contractualBasis = d.entitlementBasis || d.contractualBasis || '';
-  n.costImpact = d.costNarrative || d.costImplications?.narrative || d.costImpact || '';
-  n.programmeImpact = d.programmeNarrative || d.programmeImpact?.narrative || d.programmeImpact || '';
+  n.costImpact = String(d.costNarrative || d.costImplications?.narrative || (typeof d.costImpact === 'string' ? d.costImpact : d.costImpact?.narrative) || '');
+  n.programmeImpact = String(d.programmeNarrative || (typeof d.programmeImpact === 'string' ? d.programmeImpact : d.programmeImpact?.narrative) || '');
   n.requiredActions = typeof d.quotationRequirements === 'object' ? JSON.stringify(d.quotationRequirements) : d.quotationRequirements || d.requiredActions || '';
   n.supportingEvidence = d.supportingEvidence || [];
   n.notificationDate = d.notificationDate || d.letterDate || '';
