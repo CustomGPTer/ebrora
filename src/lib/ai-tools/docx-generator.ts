@@ -690,8 +690,15 @@ export async function generateAiToolDocument(
   }
 
   if (toolSlug === 'carbon-reduction-plan') {
-    const { buildCarbonReductionPlanDocument } = await import('./templates/new-tools-templates');
-    const doc = await buildCarbonReductionPlanDocument(content as any);
+    const crpSlug = (content as any)._crpTemplateSlug;
+    let doc;
+    if (crpSlug) {
+      const { buildCrpTemplateDocument } = await import('./templates/crp-templates');
+      doc = await buildCrpTemplateDocument(content as any, crpSlug);
+    } else {
+      const { buildCarbonReductionPlanDocument } = await import('./templates/new-tools-templates');
+      doc = await buildCarbonReductionPlanDocument(content as any);
+    }
     const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }
