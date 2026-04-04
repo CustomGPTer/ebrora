@@ -1,232 +1,545 @@
 // =============================================================================
-// Working at Height Assessment — Multi-Template Engine
-// 4 templates: Full Compliance, Formal HSE, Site-Ready, Quick Check
-// Compliant with Work at Height Regulations 2005
+// Working at Height Assessment — Multi-Template Engine (REBUILT)
+// 4 templates matching HTML render library exactly.
+//
+// T1 — Site-Ready        (#1E40AF blue, Arial, 4 sections, checklist)
+// T2 — Formal HSE        (#B45309 amber + #2D2D2D bars, Cambria, clause-numbered)
+// T3 — Quick Check       (#475569 slate, Arial, left-border, pre-task checklist)
+// T4 — Full Compliance   (#065F46 green, Arial, 5 sections, rescue plan, competency)
 // =============================================================================
 import {
   Document, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, WidthType, ShadingType, BorderStyle, VerticalAlign,
-  Header, Footer, PageNumber, PageBreak, TabStopType, TabStopPosition,
+  PageBreak,
 } from 'docx';
 import * as h from '@/lib/rams/docx-helpers';
 import type { WahTemplateSlug } from '@/lib/wah/types';
 
 const W = h.A4_CONTENT_WIDTH;
-// Generous padding for premium feel
-const cellPad = { top: 80, bottom: 80, left: 120, right: 120 };
-const hdrPad = { top: 100, bottom: 100, left: 140, right: 140 };
-const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
-const borders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
-const noBorders = { top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' } };
+const SM = 16; const BODY = 18; const LG = 22;
+const CM = { top: 80, bottom: 80, left: 120, right: 120 };
+const thin = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
+const bdr = { top: thin, bottom: thin, left: thin, right: thin };
+const ZEBRA = 'F2F2F2';
 
-interface Palette { primary: string; primaryLight: string; accent: string; dark: string; mid: string; rowAlt: string; font: string; bodySize: number; }
-
-const PALETTES: Record<WahTemplateSlug, Palette> = {
-  'full-compliance': { primary: '065F46', primaryLight: 'E8F4F0', accent: '065F46', dark: '1A2E2A', mid: '6B7280', rowAlt: 'F2F2F2', font: 'Arial', bodySize: 20 },
-  'formal-hse':      { primary: '2D2D2D', primaryLight: 'FEF3C7', accent: 'B45309', dark: '333333', mid: '666666', rowAlt: 'FFFBEB', font: 'Cambria', bodySize: 19 },
-  'site-ready':      { primary: '1E40AF', primaryLight: 'EFF6FF', accent: '1E40AF', dark: '1E293B', mid: '64748B', rowAlt: 'F1F5F9', font: 'Calibri', bodySize: 20 },
-  'quick-check':     { primary: '475569', primaryLight: 'F8FAFC', accent: '475569', dark: '334155', mid: '94A3B8', rowAlt: 'F8FAFC', font: 'Arial', bodySize: 20 },
+interface Pal { accent: string; barBg: string; barNumColor: string; subtitleColor: string; labelBg: string; dark: string; mid: string; font: string; }
+const PAL: Record<WahTemplateSlug, Pal> = {
+  'site-ready':      { accent: '1E40AF', barBg: '1E40AF', barNumColor: 'FFFFFF', subtitleColor: '93C5FD', labelBg: 'EFF6FF', dark: '1E293B', mid: '64748B', font: 'Arial' },
+  'formal-hse':      { accent: 'B45309', barBg: '2D2D2D', barNumColor: 'FDE68A', subtitleColor: 'FDE68A', labelBg: 'FFFBEB', dark: '333333', mid: '666666', font: 'Cambria' },
+  'quick-check':     { accent: '475569', barBg: '475569', barNumColor: 'FFFFFF', subtitleColor: 'CBD5E1', labelBg: 'F8FAFC', dark: '334155', mid: '94A3B8', font: 'Arial' },
+  'full-compliance': { accent: '065F46', barBg: '065F46', barNumColor: 'FFFFFF', subtitleColor: 'A7F3D0', labelBg: 'F0FDF4', dark: '1A2E2A', mid: '6B7280', font: 'Arial' },
 };
 
-type DetailLevel = 'full' | 'detailed' | 'standard' | 'light';
-const DETAIL: Record<WahTemplateSlug, DetailLevel> = { 'full-compliance': 'full', 'formal-hse': 'detailed', 'site-ready': 'standard', 'quick-check': 'light' };
-
-function show(slug: WahTemplateSlug, s: string): boolean {
-  const l = DETAIL[slug];
-  const always = ['task', 'hazards', 'controls', 'sign-off'];
-  const standard = [...always, 'equipment', 'hierarchy', 'weather'];
-  const detailed = [...standard, 'competency', 'emergency'];
-  const full = [...detailed, 'rescue', 'cover', 'summary'];
-  if (l === 'full') return full.includes(s);
-  if (l === 'detailed') return detailed.includes(s);
-  if (l === 'standard') return standard.includes(s);
-  return always.includes(s);
+// ── Data ─────────────────────────────────────────────────────────────────────
+interface WahData {
+  documentRef: string; assessmentDate: string; reviewDate: string;
+  assessor: string; reviewedBy: string;
+  projectName: string; siteAddress: string; client: string; principalContractor: string;
+  taskDescription: string; location: string; workingHeight: string; duration: string;
+  accessMethod: string; riskLevel: string; contractReference: string;
+  hierarchy: { avoidance: string; prevention: string; mitigation: string };
+  hazards: Array<{ ref: string; hazard: string; consequence: string; whoAtRisk: string;
+    likelihoodBefore: number; severityBefore: number; riskRatingBefore: string;
+    controlMeasures: string; responsible: string;
+    likelihoodAfter: number; severityAfter: number; riskRatingAfter: string }>;
+  equipment: Array<{ item: string; specification: string; checked: string; notes: string }>;
+  rescuePlan: string;
+  competency: Array<{ person: string; role: string; qualification: string; expiry: string; verified: string }>;
+  weatherRestrictions: Array<{ condition: string; restriction: string }>;
+  inspections: Array<{ inspection: string; frequency: string; byWhom: string; record: string }>;
+  regulatoryNarrative: string;
 }
 
-// ── Shared helpers ───────────────────────────────────────────
-function hdrCell(p: Palette, text: string, width: number): TableCell {
-  return new TableCell({ borders, width: { size: width, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: hdrPad, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text, bold: true, color: 'FFFFFF', font: p.font, size: p.bodySize })] })] });
-}
-function dCell(p: Palette, text: string, width: number, opts: { bold?: boolean; shade?: string; align?: (typeof AlignmentType)[keyof typeof AlignmentType] } = {}): TableCell {
-  return new TableCell({ borders, width: { size: width, type: WidthType.DXA }, shading: opts.shade ? { fill: opts.shade, type: ShadingType.CLEAR } : undefined, margins: cellPad, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ alignment: opts.align, children: [new TextRun({ text, bold: !!opts.bold, font: p.font, size: p.bodySize, color: p.dark })] })] });
-}
-function altRow(p: Palette, cells: [string, number, { bold?: boolean }?][], idx: number): TableRow {
-  const shade = idx % 2 === 0 ? p.rowAlt : 'FFFFFF';
-  return new TableRow({ children: cells.map(([t, w, o]) => dCell(p, t, w, { shade, ...o })) });
-}
-function bodyPara(p: Palette, text: string): Paragraph { return new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text, font: p.font, size: p.bodySize, color: p.dark })] }); }
-function gap(size = 200): Paragraph { return new Paragraph({ spacing: { after: size }, children: [] }); }
-
-function sectionHead(slug: WahTemplateSlug, p: Palette, num: number, title: string): Paragraph | Table {
-  if (slug === 'full-compliance') return new Paragraph({ spacing: { before: 360, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: p.primary, space: 4 } }, children: [new TextRun({ text: `${num}. ${title.toUpperCase()}`, bold: true, font: p.font, size: 24, color: p.primary })] });
-  if (slug === 'formal-hse') return new Paragraph({ spacing: { before: 400, after: 140 }, children: [new TextRun({ text: `${num}.  `, bold: true, font: p.font, size: 24, color: p.accent }), new TextRun({ text: title.toUpperCase(), bold: true, font: p.font, size: 24, color: p.primary })] });
-  if (slug === 'site-ready') { const ns = num < 10 ? `0${num}` : `${num}`; return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 80, bottom: 80, left: 160, right: 160 }, children: [new Paragraph({ children: [new TextRun({ text: `${ns}   ${title.toUpperCase()}`, bold: true, font: p.font, size: 22, color: 'FFFFFF' })] })] })] })] }); }
-  return new Paragraph({ spacing: { before: 280, after: 100 }, border: { left: { style: BorderStyle.SINGLE, size: 14, color: p.primary, space: 6 } }, indent: { left: 80 }, children: [new TextRun({ text: title, bold: true, font: p.font, size: 22, color: p.dark })] });
-}
-
-function buildInfoTable(p: Palette, rows: [string, string][]): Table {
-  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [2800, W - 2800], rows: rows.map(([l, v], i) => altRow(p, [[l, 2800, { bold: true }], [v, W - 2800]], i)) });
-}
-function buildDataTable(p: Palette, headers: [string, number][], data: string[][]): Table {
-  const cw = headers.map(([, w]) => w);
-  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: cw, rows: [new TableRow({ children: headers.map(([l, w]) => hdrCell(p, l, w)) }), ...data.map((row, i) => altRow(p, row.map((t, ci) => [t, cw[ci]] as [string, number]), i))] });
-}
-function buildBulletList(p: Palette, items: string[]): Paragraph[] {
-  return (items || []).map(item => new Paragraph({ spacing: { after: 60 }, indent: { left: 280 }, children: [new TextRun({ text: '•  ', font: p.font, size: p.bodySize, color: p.accent }), new TextRun({ text: item, font: p.font, size: p.bodySize, color: p.dark })] }));
-}
-
-// ── Cover ─────────────────────────────────────────────────────
-function buildCover(slug: WahTemplateSlug, p: Palette, d: any): (Paragraph | Table)[] {
-  if (slug === 'full-compliance') return [
-    gap(200),
-    new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 300, bottom: 300, left: 300, right: 300 }, children: [
-      new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: 'WORKING AT HEIGHT', bold: true, font: p.font, size: 48, color: 'FFFFFF' })] }),
-      new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'RISK ASSESSMENT', bold: true, font: p.font, size: 36, color: 'A7F3D0' })] }),
-      new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'D1FAE5' })] }),
-      new Paragraph({ children: [new TextRun({ text: `Ref: ${d.documentRef || ''}  |  ${d.assessmentDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] }),
-    ] })] })] }),
-    gap(120),
-    new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Work at Height Regulations 2005', bold: true, font: p.font, size: 18, color: p.accent })] }),
-    gap(300),
-  ];
-  if (slug === 'formal-hse') return [
-    gap(600),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 }, children: [new TextRun({ text: 'WORKING AT HEIGHT ASSESSMENT', bold: true, font: p.font, size: 48, color: p.primary })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 60 }, border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 8 } }, children: [new TextRun({ text: d.projectName || '', font: p.font, size: 28, color: p.dark })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 }, children: [new TextRun({ text: `${d.documentRef || ''}  |  ${d.assessmentDate || ''}`, font: p.font, size: 20, color: p.mid })] }),
-    gap(300),
-  ];
-  if (slug === 'site-ready') return [
-    gap(400),
-    new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 300, bottom: 300, left: 300, right: 300 }, children: [
-      new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'WAH ASSESSMENT', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }),
-      new Paragraph({ children: [new TextRun({ text: `${d.projectName || ''}`, font: p.font, size: 22, color: 'BFDBFE' })] }),
-    ] })] })] }),
-    gap(300),
-  ];
-  return []; // quick-check: no cover
+function extract(c: any): WahData {
+  const d = c || {};
+  const safe = (v: any) => (typeof v === 'string' ? v : '') || '';
+  const safeArr = (v: any) => (Array.isArray(v) ? v : []);
+  const hoc = d.hierarchyOfControl || {};
+  return {
+    documentRef: safe(d.documentRef), assessmentDate: safe(d.assessmentDate),
+    reviewDate: safe(d.reviewDate), assessor: safe(d.assessor),
+    reviewedBy: safe(d.reviewedBy || d.reviewer),
+    projectName: safe(d.projectName), siteAddress: safe(d.siteAddress),
+    client: safe(d.client), principalContractor: safe(d.principalContractor),
+    taskDescription: safe(d.taskDescription), location: safe(d.location),
+    workingHeight: safe(d.workingHeight), duration: safe(d.duration),
+    accessMethod: safe(d.accessMethod), riskLevel: safe(d.riskLevel),
+    contractReference: safe(d.contractReference),
+    hierarchy: { avoidance: safe(hoc.avoidance), prevention: safe(hoc.prevention), mitigation: safe(hoc.mitigation) },
+    hazards: safeArr(d.hazards).map((hz: any) => ({
+      ref: safe(hz.ref), hazard: safe(hz.hazard), consequence: safe(hz.consequence),
+      whoAtRisk: safe(hz.whoAtRisk),
+      likelihoodBefore: Number(hz.likelihoodBefore) || 0, severityBefore: Number(hz.severityBefore) || 0,
+      riskRatingBefore: safe(hz.riskRatingBefore), controlMeasures: safe(hz.controlMeasures),
+      responsible: safe(hz.responsible),
+      likelihoodAfter: Number(hz.likelihoodAfter) || 0, severityAfter: Number(hz.severityAfter) || 0,
+      riskRatingAfter: safe(hz.riskRatingAfter),
+    })),
+    equipment: safeArr(d.equipmentRequired || d.equipment).map((eq: any) => ({
+      item: safe(eq.item), specification: safe(eq.specification),
+      checked: safe(eq.checked || eq.inspectionRequired || '\u2713 YES'),
+      notes: safe(eq.notes || eq.specification),
+    })),
+    rescuePlan: safe(d.rescuePlan),
+    competency: safeArr(d.competencyRequirements || d.competency).map((cp: any) => ({
+      person: safe(cp.person || cp.name), role: safe(cp.role),
+      qualification: safe(cp.qualification), expiry: safe(cp.expiry),
+      verified: safe(cp.verified || '\u2713'),
+    })),
+    weatherRestrictions: typeof d.weatherRestrictions === 'string'
+      ? (d.weatherRestrictions || '').split(/\n\n?/).filter(Boolean).map((line: string) => {
+          const [cond, ...rest] = line.split(':');
+          return { condition: (cond || '').trim(), restriction: rest.join(':').trim() };
+        })
+      : safeArr(d.weatherRestrictions).map((wr: any) => ({
+          condition: safe(wr.condition || wr.label), restriction: safe(wr.restriction || wr.value),
+        })),
+    inspections: safeArr(d.inspections || d.inspectionSchedule).map((ins: any) => ({
+      inspection: safe(ins.inspection || ins.item), frequency: safe(ins.frequency),
+      byWhom: safe(ins.byWhom || ins.inspector), record: safe(ins.record),
+    })),
+    regulatoryNarrative: safe(d.regulatoryNarrative || d.accessJustification),
+  };
 }
 
-function makeHeader(slug: WahTemplateSlug, p: Palette, d: any): Header {
-  return new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'WORKING AT HEIGHT ASSESSMENT', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function gap(s = 200): Paragraph { return new Paragraph({ spacing: { after: s }, children: [] }); }
+function proseParas(p: Pal, text: string): Paragraph[] {
+  return (text || '').split(/\n\n?/).filter(Boolean).map(para =>
+    new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: para, font: p.font, size: BODY, color: p.dark })] }));
 }
-function makeFooter(p: Palette): Footer {
-  return new Footer({ children: [new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'WAH Regs 2005 Compliant', font: p.font, size: 16, color: p.mid }), new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }), new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
+function hdrCell(text: string, w: number, bg: string, font: string): TableCell {
+  return new TableCell({ width: { size: w, type: WidthType.DXA }, margins: CM, borders: bdr,
+    shading: { fill: bg, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text.toUpperCase(), bold: true, size: SM, font, color: h.WHITE })] })] });
+}
+function dCell(text: string, w: number, font: string, dark: string, opts?: { bold?: boolean; shade?: string; color?: string }): TableCell {
+  return new TableCell({ width: { size: w, type: WidthType.DXA }, margins: CM, borders: bdr,
+    shading: opts?.shade ? { fill: opts.shade, type: ShadingType.CLEAR } : undefined, verticalAlign: VerticalAlign.TOP,
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text || '\u2014', bold: opts?.bold, font, size: BODY, color: opts?.color || dark })] })] });
+}
+function accentInfoTable(p: Pal, rows: Array<{ label: string; value: string; valueColor?: string; valueBold?: boolean }>): Table {
+  const lw = Math.round(W * 0.28); const vw = W - lw;
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [lw, vw],
+    rows: rows.map(r => new TableRow({ children: [
+      new TableCell({ width: { size: lw, type: WidthType.DXA }, margins: CM, borders: bdr,
+        shading: { fill: p.labelBg, type: ShadingType.CLEAR },
+        children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: r.label, bold: true, size: BODY, font: p.font, color: p.accent })] })] }),
+      new TableCell({ width: { size: vw, type: WidthType.DXA }, margins: CM, borders: bdr,
+        children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: r.value || '\u2014', size: BODY, font: p.font, color: r.valueColor || p.dark, bold: r.valueBold })] })] }),
+    ] })) });
 }
 
-// =================================================================
-// MAIN BUILD
-// =================================================================
-export async function buildWahTemplateDocument(content: any, templateSlug: WahTemplateSlug): Promise<Document> {
-  const p = PALETTES[templateSlug];
-  const d = content;
-  let sec = 0;
+function ragCell(rating: string, w: number, font: string): TableCell {
+  const r = (rating || '').toUpperCase();
+  let bg = 'F5F5F5'; let color = '333333';
+  if (r.includes('HIGH') || r === 'H' || (Number(r) >= 12)) { bg = 'FEF2F2'; color = 'DC2626'; }
+  else if (r.includes('MED') || r === 'M' || (Number(r) >= 6 && Number(r) < 12)) { bg = 'FFFBEB'; color = 'D97706'; }
+  else if (r.includes('LOW') || r === 'L' || (Number(r) > 0 && Number(r) < 6)) { bg = 'D1FAE5'; color = '059669'; }
+  return new TableCell({ width: { size: w, type: WidthType.DXA }, margins: CM, borders: bdr,
+    shading: { fill: bg, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [
+      new TextRun({ text: rating || '\u2014', bold: true, font, size: SM, color })] })] });
+}
+
+// Formal HSE section bar (charcoal + amber clause number)
+function formalBar(num: string, title: string, barBg: string, numColor: string, font: string): Table {
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W],
+    rows: [new TableRow({ children: [new TableCell({
+      width: { size: W, type: WidthType.DXA }, borders: h.NO_BORDERS,
+      shading: { fill: barBg, type: ShadingType.CLEAR },
+      margins: { top: 60, bottom: 60, left: 140, right: 140 },
+      children: [new Paragraph({ spacing: { after: 0 }, children: [
+        new TextRun({ text: num, bold: true, size: LG, font, color: numColor }),
+        new TextRun({ text: `   ${title.toUpperCase()}`, bold: true, size: LG, font, color: h.WHITE }),
+      ] })],
+    })] })],
+  });
+}
+
+function leftBorderHead(title: string, accent: string, font: string): Paragraph {
+  return new Paragraph({ spacing: { before: 280, after: 100 },
+    border: { left: { style: BorderStyle.SINGLE, size: 14, color: accent, space: 6 } },
+    indent: { left: 80 },
+    children: [new TextRun({ text: title.toUpperCase(), bold: true, font, size: LG, color: accent })] });
+}
+
+// Hierarchy step (coloured number + content)
+function hierarchyStep(num: number, title: string, text: string, numBg: string, font: string, dark: string): Table {
+  const numW = 400; const contentW = W - numW;
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [numW, contentW],
+    rows: [new TableRow({ children: [
+      new TableCell({ width: { size: numW, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 80, right: 80 }, borders: h.NO_BORDERS,
+        shading: { fill: numBg, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.TOP,
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [
+          new TextRun({ text: String(num), bold: true, size: 28, font: 'Arial', color: h.WHITE })] })] }),
+      new TableCell({ width: { size: contentW, type: WidthType.DXA }, margins: CM, borders: h.NO_BORDERS,
+        children: [new Paragraph({ spacing: { after: 0 }, children: [
+          new TextRun({ text: `${title} `, bold: true, font, size: BODY, color: dark }),
+          new TextRun({ text, font, size: BODY, color: dark }),
+        ] })] }),
+    ] })] });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T1 — SITE-READY (#1E40AF, 01-numbered, hazard table + equipment checklist)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT1(d: WahData): Document {
+  const p = PAL['site-ready'];
   const children: (Paragraph | Table)[] = [];
-
-  // Cover
-  const cover = buildCover(templateSlug, p, d);
-  if (cover.length > 0) { children.push(...cover); }
-
-  // Assessment details
-  children.push(sectionHead(templateSlug, p, ++sec, 'Assessment Details'));
-  children.push(buildInfoTable(p, [
-    ['Document Reference', d.documentRef || ''], ['Assessment Date', d.assessmentDate || ''],
-    ['Review Date', d.reviewDate || ''], ['Assessor', d.assessor || ''],
-    ['Project Name', d.projectName || ''], ['Site Address', d.siteAddress || ''],
-    ['Client', d.client || ''], ['Principal Contractor', d.principalContractor || ''],
-  ]));
-  children.push(gap());
-
-  // Task description
-  children.push(sectionHead(templateSlug, p, ++sec, 'Task Description'));
-  children.push(buildInfoTable(p, [
-    ['Working Height', d.workingHeight || ''], ['Access Method', d.accessMethod || ''],
-    ['Location', d.location || ''], ['Duration', d.duration || ''], ['Frequency', d.frequency || ''],
-  ]));
-  children.push(gap(80));
-  for (const para of (d.taskDescription || '').split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-  children.push(gap());
-
-  // Hierarchy of control
-  if (show(templateSlug, 'hierarchy') && d.hierarchyOfControl) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Hierarchy of Control (WAH Regs 2005 Reg 6)'));
-    children.push(buildInfoTable(p, [['Access Justification', d.accessJustification || '']]));
-    children.push(gap(80));
-    const hoc = d.hierarchyOfControl;
-    if (hoc.avoidance) { children.push(bodyPara(p, `AVOID — ${hoc.avoidance}`)); }
-    if (hoc.prevention) { children.push(bodyPara(p, `PREVENT — ${hoc.prevention}`)); }
-    if (hoc.mitigation) { children.push(bodyPara(p, `MITIGATE — ${hoc.mitigation}`)); }
-    children.push(gap());
-  }
-
-  // Hazard identification & risk matrix
-  children.push(sectionHead(templateSlug, p, ++sec, 'Hazard Identification & Risk Assessment'));
-  const hazards = d.hazards || [];
-  if (hazards.length > 0) {
-    const rW = Math.floor(W * 0.05); const hW = Math.floor(W * 0.18); const wW = Math.floor(W * 0.10);
-    const lW = Math.floor(W * 0.06); const sW = Math.floor(W * 0.06); const rrW = Math.floor(W * 0.06);
-    const cW = Math.floor(W * 0.25); const laW = Math.floor(W * 0.06); const saW = Math.floor(W * 0.06);
-    const raW = W - rW - hW - wW - lW - sW - rrW - cW - laW - saW;
-    children.push(buildDataTable(p,
-      [['#', rW], ['Hazard', hW], ['Who', wW], ['L', lW], ['S', sW], ['R', rrW], ['Controls', cW], ['L', laW], ['S', saW], ['R', raW]],
-      hazards.map((hz: any) => [hz.ref || '', hz.hazard || '', hz.whoAtRisk || '', String(hz.likelihoodBefore ?? ''), String(hz.severityBefore ?? ''), hz.riskRatingBefore || '', hz.controlMeasures || '', String(hz.likelihoodAfter ?? ''), String(hz.severityAfter ?? ''), hz.riskRatingAfter || '']),
-    ));
-  }
-  children.push(gap());
-
-  // Equipment
-  if (show(templateSlug, 'equipment') && d.equipmentRequired?.length) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Equipment Required'));
-    const eqW1 = Math.floor(W * 0.30); const eqW2 = Math.floor(W * 0.40); const eqW3 = W - eqW1 - eqW2;
-    children.push(buildDataTable(p, [['Item', eqW1], ['Specification', eqW2], ['Inspection', eqW3]], d.equipmentRequired.map((eq: any) => [eq.item || '', eq.specification || '', eq.inspectionRequired || ''])));
-    children.push(gap());
-  }
-
-  // Rescue plan
-  if (show(templateSlug, 'rescue') && d.rescuePlan) {
-    children.push(new Paragraph({ children: [new PageBreak()] }));
-    children.push(sectionHead(templateSlug, p, ++sec, 'Rescue Plan (WAH Regs 2005 Reg 9)'));
-    for (const para of (d.rescuePlan as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-
-  // Competency
-  if (show(templateSlug, 'competency') && d.competencyRequirements?.length) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Competency Requirements'));
-    const cpW1 = Math.floor(W * 0.25); const cpW2 = Math.floor(W * 0.45); const cpW3 = W - cpW1 - cpW2;
-    children.push(buildDataTable(p, [['Role', cpW1], ['Qualification', cpW2], ['Verified', cpW3]], d.competencyRequirements.map((c: any) => [c.role || '', c.qualification || '', c.verified || ''])));
-    children.push(gap());
-  }
-
-  // Weather
-  if (show(templateSlug, 'weather') && d.weatherRestrictions) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Weather Restrictions'));
-    for (const para of (d.weatherRestrictions as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-
-  // Emergency
-  if (show(templateSlug, 'emergency') && d.emergencyProcedures) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Emergency Procedures'));
-    for (const para of (d.emergencyProcedures as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-
-  // Sign-off
-  children.push(sectionHead(templateSlug, p, ++sec, 'Assessment Sign-Off'));
-  const sigCw = [2200, 3200, 1800, W - 7200];
-  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: sigCw, rows: [
-    new TableRow({ children: [hdrCell(p, 'Role', sigCw[0]), hdrCell(p, 'Name', sigCw[1]), hdrCell(p, 'Signature', sigCw[2]), hdrCell(p, 'Date', sigCw[3])] }),
-    ...(d.signOff || [{ role: 'Assessor', name: d.assessor || '' }]).map((s: any, i: number) => altRow(p, [[s.role || '', sigCw[0], { bold: true }], [s.name || '', sigCw[1]], ['', sigCw[2]], ['', sigCw[3]]], i)),
-  ] }));
-
-  // Footer
+  children.push(h.coverBlock(['WORKING AT HEIGHT', 'ASSESSMENT'], `Site-Ready Format \u2014 ${d.taskDescription?.split('.')[0] || d.projectName}`, p.accent, p.subtitleColor));
   children.push(gap(300));
-  children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '— End of Assessment —', italics: true, font: p.font, size: p.bodySize, color: p.mid })] }));
-  children.push(gap(80));
+  children.push(h.projectNameBar(d.projectName, p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Reference', value: d.documentRef }, { label: 'Date', value: d.assessmentDate },
+    { label: 'Assessed By', value: d.assessor },
+    { label: 'Task', value: d.taskDescription?.slice(0, 200) || '' },
+    { label: 'Location', value: d.location }, { label: 'Maximum Height', value: d.workingHeight },
+    { label: 'Duration', value: d.duration },
+  ], p.accent, W));
+  children.push(gap(200)); children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 01 TASK & LOCATION
+  children.push(h.fullWidthSectionBar('01', 'TASK & LOCATION', p.accent)); children.push(gap(80));
+  children.push(...proseParas(p, d.taskDescription)); children.push(gap(200));
+
+  // 02 HAZARD IDENTIFICATION
+  children.push(h.fullWidthSectionBar('02', 'HAZARD IDENTIFICATION', p.accent)); children.push(gap(80));
+  const cw = [Math.round(W*0.22), Math.round(W*0.20), Math.round(W*0.10), Math.round(W*0.36)];
+  cw.push(W - cw[0]-cw[1]-cw[2]-cw[3]);
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: cw,
+    rows: [
+      new TableRow({ children: [hdrCell('Hazard',cw[0],p.accent,p.font), hdrCell('Consequence',cw[1],p.accent,p.font), hdrCell('Risk',cw[2],p.accent,p.font), hdrCell('Control Measure',cw[3],p.accent,p.font), hdrCell('Residual',cw[4],p.accent,p.font)] }),
+      ...d.hazards.map((hz,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(hz.hazard, cw[0], p.font, p.dark, { shade, bold: true }),
+          dCell(hz.consequence || hz.whoAtRisk, cw[1], p.font, p.dark, { shade }),
+          ragCell(hz.riskRatingBefore, cw[2], p.font),
+          dCell(hz.controlMeasures, cw[3], p.font, p.dark, { shade }),
+          ragCell(hz.riskRatingAfter, cw[4], p.font),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 03 EQUIPMENT CHECKLIST
+  children.push(h.fullWidthSectionBar('03', 'EQUIPMENT CHECKLIST', p.accent)); children.push(gap(80));
+  const ecw = [Math.round(W*0.35), Math.round(W*0.12)]; ecw.push(W-ecw[0]-ecw[1]);
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: ecw,
+    rows: [
+      new TableRow({ children: [hdrCell('Item',ecw[0],p.accent,p.font), hdrCell('Checked',ecw[1],p.accent,p.font), hdrCell('Notes',ecw[2],p.accent,p.font)] }),
+      ...d.equipment.map((eq,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(eq.item, ecw[0], p.font, p.dark, { shade, bold: true }),
+          dCell(eq.checked, ecw[1], p.font, '059669', { shade }),
+          dCell(eq.notes, ecw[2], p.font, p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 04 SIGN-OFF
+  children.push(h.fullWidthSectionBar('04', 'SIGN-OFF', p.accent)); children.push(gap(100));
+  children.push(h.signatureGrid(['Assessor', 'Scaffold Supervisor'], p.accent, W));
+  children.push(gap(200)); children.push(...h.endMark(p.accent));
 
   return new Document({
-    styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } },
-    sections: [{ properties: { page: { size: { width: h.A4_WIDTH, height: h.A4_HEIGHT }, margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL } } }, headers: { default: makeHeader(templateSlug, p, d) }, footers: { default: makeFooter(p) }, children }],
+    styles: { default: { document: { run: { font: p.font, size: BODY, color: p.dark } } } },
+    sections: [{ properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('Working at Height Assessment', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Site-Ready', p.accent) }, children }],
   });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T2 — FORMAL HSE (#B45309 amber + #2D2D2D bars, clause-numbered 1.0–4.0)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT2(d: WahData): Document {
+  const p = PAL['formal-hse'];
+  const children: (Paragraph | Table)[] = [];
+  children.push(h.coverBlock(['WORKING AT HEIGHT', 'ASSESSMENT'], 'Formal HSE Format \u2014 WAH Regulations 2005 Compliance', p.accent, p.subtitleColor));
+  children.push(gap(300)); children.push(h.projectNameBar(d.projectName, p.barBg));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Reference', value: d.documentRef }, { label: 'Date', value: d.assessmentDate },
+    { label: 'Task', value: d.taskDescription?.slice(0, 120) || '' },
+    { label: 'Maximum Height', value: d.workingHeight },
+    { label: 'Contract', value: d.contractReference },
+    { label: 'Assessed By', value: d.assessor }, { label: 'Reviewed By', value: d.reviewedBy },
+  ], p.accent, W));
+  children.push(gap(200)); children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 1.0 REGULATORY FRAMEWORK
+  children.push(formalBar('1.0', 'REGULATORY FRAMEWORK', p.barBg, p.barNumColor, p.font)); children.push(gap(80));
+  const regParas = (d.regulatoryNarrative || d.hierarchy.avoidance || '').split(/\n\n?/).filter(Boolean);
+  regParas.forEach((para, i) => {
+    children.push(new Paragraph({ spacing: { after: 120 }, children: [
+      new TextRun({ text: `1.${i+1} `, bold: true, font: p.font, size: BODY, color: p.accent }),
+      new TextRun({ text: para, font: p.font, size: BODY, color: p.dark }),
+    ] }));
+  }); children.push(gap(200));
+
+  // 2.0 HIERARCHY OF CONTROL
+  children.push(formalBar('2.0', 'HIERARCHY OF CONTROL', p.barBg, p.barNumColor, p.font)); children.push(gap(80));
+  const stepColors = ['DC2626', 'D97706', '059669', '2563EB'];
+  const stepTitles = ['Avoid work at height?', 'Prevent falls \u2014 collective protection?', 'Prevent falls \u2014 personal protection?', 'Mitigate falls \u2014 minimise distance and consequence?'];
+  const stepTexts = [d.hierarchy.avoidance, d.hierarchy.prevention, d.hierarchy.mitigation, d.hierarchy.mitigation ? '' : ''];
+  [0,1,2,3].forEach(i => {
+    const txt = i===0 ? d.hierarchy.avoidance : i===1 ? d.hierarchy.prevention : d.hierarchy.mitigation;
+    if (txt) { children.push(hierarchyStep(i+1, stepTitles[i], txt, stepColors[i], p.font, p.dark)); children.push(gap(60)); }
+  }); children.push(gap(140));
+
+  // 3.0 HAZARD REGISTER
+  children.push(formalBar('3.0', 'HAZARD REGISTER', p.barBg, p.barNumColor, p.font)); children.push(gap(80));
+  const hcw = [Math.round(W*0.08), Math.round(W*0.20), Math.round(W*0.10), Math.round(W*0.32), Math.round(W*0.12)];
+  hcw.push(W - hcw[0]-hcw[1]-hcw[2]-hcw[3]-hcw[4]);
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: hcw,
+    rows: [
+      new TableRow({ children: [hdrCell('#',hcw[0],p.accent,p.font), hdrCell('Hazard',hcw[1],p.accent,p.font), hdrCell('Risk',hcw[2],p.accent,p.font), hdrCell('Control (Reg. Ref.)',hcw[3],p.accent,p.font), hdrCell('Residual',hcw[4],p.accent,p.font), hdrCell('Responsible',hcw[5],p.accent,p.font)] }),
+      ...d.hazards.map((hz,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(hz.ref || `H${i+1}`, hcw[0], p.font, p.dark, { shade }),
+          dCell(hz.hazard, hcw[1], p.font, p.dark, { shade }),
+          ragCell(hz.riskRatingBefore, hcw[2], p.font),
+          dCell(hz.controlMeasures, hcw[3], p.font, p.dark, { shade }),
+          ragCell(hz.riskRatingAfter, hcw[4], p.font),
+          dCell(hz.responsible, hcw[5], p.font, p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 4.0 INSPECTION & REVIEW SCHEDULE
+  children.push(formalBar('4.0', 'INSPECTION & REVIEW SCHEDULE', p.barBg, p.barNumColor, p.font)); children.push(gap(80));
+  const icw = [Math.round(W*0.30), Math.round(W*0.20), Math.round(W*0.25)]; icw.push(W-icw[0]-icw[1]-icw[2]);
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: icw,
+    rows: [
+      new TableRow({ children: [hdrCell('Inspection',icw[0],p.accent,p.font), hdrCell('Frequency',icw[1],p.accent,p.font), hdrCell('By Whom',icw[2],p.accent,p.font), hdrCell('Record',icw[3],p.accent,p.font)] }),
+      ...d.inspections.map((ins,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(ins.inspection, icw[0], p.font, p.dark, { shade }), dCell(ins.frequency, icw[1], p.font, p.dark, { shade }),
+          dCell(ins.byWhom, icw[2], p.font, p.dark, { shade }), dCell(ins.record, icw[3], p.font, p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  children.push(h.signatureGrid(['Assessed By', 'Reviewed By (H&S)'], p.accent, W));
+  children.push(gap(200)); children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: p.font, size: BODY, color: p.dark } } } },
+    sections: [{ properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('Working at Height Assessment', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Formal HSE', p.accent) }, children }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T3 — QUICK CHECK (#475569 slate, left-border, pre-task checklist)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT3(d: WahData): Document {
+  const p = PAL['quick-check'];
+  const children: (Paragraph | Table)[] = [];
+  children.push(h.coverBlock(['WAH', 'QUICK CHECK'], `Pre-Task Checklist \u2014 ${d.taskDescription?.split('.')[0] || ''}`, p.accent, p.subtitleColor));
+  children.push(gap(300)); children.push(h.projectNameBar(d.projectName, p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Reference', value: d.documentRef }, { label: 'Date', value: d.assessmentDate },
+    { label: 'Checked By', value: d.assessor },
+    { label: 'Task', value: d.taskDescription?.slice(0, 120) || '' },
+    { label: 'Height', value: d.workingHeight },
+  ], p.accent, W));
+  children.push(gap(200)); children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // Header bar
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W],
+    rows: [new TableRow({ children: [new TableCell({ width: { size: W, type: WidthType.DXA }, borders: h.NO_BORDERS,
+      shading: { fill: p.accent, type: ShadingType.CLEAR },
+      margins: { top: 80, bottom: 80, left: 160, right: 160 },
+      children: [new Paragraph({ spacing: { after: 0 }, children: [
+        new TextRun({ text: `WAH QUICK CHECK  |  ${d.documentRef}  |  ${d.assessmentDate}`, bold: true, size: BODY, font: p.font, color: h.WHITE }),
+      ] })] })] })] }));
+  children.push(gap(120));
+
+  // TASK SUMMARY
+  children.push(leftBorderHead('TASK SUMMARY', p.accent, p.font));
+  children.push(accentInfoTable(p, [
+    { label: 'Task', value: d.taskDescription?.slice(0, 200) || '' },
+    { label: 'Height', value: d.workingHeight },
+    { label: 'Equipment', value: d.accessMethod },
+  ])); children.push(gap(200));
+
+  // KEY HAZARDS & CONTROLS
+  children.push(leftBorderHead('KEY HAZARDS & CONTROLS', p.accent, p.font));
+  const kcw = [Math.round(W*0.35), Math.round(W*0.55)]; kcw.push(W-kcw[0]-kcw[1]);
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: kcw,
+    rows: [
+      new TableRow({ children: [hdrCell('Hazard',kcw[0],p.accent,p.font), hdrCell('Control',kcw[1],p.accent,p.font), hdrCell('OK?',kcw[2],p.accent,p.font)] }),
+      ...d.hazards.map((hz,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(hz.hazard, kcw[0], p.font, p.dark, { shade }),
+          dCell(hz.controlMeasures, kcw[1], p.font, p.dark, { shade }),
+          dCell('\u2713', kcw[2], p.font, '059669', { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // EQUIPMENT CHECK
+  children.push(leftBorderHead('EQUIPMENT CHECK', p.accent, p.font));
+  const eqcw = [Math.round(W*0.50), Math.round(W*0.15)]; eqcw.push(W-eqcw[0]-eqcw[1]);
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: eqcw,
+    rows: [
+      new TableRow({ children: [hdrCell('Item',eqcw[0],p.accent,p.font), hdrCell('Checked',eqcw[1],p.accent,p.font), hdrCell('Notes',eqcw[2],p.accent,p.font)] }),
+      ...d.equipment.map((eq,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(eq.item, eqcw[0], p.font, p.dark, { shade }),
+          dCell(eq.checked, eqcw[1], p.font, '059669', { shade }),
+          dCell(eq.notes, eqcw[2], p.font, p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(120));
+
+  // Warning banner
+  children.push(h.warningBanner('\u26A0 DO NOT ACCESS IF ANY CHECK FAILS \u26A0', 'FEF2F2', '991B1B', W));
+  children.push(gap(200));
+
+  children.push(h.signatureGrid(['Checked By', 'Operatives Briefed'], p.accent, W));
+  children.push(gap(200)); children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: p.font, size: BODY, color: p.dark } } } },
+    sections: [{ properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('WAH Quick Check', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Quick Check', p.accent) }, children }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T4 — FULL COMPLIANCE (#065F46 green, 5 sections, rescue plan, competency)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT4(d: WahData): Document {
+  const p = PAL['full-compliance'];
+  const children: (Paragraph | Table)[] = [];
+  children.push(h.coverBlock(['WORKING AT HEIGHT', 'FULL COMPLIANCE', 'ASSESSMENT'], 'WAH Regs 2005 \u00B7 Rescue Plan \u00B7 Competency Matrix \u00B7 Emergency Procedures', p.accent, p.subtitleColor));
+  children.push(gap(300)); children.push(h.projectNameBar(d.projectName, p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Reference', value: d.documentRef }, { label: 'Date', value: d.assessmentDate },
+    { label: 'Assessed By', value: d.assessor }, { label: 'Reviewed By', value: d.reviewedBy },
+    { label: 'Task', value: d.taskDescription?.slice(0, 120) || '' },
+    { label: 'Location', value: d.location }, { label: 'Max Height', value: d.workingHeight },
+    { label: 'Risk Level', value: d.riskLevel || 'HIGH' },
+  ], p.accent, W));
+  children.push(gap(200)); children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 01 HIERARCHY OF CONTROL
+  children.push(h.fullWidthSectionBar('01', 'HIERARCHY OF CONTROL (Regulation 6)', p.accent)); children.push(gap(80));
+  const stepColors = ['DC2626', 'D97706', '059669', '2563EB'];
+  const stepTitles = ['Avoid (Reg 6(2)):', 'Prevent \u2014 Collective (Reg 6(3)(a), Sched 2):', 'Prevent \u2014 Personal (Reg 6(3)(c)):', 'Mitigate (Reg 6(4)):'];
+  const stepTexts = [d.hierarchy.avoidance, d.hierarchy.prevention, d.hierarchy.mitigation, d.hierarchy.mitigation ? 'Exclusion zone, first aid, rescue plan.' : ''];
+  stepTexts.forEach((txt, i) => {
+    if (txt) { children.push(hierarchyStep(i+1, stepTitles[i], txt, stepColors[i], p.font, p.dark)); children.push(gap(60)); }
+  }); children.push(gap(140));
+
+  // 02 RISK MATRIX
+  children.push(h.fullWidthSectionBar('02', 'RISK MATRIX', p.accent)); children.push(gap(80));
+  const rcw = [Math.round(W*0.20), Math.round(W*0.06), Math.round(W*0.06), Math.round(W*0.08), Math.round(W*0.30), Math.round(W*0.06), Math.round(W*0.06)];
+  rcw.push(W - rcw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: rcw,
+    rows: [
+      new TableRow({ children: [hdrCell('Hazard',rcw[0],p.accent,p.font), hdrCell('L',rcw[1],p.accent,p.font), hdrCell('S',rcw[2],p.accent,p.font), hdrCell('Risk',rcw[3],p.accent,p.font), hdrCell('Control',rcw[4],p.accent,p.font), hdrCell('L',rcw[5],p.accent,p.font), hdrCell('S',rcw[6],p.accent,p.font), hdrCell('Res.',rcw[7],p.accent,p.font)] }),
+      ...d.hazards.map((hz,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        const risk = hz.likelihoodBefore * hz.severityBefore;
+        const res = hz.likelihoodAfter * hz.severityAfter;
+        return new TableRow({ children: [
+          dCell(hz.hazard, rcw[0], p.font, p.dark, { shade, bold: true }),
+          dCell(String(hz.likelihoodBefore), rcw[1], p.font, p.dark, { shade }),
+          dCell(String(hz.severityBefore), rcw[2], p.font, p.dark, { shade }),
+          ragCell(String(risk), rcw[3], p.font),
+          dCell(hz.controlMeasures, rcw[4], p.font, p.dark, { shade }),
+          dCell(String(hz.likelihoodAfter), rcw[5], p.font, p.dark, { shade }),
+          dCell(String(hz.severityAfter), rcw[6], p.font, p.dark, { shade }),
+          ragCell(String(res), rcw[7], p.font),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 03 RESCUE PLAN
+  children.push(h.fullWidthSectionBar('03', 'RESCUE PLAN (Regulation 9)', p.accent)); children.push(gap(80));
+  children.push(h.calloutBox('Rescue Scenario: ' + (d.rescuePlan?.split('.')[0] || 'Worker suspended in harness or fallen to lower level.'), 'DC2626', 'FEF2F2', '991B1B', W));
+  children.push(gap(80));
+  children.push(...proseParas(p, d.rescuePlan)); children.push(gap(200));
+
+  // 04 COMPETENCY MATRIX
+  children.push(h.fullWidthSectionBar('04', 'COMPETENCY MATRIX', p.accent)); children.push(gap(80));
+  const ccw = [Math.round(W*0.22), Math.round(W*0.18), Math.round(W*0.30), Math.round(W*0.15)]; ccw.push(W-ccw[0]-ccw[1]-ccw[2]-ccw[3]);
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: ccw,
+    rows: [
+      new TableRow({ children: [hdrCell('Person',ccw[0],p.accent,p.font), hdrCell('Role',ccw[1],p.accent,p.font), hdrCell('Qualification',ccw[2],p.accent,p.font), hdrCell('Expiry',ccw[3],p.accent,p.font), hdrCell('Verified',ccw[4],p.accent,p.font)] }),
+      ...d.competency.map((cp,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(cp.person, ccw[0], p.font, p.dark, { shade, bold: true }),
+          dCell(cp.role, ccw[1], p.font, p.dark, { shade }),
+          dCell(cp.qualification, ccw[2], p.font, p.dark, { shade }),
+          dCell(cp.expiry, ccw[3], p.font, p.dark, { shade }),
+          dCell(cp.verified, ccw[4], p.font, '059669', { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 05 WEATHER RESTRICTIONS
+  children.push(h.fullWidthSectionBar('05', 'WEATHER RESTRICTIONS', p.accent)); children.push(gap(80));
+  children.push(accentInfoTable(p, d.weatherRestrictions.map(wr => ({ label: wr.condition, value: wr.restriction }))));
+  children.push(gap(200));
+
+  // 4-box sig grid
+  children.push(h.signatureGrid(['Assessed By', 'H&S Review', 'Scaffold Co. Acceptance', 'Client / PC'], p.accent, W));
+  children.push(gap(200)); children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: p.font, size: BODY, color: p.dark } } } },
+    sections: [{ properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('Working at Height Assessment', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Full Compliance', p.accent) }, children }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ROUTER
+// ═════════════════════════════════════════════════════════════════════════════
+export async function buildWahTemplateDocument(
+  content: any,
+  templateSlug: WahTemplateSlug,
+): Promise<Document> {
+  const d = extract(content);
+  switch (templateSlug) {
+    case 'site-ready':      return buildT1(d);
+    case 'formal-hse':      return buildT2(d);
+    case 'quick-check':     return buildT3(d);
+    case 'full-compliance': return buildT4(d);
+    default:                return buildT1(d);
+  }
 }

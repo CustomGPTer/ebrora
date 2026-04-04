@@ -1,205 +1,487 @@
 // =============================================================================
-// Whole Body Vibration Assessment — Multi-Template Engine
-// 3 templates: Professional, Compliance, Site Practical
-// Compliant with Control of Vibration at Work Regulations 2005
+// Whole Body Vibration Assessment — Multi-Template Engine (REBUILT)
+// 3 templates matching HTML render library exactly.
+//
+// T1 — Site Practical   (#4D7C0F lime, Arial, 3 sections, exposure summary)
+// T2 — Compliance       (#1E3A5F navy, Arial, 5 sections, regulatory, clause-numbered)
+// T3 — Professional     (#0F766E teal, Arial, 4 sections, A(8) calcs, KPI, action plan)
 // =============================================================================
 import {
   Document, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, WidthType, ShadingType, BorderStyle, VerticalAlign,
-  Header, Footer, PageNumber, PageBreak, TabStopType, TabStopPosition,
+  PageBreak,
 } from 'docx';
 import * as h from '@/lib/rams/docx-helpers';
 import type { WbvTemplateSlug } from '@/lib/wbv/types';
 
 const W = h.A4_CONTENT_WIDTH;
-const cellPad = { top: 80, bottom: 80, left: 120, right: 120 };
-const hdrPad = { top: 100, bottom: 100, left: 140, right: 140 };
-const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
-const borders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
-const noBorders = { top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' } };
+const SM = 16; const BODY = 18; const LG = 22;
+const CM = { top: 80, bottom: 80, left: 120, right: 120 };
+const thin = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
+const bdr = { top: thin, bottom: thin, left: thin, right: thin };
+const ZEBRA = 'F2F2F2';
 
-interface Palette { primary: string; primaryLight: string; accent: string; dark: string; mid: string; rowAlt: string; font: string; bodySize: number; }
-
-const PALETTES: Record<WbvTemplateSlug, Palette> = {
-  'professional':   { primary: '0F766E', primaryLight: 'E0F2F1', accent: '0F766E', dark: '1A2E2A', mid: '6B7280', rowAlt: 'F0FDFA', font: 'Arial', bodySize: 20 },
-  'compliance':     { primary: '1E3A5F', primaryLight: 'EFF6FF', accent: '1E3A5F', dark: '1E293B', mid: '64748B', rowAlt: 'F1F5F9', font: 'Cambria', bodySize: 19 },
-  'site-practical': { primary: '4D7C0F', primaryLight: 'F7FEE7', accent: '4D7C0F', dark: '365314', mid: '6B7280', rowAlt: 'F7FEE7', font: 'Calibri', bodySize: 20 },
+interface Pal { accent: string; subtitleColor: string; labelBg: string; dark: string; mid: string; font: string; }
+const PAL: Record<WbvTemplateSlug, Pal> = {
+  'site-practical': { accent: '4D7C0F', subtitleColor: 'D9F99D', labelBg: 'F7FEE7', dark: '365314', mid: '6B7280', font: 'Arial' },
+  'compliance':     { accent: '1E3A5F', subtitleColor: '93C5FD', labelBg: 'F1F5F9', dark: '1E293B', mid: '64748B', font: 'Arial' },
+  'professional':   { accent: '0F766E', subtitleColor: '99F6E4', labelBg: 'F0FDFA', dark: '134E4A', mid: '6B7280', font: 'Arial' },
 };
 
-type DetailLevel = 'full' | 'standard' | 'practical';
-const DETAIL: Record<WbvTemplateSlug, DetailLevel> = { 'professional': 'full', 'compliance': 'standard', 'site-practical': 'practical' };
-
-function show(slug: WbvTemplateSlug, s: string): boolean {
-  const l = DETAIL[slug];
-  const always = ['details', 'equipment', 'exposure', 'controls'];
-  const standard = [...always, 'regulatory', 'health-surv', 'action-plan'];
-  const full = [...standard, 'cover', 'operatives', 'monitoring', 'narrative'];
-  if (l === 'full') return full.includes(s);
-  if (l === 'standard') return standard.includes(s);
-  return always.includes(s);
+// ── Data ─────────────────────────────────────────────────────────────────────
+interface WbvData {
+  documentRef: string; assessmentDate: string; reviewDate: string;
+  assessor: string; reviewedBy: string;
+  projectName: string; siteAddress: string; contractReference: string;
+  operatorsSummary: string; equipmentSummary: string; overallStatus: string;
+  assessmentScope: string; regulatoryContext: string;
+  equipmentAssessments: Array<{
+    ref: string; machineType: string; makeModel: string; age: string;
+    seatType: string; seatCondition: string;
+    vibrationMagnitude: number; dailyExposure: number; a8Result: number;
+    vsEav: string; vsElv: string; action: string; source: string;
+  }>;
+  operatives: Array<{ name: string; role: string; equipment: string; maxHours: string; briefed: string }>;
+  hazards: Array<{ hazard: string; likelihood: number; severity: number; risk: number; control: string; residual: string }>;
+  controlMeasures: Array<{ ref: string; regulation: string; measure: string; owner: string; frequency: string }>;
+  healthSurveillance: Array<{ operator: string; status: string; lastAssessment: string; nextDue: string; notes: string }>;
+  actionPlan: Array<{ num: string; action: string; owner: string; priority: string; target: string; benefit: string }>;
+  controls: string[];
+  healthSurveillanceNarrative: string; reviewSchedule: string;
 }
 
-function hdrCell(p: Palette, text: string, width: number): TableCell {
-  return new TableCell({ borders, width: { size: width, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: hdrPad, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text, bold: true, color: 'FFFFFF', font: p.font, size: p.bodySize })] })] });
-}
-function dCell(p: Palette, text: string, width: number, opts: { bold?: boolean; shade?: string } = {}): TableCell {
-  return new TableCell({ borders, width: { size: width, type: WidthType.DXA }, shading: opts.shade ? { fill: opts.shade, type: ShadingType.CLEAR } : undefined, margins: cellPad, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text, bold: !!opts.bold, font: p.font, size: p.bodySize, color: p.dark })] })] });
-}
-function altRow(p: Palette, cells: [string, number, { bold?: boolean }?][], idx: number): TableRow {
-  const shade = idx % 2 === 0 ? p.rowAlt : 'FFFFFF';
-  return new TableRow({ children: cells.map(([t, w, o]) => dCell(p, t, w, { shade, ...o })) });
-}
-function bodyPara(p: Palette, text: string): Paragraph { return new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text, font: p.font, size: p.bodySize, color: p.dark })] }); }
-function gap(size = 200): Paragraph { return new Paragraph({ spacing: { after: size }, children: [] }); }
-
-function sectionHead(slug: WbvTemplateSlug, p: Palette, num: number, title: string): Paragraph | Table {
-  if (slug === 'professional') return new Paragraph({ spacing: { before: 360, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: p.primary, space: 4 } }, children: [new TextRun({ text: `${num}. ${title.toUpperCase()}`, bold: true, font: p.font, size: 24, color: p.primary })] });
-  if (slug === 'compliance') { const ns = num < 10 ? `0${num}` : `${num}`; return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 80, bottom: 80, left: 160, right: 160 }, children: [new Paragraph({ children: [new TextRun({ text: `${ns}   ${title.toUpperCase()}`, bold: true, font: p.font, size: 22, color: 'FFFFFF' })] })] })] })] }); }
-  return new Paragraph({ spacing: { before: 280, after: 100 }, border: { left: { style: BorderStyle.SINGLE, size: 14, color: p.primary, space: 6 } }, indent: { left: 80 }, children: [new TextRun({ text: title, bold: true, font: p.font, size: 22, color: p.dark })] });
-}
-
-function buildInfoTable(p: Palette, rows: [string, string][]): Table {
-  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [2800, W - 2800], rows: rows.map(([l, v], i) => altRow(p, [[l, 2800, { bold: true }], [v, W - 2800]], i)) });
-}
-function buildDataTable(p: Palette, headers: [string, number][], data: string[][]): Table {
-  const cw = headers.map(([, w]) => w);
-  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: cw, rows: [new TableRow({ children: headers.map(([l, w]) => hdrCell(p, l, w)) }), ...data.map((row, i) => altRow(p, row.map((t, ci) => [t, cw[ci]] as [string, number]), i))] });
-}
-
-function buildCover(slug: WbvTemplateSlug, p: Palette, d: any): (Paragraph | Table)[] {
-  if (slug === 'professional') return [
-    gap(200),
-    new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 300, bottom: 300, left: 300, right: 300 }, children: [
-      new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: 'WHOLE BODY VIBRATION', bold: true, font: p.font, size: 48, color: 'FFFFFF' })] }),
-      new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'ASSESSMENT', bold: true, font: p.font, size: 36, color: '80CBC4' })] }),
-      new Paragraph({ children: [new TextRun({ text: `${d.projectName || ''}  |  ${d.documentRef || ''}`, font: p.font, size: 20, color: 'B2DFDB' })] }),
-    ] })] })] }),
-    gap(120),
-    new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Control of Vibration at Work Regulations 2005', bold: true, font: p.font, size: 18, color: p.accent })] }),
-    gap(300),
-  ];
-  if (slug === 'compliance') return [
-    gap(400),
-    new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 300, bottom: 300, left: 300, right: 300 }, children: [
-      new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'WBV ASSESSMENT', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }),
-      new Paragraph({ children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] }),
-    ] })] })] }),
-    gap(300),
-  ];
-  return []; // site-practical: no cover
-}
-
-function makeHeader(p: Palette, d: any): Header {
-  return new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'WBV ASSESSMENT', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
-}
-function makeFooter(p: Palette): Footer {
-  return new Footer({ children: [new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'Vibration Regs 2005 Compliant', font: p.font, size: 16, color: p.mid }), new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }), new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
+function extract(c: any): WbvData {
+  const d = c || {};
+  const safe = (v: any) => (typeof v === 'string' ? v : '') || '';
+  const safeArr = (v: any) => (Array.isArray(v) ? v : []);
+  return {
+    documentRef: safe(d.documentRef), assessmentDate: safe(d.assessmentDate),
+    reviewDate: safe(d.reviewDate), assessor: safe(d.assessor),
+    reviewedBy: safe(d.reviewedBy || d.reviewer),
+    projectName: safe(d.projectName), siteAddress: safe(d.siteAddress),
+    contractReference: safe(d.contractReference),
+    operatorsSummary: safe(d.operatorsSummary), equipmentSummary: safe(d.equipmentSummary),
+    overallStatus: safe(d.overallStatus),
+    assessmentScope: safe(d.assessmentScope), regulatoryContext: safe(d.regulatoryContext),
+    equipmentAssessments: safeArr(d.equipmentAssessments).map((eq: any) => ({
+      ref: safe(eq.ref), machineType: safe(eq.machineType), makeModel: safe(eq.makeModel),
+      age: safe(eq.age), seatType: safe(eq.seatType), seatCondition: safe(eq.seatCondition),
+      vibrationMagnitude: Number(eq.vibrationMagnitude) || 0,
+      dailyExposure: Number(eq.dailyExposure) || 0,
+      a8Result: Number(eq.a8Result) || 0,
+      vsEav: safe(eq.vsEav || eq.eavStatus), vsElv: safe(eq.vsElv || eq.elvStatus),
+      action: safe(eq.action || eq.requiredAction), source: safe(eq.source || eq.vibrationSource),
+    })),
+    operatives: safeArr(d.operatives).map((op: any) => ({
+      name: safe(op.name), role: safe(op.role), equipment: safe(op.equipment || op.machineType),
+      maxHours: safe(op.maxHours || op.maxDailyHours), briefed: safe(op.briefed || '\u2713 YES'),
+    })),
+    hazards: safeArr(d.hazards || d.riskAssessment).map((hz: any) => ({
+      hazard: safe(hz.hazard), likelihood: Number(hz.likelihood || hz.likelihoodBefore) || 0,
+      severity: Number(hz.severity || hz.severityBefore) || 0,
+      risk: Number(hz.risk || hz.riskRating) || 0,
+      control: safe(hz.control || hz.controlMeasures), residual: safe(hz.residual || hz.residualRisk),
+    })),
+    controlMeasures: safeArr(d.controlMeasures).map((cm: any) => ({
+      ref: safe(cm.ref || cm.regulationRef), regulation: safe(cm.regulation || cm.regulationTitle),
+      measure: safe(cm.measure || cm.controlMeasure), owner: safe(cm.owner), frequency: safe(cm.frequency),
+    })),
+    healthSurveillance: safeArr(d.healthSurveillance || d.healthSurveillanceProgramme).map((hs: any) => ({
+      operator: safe(hs.operator || hs.name), status: safe(hs.status),
+      lastAssessment: safe(hs.lastAssessment), nextDue: safe(hs.nextDue), notes: safe(hs.notes),
+    })),
+    actionPlan: safeArr(d.actionPlan).map((ap: any, i: number) => ({
+      num: safe(ap.num) || String(i + 1), action: safe(ap.action), owner: safe(ap.owner),
+      priority: safe(ap.priority), target: safe(ap.target), benefit: safe(ap.benefit || ap.expectedBenefit),
+    })),
+    controls: safeArr(d.controls || d.controlsList).map((s: any) => safe(s)),
+    healthSurveillanceNarrative: safe(d.healthSurveillanceNarrative),
+    reviewSchedule: safe(d.reviewSchedule),
+  };
 }
 
-// =================================================================
-export async function buildWbvTemplateDocument(content: any, templateSlug: WbvTemplateSlug): Promise<Document> {
-  const p = PALETTES[templateSlug];
-  const d = content;
-  let sec = 0;
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function gap(s = 200): Paragraph { return new Paragraph({ spacing: { after: s }, children: [] }); }
+function hdrCell(text: string, w: number, bg: string): TableCell {
+  return new TableCell({ width: { size: w, type: WidthType.DXA }, margins: CM, borders: bdr,
+    shading: { fill: bg, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text.toUpperCase(), bold: true, size: SM, font: 'Arial', color: h.WHITE })] })] });
+}
+function dCell(text: string, w: number, dark: string, opts?: { bold?: boolean; shade?: string; color?: string }): TableCell {
+  return new TableCell({ width: { size: w, type: WidthType.DXA }, margins: CM, borders: bdr,
+    shading: opts?.shade ? { fill: opts.shade, type: ShadingType.CLEAR } : undefined, verticalAlign: VerticalAlign.TOP,
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text || '\u2014', bold: opts?.bold, font: 'Arial', size: BODY, color: opts?.color || dark })] })] });
+}
+function ragCell(rating: string, w: number): TableCell {
+  const r = (rating || '').toUpperCase();
+  let bg = 'F5F5F5'; let color = '333333';
+  if (r.includes('ABOVE') || r.includes('HIGH') || r.includes('>') || r === '= EAV' || (Number(r) >= 12)) { bg = 'FFFBEB'; color = 'D97706'; }
+  if (r.includes('BELOW') || r.includes('LOW') || r.includes('<') || (Number(r) > 0 && Number(r) < 6)) { bg = 'D1FAE5'; color = '059669'; }
+  if (r.includes('EXCEED') || (Number(r) >= 15)) { bg = 'FEF2F2'; color = 'DC2626'; }
+  return new TableCell({ width: { size: w, type: WidthType.DXA }, margins: CM, borders: bdr,
+    shading: { fill: bg, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [
+      new TextRun({ text: rating || '\u2014', bold: true, font: 'Arial', size: SM, color })] })] });
+}
+function priorityColor(p: string): string {
+  const lc = (p || '').toLowerCase();
+  if (lc.includes('immediate')) return 'DC2626';
+  if (lc.includes('short')) return 'D97706';
+  return '6B7280';
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T1 — SITE PRACTICAL (#4D7C0F, 3 sections)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT1(d: WbvData): Document {
+  const p = PAL['site-practical'];
   const children: (Paragraph | Table)[] = [];
+  children.push(h.coverBlock(['WHOLE BODY VIBRATION', 'ASSESSMENT'], `Site Practical \u2014 ${d.equipmentSummary || d.projectName}`, p.accent, p.subtitleColor));
+  children.push(gap(300)); children.push(h.projectNameBar(d.projectName, p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Reference', value: d.documentRef }, { label: 'Date', value: d.assessmentDate },
+    { label: 'Assessed By', value: d.assessor },
+    { label: 'Operators', value: d.operatorsSummary || d.operatives.map(o => o.name).join(', ') },
+    { label: 'Equipment', value: d.equipmentSummary || d.equipmentAssessments.map(e => e.makeModel).join(', ') },
+  ], p.accent, W));
+  children.push(gap(200)); children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
 
-  const cover = buildCover(templateSlug, p, d);
-  if (cover.length > 0) { children.push(...cover); }
+  // 01 EQUIPMENT & EXPOSURE SUMMARY
+  children.push(h.fullWidthSectionBar('01', 'EQUIPMENT & EXPOSURE SUMMARY', p.accent)); children.push(gap(80));
+  const ecw = [Math.round(W*0.20), Math.round(W*0.12), Math.round(W*0.10), Math.round(W*0.10), Math.round(W*0.12), Math.round(W*0.12)];
+  ecw.push(W - ecw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: ecw,
+    rows: [
+      new TableRow({ children: [hdrCell('Equipment',ecw[0],p.accent), hdrCell('Vibration',ecw[1],p.accent), hdrCell('Daily Use',ecw[2],p.accent), hdrCell('A(8)',ecw[3],p.accent), hdrCell('vs EAV',ecw[4],p.accent), hdrCell('vs ELV',ecw[5],p.accent), hdrCell('Action',ecw[6],p.accent)] }),
+      ...d.equipmentAssessments.map((eq,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(eq.machineType || eq.makeModel, ecw[0], p.dark, { shade, bold: true }),
+          dCell(`${eq.vibrationMagnitude} m/s\u00B2`, ecw[1], p.dark, { shade }),
+          dCell(`${eq.dailyExposure} hrs`, ecw[2], p.dark, { shade }),
+          dCell(eq.a8Result.toFixed(2), ecw[3], p.dark, { shade, bold: true }),
+          ragCell(eq.vsEav, ecw[4]), ragCell(eq.vsElv, ecw[5]),
+          dCell(eq.action, ecw[6], p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(80));
+  children.push(h.calloutBox('EAV (0.5 m/s\u00B2): Exposure Action Value \u2014 employer must take action to reduce exposure. ELV (1.15 m/s\u00B2): Exposure Limit Value \u2014 must not be exceeded.', 'D97706', 'FFFBEB', '92400E', W));
+  children.push(gap(200));
 
-  // Assessment details
-  children.push(sectionHead(templateSlug, p, ++sec, 'Assessment Details'));
-  children.push(buildInfoTable(p, [
-    ['Document Reference', d.documentRef || ''], ['Assessment Date', d.assessmentDate || ''],
-    ['Review Date', d.reviewDate || ''], ['Assessor', d.assessor || ''],
-    ['Project Name', d.projectName || ''], ['Site Address', d.siteAddress || ''],
-    ['Client', d.client || ''], ['Principal Contractor', d.principalContractor || ''],
-  ]));
-  children.push(gap());
+  // 02 CONTROLS
+  children.push(h.fullWidthSectionBar('02', 'CONTROLS', p.accent)); children.push(gap(80));
+  d.controls.forEach(ctrl => {
+    children.push(new Paragraph({ spacing: { after: 60 }, indent: { left: 280 }, children: [
+      new TextRun({ text: '\u2022  ', font: 'Arial', size: BODY, color: p.accent }),
+      new TextRun({ text: ctrl, font: 'Arial', size: BODY, color: p.dark }),
+    ] }));
+  }); children.push(gap(200));
 
-  // Regulatory context
-  if (show(templateSlug, 'regulatory') && d.regulatoryContext) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Regulatory Context'));
-    for (const para of (d.regulatoryContext as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-
-  // Scope
-  if (show(templateSlug, 'narrative') && d.assessmentScope) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Assessment Scope'));
-    for (const para of (d.assessmentScope as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-
-  // Operatives
-  if (show(templateSlug, 'operatives') && d.operatives?.length) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Operatives Assessed'));
-    const opW1 = Math.floor(W * 0.30); const opW2 = Math.floor(W * 0.40); const opW3 = W - opW1 - opW2;
-    children.push(buildDataTable(p, [['Name', opW1], ['Role', opW2], ['Experience (yrs)', opW3]], d.operatives.map((op: any) => [op.name || '', op.role || '', String(op.experienceYears ?? '')])));
-    children.push(gap());
-  }
-
-  // Equipment assessments — the core table
-  children.push(sectionHead(templateSlug, p, ++sec, 'Equipment Vibration Assessment'));
-  const eqs = d.equipmentAssessments || [];
-  if (eqs.length > 0) {
-    const w1 = Math.floor(W * 0.14); const w2 = Math.floor(W * 0.16); const w3 = Math.floor(W * 0.10);
-    const w4 = Math.floor(W * 0.10); const w5 = Math.floor(W * 0.10); const w6 = Math.floor(W * 0.10);
-    const w7 = Math.floor(W * 0.08); const w8 = Math.floor(W * 0.08); const w9 = W - w1 - w2 - w3 - w4 - w5 - w6 - w7 - w8;
-    children.push(buildDataTable(p,
-      [['Machine', w1], ['Make/Model', w2], ['Seat', w3], ['Mag (m/s²)', w4], ['Hrs/Day', w5], ['A(8)', w6], ['EAV?', w7], ['ELV?', w8], ['Risk', w9]],
-      eqs.map((eq: any) => [eq.machineType || '', eq.makeModel || '', eq.seatType || '', String(eq.vibrationMagnitude ?? ''), String(eq.dailyExposureHours ?? ''), String(eq.a8Calculation ?? ''), eq.eavExceeded ? 'YES' : 'No', eq.elvExceeded ? 'YES' : 'No', eq.riskRating || '']),
-    ));
-  }
-  children.push(gap());
-
-  // Exposure summary
-  if (d.exposureSummary) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Exposure Summary'));
-    children.push(buildInfoTable(p, [['Exposure Action Value (EAV)', '0.5 m/s² A(8)'], ['Exposure Limit Value (ELV)', '1.15 m/s² A(8)']]));
-    children.push(gap(80));
-    for (const para of (d.exposureSummary as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-
-  // Control measures
-  children.push(sectionHead(templateSlug, p, ++sec, 'Control Measures'));
-  if (d.controlMeasures?.length) {
-    const cmW1 = Math.floor(W * 0.08); const cmW2 = Math.floor(W * 0.50); const cmW3 = Math.floor(W * 0.22); const cmW4 = W - cmW1 - cmW2 - cmW3;
-    children.push(buildDataTable(p, [['Ref', cmW1], ['Measure', cmW2], ['Responsibility', cmW3], ['Target', cmW4]], d.controlMeasures.map((cm: any) => [cm.ref || '', cm.measure || '', cm.responsibility || '', cm.targetDate || ''])));
-  }
-  if (d.controlNarrative) { children.push(gap(80)); for (const para of (d.controlNarrative as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para)); }
-  children.push(gap());
-
-  // Health surveillance
-  if (show(templateSlug, 'health-surv') && d.healthSurveillance) {
-    children.push(new Paragraph({ children: [new PageBreak()] }));
-    children.push(sectionHead(templateSlug, p, ++sec, 'Health Surveillance'));
-    for (const para of (d.healthSurveillance as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-
-  // Action plan
-  if (show(templateSlug, 'action-plan') && d.actionPlan?.length) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Action Plan'));
-    const apW1 = Math.floor(W * 0.40); const apW2 = Math.floor(W * 0.12); const apW3 = Math.floor(W * 0.24); const apW4 = W - apW1 - apW2 - apW3;
-    children.push(buildDataTable(p, [['Action', apW1], ['Priority', apW2], ['Responsible', apW3], ['Target', apW4]], d.actionPlan.map((a: any) => [a.action || '', a.priority || '', a.responsible || '', a.targetDate || ''])));
-    children.push(gap());
-  }
-
-  // Monitoring
-  if (show(templateSlug, 'monitoring') && d.monitoringArrangements) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Monitoring Arrangements'));
-    for (const para of (d.monitoringArrangements as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-
-  // End
-  children.push(gap(300));
-  children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '— End of Assessment —', italics: true, font: p.font, size: p.bodySize, color: p.mid })] }));
-  children.push(gap(80));
+  // 03 OPERATIVE ACKNOWLEDGEMENT
+  children.push(h.fullWidthSectionBar('03', 'OPERATIVE ACKNOWLEDGEMENT', p.accent)); children.push(gap(80));
+  const ocw = [Math.round(W*0.22), Math.round(W*0.20), Math.round(W*0.15), Math.round(W*0.13)];
+  ocw.push(W - ocw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: ocw,
+    rows: [
+      new TableRow({ children: [hdrCell('Name',ocw[0],p.accent), hdrCell('Equipment',ocw[1],p.accent), hdrCell('Max Daily Hrs',ocw[2],p.accent), hdrCell('Briefed',ocw[3],p.accent), hdrCell('Signature',ocw[4],p.accent)] }),
+      ...d.operatives.map((op,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(op.name, ocw[0], p.dark, { shade, bold: true }),
+          dCell(op.equipment, ocw[1], p.dark, { shade }),
+          dCell(op.maxHours, ocw[2], p.dark, { shade }),
+          dCell(op.briefed, ocw[3], '059669', { shade }),
+          dCell('', ocw[4], p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(80));
+  if (d.reviewSchedule) children.push(h.calloutBox(`Review Date: ${d.reviewSchedule}`, '2563EB', 'EFF6FF', '1E40AF', W));
+  children.push(gap(200)); children.push(...h.endMark(p.accent));
 
   return new Document({
-    styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } },
-    sections: [{ properties: { page: { size: { width: h.A4_WIDTH, height: h.A4_HEIGHT }, margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL } } }, headers: { default: makeHeader(p, d) }, footers: { default: makeFooter(p) }, children }],
+    styles: { default: { document: { run: { font: 'Arial', size: BODY, color: p.dark } } } },
+    sections: [{ properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('Whole Body Vibration Assessment', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Site Practical', p.accent) }, children }],
   });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T2 — COMPLIANCE (#1E3A5F navy, 5 sections, regulatory)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT2(d: WbvData): Document {
+  const p = PAL['compliance'];
+  const children: (Paragraph | Table)[] = [];
+  children.push(h.coverBlock(['WHOLE BODY VIBRATION', 'COMPLIANCE ASSESSMENT'], 'Control of Vibration at Work Regulations 2005 \u2014 Formal Compliance', p.accent, p.subtitleColor));
+  children.push(gap(300)); children.push(h.projectNameBar(d.projectName, p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Reference', value: d.documentRef }, { label: 'Date / Rev', value: d.assessmentDate },
+    { label: 'Assessed By', value: d.assessor }, { label: 'Reviewed By', value: d.reviewedBy },
+    { label: 'Regulation', value: 'Control of Vibration at Work Regulations 2005 (SI 2005/1093)' },
+    { label: 'Guidance', value: 'HSE L140; HSE Whole body vibration guidance' },
+  ], p.accent, W));
+  children.push(gap(200)); children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 01 REGULATORY THRESHOLDS
+  children.push(h.fullWidthSectionBar('01', 'REGULATORY THRESHOLDS', p.accent)); children.push(gap(80));
+  const tcw = [Math.round(W*0.25), Math.round(W*0.15)]; tcw.push(W-tcw[0]-tcw[1]);
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: tcw,
+    rows: [
+      new TableRow({ children: [hdrCell('Threshold',tcw[0],p.accent), hdrCell('Value',tcw[1],p.accent), hdrCell('Legal Requirement',tcw[2],p.accent)] }),
+      new TableRow({ children: [
+        dCell('Exposure Action Value (EAV)', tcw[0], p.dark, { bold: true }),
+        dCell('0.5 m/s\u00B2 A(8)', tcw[1], p.dark, { bold: true, color: 'D97706' }),
+        dCell('Regulation 6(1)(a) \u2014 employer must introduce measures to reduce exposure. Regulation 7 \u2014 health surveillance required.', tcw[2], p.dark),
+      ] }),
+      new TableRow({ children: [
+        dCell('Exposure Limit Value (ELV)', tcw[0], p.dark, { bold: true, shade: ZEBRA }),
+        dCell('1.15 m/s\u00B2 A(8)', tcw[1], p.dark, { bold: true, color: '991B1B', shade: ZEBRA }),
+        dCell('Regulation 6(1)(b) \u2014 exposure must NOT be exceeded. Regulation 8 \u2014 record and investigate.', tcw[2], p.dark, { shade: ZEBRA }),
+      ] }),
+    ],
+  })); children.push(gap(200));
+
+  // 02 EXPOSURE ASSESSMENT
+  children.push(h.fullWidthSectionBar('02', 'EXPOSURE ASSESSMENT (Regulation 5)', p.accent)); children.push(gap(80));
+  children.push(new Paragraph({ spacing: { after: 120 }, children: [
+    new TextRun({ text: '2.1 ', bold: true, font: 'Arial', size: BODY, color: p.accent }),
+    new TextRun({ text: 'Daily vibration exposure A(8) is calculated using the formula: A(8) = a\u2095\u1D65 \u00D7 \u221A(T/8), where a\u2095\u1D65 is the vibration magnitude (m/s\u00B2) and T is the daily exposure duration (hours).', font: 'Arial', size: BODY, color: p.dark }),
+  ] }));
+  const excw = [Math.round(W*0.20), Math.round(W*0.10), Math.round(W*0.10), Math.round(W*0.10), Math.round(W*0.12), Math.round(W*0.12)];
+  excw.push(W - excw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: excw,
+    rows: [
+      new TableRow({ children: [hdrCell('Equipment',excw[0],p.accent), hdrCell('a\u2095\u1D65',excw[1],p.accent), hdrCell('T (hrs)',excw[2],p.accent), hdrCell('A(8)',excw[3],p.accent), hdrCell('vs EAV',excw[4],p.accent), hdrCell('vs ELV',excw[5],p.accent), hdrCell('Source',excw[6],p.accent)] }),
+      ...d.equipmentAssessments.map((eq,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(eq.makeModel || eq.machineType, excw[0], p.dark, { shade, bold: true }),
+          dCell(`${eq.vibrationMagnitude}`, excw[1], p.dark, { shade }),
+          dCell(`${eq.dailyExposure}`, excw[2], p.dark, { shade }),
+          dCell(eq.a8Result.toFixed(2), excw[3], p.dark, { shade, bold: true }),
+          ragCell(eq.vsEav, excw[4]), ragCell(eq.vsElv, excw[5]),
+          dCell(eq.source, excw[6], p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(80));
+  children.push(h.calloutBox('Regulation 6 Triggered: Equipment at or above the EAV. Employer must take action under Regulation 6(1)(a) to reduce exposure so far as reasonably practicable.', 'D97706', 'FFFBEB', '92400E', W));
+  children.push(gap(200));
+
+  // 03 RISK ASSESSMENT MATRIX
+  children.push(h.fullWidthSectionBar('03', 'RISK ASSESSMENT MATRIX', p.accent)); children.push(gap(80));
+  const rcw = [Math.round(W*0.20), Math.round(W*0.08), Math.round(W*0.08), Math.round(W*0.08), Math.round(W*0.38)];
+  rcw.push(W - rcw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: rcw,
+    rows: [
+      new TableRow({ children: [hdrCell('Hazard',rcw[0],p.accent), hdrCell('L',rcw[1],p.accent), hdrCell('S',rcw[2],p.accent), hdrCell('Risk',rcw[3],p.accent), hdrCell('Control (Reg. Ref.)',rcw[4],p.accent), hdrCell('Residual',rcw[5],p.accent)] }),
+      ...d.hazards.map((hz,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(hz.hazard, rcw[0], p.dark, { shade, bold: true }),
+          dCell(String(hz.likelihood), rcw[1], p.dark, { shade }),
+          dCell(String(hz.severity), rcw[2], p.dark, { shade }),
+          ragCell(String(hz.risk || hz.likelihood * hz.severity), rcw[3]),
+          dCell(hz.control, rcw[4], p.dark, { shade }),
+          ragCell(hz.residual, rcw[5]),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 04 CONTROL MEASURES
+  children.push(h.fullWidthSectionBar('04', 'CONTROL MEASURES (Regulation 6(2))', p.accent)); children.push(gap(80));
+  const ccw = [Math.round(W*0.08), Math.round(W*0.20), Math.round(W*0.38), Math.round(W*0.16)];
+  ccw.push(W - ccw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: ccw,
+    rows: [
+      new TableRow({ children: [hdrCell('Ref',ccw[0],p.accent), hdrCell('Regulation',ccw[1],p.accent), hdrCell('Control Measure',ccw[2],p.accent), hdrCell('Owner',ccw[3],p.accent), hdrCell('Frequency',ccw[4],p.accent)] }),
+      ...d.controlMeasures.map((cm,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(cm.ref, ccw[0], p.dark, { shade }), dCell(cm.regulation, ccw[1], p.dark, { shade }),
+          dCell(cm.measure, ccw[2], p.dark, { shade }), dCell(cm.owner, ccw[3], p.dark, { shade }),
+          dCell(cm.frequency, ccw[4], p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 05 HEALTH SURVEILLANCE
+  children.push(h.fullWidthSectionBar('05', 'HEALTH SURVEILLANCE (Regulation 7)', p.accent)); children.push(gap(80));
+  if (d.healthSurveillanceNarrative) {
+    children.push(new Paragraph({ spacing: { after: 120 }, children: [
+      new TextRun({ text: '5.1 ', bold: true, font: 'Arial', size: BODY, color: p.accent }),
+      new TextRun({ text: d.healthSurveillanceNarrative, font: 'Arial', size: BODY, color: p.dark }),
+    ] }));
+  }
+  children.push(gap(200));
+
+  children.push(h.signatureGrid(['Assessed By', 'Reviewed By'], p.accent, W));
+  children.push(gap(200)); children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY, color: p.dark } } } },
+    sections: [{ properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('WBV Compliance Assessment', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Compliance', p.accent) }, children }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T3 — PROFESSIONAL (#0F766E teal, 4 sections, A(8) calcs, KPI, action plan)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT3(d: WbvData): Document {
+  const p = PAL['professional'];
+  const children: (Paragraph | Table)[] = [];
+  children.push(h.coverBlock(['WHOLE BODY VIBRATION', 'PROFESSIONAL', 'ASSESSMENT'], 'Full A(8) Calculations \u00B7 Health Surveillance \u00B7 Action Plan', p.accent, p.subtitleColor));
+  children.push(gap(300)); children.push(h.projectNameBar(d.projectName, p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Reference', value: d.documentRef }, { label: 'Date / Rev', value: d.assessmentDate },
+    { label: 'Project', value: d.projectName }, { label: 'Contract', value: d.contractReference },
+    { label: 'Assessed By', value: d.assessor }, { label: 'Reviewed By', value: d.reviewedBy },
+    { label: 'Operators Assessed', value: d.operatorsSummary || String(d.operatives.length) },
+    { label: 'Overall Status', value: d.overallStatus || 'EAV REACHED \u2014 CONTROLS REQUIRED' },
+  ], p.accent, W));
+  children.push(gap(200)); children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 01 EQUIPMENT REGISTER
+  children.push(h.fullWidthSectionBar('01', 'EQUIPMENT REGISTER', p.accent)); children.push(gap(80));
+  const ercw = [Math.round(W*0.18), Math.round(W*0.12), Math.round(W*0.08), Math.round(W*0.10), Math.round(W*0.12), Math.round(W*0.14)];
+  ercw.push(W - ercw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: ercw,
+    rows: [
+      new TableRow({ children: [hdrCell('Equipment',ercw[0],p.accent), hdrCell('Model',ercw[1],p.accent), hdrCell('Year',ercw[2],p.accent), hdrCell('WBV (m/s\u00B2)',ercw[3],p.accent), hdrCell('Source',ercw[4],p.accent), hdrCell('Seat Type',ercw[5],p.accent), hdrCell('Condition',ercw[6],p.accent)] }),
+      ...d.equipmentAssessments.map((eq,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(eq.machineType, ercw[0], p.dark, { shade, bold: true }),
+          dCell(eq.makeModel, ercw[1], p.dark, { shade }),
+          dCell(eq.age, ercw[2], p.dark, { shade }),
+          dCell(String(eq.vibrationMagnitude), ercw[3], p.dark, { shade }),
+          dCell(eq.source, ercw[4], p.dark, { shade }),
+          dCell(eq.seatType, ercw[5], p.dark, { shade }),
+          dCell(eq.seatCondition, ercw[6], p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 02 A(8) EXPOSURE CALCULATIONS
+  children.push(h.fullWidthSectionBar('02', 'A(8) EXPOSURE CALCULATIONS', p.accent)); children.push(gap(80));
+  children.push(new Paragraph({ spacing: { after: 120 }, children: [
+    new TextRun({ text: 'Formula: ', bold: true, font: 'Arial', size: BODY, color: p.dark }),
+    new TextRun({ text: 'A(8) = a\u2095\u1D65 \u00D7 \u221A(T/T\u2080), where a\u2095\u1D65 = vibration magnitude (m/s\u00B2), T = daily exposure (hrs), T\u2080 = 8 hrs reference.', font: 'Arial', size: BODY, color: p.dark }),
+  ] }));
+  const a8cw = [Math.round(W*0.20), Math.round(W*0.16), Math.round(W*0.08), Math.round(W*0.08), Math.round(W*0.10), Math.round(W*0.10)];
+  a8cw.push(W - a8cw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: a8cw,
+    rows: [
+      new TableRow({ children: [hdrCell('Operator',a8cw[0],p.accent), hdrCell('Equipment',a8cw[1],p.accent), hdrCell('a\u2095\u1D65',a8cw[2],p.accent), hdrCell('T (hrs)',a8cw[3],p.accent), hdrCell('\u221A(T/8)',a8cw[4],p.accent), hdrCell('A(8)',a8cw[5],p.accent), hdrCell('Status',a8cw[6],p.accent)] }),
+      ...d.operatives.map((op,i) => {
+        const eq = d.equipmentAssessments.find(e => e.makeModel === op.equipment || e.machineType === op.equipment) || d.equipmentAssessments[i] || { vibrationMagnitude: 0, dailyExposure: 0, a8Result: 0, vsEav: '' };
+        const sqrtT8 = eq.dailyExposure > 0 ? Math.sqrt(eq.dailyExposure / 8) : 0;
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(op.name, a8cw[0], p.dark, { shade, bold: true }),
+          dCell(op.equipment, a8cw[1], p.dark, { shade }),
+          dCell(String(eq.vibrationMagnitude), a8cw[2], p.dark, { shade }),
+          dCell(String(eq.dailyExposure), a8cw[3], p.dark, { shade }),
+          dCell(sqrtT8.toFixed(3), a8cw[4], p.dark, { shade }),
+          dCell(eq.a8Result.toFixed(2), a8cw[5], p.dark, { shade, bold: true }),
+          ragCell(eq.vsEav, a8cw[6]),
+        ] });
+      }),
+    ],
+  })); children.push(gap(80));
+
+  // KPI Dashboard
+  const maxA8 = d.equipmentAssessments.reduce((max, eq) => Math.max(max, eq.a8Result), 0);
+  children.push(h.kpiDashboard([
+    { value: maxA8.toFixed(2), label: 'Highest A(8)' },
+    { value: '0.50', label: 'EAV Threshold' },
+    { value: '1.15', label: 'ELV Limit' },
+  ], p.accent, W));
+  children.push(gap(200));
+
+  // 03 HEALTH SURVEILLANCE PROGRAMME
+  children.push(h.fullWidthSectionBar('03', 'HEALTH SURVEILLANCE PROGRAMME', p.accent)); children.push(gap(80));
+  const hscw = [Math.round(W*0.22), Math.round(W*0.15), Math.round(W*0.16), Math.round(W*0.16)];
+  hscw.push(W - hscw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: hscw,
+    rows: [
+      new TableRow({ children: [hdrCell('Operator',hscw[0],p.accent), hdrCell('Status',hscw[1],p.accent), hdrCell('Last Assessment',hscw[2],p.accent), hdrCell('Next Due',hscw[3],p.accent), hdrCell('Notes',hscw[4],p.accent)] }),
+      ...d.healthSurveillance.map((hs,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(hs.operator, hscw[0], p.dark, { shade, bold: true }),
+          dCell(hs.status, hscw[1], p.dark, { shade }),
+          dCell(hs.lastAssessment, hscw[2], p.dark, { shade }),
+          dCell(hs.nextDue, hscw[3], p.dark, { shade }),
+          dCell(hs.notes, hscw[4], p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(200));
+
+  // 04 ACTION PLAN
+  children.push(h.fullWidthSectionBar('04', 'ACTION PLAN', p.accent)); children.push(gap(80));
+  const apcw = [Math.round(W*0.05), Math.round(W*0.33), Math.round(W*0.12), Math.round(W*0.12), Math.round(W*0.13)];
+  apcw.push(W - apcw.reduce((a,b)=>a+b,0));
+  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: apcw,
+    rows: [
+      new TableRow({ children: [hdrCell('#',apcw[0],p.accent), hdrCell('Action',apcw[1],p.accent), hdrCell('Owner',apcw[2],p.accent), hdrCell('Priority',apcw[3],p.accent), hdrCell('Target',apcw[4],p.accent), hdrCell('Expected Benefit',apcw[5],p.accent)] }),
+      ...d.actionPlan.map((ap,i) => {
+        const shade = i%2===0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: [
+          dCell(ap.num, apcw[0], p.dark, { shade }),
+          dCell(ap.action, apcw[1], p.dark, { shade }),
+          dCell(ap.owner, apcw[2], p.dark, { shade }),
+          dCell(ap.priority, apcw[3], p.dark, { shade, bold: true, color: priorityColor(ap.priority) }),
+          dCell(ap.target, apcw[4], p.dark, { shade }),
+          dCell(ap.benefit, apcw[5], p.dark, { shade }),
+        ] });
+      }),
+    ],
+  })); children.push(gap(80));
+  if (d.reviewSchedule) children.push(h.calloutBox(`Review Schedule: ${d.reviewSchedule}`, '2563EB', 'EFF6FF', '1E40AF', W));
+  children.push(gap(200));
+
+  children.push(h.signatureGrid(['Assessed By', 'H&S Manager'], p.accent, W));
+  children.push(gap(200)); children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY, color: p.dark } } } },
+    sections: [{ properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('WBV Professional Assessment', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Professional', p.accent) }, children }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ROUTER
+// ═════════════════════════════════════════════════════════════════════════════
+export async function buildWbvTemplateDocument(
+  content: any,
+  templateSlug: WbvTemplateSlug,
+): Promise<Document> {
+  const d = extract(content);
+  switch (templateSlug) {
+    case 'site-practical': return buildT1(d);
+    case 'compliance':     return buildT2(d);
+    case 'professional':   return buildT3(d);
+    default:               return buildT1(d);
+  }
 }

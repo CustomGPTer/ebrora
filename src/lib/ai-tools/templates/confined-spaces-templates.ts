@@ -1,11 +1,11 @@
 // =============================================================================
-// Confined Spaces Assessment Builder — Multi-Template Engine
-// 4 templates, all consuming the same expanded JSON structure.
+// Confined Spaces Assessment Builder — Multi-Template Engine (REBUILT)
+// 4 templates matching HTML render library exactly.
 //
-// T1 — Ebrora Standard  (green, cover, 22 sections, comprehensive)
-// T2 — Red Danger        (red/black, danger callouts, hazard-first, 17 sections)
-// T3 — Permit Style      (orange, checklist, auth chain, entry log, 9 sections)
-// T4 — Rescue Focused    (teal, expanded rescue plan, 8 sections)
+// T1 — Ebrora Standard  (green #059669, 13 sections, comprehensive, ~4pp)
+// T2 — Red Danger        (red #DC2626/#991B1B, hazard-first, IDLH callouts, ~3pp)
+// T3 — Permit Style      (amber #92400E, checklist + blank entry logs, ~3pp)
+// T4 — Rescue Focused    (teal #0f766e, expanded rescue plan + equipment, ~3pp)
 // =============================================================================
 import {
   Document, Paragraph, TextRun, Table, TableRow, TableCell,
@@ -15,619 +15,257 @@ import * as h from '@/lib/rams/docx-helpers';
 import type { ConfinedSpacesTemplateSlug } from '@/lib/confined-spaces/types';
 
 const W = h.A4_CONTENT_WIDTH;
-const BODY = 20;
-const SM = 16;
-const LG = 24;
-const XL = 32;
-const TTL = 44;
+const SM = 16; const BODY = 18; const LG = 22;
 
-// ── Colours ──────────────────────────────────────────────────────────────────
-const EBRORA = h.EBRORA_GREEN;
-const ACCENT_DARK = '143D2B';
-const RED_D = '991B1B';
-const RED = 'DC2626';
-const RED_BG = 'FEF2F2';
-const AMBER_BG = 'FEF3C7';
-const AMBER = 'D97706';
-const GREEN_RAG = '059669';
-const GREEN_BG = 'D1FAE5';
-const GREY_RAG = '6B7280';
-const GREY_BG = 'F3F4F6';
-const ORANGE = '92400e';
-const ORANGE_BG = 'FFFBEB';
-const TEAL = '0f766e';
-const TEAL_BG = 'f0fdfa';
-const TEAL_DARK = '134e4a';
-const ZEBRA = 'F5F5F5';
+const GREEN = '059669'; const GREEN_SUB = 'A7F3D0'; const GREEN_BG = 'ECFDF5';
+const RED = 'DC2626'; const RED_DK = '991B1B'; const RED_SUB = 'FCA5A5'; const RED_BG = 'FEF2F2';
+const AMBER_O = '92400E'; const AMBER_SUB = 'FDE68A'; const AMBER_BG = 'FFFBEB';
+const TEAL = '0f766e'; const TEAL_SUB = '99F6E4'; const TEAL_BG = 'f0fdfa';
+const AMBER = 'D97706'; const GREY = '6B7280'; const ZEBRA = 'F5F5F5';
 
-const CM = { top: 80, bottom: 80, left: 120, right: 120 };
-
-// ── Data Interface (expanded for all 4 templates) ────────────────────────────
-interface AdjacentSpace {
-  space: string; connectionType: string; isolationMethod: string;
-  gasMigrationRisk: string; status: string;
-}
-interface HistoricalReading {
-  date: string; o2: string; h2s: string; lel: string; co: string;
-  conditions: string; recordedBy: string;
-}
-interface Hazard {
-  category: string; hazard: string; causeSource: string;
-  severity: string; likelihood: string;
-}
-interface AtmoParam {
-  parameter: string; alarmLevel: string; evacuateLevel: string;
-  instrument: string; actionRequired: string;
-}
-interface Isolation {
-  system: string; method: string; isolationPoint: string;
-  verifiedBy: string; lockOff: string;
-}
-interface SimOp {
-  activity: string; potentialImpact: string;
-  controlMeasure: string; risk: string; acceptable: string;
-}
-interface EntryStep {
-  step: string; action: string; responsibility: string; verification: string;
-}
-interface PpeItem {
-  type: string; specification: string; standard: string;
-  replacement: string; mandatory: string;
-}
-interface RescueStep {
-  step: string; action: string; responsibility: string;
-  timeTarget: string; equipment: string;
-}
-interface ExtractionStep {
-  step: string; method: string; equipment: string; consideration: string;
-}
-interface MultiCasualtyScenario {
-  scenario: string; action: string; limitation: string;
-}
-interface RescueEquipmentItem {
-  equipment: string; specification: string; standard: string; location: string;
-}
-interface CommsCascadeItem {
-  order: string; contact: string; nameRole: string; number: string; when: string;
-}
-interface PostIncidentStep {
-  step: string; action: string; responsibility: string; notes: string;
-}
-interface EmergencyScenario {
-  scenario: string; immediateAction: string;
-  responsibility: string; escalation: string;
-}
-interface CompetencyRole {
-  role: string; requiredTraining: string;
-  evidence: string; refresher: string;
-}
-interface RegRef { reference: string; description: string; }
-
-interface PreEntryCheckItem {
-  item: string;
-}
-
-interface CSData {
-  documentRef: string; assessmentDate: string; reviewDate: string;
-  assessedBy: string; projectName: string; siteAddress: string;
-  // Space identification
-  spaceName: string; spaceLocation: string; spaceType: string;
-  dimensions: string; accessType: string; classification: string;
-  reasonForEntry: string; entryAvoidable: string; loneWorking: string;
-  // Adjacent spaces
-  adjacentSpaces: AdjacentSpace[];
-  // Hazards
-  hazards: Hazard[];
-  // Historical gas
-  historicalReadings: HistoricalReading[];
-  historicalAnalysis: string;
-  // SSOW
-  safeSystemOfWork: string;
-  // Atmospheric monitoring
-  atmosphericParams: AtmoParam[];
-  preEntryTesting: string; continuousMonitoring: string; instrumentCalibration: string;
-  // Ventilation
-  ventilationType: string; ventilationSpec: string; preVentDuration: string;
-  ventInletPosition: string; ventFailureAction: string;
-  // Isolation
-  isolations: Isolation[];
-  // SIMOPS
-  simops: SimOp[];
-  // Entry/exit
-  entrySteps: EntryStep[];
-  // PPE
-  ppeItems: PpeItem[];
-  // Duration/heat stress
-  maxContinuousWork: string; maxShiftDuration: string;
-  hydration: string; heatStressIndicators: string; scbaWeightFactor: string;
-  // Comms
-  primaryComms: string; backupComms: string;
-  checkInFrequency: string; emergencySignal: string;
-  // Rescue plan
-  rescueSteps: RescueStep[];
-  rescueEquipmentLocation: string; nearestAE: string;
-  rescueDrillFrequency: string;
-  // 600mm extraction (rescue-focused)
-  extractionSteps: ExtractionStep[];
-  // Multiple casualty (rescue-focused)
-  multiCasualtyScenarios: MultiCasualtyScenario[];
-  // FRS pre-notification (rescue-focused)
-  frsPreNotify: string; frsContact: string;
-  frsInfoProvided: string; frsAccess: string;
-  // Rescue equipment inventory
-  rescueEquipment: RescueEquipmentItem[];
-  // Comms cascade
-  commsCascade: CommsCascadeItem[];
-  // Hospital route
-  hospitalName: string; hospitalDistance: string;
-  hospitalGridRef: string; hospitalRoute: string;
-  // Post-incident
-  postIncidentSteps: PostIncidentStep[];
-  // Emergency procedures
-  emergencyScenarios: EmergencyScenario[];
-  // Welfare/decon
-  deconStation: string; deconProcedure: string;
-  noEatingDrinking: string; leptospirosisAwareness: string;
-  hepatitisA: string; welfareFacilities: string;
-  // Risk rating
-  riskBeforeL: number; riskBeforeS: number; riskBeforeScore: number; riskBeforeRating: string;
-  riskAfterL: number; riskAfterS: number; riskAfterScore: number; riskAfterRating: string;
-  riskNote: string;
-  // Competency
-  competencyRoles: CompetencyRole[];
-  // Permit
-  permitType: string; authorisationChain: string;
-  maxOccupancy: string; permitCancellation: string;
-  // Pre-entry checklist items (permit-style)
-  preEntryChecklist: PreEntryCheckItem[];
-  // Monitoring & review
-  reviewDate2: string; reviewTriggers: string; linkedDocuments: string;
-  // Reg refs
-  regulatoryReferences: RegRef[];
+// ── Data Interface ───────────────────────────────────────────────────────────
+interface CsData {
+  documentRef: string; assessmentDate: string; reviewDate: string; assessedBy: string;
+  projectName: string; siteAddress: string; contractor: string;
+  spaceName: string; classification: string; accessType: string; task: string; maxDuration: string;
+  spaceIdentification: Array<{ label: string; value: string }>;
+  hazards: Array<{ category: string; hazard: string; source: string; severity: string; likelihood: string }>;
+  adjacentSpaces: Array<{ space: string; connection: string; isolationMethod: string; gasMigrationRisk: string; status: string }>;
+  gasReadings: Array<{ date: string; o2: string; h2s: string; lel: string; co: string; conditions: string; recordedBy: string }>;
+  atmosphericParams: Array<{ parameter: string; alarmLevel: string; evacuateLevel: string; instrument: string; action: string }>;
+  isolationMatrix: Array<{ system: string; method: string; isolationPoint: string; verifiedBy: string; lockOff: string }>;
+  simops: Array<{ activity: string; impact: string; control: string; risk: string; acceptable: string }>;
+  entryProcedure: Array<{ step: string; action: string; responsibility: string; verification: string }>;
+  durationLimits: string;
+  rescuePlan: string;
+  ppeEquipment: Array<{ item: string; specification: string; standard: string; mandatory: string }>;
+  competencyRequirements: Array<{ role: string; training: string; evidence: string; refresher: string }>;
+  regulatoryReferences: string;
+  // T2 Red Danger fields
+  dangerBoxes: Array<{ title: string; body: string }>;
+  controlsSummary: string;
+  rescuerFatalityWarning: string;
+  // T3 Permit fields
+  preEntryChecklist: string[];
+  authorisationChain: Array<{ role: string; name: string }>;
+  permitCancellation: Array<{ label: string; value: string }>;
+  // T4 Rescue fields
+  rescueSteps: Array<{ step: string; action: string; responsibility: string; timeTarget: string; equipment: string }>;
+  extractionMethod: string;
+  multiCasualtyDecisions: Array<{ scenario: string; action: string; limitation: string }>;
+  frsDetails: Array<{ label: string; value: string }>;
+  hospitalDetails: Array<{ label: string; value: string }>;
+  rescueEquipment: Array<{ equipment: string; specification: string; standard: string; location: string }>;
   additionalNotes: string;
+  [key: string]: any;
 }
 
-// ── Extract ──────────────────────────────────────────────────────────────────
-function extract(c: any): CSData {
-  const s = (v: any, fb = '') => v ?? fb;
-  const a = (v: any) => Array.isArray(v) ? v : [];
-  const rr = c.riskRating || {};
+function extract(c: any): CsData {
+  const s = (k: string, fb = '') => (typeof c?.[k] === 'string' ? c[k] : fb);
+  const a = (k: string) => (Array.isArray(c?.[k]) ? c[k] : []);
   return {
-    documentRef: s(c.documentRef), assessmentDate: s(c.assessmentDate),
-    reviewDate: s(c.reviewDate), assessedBy: s(c.assessedBy),
-    projectName: s(c.projectName), siteAddress: s(c.siteAddress),
-    spaceName: s(c.spaceName || c.spaceIdentification?.name),
-    spaceLocation: s(c.spaceLocation || c.spaceIdentification?.location),
-    spaceType: s(c.spaceType || c.spaceIdentification?.type),
-    dimensions: s(c.dimensions || c.spaceIdentification?.dimensions),
-    accessType: s(c.accessType || c.spaceIdentification?.accessPoints),
-    classification: s(c.classification || c.spaceIdentification?.classification),
-    reasonForEntry: s(c.reasonForEntry), entryAvoidable: s(c.entryAvoidable, 'No'),
-    loneWorking: s(c.loneWorking, 'Absolutely Prohibited — minimum 3 persons at all times'),
-    adjacentSpaces: a(c.adjacentSpaces),
-    hazards: a(c.hazards),
-    historicalReadings: a(c.historicalReadings),
-    historicalAnalysis: s(c.historicalAnalysis),
-    safeSystemOfWork: s(c.safeSystemOfWork),
-    atmosphericParams: a(c.atmosphericParams),
-    preEntryTesting: s(c.preEntryTesting), continuousMonitoring: s(c.continuousMonitoring),
-    instrumentCalibration: s(c.instrumentCalibration),
-    ventilationType: s(c.ventilationType), ventilationSpec: s(c.ventilationSpec),
-    preVentDuration: s(c.preVentDuration), ventInletPosition: s(c.ventInletPosition),
-    ventFailureAction: s(c.ventFailureAction),
-    isolations: a(c.isolations), simops: a(c.simops), entrySteps: a(c.entrySteps),
-    ppeItems: a(c.ppeItems),
-    maxContinuousWork: s(c.maxContinuousWork), maxShiftDuration: s(c.maxShiftDuration),
-    hydration: s(c.hydration), heatStressIndicators: s(c.heatStressIndicators),
-    scbaWeightFactor: s(c.scbaWeightFactor),
-    primaryComms: s(c.primaryComms), backupComms: s(c.backupComms),
-    checkInFrequency: s(c.checkInFrequency), emergencySignal: s(c.emergencySignal),
-    rescueSteps: a(c.rescueSteps), rescueEquipmentLocation: s(c.rescueEquipmentLocation),
-    nearestAE: s(c.nearestAE), rescueDrillFrequency: s(c.rescueDrillFrequency),
-    extractionSteps: a(c.extractionSteps),
-    multiCasualtyScenarios: a(c.multiCasualtyScenarios),
-    frsPreNotify: s(c.frsPreNotify), frsContact: s(c.frsContact),
-    frsInfoProvided: s(c.frsInfoProvided), frsAccess: s(c.frsAccess),
-    rescueEquipment: a(c.rescueEquipment), commsCascade: a(c.commsCascade),
-    hospitalName: s(c.hospitalName), hospitalDistance: s(c.hospitalDistance),
-    hospitalGridRef: s(c.hospitalGridRef), hospitalRoute: s(c.hospitalRoute),
-    postIncidentSteps: a(c.postIncidentSteps),
-    emergencyScenarios: a(c.emergencyScenarios),
-    deconStation: s(c.deconStation), deconProcedure: s(c.deconProcedure),
-    noEatingDrinking: s(c.noEatingDrinking), leptospirosisAwareness: s(c.leptospirosisAwareness),
-    hepatitisA: s(c.hepatitisA), welfareFacilities: s(c.welfareFacilities),
-    riskBeforeL: rr.beforeLikelihood ?? 4, riskBeforeS: rr.beforeSeverity ?? 5,
-    riskBeforeScore: rr.beforeScore ?? 20, riskBeforeRating: s(rr.beforeRating, 'High'),
-    riskAfterL: rr.afterLikelihood ?? 2, riskAfterS: rr.afterSeverity ?? 5,
-    riskAfterScore: rr.afterScore ?? 10, riskAfterRating: s(rr.afterRating, 'Medium'),
-    riskNote: s(c.riskNote, 'Residual severity remains 5 (fatal) — atmospheric hazard consequences cannot be reduced, only likelihood is controlled. Consistent with L101 ACoP.'),
-    competencyRoles: a(c.competencyRoles),
-    permitType: s(c.permitType), authorisationChain: s(c.authorisationChain),
-    maxOccupancy: s(c.maxOccupancy), permitCancellation: s(c.permitCancellation),
-    preEntryChecklist: a(c.preEntryChecklist),
-    reviewDate2: s(c.reviewDate2) || s(c.reviewDate),
-    reviewTriggers: s(c.reviewTriggers), linkedDocuments: s(c.linkedDocuments),
-    regulatoryReferences: a(c.regulatoryReferences).length > 0 ? a(c.regulatoryReferences) : defaultRefs(),
-    additionalNotes: s(c.additionalNotes),
+    documentRef: s('documentRef', 'CS-001'), assessmentDate: s('assessmentDate'), reviewDate: s('reviewDate'),
+    assessedBy: s('assessedBy'), projectName: s('projectName'), siteAddress: s('siteAddress'),
+    contractor: s('contractor'), spaceName: s('spaceName'), classification: s('classification'),
+    accessType: s('accessType'), task: s('task'), maxDuration: s('maxDuration'),
+    spaceIdentification: a('spaceIdentification'), hazards: a('hazards'),
+    adjacentSpaces: a('adjacentSpaces'), gasReadings: a('gasReadings'),
+    atmosphericParams: a('atmosphericParams'), isolationMatrix: a('isolationMatrix'),
+    simops: a('simops'), entryProcedure: a('entryProcedure'),
+    durationLimits: s('durationLimits'), rescuePlan: s('rescuePlan'),
+    ppeEquipment: a('ppeEquipment'), competencyRequirements: a('competencyRequirements'),
+    regulatoryReferences: s('regulatoryReferences'),
+    dangerBoxes: a('dangerBoxes'), controlsSummary: s('controlsSummary'),
+    rescuerFatalityWarning: s('rescuerFatalityWarning'),
+    preEntryChecklist: a('preEntryChecklist'), authorisationChain: a('authorisationChain'),
+    permitCancellation: a('permitCancellation'),
+    rescueSteps: a('rescueSteps'), extractionMethod: s('extractionMethod'),
+    multiCasualtyDecisions: a('multiCasualtyDecisions'),
+    frsDetails: a('frsDetails'), hospitalDetails: a('hospitalDetails'),
+    rescueEquipment: a('rescueEquipment'), additionalNotes: s('additionalNotes'),
   };
 }
 
-function defaultRefs(): RegRef[] {
-  return [
-    { reference: 'Confined Spaces Regulations 1997 (SI 1997/1713)', description: 'Primary legislation — identify, assess, control confined space risks' },
-    { reference: 'HSE L101 ACoP (3rd Ed. 2014)', description: 'Safe work in confined spaces — Approved Code of Practice and guidance' },
-    { reference: 'HSE INDG258 (Rev 3)', description: 'Confined spaces — brief guide to working safely' },
-    { reference: 'EI15 (4th Ed. 2018)', description: 'Model code — confined space entry (wastewater sector reference)' },
-    { reference: 'EH40/2005 (4th Ed. 2020)', description: 'Workplace Exposure Limits — H₂S, CO' },
-    { reference: 'MHSW Regulations 1999', description: 'General risk assessment duty' },
-    { reference: 'BS 7671:2018 + A2:2022', description: 'Electrical installations — relevant to isolation' },
-    { reference: 'CDM 2015', description: 'Construction-phase health and safety management' },
-  ];
+// ── Shared helpers ───────────────────────────────────────────────────────────
+function hdrCell(text: string, width: number, accent: string): TableCell {
+  return h.headerCell(text, width, { fillColor: accent, color: 'FFFFFF', fontSize: SM });
 }
-
-// ── RAG ──────────────────────────────────────────────────────────────────────
-function ragColours(status: string): { fill: string; text: string } {
-  const r = (status || '').toLowerCase();
-  if (r === 'high' || r === 'fatal' || r === 'no') return { fill: 'FEE2E2', text: RED };
-  if (r === 'medium' || r === 'moderate' || r === 'partial' || r === 'serious') return { fill: AMBER_BG, text: AMBER };
-  if (r === 'low' || r === 'yes' || r.includes('isolated') || r.includes('controlled') || r.includes('loto')) return { fill: GREEN_BG, text: GREEN_RAG };
-  return { fill: GREY_BG, text: GREY_RAG };
+function txtCell(text: string, width: number, opts?: { bg?: string; bold?: boolean; color?: string }): TableCell {
+  return h.dataCell(text, width, { fillColor: opts?.bg, bold: opts?.bold, color: opts?.color, fontSize: SM });
 }
-
-function ragCell(text: string, width: number, fontSize = SM): TableCell {
-  const c = ragColours(text);
+function ragCell(text: string, width: number): TableCell {
+  const low = (text || '').toLowerCase();
+  let bg = ZEBRA; let color = GREY;
+  if (low.includes('high') || low.includes('non') || low.includes('exceeds')) { bg = RED_BG; color = RED; }
+  else if (low.includes('medium') || low.includes('partial') || low.includes('near')) { bg = AMBER_BG; color = AMBER; }
+  else if (low.includes('low') || low.includes('yes') || low.includes('within') || low.includes('compliant')) { bg = 'D1FAE5'; color = GREEN; }
+  return h.dataCell(text, width, { fillColor: bg, color, fontSize: SM, bold: true });
+}
+function blankCell(width: number): TableCell {
+  const dashed = { style: BorderStyle.DASHED, size: 1, color: 'CCCCCC' };
   return new TableCell({
-    width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
-    shading: { fill: c.fill, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.CENTER,
-    children: [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [
-      new TextRun({ text: text || '\u2014', bold: true, size: fontSize, font: 'Arial', color: c.text }),
-    ] })],
+    width: { size: width, type: WidthType.DXA },
+    borders: { top: dashed, bottom: dashed, left: dashed, right: dashed },
+    margins: { top: 40, bottom: 40, left: 60, right: 60 },
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: '', size: SM })] })],
   });
 }
-
-// ── Heading ──────────────────────────────────────────────────────────────────
-function secHead(num: string, text: string, accent: string, font = 'Arial', fontSize = LG): Paragraph {
-  return new Paragraph({
-    spacing: { before: 360, after: 140 },
-    border: { left: { style: BorderStyle.SINGLE, size: 18, color: accent, space: 6 } },
-    children: [new TextRun({ text: `${num}   ${text.toUpperCase()}`, bold: true, size: fontSize, font, color: accent })],
-  });
-}
-
-function subHead(num: string, text: string, accent: string, font = 'Arial'): Paragraph {
-  return new Paragraph({
-    spacing: { before: 240, after: 100 },
-    border: { left: { style: BorderStyle.SINGLE, size: 12, color: accent, space: 6 } },
-    children: [new TextRun({ text: `${num}   ${text.toUpperCase()}`, bold: true, size: BODY, font, color: accent })],
-  });
-}
-
-// ── Generic table helpers ────────────────────────────────────────────────────
-function hdrCell(text: string, width: number, bg: string, font = 'Arial'): TableCell {
-  return new TableCell({
-    width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
-    shading: { fill: bg, type: ShadingType.CLEAR },
-    children: [new Paragraph({ spacing: { after: 0 }, children: [
-      new TextRun({ text: text.toUpperCase(), bold: true, size: SM, font, color: h.WHITE }),
-    ] })],
-  });
-}
-
-function txtCell(text: string, width: number, opts?: { bold?: boolean; bg?: string; fontSize?: number; font?: string; color?: string }): TableCell {
-  return new TableCell({
-    width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
-    shading: { fill: opts?.bg || h.WHITE, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.TOP,
-    children: [new Paragraph({ spacing: { after: 0 }, children: [
-      new TextRun({ text: text || '\u2014', bold: opts?.bold, size: opts?.fontSize || SM + 2, font: opts?.font || 'Arial', color: opts?.color }),
-    ] })],
-  });
-}
-
-function infoRow(label: string, value: string, labelW: number, valueW: number, labelBg: string, labelColor: string): TableRow {
-  return new TableRow({ children: [
-    new TableCell({ width: { size: labelW, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS, shading: { fill: labelBg, type: ShadingType.CLEAR },
-      children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: label, bold: true, size: SM + 2, font: 'Arial', color: labelColor })] })] }),
-    new TableCell({ width: { size: valueW, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
-      children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: value || '\u2014', size: SM + 2, font: 'Arial' })] })] }),
-  ] });
-}
-
-function infoTable(rows: Array<{ label: string; value: string }>, labelBg: string, labelColor: string): Table {
-  const lw = Math.round(W * 0.35);
-  return new Table({ width: { size: W, type: WidthType.DXA }, rows: rows.map(r => infoRow(r.label, r.value, lw, W - lw, labelBg, labelColor)) });
-}
-
-function dataTable(
-  headers: Array<{ text: string; width: number }>,
-  rows: Array<Array<{ text: string; bold?: boolean; rag?: boolean }>>,
-  headerBg: string, zebraColor = ZEBRA, font = 'Arial',
-): Table {
+function dataTable(accent: string, headers: { text: string; width: number }[], rows: any[][], ragCols: number[] = []): Table {
   return new Table({
-    width: { size: W, type: WidthType.DXA },
+    width: { size: W, type: WidthType.DXA }, columnWidths: headers.map(h2 => h2.width),
     rows: [
-      new TableRow({ children: headers.map(hd => hdrCell(hd.text, hd.width, headerBg, font)) }),
-      ...rows.map((row, ri) => new TableRow({
-        children: row.map((cell, ci) => {
-          if (cell.rag) return ragCell(cell.text, headers[ci].width);
-          return txtCell(cell.text, headers[ci].width, { bold: cell.bold, bg: ri % 2 === 0 ? zebraColor : h.WHITE, font });
-        }),
+      new TableRow({ children: headers.map(h2 => hdrCell(h2.text, h2.width, accent)) }),
+      ...rows.map((cells, ri) => new TableRow({
+        children: cells.map((cell, ci) =>
+          ragCols.includes(ci) ? ragCell(String(cell || ''), headers[ci].width) :
+          txtCell(String(cell || ''), headers[ci].width, { bg: ri % 2 === 1 ? ZEBRA : undefined })
+        ),
       })),
     ],
   });
 }
-
-function signOff(roles: string[], bg: string, cols: Array<{ text: string; width: number }>): Table {
-  return new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-    new TableRow({ children: cols.map(c => hdrCell(c.text, c.width, bg)) }),
-    ...roles.map(role => new TableRow({
-      height: { value: 600, rule: 'atLeast' as any },
-      children: cols.map((c, i) => txtCell(i === 0 ? role : '', c.width)),
-    })),
-  ] });
-}
-
-function dangerCallout(text: string): Paragraph {
-  return new Paragraph({
-    spacing: { before: 160, after: 160 },
-    border: { left: { style: BorderStyle.SINGLE, size: 18, color: RED, space: 6 } },
-    shading: { type: ShadingType.CLEAR, fill: RED_BG },
-    children: [new TextRun({ text, bold: true, size: BODY, font: 'Arial', color: RED_D })],
+function blankTable(accent: string, headers: { text: string; width: number }[], rowCount: number): Table {
+  return new Table({
+    width: { size: W, type: WidthType.DXA }, columnWidths: headers.map(h2 => h2.width),
+    rows: [
+      new TableRow({ children: headers.map(h2 => hdrCell(h2.text, h2.width, accent)) }),
+      ...Array.from({ length: rowCount }, () => new TableRow({ children: headers.map(h2 => blankCell(h2.width)) })),
+    ],
   });
 }
-
-function rescueCallout(title: string, body: string): Paragraph[] {
-  return [
-    new Paragraph({
-      spacing: { before: 160, after: 40 },
-      border: { left: { style: BorderStyle.SINGLE, size: 12, color: TEAL, space: 6 },
-        top: { style: BorderStyle.SINGLE, size: 1, color: TEAL }, bottom: { style: BorderStyle.SINGLE, size: 1, color: TEAL },
-        right: { style: BorderStyle.SINGLE, size: 1, color: TEAL } },
-      shading: { type: ShadingType.CLEAR, fill: TEAL_BG },
-      children: [new TextRun({ text: title.toUpperCase(), bold: true, size: SM + 2, font: 'Arial', color: TEAL })],
-    }),
-    new Paragraph({
-      spacing: { after: 160 },
-      border: { left: { style: BorderStyle.SINGLE, size: 12, color: TEAL, space: 6 },
-        bottom: { style: BorderStyle.SINGLE, size: 1, color: TEAL },
-        right: { style: BorderStyle.SINGLE, size: 1, color: TEAL } },
-      shading: { type: ShadingType.CLEAR, fill: TEAL_BG },
-      children: [new TextRun({ text: body, size: SM + 2, font: 'Arial', color: TEAL_DARK })],
-    }),
-  ];
+function cols(ratios: number[]): number[] {
+  const widths = ratios.map(r => Math.round(W * r));
+  widths[widths.length - 1] = W - widths.slice(0, -1).reduce((a, b) => a + b, 0);
+  return widths;
 }
-
-function permitBox(title: string): Paragraph {
-  return new Paragraph({
-    spacing: { before: 120, after: 120 },
-    border: { left: { style: BorderStyle.SINGLE, size: 8, color: ORANGE, space: 6 },
-      top: { style: BorderStyle.SINGLE, size: 2, color: ORANGE }, bottom: { style: BorderStyle.SINGLE, size: 2, color: ORANGE },
-      right: { style: BorderStyle.SINGLE, size: 2, color: ORANGE } },
-    shading: { type: ShadingType.CLEAR, fill: ORANGE_BG },
-    children: [new TextRun({ text: title.toUpperCase(), bold: true, size: SM + 2, font: 'Arial', color: ORANGE })],
+function dangerBox(title: string, body: string): Table {
+  return new Table({
+    width: { size: W, type: WidthType.DXA }, columnWidths: [W],
+    rows: [new TableRow({ children: [new TableCell({
+      width: { size: W, type: WidthType.DXA },
+      shading: { fill: RED_BG, type: ShadingType.CLEAR },
+      borders: { top: { style: BorderStyle.SINGLE, size: 4, color: RED }, bottom: { style: BorderStyle.SINGLE, size: 4, color: RED }, left: { style: BorderStyle.SINGLE, size: 4, color: RED }, right: { style: BorderStyle.SINGLE, size: 4, color: RED } },
+      margins: { top: 100, bottom: 100, left: 160, right: 160 },
+      children: [
+        new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: `\u26A0 ${title}`, bold: true, size: LG, font: 'Arial', color: RED_DK })] }),
+        ...h.richBodyText(body),
+      ],
+    })] })],
   });
 }
-
-function checkboxRow(num: string, text: string, cw: number[]): TableRow {
-  return new TableRow({ children: [
-    txtCell(num, cw[0], { fontSize: SM }),
-    txtCell(text, cw[1], { fontSize: SM }),
-    new TableCell({ width: { size: cw[2], type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
-      children: [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [
-        new TextRun({ text: '\u2610', size: BODY + 4, font: 'Arial' }),
-      ] })] }),
-    txtCell('', cw[3], { fontSize: SM }),
-    txtCell('', cw[4], { fontSize: SM }),
-  ] });
-}
-
-function emptyRow(cols: number[], count: number): TableRow[] {
-  return Array.from({ length: count }, () => new TableRow({
-    height: { value: 400, rule: 'atLeast' as any },
-    children: cols.map(w => txtCell('', w)),
-  }));
-}
-
-function footerLine(): Paragraph {
+function checklistItem(text: string): Paragraph {
   return new Paragraph({
-    alignment: AlignmentType.CENTER, spacing: { before: 400 },
-    border: { top: { style: BorderStyle.SINGLE, size: 1, color: h.GREY_MID } },
-    children: [new TextRun({ text: 'This assessment must be reviewed at least every 6 months, before each entry campaign, and whenever space conditions or work methods change.', size: SM, font: 'Arial', color: h.GREY_DARK, italics: true })],
+    spacing: { after: 40 }, indent: { left: 200 },
+    children: [new TextRun({ text: `\u2610  ${text}`, size: SM, font: 'Arial' })],
   });
 }
 
 
 // ═════════════════════════════════════════════════════════════════════════════
-// T1 — EBRORA STANDARD (green, 22 sections)
+// T1 — EBRORA STANDARD (Green #059669)
 // ═════════════════════════════════════════════════════════════════════════════
-function buildT1(d: CSData): Document {
-  const A = EBRORA; const LBG = 'f0fdf4'; const LC = EBRORA;
-  const adjCols = [Math.round(W*0.20), Math.round(W*0.20), Math.round(W*0.22), Math.round(W*0.20), W - Math.round(W*0.20)*2 - Math.round(W*0.22) - Math.round(W*0.20)];
-  const hazCols = [Math.round(W*0.12), Math.round(W*0.24), Math.round(W*0.28), Math.round(W*0.16), W - Math.round(W*0.12) - Math.round(W*0.24) - Math.round(W*0.28) - Math.round(W*0.16)];
-  const histCols = [Math.round(W*0.14), Math.round(W*0.10), Math.round(W*0.12), Math.round(W*0.10), Math.round(W*0.10), Math.round(W*0.28), W - Math.round(W*0.14) - Math.round(W*0.10) - Math.round(W*0.12) - Math.round(W*0.10) - Math.round(W*0.10) - Math.round(W*0.28)];
-  const atmoCols = [Math.round(W*0.18), Math.round(W*0.14), Math.round(W*0.14), Math.round(W*0.22), W - Math.round(W*0.18) - Math.round(W*0.14)*2 - Math.round(W*0.22)];
-  const isoCols = [Math.round(W*0.18), Math.round(W*0.18), Math.round(W*0.26), Math.round(W*0.18), W - Math.round(W*0.18)*2 - Math.round(W*0.26) - Math.round(W*0.18)];
-  const simCols = [Math.round(W*0.20), Math.round(W*0.22), Math.round(W*0.26), Math.round(W*0.14), W - Math.round(W*0.20) - Math.round(W*0.22) - Math.round(W*0.26) - Math.round(W*0.14)];
-  const entryCols = [Math.round(W*0.06), Math.round(W*0.34), Math.round(W*0.28), W - Math.round(W*0.06) - Math.round(W*0.34) - Math.round(W*0.28)];
-  const ppeCols = [Math.round(W*0.16), Math.round(W*0.28), Math.round(W*0.16), Math.round(W*0.20), W - Math.round(W*0.16) - Math.round(W*0.28) - Math.round(W*0.16) - Math.round(W*0.20)];
-  const rescCols = [Math.round(W*0.06), Math.round(W*0.36), Math.round(W*0.22), W - Math.round(W*0.06) - Math.round(W*0.36) - Math.round(W*0.22)];
-  const emerCols = [Math.round(W*0.20), Math.round(W*0.38), Math.round(W*0.18), W - Math.round(W*0.20) - Math.round(W*0.38) - Math.round(W*0.18)];
-  const compCols = [Math.round(W*0.18), Math.round(W*0.30), Math.round(W*0.24), W - Math.round(W*0.18) - Math.round(W*0.30) - Math.round(W*0.24)];
-  const refCols = [Math.round(W*0.38), W - Math.round(W*0.38)];
+function buildT1(d: CsData): Document {
+  const A = GREEN;
+  const hdr = h.accentHeader('Confined Space Risk Assessment', A);
+  const ftr = h.accentFooter(d.documentRef, 'Ebrora Standard', A);
+
+  const hazCols = cols([0.16, 0.18, 0.28, 0.16, 0.22]);
+  const adjCols = cols([0.18, 0.18, 0.26, 0.18, 0.20]);
+  const gasCols = cols([0.12, 0.08, 0.10, 0.08, 0.08, 0.34, 0.20]);
+  const atmCols = cols([0.16, 0.18, 0.16, 0.22, 0.28]);
+  const isoCols = cols([0.18, 0.26, 0.20, 0.20, 0.16]);
+  const simCols = cols([0.20, 0.24, 0.26, 0.12, 0.18]);
+  const entCols = cols([0.06, 0.38, 0.20, 0.36]);
+  const ppeCols = cols([0.28, 0.30, 0.16, 0.26]);
+  const compCols = cols([0.20, 0.30, 0.26, 0.24]);
 
   return new Document({
     styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
     sections: [
       // Cover
-      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Confined Space Assessment') }, footers: { default: h.ebroraFooter() },
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
         children: [
-          new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ACCENT_DARK }, spacing: { after: 0 }, children: [new TextRun({ text: ' ', size: 12, font: 'Arial', color: ACCENT_DARK })] }),
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 600, after: 40 }, children: [new TextRun({ text: 'CONFINED SPACE ASSESSMENT', bold: true, size: TTL, font: 'Arial', color: A })] }),
-          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 HSE L101 ACoP', size: BODY, font: 'Arial', color: h.GREY_DARK })] }),
-          h.spacer(100),
-          new Paragraph({ shading: { type: ShadingType.CLEAR, fill: A }, alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: `  ${(d.spaceName || 'CONFINED SPACE').toUpperCase()}  `, bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-          h.spacer(100),
-          infoTable([
-            { label: 'Document Ref', value: d.documentRef }, { label: 'Assessment Date', value: d.assessmentDate },
-            { label: 'Review Date', value: d.reviewDate }, { label: 'Assessor', value: d.assessedBy },
-            { label: 'Project', value: d.projectName }, { label: 'Location', value: d.siteAddress },
-          ], LBG, LC),
+          h.coverBlock(['CONFINED SPACE', 'RISK ASSESSMENT'], d.spaceName ? `${d.spaceName} \u2014 ${d.projectName}` : d.projectName || '', A, GREEN_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Reference', value: d.documentRef }, { label: 'Assessment Date', value: d.assessmentDate },
+            { label: 'Review Date', value: d.reviewDate }, { label: 'Assessed By', value: d.assessedBy },
+            { label: 'Project', value: d.projectName }, { label: 'Site Address', value: d.siteAddress },
+            { label: 'Space Name', value: d.spaceName }, { label: 'Classification', value: d.classification },
+            { label: 'Access Type', value: d.accessType }, { label: 'Task', value: d.task },
+            { label: 'Maximum Entry Duration', value: d.maxDuration },
+          ], A, W),
+          h.coverFooterLine(),
         ] },
-      // Body
-      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Confined Space Assessment') }, footers: { default: h.ebroraFooter() },
+      // Body — Space ID, Hazards, Adjacent, Gas Readings
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
         children: [
-          secHead('1.0', 'Space Identification & Classification', A),
-          infoTable([
-            { label: 'Space Name / ID', value: d.spaceName }, { label: 'Location', value: d.spaceLocation },
-            { label: 'Space Type', value: d.spaceType }, { label: 'Dimensions', value: d.dimensions },
-            { label: 'Access', value: d.accessType }, { label: 'Classification', value: d.classification },
-            { label: 'Reason for Entry', value: d.reasonForEntry }, { label: 'Entry Avoidable?', value: d.entryAvoidable },
-            { label: 'Lone Working', value: d.loneWorking },
-          ], LBG, LC),
-
-          secHead('2.0', 'Adjacent & Connected Spaces', A),
-          dataTable(
-            [{ text: 'Connected Space', width: adjCols[0] }, { text: 'Connection Type', width: adjCols[1] }, { text: 'Isolation Method', width: adjCols[2] }, { text: 'Gas Migration Risk', width: adjCols[3] }, { text: 'Status', width: adjCols[4] }],
-            d.adjacentSpaces.map(as => [{ text: as.space }, { text: as.connectionType }, { text: as.isolationMethod }, { text: as.gasMigrationRisk, rag: true }, { text: as.status, rag: true }]),
-            A),
-
-          secHead('3.0', 'Hazard Identification', A),
-          dataTable(
-            [{ text: 'Category', width: hazCols[0] }, { text: 'Hazard', width: hazCols[1] }, { text: 'Cause / Source', width: hazCols[2] }, { text: 'Severity', width: hazCols[3] }, { text: 'Likelihood', width: hazCols[4] }],
-            d.hazards.map(hz => [{ text: hz.category, bold: true }, { text: hz.hazard }, { text: hz.causeSource }, { text: hz.severity, rag: true }, { text: hz.likelihood, rag: true }]),
-            A),
-
-          secHead('4.0', 'Historical Gas Readings', A),
-          dataTable(
-            [{ text: 'Date', width: histCols[0] }, { text: 'O₂ (%)', width: histCols[1] }, { text: 'H₂S (ppm)', width: histCols[2] }, { text: 'LEL (%)', width: histCols[3] }, { text: 'CO (ppm)', width: histCols[4] }, { text: 'Conditions', width: histCols[5] }, { text: 'By', width: histCols[6] }],
-            d.historicalReadings.map(hr => [{ text: hr.date }, { text: hr.o2 }, { text: hr.h2s }, { text: hr.lel }, { text: hr.co }, { text: hr.conditions }, { text: hr.recordedBy }]),
-            A),
-          ...(d.historicalAnalysis ? h.prose(d.historicalAnalysis, BODY) : []),
-
-          secHead('5.0', 'Safe System of Work (Regulation 4)', A),
-          ...h.prose(d.safeSystemOfWork, BODY),
-
-          secHead('6.0', 'Atmospheric Monitoring', A),
-          dataTable(
-            [{ text: 'Parameter', width: atmoCols[0] }, { text: 'Alarm', width: atmoCols[1] }, { text: 'Evacuate', width: atmoCols[2] }, { text: 'Instrument', width: atmoCols[3] }, { text: 'Action Required', width: atmoCols[4] }],
-            d.atmosphericParams.map(ap => [{ text: ap.parameter }, { text: ap.alarmLevel }, { text: ap.evacuateLevel }, { text: ap.instrument }, { text: ap.actionRequired }]),
-            A),
-          infoTable([
-            { label: 'Pre-Entry Testing', value: d.preEntryTesting },
-            { label: 'Continuous Monitoring', value: d.continuousMonitoring },
-            { label: 'Instrument Calibration', value: d.instrumentCalibration },
-          ], LBG, LC),
-
-          secHead('7.0', 'Ventilation', A),
-          infoTable([
-            { label: 'Type', value: d.ventilationType }, { label: 'Specification', value: d.ventilationSpec },
-            { label: 'Pre-Ventilation', value: d.preVentDuration }, { label: 'Inlet Position', value: d.ventInletPosition },
-            { label: 'Failure Action', value: d.ventFailureAction },
-          ], LBG, LC),
-
-          secHead('8.0', 'Isolation Requirements', A),
-          dataTable(
-            [{ text: 'System', width: isoCols[0] }, { text: 'Method', width: isoCols[1] }, { text: 'Isolation Point', width: isoCols[2] }, { text: 'Verified By', width: isoCols[3] }, { text: 'Lock-Off?', width: isoCols[4] }],
-            d.isolations.map(iso => [{ text: iso.system }, { text: iso.method }, { text: iso.isolationPoint }, { text: iso.verifiedBy }, { text: iso.lockOff, rag: true }]),
-            A),
-
-          secHead('9.0', 'SIMOPS — Simultaneous Operations', A),
-          dataTable(
-            [{ text: 'Activity', width: simCols[0] }, { text: 'Impact', width: simCols[1] }, { text: 'Control', width: simCols[2] }, { text: 'Risk', width: simCols[3] }, { text: 'Acceptable?', width: simCols[4] }],
-            d.simops.map(si => [{ text: si.activity }, { text: si.potentialImpact }, { text: si.controlMeasure }, { text: si.risk, rag: true }, { text: si.acceptable, rag: true }]),
-            A),
-
-          secHead('10.0', 'Entry & Exit Procedures', A),
-          dataTable(
-            [{ text: '#', width: entryCols[0] }, { text: 'Step', width: entryCols[1] }, { text: 'Responsibility', width: entryCols[2] }, { text: 'Verification', width: entryCols[3] }],
-            d.entrySteps.map((es, i) => [{ text: String(i + 1) }, { text: es.action }, { text: es.responsibility }, { text: es.verification }]),
-            A),
-
-          secHead('11.0', 'PPE & RPE Requirements', A),
-          dataTable(
-            [{ text: 'PPE Type', width: ppeCols[0] }, { text: 'Specification', width: ppeCols[1] }, { text: 'Standard', width: ppeCols[2] }, { text: 'Replacement', width: ppeCols[3] }, { text: 'Mandatory?', width: ppeCols[4] }],
-            d.ppeItems.map(pp => [{ text: pp.type }, { text: pp.specification }, { text: pp.standard }, { text: pp.replacement }, { text: pp.mandatory, rag: true }]),
-            A),
-
-          secHead('12.0', 'Duration Limits & Heat Stress', A),
-          infoTable([
-            { label: 'Max Continuous Work', value: d.maxContinuousWork },
-            { label: 'Max Shift Duration', value: d.maxShiftDuration },
-            { label: 'Hydration', value: d.hydration },
-            { label: 'Heat Stress Indicators', value: d.heatStressIndicators },
-            { label: 'SCBA Weight Factor', value: d.scbaWeightFactor },
-          ], LBG, LC),
-
-          secHead('13.0', 'Communication Protocols', A),
-          infoTable([
-            { label: 'Primary', value: d.primaryComms }, { label: 'Backup', value: d.backupComms },
-            { label: 'Check-In Frequency', value: d.checkInFrequency }, { label: 'Emergency Signal', value: d.emergencySignal },
-          ], LBG, LC),
-
-          secHead('14.0', 'Rescue Plan (Regulation 5)', A),
-          dataTable(
-            [{ text: '#', width: rescCols[0] }, { text: 'Rescue Action', width: rescCols[1] }, { text: 'Responsibility', width: rescCols[2] }, { text: 'Equipment / Notes', width: rescCols[3] }],
-            d.rescueSteps.map((rs, i) => [{ text: String(i + 1) }, { text: rs.action }, { text: rs.responsibility }, { text: rs.equipment }]),
-            A),
-          infoTable([
-            { label: 'Rescue Equipment Location', value: d.rescueEquipmentLocation },
-            { label: 'Nearest A&E', value: d.nearestAE },
-            { label: 'Rescue Drill Frequency', value: d.rescueDrillFrequency },
-          ], LBG, LC),
-
-          secHead('15.0', 'Emergency Procedures', A),
-          dataTable(
-            [{ text: 'Scenario', width: emerCols[0] }, { text: 'Immediate Action', width: emerCols[1] }, { text: 'Responsibility', width: emerCols[2] }, { text: 'Escalation', width: emerCols[3] }],
-            d.emergencyScenarios.map(es => [{ text: es.scenario }, { text: es.immediateAction }, { text: es.responsibility }, { text: es.escalation }]),
-            A),
-
-          secHead('16.0', 'Welfare, Hygiene & Decontamination', A),
-          infoTable([
-            { label: 'Decon Station', value: d.deconStation }, { label: 'Procedure', value: d.deconProcedure },
-            { label: 'No Eating/Drinking/Smoking', value: d.noEatingDrinking },
-            { label: 'Leptospirosis Awareness', value: d.leptospirosisAwareness },
-            { label: 'Hepatitis A', value: d.hepatitisA },
-            { label: 'Welfare Facilities', value: d.welfareFacilities },
-          ], LBG, LC),
-
-          secHead('17.0', 'Risk Rating', A),
-          dataTable(
-            [{ text: 'Stage', width: Math.round(W*0.34) }, { text: 'L', width: Math.round(W*0.12) }, { text: 'S', width: Math.round(W*0.12) }, { text: 'Score', width: Math.round(W*0.12) }, { text: 'Rating', width: W - Math.round(W*0.34) - Math.round(W*0.12)*3 }],
-            [
-              [{ text: 'Before Controls' }, { text: String(d.riskBeforeL) }, { text: String(d.riskBeforeS) }, { text: String(d.riskBeforeScore) }, { text: d.riskBeforeRating, rag: true }],
-              [{ text: 'After Controls (with full SSOW)' }, { text: String(d.riskAfterL) }, { text: String(d.riskAfterS) }, { text: String(d.riskAfterScore) }, { text: d.riskAfterRating, rag: true }],
-            ], A),
-          ...(d.riskNote ? h.prose(d.riskNote, SM + 2) : []),
-
-          secHead('18.0', 'Competency & Training', A),
-          dataTable(
-            [{ text: 'Role', width: compCols[0] }, { text: 'Required Training', width: compCols[1] }, { text: 'Evidence', width: compCols[2] }, { text: 'Refresher', width: compCols[3] }],
-            d.competencyRoles.map(cr => [{ text: cr.role }, { text: cr.requiredTraining }, { text: cr.evidence }, { text: cr.refresher }]),
-            A),
-
-          secHead('19.0', 'Permit / Authorisation', A),
-          infoTable([
-            { label: 'Permit Type', value: d.permitType }, { label: 'Authorisation', value: d.authorisationChain },
-            { label: 'Max Occupancy', value: d.maxOccupancy }, { label: 'Cancellation', value: d.permitCancellation },
-          ], LBG, LC),
-
-          secHead('20.0', 'Monitoring & Review', A),
-          infoTable([
-            { label: 'Review Date', value: d.reviewDate2 }, { label: 'Review Triggers', value: d.reviewTriggers },
-            { label: 'Linked Documents', value: d.linkedDocuments },
-          ], LBG, LC),
-
-          secHead('21.0', 'Regulatory References', A),
-          dataTable(
-            [{ text: 'Reference', width: refCols[0] }, { text: 'Description', width: refCols[1] }],
-            d.regulatoryReferences.map(rr => [{ text: rr.reference, bold: true }, { text: rr.description }]),
-            A),
-
-          secHead('22.0', 'Assessor Sign-Off', A),
-          signOff(['Assessor', 'Responsible Person', 'Reviewed By'], A, [
-            { text: 'Role', width: Math.round(W*0.22) }, { text: 'Name', width: Math.round(W*0.28) },
-            { text: 'Signature', width: Math.round(W*0.25) }, { text: 'Date', width: W - Math.round(W*0.22) - Math.round(W*0.28) - Math.round(W*0.25) },
-          ]),
-          footerLine(),
+          h.fullWidthSectionBar('01', 'SPACE IDENTIFICATION & CLASSIFICATION', A), h.spacer(80),
+          ...(d.spaceIdentification.length > 0 ? [h.coverInfoTable(d.spaceIdentification, A, W)] : []),
+          h.spacer(80), h.fullWidthSectionBar('02', 'HAZARD IDENTIFICATION', A), h.spacer(80),
+          ...(d.hazards.length > 0 ? [dataTable(A,
+            [{ text: 'CATEGORY', width: hazCols[0] }, { text: 'HAZARD', width: hazCols[1] }, { text: 'SOURCE', width: hazCols[2] }, { text: 'SEVERITY', width: hazCols[3] }, { text: 'LIKELIHOOD', width: hazCols[4] }],
+            d.hazards.map(hz => [hz.category, hz.hazard, hz.source, hz.severity, hz.likelihood]), [3, 4]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('03', 'ADJACENT & CONNECTED SPACES', A), h.spacer(80),
+          ...(d.adjacentSpaces.length > 0 ? [dataTable(A,
+            [{ text: 'SPACE', width: adjCols[0] }, { text: 'CONNECTION', width: adjCols[1] }, { text: 'ISOLATION METHOD', width: adjCols[2] }, { text: 'GAS MIGRATION', width: adjCols[3] }, { text: 'STATUS', width: adjCols[4] }],
+            d.adjacentSpaces.map(a => [a.space, a.connection, a.isolationMethod, a.gasMigrationRisk, a.status]), [3]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('04', 'HISTORICAL GAS READINGS', A), h.spacer(80),
+          ...(d.gasReadings.length > 0 ? [dataTable(A,
+            [{ text: 'DATE', width: gasCols[0] }, { text: 'O\u2082 (%)', width: gasCols[1] }, { text: 'H\u2082S (ppm)', width: gasCols[2] }, { text: 'LEL (%)', width: gasCols[3] }, { text: 'CO (ppm)', width: gasCols[4] }, { text: 'CONDITIONS', width: gasCols[5] }, { text: 'RECORDED BY', width: gasCols[6] }],
+            d.gasReadings.map(g => [g.date, g.o2, g.h2s, g.lel, g.co, g.conditions, g.recordedBy])
+          )] : []),
+          h.spacer(40),
+          h.calloutBox('H\u2082S readings have exceeded the 10 ppm WEL on multiple occasions. Continuous atmospheric monitoring with audible alarm is mandatory for all entries.', AMBER, AMBER_BG, '92400E', W, { boldPrefix: 'Historical Reading Note:' }),
+        ] },
+      // Body — Atmospheric, Isolation, SIMOPS, Entry Procedure
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('05', 'ATMOSPHERIC MONITORING PARAMETERS', A), h.spacer(80),
+          ...(d.atmosphericParams.length > 0 ? [dataTable(A,
+            [{ text: 'PARAMETER', width: atmCols[0] }, { text: 'ALARM LEVEL', width: atmCols[1] }, { text: 'EVACUATE LEVEL', width: atmCols[2] }, { text: 'INSTRUMENT', width: atmCols[3] }, { text: 'ACTION', width: atmCols[4] }],
+            d.atmosphericParams.map(a => [a.parameter, a.alarmLevel, a.evacuateLevel, a.instrument, a.action])
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('06', 'ISOLATION MATRIX', A), h.spacer(80),
+          ...(d.isolationMatrix.length > 0 ? [dataTable(A,
+            [{ text: 'SYSTEM', width: isoCols[0] }, { text: 'METHOD', width: isoCols[1] }, { text: 'ISOLATION POINT', width: isoCols[2] }, { text: 'VERIFIED BY', width: isoCols[3] }, { text: 'LOCK-OFF', width: isoCols[4] }],
+            d.isolationMatrix.map(i => [i.system, i.method, i.isolationPoint, i.verifiedBy, i.lockOff])
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('07', 'SIMOPS ASSESSMENT', A), h.spacer(80),
+          ...(d.simops.length > 0 ? [dataTable(A,
+            [{ text: 'ADJACENT ACTIVITY', width: simCols[0] }, { text: 'POTENTIAL IMPACT', width: simCols[1] }, { text: 'CONTROL', width: simCols[2] }, { text: 'RISK', width: simCols[3] }, { text: 'ACCEPTABLE?', width: simCols[4] }],
+            d.simops.map(s => [s.activity, s.impact, s.control, s.risk, s.acceptable]), [3, 4]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('08', 'ENTRY PROCEDURE & CONTROLS', A), h.spacer(80),
+          ...(d.entryProcedure.length > 0 ? [dataTable(A,
+            [{ text: 'STEP', width: entCols[0] }, { text: 'ACTION', width: entCols[1] }, { text: 'RESPONSIBILITY', width: entCols[2] }, { text: 'VERIFICATION', width: entCols[3] }],
+            d.entryProcedure.map(e => [e.step, e.action, e.responsibility, e.verification])
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('09', 'DURATION LIMITS & HEAT STRESS', A), h.spacer(80),
+          ...h.richBodyText(d.durationLimits || ''),
+        ] },
+      // Body — Rescue, PPE, Competency, Refs, Sign-off
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('10', 'RESCUE PLAN SUMMARY', A), h.spacer(80),
+          ...h.richBodyText(d.rescuePlan || ''),
+          h.spacer(80), h.fullWidthSectionBar('11', 'PPE & EQUIPMENT REQUIREMENTS', A), h.spacer(80),
+          ...(d.ppeEquipment.length > 0 ? [dataTable(A,
+            [{ text: 'ITEM', width: ppeCols[0] }, { text: 'SPECIFICATION', width: ppeCols[1] }, { text: 'STANDARD', width: ppeCols[2] }, { text: 'MANDATORY', width: ppeCols[3] }],
+            d.ppeEquipment.map(p => [p.item, p.specification, p.standard, p.mandatory]), [3]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('12', 'COMPETENCY REQUIREMENTS', A), h.spacer(80),
+          ...(d.competencyRequirements.length > 0 ? [dataTable(A,
+            [{ text: 'ROLE', width: compCols[0] }, { text: 'REQUIRED TRAINING', width: compCols[1] }, { text: 'EVIDENCE', width: compCols[2] }, { text: 'REFRESHER', width: compCols[3] }],
+            d.competencyRequirements.map(c => [c.role, c.training, c.evidence, c.refresher])
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('13', 'REGULATORY REFERENCES', A), h.spacer(80),
+          ...h.richBodyText(d.regulatoryReferences || 'Confined Spaces Regulations 1997. HSE ACOP L101. EH40/2005. COSHH 2002. WAH Regs 2005. PUWER 1998.'),
+          h.spacer(80),
+          h.signatureGrid(['Assessed By', 'Approved By'], A, W),
+          h.spacer(80), ...h.endMark(A),
         ] },
     ],
   });
@@ -635,396 +273,217 @@ function buildT1(d: CSData): Document {
 
 
 // ═════════════════════════════════════════════════════════════════════════════
-// T2 — RED DANGER (17 sections, danger callouts)
+// T2 — RED DANGER (#DC2626 / #991B1B)
 // ═════════════════════════════════════════════════════════════════════════════
-function buildT2(d: CSData): Document {
-  const A = RED_D; const LBG = RED_BG; const LC = RED_D; const ZB = 'FFF5F5';
-  const hazCols = [Math.round(W*0.12), Math.round(W*0.22), Math.round(W*0.28), Math.round(W*0.16), W - Math.round(W*0.12) - Math.round(W*0.22) - Math.round(W*0.28) - Math.round(W*0.16)];
+function buildT2(d: CsData): Document {
+  const A = RED;
+  const hdr = h.accentHeader('Confined Space Risk Assessment \u2014 RED DANGER', A);
+  const ftr = h.accentFooter(d.documentRef, 'Red Danger', A);
+  const gasCols6 = cols([0.14, 0.10, 0.14, 0.10, 0.10, 0.42]);
 
   return new Document({
     styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
-    sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Confined Space Assessment') }, footers: { default: h.ebroraFooter() },
-      children: [
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 0 }, children: [new TextRun({ text: '\u26A0 CONFINED SPACE ASSESSMENT \u2014 IMMEDIATELY DANGEROUS TO LIFE', bold: true, size: SM, font: 'Arial', color: 'D0D0D0' })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 0 }, children: [new TextRun({ text: d.spaceName || 'Confined Space', bold: true, size: XL + 2, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 HSE L101 ACoP', size: BODY, font: 'Arial', color: 'E6E6E6' })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '1a1a1a' }, spacing: { after: 60 }, children: [new TextRun({ text: `Ref: ${d.documentRef}   |   Assessed: ${d.assessmentDate}   |   Assessor: ${d.assessedBy}   |   Review: ${d.reviewDate}`, size: SM, font: 'Arial', color: 'e5e5e5' })] }),
-
-        dangerCallout(`\u26A0 DANGER \u2014 THIS SPACE CAN KILL: ${d.hazards.find(hz => hz.category === 'Atmospheric')?.causeSource || 'Atmospheric hazards identified'}. Entry ONLY with valid permit, continuous monitoring, forced ventilation, and rescue standby. MINIMUM 3 PERSONS AT ALL TIMES. LONE WORKING IS ABSOLUTELY PROHIBITED.`),
-
-        secHead('1.0', 'Space Classification', A),
-        infoTable([
-          { label: 'Space', value: `${d.spaceName} \u2014 ${d.dimensions} \u2014 ${d.accessType}` },
-          { label: 'Classification', value: d.classification }, { label: 'Entry Avoidable?', value: d.entryAvoidable },
-          { label: 'Lone Working', value: d.loneWorking },
-        ], LBG, LC),
-
-        secHead('2.0', 'What Can Kill You', A),
-        dangerCallout(`\u26A0 ATMOSPHERIC HAZARDS \u2014 THE PRIMARY KILLER: ${d.hazards.filter(hz => hz.category === 'Atmospheric').map(hz => hz.hazard).join('. ')}. ${d.historicalAnalysis || ''}`),
-        dataTable(
-          [{ text: 'Category', width: hazCols[0] }, { text: 'Hazard', width: hazCols[1] }, { text: 'How It Kills', width: hazCols[2] }, { text: 'Severity', width: hazCols[3] }, { text: 'Likelihood', width: hazCols[4] }],
-          d.hazards.map(hz => [{ text: hz.category, bold: true }, { text: hz.hazard }, { text: hz.causeSource }, { text: hz.severity, rag: true }, { text: hz.likelihood, rag: true }]),
-          A, ZB),
-
-        secHead('3.0', 'Historical Gas Readings', A),
-        dataTable(
-          [{ text: 'Date', width: Math.round(W*0.16) }, { text: 'O₂', width: Math.round(W*0.12) }, { text: 'H₂S', width: Math.round(W*0.12) }, { text: 'LEL', width: Math.round(W*0.12) }, { text: 'CO', width: Math.round(W*0.12) }, { text: 'Conditions', width: W - Math.round(W*0.16) - Math.round(W*0.12)*4 }],
-          d.historicalReadings.map(hr => [{ text: hr.date }, { text: hr.o2 }, { text: hr.h2s }, { text: hr.lel }, { text: hr.co }, { text: hr.conditions }]),
-          A, ZB),
-
-        secHead('4.0', 'Adjacent Spaces & Gas Migration', A),
-        dangerCallout(`\u26A0 GAS MIGRATION: This space shares pipework with connected spaces. H\u2082S can migrate through connected pipework even when valves are closed. ALL connected spaces must be isolated and locked before entry.`),
-        dataTable(
-          [{ text: 'Space', width: Math.round(W*0.22) }, { text: 'Connection', width: Math.round(W*0.22) }, { text: 'Isolation', width: Math.round(W*0.28) }, { text: 'Risk', width: W - Math.round(W*0.22)*2 - Math.round(W*0.28) }],
-          d.adjacentSpaces.map(as => [{ text: as.space }, { text: as.connectionType }, { text: as.isolationMethod }, { text: as.gasMigrationRisk, rag: true }]),
-          A, ZB),
-
-        secHead('5.0', 'SIMOPS', A),
-        dataTable(
-          [{ text: 'Activity', width: Math.round(W*0.22) }, { text: 'Impact', width: Math.round(W*0.30) }, { text: 'Control', width: W - Math.round(W*0.22) - Math.round(W*0.30) }],
-          d.simops.map(si => [{ text: si.activity }, { text: si.potentialImpact }, { text: si.controlMeasure }]),
-          A, ZB),
-
-        secHead('6.0', 'Monitoring & Controls', A),
-        dataTable(
-          [{ text: 'Parameter', width: Math.round(W*0.20) }, { text: 'Alarm', width: Math.round(W*0.20) }, { text: 'Evacuate', width: Math.round(W*0.20) }, { text: 'Instrument', width: W - Math.round(W*0.20)*3 }],
-          d.atmosphericParams.map(ap => [{ text: ap.parameter }, { text: ap.alarmLevel }, { text: ap.evacuateLevel }, { text: ap.instrument }]),
-          A, ZB),
-        infoTable([
-          { label: 'Ventilation', value: `${d.ventilationType}. ${d.ventilationSpec}. ${d.preVentDuration}.` },
-          { label: 'Isolations', value: `${d.isolations.length} isolation points \u2014 all LOTO` },
-          { label: 'Duration Limits', value: `${d.maxContinuousWork}. ${d.maxShiftDuration}.` },
-        ], LBG, LC),
-
-        secHead('7.0', 'PPE', A),
-        dataTable(
-          [{ text: 'PPE', width: Math.round(W*0.18) }, { text: 'Spec', width: Math.round(W*0.34) }, { text: 'Standard', width: Math.round(W*0.22) }, { text: 'Required?', width: W - Math.round(W*0.18) - Math.round(W*0.34) - Math.round(W*0.22) }],
-          d.ppeItems.map(pp => [{ text: pp.type }, { text: pp.specification }, { text: pp.standard }, { text: pp.mandatory, rag: true }]),
-          A, ZB),
-
-        secHead('8.0', 'Rescue Plan', A),
-        dangerCallout(`\u26A0 CRITICAL: Over 60% of UK confined space fatalities are would-be rescuers who entered without BA (L101 \u00A7129). Under NO circumstances shall anyone enter to attempt unaided rescue. Winch from surface first. Only trained rescue entrants with full SCBA may enter.`),
-        dataTable(
-          [{ text: '#', width: Math.round(W*0.06) }, { text: 'Action', width: Math.round(W*0.38) }, { text: 'Responsibility', width: Math.round(W*0.24) }, { text: 'Equipment', width: W - Math.round(W*0.06) - Math.round(W*0.38) - Math.round(W*0.24) }],
-          d.rescueSteps.map((rs, i) => [{ text: String(i + 1) }, { text: rs.action }, { text: rs.responsibility }, { text: rs.equipment }]),
-          A, ZB),
-        infoTable([{ label: 'Nearest A&E', value: d.nearestAE }], LBG, LC),
-
-        secHead('9.0', 'Welfare & Decontamination', A),
-        dangerCallout(`\u26A0 LEPTOSPIROSIS: Weil's disease can be fatal. ALL entrants must decon on exit. No eating/drinking/smoking until decontaminated. Cuts must be cleaned, dressed, and recorded. Weil's card issued. Hep A vaccination recommended.`),
-        infoTable([
-          { label: 'Decon Station', value: d.deconStation }, { label: 'Procedure', value: d.deconProcedure },
-          { label: 'Hydration', value: d.hydration },
-        ], LBG, LC),
-
-        secHead('10.0', 'Risk Rating', A),
-        dataTable(
-          [{ text: 'Stage', width: Math.round(W*0.34) }, { text: 'L', width: Math.round(W*0.12) }, { text: 'S', width: Math.round(W*0.12) }, { text: 'Score', width: Math.round(W*0.12) }, { text: 'Rating', width: W - Math.round(W*0.34) - Math.round(W*0.12)*3 }],
-          [
-            [{ text: 'Before Controls' }, { text: String(d.riskBeforeL) }, { text: String(d.riskBeforeS) }, { text: String(d.riskBeforeScore) }, { text: d.riskBeforeRating, rag: true }],
-            [{ text: 'After Controls' }, { text: String(d.riskAfterL) }, { text: String(d.riskAfterS) }, { text: String(d.riskAfterScore) }, { text: d.riskAfterRating, rag: true }],
-          ], A, ZB),
-
-        secHead('11.0', 'Emergency Procedures', A),
-        dataTable(
-          [{ text: 'Scenario', width: Math.round(W*0.20) }, { text: 'Action', width: W - Math.round(W*0.20) }],
-          d.emergencyScenarios.map(es => [{ text: es.scenario }, { text: es.immediateAction }]),
-          A, ZB),
-
-        secHead('12.0', 'Competency', A),
-        dataTable(
-          [{ text: 'Role', width: Math.round(W*0.20) }, { text: 'Training', width: Math.round(W*0.50) }, { text: 'Refresher', width: W - Math.round(W*0.20) - Math.round(W*0.50) }],
-          d.competencyRoles.map(cr => [{ text: cr.role }, { text: cr.requiredTraining }, { text: cr.refresher }]),
-          A, ZB),
-
-        secHead('13.0', 'Comms & Permit', A),
-        infoTable([
-          { label: 'Primary Comms', value: `${d.primaryComms}. Check-in: ${d.checkInFrequency}. Missed = emergency.` },
-          { label: 'Permit', value: `${d.permitType}. ${d.authorisationChain}. Max ${d.maxOccupancy} entrants.` },
-        ], LBG, LC),
-
-        secHead('14.0', 'Monitoring & Review', A),
-        infoTable([
-          { label: 'Review', value: `${d.reviewDate2}. Triggers: ${d.reviewTriggers}` },
-          { label: 'Linked', value: d.linkedDocuments },
-        ], LBG, LC),
-
-        secHead('15.0', 'References', A),
-        dataTable(
-          [{ text: 'Reference', width: Math.round(W*0.38) }, { text: 'Description', width: W - Math.round(W*0.38) }],
-          d.regulatoryReferences.map(rr => [{ text: rr.reference, bold: true }, { text: rr.description }]),
-          A, ZB),
-
-        secHead('16.0', 'Sign-Off', A),
-        signOff(['Assessor', 'Responsible Person'], A, [
-          { text: 'Role', width: Math.round(W*0.22) }, { text: 'Name', width: Math.round(W*0.28) },
-          { text: 'Signature', width: Math.round(W*0.25) }, { text: 'Date', width: W - Math.round(W*0.22) - Math.round(W*0.28) - Math.round(W*0.25) },
-        ]),
-        footerLine(),
-      ] }],
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['\u26A0 CONFINED SPACE', 'RISK ASSESSMENT'], d.classification ? d.classification.toUpperCase() : 'MEDIUM RISK \u2014 SPECIFIED RISK SPACE', RED_DK, RED_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef }, { label: 'Date', value: d.assessmentDate },
+            { label: 'Space', value: d.spaceName }, { label: 'Classification', value: d.classification },
+            { label: 'Primary Hazards', value: d.hazards.map(hz => hz.hazard).join(' \u00B7 ') },
+            { label: 'Contractor', value: d.contractor }, { label: 'CS Supervisor', value: d.assessedBy },
+            { label: 'Max Entry Duration', value: d.maxDuration },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — Danger banner, danger boxes, gas readings, controls
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.warningBanner('DANGER \u2014 IMMEDIATELY DANGEROUS TO LIFE OR HEALTH (IDLH) ATMOSPHERE POSSIBLE', RED_DK, 'FFFFFF', W),
+          h.spacer(80),
+          ...(d.dangerBoxes.length > 0
+            ? d.dangerBoxes.flatMap(db => [dangerBox(db.title, db.body), h.spacer(60)])
+            : d.hazards.slice(0, 4).flatMap(hz => [dangerBox(`${hz.hazard} \u2014 ${hz.category}`, hz.source), h.spacer(60)])),
+          h.spacer(40),
+          h.calloutBox(
+            d.rescuerFatalityWarning || '"Over half of those who die in confined spaces are people who try to rescue without proper equipment and training." NEVER enter to attempt rescue without SCBA and a trained rescue team.',
+            RED, RED_BG, RED_DK, W, { boldPrefix: 'Rescuer Fatality Warning (ACOP L101, \u00A7129):' }
+          ),
+          h.spacer(80), h.fullWidthSectionBar('', 'HISTORICAL GAS READINGS \u2014 SEVERITY HIGHLIGHTED', RED_DK), h.spacer(80),
+          ...(d.gasReadings.length > 0 ? [dataTable(RED_DK,
+            [{ text: 'DATE', width: gasCols6[0] }, { text: 'O\u2082', width: gasCols6[1] }, { text: 'H\u2082S', width: gasCols6[2] }, { text: 'LEL', width: gasCols6[3] }, { text: 'CO', width: gasCols6[4] }, { text: 'SEVERITY', width: gasCols6[5] }],
+            d.gasReadings.map(g => [g.date, g.o2, g.h2s, g.lel, g.co, g.conditions]),
+            [5]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('', 'CONTROL MEASURES SUMMARY', RED_DK), h.spacer(80),
+          ...h.richBodyText(d.controlsSummary || ''),
+          h.spacer(80),
+          h.signatureGrid(['CS Supervisor', 'H&S Manager'], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
   });
 }
 
 
 // ═════════════════════════════════════════════════════════════════════════════
-// T3 — PERMIT STYLE (orange, checklist, auth chain, entry log)
+// T3 — PERMIT STYLE (Amber #92400E)
 // ═════════════════════════════════════════════════════════════════════════════
-function buildT3(d: CSData): Document {
-  const A = ORANGE; const LBG = ORANGE_BG; const LC = ORANGE; const ZB = ORANGE_BG;
-  const checkCols = [Math.round(W*0.06), Math.round(W*0.50), Math.round(W*0.12), Math.round(W*0.14), W - Math.round(W*0.06) - Math.round(W*0.50) - Math.round(W*0.12) - Math.round(W*0.14)];
-  const gasCols = [Math.round(W*0.14), Math.round(W*0.14), Math.round(W*0.14), Math.round(W*0.14), Math.round(W*0.14), Math.round(W*0.14), W - Math.round(W*0.14)*6];
-  const reTestCols = [Math.round(W*0.12), Math.round(W*0.13), Math.round(W*0.13), Math.round(W*0.13), Math.round(W*0.13), Math.round(W*0.22), W - Math.round(W*0.12) - Math.round(W*0.13)*4 - Math.round(W*0.22)];
-  const entryLogCols = [Math.round(W*0.22), Math.round(W*0.14), Math.round(W*0.14), Math.round(W*0.14), Math.round(W*0.14), W - Math.round(W*0.22) - Math.round(W*0.14)*4];
-  const authCols = [Math.round(W*0.18), Math.round(W*0.20), Math.round(W*0.18), Math.round(W*0.14), Math.round(W*0.12), W - Math.round(W*0.18) - Math.round(W*0.20) - Math.round(W*0.18) - Math.round(W*0.14) - Math.round(W*0.12)];
-  const hbCols = [Math.round(W*0.22), Math.round(W*0.36), Math.round(W*0.20), W - Math.round(W*0.22) - Math.round(W*0.36) - Math.round(W*0.20)];
+function buildT3(d: CsData): Document {
+  const A = AMBER_O;
+  const hdr = h.accentHeader('Confined Space Entry Permit', A);
+  const ftr = h.accentFooter(d.documentRef, 'Permit Style', A);
 
-  const checklistItems = d.preEntryChecklist.length > 0 ? d.preEntryChecklist : [
-    { item: 'All electrical isolations confirmed and LOTO applied' },
-    { item: 'All mechanical/hydraulic isolations confirmed and locked' },
-    { item: 'Adjacent space isolations confirmed' },
-    { item: 'SIMOPS check — no conflicting adjacent operations' },
-    { item: 'Tank/space drained — no standing liquid >150mm' },
-    { item: 'Ventilation running minimum pre-vent duration' },
-    { item: 'Gas test — O₂ within 19.5–23.5% at all depths' },
-    { item: 'Gas test — H₂S <5ppm at all depths' },
-    { item: 'Gas test — LEL <10% at all depths' },
-    { item: 'Gas test — CO <20ppm at all depths' },
-    { item: 'Rescue tripod erected and winch tested' },
-    { item: 'Rescue SCBA available, cylinder pressure checked' },
-    { item: 'Radio communication check (entrant ↔ standby)' },
-    { item: 'FA kit + AED + O₂ set at surface' },
-    { item: 'Decontamination station set up' },
-    { item: 'All entrants in full PPE (harness, helmet, SCBA escape, gloves, coveralls, boots, goggles)' },
-    { item: 'Standby person briefed and in position' },
-    { item: 'Weather check — no adverse weather warning' },
-    { item: 'Emergency services route confirmed' },
-  ];
+  const gasBlankCols = cols([0.22, 0.18, 0.15, 0.15, 0.15, 0.15]);
+  const retestCols = cols([0.12, 0.12, 0.14, 0.12, 0.12, 0.22, 0.16]);
+  const entryCols = cols([0.20, 0.16, 0.14, 0.14, 0.16, 0.20]);
+  const authCols = cols([0.34, 0.26, 0.22, 0.18]);
 
   return new Document({
     styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
-    sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Confined Space Entry Permit & Assessment') }, footers: { default: h.ebroraFooter() },
-      children: [
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ORANGE }, spacing: { after: 0 }, children: [new TextRun({ text: 'CONFINED SPACE ENTRY PERMIT & ASSESSMENT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ORANGE }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 HSE L101 ACoP', size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '78350f' }, spacing: { after: 60 }, children: [new TextRun({ text: `Ref: ${d.documentRef}   Space: ${d.spaceName}   Date: ${d.assessmentDate}   Valid: 12 hours max   Min 3 persons`, size: SM, font: 'Arial', color: 'fef3c7' })] }),
-
-        secHead('1.0', 'Space & Hazard Summary', A),
-        infoTable([
-          { label: 'Space', value: `${d.spaceName} \u2014 ${d.dimensions} \u2014 ${d.accessType}` },
-          { label: 'Classification', value: d.classification },
-          { label: 'Key Hazards', value: d.hazards.map(hz => hz.hazard).join(', ') },
-          { label: 'Adjacent Spaces', value: d.adjacentSpaces.map(as => `${as.space} (${as.status})`).join(', ') || 'See assessment' },
-          { label: 'SIMOPS', value: d.simops.map(si => `${si.activity}: ${si.controlMeasure}`).join('. ') || 'Assessed — no conflicts' },
-          { label: 'Max Occupancy', value: d.maxOccupancy },
-          { label: 'Duration Limits', value: d.maxContinuousWork },
-        ], LBG, LC),
-
-        secHead('2.0', 'Pre-Entry Checklist', A),
-        permitBox('All items must be confirmed \u2611 before entry is authorised'),
-        new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-          new TableRow({ children: [hdrCell('#', checkCols[0], A), hdrCell('Check Item', checkCols[1], A), hdrCell('\u2611', checkCols[2], A), hdrCell('By Whom', checkCols[3], A), hdrCell('Time', checkCols[4], A)] }),
-          ...checklistItems.map((ci, i) => checkboxRow(String(i + 1), ci.item, checkCols)),
-        ] }),
-
-        secHead('3.0', 'Pre-Entry Gas Test Results', A),
-        new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-          new TableRow({ children: [hdrCell('Depth', gasCols[0], A), hdrCell('O₂ (%)', gasCols[1], A), hdrCell('H₂S (ppm)', gasCols[2], A), hdrCell('LEL (%)', gasCols[3], A), hdrCell('CO (ppm)', gasCols[4], A), hdrCell('Time', gasCols[5], A), hdrCell('Initials', gasCols[6], A)] }),
-          ...['Top', 'Middle', 'Bottom'].map(depth => new TableRow({ children: [txtCell(depth, gasCols[0], { fontSize: SM }), ...gasCols.slice(1).map(w => txtCell('', w))] })),
-        ] }),
-        infoTable([
-          { label: 'Instrument Serial No.', value: '' }, { label: 'Last Calibration', value: '' },
-          { label: 'Bump Tested?', value: '\u2610 Yes   \u2610 No' },
-        ], LBG, LC),
-
-        secHead('4.0', 'Periodic Re-Test Log (Every 30 Minutes)', A),
-        new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-          new TableRow({ children: [hdrCell('Time', reTestCols[0], A), hdrCell('O₂ (%)', reTestCols[1], A), hdrCell('H₂S', reTestCols[2], A), hdrCell('LEL (%)', reTestCols[3], A), hdrCell('CO', reTestCols[4], A), hdrCell('Action', reTestCols[5], A), hdrCell('Initials', reTestCols[6], A)] }),
-          ...emptyRow(reTestCols, 8),
-        ] }),
-
-        secHead('5.0', 'Personnel Entry / Exit Log', A),
-        new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-          new TableRow({ children: [hdrCell('Name', entryLogCols[0], A), hdrCell('Role', entryLogCols[1], A), hdrCell('Time In', entryLogCols[2], A), hdrCell('Time Out', entryLogCols[3], A), hdrCell('Duration', entryLogCols[4], A), hdrCell('Notes', entryLogCols[5], A)] }),
-          ...emptyRow(entryLogCols, 6),
-        ] }),
-
-        secHead('6.0', 'Authorisation Chain', A),
-        permitBox('Entry Authorisation — ALL roles must sign before entry proceeds'),
-        new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-          new TableRow({ children: [hdrCell('Role', authCols[0], A), hdrCell('Name', authCols[1], A), hdrCell('Signature', authCols[2], A), hdrCell('Date', authCols[3], A), hdrCell('Time', authCols[4], A), hdrCell('CSCS/ID', authCols[5], A)] }),
-          ...['Responsible Person', 'Entrant 1', 'Entrant 2', 'Standby Person', 'Rescue Standby'].map(role =>
-            new TableRow({ height: { value: 600, rule: 'atLeast' as any }, children: authCols.map((w, i) => txtCell(i === 0 ? role : '', w, { bold: i === 0 })) })),
-        ] }),
-
-        secHead('7.0', 'Rescue Plan Summary', A),
-        dataTable(
-          [{ text: '#', width: Math.round(W*0.06) }, { text: 'Action', width: W - Math.round(W*0.06) }],
-          d.rescueSteps.map((rs, i) => [{ text: String(i + 1), bold: true }, { text: rs.action }]),
-          A, ZB),
-        infoTable([{ label: 'Nearest A&E', value: d.nearestAE }], LBG, LC),
-
-        secHead('8.0', 'Permit Cancellation / Handback', A),
-        permitBox('Complete this section when ALL entries are finished and space is cleared'),
-        new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-          new TableRow({ children: [hdrCell('Item', hbCols[0], A), hdrCell('Detail', hbCols[1], A), hdrCell('Confirmed By', hbCols[2], A), hdrCell('Time', hbCols[3], A)] }),
-          ...['All personnel out — head count confirmed', 'Equipment recovered from space', 'Space secured — cover replaced, signage maintained', 'Isolations: \u2610 Maintained  \u2610 Removed', 'Decon completed — contaminated PPE disposed'].map((item, i) =>
-            new TableRow({ children: [txtCell(item, hbCols[0] + hbCols[1], { fontSize: SM }), txtCell('', hbCols[2]), txtCell('', hbCols[3])] })),
-        ] }),
-        h.spacer(80),
-        signOff(['Cancelled By'], A, [
-          { text: 'Reason', width: Math.round(W*0.24) }, { text: 'Name', width: Math.round(W*0.22) },
-          { text: 'Signature', width: Math.round(W*0.18) }, { text: 'Date', width: Math.round(W*0.16) },
-          { text: 'Time', width: W - Math.round(W*0.24) - Math.round(W*0.22) - Math.round(W*0.18) - Math.round(W*0.16) },
-        ]),
-
-        secHead('9.0', 'References', A),
-        dataTable(
-          [{ text: 'Reference', width: Math.round(W*0.38) }, { text: 'Description', width: W - Math.round(W*0.38) }],
-          d.regulatoryReferences.slice(0, 5).map(rr => [{ text: rr.reference, bold: true }, { text: rr.description }]),
-          A, ZB),
-        footerLine(),
-      ] }],
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['CONFINED SPACE', 'ENTRY PERMIT &', 'RISK ASSESSMENT'], d.spaceName ? `${d.spaceName} \u2014 ${d.projectName}` : d.projectName || '', A, AMBER_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Permit Number', value: d.documentRef },
+            { label: 'Date of Issue', value: d.assessmentDate },
+            { label: 'Valid Until', value: `${d.assessmentDate}, 17:00 hrs (single shift)` },
+            { label: 'Space', value: d.spaceName }, { label: 'Task', value: d.task },
+            { label: 'Classification', value: d.classification },
+            { label: 'Contractor', value: d.contractor }, { label: 'CS Supervisor', value: d.assessedBy },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — Checklist, gas tests, entry log, authorisation, cancellation
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('', 'PRE-ENTRY CHECKLIST \u2014 ALL ITEMS MUST BE CONFIRMED BEFORE ENTRY', A), h.spacer(60),
+          ...(d.preEntryChecklist.length > 0
+            ? d.preEntryChecklist.map(item => checklistItem(item))
+            : [checklistItem('Risk assessment reviewed and briefed to all entry team'),
+               checklistItem('All isolations verified and LOTO confirmed'),
+               checklistItem('Weather check completed'),
+               checklistItem('Forced ventilation running \u226515 minutes'),
+               checklistItem('Pre-entry gas test at 3 depths \u2014 all within limits'),
+               checklistItem('Tripod and rescue winch erected and tested'),
+               checklistItem('Rescue team briefed, equipped with SCBA, on standby'),
+               checklistItem('First aider identified and kit at entry point'),
+               checklistItem('Fire service pre-notified'),
+               checklistItem('Communications tested'),
+               checklistItem('All entrants in full PPE \u2014 harness, RPE, hard hat, gloves'),
+               checklistItem('Personal 4-gas monitors calibrated and bump-tested'),
+               checklistItem('LEV positioned at work point'),
+               checklistItem('Decontamination station set up'),
+               checklistItem('Entry duration timer set'),
+              ]),
+          h.spacer(80), h.fullWidthSectionBar('', 'GAS TEST RESULTS \u2014 PRE-ENTRY (3 DEPTHS)', A), h.spacer(80),
+          blankTable(A,
+            [{ text: 'PARAMETER', width: gasBlankCols[0] }, { text: 'ACCEPTABLE', width: gasBlankCols[1] }, { text: 'TOP (0.5m)', width: gasBlankCols[2] }, { text: 'MIDDLE', width: gasBlankCols[3] }, { text: 'FLOOR', width: gasBlankCols[4] }, { text: 'RESULT', width: gasBlankCols[5] }],
+            4
+          ),
+          h.bodyText('Tested by: __________ \u00A0 Monitor S/N: __________ \u00A0 Last calibration: __________ \u00A0 Time: __________', SM),
+          h.spacer(80), h.fullWidthSectionBar('', '30-MINUTE PERIODIC RE-TEST LOG', A), h.spacer(80),
+          blankTable(A,
+            [{ text: 'TIME', width: retestCols[0] }, { text: 'O\u2082 (%)', width: retestCols[1] }, { text: 'H\u2082S (ppm)', width: retestCols[2] }, { text: 'LEL (%)', width: retestCols[3] }, { text: 'CO (ppm)', width: retestCols[4] }, { text: 'ACTION', width: retestCols[5] }, { text: 'INITIALS', width: retestCols[6] }],
+            4
+          ),
+          h.spacer(80), h.fullWidthSectionBar('', 'PERSONNEL ENTRY / EXIT LOG', A), h.spacer(80),
+          blankTable(A,
+            [{ text: 'NAME', width: entryCols[0] }, { text: 'ROLE', width: entryCols[1] }, { text: 'TIME IN', width: entryCols[2] }, { text: 'TIME OUT', width: entryCols[3] }, { text: 'DURATION', width: entryCols[4] }, { text: 'SIGNATURE', width: entryCols[5] }],
+            4
+          ),
+          h.spacer(80), h.fullWidthSectionBar('', 'AUTHORISATION CHAIN', A), h.spacer(80),
+          ...(d.authorisationChain.length > 0 ? [dataTable(A,
+            [{ text: 'ROLE', width: authCols[0] }, { text: 'NAME', width: authCols[1] }, { text: 'SIGNATURE', width: authCols[2] }, { text: 'DATE / TIME', width: authCols[3] }],
+            d.authorisationChain.map((a, i) => [`${i + 1}. ${a.role}`, a.name, '', ''])
+          )] : [blankTable(A,
+            [{ text: 'ROLE', width: authCols[0] }, { text: 'NAME', width: authCols[1] }, { text: 'SIGNATURE', width: authCols[2] }, { text: 'DATE / TIME', width: authCols[3] }],
+            5
+          )]),
+          h.spacer(80), h.fullWidthSectionBar('', 'PERMIT CANCELLATION / HANDBACK', A), h.spacer(80),
+          h.coverInfoTable([
+            { label: 'Work Completed?', value: '\u2610 Yes \u00A0\u00A0 \u2610 No \u2014 Resumed under new permit: __________' },
+            { label: 'All Personnel Evacuated?', value: '\u2610 Yes \u00A0\u00A0 Headcount confirmed by: __________' },
+            { label: 'Equipment Removed?', value: '\u2610 Yes \u00A0\u00A0 \u2610 N/A' },
+            { label: 'Manhole Cover Secured?', value: '\u2610 Yes' },
+            { label: 'Isolations Removed?', value: '\u2610 Yes \u00A0\u00A0 \u2610 No \u2014 Reason: __________' },
+            { label: 'Permit Cancelled By', value: 'Name: __________ \u00A0 Signature: __________ \u00A0 Time: __________' },
+          ], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
   });
 }
 
 
 // ═════════════════════════════════════════════════════════════════════════════
-// T4 — RESCUE FOCUSED (teal, expanded rescue plan)
+// T4 — RESCUE FOCUSED (Teal #0f766e)
 // ═════════════════════════════════════════════════════════════════════════════
-function buildT4(d: CSData): Document {
-  const A = TEAL; const LBG = TEAL_BG; const LC = TEAL; const ZB = TEAL_BG;
+function buildT4(d: CsData): Document {
+  const A = TEAL;
+  const hdr = h.accentHeader('Confined Space \u2014 Rescue Plan', A);
+  const ftr = h.accentFooter(d.documentRef, 'Rescue Focused', A);
+
+  const resCols = cols([0.06, 0.28, 0.16, 0.12, 0.38]);
+  const mcCols = cols([0.24, 0.42, 0.34]);
+  const eqCols = cols([0.22, 0.30, 0.16, 0.32]);
 
   return new Document({
     styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
-    sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader('Confined Space Assessment & Rescue Plan') }, footers: { default: h.ebroraFooter() },
-      children: [
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'CONFINED SPACE ASSESSMENT & RESCUE PLAN', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'Confined Spaces Regulations 1997 \u00B7 Regulation 5 \u2014 Rescue Arrangements', size: BODY, font: 'Arial', color: 'D9D9D9' })] }),
-        new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `Ref: ${d.documentRef}   Space: ${d.spaceName}   Date: ${d.assessmentDate}   Assessor: ${d.assessedBy}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }),
-
-        // 1.0 Summary
-        secHead('1.0', 'Space & Hazard Summary', A),
-        infoTable([
-          { label: 'Space', value: `${d.spaceName} \u2014 ${d.dimensions}, ${d.accessType}` },
-          { label: 'Classification', value: d.classification },
-          { label: 'Key Hazards', value: d.hazards.map(hz => hz.hazard).join(', ') },
-          { label: 'Adjacent Spaces', value: d.adjacentSpaces.map(as => `${as.space} (${as.status})`).join(', ') || 'Assessed' },
-          { label: 'Risk Rating', value: `Before: ${d.riskBeforeScore} (${d.riskBeforeRating}) \u2192 After SSOW: ${d.riskAfterScore} (${d.riskAfterRating})` },
-          { label: 'Duration Limits', value: d.maxContinuousWork },
-        ], LBG, LC),
-
-        // 2.0 Controls summary
-        secHead('2.0', 'Controls Summary', A),
-        dataTable(
-          [{ text: 'Parameter', width: Math.round(W*0.20) }, { text: 'Alarm', width: Math.round(W*0.20) }, { text: 'Evacuate', width: Math.round(W*0.20) }, { text: 'Action', width: W - Math.round(W*0.60) }],
-          d.atmosphericParams.map(ap => [{ text: ap.parameter }, { text: ap.alarmLevel }, { text: ap.evacuateLevel }, { text: ap.actionRequired }]),
-          A, ZB),
-        infoTable([
-          { label: 'Ventilation', value: `${d.ventilationType}. ${d.ventilationSpec}. ${d.preVentDuration}.` },
-          { label: 'Isolations', value: `${d.isolations.length} LOTO points (electrical + mechanical + connected spaces)` },
-          { label: 'PPE', value: d.ppeItems.map(pp => `${pp.type} (${pp.standard})`).join(', ') },
-          { label: 'Comms', value: `${d.primaryComms}. ${d.checkInFrequency}.` },
-        ], LBG, LC),
-
-        // 3.0 RESCUE PLAN — the main event
-        secHead('3.0', 'Rescue Plan (Regulation 5)', A),
-        ...rescueCallout('This Section is the Primary Reference in an Emergency — Read Before Entry',
-          'A copy of this rescue plan must be available at the access point at all times during entry. All personnel must read and understand it before entering or acting as standby.'),
-
-        subHead('3.1', 'Rescue Procedure — Step by Step', A),
-        dataTable(
-          [{ text: '#', width: Math.round(W*0.05) }, { text: 'Action', width: Math.round(W*0.34) }, { text: 'Responsibility', width: Math.round(W*0.18) }, { text: 'Time', width: Math.round(W*0.13) }, { text: 'Equipment', width: W - Math.round(W*0.05) - Math.round(W*0.34) - Math.round(W*0.18) - Math.round(W*0.13) }],
-          d.rescueSteps.map((rs, i) => [{ text: String(i + 1), bold: true }, { text: rs.action }, { text: rs.responsibility }, { text: rs.timeTarget }, { text: rs.equipment }]),
-          A, ZB),
-
-        subHead('3.2', 'Manhole Extraction Method', A),
-        ...rescueCallout('Critical: Extracting an unconscious casualty through a restricted opening',
-          'Vertical extraction required. Casualty must be positioned with arms above head. Spinal precaution assumed until cleared.'),
-        dataTable(
-          [{ text: '#', width: Math.round(W*0.06) }, { text: 'Method', width: Math.round(W*0.38) }, { text: 'Equipment', width: Math.round(W*0.28) }, { text: 'Consideration', width: W - Math.round(W*0.06) - Math.round(W*0.38) - Math.round(W*0.28) }],
-          d.extractionSteps.map((es, i) => [{ text: String(i + 1) }, { text: es.method }, { text: es.equipment }, { text: es.consideration }]),
-          A, ZB),
-
-        subHead('3.3', 'Multiple Casualty Scenario', A),
-        ...rescueCallout('Decision Tree: What if multiple entrants are incapacitated?', 'Sequential extraction only — single winch line. BA time limits critical.'),
-        dataTable(
-          [{ text: 'Scenario', width: Math.round(W*0.24) }, { text: 'Action', width: Math.round(W*0.38) }, { text: 'Limitation', width: W - Math.round(W*0.24) - Math.round(W*0.38) }],
-          d.multiCasualtyScenarios.map(mc => [{ text: mc.scenario }, { text: mc.action }, { text: mc.limitation }]),
-          A, ZB),
-
-        subHead('3.4', 'Fire & Rescue Service Pre-Notification', A),
-        infoTable([
-          { label: 'Pre-Notify FRS?', value: d.frsPreNotify },
-          { label: 'FRS Contact', value: d.frsContact },
-          { label: 'Info Provided', value: d.frsInfoProvided },
-          { label: 'FRS Access', value: d.frsAccess },
-        ], LBG, LC),
-
-        subHead('3.5', 'Rescue Equipment Inventory', A),
-        dataTable(
-          [{ text: 'Equipment', width: Math.round(W*0.24) }, { text: 'Specification', width: Math.round(W*0.22) }, { text: 'Standard', width: Math.round(W*0.16) }, { text: 'Location', width: Math.round(W*0.20) }, { text: 'Checked?', width: W - Math.round(W*0.24) - Math.round(W*0.22) - Math.round(W*0.16) - Math.round(W*0.20) }],
-          d.rescueEquipment.map(re => [{ text: re.equipment }, { text: re.specification }, { text: re.standard }, { text: re.location }, { text: '\u2610' }]),
-          A, ZB),
-
-        subHead('3.6', 'Emergency Communication Cascade', A),
-        dataTable(
-          [{ text: 'Order', width: Math.round(W*0.08) }, { text: 'Contact', width: Math.round(W*0.22) }, { text: 'Name / Role', width: Math.round(W*0.24) }, { text: 'Number', width: Math.round(W*0.22) }, { text: 'When', width: W - Math.round(W*0.08) - Math.round(W*0.22) - Math.round(W*0.24) - Math.round(W*0.22) }],
-          d.commsCascade.map(cc => [{ text: cc.order }, { text: cc.contact }, { text: cc.nameRole }, { text: cc.number, bold: true }, { text: cc.when }]),
-          A, ZB),
-
-        subHead('3.7', 'Hospital Route', A),
-        infoTable([
-          { label: 'Nearest A&E', value: d.hospitalName }, { label: 'Distance / Time', value: d.hospitalDistance },
-          { label: 'Grid Reference', value: d.hospitalGridRef }, { label: 'Route', value: d.hospitalRoute },
-        ], LBG, LC),
-
-        subHead('3.8', 'Post-Incident Preservation', A),
-        dataTable(
-          [{ text: '#', width: Math.round(W*0.06) }, { text: 'Action', width: Math.round(W*0.40) }, { text: 'Responsibility', width: Math.round(W*0.24) }, { text: 'Notes', width: W - Math.round(W*0.06) - Math.round(W*0.40) - Math.round(W*0.24) }],
-          d.postIncidentSteps.map((pi, i) => [{ text: String(i + 1) }, { text: pi.action }, { text: pi.responsibility }, { text: pi.notes }]),
-          A, ZB),
-
-        // 4.0 Rescue drill log
-        secHead('4.0', 'Rescue Drill Log', A),
-        new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-          new TableRow({ children: [
-            hdrCell('Date', Math.round(W*0.16), A), hdrCell('Drill Type', Math.round(W*0.18), A),
-            hdrCell('Led By', Math.round(W*0.18), A), hdrCell('Duration', Math.round(W*0.12), A),
-            hdrCell('Issues / Lessons Learned', W - Math.round(W*0.16) - Math.round(W*0.18)*2 - Math.round(W*0.12), A),
-          ] }),
-          ...emptyRow([Math.round(W*0.16), Math.round(W*0.18), Math.round(W*0.18), Math.round(W*0.12), W - Math.round(W*0.16) - Math.round(W*0.18)*2 - Math.round(W*0.12)], 4),
-        ] }),
-
-        // 5.0 Welfare
-        secHead('5.0', 'Welfare & Decontamination', A),
-        infoTable([
-          { label: 'Decon Station', value: d.deconStation }, { label: 'Procedure', value: d.deconProcedure },
-          { label: 'Leptospirosis', value: d.leptospirosisAwareness },
-          { label: 'No Eating/Drinking', value: d.noEatingDrinking },
-        ], LBG, LC),
-
-        // 6.0 Competency
-        secHead('6.0', 'Competency', A),
-        dataTable(
-          [{ text: 'Role', width: Math.round(W*0.20) }, { text: 'Training', width: Math.round(W*0.50) }, { text: 'Refresher', width: W - Math.round(W*0.20) - Math.round(W*0.50) }],
-          d.competencyRoles.map(cr => [{ text: cr.role }, { text: cr.requiredTraining }, { text: cr.refresher }]),
-          A, ZB),
-
-        // 7.0 References
-        secHead('7.0', 'References', A),
-        dataTable(
-          [{ text: 'Reference', width: Math.round(W*0.38) }, { text: 'Description', width: W - Math.round(W*0.38) }],
-          d.regulatoryReferences.map(rr => [{ text: rr.reference, bold: true }, { text: rr.description }]),
-          A, ZB),
-
-        // 8.0 Sign-off
-        secHead('8.0', 'Sign-Off', A),
-        signOff(['Assessor', 'Responsible Person', 'Reviewed By'], A, [
-          { text: 'Role', width: Math.round(W*0.22) }, { text: 'Name', width: Math.round(W*0.28) },
-          { text: 'Signature', width: Math.round(W*0.25) }, { text: 'Date', width: W - Math.round(W*0.22) - Math.round(W*0.28) - Math.round(W*0.25) },
-        ]),
-        footerLine(),
-      ] }],
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['CONFINED SPACE', 'ASSESSMENT &', 'RESCUE PLAN'], d.spaceName ? `${d.spaceName} \u2014 ${d.projectName}` : d.projectName || '', A, TEAL_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef }, { label: 'Date', value: d.assessmentDate },
+            { label: 'Space', value: `${d.spaceName} \u2014 ${d.accessType}, ${d.maxDuration ? d.maxDuration + ' max' : ''}` },
+            { label: 'Classification', value: d.classification }, { label: 'Contractor', value: d.contractor },
+            ...(d.hospitalDetails.length > 0 ? [{ label: 'Nearest A&E', value: d.hospitalDetails[0]?.value || '' }] : []),
+            ...(d.frsDetails.length > 0 ? [{ label: 'FRS Response', value: d.frsDetails[0]?.value || '' }] : []),
+            { label: 'Rescue Method', value: d.rescueSteps.length > 0 ? 'Winch extraction' : '' },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — Rescue Steps, Extraction, Multi-Casualty, FRS/Hospital, Equipment
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('', 'RESCUE PROCEDURE \u2014 STEP SEQUENCE', A), h.spacer(80),
+          ...(d.rescueSteps.length > 0 ? [dataTable(A,
+            [{ text: 'STEP', width: resCols[0] }, { text: 'ACTION', width: resCols[1] }, { text: 'RESPONSIBILITY', width: resCols[2] }, { text: 'TIME', width: resCols[3] }, { text: 'EQUIPMENT', width: resCols[4] }],
+            d.rescueSteps.map(r => [r.step, r.action, r.responsibility, r.timeTarget, r.equipment])
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('', 'EXTRACTION METHOD \u2014 SPECIFIC PROCEDURE', A), h.spacer(80),
+          ...h.richBodyText(d.extractionMethod || d.rescuePlan || ''),
+          h.spacer(80), h.fullWidthSectionBar('', 'MULTIPLE CASUALTY DECISION TREE', A), h.spacer(80),
+          ...(d.multiCasualtyDecisions.length > 0 ? [dataTable(A,
+            [{ text: 'SCENARIO', width: mcCols[0] }, { text: 'ACTION', width: mcCols[1] }, { text: 'LIMITATION', width: mcCols[2] }],
+            d.multiCasualtyDecisions.map(m => [m.scenario, m.action, m.limitation])
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('', 'FRS PRE-NOTIFICATION & HOSPITAL ROUTE', A), h.spacer(80),
+          ...(d.frsDetails.length > 0 ? [h.coverInfoTable(d.frsDetails, A, W), h.spacer(40)] : []),
+          ...(d.hospitalDetails.length > 0 ? [h.coverInfoTable(d.hospitalDetails, A, W)] : []),
+          h.spacer(80), h.fullWidthSectionBar('', 'RESCUE EQUIPMENT INVENTORY', A), h.spacer(80),
+          ...(d.rescueEquipment.length > 0 ? [dataTable(A,
+            [{ text: 'EQUIPMENT', width: eqCols[0] }, { text: 'SPECIFICATION', width: eqCols[1] }, { text: 'STANDARD', width: eqCols[2] }, { text: 'LOCATION', width: eqCols[3] }],
+            d.rescueEquipment.map(e => [e.equipment, e.specification, e.standard, e.location])
+          )] : []),
+          h.spacer(40),
+          h.calloutBox(
+            'A rescue drill must be conducted at the start of the first entry day before any live entry commences. The drill must include tripod/winch deployment, SCBA donning, simulated casualty extraction, and communication cascade test.',
+            A, TEAL_BG, '134e4a', W, { boldPrefix: 'Rescue Drill Requirement:' }
+          ),
+          h.spacer(80),
+          h.signatureGrid(['CS Supervisor', 'Rescue Team Leader'], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
   });
 }
 

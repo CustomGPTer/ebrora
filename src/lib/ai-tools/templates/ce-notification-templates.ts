@@ -1,119 +1,373 @@
 // =============================================================================
-// COMPENSATION EVENT NOTIFICATION — Multi-Template Engine (3 templates: Formal, Corporate, Concise)
+// CE Notification Builder — Multi-Template Engine (REBUILT)
+// 3 templates matching HTML render library exactly.
+//
+// T1 — Formal Letter  (dark green #065F46, Arial, underline headings, ~3pp)
+// T2 — Corporate      (navy #1E3A5F, Cambria, full-width bar headings, ~2pp)
+// T3 — Concise        (slate #475569, Arial, left-border headings, ~2pp)
 // =============================================================================
 import {
   Document, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, WidthType, ShadingType, BorderStyle, VerticalAlign,
-  Header, Footer, PageNumber, PageBreak, TabStopType, TabStopPosition,
 } from 'docx';
 import * as h from '@/lib/rams/docx-helpers';
 import type { CeTemplateSlug } from '@/lib/ce/types';
 
 const W = h.A4_CONTENT_WIDTH;
-const cellPad = { top: 80, bottom: 80, left: 120, right: 120 };
-const hdrPad = { top: 100, bottom: 100, left: 140, right: 140 };
-const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
-const borders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
-const noBorders = { top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' } };
+const SM = 16; const BODY = 18; const LG = 22;
 
-interface Palette { primary: string; accent: string; dark: string; mid: string; rowAlt: string; font: string; bodySize: number; }
-const PALETTES: Record<CeTemplateSlug, Palette> = {
-  'formal-letter': { primary: '065F46', accent: '065F46', dark: '1A2E2A', mid: '6B7280', rowAlt: 'F2F2F2', font: 'Arial', bodySize: 20 },
-  'corporate': { primary: '1E3A5F', accent: '1E3A5F', dark: '1E293B', mid: '64748B', rowAlt: 'F1F5F9', font: 'Cambria', bodySize: 19 },
-  'concise': { primary: '475569', accent: '475569', dark: '334155', mid: '94A3B8', rowAlt: 'F8FAFC', font: 'Arial', bodySize: 20 },
-};
+const DK_GREEN = '065F46'; const DK_GREEN_SUB = 'A7F3D0'; const DK_GREEN_BG = 'ECFDF5';
+const NAVY = '1E3A5F'; const NAVY_SUB = 'BFDBFE'; const NAVY_BG = 'EFF6FF';
+const SLATE = '475569'; const SLATE_SUB = 'CBD5E1'; const SLATE_DK = '334155';
+const RED = 'DC2626'; const AMBER = 'D97706';
+const GREY = '6B7280'; const ZEBRA = 'F5F5F5';
 
-function hdrCell(p: Palette, t: string, w: number): TableCell { return new TableCell({ borders, width: { size: w, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: hdrPad, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text: t, bold: true, color: 'FFFFFF', font: p.font, size: p.bodySize })] })] }); }
-function dCell(p: Palette, t: string, w: number, o: { bold?: boolean; shade?: string } = {}): TableCell { return new TableCell({ borders, width: { size: w, type: WidthType.DXA }, shading: o.shade ? { fill: o.shade, type: ShadingType.CLEAR } : undefined, margins: cellPad, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text: t, bold: !!o.bold, font: p.font, size: p.bodySize, color: p.dark })] })] }); }
-function altRow(p: Palette, cells: [string, number, { bold?: boolean }?][], idx: number): TableRow { const shade = idx % 2 === 0 ? p.rowAlt : 'FFFFFF'; return new TableRow({ children: cells.map(([t, w, o]) => dCell(p, t, w, { shade, ...o })) }); }
-function bodyPara(p: Palette, t: string): Paragraph { return new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: t, font: p.font, size: p.bodySize, color: p.dark })] }); }
-function gap(s = 200): Paragraph { return new Paragraph({ spacing: { after: s }, children: [] }); }
-
-function sectionHead(slug: CeTemplateSlug, p: Palette, num: number, title: string): Paragraph | Table {
-  if (slug === 'formal-letter') return new Paragraph({ spacing: { before: 360, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: p.primary, space: 4 } }, children: [new TextRun({ text: `${num}. ${title.toUpperCase()}`, bold: true, font: p.font, size: 24, color: p.primary })] });
-  if (slug === 'corporate') { const ns = num < 10 ? `0${num}` : `${num}`; return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 80, bottom: 80, left: 160, right: 160 }, children: [new Paragraph({ children: [new TextRun({ text: `${ns}   ${title.toUpperCase()}`, bold: true, font: p.font, size: 22, color: 'FFFFFF' })] })] })] })] }); }
-  return new Paragraph({ spacing: { before: 280, after: 100 }, border: { left: { style: BorderStyle.SINGLE, size: 14, color: p.primary, space: 6 } }, indent: { left: 80 }, children: [new TextRun({ text: title, bold: true, font: p.font, size: 22, color: p.dark })] });
+// ── Data Interface ───────────────────────────────────────────────────────────
+interface CeData {
+  documentRef: string; notificationDate: string; contractRef: string;
+  projectName: string; siteAddress: string; contractor: string;
+  notifiedBy: string; notifiedTo: string;
+  ceClause: string; eventDate: string; relatedInstruction: string;
+  estimatedCost: string; estimatedProgrammeImpact: string;
+  eventDescription: string;
+  entitlementBasis: string;
+  programmeImpact: string;
+  programmeKpis: Array<{ value: string; label: string; sublabel?: string }>;
+  costItems: Array<{ element: string; description: string; amount: string }>;
+  totalCost: string;
+  evidence: Array<{ document: string; reference: string; status: string }>;
+  relatedNotices: string;
+  additionalNotes: string;
+  [key: string]: any;
 }
 
-function buildInfoTable(p: Palette, rows: [string, string][]): Table { return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [2800, W - 2800], rows: rows.map(([l, v], i) => altRow(p, [[l, 2800, { bold: true }], [v, W - 2800]], i)) }); }
-function buildBulletList(p: Palette, items: string[]): Paragraph[] { return (items || []).map(item => new Paragraph({ spacing: { after: 60 }, indent: { left: 280 }, children: [new TextRun({ text: '•  ', font: p.font, size: p.bodySize, color: p.accent }), new TextRun({ text: item, font: p.font, size: p.bodySize, color: p.dark })] })); }
-
-function buildCover(slug: CeTemplateSlug, p: Palette, d: any): (Paragraph | Table)[] {
-  if (slug === 'formal-letter') return [gap(200), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 400, bottom: 400, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }), new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'D1FAE5' })] }), new Paragraph({ children: [new TextRun({ text: `${d.documentRef || ''}  |  ${d.notificationDate || d.confirmationDate || d.rfiDate || d.noticeDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] })] })] })] }), gap(300)];
-  if (slug === 'corporate') return [gap(400), new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 350, bottom: 350, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 40, color: 'FFFFFF' })] }), new Paragraph({ children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] })] })] })] }), gap(300)];
-  return [];
+function extract(c: any): CeData {
+  const s = (k: string, fb = '') => (typeof c?.[k] === 'string' ? c[k] : fb);
+  const a = (k: string) => (Array.isArray(c?.[k]) ? c[k] : []);
+  const pi = c?.programmeImpact || {};
+  const ci = c?.costImplications || {};
+  // Build costItems from nested or flat
+  let costItems = a('costItems');
+  if (costItems.length === 0 && ci) {
+    const pairs: Array<{ element: string; description: string; amount: string }> = [];
+    if (ci.labourCost) pairs.push({ element: 'Labour', description: '', amount: ci.labourCost });
+    if (ci.plantCost) pairs.push({ element: 'Plant', description: '', amount: ci.plantCost });
+    if (ci.materialsCost) pairs.push({ element: 'Materials', description: '', amount: ci.materialsCost });
+    if (ci.subcontractorCost) pairs.push({ element: 'Subcontractor', description: '', amount: ci.subcontractorCost });
+    if (ci.preliminariesImpact) pairs.push({ element: 'Preliminaries', description: '', amount: ci.preliminariesImpact });
+    costItems = pairs;
+  }
+  // Build programmeKpis from nested or flat
+  let kpis = a('programmeKpis');
+  if (kpis.length === 0 && pi.estimatedDelay) {
+    kpis = [
+      { value: pi.estimatedDelay, label: 'Working Days Delay', sublabel: 'To Planned Completion' },
+      { value: pi.criticalPathAffected || 'Yes', label: 'Critical Path Affected', sublabel: '' },
+      { value: pi.plannedCompletionImpact || '', label: 'Revised Completion', sublabel: '' },
+    ];
+  }
+  return {
+    documentRef: s('documentRef', 'CEN-001'), notificationDate: s('notificationDate'), contractRef: s('contractReference') || s('contractRef'),
+    projectName: s('projectName'), siteAddress: s('siteAddress'), contractor: s('contractor'),
+    notifiedBy: s('notifiedBy'), notifiedTo: s('notifiedTo'),
+    ceClause: s('compensationEventClause') || s('ceClause'),
+    eventDate: s('eventDate'), relatedInstruction: typeof c?.relatedInstruction === 'object' ? c.relatedInstruction?.instructionRef || '' : s('relatedInstruction'),
+    estimatedCost: ci?.estimatedAdditionalCost || s('estimatedCost'),
+    estimatedProgrammeImpact: pi?.estimatedDelay ? `${pi.estimatedDelay} working days` : s('estimatedProgrammeImpact'),
+    eventDescription: s('eventDescription'), entitlementBasis: s('entitlementBasis'),
+    programmeImpact: typeof pi === 'string' ? pi : (pi?.programmeNarrative || s('programmeImpact')),
+    programmeKpis: kpis, costItems, totalCost: ci?.estimatedAdditionalCost || s('totalCost'),
+    evidence: a('supportingEvidence').length > 0 ? a('supportingEvidence') : a('evidence'),
+    relatedNotices: s('relatedNotices'), additionalNotes: s('additionalNotes'),
+  };
 }
 
-export async function buildCeTemplateDocument(content: any, templateSlug: CeTemplateSlug): Promise<Document> {
-  const p = PALETTES[templateSlug]; const d = content;
-  // Normalize schema field names to docx engine field names
-  const n: any = { ...d };
-  n.addressee = d.notifiedTo || d.addressee || '';
-  n.ceClause = d.compensationEventClause || d.ceClause || '';
-  n.contractRef = d.contractReference || d.contractRef || '';
-  n.contractor = d.notifiedBy || d.contractor || '';
-  n.preparedBy = d.notifiedBy || d.preparedBy || '';
-  n.contractualBasis = d.entitlementBasis || d.contractualBasis || '';
-  n.costImpact = String(d.costNarrative || d.costImplications?.narrative || (typeof d.costImpact === 'string' ? d.costImpact : d.costImpact?.narrative) || '');
-  n.programmeImpact = String(d.programmeNarrative || (typeof d.programmeImpact === 'string' ? d.programmeImpact : d.programmeImpact?.narrative) || '');
-  n.requiredActions = typeof d.quotationRequirements === 'object' ? JSON.stringify(d.quotationRequirements) : d.quotationRequirements || d.requiredActions || '';
-  n.supportingEvidence = d.supportingEvidence || [];
-  n.notificationDate = d.notificationDate || d.letterDate || '';
-  n.eventDescription = d.eventDescription || '';
-  const d2 = n;
+// ── Shared helpers ───────────────────────────────────────────────────────────
+function hdrCell(text: string, width: number, accent: string): TableCell {
+  return h.headerCell(text, width, { fillColor: accent, color: 'FFFFFF', fontSize: SM });
+}
+function txtCell(text: string, width: number, opts?: { bg?: string; bold?: boolean }): TableCell {
+  return h.dataCell(text, width, { fillColor: opts?.bg, bold: opts?.bold, fontSize: SM });
+}
+function ragCell(text: string, width: number): TableCell {
+  const low = (text || '').toLowerCase();
+  let bg = ZEBRA; let color = GREY;
+  if (low.includes('attached') || low.includes('yes')) { bg = 'D1FAE5'; color = '059669'; }
+  else if (low.includes('follow') || low.includes('pending')) { bg = 'FFFBEB'; color = AMBER; }
+  else if (low.includes('missing') || low.includes('no')) { bg = 'FEF2F2'; color = RED; }
+  return h.dataCell(text, width, { fillColor: bg, color, fontSize: SM, bold: true });
+}
+function dataTable(accent: string, headers: { text: string; width: number }[], rows: any[][], ragCols: number[] = []): Table {
+  return new Table({
+    width: { size: W, type: WidthType.DXA }, columnWidths: headers.map(h2 => h2.width),
+    rows: [
+      new TableRow({ children: headers.map(h2 => hdrCell(h2.text, h2.width, accent)) }),
+      ...rows.map((cells, ri) => new TableRow({
+        children: cells.map((cell, ci) =>
+          ragCols.includes(ci) ? ragCell(String(cell || ''), headers[ci].width) :
+          txtCell(String(cell || ''), headers[ci].width, {
+            bg: ri % 2 === 1 ? ZEBRA : undefined,
+            bold: (cell || '').toString().toUpperCase().includes('TOTAL'),
+          })
+        ),
+      })),
+    ],
+  });
+}
+function cols(ratios: number[]): number[] {
+  const widths = ratios.map(r => Math.round(W * r));
+  widths[widths.length - 1] = W - widths.slice(0, -1).reduce((a, b) => a + b, 0);
+  return widths;
+}
 
-  const children: (Paragraph | Table)[] = [];
-  const cover = buildCover(templateSlug, p, d);
-  if (cover.length > 0) { children.push(...cover); children.push(new Paragraph({ children: [new PageBreak()] })); }
+// Underline section heading (T1 Formal Letter style)
+function underlineHead(num: number, title: string, accent: string): Paragraph {
+  return new Paragraph({
+    spacing: { before: 360, after: 120 },
+    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: accent, space: 4 } },
+    children: [new TextRun({ text: `${num}. ${title.toUpperCase()}`, bold: true, font: 'Arial', size: 24, color: accent })],
+  });
+}
+// Left-border section heading (T3 Concise style)
+function leftBorderHead(title: string, accent: string): Paragraph {
+  return new Paragraph({
+    spacing: { before: 280, after: 100 },
+    border: { left: { style: BorderStyle.SINGLE, size: 14, color: accent, space: 6 } },
+    indent: { left: 80 },
+    children: [new TextRun({ text: title, bold: true, font: 'Arial', size: LG, color: SLATE_DK })],
+  });
+}
 
-  children.push(sectionHead(templateSlug, p, 1, 'Notification Details'));
-  children.push(buildInfoTable(p, [['Document Reference', d2.documentRef || ''], ['Date', d2.notificationDate || ''], ['Contract Reference', d2.contractRef || ''], ['Project', d2.projectName || ''], ['Site Address', d2.siteAddress || ''], ['Contractor', d2.contractor || ''], ['Addressed To', d2.addressee || ''], ['CE Clause Reference', d2.ceClause || '']]));
-  children.push(gap());
-  if (d2.eventDescription) {
-    children.push(sectionHead(templateSlug, p, 2, 'Event Description'));
-    for (const para of (d2.eventDescription as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-  if (d2.contractualBasis) {
-    children.push(sectionHead(templateSlug, p, 3, 'Contractual Basis'));
-    for (const para of (d2.contractualBasis as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-  if (d2.programmeImpact) {
-    children.push(sectionHead(templateSlug, p, 4, 'Programme Impact'));
-    for (const para of (d2.programmeImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-  if (d2.costImpact) {
-    children.push(sectionHead(templateSlug, p, 5, 'Cost Impact'));
-    for (const para of (d2.costImpact as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
-  if (d2.supportingEvidence?.length) {
-    children.push(sectionHead(templateSlug, p, 6, 'Supporting Evidence'));
-    children.push(...buildBulletList(p, d2.supportingEvidence));
-    children.push(gap());
-  }
-  if (d2.requiredActions) {
-    children.push(sectionHead(templateSlug, p, 7, 'Required Actions'));
-    for (const para of (d2.requiredActions as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-    children.push(gap());
-  }
+// Standard cover info rows
+function coverInfoRows(d: CeData): Array<{ label: string; value: string }> {
+  return [
+    { label: 'Document Reference', value: d.documentRef },
+    { label: 'Notification Date', value: d.notificationDate },
+    { label: 'Contract Reference', value: d.contractRef },
+    { label: 'Project', value: d.projectName },
+    { label: 'Site Address', value: d.siteAddress },
+    { label: 'Contractor', value: d.contractor },
+    { label: 'Notified By', value: d.notifiedBy },
+    { label: 'Addressed To', value: d.notifiedTo },
+    { label: 'CE Clause Reference', value: d.ceClause },
+    { label: 'Event Date', value: d.eventDate },
+    { label: 'Related Instruction', value: d.relatedInstruction },
+  ];
+}
 
-  // Signature block
-  children.push(gap(200));
-  const sigCw = [2200, 3200, 1800, W - 7200];
-  children.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: sigCw, rows: [
-    new TableRow({ children: [hdrCell(p, 'Role', sigCw[0]), hdrCell(p, 'Name', sigCw[1]), hdrCell(p, 'Signature', sigCw[2]), hdrCell(p, 'Date', sigCw[3])] }),
-    altRow(p, [['Prepared By', sigCw[0], { bold: true }], [d2.preparedBy || d2.raisedBy || '', sigCw[1]], ['', sigCw[2]], ['', sigCw[3]]], 0),
-  ] }));
 
-  children.push(gap(300));
-  children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '— End of Document —', italics: true, font: p.font, size: p.bodySize, color: p.mid })] }));
-  children.push(gap(80));
-  children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Generated by Ebrora — ebrora.com', font: p.font, size: 18, color: p.accent })] }));
+// ═════════════════════════════════════════════════════════════════════════════
+// T1 — FORMAL LETTER (Dark Green #065F46, Arial, underline headings)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT1(d: CeData): Document {
+  const A = DK_GREEN;
+  const hdr = h.accentHeader('Compensation Event Notification', A);
+  const ftr = h.accentFooter(d.documentRef, 'Formal Letter', A);
+  const costCols = cols([0.22, 0.54, 0.24]);
+  const evCols = cols([0.36, 0.38, 0.26]);
 
-  const hdr = new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'COMPENSATION EVENT NOTIFICATION', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d2.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
-  const ftr = new Footer({ children: [new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'NEC4 Compliant', font: p.font, size: 16, color: p.mid }), new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }), new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
-  return new Document({ styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } }, sections: [{ properties: { page: { size: { width: h.A4_WIDTH, height: h.A4_HEIGHT }, margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL } } }, headers: { default: hdr }, footers: { default: ftr }, children }] });
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['COMPENSATION EVENT', 'NOTIFICATION'], d.projectName || '', A, DK_GREEN_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Reference', value: d.documentRef },
+            { label: 'Notification Date', value: d.notificationDate },
+            { label: 'Contract Reference', value: d.contractRef },
+            { label: 'Project', value: d.projectName },
+            { label: 'Notified By', value: d.notifiedBy },
+            { label: 'Notified To', value: d.notifiedTo },
+            { label: 'CE Clause', value: d.ceClause },
+            { label: 'Event Date', value: d.eventDate },
+            { label: 'Estimated Cost Impact', value: d.estimatedCost },
+            { label: 'Estimated Programme Impact', value: d.estimatedProgrammeImpact },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — Notification, Event, Entitlement
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          underlineHead(1, 'NOTIFICATION DETAILS', A), h.spacer(40),
+          h.coverInfoTable(coverInfoRows(d), A, W),
+          underlineHead(2, 'EVENT DESCRIPTION', A), h.spacer(40),
+          ...h.richBodyText(d.eventDescription || ''),
+          underlineHead(3, 'CONTRACTUAL BASIS \u2014 ENTITLEMENT', A), h.spacer(40),
+          ...h.richBodyText(d.entitlementBasis || ''),
+        ] },
+      // Body — Programme, Cost, Evidence, Related Notices, Sig
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          underlineHead(4, 'PROGRAMME IMPACT', A), h.spacer(40),
+          ...(d.programmeKpis.length > 0 ? [h.kpiDashboard(d.programmeKpis.map(k => ({ value: k.value, label: k.label })), A, W), h.spacer(60)] : []),
+          ...h.richBodyText(d.programmeImpact || ''),
+          underlineHead(5, 'COST IMPLICATIONS', A), h.spacer(40),
+          ...(d.costItems.length > 0 ? [dataTable(A,
+            [{ text: 'COST ELEMENT', width: costCols[0] }, { text: 'DESCRIPTION', width: costCols[1] }, { text: 'AMOUNT (\u00A3)', width: costCols[2] }],
+            [...d.costItems.map(c => [c.element, c.description, c.amount]),
+             ['ESTIMATED TOTAL ADDITIONAL COST', '', d.totalCost || '']]
+          )] : []),
+          h.spacer(40),
+          h.calloutBox(
+            'This is a preliminary cost indication. A formal quotation will be submitted under Clause 62.3 within three weeks of the PM\'s instruction to submit quotations, including a revised programme per Clause 62.2.',
+            A, DK_GREEN_BG, '134e4a', W, { boldPrefix: 'Quotation Note:' }
+          ),
+          underlineHead(6, 'SUPPORTING EVIDENCE', A), h.spacer(40),
+          ...(d.evidence.length > 0 ? [dataTable(A,
+            [{ text: 'DOCUMENT', width: evCols[0] }, { text: 'REFERENCE', width: evCols[1] }, { text: 'STATUS', width: evCols[2] }],
+            d.evidence.map(e => [e.document, e.reference, e.status]), [2]
+          )] : []),
+          ...(d.relatedNotices ? [underlineHead(7, 'RELATED NOTICES', A), h.spacer(40), ...h.richBodyText(d.relatedNotices)] : []),
+          h.spacer(80),
+          h.signatureGrid(['Notified By', 'Received By'], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T2 — CORPORATE (Navy #1E3A5F, Cambria, full-width bar headings)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT2(d: CeData): Document {
+  const A = NAVY;
+  const hdr = h.accentHeader('Compensation Event Notification', A);
+  const ftr = h.accentFooter(d.documentRef, 'Corporate', A);
+  const costCols = cols([0.22, 0.54, 0.24]);
+  const evCols = cols([0.36, 0.38, 0.26]);
+
+  return new Document({
+    styles: { default: { document: { run: { font: 'Cambria', size: BODY } } } },
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['COMPENSATION EVENT', 'NOTIFICATION'], d.projectName || '', A, NAVY_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Reference', value: d.documentRef },
+            { label: 'Notification Date', value: d.notificationDate },
+            { label: 'Contract', value: d.contractRef },
+            { label: 'Project', value: d.projectName },
+            { label: 'Notified By', value: d.notifiedBy },
+            { label: 'Notified To', value: d.notifiedTo },
+            { label: 'CE Clause', value: d.ceClause },
+            { label: 'Estimated Cost', value: d.estimatedCost },
+            { label: 'Estimated Delay', value: d.estimatedProgrammeImpact },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('01', 'NOTIFICATION DETAILS', A), h.spacer(80),
+          h.coverInfoTable(coverInfoRows(d), A, W),
+          h.spacer(80), h.fullWidthSectionBar('02', 'EVENT DESCRIPTION', A), h.spacer(80),
+          ...h.richBodyText(d.eventDescription || ''),
+          h.spacer(80), h.fullWidthSectionBar('03', 'ENTITLEMENT BASIS', A), h.spacer(80),
+          ...h.richBodyText(d.entitlementBasis || ''),
+          h.spacer(80), h.fullWidthSectionBar('04', 'PROGRAMME & COST IMPACT', A), h.spacer(80),
+          ...(d.programmeKpis.length > 0 ? [h.kpiDashboard(d.programmeKpis.map(k => ({ value: k.value, label: k.label })), A, W), h.spacer(60)] : []),
+          ...(d.costItems.length > 0 ? [dataTable(A,
+            [{ text: 'COST ELEMENT', width: costCols[0] }, { text: 'DESCRIPTION', width: costCols[1] }, { text: '\u00A3', width: costCols[2] }],
+            [...d.costItems.map(c => [c.element, c.description, c.amount]),
+             ['TOTAL', '', d.totalCost || '']]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('05', 'SUPPORTING EVIDENCE', A), h.spacer(80),
+          ...(d.evidence.length > 0 ? [dataTable(A,
+            [{ text: 'DOCUMENT', width: evCols[0] }, { text: 'REFERENCE', width: evCols[1] }, { text: 'STATUS', width: evCols[2] }],
+            d.evidence.map(e => [e.document, e.reference, e.status]), [2]
+          )] : []),
+          h.spacer(80),
+          h.signatureGrid(['Notified By', 'Received By'], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T3 — CONCISE (Slate #475569, Arial, left-border headings)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT3(d: CeData): Document {
+  const A = SLATE;
+  const hdr = h.accentHeader('CE Notification \u2014 Concise', A);
+  const ftr = h.accentFooter(d.documentRef, 'Concise', A);
+  const costCols2 = cols([0.70, 0.30]);
+
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['CE NOTIFICATION'], `${d.projectName || ''} \u00B7 ${d.documentRef}`, A, SLATE_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef },
+            { label: 'Date', value: d.notificationDate },
+            { label: 'Contract', value: d.contractRef },
+            { label: 'Contractor', value: d.contractor },
+            { label: 'CE Clause', value: d.ceClause },
+            { label: 'Cost Impact', value: d.estimatedCost },
+            { label: 'Programme Impact', value: d.estimatedProgrammeImpact },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — compact single page
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          leftBorderHead('Notification Details', A),
+          h.coverInfoTable([
+            { label: 'Ref', value: d.documentRef }, { label: 'Date', value: d.notificationDate },
+            { label: 'Contract', value: d.contractRef },
+            { label: 'From', value: d.notifiedBy }, { label: 'To', value: d.notifiedTo },
+            { label: 'CE Clause', value: d.ceClause },
+            { label: 'Event Date', value: d.eventDate },
+            { label: 'Instruction', value: d.relatedInstruction },
+          ], A, W),
+          leftBorderHead('Event Summary', A),
+          ...h.richBodyText(d.eventDescription || ''),
+          leftBorderHead('Programme Impact', A),
+          ...h.richBodyText(d.programmeImpact || ''),
+          leftBorderHead(`Cost Impact \u2014 ${d.totalCost || d.estimatedCost || ''}`, A),
+          ...(d.costItems.length > 0 ? [dataTable(A,
+            [{ text: 'ELEMENT', width: costCols2[0] }, { text: '\u00A3', width: costCols2[1] }],
+            [...d.costItems.map(c => [c.element + (c.description ? ` (${c.description})` : ''), c.amount]),
+             ['TOTAL', d.totalCost || '']]
+          )] : []),
+          leftBorderHead('Evidence', A),
+          h.bodyText(
+            d.evidence.map(e => `${e.reference} (${e.status.toLowerCase()})`).join(' \u00B7 ') +
+            (d.relatedNotices ? `. ${d.relatedNotices}` : ''),
+            SM
+          ),
+          h.spacer(80),
+          h.signatureGrid(['Notified By', 'Received By'], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ROUTER
+// ═════════════════════════════════════════════════════════════════════════════
+export async function buildCeTemplateDocument(
+  content: any,
+  templateSlug: CeTemplateSlug
+): Promise<Document> {
+  const d = extract(content);
+  switch (templateSlug) {
+    case 'formal-letter': return buildT1(d);
+    case 'corporate':     return buildT2(d);
+    case 'concise':       return buildT3(d);
+    default:              return buildT1(d);
+  }
 }

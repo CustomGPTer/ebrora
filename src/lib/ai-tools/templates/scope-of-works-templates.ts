@@ -1,517 +1,435 @@
 // =============================================================================
-// Scope of Works Builder — Multi-Template Engine
-// 3 templates, all consuming the same ScopeOfWorksData JSON.
+// Scope of Works — Multi-Template Engine (REBUILT)
+// 3 templates matching HTML render library exactly.
 //
-// Templates:
-//   T1 — Corporate Blue   (blue headers, Arial, banded tables)
-//   T2 — Formal Contract   (charcoal + red clauses, Cambria, clause numbering)
-//   T3 — Executive Navy    (navy cover, teal bars, Calibri, contemporary)
+// T1 — Corporate Blue     (#1F4E79, comprehensive 9-section, numbered items)
+// T2 — Formal Contract    (#2D2D2D + #C0392B, clause-numbered, NEC4 focus)
+// T3 — Executive Navy     (#1B2A4A + #00897B, condensed, comparison tables)
 // =============================================================================
 import {
   Document, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, WidthType, ShadingType, BorderStyle, VerticalAlign,
-  Header, Footer, PageNumber, PageBreak, TabStopType, TabStopPosition,
 } from 'docx';
 import * as h from '@/lib/rams/docx-helpers';
 import type { ScopeTemplateSlug, ScopeOfWorksData } from '@/lib/scope/types';
 
-// ── Layout Constants ─────────────────────────────────────────────
-const W = h.A4_CONTENT_WIDTH; // 9026 DXA
-const cellPad = { top: 60, bottom: 60, left: 100, right: 100 };
-const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
-const borders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
+const W = h.A4_CONTENT_WIDTH;
+const SM = 16; const BODY = 18; const LG = 22;
+const CM = { top: 80, bottom: 80, left: 120, right: 120 };
 
-// ── Palette per template ─────────────────────────────────────────
-interface Palette {
-  primary: string;
-  primaryLight: string;
-  accent: string;
-  dark: string;
-  mid: string;
-  rowAlt: string;
-  font: string;
-  bodySize: number;
+// Colours
+const CORP_BLUE = '1F4E79'; const CORP_DARK = '163b5c'; const CORP_BG = 'D6E4F0';
+const CHARCOAL = '2D2D2D'; const DEEP_RED = 'C0392B'; const RED_DARK = '922b21';
+const EXEC_NAVY = '1B2A4A'; const NAVY_DARK = '0d1a33';
+const TEAL = '00897B'; const TEAL_BG = 'E0F2F1';
+const GREY = '6B7280'; const ZEBRA = 'F5F5F5';
+
+// ── Shared Helpers ───────────────────────────────────────────────────────────
+function hdrCell(text: string, width: number, bg: string): TableCell {
+  return new TableCell({ width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
+    shading: { fill: bg, type: ShadingType.CLEAR },
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text.toUpperCase(), bold: true, size: SM, font: 'Arial', color: h.WHITE })] })] });
+}
+function txtCell(text: string, width: number, opts?: { bold?: boolean; bg?: string; color?: string }): TableCell {
+  return new TableCell({ width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
+    shading: { fill: opts?.bg || h.WHITE, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.TOP,
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text || '\u2014', bold: opts?.bold, size: BODY, font: 'Arial', color: opts?.color })] })] });
+}
+function accentInfoTable(rows: Array<{ label: string; value: string }>, lbg: string, lc: string): Table {
+  const lw = Math.round(W * 0.28); const vw = W - lw;
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [lw, vw],
+    rows: rows.map(r => new TableRow({ children: [
+      new TableCell({ width: { size: lw, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
+        shading: { fill: lbg, type: ShadingType.CLEAR },
+        children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: r.label, bold: true, size: BODY, font: 'Arial', color: lc })] })] }),
+      new TableCell({ width: { size: vw, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
+        children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: r.value || '\u2014', size: BODY, font: 'Arial' })] })] }),
+    ] })) });
 }
 
-const PALETTES: Record<ScopeTemplateSlug, Palette> = {
-  'corporate-blue': { primary: '1F4E79', primaryLight: 'D6E4F0', accent: '1F4E79', dark: '404040', mid: '808080', rowAlt: 'F2F2F2', font: 'Arial', bodySize: 20 },
-  'formal-contract': { primary: '2D2D2D', primaryLight: 'F5F5F5', accent: 'C0392B', dark: '333333', mid: '666666', rowAlt: 'F5F5F5', font: 'Cambria', bodySize: 19 },
-  'executive-navy': { primary: '1B2A4A', primaryLight: 'E0F2F1', accent: '00897B', dark: '2C2C2C', mid: '777777', rowAlt: 'F8F7F5', font: 'Calibri', bodySize: 20 },
-};
-
-// ── Shared Helpers ───────────────────────────────────────────────
-function hdrCell(p: Palette, text: string, width: number): TableCell {
-  return new TableCell({
-    borders, width: { size: width, type: WidthType.DXA },
-    shading: { fill: p.primary, type: ShadingType.CLEAR },
-    margins: cellPad, verticalAlign: VerticalAlign.CENTER,
-    children: [new Paragraph({ children: [new TextRun({ text, bold: true, color: 'FFFFFF', font: p.font, size: p.bodySize })] })],
-  });
+// Inclusion/exclusion item block (numbered title + detail paragraph)
+function scopeItemBlock(no: string, title: string, detail: string, accent: string): Paragraph[] {
+  return [
+    new Paragraph({ spacing: { before: 120, after: 40 }, children: [
+      new TextRun({ text: `${no}. ${title}`, bold: true, size: BODY, font: 'Arial', color: accent }),
+    ] }),
+    new Paragraph({ spacing: { after: 80 }, indent: { left: 200 }, children: [
+      new TextRun({ text: detail, size: BODY, font: 'Arial' }),
+    ] }),
+  ];
 }
 
-function dCell(p: Palette, text: string, width: number, opts: { bold?: boolean; shade?: string; align?: (typeof AlignmentType)[keyof typeof AlignmentType] } = {}): TableCell {
-  return new TableCell({
-    borders, width: { size: width, type: WidthType.DXA },
-    shading: opts.shade ? { fill: opts.shade, type: ShadingType.CLEAR } : undefined,
-    margins: cellPad, verticalAlign: VerticalAlign.CENTER,
-    children: [new Paragraph({ alignment: opts.align, children: [new TextRun({ text, bold: !!opts.bold, font: p.font, size: p.bodySize, color: p.dark })] })],
-  });
-}
 
-function altRow(p: Palette, cells: [string, number, { bold?: boolean; align?: (typeof AlignmentType)[keyof typeof AlignmentType] }?][], idx: number): TableRow {
-  const shade = idx % 2 === 0 ? p.rowAlt : 'FFFFFF';
-  return new TableRow({
-    children: cells.map(([text, width, opts]) => dCell(p, text, width, { shade, ...opts })),
-  });
-}
+// ═════════════════════════════════════════════════════════════════════════════
+// T1 — CORPORATE BLUE (#1F4E79)
+// Cover + content. Section numbering: 01–09
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT1(d: ScopeOfWorksData): Document {
+  const A = CORP_BLUE;
+  const hdr = h.accentHeader('Subcontractor Scope of Works', A);
+  const ftr = h.accentFooter(d.documentRef, 'Corporate Blue', A);
+  const revCols = [Math.round(W * 0.08), Math.round(W * 0.14), Math.round(W * 0.38), Math.round(W * 0.20)];
+  revCols.push(W - revCols.reduce((a, b) => a + b, 0));
+  const attCols = [Math.round(W * 0.28), Math.round(W * 0.20)];
+  attCols.push(W - attCols[0] - attCols[1]);
 
-function bodyPara(p: Palette, text: string): Paragraph {
-  return new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text, font: p.font, size: p.bodySize, color: p.dark })] });
-}
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // ── COVER ──
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['SUBCONTRACTOR', 'SCOPE OF WORKS'], d.discipline || d.scopeOverview?.substring(0, 60) || '', CORP_DARK, '93C5FD'),
+          h.spacer(200),
+          h.projectNameBar(d.projectName || 'PROJECT', A),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Ref', value: d.documentRef },
+            { label: 'Issue Date', value: d.issueDate },
+            { label: 'Revision', value: d.revision },
+            { label: 'Project', value: d.projectName },
+            { label: 'Client', value: d.client },
+            { label: 'Principal Contractor', value: d.principalContractor },
+            { label: 'Contractor', value: d.principalContractor },
+            { label: 'Subcontractor', value: d.subcontractor },
+            { label: 'Discipline', value: d.discipline },
+            { label: 'Contract Form', value: d.contractForm },
+            { label: 'Prepared By', value: d.preparedBy },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // ── CONTENT ──
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          // 01 DOCUMENT CONTROL
+          h.fullWidthSectionBar('01', 'Document Control', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: revCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Rev', revCols[0], A), hdrCell('Date', revCols[1], A), hdrCell('Description', revCols[2], A), hdrCell('Issued By', revCols[3], A), hdrCell('Approved By', revCols[4], A)] }),
+              new TableRow({ children: [
+                txtCell(d.revision || '0', revCols[0]),
+                txtCell(d.issueDate, revCols[1]),
+                txtCell('First Issue \u2014 For Tender', revCols[2]),
+                txtCell(d.preparedBy, revCols[3]),
+                txtCell('', revCols[4]),
+              ] }),
+            ] }),
 
-function gap(size = 200): Paragraph {
-  return new Paragraph({ spacing: { after: size }, children: [] });
-}
+          // 02 SCOPE OVERVIEW
+          h.spacer(120),
+          h.fullWidthSectionBar('02', 'Scope Overview', A),
+          h.spacer(80),
+          ...h.richBodyText(d.scopeOverview || 'Scope overview to be confirmed.'),
 
-// ── Section heading — varies per template ────────────────────────
-let clauseCounter = 0;
+          // 03 INCLUSIONS
+          h.spacer(120),
+          h.fullWidthSectionBar('03', 'Inclusions', A),
+          h.spacer(80),
+          ...d.inclusions.flatMap(inc => scopeItemBlock(inc.no, inc.item, inc.detail, A)),
 
-function sectionHead(slug: ScopeTemplateSlug, p: Palette, num: number, title: string): Paragraph | Table {
-  if (slug === 'corporate-blue') {
-    return new Paragraph({
-      spacing: { before: 360, after: 120 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: p.primary, space: 4 } },
-      children: [new TextRun({ text: `${num}. ${title.toUpperCase()}`, bold: true, font: p.font, size: 24, color: p.primary })],
-    });
-  }
-  if (slug === 'formal-contract') {
-    return new Paragraph({
-      spacing: { before: 400, after: 140 },
-      children: [
-        new TextRun({ text: `${num}.  `, bold: true, font: p.font, size: 24, color: p.accent }),
-        new TextRun({ text: title.toUpperCase(), bold: true, font: p.font, size: 24, color: p.primary }),
-      ],
-    });
-  }
-  // executive-navy — full-width teal bar
-  const numStr = num < 10 ? `0${num}` : `${num}`;
-  return new Table({
-    width: { size: W, type: WidthType.DXA }, columnWidths: [W],
-    rows: [new TableRow({
-      children: [new TableCell({
-        borders: { top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' } },
-        width: { size: W, type: WidthType.DXA },
-        shading: { fill: p.accent, type: ShadingType.CLEAR },
-        margins: { top: 80, bottom: 80, left: 160, right: 160 },
-        children: [new Paragraph({
-          children: [
-            new TextRun({ text: `${numStr}   `, bold: true, font: p.font, size: 22, color: 'FFFFFF' }),
-            new TextRun({ text: title.toUpperCase(), bold: true, font: p.font, size: 22, color: 'FFFFFF' }),
-          ],
-        })],
-      })],
-    })],
-  });
-}
+          // 04 EXCLUSIONS
+          h.spacer(120),
+          h.fullWidthSectionBar('04', 'Exclusions', A),
+          h.spacer(80),
+          ...d.exclusions.flatMap(exc => scopeItemBlock(exc.no, exc.item, exc.detail, A)),
 
-function subPoint(p: Palette, num: string, text: string): Paragraph {
-  return new Paragraph({
-    spacing: { after: 100 }, indent: { left: 280 },
-    children: [
-      new TextRun({ text: `${num}  `, bold: true, font: p.font, size: p.bodySize, color: p.mid }),
-      new TextRun({ text, font: p.font, size: p.bodySize, color: p.dark }),
+          // 05 ATTENDANCE & INTERFACE
+          h.spacer(120),
+          h.fullWidthSectionBar('05', 'Attendance & Interface', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: attCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Item', attCols[0], A), hdrCell('Provided By', attCols[1], A), hdrCell('Notes', attCols[2], A)] }),
+              ...d.attendance.map((att, ri) => new TableRow({ children: [
+                txtCell(att.item, attCols[0], { bold: true, bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(att.providedBy, attCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(att.notes, attCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] }),
+
+          // 06 PROGRAMME
+          h.spacer(120),
+          h.fullWidthSectionBar('06', 'Programme', A),
+          h.spacer(80),
+          accentInfoTable([
+            { label: 'Start Date', value: d.programmeStart },
+            { label: 'Completion Date', value: d.programmeCompletion },
+            { label: 'Duration', value: d.keyMilestones?.split('\u00B7')[0]?.trim() || '' },
+            { label: 'Working Hours', value: d.workingHours },
+            { label: 'Key Milestones', value: d.keyMilestones },
+          ], CORP_BG, A),
+          h.spacer(40),
+          ...h.richBodyText(d.programmeNotes || ''),
+
+          // 07 HEALTH, SAFETY & ENVIRONMENT
+          h.spacer(120),
+          h.fullWidthSectionBar('07', 'Health, Safety & Environment', A),
+          h.spacer(80),
+          ...h.richBodyText(d.healthSafetyEnvironmental || ''),
+
+          // 08 COMMERCIAL TERMS
+          h.spacer(120),
+          h.fullWidthSectionBar('08', 'Commercial Terms', A),
+          h.spacer(80),
+          accentInfoTable([
+            { label: 'Payment Basis', value: d.paymentBasis },
+            { label: 'Application Date', value: d.applicationDate },
+            { label: 'Payment Terms', value: `${d.paymentDays} days from date of application` },
+            { label: 'Retention', value: `${d.retentionPercent}% (${d.retentionAtPC}% at Completion, ${d.retentionPercent - d.retentionAtPC}% at Defects Date)` },
+            { label: 'Defects Period', value: d.defectsPeriod },
+            { label: 'Latent Defects', value: `${d.latentDefectsYears} years (Limitation Act 1980)` },
+            { label: 'Insurance', value: d.insurance?.map(i => `${i.type}: ${i.minimumCover}`).join(' \u00B7 ') || '' },
+            { label: 'Performance Bond', value: `${d.bondPercent}% of subcontract value, delivered within ${d.bondDeliveryDays} days of award` },
+            { label: 'Governing Law', value: d.governingLaw },
+            { label: 'Dispute Resolution', value: `Adjudication per NEC4 W1, nominating body ${d.disputeNominatingBody}` },
+          ], CORP_BG, A),
+
+          // 09 APPROVAL
+          h.spacer(120),
+          h.fullWidthSectionBar('09', 'Approval', A),
+          h.spacer(80),
+          h.signatureGrid(['Prepared By', 'Approved By (PC)'], A, W),
+          h.spacer(80),
+          ...h.endMark(A),
+        ] },
     ],
   });
 }
 
-// ── Build document control table ─────────────────────────────────
-function buildDocControl(p: Palette, d: ScopeOfWorksData): Table {
-  const rows = [
-    ['Document Reference', d.documentRef],
-    ['Revision', d.revision],
-    ['Issue Date', d.issueDate],
-    ['Project Name', d.projectName],
-    ['Site Address', d.siteAddress],
-    ['Client', d.client],
-    ['Principal Contractor', d.principalContractor],
-    ['Subcontractor', d.subcontractor],
-    ['Discipline', d.discipline],
-    ['Contract Form', d.contractForm],
-  ];
-  return new Table({
-    width: { size: W, type: WidthType.DXA }, columnWidths: [2800, W - 2800],
-    rows: [
-      new TableRow({ children: [hdrCell(p, 'Field', 2800), hdrCell(p, 'Detail', W - 2800)] }),
-      ...rows.map(([l, v], i) => altRow(p, [[l, 2800, { bold: true }], [v, W - 2800]], i)),
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T2 — FORMAL CONTRACT (Charcoal #2D2D2D + Red #C0392B)
+// Cover + content. Section numbering: 1.0–6.0 with clause sub-numbering
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT2(d: ScopeOfWorksData): Document {
+  const A = CHARCOAL;
+  const AC = DEEP_RED;
+  const hdr = h.accentHeader('Scope of Works', AC);
+  const ftr = h.accentFooter(d.documentRef, 'Formal Contract', AC);
+
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // ── COVER ──
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['SCOPE OF WORKS'], 'Formal Contract Document \u00B7 NEC4 ECS Option A', RED_DARK, 'F5B7B1'),
+          h.spacer(200),
+          h.projectNameBar(`${d.projectName || 'PROJECT'} \u2014 ${d.discipline || ''}`, A),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Ref', value: d.documentRef },
+            { label: 'Issue Date / Rev', value: `${d.issueDate} \u00B7 Revision ${d.revision}` },
+            { label: 'Contract', value: d.contractForm },
+            { label: 'Contractor', value: d.principalContractor },
+            { label: 'Subcontractor', value: d.subcontractor },
+            { label: 'Discipline', value: d.discipline },
+          ], AC, W),
+          h.coverFooterLine(),
+        ] },
+      // ── CONTENT ──
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          // 1.0 CONTRACT BASIS
+          h.fullWidthSectionBar('1.0', 'Contract Basis', A),
+          h.spacer(80),
+          ...h.richBodyText(d.contractBasisNotes || ''),
+          ...(d.contractDocuments?.length > 0 ? [new Paragraph({ spacing: { before: 80, after: 80 }, children: [
+            new TextRun({ text: 'Contract Documents Schedule: ', bold: true, size: BODY, font: 'Arial', color: AC }),
+            new TextRun({ text: d.contractDocuments.join('; '), size: BODY, font: 'Arial' }),
+          ] })] : []),
+
+          // 2.0 SCOPE OF THE WORKS
+          h.spacer(120),
+          h.fullWidthSectionBar('2.0', 'Scope of the Works', A),
+          h.spacer(80),
+          ...h.richBodyText(d.scopeOverview || ''),
+          ...(d.exclusions.length > 0 ? [h.spacer(40), new Paragraph({ spacing: { after: 80 }, children: [
+            new TextRun({ text: 'Exclusions: ', bold: true, size: BODY, font: 'Arial', color: AC }),
+            new TextRun({ text: d.exclusions.map(e => e.item).join('; ') + '.', size: BODY, font: 'Arial' }),
+          ] })] : []),
+
+          // 3.0 DESIGN RESPONSIBILITY
+          h.spacer(120),
+          h.fullWidthSectionBar('3.0', 'Design Responsibility', A),
+          h.spacer(80),
+          ...h.richBodyText(d.designResponsibility || ''),
+
+          // 4.0 PROGRAMME & MILESTONES
+          h.spacer(120),
+          h.fullWidthSectionBar('4.0', 'Programme & Milestones', A),
+          h.spacer(80),
+          ...h.richBodyText(d.programmeNotes || `The Subcontractor shall commence the Works on ${d.programmeStart} and complete by ${d.programmeCompletion}. Key milestones: ${d.keyMilestones || 'To be agreed.'}`),
+
+          // 5.0 COMMERCIAL TERMS
+          h.spacer(120),
+          h.fullWidthSectionBar('5.0', 'Commercial Terms', A),
+          h.spacer(80),
+          ...h.richBodyText([
+            `Payment: ${d.paymentBasis}. Monthly valuations submitted on the ${d.applicationDate}. Payment within ${d.paymentDays} days per NEC4 clause 51.`,
+            `Retention: ${d.retentionPercent}% of assessed amounts. ${d.retentionAtPC}% released at Completion; ${d.retentionPercent - d.retentionAtPC}% released at expiry of the Defects Date (${d.defectsPeriod}).`,
+            `Insurance: ${d.insurance?.map(i => `${i.type} ${i.minimumCover}`).join('; ') || 'Per contract requirements.'}`,
+            `Performance Bond: ${d.bondPercent}% of the subcontract value, delivered within ${d.bondDeliveryDays} days of award.`,
+          ].join('\n\n')),
+
+          // 6.0 APPROVAL
+          h.spacer(120),
+          h.fullWidthSectionBar('6.0', 'Approval', A),
+          h.spacer(80),
+          h.signatureGrid(['For the Contractor', 'For the Subcontractor'], AC, W),
+          h.spacer(80),
+          ...h.endMark(AC),
+        ] },
     ],
   });
 }
 
-function buildApprovalTable(p: Palette, d: ScopeOfWorksData): Table {
-  const colW = [2200, 2600, 2200, W - 7000];
-  return new Table({
-    width: { size: W, type: WidthType.DXA }, columnWidths: colW,
-    rows: [
-      new TableRow({ children: [hdrCell(p, 'Role', colW[0]), hdrCell(p, 'Name', colW[1]), hdrCell(p, 'Signature', colW[2]), hdrCell(p, 'Date', colW[3])] }),
-      altRow(p, [['Prepared By', colW[0], { bold: true }], [d.preparedBy, colW[1]], ['', colW[2]], [d.issueDate, colW[3]]], 0),
-      altRow(p, [['Reviewed By', colW[0], { bold: true }], ['', colW[1]], ['', colW[2]], ['', colW[3]]], 1),
-      altRow(p, [['Accepted By (Sub)', colW[0], { bold: true }], ['', colW[1]], ['', colW[2]], ['', colW[3]]], 2),
-      altRow(p, [['Accepted By (PC)', colW[0], { bold: true }], ['', colW[1]], ['', colW[2]], ['', colW[3]]], 3),
-    ],
-  });
-}
 
-// ── Build standard 3-col data table ──────────────────────────────
-function build3ColTable(p: Palette, headers: [string, number][], data: string[][]): Table {
-  const colWidths = headers.map(([, w]) => w);
-  return new Table({
-    width: { size: W, type: WidthType.DXA }, columnWidths: colWidths,
-    rows: [
-      new TableRow({ children: headers.map(([label, w]) => hdrCell(p, label, w)) }),
-      ...data.map((row, i) => altRow(p, row.map((text, ci) => [text, colWidths[ci], ci === 0 ? { align: AlignmentType.CENTER } : ci === 1 ? { bold: true } : {}] as [string, number, { bold?: boolean; align?: (typeof AlignmentType)[keyof typeof AlignmentType] }?]), i)),
-    ],
-  });
-}
+// ═════════════════════════════════════════════════════════════════════════════
+// T3 — EXECUTIVE NAVY (#1B2A4A + Teal #00897B)
+// Cover + content. Section numbering: 01–06. Dual-colour accent.
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT3(d: ScopeOfWorksData): Document {
+  const A = TEAL; // Section bars use teal
+  const hdr = h.accentHeader('Scope of Works', TEAL);
+  const ftr = h.accentFooter(d.documentRef, 'Executive Navy', TEAL);
 
-function build2ColTable(p: Palette, headers: [string, number][], data: [string, string][]): Table {
-  const colWidths = headers.map(([, w]) => w);
-  return new Table({
-    width: { size: W, type: WidthType.DXA }, columnWidths: colWidths,
-    rows: [
-      new TableRow({ children: headers.map(([label, w]) => hdrCell(p, label, w)) }),
-      ...data.map(([l, v], i) => altRow(p, [[l, colWidths[0], { bold: true }], [v, colWidths[1]]], i)),
-    ],
-  });
-}
+  const incExcCols = [Math.round(W * 0.50)]; incExcCols.push(W - incExcCols[0]);
+  const delCols = [Math.round(W * 0.35), Math.round(W * 0.25)]; delCols.push(W - delCols[0] - delCols[1]);
+  const mileCols = [Math.round(W * 0.40), Math.round(W * 0.20)]; mileCols.push(W - mileCols[0] - mileCols[1]);
 
-// ── Commercial Boilerplate Builders ──────────────────────────────
-function buildPaymentSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Payment Mechanism'),
-    bodyPara(p, `Payment shall be made on a ${d.paymentCycle.toLowerCase()} cycle in accordance with the subcontract payment provisions. ${d.subcontractor} shall submit an application for payment by the ${d.applicationDate}, detailing the value of work completed against the ${d.paymentBasis.toLowerCase().includes('activity') ? 'activity schedule' : 'agreed valuation basis'}.`),
-    bodyPara(p, `The principal contractor shall issue a payment certificate within 7 days of the assessment date. Payment shall be made within ${d.paymentDays} days of the assessment date. A pay-less notice, if applicable, shall be issued no later than 7 days before the final date for payment, in accordance with the Housing Grants, Construction and Regeneration Act 1996 (as amended by the Local Democracy, Economic Development and Construction Act 2009).`),
-    bodyPara(p, `Retention shall be held at ${d.retentionPercent}% of the gross valuation, reduced to ${d.retentionAtPC}% at practical completion. The remaining retention shall be released at the expiry of the defects correction period, subject to satisfactory completion of all defects.`),
-  ];
-}
-
-function buildDayworkSection(p: Palette, slug: ScopeTemplateSlug, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Daywork & Provisional Sums'),
-    bodyPara(p, 'Any works instructed outside the defined scope shall be valued in accordance with the agreed schedule of daywork rates, appended to the subcontract. Daywork rates shall include for all overheads, profit, supervision, and small tools.'),
-    bodyPara(p, 'No daywork shall be undertaken without a written daywork instruction from the principal contractor. Daywork sheets must be submitted for signature within 48 hours of the work being carried out. Failure to obtain signature within 7 days shall result in the daywork being deemed unverified.'),
-    bodyPara(p, 'Provisional sums, where included, shall be expended only on the written instruction of the principal contractor and valued at the actual cost of the works plus the agreed percentage for overheads and profit.'),
-  ];
-}
-
-function buildVariationSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  const isNEC = d.contractForm.toLowerCase().includes('nec');
-  return [
-    sectionHead(slug, p, secNum, 'Variation Procedure'),
-    bodyPara(p, `All variations shall be managed in accordance with the ${isNEC ? 'NEC4 ECS compensation event procedure' : 'contract variation provisions'}. ${d.subcontractor} shall not carry out any varied work without a written instruction from the principal contractor.`),
-    bodyPara(p, `Upon receipt of a variation instruction, ${d.subcontractor} shall submit a quotation within 3 weeks, including the effect on the prices and any impact on the programme. Quotations must be supported by a detailed breakdown of labour, materials, plant, and subcontractor costs.`),
-  ];
-}
-
-function buildDelaySection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Delay & Liquidated Damages'),
-    bodyPara(p, `${d.subcontractor} shall complete the works by the completion date stated in the accepted programme. Time is of the essence.`),
-    bodyPara(p, `Liquidated damages for delay shall apply at the rate of ${d.ladRate.toLowerCase()}. The principal contractor reserves the right to recover liquidated damages from the subcontractor where delay is attributable to the subcontractor's default, including failure to adequately resource the works.`),
-  ];
-}
-
-function buildTerminationSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Termination'),
-    bodyPara(p, `Either party may terminate the subcontract in accordance with the termination provisions of the contract. Grounds for termination by the principal contractor include insolvency, persistent breach, failure to comply with health and safety obligations, and substantial failure to meet programme milestones.`),
-    bodyPara(p, `Upon termination, ${d.subcontractor} shall secure the works, remove all plant and temporary works, and provide a full account of work completed and materials on site. The principal contractor shall be entitled to recover any additional costs incurred in completing the works.`),
-  ];
-}
-
-function buildDisputeSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Dispute Resolution'),
-    bodyPara(p, `Any dispute arising out of or in connection with this subcontract shall be referred to adjudication in accordance with the Housing Grants, Construction and Regeneration Act 1996, with the nominating body being the ${d.disputeNominatingBody}.`),
-    bodyPara(p, `The parties shall endeavour to resolve disputes by negotiation and, where appropriate, mediation prior to referral to adjudication. The subcontract shall be governed by the laws of ${d.governingLaw}, and the courts of ${d.governingLaw} shall have exclusive jurisdiction.`),
-  ];
-}
-
-function buildContraChargeSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Contra-Charges & Set-Off'),
-    bodyPara(p, `The principal contractor reserves the right to contra-charge ${d.subcontractor} for costs arising from defective work, non-compliance with site rules, failure to maintain adequate welfare or safety standards, or failure to adequately resource the works.`),
-    bodyPara(p, `Written notice of the intention to contra-charge shall be given no less than 7 days prior to any deduction, detailing the nature of the default and the costs incurred. ${d.subcontractor} shall have the right to respond in writing within 5 working days of receipt of notice.`),
-  ];
-}
-
-function buildWarrantiesBondsSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Collateral Warranties & Bonds'),
-    bodyPara(p, `${d.subcontractor} shall, if required by the principal contractor, execute collateral warranties in favour of the client, any funder, and any future tenant or purchaser, in the form appended to the subcontract.`),
-    bodyPara(p, `A performance bond of ${d.bondPercent}% of the subcontract value shall be provided by ${d.subcontractor} from a surety approved by the principal contractor, to be delivered within ${d.bondDeliveryDays} days of subcontract award. A parent company guarantee may be accepted at the principal contractor's discretion.`),
-  ];
-}
-
-function buildCISSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'CIS & Tax'),
-    bodyPara(p, `${d.subcontractor} confirms that it is registered under the Construction Industry Scheme (CIS) and holds ${d.cisStatus}. Evidence of CIS registration must be provided prior to the first payment application. All payments shall be subject to CIS deductions where applicable.`),
-    bodyPara(p, `${d.subcontractor} is solely responsible for the tax affairs of its employees and any self-employed operatives engaged on the works, including PAYE, National Insurance, and VAT. VAT shall be applied at the prevailing rate on all invoices.`),
-  ];
-}
-
-function buildInsuranceSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Insurance'),
-    build2ColTable(p,
-      [['Insurance Type', 4500], ['Minimum Cover', W - 4500]],
-      d.insurance.map((ins) => [ins.type, ins.minimumCover] as [string, string]),
-    ),
-    bodyPara(p, `Insurance certificates must be provided to the principal contractor prior to commencement and renewed annually. ${d.subcontractor} shall notify the principal contractor immediately of any material change to its insurance arrangements.`),
-  ];
-}
-
-function buildBackToBackSection(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Back-to-Back Obligations'),
-    bodyPara(p, `${d.subcontractor} acknowledges that the obligations under this subcontract flow down from the main contract between the principal contractor and the client. The subcontractor's obligations, including programme, quality, safety, and defects liability, shall be back-to-back with the main contract to the extent applicable.`),
-    bodyPara(p, `The defects correction period of ${d.defectsPeriod} is aligned with the main contract. ${d.subcontractor} shall remain liable for latent defects for a period of ${d.latentDefectsYears} years (or ${d.latentDefectsYears * 2} years where the subcontract is executed as a deed) from practical completion.`),
-  ];
-}
-
-function buildCommercialSummary(p: Palette, slug: ScopeTemplateSlug, d: ScopeOfWorksData, secNum: number): (Paragraph | Table)[] {
-  return [
-    sectionHead(slug, p, secNum, 'Commercial Terms Summary'),
-    build2ColTable(p,
-      [['Item', 3500], ['Detail', W - 3500]],
-      [
-        ['Payment Basis', d.paymentBasis],
-        ['Retention', `${d.retentionPercent}% reducing to ${d.retentionAtPC}% at practical completion`],
-        ['Defects Correction Period', d.defectsPeriod],
-        ['Liquidated Damages', d.ladRate],
-        ['Performance Bond', `${d.bondPercent}% of subcontract value`],
-        ['Governing Law', `Laws of ${d.governingLaw}`],
-      ],
-    ),
-  ];
-}
-
-// ── Header / Footer per template ─────────────────────────────────
-function makeHeader(p: Palette, d: ScopeOfWorksData): Header {
-  return new Header({
-    children: [new Paragraph({
-      border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } },
-      children: [
-        new TextRun({ text: 'SCOPE OF WORKS', bold: true, font: p.font, size: 17, color: p.primary }),
-        new TextRun({ text: `\t${d.documentRef}  |  Rev ${d.revision}`, font: p.font, size: 16, color: p.mid }),
-      ],
-      tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-    })],
-  });
-}
-
-function makeFooter(p: Palette, d: ScopeOfWorksData): Footer {
-  return new Footer({
-    children: [new Paragraph({
-      border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } },
-      children: [
-        new TextRun({ text: `Confidential — ${d.subcontractor}`, font: p.font, size: 16, color: p.mid }),
-        new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }),
-        new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid }),
-      ],
-      tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-    })],
-  });
-}
-
-// ── Cover page — varies per template ─────────────────────────────
-function buildCover(slug: ScopeTemplateSlug, p: Palette, d: ScopeOfWorksData): (Paragraph | Table)[] {
-  if (slug === 'executive-navy') {
-    return [
-      new Table({
-        width: { size: W, type: WidthType.DXA }, columnWidths: [W],
-        rows: [new TableRow({
-          children: [new TableCell({
-            borders: { top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' } },
-            width: { size: W, type: WidthType.DXA },
-            shading: { fill: p.primary, type: ShadingType.CLEAR },
-            margins: { top: 250, bottom: 250, left: 300, right: 300 },
-            children: [
-              new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'SCOPE OF WORKS', bold: true, font: p.font, size: 52, color: 'FFFFFF' })] }),
-              new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d.discipline, font: p.font, size: 28, color: '80CBC4' })] }),
-              new Paragraph({ children: [new TextRun({ text: `${d.projectName} — ${d.siteAddress}`, font: p.font, size: 22, color: 'B0BEC5' })] }),
-            ],
-          })],
-        })],
-      }),
-      gap(150),
-    ];
+  // Build inc/exc comparison rows — match items by index
+  const maxRows = Math.max(d.inclusions.length, d.exclusions.length);
+  const compRows: TableRow[] = [];
+  for (let i = 0; i < maxRows; i++) {
+    const inc = d.inclusions[i];
+    const exc = d.exclusions[i];
+    compRows.push(new TableRow({ children: [
+      txtCell(inc ? `${inc.item}` : '', incExcCols[0], { bg: i % 2 === 0 ? ZEBRA : h.WHITE }),
+      txtCell(exc ? `${exc.item}` : '', incExcCols[1], { bg: i % 2 === 0 ? ZEBRA : h.WHITE }),
+    ] }));
   }
 
-  const titleSize = slug === 'formal-contract' ? 56 : 52;
-  return [
-    new Paragraph({
-      spacing: { before: 80, after: 40 },
-      children: [new TextRun({ text: 'SCOPE OF WORKS', bold: true, font: p.font, size: titleSize, color: p.primary })],
-    }),
-    new Paragraph({
-      spacing: { after: 150 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: slug === 'formal-contract' ? 4 : 8, color: p.accent, space: 8 } },
-      children: [new TextRun({ text: `${d.discipline} — ${d.projectName}`, font: p.font, size: 28, color: p.dark })],
-    }),
-    gap(80),
-  ];
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // ── COVER ──
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['SCOPE OF WORKS'], `${d.discipline} \u00B7 ${d.subcontractor || 'Subcontractor Package'}`, NAVY_DARK, '80CBC4'),
+          h.spacer(200),
+          h.projectNameBar(d.projectName || 'PROJECT', TEAL),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Ref', value: d.documentRef },
+            { label: 'Issue Date / Rev', value: `${d.issueDate} \u00B7 Revision ${d.revision}` },
+            { label: 'Project', value: d.projectName },
+            { label: 'Client', value: d.client },
+            { label: 'Contractor', value: d.principalContractor },
+            { label: 'Subcontractor', value: d.subcontractor },
+            { label: 'Contract', value: d.contractForm },
+            { label: 'Discipline', value: d.discipline },
+            { label: 'Programme', value: `${d.programmeStart} \u2013 ${d.programmeCompletion}` },
+          ], TEAL, W),
+          h.coverFooterLine(),
+        ] },
+      // ── CONTENT ──
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          // 01 SCOPE OVERVIEW
+          h.fullWidthSectionBar('01', 'Scope Overview', A),
+          h.spacer(80),
+          ...h.richBodyText(d.scopeOverview || ''),
+
+          // 02 INCLUSIONS & EXCLUSIONS (comparison table)
+          h.spacer(120),
+          h.fullWidthSectionBar('02', 'Inclusions & Exclusions', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: incExcCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Included (Subcontractor)', incExcCols[0], EXEC_NAVY), hdrCell('Excluded (by Contractor)', incExcCols[1], EXEC_NAVY)] }),
+              ...compRows,
+            ] }),
+
+          // 03 DESIGN & MATERIALS
+          h.spacer(120),
+          h.fullWidthSectionBar('03', 'Design & Materials', A),
+          h.spacer(80),
+          new Paragraph({ spacing: { after: 60 }, children: [
+            new TextRun({ text: 'Design: ', bold: true, size: BODY, font: 'Arial' }),
+            new TextRun({ text: d.designResponsibility || '', size: BODY, font: 'Arial' }),
+          ] }),
+          new Paragraph({ spacing: { after: 60 }, children: [
+            new TextRun({ text: 'Materials: ', bold: true, size: BODY, font: 'Arial' }),
+            new TextRun({ text: d.materialsEquipment || '', size: BODY, font: 'Arial' }),
+          ] }),
+
+          // 04 TESTING & DELIVERABLES
+          h.spacer(120),
+          h.fullWidthSectionBar('04', 'Testing & Deliverables', A),
+          h.spacer(80),
+          ...(d.deliverables.length > 0 ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: delCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Deliverable', delCols[0], EXEC_NAVY), hdrCell('Required By', delCols[1], EXEC_NAVY), hdrCell('Format', delCols[2], EXEC_NAVY)] }),
+              ...d.deliverables.map((del, ri) => new TableRow({ children: [
+                txtCell(del.document, delCols[0], { bold: true, bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(del.requiredBy, delCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(del.format, delCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] })] : []),
+
+          // 05 PROGRAMME & MILESTONES
+          h.spacer(120),
+          h.fullWidthSectionBar('05', 'Programme & Milestones', A),
+          h.spacer(80),
+          ...(d.interfaces?.length > 0 || d.keyMilestones ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: mileCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Milestone', mileCols[0], EXEC_NAVY), hdrCell('Target Date', mileCols[1], EXEC_NAVY), hdrCell('Dependencies', mileCols[2], EXEC_NAVY)] }),
+              // Derive milestones from interfaces or keyMilestones text
+              ...(d.interfaces?.length > 0 ? d.interfaces.map((iface, ri) => new TableRow({ children: [
+                txtCell(iface.interfaceWith, mileCols[0], { bold: true, bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(iface.description, mileCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(iface.responsibility, mileCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })) : []),
+            ] })] : []),
+          h.spacer(40),
+          ...h.richBodyText(d.programmeNotes || ''),
+
+          // 06 COMMERCIAL SUMMARY
+          h.spacer(120),
+          h.fullWidthSectionBar('06', 'Commercial Summary', A),
+          h.spacer(80),
+          accentInfoTable([
+            { label: 'Payment', value: `${d.paymentBasis}, ${d.paymentDays} days net, NEC4 cl. 51 \u00B7 Application ${d.applicationDate}` },
+            { label: 'Retention', value: `${d.retentionPercent}% (${d.retentionAtPC}% at Completion, ${d.retentionPercent - d.retentionAtPC}% at Defects Date \u2014 ${d.defectsPeriod})` },
+            { label: 'Insurance', value: d.insurance?.map(i => `${i.type} ${i.minimumCover}`).join(' \u00B7 ') || '' },
+            { label: 'Bond', value: `${d.bondPercent}%, ${d.bondDeliveryDays} days from award` },
+            { label: 'Latent Defects', value: `${d.latentDefectsYears} years \u00B7 Governing law: ${d.governingLaw} \u00B7 Disputes: ${d.disputeNominatingBody} adjudication` },
+          ], TEAL_BG, TEAL),
+
+          // Sign-off + end mark
+          h.spacer(120),
+          h.signatureGrid(['Contractor', 'Subcontractor'], TEAL, W),
+          h.spacer(80),
+          ...h.endMark(TEAL),
+        ] },
+    ],
+  });
 }
 
-// =================================================================
-// MAIN BUILD FUNCTION
-// =================================================================
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ROUTER
+// ═════════════════════════════════════════════════════════════════════════════
 export async function buildScopeTemplateDocument(
   content: ScopeOfWorksData,
   templateSlug: ScopeTemplateSlug,
 ): Promise<Document> {
-  const p = PALETTES[templateSlug];
-  const d = content;
-  let sec = 0; // section counter
-
-  // ── Build all content children ──────────────────────────────
-  const children: (Paragraph | Table)[] = [];
-
-  // Cover + doc control
-  children.push(...buildCover(templateSlug, p, d));
-  children.push(buildDocControl(p, d));
-  children.push(gap());
-  children.push(buildApprovalTable(p, d));
-  children.push(gap());
-
-  // 1. Scope Overview
-  children.push(sectionHead(templateSlug, p, ++sec, 'Scope Overview'));
-  children.push(bodyPara(p, d.scopeOverview));
-
-  // 2. Contract Basis
-  children.push(sectionHead(templateSlug, p, ++sec, 'Contract Basis'));
-  children.push(bodyPara(p, d.contractBasisNotes));
-  if (d.contractDocuments?.length) {
-    children.push(bodyPara(p, `This scope is to be read in conjunction with: ${d.contractDocuments.join('; ')}.`));
+  switch (templateSlug) {
+    case 'corporate-blue':    return buildT1(content);
+    case 'formal-contract':   return buildT2(content);
+    case 'executive-navy':    return buildT3(content);
+    default:                  return buildT1(content);
   }
-
-  // 3. Inclusions
-  children.push(sectionHead(templateSlug, p, ++sec, 'Inclusions'));
-  children.push(build3ColTable(p,
-    [['No.', 600], ['Item', 2000], ['Detail', W - 2600]],
-    d.inclusions.map((inc) => [inc.no, inc.item, inc.detail]),
-  ));
-
-  // 4. Exclusions
-  children.push(sectionHead(templateSlug, p, ++sec, 'Exclusions'));
-  children.push(build3ColTable(p,
-    [['No.', 600], ['Item', 2200], ['Detail', W - 2800]],
-    d.exclusions.map((exc) => [exc.no, exc.item, exc.detail]),
-  ));
-
-  // 5. Design Responsibility
-  children.push(sectionHead(templateSlug, p, ++sec, 'Design Responsibility'));
-  children.push(bodyPara(p, d.designResponsibility));
-
-  // 6. Materials & Equipment
-  children.push(sectionHead(templateSlug, p, ++sec, 'Materials & Equipment'));
-  children.push(bodyPara(p, d.materialsEquipment));
-  children.push(build2ColTable(p,
-    [['Item', 3000], ['Detail', W - 3000]],
-    [['Free-Issue Items', d.freeIssueItems], ['Material Approval Process', d.materialApprovalProcess]],
-  ));
-
-  // 7. Attendance & Facilities
-  children.push(sectionHead(templateSlug, p, ++sec, 'Attendance & Facilities'));
-  children.push(build3ColTable(p,
-    [['Item', 2800], ['Provided By', 2513], ['Notes', W - 5313]],
-    d.attendance.map((a) => [a.item, a.providedBy, a.notes]),
-  ));
-
-  // 8. Programme & Sequencing
-  children.push(sectionHead(templateSlug, p, ++sec, 'Programme & Sequencing'));
-  children.push(build2ColTable(p,
-    [['Item', 3000], ['Detail', W - 3000]],
-    [['Planned Start', d.programmeStart], ['Planned Completion', d.programmeCompletion], ['Working Hours', d.workingHours], ['Key Milestones', d.keyMilestones]],
-  ));
-  children.push(bodyPara(p, d.programmeNotes));
-
-  children.push(new Paragraph({ children: [new PageBreak()] }));
-
-  // 9. Interface Requirements
-  children.push(sectionHead(templateSlug, p, ++sec, 'Interface Requirements'));
-  children.push(build3ColTable(p,
-    [['Interface With', 2200], ['Description', Math.floor((W - 2200) / 2)], ['Responsibility', W - 2200 - Math.floor((W - 2200) / 2)]],
-    d.interfaces.map((iface) => [iface.interfaceWith, iface.description, iface.responsibility]),
-  ));
-
-  // 10. Testing & Commissioning
-  children.push(sectionHead(templateSlug, p, ++sec, 'Testing & Commissioning'));
-  children.push(bodyPara(p, d.testingCommissioning));
-
-  // 11. Deliverables
-  children.push(sectionHead(templateSlug, p, ++sec, 'Deliverables'));
-  children.push(build3ColTable(p,
-    [['Document', 3400], ['Required By', 3313], ['Format', W - 6713]],
-    d.deliverables.map((del) => [del.document, del.requiredBy, del.format]),
-  ));
-
-  // 12. H&S&E
-  children.push(sectionHead(templateSlug, p, ++sec, 'Health, Safety & Environmental'));
-  children.push(bodyPara(p, d.healthSafetyEnvironmental));
-
-  children.push(new Paragraph({ children: [new PageBreak()] }));
-
-  // ── Conditional sections ───────────────────────────────────
-  if (d.groundConditions) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Ground Conditions & Site Information'));
-    children.push(bodyPara(p, d.groundConditions));
-  }
-
-  if (d.priceEscalation) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Price Escalation / Inflation'));
-    children.push(bodyPara(p, d.priceEscalation));
-  }
-
-  if (d.contaminationRisk) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Contamination & Environmental Risk'));
-    children.push(bodyPara(p, d.contaminationRisk));
-  }
-
-  // ── Commercial boilerplate sections ────────────────────────
-  children.push(...buildPaymentSection(p, templateSlug, d, ++sec));
-  children.push(...buildDayworkSection(p, templateSlug, ++sec));
-  children.push(...buildVariationSection(p, templateSlug, d, ++sec));
-  children.push(...buildDelaySection(p, templateSlug, d, ++sec));
-  children.push(...buildTerminationSection(p, templateSlug, d, ++sec));
-  children.push(...buildDisputeSection(p, templateSlug, d, ++sec));
-  children.push(...buildContraChargeSection(p, templateSlug, d, ++sec));
-  children.push(...buildWarrantiesBondsSection(p, templateSlug, d, ++sec));
-  children.push(...buildCISSection(p, templateSlug, d, ++sec));
-  children.push(...buildInsuranceSection(p, templateSlug, d, ++sec));
-  children.push(...buildBackToBackSection(p, templateSlug, d, ++sec));
-  children.push(...buildCommercialSummary(p, templateSlug, d, ++sec));
-
-  // ── Footer ─────────────────────────────────────────────────
-  children.push(gap(300));
-  children.push(new Paragraph({
-    alignment: AlignmentType.CENTER,
-    children: [new TextRun({ text: '— End of Scope of Works —', italics: true, font: p.font, size: p.bodySize, color: p.mid })],
-  }));
-
-  // ── Assemble document ──────────────────────────────────────
-  return new Document({
-    styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } },
-    sections: [{
-      properties: {
-        page: {
-          size: { width: h.A4_WIDTH, height: h.A4_HEIGHT },
-          margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL },
-        },
-      },
-      headers: { default: makeHeader(p, d) },
-      footers: { default: makeFooter(p, d) },
-      children,
-    }],
-  });
 }

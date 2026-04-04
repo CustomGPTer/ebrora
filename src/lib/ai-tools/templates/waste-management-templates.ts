@@ -1,113 +1,483 @@
 // =============================================================================
-// Site Waste Management Plan — Multi-Template Engine
-// 3 templates: Full Compliance, Corporate, Site Record
+// Waste Management Plan — Multi-Template Engine (REBUILT)
+// 3 templates matching HTML render library exactly.
+//
+// T1 — Site Record      (green #4D7C0F, practical tracking)
+// T2 — Corporate        (navy #1E3A5F, client submission, hierarchy strategy)
+// T3 — Full Compliance  (teal #0F766E, EPA 1990, duty of care, full forecast)
 // =============================================================================
-import { Document, Paragraph, TextRun, Table, TableRow, TableCell, AlignmentType, WidthType, ShadingType, BorderStyle, VerticalAlign, Header, Footer, PageNumber, PageBreak, TabStopType, TabStopPosition } from 'docx';
+import {
+  Document, Paragraph, TextRun, Table, TableRow, TableCell,
+  AlignmentType, WidthType, ShadingType, BorderStyle, VerticalAlign,
+} from 'docx';
 import * as h from '@/lib/rams/docx-helpers';
 import type { WasteTemplateSlug } from '@/lib/waste/types';
 
 const W = h.A4_CONTENT_WIDTH;
-const cellPad = { top: 80, bottom: 80, left: 120, right: 120 };
-const hdrPad = { top: 100, bottom: 100, left: 140, right: 140 };
-const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
-const borders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
-const noBorders = { top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' } };
+const SM = 16; const BODY = 18; const LG = 22;
+const CM = { top: 80, bottom: 80, left: 120, right: 120 };
 
-interface Palette { primary: string; accent: string; dark: string; mid: string; rowAlt: string; font: string; bodySize: number; }
-const PALETTES: Record<WasteTemplateSlug, Palette> = {
-  'full-compliance': { primary: '0F766E', accent: '0F766E', dark: '1A2E2A', mid: '6B7280', rowAlt: 'F0FDFA', font: 'Arial', bodySize: 20 },
-  'corporate':       { primary: '1E3A5F', accent: '1E3A5F', dark: '1E293B', mid: '64748B', rowAlt: 'F1F5F9', font: 'Cambria', bodySize: 19 },
-  'site-record':     { primary: '4D7C0F', accent: '4D7C0F', dark: '365314', mid: '6B7280', rowAlt: 'F7FEE7', font: 'Calibri', bodySize: 20 },
-};
-type DL = 'full' | 'standard' | 'practical';
-const DETAIL: Record<WasteTemplateSlug, DL> = { 'full-compliance': 'full', 'corporate': 'standard', 'site-record': 'practical' };
-function show(slug: WasteTemplateSlug, s: string): boolean {
-  const l = DETAIL[slug];
-  const always = ['details', 'streams', 'segregation'];
-  const standard = [...always, 'hierarchy', 'carriers', 'facilities', 'monitoring'];
-  const full = [...standard, 'cover', 'regulatory', 'targets', 'contaminated', 'transfer-log'];
-  if (l === 'full') return full.includes(s); if (l === 'standard') return standard.includes(s); return always.includes(s);
+// Colours
+const LIME = '4D7C0F'; const LIME_DARK = '365314';
+const NAVY = '1E3A5F'; const NAVY_DARK = '0f2440';
+const TEAL = '0F766E'; const TEAL_DARK = '134e4a'; const TEAL_BG = 'f0fdf4';
+const GREEN_RAG = '059669'; const RED_D = '991B1B';
+const GREY = '6B7280'; const ZEBRA = 'F5F5F5';
+
+// ── Data Interfaces ──────────────────────────────────────────────────────────
+interface WasteStream { stream: string; ewcCode: string; estimatedVolume: string; classification: string; container: string; disposalRoute: string; hierarchyLevel: string; carrier: string; facility: string; costEstimate: string; diversionRate: string; }
+interface SkipEntry { skipId: string; type: string; size: string; location: string; delivered: string; collected: string; wtnRef: string; }
+interface TransferNote { wtnRef: string; date: string; wasteType: string; ewcCode: string; quantity: string; carrier: string; destination: string; }
+interface SegregationItem { item: string; checked: boolean; notes: string; }
+interface HierarchyStep { level: number; title: string; description: string; }
+interface CarrierFacility { company: string; role: string; registration: string; expiry: string; wasteTypes: string; verified: boolean; }
+interface KpiTarget { value: string; label: string; }
+interface RegRef { reference: string; description: string; }
+
+interface WmpData {
+  documentRef: string; planDate: string; revision: string;
+  preparedBy: string; reviewedBy: string; approvedBy: string;
+  projectName: string; siteAddress: string; client: string;
+  principalContractor: string; contractReference: string;
+  estimatedProjectValue: string; estimatedTotalWaste: string; diversionTarget: string;
+  projectOverview: string;
+  regulatoryContext: string;
+  wasteStreams: WasteStream[];
+  skipLog: SkipEntry[];
+  transferNotes: TransferNote[];
+  segregationChecklist: SegregationItem[];
+  hierarchySteps: HierarchyStep[];
+  carrierFacilities: CarrierFacility[];
+  kpiTargets: KpiTarget[];
+  kpiNarrative: string;
+  dutyCareStatement: string;
+  monitoringSchedule: string;
+  regulatoryReferences: RegRef[];
+  additionalNotes: string;
 }
 
-function hdrCell(p: Palette, t: string, w: number): TableCell { return new TableCell({ borders, width: { size: w, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: hdrPad, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text: t, bold: true, color: 'FFFFFF', font: p.font, size: p.bodySize })] })] }); }
-function dCell(p: Palette, t: string, w: number, o: { bold?: boolean; shade?: string } = {}): TableCell { return new TableCell({ borders, width: { size: w, type: WidthType.DXA }, shading: o.shade ? { fill: o.shade, type: ShadingType.CLEAR } : undefined, margins: cellPad, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text: t, bold: !!o.bold, font: p.font, size: p.bodySize, color: p.dark })] })] }); }
-function altRow(p: Palette, cells: [string, number, { bold?: boolean }?][], idx: number): TableRow { const shade = idx % 2 === 0 ? p.rowAlt : 'FFFFFF'; return new TableRow({ children: cells.map(([t, w, o]) => dCell(p, t, w, { shade, ...o })) }); }
-function bodyPara(p: Palette, t: string): Paragraph { return new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: t, font: p.font, size: p.bodySize, color: p.dark })] }); }
-function gap(s = 200): Paragraph { return new Paragraph({ spacing: { after: s }, children: [] }); }
-function sectionHead(slug: WasteTemplateSlug, p: Palette, num: number, title: string): Paragraph | Table {
-  if (slug === 'full-compliance') return new Paragraph({ spacing: { before: 360, after: 120 }, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: p.primary, space: 4 } }, children: [new TextRun({ text: `${num}. ${title.toUpperCase()}`, bold: true, font: p.font, size: 24, color: p.primary })] });
-  if (slug === 'corporate') { const ns = num < 10 ? `0${num}` : `${num}`; return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 80, bottom: 80, left: 160, right: 160 }, children: [new Paragraph({ children: [new TextRun({ text: `${ns}   ${title.toUpperCase()}`, bold: true, font: p.font, size: 22, color: 'FFFFFF' })] })] })] })] }); }
-  return new Paragraph({ spacing: { before: 280, after: 100 }, border: { left: { style: BorderStyle.SINGLE, size: 14, color: p.primary, space: 6 } }, indent: { left: 80 }, children: [new TextRun({ text: title, bold: true, font: p.font, size: 22, color: p.dark })] });
+// ── Extract ──────────────────────────────────────────────────────────────────
+function extract(c: any): WmpData {
+  const s = (v: any, fb = '') => v ?? fb;
+  const a = (v: any) => Array.isArray(v) ? v : [];
+  return {
+    documentRef: s(c.documentRef), planDate: s(c.planDate), revision: s(c.revision, '0'),
+    preparedBy: s(c.preparedBy), reviewedBy: s(c.reviewedBy), approvedBy: s(c.approvedBy),
+    projectName: s(c.projectName), siteAddress: s(c.siteAddress), client: s(c.client),
+    principalContractor: s(c.principalContractor), contractReference: s(c.contractReference),
+    estimatedProjectValue: s(c.estimatedProjectValue), estimatedTotalWaste: s(c.estimatedTotalWaste),
+    diversionTarget: s(c.diversionTarget, '95%'),
+    projectOverview: s(c.projectOverview),
+    regulatoryContext: s(c.regulatoryContext),
+    wasteStreams: a(c.wasteStreams),
+    skipLog: a(c.skipLog),
+    transferNotes: a(c.transferNotes),
+    segregationChecklist: a(c.segregationChecklist).length > 0 ? a(c.segregationChecklist) : defaultChecklist(),
+    hierarchySteps: a(c.hierarchySteps).length > 0 ? a(c.hierarchySteps) : defaultHierarchy(),
+    carrierFacilities: a(c.carrierFacilities || c.carrierRegister),
+    kpiTargets: a(c.kpiTargets),
+    kpiNarrative: s(c.kpiNarrative),
+    dutyCareStatement: s(c.dutyCareStatement),
+    monitoringSchedule: s(c.monitoringSchedule),
+    regulatoryReferences: a(c.regulatoryReferences),
+    additionalNotes: s(c.additionalNotes),
+  };
 }
-function buildInfoTable(p: Palette, rows: [string, string][]): Table { return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [2800, W - 2800], rows: rows.map(([l, v], i) => altRow(p, [[l, 2800, { bold: true }], [v, W - 2800]], i)) }); }
-function buildDataTable(p: Palette, headers: [string, number][], data: string[][]): Table { const cw = headers.map(([, w]) => w); return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: cw, rows: [new TableRow({ children: headers.map(([l, w]) => hdrCell(p, l, w)) }), ...data.map((row, i) => altRow(p, row.map((t, ci) => [t, cw[ci]] as [string, number]), i))] }); }
 
-function buildCover(slug: WasteTemplateSlug, p: Palette, d: any): (Paragraph | Table)[] {
-  if (slug === 'full-compliance') return [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 300, bottom: 300, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: 'SITE WASTE', bold: true, font: p.font, size: 48, color: 'FFFFFF' })] }), new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'MANAGEMENT PLAN', bold: true, font: p.font, size: 36, color: '80CBC4' })] }), new Paragraph({ children: [new TextRun({ text: `${d.projectName || ''}  |  ${d.documentRef || ''}`, font: p.font, size: 20, color: 'B2DFDB' })] })] })] })] }), gap(120), new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'EPA 1990 s.34 — Duty of Care', bold: true, font: p.font, size: 18, color: p.accent })] }), gap(150)];
-  if (slug === 'corporate') return [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [new TableCell({ borders: noBorders, width: { size: W, type: WidthType.DXA }, shading: { fill: p.primary, type: ShadingType.CLEAR }, margins: { top: 300, bottom: 300, left: 300, right: 300 }, children: [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'WASTE MANAGEMENT PLAN', bold: true, font: p.font, size: 44, color: 'FFFFFF' })] }), new Paragraph({ children: [new TextRun({ text: d.projectName || '', font: p.font, size: 22, color: 'BFDBFE' })] })] })] })] }), gap(150)];
-  return [];
+function defaultChecklist(): SegregationItem[] {
+  return [
+    { item: 'All skips clearly labelled with waste type and EWC code', checked: true, notes: '' },
+    { item: 'Segregation signage displayed at skip locations', checked: true, notes: '' },
+    { item: 'Concrete washout bay sealed and bunded', checked: true, notes: '' },
+    { item: 'Hazardous waste area separate and locked', checked: true, notes: '' },
+    { item: 'Toolbox talk on waste segregation delivered', checked: true, notes: '' },
+    { item: 'Duty of care transfer notes file maintained', checked: true, notes: '' },
+  ];
+}
+function defaultHierarchy(): HierarchyStep[] {
+  return [
+    { level: 1, title: 'Prevention', description: 'Accurate material ordering, BIM quantities, just-in-time delivery' },
+    { level: 2, title: 'Reuse', description: 'Excavated material reuse, formwork reuse, temporary works materials' },
+    { level: 3, title: 'Recycling', description: 'Segregated streams to licensed recycling facilities' },
+    { level: 4, title: 'Disposal', description: 'Residual waste to MRF, hazardous to licensed facilities' },
+  ];
 }
 
-export async function buildWasteTemplateDocument(content: any, templateSlug: WasteTemplateSlug): Promise<Document> {
-  const p = PALETTES[templateSlug]; const d = content; let sec = 0;
-  const children: (Paragraph | Table)[] = [];
-  const cover = buildCover(templateSlug, p, d);
-  if (cover.length > 0) { children.push(...cover); }
+// ── Shared Helpers ───────────────────────────────────────────────────────────
+function hdrCell(text: string, width: number, bg: string): TableCell {
+  return new TableCell({ width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
+    shading: { fill: bg, type: ShadingType.CLEAR },
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text.toUpperCase(), bold: true, size: SM, font: 'Arial', color: h.WHITE })] })] });
+}
+function txtCell(text: string, width: number, opts?: { bold?: boolean; bg?: string; color?: string }): TableCell {
+  return new TableCell({ width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
+    shading: { fill: opts?.bg || h.WHITE, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.TOP,
+    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text || '\u2014', bold: opts?.bold, size: BODY, font: 'Arial', color: opts?.color })] })] });
+}
+function checkCell(checked: boolean, width: number): TableCell {
+  return new TableCell({ width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
+    verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 },
+      children: [new TextRun({ text: checked ? '\u2713 YES' : '\u2717 NO', bold: true, size: SM, font: 'Arial', color: checked ? GREEN_RAG : RED_D })] })] });
+}
 
-  children.push(sectionHead(templateSlug, p, ++sec, 'Plan Details'));
-  children.push(buildInfoTable(p, [['Document Reference', d.documentRef || ''], ['Date', d.planDate || ''], ['Review Date', d.reviewDate || ''], ['Prepared By', d.preparedBy || ''], ['Project', d.projectName || ''], ['Site Address', d.siteAddress || ''], ['Client', d.client || ''], ['Principal Contractor', d.principalContractor || '']]));
-  children.push(gap());
+// Waste hierarchy step block (numbered box + text)
+function hierarchyBlock(step: HierarchyStep, accent: string): Table {
+  const numW = 500; const contentW = W - numW;
+  const colours = ['059669', '2563EB', 'D97706', 'DC2626'];
+  const fill = colours[Math.min(step.level - 1, colours.length - 1)] || accent;
+  const noBorder = { style: BorderStyle.NONE, size: 0, color: h.WHITE };
+  const noBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [numW, contentW],
+    rows: [new TableRow({ children: [
+      new TableCell({ width: { size: numW, type: WidthType.DXA }, shading: { fill, type: ShadingType.CLEAR }, borders: noBorders,
+        margins: { top: 80, bottom: 80, left: 60, right: 60 }, verticalAlign: VerticalAlign.CENTER,
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: String(step.level), bold: true, size: 28, font: 'Arial', color: h.WHITE })] })] }),
+      new TableCell({ width: { size: contentW, type: WidthType.DXA }, borders: { ...noBorders, left: { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' } },
+        margins: { top: 80, bottom: 80, left: 140, right: 140 },
+        children: [new Paragraph({ spacing: { after: 0 }, children: [
+          new TextRun({ text: `${step.title}: `, bold: true, size: BODY, font: 'Arial' }),
+          new TextRun({ text: step.description, size: BODY, font: 'Arial' }),
+        ] })] }),
+    ] })] });
+}
 
-  if (show(templateSlug, 'regulatory') && d.regulatoryContext) { children.push(sectionHead(templateSlug, p, ++sec, 'Regulatory Context')); for (const para of (d.regulatoryContext as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para)); children.push(gap()); }
 
-  children.push(sectionHead(templateSlug, p, ++sec, 'Project Overview'));
-  for (const para of (d.projectOverview || '').split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-  children.push(gap());
+// ═════════════════════════════════════════════════════════════════════════════
+// T1 — SITE RECORD (Green #4D7C0F)
+// Cover + content. Section numbering: 01, 02...
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT1(d: WmpData): Document {
+  const A = LIME;
+  const hdr = h.accentHeader('Site Waste Record', A);
+  const ftr = h.accentFooter(d.documentRef, 'Site Record', A);
 
-  children.push(sectionHead(templateSlug, p, ++sec, 'Waste Streams'));
-  if (d.wasteStreams?.length) {
-    const ws = [Math.floor(W*0.16), Math.floor(W*0.10), Math.floor(W*0.12), Math.floor(W*0.12), Math.floor(W*0.16), Math.floor(W*0.16), W - Math.floor(W*0.16) - Math.floor(W*0.10) - Math.floor(W*0.12) - Math.floor(W*0.12) - Math.floor(W*0.16) - Math.floor(W*0.16)];
-    children.push(buildDataTable(p, [['Stream', ws[0]], ['EWC', ws[1]], ['Class', ws[2]], ['Volume', ws[3]], ['Source', ws[4]], ['Segregation', ws[5]], ['Route', ws[6]]], d.wasteStreams.map((s: any) => [s.stream || '', s.ewcCode || '', s.classification || '', s.estimatedVolume || '', s.source || '', s.segregationMethod || '', s.disposalRoute || ''])));
+  const streamCols = [Math.round(W * 0.18), Math.round(W * 0.10), Math.round(W * 0.10), Math.round(W * 0.12), Math.round(W * 0.18)];
+  streamCols.push(W - streamCols.reduce((a, b) => a + b, 0));
+  const skipCols = [Math.round(W * 0.08), Math.round(W * 0.14), Math.round(W * 0.10), Math.round(W * 0.20), Math.round(W * 0.14), Math.round(W * 0.14)];
+  skipCols.push(W - skipCols.reduce((a, b) => a + b, 0));
+  const wtnCols = [Math.round(W * 0.10), Math.round(W * 0.10), Math.round(W * 0.16), Math.round(W * 0.10), Math.round(W * 0.10), Math.round(W * 0.18)];
+  wtnCols.push(W - wtnCols.reduce((a, b) => a + b, 0));
+  const segCols = [Math.round(W * 0.50), Math.round(W * 0.15)];
+  segCols.push(W - segCols[0] - segCols[1]);
+
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['SITE WASTE', 'RECORD'], 'Practical Tracking \u2014 Skips, Transfer Notes & Segregation', LIME_DARK, 'D9F99D'),
+          h.spacer(200),
+          h.projectNameBar(d.projectName || 'PROJECT', A),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef },
+            { label: 'Date', value: d.planDate },
+            { label: 'Site Manager', value: d.preparedBy },
+            { label: 'Project', value: d.projectName },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          // 01 WASTE STREAM SUMMARY
+          h.fullWidthSectionBar('01', 'Waste Stream Summary', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: streamCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Waste Stream', streamCols[0], A), hdrCell('EWC Code', streamCols[1], A), hdrCell('Est. Qty', streamCols[2], A), hdrCell('Classification', streamCols[3], A), hdrCell('Container', streamCols[4], A), hdrCell('Disposal Route', streamCols[5], A)] }),
+              ...d.wasteStreams.map((ws, ri) => new TableRow({ children: [
+                txtCell(ws.stream, streamCols[0], { bold: true, bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.ewcCode, streamCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.estimatedVolume, streamCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.classification, streamCols[3], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE, color: ws.classification?.toLowerCase() === 'hazardous' ? RED_D : undefined, bold: ws.classification?.toLowerCase() === 'hazardous' }),
+                txtCell(ws.container, streamCols[4], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.disposalRoute, streamCols[5], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] }),
+
+          // 02 SKIP / CONTAINER LOG
+          h.spacer(120),
+          h.fullWidthSectionBar('02', 'Skip / Container Log', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: skipCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Skip ID', skipCols[0], A), hdrCell('Type', skipCols[1], A), hdrCell('Size', skipCols[2], A), hdrCell('Location', skipCols[3], A), hdrCell('Delivered', skipCols[4], A), hdrCell('Collected', skipCols[5], A), hdrCell('WTN Ref', skipCols[6], A)] }),
+              ...d.skipLog.map((sk, ri) => new TableRow({ children: [
+                txtCell(sk.skipId, skipCols[0], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(sk.type, skipCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(sk.size, skipCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(sk.location, skipCols[3], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(sk.delivered, skipCols[4], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(sk.collected, skipCols[5], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(sk.wtnRef, skipCols[6], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] }),
+
+          // 03 TRANSFER NOTE REGISTER
+          h.spacer(120),
+          h.fullWidthSectionBar('03', 'Transfer Note Register', A),
+          h.spacer(80),
+          ...(d.transferNotes.length > 0 ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: wtnCols,
+            rows: [
+              new TableRow({ children: [hdrCell('WTN Ref', wtnCols[0], A), hdrCell('Date', wtnCols[1], A), hdrCell('Waste Type', wtnCols[2], A), hdrCell('EWC', wtnCols[3], A), hdrCell('Qty', wtnCols[4], A), hdrCell('Carrier', wtnCols[5], A), hdrCell('Destination', wtnCols[6], A)] }),
+              ...d.transferNotes.map((tn, ri) => new TableRow({ children: [
+                txtCell(tn.wtnRef, wtnCols[0], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(tn.date, wtnCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(tn.wasteType, wtnCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(tn.ewcCode, wtnCols[3], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(tn.quantity, wtnCols[4], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(tn.carrier, wtnCols[5], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(tn.destination, wtnCols[6], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] })] : [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 },
+              children: [new TextRun({ text: 'No waste transfers to date', size: BODY, font: 'Arial', italics: true, color: GREY })] })]),
+
+          // 04 SEGREGATION CHECKLIST
+          h.spacer(120),
+          h.fullWidthSectionBar('04', 'Segregation Checklist', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: segCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Item', segCols[0], A), hdrCell('Check', segCols[1], A), hdrCell('Notes', segCols[2], A)] }),
+              ...d.segregationChecklist.map((sc, ri) => new TableRow({ children: [
+                txtCell(sc.item, segCols[0], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                checkCell(sc.checked, segCols[1]),
+                txtCell(sc.notes, segCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] }),
+
+          h.spacer(120),
+          ...h.endMark(A),
+        ] },
+    ],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T2 — CORPORATE (Navy #1E3A5F)
+// Cover + content. Section numbering: 01, 02...
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT2(d: WmpData): Document {
+  const A = NAVY;
+  const hdr = h.accentHeader('Site Waste Management Plan', A);
+  const ftr = h.accentFooter(d.documentRef, 'Corporate', A);
+
+  const forecastCols = [Math.round(W * 0.16), Math.round(W * 0.08), Math.round(W * 0.10), Math.round(W * 0.10), Math.round(W * 0.16), Math.round(W * 0.12)];
+  forecastCols.push(W - forecastCols.reduce((a, b) => a + b, 0));
+  const carrierCols = [Math.round(W * 0.20), Math.round(W * 0.12), Math.round(W * 0.18), Math.round(W * 0.14)];
+  carrierCols.push(W - carrierCols.reduce((a, b) => a + b, 0));
+
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['SITE WASTE', 'MANAGEMENT PLAN'], 'Corporate Format \u2014 Client Submission & Tender Document', NAVY_DARK, '93C5FD'),
+          h.spacer(200),
+          h.projectNameBar(d.projectName || 'PROJECT', A),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef },
+            { label: 'Date / Rev', value: `${d.planDate} \u00B7 Revision ${d.revision}` },
+            { label: 'Prepared By', value: d.preparedBy },
+            { label: 'Reviewed By', value: d.reviewedBy },
+            { label: 'Project', value: d.projectName },
+            { label: 'Contract', value: d.contractReference },
+            { label: 'Contractor', value: d.principalContractor },
+            { label: 'Client', value: d.client },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          // 01 WASTE HIERARCHY STRATEGY
+          h.fullWidthSectionBar('01', 'Waste Hierarchy Strategy', A),
+          h.spacer(80),
+          ...d.hierarchySteps.map(step => {
+            const els: (Paragraph | Table)[] = [hierarchyBlock(step, A), h.spacer(40)];
+            return els;
+          }).flat(),
+
+          // 02 WASTE FORECAST
+          h.spacer(80),
+          h.fullWidthSectionBar('02', 'Waste Forecast', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: forecastCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Waste Stream', forecastCols[0], A), hdrCell('EWC', forecastCols[1], A), hdrCell('Forecast', forecastCols[2], A), hdrCell('Class', forecastCols[3], A), hdrCell('Route', forecastCols[4], A), hdrCell('Diversion', forecastCols[5], A), hdrCell('Cost Est.', forecastCols[6], A)] }),
+              ...d.wasteStreams.map((ws, ri) => new TableRow({ children: [
+                txtCell(ws.stream, forecastCols[0], { bold: true, bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.ewcCode, forecastCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.estimatedVolume, forecastCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.classification, forecastCols[3], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE, color: ws.classification?.toLowerCase() === 'hazardous' ? RED_D : undefined, bold: ws.classification?.toLowerCase() === 'hazardous' }),
+                txtCell(ws.disposalRoute, forecastCols[4], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.diversionRate || '', forecastCols[5], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.costEstimate || '', forecastCols[6], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] }),
+
+          // 03 CARRIER & FACILITY REGISTER
+          h.spacer(120),
+          h.fullWidthSectionBar('03', 'Carrier & Facility Register', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: carrierCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Company', carrierCols[0], A), hdrCell('Role', carrierCols[1], A), hdrCell('EA Licence', carrierCols[2], A), hdrCell('Expiry', carrierCols[3], A), hdrCell('Waste Types', carrierCols[4], A)] }),
+              ...d.carrierFacilities.map((cf, ri) => new TableRow({ children: [
+                txtCell(cf.company, carrierCols[0], { bold: true, bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(cf.role, carrierCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(cf.registration, carrierCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(cf.expiry, carrierCols[3], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(cf.wasteTypes, carrierCols[4], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] }),
+
+          // 04 KPI TARGETS & MONITORING
+          h.spacer(120),
+          h.fullWidthSectionBar('04', 'KPI Targets & Monitoring', A),
+          h.spacer(80),
+          ...(d.kpiTargets.length > 0 ? [h.kpiDashboard(d.kpiTargets, A, W)] : [h.kpiDashboard([
+            { value: d.diversionTarget || '95%', label: 'Landfill Diversion Target' },
+            { value: '0', label: 'Duty of Care Breaches' },
+            { value: '100%', label: 'Soil Reuse On Site' },
+            { value: 'Monthly', label: 'Review Frequency' },
+          ], A, W)]),
+
+          // Sign-off + end mark
+          h.spacer(120),
+          h.signatureGrid(['Prepared By', 'Approved By'], A, W),
+          h.spacer(80),
+          ...h.endMark(A),
+        ] },
+    ],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T3 — FULL COMPLIANCE (Teal #0F766E)
+// Cover + content. Section numbering: 01, 02...
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT3(d: WmpData): Document {
+  const A = TEAL;
+  const LBG = TEAL_BG; const LC = TEAL;
+  const hdr = h.accentHeader('Site Waste Management Plan', A);
+  const ftr = h.accentFooter(d.documentRef, 'Full Compliance', A);
+
+  const fullCols = [Math.round(W * 0.14), Math.round(W * 0.07), Math.round(W * 0.08), Math.round(W * 0.08), Math.round(W * 0.13), Math.round(W * 0.14), Math.round(W * 0.14)];
+  fullCols.push(W - fullCols.reduce((a, b) => a + b, 0));
+  const docCols = [Math.round(W * 0.18), Math.round(W * 0.10), Math.round(W * 0.15), Math.round(W * 0.10), Math.round(W * 0.12)];
+  docCols.push(W - docCols.reduce((a, b) => a + b, 0));
+
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['SITE WASTE', 'MANAGEMENT PLAN'], 'Full Compliance \u00B7 EPA 1990 \u00B7 Duty of Care \u00B7 Waste Forecasting', TEAL_DARK, '99F6E4'),
+          h.spacer(200),
+          h.projectNameBar(d.projectName || 'PROJECT', A),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef },
+            { label: 'Date / Rev', value: `${d.planDate} \u00B7 Revision ${d.revision}` },
+            { label: 'Project', value: d.projectName },
+            { label: 'Client', value: d.client },
+            { label: 'Contractor', value: d.principalContractor },
+            { label: 'Contract', value: d.contractReference },
+            { label: 'Estimated Project Value', value: d.estimatedProjectValue },
+            { label: 'Estimated Total Waste', value: d.estimatedTotalWaste },
+            { label: 'Diversion Target', value: d.diversionTarget },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          // 01 LEGISLATIVE FRAMEWORK
+          h.fullWidthSectionBar('01', 'Legislative Framework', A),
+          h.spacer(80),
+          ...h.richBodyText(d.regulatoryContext || 'This SWMP is prepared in accordance with the Environmental Protection Act 1990 Section 34 (duty of care), the Waste (England and Wales) Regulations 2011, and the Hazardous Waste (England and Wales) Regulations 2005.'),
+
+          // 02 WASTE STREAM FORECAST & MANAGEMENT
+          h.spacer(120),
+          h.fullWidthSectionBar('02', 'Waste Stream Forecast & Management', A),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: fullCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Stream', fullCols[0], A), hdrCell('EWC', fullCols[1], A), hdrCell('Qty', fullCols[2], A), hdrCell('Class', fullCols[3], A), hdrCell('Hierarchy', fullCols[4], A), hdrCell('Carrier', fullCols[5], A), hdrCell('Facility', fullCols[6], A), hdrCell('Cost', fullCols[7], A)] }),
+              ...d.wasteStreams.map((ws, ri) => new TableRow({ children: [
+                txtCell(ws.stream, fullCols[0], { bold: true, bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.ewcCode, fullCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.estimatedVolume, fullCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.classification, fullCols[3], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE, color: ws.classification?.toLowerCase() === 'hazardous' ? RED_D : undefined, bold: ws.classification?.toLowerCase() === 'hazardous' }),
+                txtCell(ws.hierarchyLevel || ws.disposalRoute, fullCols[4], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.carrier || '', fullCols[5], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.facility || '', fullCols[6], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(ws.costEstimate || '', fullCols[7], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] }),
+
+          // 03 DUTY OF CARE CHAIN
+          h.spacer(120),
+          h.fullWidthSectionBar('03', 'Duty of Care Chain', A),
+          h.spacer(80),
+          h.calloutBox(
+            d.dutyCareStatement || 'The waste producer must ensure all waste is transferred only to authorised persons and received at permitted facilities. Waste transfer notes must be completed for each transfer and retained for 2 years (3 years for hazardous waste).',
+            A, LBG, TEAL_DARK, W,
+            { boldPrefix: 'Duty of Care (EPA 1990 s.34):' }
+          ),
+          h.spacer(80),
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: docCols,
+            rows: [
+              new TableRow({ children: [hdrCell('Company', docCols[0], A), hdrCell('Role', docCols[1], A), hdrCell('Registration', docCols[2], A), hdrCell('Expiry', docCols[3], A), hdrCell('Verified', docCols[4], A), hdrCell('Waste Types', docCols[5], A)] }),
+              ...d.carrierFacilities.map((cf, ri) => new TableRow({ children: [
+                txtCell(cf.company, docCols[0], { bold: true, bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(cf.role, docCols[1], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(cf.registration, docCols[2], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                txtCell(cf.expiry, docCols[3], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+                checkCell(cf.verified !== false, docCols[4]),
+                txtCell(cf.wasteTypes, docCols[5], { bg: ri % 2 === 0 ? ZEBRA : h.WHITE }),
+              ] })),
+            ] }),
+
+          // 04 KPI TARGETS
+          h.spacer(120),
+          h.fullWidthSectionBar('04', 'KPI Targets', A),
+          h.spacer(80),
+          ...(d.kpiTargets.length > 0 ? [h.kpiDashboard(d.kpiTargets, A, W)] : [h.kpiDashboard([
+            { value: '95%', label: 'Landfill Diversion' },
+            { value: '100%', label: 'Soil Reuse' },
+            { value: '0', label: 'Duty of Care Breaches' },
+            { value: '<\u00A31k', label: 'Net Disposal Cost' },
+          ], A, W)]),
+          h.spacer(80),
+          ...h.richBodyText(d.kpiNarrative || d.monitoringSchedule || 'KPIs reported monthly. Waste data tracked via carrier portal. Quarterly review against targets.'),
+
+          // Sign-off + end mark
+          h.spacer(120),
+          h.signatureGrid(['Prepared By', 'Environmental Advisor'], A, W),
+          h.spacer(80),
+          ...h.endMark(A),
+        ] },
+    ],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ROUTER
+// ═════════════════════════════════════════════════════════════════════════════
+export async function buildWasteTemplateDocument(
+  content: any,
+  templateSlug: WasteTemplateSlug
+): Promise<Document> {
+  const d = extract(content);
+  switch (templateSlug) {
+    case 'site-record':      return buildT1(d);
+    case 'corporate':        return buildT2(d);
+    case 'full-compliance':  return buildT3(d);
+    default:                 return buildT3(d);
   }
-  children.push(gap());
-
-  if (show(templateSlug, 'hierarchy') && d.wasteHierarchy) { children.push(sectionHead(templateSlug, p, ++sec, 'Waste Hierarchy')); for (const para of (d.wasteHierarchy as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para)); children.push(gap()); }
-
-  children.push(sectionHead(templateSlug, p, ++sec, 'Segregation Plan'));
-  for (const para of (d.segregationPlan || '').split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para));
-  children.push(gap());
-
-  children.push(new Paragraph({ children: [new PageBreak()] }));
-
-  if (show(templateSlug, 'carriers') && d.carrierRegister?.length) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Carrier Register'));
-    const cw = [Math.floor(W*0.28), Math.floor(W*0.24), Math.floor(W*0.28), W - Math.floor(W*0.28) - Math.floor(W*0.24) - Math.floor(W*0.28)];
-    children.push(buildDataTable(p, [['Carrier', cw[0]], ['Licence No.', cw[1]], ['Waste Types', cw[2]], ['Expiry', cw[3]]], d.carrierRegister.map((c: any) => [c.carrier || '', c.licenceNumber || '', c.wasteTypes || '', c.expiryDate || ''])));
-    children.push(gap());
-  }
-
-  if (show(templateSlug, 'facilities') && d.facilityRegister?.length) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Facility Register'));
-    const fw = [Math.floor(W*0.26), Math.floor(W*0.22), Math.floor(W*0.26), W - Math.floor(W*0.26) - Math.floor(W*0.22) - Math.floor(W*0.26)];
-    children.push(buildDataTable(p, [['Facility', fw[0]], ['Permit No.', fw[1]], ['Waste Types', fw[2]], ['Location', fw[3]]], d.facilityRegister.map((f: any) => [f.facility || '', f.permitNumber || '', f.wasteTypes || '', f.location || ''])));
-    children.push(gap());
-  }
-
-  if (show(templateSlug, 'transfer-log') && d.transferNoteLog) { children.push(sectionHead(templateSlug, p, ++sec, 'Transfer Note Log')); for (const para of (d.transferNoteLog as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para)); children.push(gap()); }
-  if (show(templateSlug, 'targets') && d.minimisationTargets?.length) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Waste Minimisation Targets'));
-    const tw = [Math.floor(W*0.35), Math.floor(W*0.40), W - Math.floor(W*0.35) - Math.floor(W*0.40)];
-    children.push(buildDataTable(p, [['Target', tw[0]], ['Measure', tw[1]], ['KPI', tw[2]]], d.minimisationTargets.map((t: any) => [t.target || '', t.measure || '', t.kpi || ''])));
-    children.push(gap());
-  }
-  if (show(templateSlug, 'contaminated') && d.contaminatedLand) { children.push(sectionHead(templateSlug, p, ++sec, 'Contaminated Land')); children.push(bodyPara(p, d.contaminatedLand)); children.push(gap()); }
-  if (show(templateSlug, 'monitoring') && d.monitoringSchedule) { children.push(sectionHead(templateSlug, p, ++sec, 'Monitoring & Reporting')); for (const para of (d.monitoringSchedule as string).split(/\n\n?/).filter(Boolean)) children.push(bodyPara(p, para)); children.push(gap()); }
-
-  children.push(gap(300));
-  children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '— End of Waste Management Plan —', italics: true, font: p.font, size: p.bodySize, color: p.mid })] }));
-  children.push(gap(80));
-
-  const hdr = new Header({ children: [new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'SITE WASTE MANAGEMENT PLAN', bold: true, font: p.font, size: 17, color: p.primary }), new TextRun({ text: `\t${d.documentRef || ''}`, font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
-  const ftr = new Footer({ children: [new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } }, children: [new TextRun({ text: 'EPA 1990 s.34 Compliant', font: p.font, size: 16, color: p.mid }), new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }), new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid })], tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }] })] });
-  return new Document({ styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } }, sections: [{ properties: { page: { size: { width: h.A4_WIDTH, height: h.A4_HEIGHT }, margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL } } }, headers: { default: hdr }, footers: { default: ftr }, children }] });
 }

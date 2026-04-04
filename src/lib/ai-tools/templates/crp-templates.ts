@@ -1,10 +1,11 @@
 // =============================================================================
-// Carbon Reduction Plan Builder — Multi-Template Engine
-// 4 visually distinct templates, all consuming the same CRP JSON structure.
-//   T1 — PPN 06/21 Standard     (GOV.UK green, Arial, compliance bands)
-//   T2 — SBTi Aligned           (corporate navy, Calibri, KPI boxes)
-//   T3 — ISO 14064 Compliant    (charcoal + red clauses, Cambria, doc control)
-//   T4 — GHG Protocol Corporate (dark teal, Calibri, scope-grouped tables)
+// Carbon Reduction Plan Builder — Multi-Template Engine (REBUILT)
+// 4 templates matching HTML render library exactly.
+//
+// T1 — PPN 06/21 Standard       (GOV.UK green #00703C, Arial, compliance, ~4pp)
+// T2 — SBTi Aligned             (deep navy #1A3C6E, Calibri, science-based, ~4pp)
+// T3 — ISO 14064 Compliant      (charcoal #2C3E50 + red #C0392B, Cambria, ~4pp)
+// T4 — GHG Protocol Corporate   (teal #00897B / dark #004D40, Calibri, ~4pp)
 // =============================================================================
 import {
   Document, Paragraph, TextRun, Table, TableRow, TableCell,
@@ -14,38 +15,55 @@ import * as h from '@/lib/rams/docx-helpers';
 import type { CrpTemplateSlug } from '@/lib/carbon-reduction/types';
 
 const W = h.A4_CONTENT_WIDTH;
-const BODY = 20; const SM = 16; const XL = 32; const TTL = 44;
+const SM = 16; const BODY = 18; const LG = 22;
 const CM = { top: 80, bottom: 80, left: 120, right: 120 };
-const ZEBRA = 'F5F5F5';
-const noBorders = { top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }, right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' } };
-const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: 'D1D5DB' };
-const borders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
 
-// ── Data Interface ──────────────────────────────────────────────────────────
+const GOV = '00703C'; const GOV_SUB = 'A7F3D0'; const GOV_BG = 'F0FFF4';
+const NAVY = '1A3C6E'; const NAVY_SUB = 'BFDBFE'; const NAVY_BG = 'EFF6FF';
+const CHAR = '2C3E50'; const RED_C = 'C0392B'; const RED_BG = 'FDEDEC';
+const TEAL_C = '00897B'; const TEAL_D = '004D40'; const TEAL_SUB = '80CBC4'; const TEAL_BG = 'E0F2F1';
+const S1_BLUE = '1D4ED8'; const S2_PURP = '7C3AED'; const S3_GREEN = '059669';
+const GREY = '6B7280'; const ZEBRA = 'F5F5F5';
+
+// ── Data Interface ───────────────────────────────────────────────────────────
 interface CrpData {
   documentRef: string; publicationDate: string; reviewDate: string;
   organisationName: string; organisationAddress: string; companiesHouseNumber: string;
-  organisationDescription: string;
-  netZeroCommitment: { commitment: string; targetYear: string; interimTarget2030: string; alignedWithSBTi: boolean; governanceStatement: string };
+  organisationDescription: string; currentProject: string; framework: string;
+  sicCode: string; baselineYear: string;
+  netZeroCommitment: { commitment: string; targetYear: string; interimTarget2030: string; scope3Target2030?: string; alignedWithSBTi: boolean; governanceStatement: string };
   baselineEmissions: { baselineYear: string; baselineScope1: string; baselineScope2: string; baselineScope3: string; totalBaselineUKOperations: string; baselineNarrative: string };
   currentEmissions: {
     reportingYear: string;
-    scope1: { total: string; narrative: string; sources: Array<{ source: string; activity: string; emissionFactor: string; tCO2e: string }> };
+    scope1: { total: string; narrative: string; sources: Array<{ source: string; activity?: string; quantity?: string; emissionFactor: string; tCO2e: string }> };
     scope2: { total: string; method: string; narrative: string; sources: Array<{ source: string; kWh: string; tariff: string; tCO2e: string }> };
-    scope3: { total: string; narrative: string; categories: Array<{ categoryNumber: string; categoryName: string; tCO2e: string; dataQuality: string; methodology: string }> };
+    scope3: { total: string; narrative: string; materiality?: string; categories: Array<{ categoryNumber: string; categoryName: string; tCO2e: string; dataQuality: string; methodology?: string; relevant?: string }> };
     totalCurrentEmissions: string;
   };
   emissionsReductionInitiatives: {
-    completed: Array<{ initiative: string; dateImplemented: string; scope: string; estimatedAnnualReduction: string; description: string }>;
-    planned: Array<{ initiative: string; plannedImplementation: string; scope: string; estimatedAnnualReduction: string; investmentRequired: string; description: string }>;
+    completed: Array<{ initiative: string; dateImplemented: string; scope: string; estimatedAnnualReduction: string; description?: string }>;
+    planned: Array<{ initiative: string; plannedImplementation: string; scope: string; estimatedAnnualReduction: string; investmentRequired?: string; description?: string }>;
   };
   carbonReductionTargets: {
     target2030: { absoluteReductionTarget: string; targetTCO2e: string; pathway: string };
     targetNetZero: { year: string; scope: string; residualEmissionsStrategy: string };
   };
+  decarbonisationPathway: Array<{ year: string; scope12: string; scope3: string; total: string; intensity?: string; interventions?: string }>;
   supplyChainEngagement: string;
   reportingAndMeasurement: string;
   boardSignOff: { signatoryName: string; signatoryTitle: string; signOffDate: string; signOffStatement: string };
+  // ISO 14064 T3 fields
+  consolidationApproach: string; organisationalBoundary: string;
+  ghgSourceIdentification: Array<{ isoCategory: string; ghgSource: string; ghgSpecies: string; classification: string }>;
+  quantificationMethodology: string;
+  quantificationTable: Array<{ source: string; activityData: string; efSource: string; dataQuality: string; tCO2e: string }>;
+  baseYearRecalcPolicy: string; uncertaintyAssessment: string;
+  verificationStatement: string;
+  // SBTi T2 fields
+  sbtiStatus: string; nearTermPathway: string;
+  scope12Analysis: string; scope2Analysis: string;
+  governanceNarrative: string;
+  kpiItems: Array<{ value: string; label: string; sublabel?: string }>;
   additionalNotes: string;
   [key: string]: any;
 }
@@ -53,484 +71,483 @@ interface CrpData {
 function extract(c: any): CrpData {
   const s = (k: string, fb = '') => (typeof c?.[k] === 'string' ? c[k] : fb);
   const o = (k: string) => (typeof c?.[k] === 'object' && c[k] !== null ? c[k] : {});
-  const a = (parent: any, k: string) => (Array.isArray(parent?.[k]) ? parent[k] : []);
-  const ce = o('currentEmissions');
-  const eri = o('emissionsReductionInitiatives');
+  const a = (k: string) => (Array.isArray(c?.[k]) ? c[k] : []);
+  const so = (obj: any, k: string, fb = '') => (typeof obj?.[k] === 'string' ? obj[k] : fb);
+  const ao = (obj: any, k: string) => (Array.isArray(obj?.[k]) ? obj[k] : []);
+  const nz = o('netZeroCommitment'); const be = o('baselineEmissions');
+  const ce = o('currentEmissions'); const eri = o('emissionsReductionInitiatives');
   const crt = o('carbonReductionTargets');
   return {
     documentRef: s('documentRef', 'CRP-001'), publicationDate: s('publicationDate'), reviewDate: s('reviewDate'),
-    organisationName: s('organisationName'), organisationAddress: s('organisationAddress'), companiesHouseNumber: s('companiesHouseNumber'),
-    organisationDescription: s('organisationDescription'),
-    netZeroCommitment: { commitment: o('netZeroCommitment').commitment || '', targetYear: o('netZeroCommitment').targetYear || '2050', interimTarget2030: o('netZeroCommitment').interimTarget2030 || '', alignedWithSBTi: !!o('netZeroCommitment').alignedWithSBTi, governanceStatement: o('netZeroCommitment').governanceStatement || '' },
-    baselineEmissions: { baselineYear: o('baselineEmissions').baselineYear || '', baselineScope1: o('baselineEmissions').baselineScope1 || '', baselineScope2: o('baselineEmissions').baselineScope2 || '', baselineScope3: o('baselineEmissions').baselineScope3 || '', totalBaselineUKOperations: o('baselineEmissions').totalBaselineUKOperations || '', baselineNarrative: o('baselineEmissions').baselineNarrative || '' },
+    organisationName: s('organisationName'), organisationAddress: s('organisationAddress'),
+    companiesHouseNumber: s('companiesHouseNumber'), organisationDescription: s('organisationDescription'),
+    currentProject: s('currentProject'), framework: s('framework'), sicCode: s('sicCode'),
+    baselineYear: s('baselineYear') || so(be, 'baselineYear'),
+    netZeroCommitment: { commitment: so(nz, 'commitment'), targetYear: so(nz, 'targetYear', '2050'), interimTarget2030: so(nz, 'interimTarget2030'), scope3Target2030: so(nz, 'scope3Target2030'), alignedWithSBTi: nz?.alignedWithSBTi ?? false, governanceStatement: so(nz, 'governanceStatement') },
+    baselineEmissions: { baselineYear: so(be, 'baselineYear'), baselineScope1: so(be, 'baselineScope1'), baselineScope2: so(be, 'baselineScope2'), baselineScope3: so(be, 'baselineScope3'), totalBaselineUKOperations: so(be, 'totalBaselineUKOperations'), baselineNarrative: so(be, 'baselineNarrative') },
     currentEmissions: {
-      reportingYear: ce.reportingYear || '', totalCurrentEmissions: ce.totalCurrentEmissions || '',
-      scope1: { total: ce.scope1?.total || '', narrative: ce.scope1?.narrative || '', sources: a(ce.scope1, 'sources') },
-      scope2: { total: ce.scope2?.total || '', method: ce.scope2?.method || '', narrative: ce.scope2?.narrative || '', sources: a(ce.scope2, 'sources') },
-      scope3: { total: ce.scope3?.total || '', narrative: ce.scope3?.narrative || '', categories: a(ce.scope3, 'categories') },
+      reportingYear: so(ce, 'reportingYear'), scope1: { total: so(ce?.scope1, 'total'), narrative: so(ce?.scope1, 'narrative'), sources: ao(ce?.scope1, 'sources') },
+      scope2: { total: so(ce?.scope2, 'total'), method: so(ce?.scope2, 'method'), narrative: so(ce?.scope2, 'narrative'), sources: ao(ce?.scope2, 'sources') },
+      scope3: { total: so(ce?.scope3, 'total'), narrative: so(ce?.scope3, 'narrative'), materiality: so(ce?.scope3, 'materiality'), categories: ao(ce?.scope3, 'categories') },
+      totalCurrentEmissions: so(ce, 'totalCurrentEmissions'),
     },
-    emissionsReductionInitiatives: { completed: a(eri, 'completed'), planned: a(eri, 'planned') },
-    carbonReductionTargets: { target2030: { absoluteReductionTarget: crt.target2030?.absoluteReductionTarget || '', targetTCO2e: crt.target2030?.targetTCO2e || '', pathway: crt.target2030?.pathway || '' }, targetNetZero: { year: crt.targetNetZero?.year || '2050', scope: crt.targetNetZero?.scope || '', residualEmissionsStrategy: crt.targetNetZero?.residualEmissionsStrategy || '' } },
+    emissionsReductionInitiatives: { completed: ao(eri, 'completed'), planned: ao(eri, 'planned') },
+    carbonReductionTargets: {
+      target2030: { absoluteReductionTarget: so(crt?.target2030, 'absoluteReductionTarget'), targetTCO2e: so(crt?.target2030, 'targetTCO2e'), pathway: so(crt?.target2030, 'pathway') },
+      targetNetZero: { year: so(crt?.targetNetZero, 'year', '2050'), scope: so(crt?.targetNetZero, 'scope'), residualEmissionsStrategy: so(crt?.targetNetZero, 'residualEmissionsStrategy') },
+    },
+    decarbonisationPathway: a('decarbonisationPathway'),
     supplyChainEngagement: s('supplyChainEngagement'), reportingAndMeasurement: s('reportingAndMeasurement'),
-    boardSignOff: { signatoryName: o('boardSignOff').signatoryName || '', signatoryTitle: o('boardSignOff').signatoryTitle || '', signOffDate: o('boardSignOff').signOffDate || '', signOffStatement: o('boardSignOff').signOffStatement || '' },
-    additionalNotes: s('additionalNotes'),
+    boardSignOff: { signatoryName: so(o('boardSignOff'), 'signatoryName'), signatoryTitle: so(o('boardSignOff'), 'signatoryTitle'), signOffDate: so(o('boardSignOff'), 'signOffDate'), signOffStatement: so(o('boardSignOff'), 'signOffStatement') },
+    consolidationApproach: s('consolidationApproach'), organisationalBoundary: s('organisationalBoundary'),
+    ghgSourceIdentification: a('ghgSourceIdentification'), quantificationMethodology: s('quantificationMethodology'),
+    quantificationTable: a('quantificationTable'), baseYearRecalcPolicy: s('baseYearRecalcPolicy'),
+    uncertaintyAssessment: s('uncertaintyAssessment'), verificationStatement: s('verificationStatement'),
+    sbtiStatus: s('sbtiStatus'), nearTermPathway: s('nearTermPathway'),
+    scope12Analysis: s('scope12Analysis'), scope2Analysis: s('scope2Analysis'),
+    governanceNarrative: s('governanceNarrative'), kpiItems: a('kpiItems'), additionalNotes: s('additionalNotes'),
   };
 }
 
-// ── Shared helpers ──────────────────────────────────────────────────────────
-function hdrCell(text: string, width: number, color: string, font = 'Arial') {
-  return new TableCell({ borders, width: { size: width, type: WidthType.DXA }, shading: { fill: color, type: ShadingType.CLEAR }, margins: CM, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text, bold: true, size: SM, font, color: 'FFFFFF' })] })] });
+// ── Shared helpers ───────────────────────────────────────────────────────────
+function hdrCell(text: string, width: number, accent: string): TableCell {
+  return h.headerCell(text, width, { fillColor: accent, color: 'FFFFFF', fontSize: SM });
 }
-function dCell(text: string, width: number, opts?: { fill?: string; font?: string; bold?: boolean; color?: string }) {
-  return new TableCell({ borders, width: { size: width, type: WidthType.DXA }, shading: opts?.fill ? { fill: opts.fill, type: ShadingType.CLEAR } : undefined, margins: CM, verticalAlign: VerticalAlign.CENTER, children: [new Paragraph({ children: [new TextRun({ text: text || '', size: SM, font: opts?.font || 'Arial', bold: opts?.bold, color: opts?.color })] })] });
+function txtCell(text: string, width: number, opts?: { bg?: string; bold?: boolean; color?: string; size?: number }): TableCell {
+  return h.dataCell(text, width, { fillColor: opts?.bg, bold: opts?.bold, color: opts?.color, fontSize: opts?.size ?? SM });
 }
-function sectionBand(text: string, color: string, font = 'Arial'): Paragraph {
-  return new Paragraph({ spacing: { before: 300, after: 120 }, shading: { fill: color, type: ShadingType.CLEAR }, children: [new TextRun({ text: `  ${text}`, bold: true, size: 22, font, color: 'FFFFFF' })] });
+function ragCell(text: string, width: number): TableCell {
+  const low = (text || '').toLowerCase();
+  let bg = ZEBRA; let color = GREY;
+  if (low.includes('measured') || low.includes('yes') || low.includes('relevant') || low.includes('on track') || low.includes('compliant')) { bg = 'D1FAE5'; color = '059669'; }
+  else if (low.includes('estimated') || low.includes('behind') || low.includes('partial') || low.includes('minor')) { bg = 'FFFBEB'; color = 'D97706'; }
+  else if (low.includes('modelled') || low.includes('not') || low.includes('low') || low.includes('long')) { bg = 'FEF2F2'; color = 'DC2626'; }
+  else if (low.includes('n/r') || low.includes('n/a') || low.includes('—')) { bg = 'F3F4F6'; color = '6B7280'; }
+  return h.dataCell(text, width, { fillColor: bg, color, fontSize: SM, bold: true });
 }
-function subHead(text: string, color: string, font = 'Arial'): Paragraph {
-  return new Paragraph({ spacing: { before: 200, after: 80 }, border: { bottom: { style: BorderStyle.SINGLE, size: 2, color } }, children: [new TextRun({ text, bold: true, size: BODY, font, color })] });
+function dataTable(accent: string, headers: { text: string; width: number }[], rows: any[][], ragCols: number[] = []): Table {
+  return new Table({
+    width: { size: W, type: WidthType.DXA }, columnWidths: headers.map(h2 => h2.width),
+    rows: [
+      new TableRow({ children: headers.map(h2 => hdrCell(h2.text, h2.width, accent)) }),
+      ...rows.map((cells, ri) => new TableRow({
+        children: cells.map((cell, ci) =>
+          ragCols.includes(ci) ? ragCell(String(cell || ''), headers[ci].width) :
+          txtCell(String(cell || ''), headers[ci].width, { bg: ri % 2 === 1 ? ZEBRA : undefined, bold: (cell || '').toString().toUpperCase().includes('TOTAL') })
+        ),
+      })),
+    ],
+  });
 }
-function prose(text: string, font = 'Arial'): Paragraph[] {
-  if (!text) return [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'Not provided.', size: SM, font, italics: true, color: '999999' })] })];
-  return text.split(/\n\n+/).filter(Boolean).map(p => new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: p.trim(), size: SM, font })] }));
-}
-function infoRow(label: string, value: string, color: string, font = 'Arial', stripe = false): TableRow {
-  const lw = Math.round(W * 0.35); const vw = W - lw;
-  return new TableRow({ children: [
-    new TableCell({ borders, width: { size: lw, type: WidthType.DXA }, shading: { fill: color, type: ShadingType.CLEAR }, margins: CM, children: [new Paragraph({ children: [new TextRun({ text: label, bold: true, size: SM, font, color: 'FFFFFF' })] })] }),
-    new TableCell({ borders, width: { size: vw, type: WidthType.DXA }, shading: stripe ? { fill: ZEBRA, type: ShadingType.CLEAR } : undefined, margins: CM, children: [new Paragraph({ children: [new TextRun({ text: value || '', size: SM, font })] })] }),
-  ] });
-}
-function infoTable(rows: Array<{ label: string; value: string }>, color: string, font = 'Arial'): Table {
-  return new Table({ width: { size: W, type: WidthType.DXA }, rows: rows.map((r, i) => infoRow(r.label, r.value, color, font, i % 2 === 1)) });
-}
-
-// ── Emissions summary table (shared, different colors) ────────────────────
-function emissionsSummaryTable(d: CrpData, color: string, font = 'Arial'): Table {
-  const cw = [Math.round(W * 0.40), Math.round(W * 0.30), W - Math.round(W * 0.40) - Math.round(W * 0.30)];
-  return new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-    new TableRow({ children: [hdrCell('Scope', cw[0], color, font), hdrCell('Emissions (tCO₂e)', cw[1], color, font), hdrCell('Change vs Baseline', cw[2], color, font)] }),
-    new TableRow({ children: [dCell('Scope 1 — Direct', cw[0], { font, bold: true }), dCell(d.currentEmissions.scope1.total, cw[1], { font }), dCell(`Baseline: ${d.baselineEmissions.baselineScope1}`, cw[2], { font, color: '666666' })] }),
-    new TableRow({ children: [dCell('Scope 2 — Indirect (Energy)', cw[0], { font, bold: true, fill: ZEBRA }), dCell(d.currentEmissions.scope2.total, cw[1], { font, fill: ZEBRA }), dCell(`Baseline: ${d.baselineEmissions.baselineScope2}`, cw[2], { font, color: '666666', fill: ZEBRA })] }),
-    new TableRow({ children: [dCell('Scope 3 — Value Chain', cw[0], { font, bold: true }), dCell(d.currentEmissions.scope3.total, cw[1], { font }), dCell(`Baseline: ${d.baselineEmissions.baselineScope3}`, cw[2], { font, color: '666666' })] }),
-    new TableRow({ children: [
-      new TableCell({ borders, width: { size: cw[0], type: WidthType.DXA }, shading: { fill: color, type: ShadingType.CLEAR }, margins: CM, children: [new Paragraph({ children: [new TextRun({ text: 'TOTAL UK OPERATIONS', bold: true, size: SM, font, color: 'FFFFFF' })] })] }),
-      new TableCell({ borders, width: { size: cw[1], type: WidthType.DXA }, shading: { fill: color, type: ShadingType.CLEAR }, margins: CM, children: [new Paragraph({ children: [new TextRun({ text: `${d.currentEmissions.totalCurrentEmissions} tCO₂e`, bold: true, size: SM, font, color: 'FFFFFF' })] })] }),
-      new TableCell({ borders, width: { size: cw[2], type: WidthType.DXA }, shading: { fill: color, type: ShadingType.CLEAR }, margins: CM, children: [new Paragraph({ children: [new TextRun({ text: `Baseline: ${d.baselineEmissions.totalBaselineUKOperations}`, size: SM, font, color: 'FFFFFF' })] })] }),
-    ] }),
-  ] });
+function cols(ratios: number[]): number[] {
+  const widths = ratios.map(r => Math.round(W * r));
+  widths[widths.length - 1] = W - widths.slice(0, -1).reduce((a, b) => a + b, 0);
+  return widths;
 }
 
-// ── Initiatives table (shared) ────────────────────────────────────────────
-function initiativesTable(items: any[], color: string, font: string, isPlanned = false): (Paragraph | Table)[] {
-  if (items.length === 0) return [new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'None recorded.', size: SM, font, italics: true, color: '999999' })] })];
-  const cw = isPlanned
-    ? [Math.round(W * 0.22), Math.round(W * 0.10), Math.round(W * 0.10), Math.round(W * 0.12), Math.round(W * 0.12), W - Math.round(W * 0.22) - Math.round(W * 0.10) - Math.round(W * 0.10) - Math.round(W * 0.12) - Math.round(W * 0.12)]
-    : [Math.round(W * 0.25), Math.round(W * 0.12), Math.round(W * 0.10), Math.round(W * 0.13), W - Math.round(W * 0.25) - Math.round(W * 0.12) - Math.round(W * 0.10) - Math.round(W * 0.13)];
-  const hdrs = isPlanned
-    ? [{ t: 'Initiative', w: cw[0] }, { t: 'By', w: cw[1] }, { t: 'Scope', w: cw[2] }, { t: 'Saving (tCO₂e)', w: cw[3] }, { t: 'Investment', w: cw[4] }, { t: 'Description', w: cw[5] }]
-    : [{ t: 'Initiative', w: cw[0] }, { t: 'Implemented', w: cw[1] }, { t: 'Scope', w: cw[2] }, { t: 'Saving (tCO₂e)', w: cw[3] }, { t: 'Description', w: cw[4] }];
-  return [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-    new TableRow({ children: hdrs.map(hd => hdrCell(hd.t, hd.w, color, font)) }),
-    ...items.map((item, i) => {
-      const vals = isPlanned
-        ? [item.initiative, item.plannedImplementation, item.scope, item.estimatedAnnualReduction, item.investmentRequired || '', item.description]
-        : [item.initiative, item.dateImplemented, item.scope, item.estimatedAnnualReduction, item.description];
-      return new TableRow({ children: vals.map((v: string, ci: number) => dCell(v || '', hdrs[ci].w, { font, fill: i % 2 === 1 ? ZEBRA : undefined })) });
-    }),
-  ] })];
+// Build combined Scope 1+2+3 source rows for T1
+function allSourceRows(d: CrpData): string[][] {
+  const rows: string[][] = [];
+  for (const s of d.currentEmissions.scope1.sources) { rows.push(['S1', s.source, s.activity || s.quantity || '', s.emissionFactor, s.tCO2e]); }
+  for (const s of d.currentEmissions.scope2.sources) { rows.push(['S2', s.source, s.kWh + ' kWh', s.tariff || '', s.tCO2e]); }
+  for (const c of d.currentEmissions.scope3.categories) { rows.push(['S3', `Cat ${c.categoryNumber}: ${c.categoryName}`, c.methodology || c.dataQuality, '', c.tCO2e]); }
+  return rows;
 }
+
 
 // ═════════════════════════════════════════════════════════════════════════════
-// T1 — PPN 06/21 Standard (GOV.UK green, Arial, compliance bands)
+// T1 — PPN 06/21 STANDARD (GOV.UK green #00703C, Arial)
 // ═════════════════════════════════════════════════════════════════════════════
-const GOV = '00703C'; const GOV_LIGHT = 'E6F4EC'; const GOV_DARK = '005A30';
-function buildT1(d: CrpData): (Paragraph | Table)[] {
-  const F = 'Arial';
-  const els: (Paragraph | Table)[] = [];
+function buildT1(d: CrpData): Document {
+  const A = GOV;
+  const hdr = h.accentHeader('Carbon Reduction Plan \u2014 PPN 06/21', A);
+  const ftr = h.accentFooter(d.documentRef, 'PPN 06/21 Standard', A);
 
-  // Compact header
-  els.push(new Paragraph({ spacing: { after: 0 }, shading: { fill: GOV, type: ShadingType.CLEAR }, children: [new TextRun({ text: '  CARBON REDUCTION PLAN', bold: true, size: 36, font: F, color: 'FFFFFF' })] }));
-  els.push(new Paragraph({ spacing: { after: 0 }, shading: { fill: GOV, type: ShadingType.CLEAR }, children: [new TextRun({ text: `  PPN 06/21 Compliant  |  ${d.organisationName}`, size: SM, font: F, color: 'D5E8D4' })] }));
-  els.push(new Paragraph({ spacing: { after: 60 }, shading: { fill: GOV_DARK, type: ShadingType.CLEAR }, children: [new TextRun({ text: `  Ref: ${d.documentRef}  |  Published: ${d.publicationDate}  |  Review: ${d.reviewDate}`, size: 14, font: F, color: 'B7D6B0' })] }));
-  els.push(h.spacer(80));
-  els.push(infoTable([
-    { label: 'Organisation', value: d.organisationName }, { label: 'Address', value: d.organisationAddress },
-    { label: 'Companies House', value: d.companiesHouseNumber }, { label: 'Publication Date', value: d.publicationDate },
-    { label: 'Annual Review Date', value: d.reviewDate },
-  ], GOV, F));
-  els.push(h.spacer(120));
+  const baseCols = cols([0.30, 0.34, 0.18, 0.18]);
+  const srcCols = cols([0.08, 0.30, 0.22, 0.20, 0.20]);
+  const compCols = cols([0.36, 0.12, 0.10, 0.42]);
+  const planCols = cols([0.30, 0.12, 0.10, 0.18, 0.30]);
 
-  // Organisation description
-  els.push(sectionBand('1. Organisation Overview', GOV, F));
-  els.push(...prose(d.organisationDescription, F));
-
-  // Net Zero Commitment
-  els.push(sectionBand('2. Net Zero Commitment (PPN 06/21 Mandatory)', GOV, F));
-  els.push(new Paragraph({ spacing: { before: 120, after: 80 }, shading: { fill: GOV_LIGHT, type: ShadingType.CLEAR }, children: [
-    new TextRun({ text: `  Net Zero Target: ${d.netZeroCommitment.targetYear}  |  2030 Interim: ${d.netZeroCommitment.interimTarget2030}  |  SBTi Aligned: ${d.netZeroCommitment.alignedWithSBTi ? 'Yes' : 'No'}`, bold: true, size: SM, font: F, color: GOV }),
-  ] }));
-  els.push(...prose(d.netZeroCommitment.commitment, F));
-  els.push(subHead('Governance & Accountability', GOV, F));
-  els.push(...prose(d.netZeroCommitment.governanceStatement, F));
-
-  // Baseline
-  els.push(sectionBand('3. Baseline Emissions Footprint', GOV, F));
-  els.push(infoTable([
-    { label: 'Baseline Year', value: d.baselineEmissions.baselineYear },
-    { label: 'Scope 1', value: `${d.baselineEmissions.baselineScope1} tCO₂e` },
-    { label: 'Scope 2', value: `${d.baselineEmissions.baselineScope2} tCO₂e` },
-    { label: 'Scope 3', value: `${d.baselineEmissions.baselineScope3} tCO₂e` },
-    { label: 'Total UK Operations', value: `${d.baselineEmissions.totalBaselineUKOperations} tCO₂e` },
-  ], GOV, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.baselineEmissions.baselineNarrative, F));
-
-  // Current Emissions
-  els.push(sectionBand('4. Current Emissions Reporting', GOV, F));
-  els.push(new Paragraph({ spacing: { before: 80, after: 80 }, children: [new TextRun({ text: `Reporting Year: ${d.currentEmissions.reportingYear}`, bold: true, size: BODY, font: F, color: GOV })] }));
-  els.push(emissionsSummaryTable(d, GOV, F));
-  els.push(h.spacer(80));
-  els.push(subHead('Scope 1 — Direct Emissions', GOV, F));
-  els.push(...prose(d.currentEmissions.scope1.narrative, F));
-  if (d.currentEmissions.scope1.sources.length > 0) {
-    const sw = [Math.round(W * 0.25), Math.round(W * 0.25), Math.round(W * 0.25), W - Math.round(W * 0.75)];
-    els.push(new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-      new TableRow({ children: [hdrCell('Source', sw[0], GOV, F), hdrCell('Activity Data', sw[1], GOV, F), hdrCell('Emission Factor', sw[2], GOV, F), hdrCell('tCO₂e', sw[3], GOV, F)] }),
-      ...d.currentEmissions.scope1.sources.map((src, i) => new TableRow({ children: [dCell(src.source, sw[0], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(src.activity, sw[1], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(src.emissionFactor, sw[2], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(src.tCO2e, sw[3], { font: F, bold: true, fill: i % 2 === 1 ? ZEBRA : undefined })] })),
-    ] }));
-  }
-  els.push(subHead('Scope 2 — Indirect Energy Emissions', GOV, F));
-  els.push(...prose(d.currentEmissions.scope2.narrative, F));
-  els.push(subHead('Scope 3 — Value Chain Emissions', GOV, F));
-  els.push(...prose(d.currentEmissions.scope3.narrative, F));
-  if (d.currentEmissions.scope3.categories.length > 0) {
-    const s3w = [Math.round(W * 0.10), Math.round(W * 0.30), Math.round(W * 0.15), Math.round(W * 0.15), W - Math.round(W * 0.70)];
-    els.push(new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-      new TableRow({ children: [hdrCell('Cat.', s3w[0], GOV, F), hdrCell('Category Name', s3w[1], GOV, F), hdrCell('tCO₂e', s3w[2], GOV, F), hdrCell('Data Quality', s3w[3], GOV, F), hdrCell('Methodology', s3w[4], GOV, F)] }),
-      ...d.currentEmissions.scope3.categories.map((cat, i) => new TableRow({ children: [dCell(cat.categoryNumber, s3w[0], { font: F, bold: true, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.categoryName, s3w[1], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.tCO2e, s3w[2], { font: F, bold: true, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.dataQuality, s3w[3], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.methodology, s3w[4], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined })] })),
-    ] }));
-  }
-
-  // Reduction Initiatives
-  els.push(sectionBand('5. Carbon Reduction Measures', GOV, F));
-  els.push(subHead('Completed Initiatives', GOV, F));
-  els.push(...initiativesTable(d.emissionsReductionInitiatives.completed, GOV, F));
-  els.push(subHead('Planned Initiatives', GOV, F));
-  els.push(...initiativesTable(d.emissionsReductionInitiatives.planned, GOV, F, true));
-
-  // Targets
-  els.push(sectionBand('6. Carbon Reduction Targets', GOV, F));
-  els.push(new Paragraph({ spacing: { before: 80, after: 80 }, shading: { fill: GOV_LIGHT, type: ShadingType.CLEAR }, children: [
-    new TextRun({ text: `  2030 Target: ${d.carbonReductionTargets.target2030.absoluteReductionTarget} reduction  |  Net Zero by ${d.carbonReductionTargets.targetNetZero.year}`, bold: true, size: SM, font: F, color: GOV }),
-  ] }));
-  els.push(...prose(d.carbonReductionTargets.target2030.pathway, F));
-  els.push(subHead('Residual Emissions Strategy', GOV, F));
-  els.push(...prose(d.carbonReductionTargets.targetNetZero.residualEmissionsStrategy, F));
-
-  // Supply Chain + Reporting
-  els.push(sectionBand('7. Supply Chain Engagement', GOV, F));
-  els.push(...prose(d.supplyChainEngagement, F));
-  els.push(sectionBand('8. Reporting & Measurement', GOV, F));
-  els.push(...prose(d.reportingAndMeasurement, F));
-
-  // Board Sign-Off
-  els.push(sectionBand('9. Board-Level Sign-Off (PPN 06/21 Mandatory)', GOV, F));
-  els.push(infoTable([
-    { label: 'Signatory', value: d.boardSignOff.signatoryName },
-    { label: 'Title', value: d.boardSignOff.signatoryTitle },
-    { label: 'Date', value: d.boardSignOff.signOffDate },
-  ], GOV, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.boardSignOff.signOffStatement, F));
-  els.push(h.spacer(100));
-  els.push(h.approvalTable([{ role: d.boardSignOff.signatoryTitle || 'Director', name: d.boardSignOff.signatoryName || '' }], W));
-
-  if (d.additionalNotes) { els.push(sectionBand('10. Additional Notes', GOV, F)); els.push(...prose(d.additionalNotes, F)); }
-
-  return els;
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['CARBON REDUCTION PLAN'], `PPN 06/21 Compliant \u2014 ${d.organisationName || 'Organisation'}`, A, GOV_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Reference', value: d.documentRef },
+            { label: 'Publication Date', value: d.publicationDate },
+            { label: 'Annual Review Date', value: d.reviewDate },
+            { label: 'Organisation', value: d.organisationName },
+            { label: 'Companies House No.', value: d.companiesHouseNumber },
+            { label: 'Registered Address', value: d.organisationAddress },
+            { label: 'Current Project', value: d.currentProject },
+            { label: 'Framework', value: d.framework },
+            { label: 'Standard', value: 'PPN 06/21 (Cabinet Office, 30 Sept 2021)' },
+            { label: 'Board Signatory', value: `${d.boardSignOff.signatoryName}, ${d.boardSignOff.signatoryTitle}` },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — Compliance, Org, Net Zero, Baseline
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('01', 'PPN 06/21 COMPLIANCE DECLARATION', A), h.spacer(80),
+          h.calloutBox(d.netZeroCommitment.commitment || d.boardSignOff.signOffStatement || 'This Carbon Reduction Plan has been completed in accordance with PPN 06/21.', A, GOV_BG, '134e4a', W, { boldPrefix: 'Compliance Statement:' }),
+          h.spacer(80), h.fullWidthSectionBar('02', 'ORGANISATION OVERVIEW', A), h.spacer(80),
+          ...h.richBodyText(d.organisationDescription || ''),
+          h.spacer(80), h.fullWidthSectionBar('03', 'NET ZERO COMMITMENT', A), h.spacer(80),
+          ...h.richBodyText(d.netZeroCommitment.governanceStatement || ''),
+          h.spacer(80), h.fullWidthSectionBar('04', 'BASELINE EMISSIONS FOOTPRINT', A), h.spacer(80),
+          ...h.richBodyText(d.baselineEmissions.baselineNarrative || ''),
+          h.spacer(40),
+          dataTable(A,
+            [{ text: 'EMISSION SCOPE', width: baseCols[0] }, { text: 'SOURCE CATEGORY', width: baseCols[1] }, { text: 'tCO\u2082e', width: baseCols[2] }, { text: '% OF TOTAL', width: baseCols[3] }],
+            [
+              [`Scope 1 \u2014 Direct`, 'Company fleet, site generators, gas heating', d.baselineEmissions.baselineScope1, ''],
+              [`Scope 2 \u2014 Indirect Energy`, 'Purchased electricity', d.baselineEmissions.baselineScope2, ''],
+              [`Scope 3 \u2014 Value Chain`, 'Purchased materials, hired plant, travel, waste', d.baselineEmissions.baselineScope3, ''],
+              ['TOTAL UK OPERATIONS (BASELINE)', '', d.baselineEmissions.totalBaselineUKOperations, '100%'],
+            ]
+          ),
+          h.spacer(40),
+          h.calloutBox(d.baselineEmissions.baselineNarrative || 'Scope 3 emissions dominate the total footprint, typical for civil engineering contractors.', A, GOV_BG, '134e4a', W, { boldPrefix: 'Baseline Narrative:' }),
+        ] },
+      // Body — Current Emissions, Completed/Planned Initiatives
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('05', `CURRENT EMISSIONS \u2014 ${d.currentEmissions.reportingYear || 'FY2025/26'}`, A), h.spacer(80),
+          h.kpiDashboard([
+            { value: d.currentEmissions.totalCurrentEmissions || '0', label: 'Total tCO\u2082e' },
+            { value: d.currentEmissions.scope1.total || '0', label: 'Scope 1' },
+            { value: d.currentEmissions.scope2.total || '0', label: 'Scope 2' },
+            { value: d.currentEmissions.scope3.total || '0', label: 'Scope 3' },
+          ], A, W),
+          h.spacer(60),
+          ...(allSourceRows(d).length > 0 ? [dataTable(A,
+            [{ text: 'SCOPE', width: srcCols[0] }, { text: 'SOURCE', width: srcCols[1] }, { text: 'ACTIVITY DATA', width: srcCols[2] }, { text: 'EF SOURCE', width: srcCols[3] }, { text: 'tCO\u2082e', width: srcCols[4] }],
+            allSourceRows(d)
+          )] : []),
+          // 06 Completed
+          h.spacer(80), h.fullWidthSectionBar('06', 'EMISSIONS REDUCTION INITIATIVES \u2014 COMPLETED', A), h.spacer(80),
+          ...(d.emissionsReductionInitiatives.completed.length > 0 ? [dataTable(A,
+            [{ text: 'INITIATIVE', width: compCols[0] }, { text: 'DATE', width: compCols[1] }, { text: 'SCOPE', width: compCols[2] }, { text: 'ANNUAL SAVING', width: compCols[3] }],
+            d.emissionsReductionInitiatives.completed.map(i => [i.initiative, i.dateImplemented, i.scope, i.estimatedAnnualReduction])
+          )] : []),
+          // 07 Planned
+          h.spacer(80), h.fullWidthSectionBar('07', 'EMISSIONS REDUCTION INITIATIVES \u2014 PLANNED', A), h.spacer(80),
+          ...(d.emissionsReductionInitiatives.planned.length > 0 ? [dataTable(A,
+            [{ text: 'INITIATIVE', width: planCols[0] }, { text: 'TARGET DATE', width: planCols[1] }, { text: 'SCOPE', width: planCols[2] }, { text: 'SAVING', width: planCols[3] }, { text: 'INVESTMENT', width: planCols[4] }],
+            d.emissionsReductionInitiatives.planned.map(i => [i.initiative, i.plannedImplementation, i.scope, i.estimatedAnnualReduction, i.investmentRequired || ''])
+          )] : []),
+        ] },
+      // Body — Targets, Supply Chain, Reporting, Board Sign-Off
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('08', 'CARBON REDUCTION TARGETS', A), h.spacer(80),
+          h.kpiDashboard([
+            { value: d.netZeroCommitment.interimTarget2030 || '-50%', label: '2030 Interim Target' },
+            { value: d.netZeroCommitment.scope3Target2030 || '-30%', label: '2030 Scope 3 Target' },
+            { value: d.netZeroCommitment.targetYear || '2050', label: 'Net Zero Year' },
+          ], A, W),
+          h.spacer(60),
+          ...h.richBodyText(d.carbonReductionTargets.target2030.pathway || ''),
+          // 09 Supply Chain
+          h.spacer(80), h.fullWidthSectionBar('09', 'SUPPLY CHAIN ENGAGEMENT', A), h.spacer(80),
+          ...h.richBodyText(d.supplyChainEngagement || ''),
+          // 10 Reporting
+          h.spacer(80), h.fullWidthSectionBar('10', 'REPORTING & MEASUREMENT FRAMEWORK', A), h.spacer(80),
+          ...h.richBodyText(d.reportingAndMeasurement || ''),
+          // 11 Board Sign-Off
+          h.spacer(80), h.fullWidthSectionBar('11', 'BOARD-LEVEL SIGN-OFF', A), h.spacer(80),
+          h.calloutBox(d.boardSignOff.signOffStatement || '', A, GOV_BG, '134e4a', W, { boldPrefix: 'Board Sign-Off Statement:' }),
+          h.spacer(60),
+          h.signatureGrid(['Board Signatory', 'Environmental Lead'], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
+  });
 }
 
+
 // ═════════════════════════════════════════════════════════════════════════════
-// T2 — SBTi Aligned (corporate navy, Calibri, KPI boxes)
+// T2 — SBTi ALIGNED (Deep navy #1A3C6E)
 // ═════════════════════════════════════════════════════════════════════════════
-const NAVY = '1A3C6E'; const NAVY_LIGHT = 'E8EDF5'; const NAVY_ACC = '2E86DE';
-function buildT2(d: CrpData): (Paragraph | Table)[] {
-  const F = 'Calibri';
-  const els: (Paragraph | Table)[] = [];
+function buildT2(d: CrpData): Document {
+  const A = NAVY;
+  const hdr = h.accentHeader('SBTi Carbon Reduction Plan', A);
+  const ftr = h.accentFooter(d.documentRef, 'SBTi Aligned', A);
 
-  // Navy header block
-  els.push(new Paragraph({ spacing: { after: 0 }, shading: { fill: NAVY, type: ShadingType.CLEAR }, children: [new TextRun({ text: '  CARBON REDUCTION PLAN', bold: true, size: 36, font: F, color: 'FFFFFF' })] }));
-  els.push(new Paragraph({ spacing: { after: 0 }, shading: { fill: NAVY, type: ShadingType.CLEAR }, children: [new TextRun({ text: `  Science Based Targets initiative (SBTi) Aligned  |  ${d.organisationName}`, size: SM, font: F, color: '93C5FD' })] }));
-  els.push(new Paragraph({ spacing: { after: 60 }, shading: { fill: NAVY_ACC, type: ShadingType.CLEAR }, children: [new TextRun({ text: `  ${d.documentRef}  |  ${d.publicationDate}  |  Review: ${d.reviewDate}`, size: 14, font: F, color: 'DBEAFE' })] }));
+  const tgtCols = cols([0.22, 0.16, 0.18, 0.18, 0.14, 0.12]);
+  const s3Cols = cols([0.06, 0.34, 0.10, 0.10, 0.16, 0.24]);
+  const pathCols = cols([0.20, 0.14, 0.14, 0.14, 0.38]);
 
-  // KPI Strip
-  const kpiW = Math.round(W / 4);
-  els.push(h.spacer(80));
-  els.push(new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-    new TableRow({ children: [
-      new TableCell({ borders: noBorders, width: { size: kpiW, type: WidthType.DXA }, shading: { fill: NAVY_LIGHT, type: ShadingType.CLEAR }, margins: { top: 120, bottom: 120, left: 100, right: 100 }, children: [
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: d.currentEmissions.totalCurrentEmissions || '—', bold: true, size: XL, font: F, color: NAVY })] }),
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'tCO₂e Current', size: 14, font: F, color: '6B7280' })] }),
-      ] }),
-      new TableCell({ borders: noBorders, width: { size: kpiW, type: WidthType.DXA }, shading: { fill: NAVY_LIGHT, type: ShadingType.CLEAR }, margins: { top: 120, bottom: 120, left: 100, right: 100 }, children: [
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: d.carbonReductionTargets.target2030.absoluteReductionTarget || '—', bold: true, size: XL, font: F, color: NAVY })] }),
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '2030 Target', size: 14, font: F, color: '6B7280' })] }),
-      ] }),
-      new TableCell({ borders: noBorders, width: { size: kpiW, type: WidthType.DXA }, shading: { fill: NAVY_LIGHT, type: ShadingType.CLEAR }, margins: { top: 120, bottom: 120, left: 100, right: 100 }, children: [
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: d.carbonReductionTargets.targetNetZero.year || '2050', bold: true, size: XL, font: F, color: NAVY })] }),
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Net Zero Year', size: 14, font: F, color: '6B7280' })] }),
-      ] }),
-      new TableCell({ borders: noBorders, width: { size: W - 3 * kpiW, type: WidthType.DXA }, shading: { fill: NAVY_LIGHT, type: ShadingType.CLEAR }, margins: { top: 120, bottom: 120, left: 100, right: 100 }, children: [
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: d.netZeroCommitment.alignedWithSBTi ? '✓ Yes' : '✗ No', bold: true, size: XL, font: F, color: d.netZeroCommitment.alignedWithSBTi ? '059669' : 'DC2626' })] }),
-        new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'SBTi Aligned', size: 14, font: F, color: '6B7280' })] }),
-      ] }),
-    ] }),
-  ] }));
-  els.push(h.spacer(120));
-
-  // Sections
-  els.push(sectionBand('1. Organisational Boundary', NAVY, F));
-  els.push(infoTable([{ label: 'Organisation', value: d.organisationName }, { label: 'Address', value: d.organisationAddress }, { label: 'Companies House', value: d.companiesHouseNumber }], NAVY, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.organisationDescription, F));
-
-  els.push(sectionBand('2. SBTi Target Summary', NAVY, F));
-  els.push(...prose(d.netZeroCommitment.commitment, F));
-  els.push(subHead('Governance & Accountability', NAVY, F));
-  els.push(...prose(d.netZeroCommitment.governanceStatement, F));
-
-  els.push(sectionBand('3. Baseline Emissions', NAVY, F));
-  els.push(infoTable([{ label: 'Baseline Year', value: d.baselineEmissions.baselineYear }, { label: 'Scope 1', value: `${d.baselineEmissions.baselineScope1} tCO₂e` }, { label: 'Scope 2', value: `${d.baselineEmissions.baselineScope2} tCO₂e` }, { label: 'Scope 3', value: `${d.baselineEmissions.baselineScope3} tCO₂e` }, { label: 'Total', value: `${d.baselineEmissions.totalBaselineUKOperations} tCO₂e` }], NAVY, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.baselineEmissions.baselineNarrative, F));
-
-  els.push(sectionBand('4. Current Emissions Analysis', NAVY, F));
-  els.push(emissionsSummaryTable(d, NAVY, F));
-  els.push(h.spacer(80));
-  els.push(subHead('Scope 1 Detail', NAVY, F)); els.push(...prose(d.currentEmissions.scope1.narrative, F));
-  els.push(subHead('Scope 2 Detail', NAVY, F)); els.push(...prose(d.currentEmissions.scope2.narrative, F));
-  els.push(subHead('Scope 3 Screening', NAVY, F)); els.push(...prose(d.currentEmissions.scope3.narrative, F));
-  if (d.currentEmissions.scope3.categories.length > 0) {
-    const s3w = [Math.round(W * 0.10), Math.round(W * 0.30), Math.round(W * 0.15), Math.round(W * 0.15), W - Math.round(W * 0.70)];
-    els.push(new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-      new TableRow({ children: [hdrCell('Cat.', s3w[0], NAVY, F), hdrCell('Category', s3w[1], NAVY, F), hdrCell('tCO₂e', s3w[2], NAVY, F), hdrCell('Quality', s3w[3], NAVY, F), hdrCell('Method', s3w[4], NAVY, F)] }),
-      ...d.currentEmissions.scope3.categories.map((cat, i) => new TableRow({ children: [dCell(cat.categoryNumber, s3w[0], { font: F, bold: true, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.categoryName, s3w[1], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.tCO2e, s3w[2], { font: F, bold: true, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.dataQuality, s3w[3], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.methodology, s3w[4], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined })] })),
-    ] }));
-  }
-
-  els.push(sectionBand('5. Decarbonisation Pathway', NAVY, F));
-  els.push(subHead('2030 Target Pathway', NAVY, F));
-  els.push(...prose(d.carbonReductionTargets.target2030.pathway, F));
-  els.push(subHead('Net Zero Residual Emissions Strategy', NAVY, F));
-  els.push(...prose(d.carbonReductionTargets.targetNetZero.residualEmissionsStrategy, F));
-
-  els.push(sectionBand('6. Reduction Initiatives', NAVY, F));
-  els.push(subHead('Completed', NAVY, F)); els.push(...initiativesTable(d.emissionsReductionInitiatives.completed, NAVY, F));
-  els.push(subHead('Planned', NAVY, F)); els.push(...initiativesTable(d.emissionsReductionInitiatives.planned, NAVY, F, true));
-
-  els.push(sectionBand('7. Supply Chain & Reporting', NAVY, F));
-  els.push(subHead('Supply Chain Engagement', NAVY, F)); els.push(...prose(d.supplyChainEngagement, F));
-  els.push(subHead('Reporting & Measurement', NAVY, F)); els.push(...prose(d.reportingAndMeasurement, F));
-
-  els.push(sectionBand('8. Board Governance & Sign-Off', NAVY, F));
-  els.push(infoTable([{ label: 'Signatory', value: d.boardSignOff.signatoryName }, { label: 'Title', value: d.boardSignOff.signatoryTitle }, { label: 'Date', value: d.boardSignOff.signOffDate }], NAVY, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.boardSignOff.signOffStatement, F));
-  els.push(h.spacer(100));
-  els.push(h.approvalTable([{ role: d.boardSignOff.signatoryTitle || 'Director', name: d.boardSignOff.signatoryName || '' }], W));
-
-  if (d.additionalNotes) { els.push(sectionBand('9. Additional Notes', NAVY, F)); els.push(...prose(d.additionalNotes, F)); }
-
-  return els;
+  return new Document({
+    styles: { default: { document: { run: { font: 'Calibri', size: BODY } } } },
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['SCIENCE-BASED', 'CARBON REDUCTION PLAN'], `SBTi Aligned \u2014 ${d.organisationName || 'Organisation'}`, A, NAVY_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Reference', value: d.documentRef },
+            { label: 'Publication Date', value: d.publicationDate },
+            { label: 'Organisation', value: d.organisationName },
+            { label: 'SIC Code', value: d.sicCode || '' },
+            { label: 'Baseline Year', value: d.baselineEmissions.baselineYear || d.baselineYear },
+            { label: 'Near-Term Target', value: `${d.netZeroCommitment.interimTarget2030 || '42%'} Scope 1&2 reduction by 2030` },
+            { label: 'Long-Term Target', value: `90% all-scope reduction by ${d.netZeroCommitment.targetYear || '2045'}` },
+            { label: 'SBTi Status', value: d.sbtiStatus || 'Commitment Letter Submitted' },
+            { label: 'Current Project', value: d.currentProject },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — Org Boundary, SBTi Targets, Scope 1&2
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('01', 'ORGANISATIONAL BOUNDARY & SCOPE', A), h.spacer(80),
+          ...h.richBodyText(d.organisationalBoundary || d.organisationDescription || ''),
+          h.spacer(80), h.fullWidthSectionBar('02', 'SBTi TARGET SUMMARY', A), h.spacer(80),
+          h.kpiDashboard([
+            { value: d.nearTermPathway || '1.5\u00B0C', label: 'Near-Term Pathway' },
+            { value: d.netZeroCommitment.interimTarget2030 || '-42%', label: 'Scope 1&2 by 2030' },
+            { value: d.netZeroCommitment.scope3Target2030 || '-25%', label: 'Scope 3 by 2030' },
+            { value: d.netZeroCommitment.targetYear || '2045', label: 'Net Zero' },
+          ], A, W),
+          h.spacer(60),
+          dataTable(A, tgtCols.map((w, i) => ({ text: ['TARGET', 'SCOPE', 'BASELINE (tCO\u2082e)', 'TARGET (tCO\u2082e)', 'REDUCTION %', 'PATHWAY'][i], width: w })), [
+            ['Near-Term (2030)', 'Scope 1 & 2', d.baselineEmissions.baselineScope1 && d.baselineEmissions.baselineScope2 ? String(parseFloat(d.baselineEmissions.baselineScope1) + parseFloat(d.baselineEmissions.baselineScope2)) : '', d.carbonReductionTargets.target2030.targetTCO2e || '', d.netZeroCommitment.interimTarget2030 || '', '1.5\u00B0C Absolute'],
+            ['Near-Term (2030)', 'Scope 3', d.baselineEmissions.baselineScope3 || '', '', d.netZeroCommitment.scope3Target2030 || '-25%', 'Well-below 2\u00B0C'],
+            ['Long-Term', 'All Scopes', d.baselineEmissions.totalBaselineUKOperations || '', '', '-90%', 'Net Zero Standard'],
+          ]),
+          h.spacer(40),
+          h.calloutBox(d.sbtiStatus || 'SBTi commitment letter submitted. Target validation in progress.', A, NAVY_BG, A, W, { boldPrefix: 'SBTi Validation Status:' }),
+          h.spacer(80), h.fullWidthSectionBar('03', 'SCOPE 1 & 2 EMISSIONS ANALYSIS', A), h.spacer(80),
+          ...h.richBodyText(d.scope12Analysis || d.currentEmissions.scope1.narrative || ''),
+          ...h.richBodyText(d.scope2Analysis || d.currentEmissions.scope2.narrative || ''),
+        ] },
+      // Body — Scope 3 Screening, Pathway, Governance, Sign-Off
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('04', 'SCOPE 3 SCREENING & MATERIAL CATEGORIES', A), h.spacer(80),
+          ...h.richBodyText(d.currentEmissions.scope3.narrative || ''),
+          ...(d.currentEmissions.scope3.categories.length > 0 ? [h.spacer(40), dataTable(A,
+            [{ text: 'CAT', width: s3Cols[0] }, { text: 'CATEGORY NAME', width: s3Cols[1] }, { text: 'tCO\u2082e', width: s3Cols[2] }, { text: '% OF S3', width: s3Cols[3] }, { text: 'MATERIAL?', width: s3Cols[4] }, { text: 'METHODOLOGY', width: s3Cols[5] }],
+            d.currentEmissions.scope3.categories.map(c => [c.categoryNumber, c.categoryName, c.tCO2e, '', c.relevant || c.dataQuality, c.methodology || '']),
+            [4]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('05', 'DECARBONISATION PATHWAY & KPIs', A), h.spacer(80),
+          ...h.richBodyText(d.carbonReductionTargets.target2030.pathway || ''),
+          ...(d.decarbonisationPathway.length > 0 ? [h.spacer(40), dataTable(A,
+            [{ text: 'YEAR', width: pathCols[0] }, { text: 'S1&2 TARGET', width: pathCols[1] }, { text: 'S3 TARGET', width: pathCols[2] }, { text: 'TOTAL TARGET', width: pathCols[3] }, { text: 'KEY INTERVENTIONS', width: pathCols[4] }],
+            d.decarbonisationPathway.map(p => [p.year, p.scope12, p.scope3, p.total, p.interventions || ''])
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('06', 'GOVERNANCE & ACCOUNTABILITY', A), h.spacer(80),
+          ...h.richBodyText(d.governanceNarrative || d.reportingAndMeasurement || ''),
+          h.spacer(60),
+          h.signatureGrid(['Managing Director', 'Head of Sustainability'], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
+  });
 }
 
+
 // ═════════════════════════════════════════════════════════════════════════════
-// T3 — ISO 14064 Compliant (charcoal + red clauses, Cambria, doc control)
+// T3 — ISO 14064 COMPLIANT (Charcoal #2C3E50 + Red #C0392B)
 // ═════════════════════════════════════════════════════════════════════════════
-const CHAR = '2C3E50'; const RED = 'C0392B'; const CHAR_LIGHT = 'ECF0F1';
-function buildT3(d: CrpData): (Paragraph | Table)[] {
-  const F = 'Cambria';
-  const els: (Paragraph | Table)[] = [];
+function buildT3(d: CrpData): Document {
+  const A = CHAR;
+  const hdr = h.accentHeader('ISO 14064-1:2018 Carbon Reduction Plan', A);
+  const ftr = h.accentFooter(d.documentRef, 'ISO 14064 Compliant', A);
 
-  // Formal charcoal header
-  els.push(new Paragraph({ spacing: { after: 0 }, border: { bottom: { style: BorderStyle.SINGLE, size: 24, color: RED } }, children: [] }));
-  els.push(new Paragraph({ spacing: { before: 80, after: 40 }, children: [new TextRun({ text: 'CARBON REDUCTION PLAN', bold: true, size: 40, font: F, color: CHAR })] }));
-  els.push(new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'ISO 14064-1:2018 Compliant  |  GHG Quantification & Reporting', size: SM, font: F, color: '7F8C8D' })] }));
+  const ghgCols = cols([0.16, 0.34, 0.22, 0.28]);
+  const quantCols = cols([0.24, 0.20, 0.22, 0.16, 0.18]);
+  const tgtCols3 = cols([0.32, 0.16, 0.30, 0.22]);
+  const revCols = cols([0.08, 0.12, 0.52, 0.14, 0.14]);
 
-  // Document control table
-  const dcw = [Math.round(W * 0.20), Math.round(W * 0.20), Math.round(W * 0.20), Math.round(W * 0.20), W - Math.round(W * 0.80)];
-  els.push(new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-    new TableRow({ children: [hdrCell('Doc Ref', dcw[0], CHAR, F), hdrCell('Revision', dcw[1], CHAR, F), hdrCell('Date', dcw[2], CHAR, F), hdrCell('Prepared By', dcw[3], CHAR, F), hdrCell('Status', dcw[4], CHAR, F)] }),
-    new TableRow({ children: [dCell(d.documentRef, dcw[0], { font: F }), dCell('Rev 01', dcw[1], { font: F }), dCell(d.publicationDate, dcw[2], { font: F }), dCell(d.boardSignOff.signatoryName, dcw[3], { font: F }), dCell('Published', dcw[4], { font: F, bold: true, color: RED })] }),
-  ] }));
-  els.push(h.spacer(80));
-  els.push(infoTable([{ label: 'Organisation', value: d.organisationName }, { label: 'Address', value: d.organisationAddress }, { label: 'Companies House', value: d.companiesHouseNumber }, { label: 'Review Date', value: d.reviewDate }], CHAR, F));
-  els.push(h.spacer(120));
-
-  // ISO clause structure with red numbering
-  function isoClause(num: string, title: string): Paragraph {
-    return new Paragraph({ spacing: { before: 280, after: 100 }, border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: CHAR } }, children: [
-      new TextRun({ text: `${num}  `, bold: true, size: 22, font: F, color: RED }),
-      new TextRun({ text: title, bold: true, size: 22, font: F, color: CHAR }),
-    ] });
-  }
-
-  els.push(isoClause('1.0', 'Organisational Boundary & Consolidation Approach'));
-  els.push(...prose(d.organisationDescription, F));
-
-  els.push(isoClause('2.0', 'Net Zero Commitment'));
-  els.push(...prose(d.netZeroCommitment.commitment, F));
-  els.push(new Paragraph({ spacing: { before: 80, after: 60 }, children: [new TextRun({ text: `2.1  `, bold: true, size: SM, font: F, color: RED }), new TextRun({ text: 'Governance Statement', bold: true, size: SM, font: F, color: CHAR })] }));
-  els.push(...prose(d.netZeroCommitment.governanceStatement, F));
-
-  els.push(isoClause('3.0', 'Base Year Emissions & Recalculation Policy (Clause 5.4)'));
-  els.push(infoTable([{ label: 'Baseline Year', value: d.baselineEmissions.baselineYear }, { label: 'Scope 1', value: `${d.baselineEmissions.baselineScope1} tCO₂e` }, { label: 'Scope 2', value: `${d.baselineEmissions.baselineScope2} tCO₂e` }, { label: 'Scope 3', value: `${d.baselineEmissions.baselineScope3} tCO₂e` }, { label: 'Total UK Operations', value: `${d.baselineEmissions.totalBaselineUKOperations} tCO₂e` }], CHAR, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.baselineEmissions.baselineNarrative, F));
-
-  els.push(isoClause('4.0', 'Current Period GHG Inventory (Clause 5.2–5.3)'));
-  els.push(emissionsSummaryTable(d, CHAR, F));
-  els.push(h.spacer(80));
-  els.push(new Paragraph({ spacing: { before: 80, after: 60 }, children: [new TextRun({ text: `4.1  `, bold: true, size: SM, font: F, color: RED }), new TextRun({ text: 'Scope 1 — Direct GHG Emissions', bold: true, size: SM, font: F, color: CHAR })] }));
-  els.push(...prose(d.currentEmissions.scope1.narrative, F));
-  els.push(new Paragraph({ spacing: { before: 80, after: 60 }, children: [new TextRun({ text: `4.2  `, bold: true, size: SM, font: F, color: RED }), new TextRun({ text: 'Scope 2 — Energy Indirect GHG Emissions', bold: true, size: SM, font: F, color: CHAR })] }));
-  els.push(...prose(d.currentEmissions.scope2.narrative, F));
-  els.push(new Paragraph({ spacing: { before: 80, after: 60 }, children: [new TextRun({ text: `4.3  `, bold: true, size: SM, font: F, color: RED }), new TextRun({ text: 'Scope 3 — Other Indirect GHG Emissions', bold: true, size: SM, font: F, color: CHAR })] }));
-  els.push(...prose(d.currentEmissions.scope3.narrative, F));
-  if (d.currentEmissions.scope3.categories.length > 0) {
-    const s3w = [Math.round(W * 0.10), Math.round(W * 0.30), Math.round(W * 0.15), Math.round(W * 0.15), W - Math.round(W * 0.70)];
-    els.push(new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-      new TableRow({ children: [hdrCell('Cat.', s3w[0], CHAR, F), hdrCell('Category', s3w[1], CHAR, F), hdrCell('tCO₂e', s3w[2], CHAR, F), hdrCell('Quality', s3w[3], CHAR, F), hdrCell('Method', s3w[4], CHAR, F)] }),
-      ...d.currentEmissions.scope3.categories.map((cat, i) => new TableRow({ children: [dCell(cat.categoryNumber, s3w[0], { font: F, bold: true, color: RED, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.categoryName, s3w[1], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.tCO2e, s3w[2], { font: F, bold: true, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.dataQuality, s3w[3], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.methodology, s3w[4], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined })] })),
-    ] }));
-  }
-
-  els.push(isoClause('5.0', 'Reduction Targets & Planned Actions'));
-  els.push(...prose(d.carbonReductionTargets.target2030.pathway, F));
-  els.push(new Paragraph({ spacing: { before: 80, after: 60 }, children: [new TextRun({ text: `5.1  `, bold: true, size: SM, font: F, color: RED }), new TextRun({ text: 'Completed Initiatives', bold: true, size: SM, font: F, color: CHAR })] }));
-  els.push(...initiativesTable(d.emissionsReductionInitiatives.completed, CHAR, F));
-  els.push(new Paragraph({ spacing: { before: 80, after: 60 }, children: [new TextRun({ text: `5.2  `, bold: true, size: SM, font: F, color: RED }), new TextRun({ text: 'Planned Initiatives', bold: true, size: SM, font: F, color: CHAR })] }));
-  els.push(...initiativesTable(d.emissionsReductionInitiatives.planned, CHAR, F, true));
-
-  els.push(isoClause('6.0', 'Supply Chain & Reporting'));
-  els.push(...prose(d.supplyChainEngagement, F));
-  els.push(...prose(d.reportingAndMeasurement, F));
-
-  els.push(isoClause('7.0', 'Verification Readiness & Board Sign-Off'));
-  els.push(infoTable([{ label: 'Signatory', value: d.boardSignOff.signatoryName }, { label: 'Title', value: d.boardSignOff.signatoryTitle }, { label: 'Date', value: d.boardSignOff.signOffDate }], CHAR, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.boardSignOff.signOffStatement, F));
-  els.push(h.approvalTable([{ role: d.boardSignOff.signatoryTitle || 'Director', name: d.boardSignOff.signatoryName || '' }], W));
-
-  if (d.additionalNotes) { els.push(isoClause('8.0', 'Additional Notes')); els.push(...prose(d.additionalNotes, F)); }
-
-  return els;
+  return new Document({
+    styles: { default: { document: { run: { font: 'Cambria', size: BODY } } } },
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['ISO 14064-1:2018', 'CARBON REDUCTION PLAN'], `GHG Inventory & Reduction Programme \u2014 ${d.organisationName || 'Organisation'}`, A, RED_C),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Reference', value: d.documentRef },
+            { label: 'Revision', value: 'Rev A \u2014 First Issue' },
+            { label: 'Date of Issue', value: d.publicationDate },
+            { label: 'Organisation', value: d.organisationName },
+            { label: 'Consolidation Approach', value: d.consolidationApproach || 'Operational Control (ISO 14064-1 Cl. 5.1)' },
+            { label: 'Reporting Period', value: d.currentEmissions.reportingYear || '' },
+            { label: 'Base Year', value: d.baselineEmissions.baselineYear || d.baselineYear },
+            { label: 'Prepared By', value: d.boardSignOff.signatoryName || '' },
+            { label: 'Verification Status', value: 'Unverified \u2014 Third-party verification planned' },
+            { label: 'Current Project', value: d.currentProject },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — Doc Control, Org Boundary, GHG Sources
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('1.0', 'DOCUMENT CONTROL', A), h.spacer(80),
+          dataTable(A, revCols.map((w, i) => ({ text: ['REV', 'DATE', 'DESCRIPTION', 'AUTHOR', 'STATUS'][i], width: w })), [
+            ['A', d.publicationDate || '', 'First issue \u2014 GHG inventory and reduction programme', d.boardSignOff.signatoryName || '', 'Issued'],
+            ['\u2014', '\u2014', 'Planned Rev B \u2014 Post third-party verification update', '\u2014', 'Pending'],
+          ]),
+          h.spacer(80), h.fullWidthSectionBar('2.0', 'ORGANISATIONAL BOUNDARY (ISO 14064-1 CLAUSE 5.1)', A), h.spacer(80),
+          ...h.richBodyText(d.organisationalBoundary || d.organisationDescription || ''),
+          h.spacer(80), h.fullWidthSectionBar('3.0', 'GHG SOURCE IDENTIFICATION (CLAUSE 5.2)', A), h.spacer(80),
+          ...h.richBodyText(d.currentEmissions.scope3.narrative || ''),
+          ...(d.ghgSourceIdentification.length > 0 ? [h.spacer(40), dataTable(A,
+            [{ text: 'ISO CATEGORY', width: ghgCols[0] }, { text: 'GHG SOURCE', width: ghgCols[1] }, { text: 'GHG SPECIES', width: ghgCols[2] }, { text: 'CLASSIFICATION', width: ghgCols[3] }],
+            d.ghgSourceIdentification.map(g => [g.isoCategory, g.ghgSource, g.ghgSpecies, g.classification])
+          )] : []),
+          h.spacer(40),
+          h.calloutBox('No significant GHG sinks or reservoirs have been identified within the organisational boundary.', A, 'F3F4F6', '1F2937', W, { boldPrefix: 'GHG Sinks & Reservoirs:' }),
+        ] },
+      // Body — Quantification, Base Year, Uncertainty
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('4.0', 'QUANTIFICATION METHODOLOGY (CLAUSE 5.3)', A), h.spacer(80),
+          ...h.richBodyText(d.quantificationMethodology || ''),
+          ...(d.quantificationTable.length > 0 ? [h.spacer(40), dataTable(A,
+            [{ text: 'SOURCE', width: quantCols[0] }, { text: 'ACTIVITY DATA', width: quantCols[1] }, { text: 'EF SOURCE', width: quantCols[2] }, { text: 'DATA QUALITY', width: quantCols[3] }, { text: 'tCO\u2082e', width: quantCols[4] }],
+            d.quantificationTable.map(q => [q.source, q.activityData, q.efSource, q.dataQuality, q.tCO2e]),
+            [3]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('5.0', 'BASE YEAR & RECALCULATION POLICY (CLAUSE 5.4)', A), h.spacer(80),
+          ...h.richBodyText(d.baseYearRecalcPolicy || d.baselineEmissions.baselineNarrative || ''),
+          h.spacer(80), h.fullWidthSectionBar('6.0', 'UNCERTAINTY ASSESSMENT', A), h.spacer(80),
+          ...h.richBodyText(d.uncertaintyAssessment || ''),
+        ] },
+      // Body — Targets, Verification, Sign-Off
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('7.0', 'REDUCTION TARGETS & PLANNED ACTIONS', A), h.spacer(80),
+          dataTable(A,
+            [{ text: 'TARGET', width: tgtCols3[0] }, { text: 'SCOPE', width: tgtCols3[1] }, { text: 'METRIC', width: tgtCols3[2] }, { text: 'STATUS', width: tgtCols3[3] }],
+            [
+              [`${d.netZeroCommitment.interimTarget2030 || '50%'} reduction by 2030`, 'Scope 1 & 2', `From ${d.baselineEmissions.baselineScope1 && d.baselineEmissions.baselineScope2 ? String(parseFloat(d.baselineEmissions.baselineScope1) + parseFloat(d.baselineEmissions.baselineScope2)) : ''} to \u2264${d.carbonReductionTargets.target2030.targetTCO2e || ''} tCO\u2082e`, 'On Track'],
+              [`${d.netZeroCommitment.scope3Target2030 || '30%'} reduction by 2030`, 'Scope 3', `From ${d.baselineEmissions.baselineScope3 || ''} to target`, 'Behind'],
+              [`Net Zero by ${d.netZeroCommitment.targetYear || '2045'}`, 'All Scopes', '90%+ absolute reduction + verified removal', 'Long-Term'],
+            ],
+            [3]
+          ),
+          h.spacer(80), h.fullWidthSectionBar('8.0', 'VERIFICATION READINESS STATEMENT (ISO 14064-3)', A), h.spacer(80),
+          h.calloutBox(d.verificationStatement || 'This GHG inventory has not yet been subject to third-party verification. Verification is planned and will be conducted by a UKAS-accredited verification body.', RED_C, RED_BG, '7F1D1D', W, { boldPrefix: 'Verification Status:' }),
+          h.spacer(40),
+          ...h.richBodyText(d.reportingAndMeasurement || ''),
+          h.spacer(80), h.fullWidthSectionBar('9.0', 'SIGN-OFF & APPROVAL', A), h.spacer(80),
+          h.signatureGrid(['Prepared By', 'Approved By'], RED_C, W),
+          h.spacer(80), ...h.endMark(RED_C),
+        ] },
+    ],
+  });
 }
 
+
 // ═════════════════════════════════════════════════════════════════════════════
-// T4 — GHG Protocol Corporate (dark teal + lighter teal, Calibri)
+// T4 — GHG PROTOCOL CORPORATE (Teal #00897B / Dark #004D40)
 // ═════════════════════════════════════════════════════════════════════════════
-const TEAL_D = '004D40'; const TEAL = '00897B'; const TEAL_LIGHT = 'E0F2F1';
-function buildT4(d: CrpData): (Paragraph | Table)[] {
-  const F = 'Calibri';
-  const els: (Paragraph | Table)[] = [];
+function buildT4(d: CrpData): Document {
+  const A = TEAL_C;
+  const hdr = h.accentHeader('GHG Protocol Carbon Reduction Plan', A);
+  const ftr = h.accentFooter(d.documentRef, 'GHG Protocol Corporate', A);
 
-  // Teal header block
-  els.push(new Paragraph({ spacing: { after: 0 }, shading: { fill: TEAL_D, type: ShadingType.CLEAR }, children: [new TextRun({ text: '  CARBON REDUCTION PLAN', bold: true, size: 36, font: F, color: 'FFFFFF' })] }));
-  els.push(new Paragraph({ spacing: { after: 0 }, shading: { fill: TEAL_D, type: ShadingType.CLEAR }, children: [new TextRun({ text: `  GHG Protocol Corporate Standard  |  ${d.organisationName}`, size: SM, font: F, color: '80CBC4' })] }));
-  els.push(new Paragraph({ spacing: { after: 60 }, shading: { fill: TEAL, type: ShadingType.CLEAR }, children: [new TextRun({ text: `  ${d.documentRef}  |  ${d.publicationDate}  |  Annual Review: ${d.reviewDate}`, size: 14, font: F, color: 'B2DFDB' })] }));
-  els.push(h.spacer(80));
-  els.push(infoTable([{ label: 'Organisation', value: d.organisationName }, { label: 'Address', value: d.organisationAddress }, { label: 'Companies House', value: d.companiesHouseNumber }, { label: 'Consolidation Approach', value: 'Operational Control' }], TEAL_D, F));
-  els.push(h.spacer(120));
+  const invCols = cols([0.16, 0.28, 0.16, 0.18, 0.22]);
+  const s3Cols4 = cols([0.06, 0.38, 0.14, 0.14, 0.28]);
+  const pathCols4 = cols([0.22, 0.16, 0.16, 0.16, 0.30]);
 
-  els.push(sectionBand('1. Company Profile & Inventory Boundaries', TEAL, F));
-  els.push(...prose(d.organisationDescription, F));
-
-  els.push(sectionBand('2. Net Zero Commitment', TEAL, F));
-  els.push(new Paragraph({ spacing: { before: 80, after: 80 }, shading: { fill: TEAL_LIGHT, type: ShadingType.CLEAR }, children: [
-    new TextRun({ text: `  Target Year: ${d.netZeroCommitment.targetYear}  |  2030: ${d.netZeroCommitment.interimTarget2030}  |  SBTi: ${d.netZeroCommitment.alignedWithSBTi ? 'Yes' : 'No'}`, bold: true, size: SM, font: F, color: TEAL_D }),
-  ] }));
-  els.push(...prose(d.netZeroCommitment.commitment, F));
-  els.push(subHead('Governance', TEAL, F));
-  els.push(...prose(d.netZeroCommitment.governanceStatement, F));
-
-  els.push(sectionBand('3. Baseline Emissions', TEAL, F));
-  els.push(infoTable([{ label: 'Baseline Year', value: d.baselineEmissions.baselineYear }, { label: 'Scope 1', value: `${d.baselineEmissions.baselineScope1} tCO₂e` }, { label: 'Scope 2', value: `${d.baselineEmissions.baselineScope2} tCO₂e` }, { label: 'Scope 3', value: `${d.baselineEmissions.baselineScope3} tCO₂e` }, { label: 'Total', value: `${d.baselineEmissions.totalBaselineUKOperations} tCO₂e` }], TEAL_D, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.baselineEmissions.baselineNarrative, F));
-
-  els.push(sectionBand('4. GHG Inventory Summary (All Scopes)', TEAL, F));
-  els.push(emissionsSummaryTable(d, TEAL_D, F));
-  els.push(h.spacer(80));
-  els.push(subHead('Scope 1', TEAL, F)); els.push(...prose(d.currentEmissions.scope1.narrative, F));
-  els.push(subHead('Scope 2', TEAL, F)); els.push(...prose(d.currentEmissions.scope2.narrative, F));
-
-  els.push(sectionBand('5. Scope 3 Category Screening (15 Categories)', TEAL, F));
-  els.push(...prose(d.currentEmissions.scope3.narrative, F));
-  if (d.currentEmissions.scope3.categories.length > 0) {
-    const s3w = [Math.round(W * 0.10), Math.round(W * 0.30), Math.round(W * 0.15), Math.round(W * 0.15), W - Math.round(W * 0.70)];
-    els.push(new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-      new TableRow({ children: [hdrCell('Cat.', s3w[0], TEAL_D, F), hdrCell('Category', s3w[1], TEAL_D, F), hdrCell('tCO₂e', s3w[2], TEAL_D, F), hdrCell('Quality', s3w[3], TEAL_D, F), hdrCell('Method', s3w[4], TEAL_D, F)] }),
-      ...d.currentEmissions.scope3.categories.map((cat, i) => new TableRow({ children: [dCell(cat.categoryNumber, s3w[0], { font: F, bold: true, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.categoryName, s3w[1], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.tCO2e, s3w[2], { font: F, bold: true, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.dataQuality, s3w[3], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined }), dCell(cat.methodology, s3w[4], { font: F, fill: i % 2 === 1 ? ZEBRA : undefined })] })),
-    ] }));
-  }
-
-  els.push(sectionBand('6. Reduction Roadmap', TEAL, F));
-  els.push(subHead('2030 Target Pathway', TEAL, F));
-  els.push(...prose(d.carbonReductionTargets.target2030.pathway, F));
-  els.push(subHead('Net Zero Strategy', TEAL, F));
-  els.push(...prose(d.carbonReductionTargets.targetNetZero.residualEmissionsStrategy, F));
-
-  els.push(sectionBand('7. Completed & Planned Initiatives', TEAL, F));
-  els.push(subHead('Completed', TEAL, F)); els.push(...initiativesTable(d.emissionsReductionInitiatives.completed, TEAL_D, F));
-  els.push(subHead('Planned', TEAL, F)); els.push(...initiativesTable(d.emissionsReductionInitiatives.planned, TEAL_D, F, true));
-
-  els.push(sectionBand('8. Supply Chain & Governance', TEAL, F));
-  els.push(subHead('Supply Chain Decarbonisation', TEAL, F)); els.push(...prose(d.supplyChainEngagement, F));
-  els.push(subHead('Reporting Cycle', TEAL, F)); els.push(...prose(d.reportingAndMeasurement, F));
-
-  els.push(sectionBand('9. Board Sign-Off', TEAL, F));
-  els.push(infoTable([{ label: 'Signatory', value: d.boardSignOff.signatoryName }, { label: 'Title', value: d.boardSignOff.signatoryTitle }, { label: 'Date', value: d.boardSignOff.signOffDate }], TEAL_D, F));
-  els.push(h.spacer(80));
-  els.push(...prose(d.boardSignOff.signOffStatement, F));
-  els.push(h.approvalTable([{ role: d.boardSignOff.signatoryTitle || 'Director', name: d.boardSignOff.signatoryName || '' }], W));
-
-  if (d.additionalNotes) { els.push(sectionBand('10. Additional Notes', TEAL, F)); els.push(...prose(d.additionalNotes, F)); }
-
-  return els;
+  return new Document({
+    styles: { default: { document: { run: { font: 'Calibri', size: BODY } } } },
+    sections: [
+      // Cover
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.coverBlock(['GHG PROTOCOL', 'CORPORATE CARBON', 'REDUCTION PLAN'], `${d.organisationName || 'Organisation'} \u2014 ${d.currentEmissions.reportingYear || 'FY2025/26'}`, TEAL_D, TEAL_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Document Reference', value: d.documentRef },
+            { label: 'Reporting Period', value: d.currentEmissions.reportingYear || '' },
+            { label: 'Organisation', value: d.organisationName },
+            { label: 'Consolidation Approach', value: d.consolidationApproach || 'Operational Control' },
+            { label: 'Reporting Standard', value: 'GHG Protocol Corporate Standard (Rev. 2015)' },
+            { label: 'Base Year', value: d.baselineEmissions.baselineYear || d.baselineYear },
+            { label: 'Net Zero Target', value: d.netZeroCommitment.targetYear || '2045' },
+            { label: 'Current Project', value: d.currentProject },
+          ], A, W),
+          h.coverFooterLine(),
+        ] },
+      // Body — Company Profile, Inventory Summary
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('01', 'COMPANY PROFILE & INVENTORY BOUNDARIES', A), h.spacer(80),
+          ...h.richBodyText(d.organisationDescription || ''),
+          h.spacer(80), h.fullWidthSectionBar('02', 'GHG INVENTORY SUMMARY (ALL SCOPES)', A), h.spacer(80),
+          h.kpiDashboard(
+            d.kpiItems.length > 0 ? d.kpiItems.slice(0, 5).map(k => ({ value: k.value, label: k.label })) : [
+              { value: d.currentEmissions.totalCurrentEmissions || '0', label: 'Total tCO\u2082e' },
+              { value: d.currentEmissions.scope1.total || '0', label: 'Scope 1' },
+              { value: d.currentEmissions.scope2.total || '0', label: 'Scope 2 (Loc)' },
+              { value: d.currentEmissions.scope3.total || '0', label: 'Scope 3' },
+            ], TEAL_D, W
+          ),
+          h.spacer(60),
+          dataTable(A,
+            [{ text: 'SCOPE', width: invCols[0] }, { text: 'SOURCE', width: invCols[1] }, { text: `${d.currentEmissions.reportingYear || 'CURRENT'} (tCO\u2082e)`, width: invCols[2] }, { text: 'BASELINE (tCO\u2082e)', width: invCols[3] }, { text: 'CHANGE', width: invCols[4] }],
+            [
+              ['SCOPE 1', 'Direct Emissions', d.currentEmissions.scope1.total || '', d.baselineEmissions.baselineScope1 || '', ''],
+              ...d.currentEmissions.scope1.sources.map(s => ['', s.source, s.tCO2e, '', '']),
+              ['SCOPE 2', 'Indirect Energy (Location-Based)', d.currentEmissions.scope2.total || '', d.baselineEmissions.baselineScope2 || '', ''],
+              ['SCOPE 3', 'Value Chain', d.currentEmissions.scope3.total || '', d.baselineEmissions.baselineScope3 || '', ''],
+              ['GRAND TOTAL', '', d.currentEmissions.totalCurrentEmissions || '', d.baselineEmissions.totalBaselineUKOperations || '', ''],
+            ]
+          ),
+        ] },
+      // Body — Scope 3 Screening, Roadmap, Supply Chain, Governance, Sign-Off
+      { properties: { ...h.PORTRAIT_SECTION }, headers: { default: hdr }, footers: { default: ftr },
+        children: [
+          h.fullWidthSectionBar('03', 'SCOPE 3 CATEGORY SCREENING (15 CATEGORIES)', A), h.spacer(80),
+          ...(d.currentEmissions.scope3.categories.length > 0 ? [dataTable(A,
+            [{ text: '#', width: s3Cols4[0] }, { text: 'CATEGORY', width: s3Cols4[1] }, { text: 'RELEVANT?', width: s3Cols4[2] }, { text: 'tCO\u2082e', width: s3Cols4[3] }, { text: 'METHOD', width: s3Cols4[4] }],
+            d.currentEmissions.scope3.categories.map(c => [c.categoryNumber, c.categoryName, c.relevant || c.dataQuality, c.tCO2e, c.methodology || '']),
+            [2]
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('04', 'REDUCTION ROADMAP \u2014 BASELINE TO NET ZERO', A), h.spacer(80),
+          ...(d.decarbonisationPathway.length > 0 ? [dataTable(TEAL_D,
+            [{ text: 'MILESTONE', width: pathCols4[0] }, { text: 'SCOPE 1&2', width: pathCols4[1] }, { text: 'SCOPE 3', width: pathCols4[2] }, { text: 'TOTAL', width: pathCols4[3] }, { text: 'INTENSITY (tCO\u2082e/\u00A3M)', width: pathCols4[4] }],
+            d.decarbonisationPathway.map(p => [p.year, p.scope12, p.scope3, p.total, p.intensity || ''])
+          )] : []),
+          h.spacer(80), h.fullWidthSectionBar('05', 'SUPPLY CHAIN DECARBONISATION STRATEGY', A), h.spacer(80),
+          ...h.richBodyText(d.supplyChainEngagement || ''),
+          h.spacer(80), h.fullWidthSectionBar('06', 'GOVERNANCE & REPORTING CYCLE', A), h.spacer(80),
+          ...h.richBodyText(d.governanceNarrative || d.reportingAndMeasurement || ''),
+          h.spacer(60),
+          h.signatureGrid(['Managing Director', 'Head of Sustainability'], A, W),
+          h.spacer(80), ...h.endMark(A),
+        ] },
+    ],
+  });
 }
+
 
 // ═════════════════════════════════════════════════════════════════════════════
 // ROUTER
 // ═════════════════════════════════════════════════════════════════════════════
-const TEMPLATE_LABELS: Record<CrpTemplateSlug, { label: string; font: string }> = {
-  'ppn-0621-standard': { label: 'Carbon Reduction Plan — PPN 06/21', font: 'Arial' },
-  'sbti-aligned': { label: 'Carbon Reduction Plan — SBTi Aligned', font: 'Calibri' },
-  'iso-14064-compliant': { label: 'Carbon Reduction Plan — ISO 14064', font: 'Cambria' },
-  'ghg-protocol-corporate': { label: 'Carbon Reduction Plan — GHG Protocol', font: 'Calibri' },
-};
-
-export async function buildCrpTemplateDocument(content: any, templateSlug: CrpTemplateSlug): Promise<Document> {
+export async function buildCrpTemplateDocument(
+  content: any,
+  templateSlug: CrpTemplateSlug
+): Promise<Document> {
   const d = extract(content);
-  const { label, font } = TEMPLATE_LABELS[templateSlug];
-
-  let children: (Paragraph | Table)[];
   switch (templateSlug) {
-    case 'ppn-0621-standard': children = buildT1(d); break;
-    case 'sbti-aligned': children = buildT2(d); break;
-    case 'iso-14064-compliant': children = buildT3(d); break;
-    case 'ghg-protocol-corporate': children = buildT4(d); break;
-    default: children = buildT1(d);
+    case 'ppn-0621-standard':      return buildT1(d);
+    case 'sbti-aligned':           return buildT2(d);
+    case 'iso-14064-compliant':    return buildT3(d);
+    case 'ghg-protocol-corporate': return buildT4(d);
+    default:                       return buildT1(d);
   }
-
-  return new Document({
-    styles: { default: { document: { run: { font, size: BODY } } } },
-    sections: [{
-      properties: { ...h.PORTRAIT_SECTION },
-      headers: { default: h.ebroraHeader(label) },
-      footers: { default: h.ebroraFooter() },
-      children,
-    }],
-  });
 }

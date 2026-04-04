@@ -1,11 +1,11 @@
 // =============================================================================
-// Noise Assessment Builder — Multi-Template Engine
-// 4 templates, all consuming the same Noise Assessment JSON structure.
+// Noise Assessment Builder — Multi-Template Engine (REBUILT)
+// 4 templates matching HTML render library exactly.
 //
-// T1 — Ebrora Standard          (green, comprehensive BS 5228, 16 sections)
-// T2 — Section 61 Application   (red, CoPA 1974 consent format)
-// T3 — Monitoring Report        (teal, ongoing measurement results)
-// T4 — Resident Communication   (navy, plain English stakeholder summary)
+// T1 — Ebrora Standard          (green #059669, BS 5228 assessment, ~2pp)
+// T2 — Section 61 Application   (dark red #991B1B, CoPA 1974 consent, ~2pp)
+// T3 — Monitoring Report        (teal #0f766e, measurement results, ~2pp)
+// T4 — Resident Communication   (navy #1E40AF, plain English letter, ~2pp)
 // =============================================================================
 import {
   Document, Paragraph, TextRun, Table, TableRow, TableCell,
@@ -15,22 +15,22 @@ import * as h from '@/lib/rams/docx-helpers';
 import type { NoiseAssessmentTemplateSlug } from '@/lib/noise-assessment/types';
 
 const W = h.A4_CONTENT_WIDTH;
-const BODY = 20; const SM = 16; const LG = 24; const XL = 32; const TTL = 44;
-const EBRORA = h.EBRORA_GREEN; const ACCENT_DARK = '143D2B';
-const RED_D = '991B1B'; const RED_BG = 'FEF2F2'; const RED = 'DC2626';
-const AMBER = 'D97706'; const AMBER_BG = 'FEF3C7';
-const GREEN_RAG = '059669'; const GREEN_BG = 'D1FAE5';
-const NAVY = '1e293b'; const NAVY_BG = 'f1f5f9';
-const TEAL = '0f766e'; const TEAL_BG = 'f0fdfa'; const TEAL_DARK = '134e4a';
-const GREY_RAG = '6B7280'; const GREY_BG = 'F3F4F6';
-const ZEBRA = 'F5F5F5';
-const CM = { top: 80, bottom: 80, left: 120, right: 120 };
+const SM = 16; const BODY = 18; const LG = 22;
+
+// Accent palettes per template
+const GREEN = '059669'; const GREEN_SUB = 'A7F3D0'; const GREEN_BG = 'ECFDF5';
+const RED_D = '991B1B'; const RED_SUB = 'FCA5A5'; const RED_BG = 'FEF2F2';
+const TEAL = '0f766e'; const TEAL_SUB = '99F6E4'; const TEAL_BG = 'F0FDFA';
+const NAVY = '1E40AF'; const NAVY_SUB = 'BFDBFE'; const NAVY_BG = 'EFF6FF';
+
+const RED = 'DC2626'; const AMBER = 'D97706'; const GREEN_RAG = '059669';
+const GREY = '6B7280'; const ZEBRA = 'F9FAFB';
 
 // ── Data Interface ───────────────────────────────────────────────────────────
 interface PlantItem { plant: string; bs5228Ref: string; lwa: string; quantity: string; onTime: string; usage: string; }
 interface Receptor { id: string; type: string; address: string; distance: string; direction: string; existingBackground: string; }
-interface PredictedLevel { receptorId: string; receptorName: string; predictedLaeq: string; criterion: string; impact: string; margin: string; }
-interface MitigationMeasure { measure: string; type: string; expectedReduction: string; implementedBy: string; status: string; }
+interface PredictedLevel { receptorId: string; receptorName: string; predictedLaeq: string; criterion: string; impact: string; margin: string; activity?: string; ambient?: string; exceedance?: string; significance?: string; }
+interface MitigationMeasure { measure: string; type: string; expectedReduction: string; implementedBy: string; status: string; detail?: string; bs5228Ref?: string; }
 interface MonitoringLocation { id: string; description: string; gridRef: string; receptorType: string; consentLimit: string; }
 interface MeasurementResult { locationId: string; date: string; startTime: string; endTime: string; laeq: string; lamax: string; la90: string; dominantSource: string; compliance: string; }
 interface Exceedance { locationId: string; date: string; measuredLevel: string; limit: string; exceedanceDb: string; cause: string; correctiveAction: string; }
@@ -50,6 +50,8 @@ interface NoiseAssessmentData {
   principalContractor: string; client: string; localAuthority: string;
   siteDescription: string; worksDescription: string; programmeDuration: string;
   assessmentBasis: string; methodology: string;
+  nearestReceptorSummary: string; keyActivities: string;
+  predictedLaeqAtNsr: string; bs5228Significance: string;
   plantItems: PlantItem[]; receptors: Receptor[]; predictedLevels: PredictedLevel[];
   impactSummary: string; bpmStatement: string;
   mitigationMeasures: MitigationMeasure[]; monitoringPlan: string;
@@ -62,36 +64,59 @@ interface NoiseAssessmentData {
   timelinePhases: TimelinePhase[]; everydayComparisons: EverydayComparison[];
   whatYouMightNotice: string; whatWeAreDoing: string;
   applicantName: string; applicantAddress: string; applicantContact: string;
+  submittedTo: string; keyNoiseSource: string;
   section61Declaration: string;
   contactName: string; contactPhone: string; contactEmail: string;
+  clientContact: string;
+  monitorLocation: string; equipment: string; complianceStatus: string;
+  monitoringPeriod: string;
+  ambientLaeq: string; predictedPiling: string; exceedanceDb: string; bs5228CatAThreshold: string;
+  significanceCallout: string;
+  monitoringNote: string;
+  weeklyMeanLaeq: string; weeklyMaxLaeq: string; s61Limit: string; exceedanceCount: string; complaintCount: string;
   regulatoryReferences: RegRef[]; additionalNotes: string;
+  noticeSubject: string; noticeDuration: string;
+  [key: string]: any;
 }
 
 function extract(c: any): NoiseAssessmentData {
-  const s = (v: any, fb = '') => v ?? fb;
-  const a = (v: any) => Array.isArray(v) ? v : [];
+  const s = (k: string, fb = '') => (typeof c?.[k] === 'string' ? c[k] : fb);
+  const a = (k: string) => (Array.isArray(c?.[k]) ? c[k] : []);
   return {
-    documentRef: s(c.documentRef), assessmentDate: s(c.assessmentDate), reviewDate: s(c.reviewDate),
-    assessedBy: s(c.assessedBy), projectName: s(c.projectName), siteAddress: s(c.siteAddress),
-    principalContractor: s(c.principalContractor), client: s(c.client), localAuthority: s(c.localAuthority),
-    siteDescription: s(c.siteDescription), worksDescription: s(c.worksDescription), programmeDuration: s(c.programmeDuration),
-    assessmentBasis: s(c.assessmentBasis), methodology: s(c.methodology),
-    plantItems: a(c.plantItems), receptors: a(c.receptors), predictedLevels: a(c.predictedLevels),
-    impactSummary: s(c.impactSummary), bpmStatement: s(c.bpmStatement),
-    mitigationMeasures: a(c.mitigationMeasures), monitoringPlan: s(c.monitoringPlan),
-    monitoringLocations: a(c.monitoringLocations), measurementResults: a(c.measurementResults),
-    exceedances: a(c.exceedances), weatherLogs: a(c.weatherLogs),
-    calibrationRecords: a(c.calibrationRecords),
-    complianceSummary: s(c.complianceSummary), trendAnalysis: s(c.trendAnalysis),
-    workingHours: a(c.workingHours), vibrationScreening: a(c.vibrationScreening),
-    proposedLimits: a(c.proposedLimits), complaintProcedure: a(c.complaintProcedure),
-    timelinePhases: a(c.timelinePhases), everydayComparisons: a(c.everydayComparisons),
-    whatYouMightNotice: s(c.whatYouMightNotice), whatWeAreDoing: s(c.whatWeAreDoing),
-    applicantName: s(c.applicantName), applicantAddress: s(c.applicantAddress), applicantContact: s(c.applicantContact),
-    section61Declaration: s(c.section61Declaration),
-    contactName: s(c.contactName), contactPhone: s(c.contactPhone), contactEmail: s(c.contactEmail),
-    regulatoryReferences: a(c.regulatoryReferences).length > 0 ? a(c.regulatoryReferences) : defaultRefs(),
-    additionalNotes: s(c.additionalNotes),
+    documentRef: s('documentRef'), assessmentDate: s('assessmentDate'), reviewDate: s('reviewDate'),
+    assessedBy: s('assessedBy'), projectName: s('projectName'), siteAddress: s('siteAddress'),
+    principalContractor: s('principalContractor'), client: s('client'), localAuthority: s('localAuthority'),
+    siteDescription: s('siteDescription'), worksDescription: s('worksDescription'), programmeDuration: s('programmeDuration'),
+    assessmentBasis: s('assessmentBasis'), methodology: s('methodology'),
+    nearestReceptorSummary: s('nearestReceptorSummary'), keyActivities: s('keyActivities'),
+    predictedLaeqAtNsr: s('predictedLaeqAtNsr'), bs5228Significance: s('bs5228Significance'),
+    plantItems: a('plantItems'), receptors: a('receptors'), predictedLevels: a('predictedLevels'),
+    impactSummary: s('impactSummary'), bpmStatement: s('bpmStatement'),
+    mitigationMeasures: a('mitigationMeasures'), monitoringPlan: s('monitoringPlan'),
+    monitoringLocations: a('monitoringLocations'), measurementResults: a('measurementResults'),
+    exceedances: a('exceedances'), weatherLogs: a('weatherLogs'),
+    calibrationRecords: a('calibrationRecords'),
+    complianceSummary: s('complianceSummary'), trendAnalysis: s('trendAnalysis'),
+    workingHours: a('workingHours'), vibrationScreening: a('vibrationScreening'),
+    proposedLimits: a('proposedLimits'), complaintProcedure: a('complaintProcedure'),
+    timelinePhases: a('timelinePhases'), everydayComparisons: a('everydayComparisons'),
+    whatYouMightNotice: s('whatYouMightNotice'), whatWeAreDoing: s('whatWeAreDoing'),
+    applicantName: s('applicantName'), applicantAddress: s('applicantAddress'), applicantContact: s('applicantContact'),
+    submittedTo: s('submittedTo'), keyNoiseSource: s('keyNoiseSource'),
+    section61Declaration: s('section61Declaration'),
+    contactName: s('contactName'), contactPhone: s('contactPhone'), contactEmail: s('contactEmail'),
+    clientContact: s('clientContact'),
+    monitorLocation: s('monitorLocation'), equipment: s('equipment'), complianceStatus: s('complianceStatus'),
+    monitoringPeriod: s('monitoringPeriod'),
+    ambientLaeq: s('ambientLaeq'), predictedPiling: s('predictedPiling'),
+    exceedanceDb: s('exceedanceDb'), bs5228CatAThreshold: s('bs5228CatAThreshold'),
+    significanceCallout: s('significanceCallout'),
+    monitoringNote: s('monitoringNote'),
+    weeklyMeanLaeq: s('weeklyMeanLaeq'), weeklyMaxLaeq: s('weeklyMaxLaeq'),
+    s61Limit: s('s61Limit'), exceedanceCount: s('exceedanceCount'), complaintCount: s('complaintCount'),
+    regulatoryReferences: a('regulatoryReferences').length > 0 ? a('regulatoryReferences') : defaultRefs(),
+    additionalNotes: s('additionalNotes'),
+    noticeSubject: s('noticeSubject'), noticeDuration: s('noticeDuration'),
   };
 }
 
@@ -102,409 +127,468 @@ function defaultRefs(): RegRef[] {
     { reference: 'Control of Pollution Act 1974 — S.61', description: 'Prior consent for construction works' },
     { reference: 'Environmental Protection Act 1990', description: 'Statutory nuisance provisions' },
     { reference: 'Control of Noise at Work Regulations 2005', description: 'Occupational noise exposure limits' },
+    { reference: 'BS 7385-2:1993', description: 'Evaluation and measurement for vibration in buildings' },
   ];
 }
 
 // ── Shared helpers ───────────────────────────────────────────────────────────
-function secHead(num: string, text: string, accent: string): Paragraph {
-  return new Paragraph({ spacing: { before: 360, after: 140 }, border: { left: { style: BorderStyle.SINGLE, size: 18, color: accent, space: 6 } },
-    children: [new TextRun({ text: num ? `${num}   ${text.toUpperCase()}` : text.toUpperCase(), bold: true, size: LG, font: 'Arial', color: accent })] });
+function hdrCell(text: string, width: number, accent: string): TableCell {
+  return h.headerCell(text, width, { fillColor: accent, color: 'FFFFFF', fontSize: SM });
 }
-function hdrCell(text: string, width: number, bg: string): TableCell {
-  return new TableCell({ width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS, shading: { fill: bg, type: ShadingType.CLEAR },
-    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text.toUpperCase(), bold: true, size: SM, font: 'Arial', color: h.WHITE })] })] });
+function txtCell(text: string, width: number, opts?: { bg?: string; bold?: boolean; color?: string }): TableCell {
+  return h.dataCell(text, width, { fillColor: opts?.bg, bold: opts?.bold, fontSize: SM, color: opts?.color });
 }
-function txtCell(text: string, width: number, opts?: { bold?: boolean; bg?: string; color?: string }): TableCell {
-  return new TableCell({ width: { size: width, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS, shading: { fill: opts?.bg || h.WHITE, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.TOP,
-    children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: text || '\u2014', bold: opts?.bold, size: SM + 2, font: 'Arial', color: opts?.color })] })] });
+function cols(fracs: number[]): number[] {
+  return fracs.map(f => Math.round(W * f));
 }
-function infoTable(rows: Array<{ label: string; value: string }>, lbg: string, lc: string): Table {
-  const lw = Math.round(W * 0.35);
-  return new Table({ width: { size: W, type: WidthType.DXA }, rows: rows.map(r => new TableRow({ children: [
-    new TableCell({ width: { size: lw, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS, shading: { fill: lbg, type: ShadingType.CLEAR },
-      children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: r.label, bold: true, size: SM + 2, font: 'Arial', color: lc })] })] }),
-    new TableCell({ width: { size: W - lw, type: WidthType.DXA }, margins: CM, borders: h.CELL_BORDERS,
-      children: [new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: r.value || '\u2014', size: SM + 2, font: 'Arial' })] })] }),
-  ] })) });
-}
-function dataTable(hdrs: Array<{ text: string; width: number }>, rows: Array<Array<{ text: string; bold?: boolean; color?: string }>>, hbg: string, zb = ZEBRA): Table {
-  return new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-    new TableRow({ children: hdrs.map(h2 => hdrCell(h2.text, h2.width, hbg)) }),
-    ...rows.map((row, ri) => new TableRow({ children: row.map((cell, ci) => txtCell(cell.text, hdrs[ci].width, { bold: cell.bold, bg: ri % 2 === 0 ? zb : h.WHITE, color: cell.color })) })),
-  ] });
-}
-function signOff(roles: string[], bg: string): Table {
-  const cols = [{ t: 'Role', w: Math.round(W * 0.22) }, { t: 'Name', w: Math.round(W * 0.28) }, { t: 'Signature', w: Math.round(W * 0.25) }, { t: 'Date', w: W - Math.round(W * 0.22) - Math.round(W * 0.28) - Math.round(W * 0.25) }];
-  return new Table({ width: { size: W, type: WidthType.DXA }, rows: [
-    new TableRow({ children: cols.map(c => hdrCell(c.t, c.w, bg)) }),
-    ...roles.map(role => new TableRow({ height: { value: 600, rule: 'atLeast' as any }, children: cols.map((c, i) => txtCell(i === 0 ? role : '', c.w)) })),
-  ] });
+function dataTable(hdrs: Array<{ text: string; w: number }>, rows: Array<Array<{ text: string; bold?: boolean; color?: string }>>, accent: string): Table {
+  return new Table({
+    width: { size: W, type: WidthType.DXA },
+    rows: [
+      new TableRow({ children: hdrs.map(col => hdrCell(col.text, col.w, accent)) }),
+      ...rows.map((row, ri) => new TableRow({
+        children: row.map((cell, ci) => txtCell(cell.text, hdrs[ci].w, { bg: ri % 2 === 0 ? ZEBRA : h.WHITE, bold: cell.bold, color: cell.color })),
+      })),
+    ],
+  });
 }
 function ragC(level: string): string {
   const l = (level || '').toLowerCase();
-  if (l.includes('significant') || l.includes('high') || l.includes('exceed') || l.includes('fail') || l.includes('non-comp')) return RED;
-  if (l.includes('moderate') || l.includes('medium') || l.includes('marginal')) return AMBER;
-  if (l.includes('low') || l.includes('negligible') || l.includes('comply') || l.includes('pass') || l.includes('compliant') || l.includes('within')) return GREEN_RAG;
-  return GREY_RAG;
+  if (l.includes('significant') || l.includes('high') || l.includes('exceed') || l.includes('fail') || l.includes('non-comp') || l.includes('not received')) return RED;
+  if (l.includes('moderate') || l.includes('medium') || l.includes('marginal') || l.includes('note') || l.includes('potentially')) return AMBER;
+  if (l.includes('low') || l.includes('negligible') || l.includes('comply') || l.includes('pass') || l.includes('compliant') || l.includes('within') || l.includes('not significant')) return GREEN_RAG;
+  return GREY;
 }
-function prose(text: string): Paragraph {
-  return new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text, size: BODY, font: 'Arial' })] });
+function prose(text: string, spacing = 120): Paragraph[] {
+  return h.richBodyText(text || '', BODY);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// T1 — EBRORA STANDARD (green, comprehensive BS 5228)
-// ═══════════════════════════════════════════════════════════════════════════════
-function buildT1(d: NoiseAssessmentData): (Paragraph | Table)[] {
-  const A = EBRORA; const LBG = 'f0fdf4'; const LC = EBRORA;
-  const els: (Paragraph | Table)[] = [];
-  let sn = 1;
 
-  // Cover
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: ACCENT_DARK }, spacing: { after: 0 }, children: [new TextRun({ text: ' ', size: 12, font: 'Arial', color: ACCENT_DARK })] }));
-  els.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 600, after: 40 }, children: [new TextRun({ text: 'CONSTRUCTION NOISE ASSESSMENT', bold: true, size: TTL, font: 'Arial', color: A })] }));
-  els.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 }, children: [new TextRun({ text: 'BS 5228-1:2009+A1:2014 \u00B7 Control of Pollution Act 1974 \u00B7 EPA 1990', size: BODY, font: 'Arial', color: h.GREY_DARK })] }));
-  els.push(h.spacer(100));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: A }, alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: `  ${(d.projectName || 'PROJECT').toUpperCase()}  `, bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(h.spacer(100));
-  els.push(infoTable([
-    { label: 'Document Ref', value: d.documentRef }, { label: 'Assessment Date', value: d.assessmentDate },
-    { label: 'Review Date', value: d.reviewDate }, { label: 'Assessed By', value: d.assessedBy },
-    { label: 'Principal Contractor', value: d.principalContractor }, { label: 'Client', value: d.client },
-    { label: 'Local Authority', value: d.localAuthority }, { label: 'Programme Duration', value: d.programmeDuration },
-  ], LBG, LC));
+// ═════════════════════════════════════════════════════════════════════════════
+// T1 — EBRORA STANDARD (Green #059669 · BS 5228 assessment)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT1(d: NoiseAssessmentData): Document {
+  const A = GREEN;
+  const hdr = h.accentHeader('Construction Noise Assessment', A);
+  const ftr = h.accentFooter(d.documentRef, 'Ebrora Standard', A);
 
-  // 1 Site & Works
-  els.push(secHead(`${sn}.0`, 'Site Description & Works', A)); sn++;
-  if (d.siteDescription) els.push(prose(d.siteDescription));
-  if (d.worksDescription) els.push(prose(d.worksDescription));
+  // Build body children
+  const body: (Paragraph | Table)[] = [];
 
-  // 2 Assessment Basis
-  els.push(secHead(`${sn}.0`, 'Assessment Basis & Methodology', A)); sn++;
-  if (d.assessmentBasis) els.push(prose(d.assessmentBasis));
-  if (d.methodology) els.push(prose(d.methodology));
+  // 01 — SITE DESCRIPTION & SENSITIVE RECEPTORS
+  body.push(h.fullWidthSectionBar('01', 'SITE DESCRIPTION & SENSITIVE RECEPTORS', A));
+  body.push(h.spacer(80));
+  body.push(...prose(d.siteDescription));
 
-  // 3 Working Hours
-  if (d.workingHours.length > 0) {
-    const wc = [Math.round(W * 0.16), Math.round(W * 0.16), Math.round(W * 0.18), Math.round(W * 0.20), W - Math.round(W * 0.16) * 2 - Math.round(W * 0.18) - Math.round(W * 0.20)];
-    els.push(secHead(`${sn}.0`, 'Working Hours', A)); sn++;
-    els.push(dataTable([{ text: 'Period', width: wc[0] }, { text: 'Days', width: wc[1] }, { text: 'Hours', width: wc[2] }, { text: 'Activity', width: wc[3] }, { text: 'Justification', width: wc[4] }],
-      d.workingHours.map(w => [{ text: w.period }, { text: w.days }, { text: w.hours, bold: true }, { text: w.noiseType }, { text: w.justification }]), A));
-  } else { sn++; }
-
-  // 4 Plant Inventory
+  // 02 — NOISE SOURCE INVENTORY
+  body.push(h.fullWidthSectionBar('02', 'NOISE SOURCE INVENTORY (BS 5228-1 TABLE C-SERIES)', A));
+  body.push(h.spacer(80));
   if (d.plantItems.length > 0) {
-    const pc = [Math.round(W * 0.22), Math.round(W * 0.12), Math.round(W * 0.10), Math.round(W * 0.08), Math.round(W * 0.12), W - Math.round(W * 0.22) - Math.round(W * 0.12) - Math.round(W * 0.10) - Math.round(W * 0.08) - Math.round(W * 0.12)];
-    els.push(secHead(`${sn}.0`, 'Plant Inventory & BS 5228 Source Levels', A)); sn++;
-    els.push(dataTable([{ text: 'Plant', width: pc[0] }, { text: 'BS 5228 Ref', width: pc[1] }, { text: 'LWA dB', width: pc[2] }, { text: 'Qty', width: pc[3] }, { text: 'On-Time %', width: pc[4] }, { text: 'Usage', width: pc[5] }],
-      d.plantItems.map(p => [{ text: p.plant, bold: true }, { text: p.bs5228Ref }, { text: p.lwa, bold: true }, { text: p.quantity }, { text: p.onTime }, { text: p.usage }]), A));
-  } else { sn++; }
+    const c = cols([0.22, 0.20, 0.12, 0.12, 0.12, 0.22]);
+    body.push(dataTable(
+      [{ text: 'Activity', w: c[0] }, { text: 'Plant / Equipment', w: c[1] }, { text: 'BS 5228 Ref', w: c[2] }, { text: 'LAeq at 10m', w: c[3] }, { text: 'Duration', w: c[4] }, { text: 'Programme Phase', w: c[5] }],
+      d.plantItems.map(p => [
+        { text: p.usage || p.plant }, { text: p.plant, bold: true }, { text: p.bs5228Ref },
+        { text: p.lwa, bold: true }, { text: p.onTime || p.quantity }, { text: (p as any).programmePhase || '' },
+      ]), A));
+  }
 
-  // 5 Sensitive Receptors
-  if (d.receptors.length > 0) {
-    const rc = [Math.round(W * 0.06), Math.round(W * 0.12), Math.round(W * 0.24), Math.round(W * 0.10), Math.round(W * 0.10), W - Math.round(W * 0.06) - Math.round(W * 0.12) - Math.round(W * 0.24) - Math.round(W * 0.10) * 2];
-    els.push(secHead(`${sn}.0`, 'Sensitive Receptors', A)); sn++;
-    els.push(dataTable([{ text: 'ID', width: rc[0] }, { text: 'Type', width: rc[1] }, { text: 'Address', width: rc[2] }, { text: 'Distance', width: rc[3] }, { text: 'Direction', width: rc[4] }, { text: 'Background', width: rc[5] }],
-      d.receptors.map(r => [{ text: r.id, bold: true }, { text: r.type }, { text: r.address }, { text: r.distance }, { text: r.direction }, { text: r.existingBackground }]), A));
-  } else { sn++; }
-
-  // 6 Predicted Levels
+  // 03 — PREDICTED NOISE LEVELS AT NEAREST RECEPTOR
+  body.push(h.fullWidthSectionBar('03', 'PREDICTED NOISE LEVELS AT NEAREST RECEPTOR', A));
+  body.push(h.spacer(80));
   if (d.predictedLevels.length > 0) {
-    const pl = [Math.round(W * 0.06), Math.round(W * 0.20), Math.round(W * 0.14), Math.round(W * 0.14), Math.round(W * 0.18), W - Math.round(W * 0.06) - Math.round(W * 0.20) - Math.round(W * 0.14) * 2 - Math.round(W * 0.18)];
-    els.push(secHead(`${sn}.0`, 'Predicted Noise Levels at Receptors', A)); sn++;
-    els.push(dataTable([{ text: 'ID', width: pl[0] }, { text: 'Receptor', width: pl[1] }, { text: 'Predicted LAeq', width: pl[2] }, { text: 'Criterion', width: pl[3] }, { text: 'Impact', width: pl[4] }, { text: 'Margin', width: pl[5] }],
-      d.predictedLevels.map(p => [{ text: p.receptorId, bold: true }, { text: p.receptorName }, { text: p.predictedLaeq, bold: true }, { text: p.criterion }, { text: p.impact, bold: true, color: ragC(p.impact) }, { text: p.margin }]), A));
-  } else { sn++; }
+    const c = cols([0.22, 0.12, 0.12, 0.14, 0.12, 0.12, 0.16]);
+    body.push(dataTable(
+      [{ text: 'Activity', w: c[0] }, { text: 'LAeq at 10m', w: c[1] }, { text: 'Distance to NSR', w: c[2] },
+       { text: 'Predicted LAeq at NSR', w: c[3] }, { text: 'Ambient LAeq', w: c[4] },
+       { text: 'Exceedance', w: c[5] }, { text: 'Significance', w: c[6] }],
+      d.predictedLevels.map(p => [
+        { text: p.activity || p.receptorName }, { text: (p as any).laeqAt10m || p.criterion },
+        { text: (p as any).distanceToNsr || '' },
+        { text: p.predictedLaeq, bold: true, color: ragC(p.significance || p.impact) },
+        { text: p.ambient || '' }, { text: p.exceedance || p.margin, color: ragC(p.exceedance || p.margin) },
+        { text: p.significance || p.impact, bold: true, color: ragC(p.significance || p.impact) },
+      ]), A));
+  }
 
-  // 7 Impact Summary
-  if (d.impactSummary) { els.push(secHead(`${sn}.0`, 'Impact Assessment Summary', A)); sn++; els.push(prose(d.impactSummary)); } else { sn++; }
+  // BS 5228 Significance callout
+  if (d.significanceCallout || d.impactSummary) {
+    body.push(h.spacer(40));
+    body.push(h.calloutBox(
+      d.significanceCallout || d.impactSummary,
+      AMBER, 'FFFBEB', '92400E', W,
+      { boldPrefix: 'BS 5228 Significance (ABC Method):' }
+    ));
+  }
 
-  // 8 BPM
-  if (d.bpmStatement) { els.push(secHead(`${sn}.0`, 'Best Practicable Means (BPM)', A)); sn++; els.push(prose(d.bpmStatement)); } else { sn++; }
-
-  // 9 Mitigation
+  // 04 — NOISE MITIGATION MEASURES
+  body.push(h.fullWidthSectionBar('04', 'NOISE MITIGATION MEASURES', A));
+  body.push(h.spacer(80));
   if (d.mitigationMeasures.length > 0) {
-    const mc = [Math.round(W * 0.30), Math.round(W * 0.16), Math.round(W * 0.14), Math.round(W * 0.16), W - Math.round(W * 0.30) - Math.round(W * 0.16) - Math.round(W * 0.14) - Math.round(W * 0.16)];
-    els.push(secHead(`${sn}.0`, 'Mitigation Measures', A)); sn++;
-    els.push(dataTable([{ text: 'Measure', width: mc[0] }, { text: 'Type', width: mc[1] }, { text: 'Reduction', width: mc[2] }, { text: 'Implemented By', width: mc[3] }, { text: 'Status', width: mc[4] }],
-      d.mitigationMeasures.map(m => [{ text: m.measure }, { text: m.type, bold: true }, { text: m.expectedReduction }, { text: m.implementedBy }, { text: m.status, bold: true, color: ragC(m.status) }]), A));
-  } else { sn++; }
+    const c = cols([0.24, 0.46, 0.30]);
+    body.push(dataTable(
+      [{ text: 'Measure', w: c[0] }, { text: 'Detail', w: c[1] }, { text: 'Noise Reduction', w: c[2] }],
+      d.mitigationMeasures.map(m => [
+        { text: m.measure, bold: true }, { text: m.detail || m.type }, { text: m.expectedReduction },
+      ]), A));
+  }
 
-  // 10 Monitoring Plan
-  if (d.monitoringPlan || d.monitoringLocations.length > 0) {
-    els.push(secHead(`${sn}.0`, 'Noise Monitoring Plan', A)); sn++;
-    if (d.monitoringPlan) els.push(prose(d.monitoringPlan));
-    if (d.monitoringLocations.length > 0) {
-      els.push(dataTable([{ text: 'ID', width: Math.round(W * 0.06) }, { text: 'Description', width: Math.round(W * 0.28) }, { text: 'Grid Ref', width: Math.round(W * 0.18) }, { text: 'Type', width: Math.round(W * 0.16) }, { text: 'Consent Limit', width: W - Math.round(W * 0.06) - Math.round(W * 0.28) - Math.round(W * 0.18) - Math.round(W * 0.16) }],
-        d.monitoringLocations.map(m => [{ text: m.id, bold: true }, { text: m.description }, { text: m.gridRef }, { text: m.receptorType }, { text: m.consentLimit }]), A));
-    }
-  } else { sn++; }
+  // 05 — REGULATORY REFERENCES
+  body.push(h.fullWidthSectionBar('05', 'REGULATORY REFERENCES', A));
+  body.push(h.spacer(80));
+  body.push(...prose(d.regulatoryReferences.map(r => `${r.reference} — ${r.description}.`).join(' ')));
 
-  // 11 Vibration
-  if (d.vibrationScreening.length > 0) {
-    const vc = [Math.round(W * 0.22), Math.round(W * 0.14), Math.round(W * 0.14), Math.round(W * 0.22), W - Math.round(W * 0.22) - Math.round(W * 0.14) * 2 - Math.round(W * 0.22)];
-    els.push(secHead(`${sn}.0`, 'Vibration Screening (BS 5228-2)', A)); sn++;
-    els.push(dataTable([{ text: 'Source', width: vc[0] }, { text: 'PPV mm/s', width: vc[1] }, { text: 'Distance', width: vc[2] }, { text: 'Criterion', width: vc[3] }, { text: 'Impact', width: vc[4] }],
-      d.vibrationScreening.map(v => [{ text: v.source, bold: true }, { text: v.ppv }, { text: v.distance }, { text: v.criterion }, { text: v.impact, bold: true, color: ragC(v.impact) }]), A));
-  } else { sn++; }
+  // Signature grid
+  body.push(h.spacer(200));
+  body.push(h.signatureGrid(['Assessed By', 'Reviewed By'], A, W));
 
-  // 12 Refs
-  els.push(secHead(`${sn}.0`, 'Regulatory References', A)); sn++;
-  els.push(dataTable([{ text: 'Reference', width: Math.round(W * 0.38) }, { text: 'Description', width: W - Math.round(W * 0.38) }],
-    d.regulatoryReferences.map(r => [{ text: r.reference, bold: true }, { text: r.description }]), A));
+  // End mark
+  body.push(...h.endMark(A));
 
-  // 13 Sign-Off
-  els.push(secHead(`${sn}.0`, 'Sign-Off', A));
-  els.push(signOff(['Assessed By', 'Environmental Manager', 'Project Manager', 'Client Representative'], A));
-  els.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400 }, border: { top: { style: BorderStyle.SINGLE, size: 1, color: h.GREY_MID } },
-    children: [new TextRun({ text: 'This noise assessment must be reviewed when activities, plant, or site conditions change. Assessment methodology aligned with BS 5228-1:2009+A1:2014.', size: SM, font: 'Arial', color: h.GREY_DARK, italics: true })] }));
-
-  return els;
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // Cover page
+      {
+        properties: { ...h.PORTRAIT_SECTION },
+        children: [
+          h.coverBlock(['CONSTRUCTION NOISE', 'ASSESSMENT'], `BS 5228-1:2009+A1:2014 — ${d.projectName}`, A, GREEN_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef },
+            { label: 'Date', value: d.assessmentDate },
+            { label: 'Review Date', value: d.reviewDate },
+            { label: 'Assessed By', value: d.assessedBy },
+            { label: 'Project', value: d.projectName },
+            { label: 'Site Address', value: d.siteAddress },
+            { label: 'Nearest Sensitive Receptor', value: d.nearestReceptorSummary || d.receptors?.[0]?.address || '' },
+            { label: 'Key Activities', value: d.keyActivities || d.plantItems.map(p => p.plant).join(', ') },
+            { label: 'Predicted LAeq,T at NSR', value: d.predictedLaeqAtNsr || '' },
+            { label: 'BS 5228 Significance', value: d.bs5228Significance || '' },
+          ], A, W),
+          h.coverFooterLine(),
+        ],
+      },
+      // Body
+      {
+        properties: { ...h.PORTRAIT_SECTION },
+        headers: { default: hdr },
+        footers: { default: ftr },
+        children: body,
+      },
+    ],
+  });
 }
 
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// T2 — SECTION 61 APPLICATION (red, CoPA 1974 consent)
-// ═══════════════════════════════════════════════════════════════════════════════
-function buildT2(d: NoiseAssessmentData): (Paragraph | Table)[] {
-  const A = RED_D; const LBG = RED_BG; const LC = RED_D;
-  const els: (Paragraph | Table)[] = [];
+// ═════════════════════════════════════════════════════════════════════════════
+// T2 — SECTION 61 APPLICATION (Dark Red #991B1B · CoPA 1974 prior consent)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT2(d: NoiseAssessmentData): Document {
+  const A = RED_D;
+  const hdr = h.accentHeader('Section 61 Prior Consent Application', A);
+  const ftr = h.accentFooter(d.documentRef, 'Section 61 Application', A);
 
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'SECTION 61 PRIOR CONSENT APPLICATION', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: RED_D }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'Control of Pollution Act 1974 \u00B7 Prior Consent for Construction Works', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '7f1d1d' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | To: ${d.localAuthority}`, size: SM, font: 'Arial', color: 'fca5a5' })] }));
+  const body: (Paragraph | Table)[] = [];
 
-  // 1 Applicant Details
-  els.push(secHead('1.0', 'Applicant & Site Details', A));
-  els.push(infoTable([
-    { label: 'Applicant', value: d.applicantName || d.principalContractor }, { label: 'Address', value: d.applicantAddress || d.siteAddress },
-    { label: 'Contact', value: d.applicantContact || d.assessedBy },
-    { label: 'Site Address', value: d.siteAddress }, { label: 'Local Authority', value: d.localAuthority },
-    { label: 'Client', value: d.client }, { label: 'Document Ref', value: d.documentRef },
-  ], LBG, LC));
+  // Section 61 legal callout
+  body.push(h.calloutBox(
+    d.section61Declaration || 'This application is made under Section 61(1) of the Control of Pollution Act 1974, seeking prior consent from the Local Authority for construction works that may generate noise levels which could constitute a statutory nuisance. Approval of this application provides the contractor with a defence under Section 61(9) against prosecution under Section 60, provided the works are carried out in accordance with the consented methods and conditions.',
+    RED, RED_BG, '991B1B', W,
+    { boldPrefix: 'Control of Pollution Act 1974, Section 61:' }
+  ));
 
-  // 2 Proposed Works
-  els.push(secHead('2.0', 'Proposed Works & Programme', A));
-  if (d.worksDescription) els.push(prose(d.worksDescription));
-  els.push(infoTable([{ label: 'Programme Duration', value: d.programmeDuration }], LBG, LC));
-
-  // 3 Working Hours
+  // PROPOSED WORKING HOURS
+  body.push(h.fullWidthSectionBar('', 'PROPOSED WORKING HOURS', A));
+  body.push(h.spacer(80));
   if (d.workingHours.length > 0) {
-    els.push(secHead('3.0', 'Proposed Working Hours', A));
-    els.push(dataTable([{ text: 'Period', width: Math.round(W * 0.14) }, { text: 'Days', width: Math.round(W * 0.16) }, { text: 'Hours', width: Math.round(W * 0.16) }, { text: 'Activity', width: Math.round(W * 0.22) }, { text: 'Justification', width: W - Math.round(W * 0.14) - Math.round(W * 0.16) * 2 - Math.round(W * 0.22) }],
-      d.workingHours.map(w => [{ text: w.period }, { text: w.days }, { text: w.hours, bold: true }, { text: w.noiseType }, { text: w.justification }]), A));
+    const c = cols([0.22, 0.22, 0.56]);
+    body.push(dataTable(
+      [{ text: 'Period', w: c[0] }, { text: 'Hours', w: c[1] }, { text: 'Activities Permitted', w: c[2] }],
+      d.workingHours.map(w => [
+        { text: w.period || w.days, bold: true }, { text: w.hours, bold: true }, { text: w.noiseType || w.justification },
+      ]), A));
   }
 
-  // 4 Plant & Predicted Levels
-  if (d.plantItems.length > 0) {
-    els.push(secHead('4.0', 'Plant List with Predicted Noise Levels', A));
-    els.push(dataTable([{ text: 'Plant', width: Math.round(W * 0.24) }, { text: 'BS 5228 Ref', width: Math.round(W * 0.14) }, { text: 'LWA dB', width: Math.round(W * 0.10) }, { text: 'Qty', width: Math.round(W * 0.08) }, { text: 'On-Time', width: Math.round(W * 0.10) }, { text: 'Usage', width: W - Math.round(W * 0.24) - Math.round(W * 0.14) - Math.round(W * 0.10) - Math.round(W * 0.08) - Math.round(W * 0.10) }],
-      d.plantItems.map(p => [{ text: p.plant, bold: true }, { text: p.bs5228Ref }, { text: p.lwa, bold: true }, { text: p.quantity }, { text: p.onTime }, { text: p.usage }]), A));
-  }
-
-  // 5 BPM
-  els.push(secHead('5.0', 'Best Practicable Means (BPM) Statement', A));
-  if (d.bpmStatement) els.push(prose(d.bpmStatement));
+  // PROPOSED NOISE CONTROL MEASURES — BPM
+  body.push(h.fullWidthSectionBar('', 'PROPOSED NOISE CONTROL MEASURES — BEST PRACTICABLE MEANS', A));
+  body.push(h.spacer(80));
   if (d.mitigationMeasures.length > 0) {
-    els.push(dataTable([{ text: 'Measure', width: Math.round(W * 0.34) }, { text: 'Type', width: Math.round(W * 0.18) }, { text: 'Expected Reduction', width: Math.round(W * 0.16) }, { text: 'Status', width: W - Math.round(W * 0.34) - Math.round(W * 0.18) - Math.round(W * 0.16) }],
-      d.mitigationMeasures.map(m => [{ text: m.measure }, { text: m.type, bold: true }, { text: m.expectedReduction }, { text: m.status }]), A));
+    const c = cols([0.30, 0.48, 0.22]);
+    body.push(dataTable(
+      [{ text: 'BPM Measure', w: c[0] }, { text: 'Detail', w: c[1] }, { text: 'BS 5228 Reference', w: c[2] }],
+      d.mitigationMeasures.map(m => [
+        { text: m.measure, bold: true }, { text: m.detail || m.type }, { text: m.bs5228Ref || m.expectedReduction },
+      ]), A));
   }
 
-  // 6 Proposed Limits
-  if (d.proposedLimits.length > 0) {
-    els.push(secHead('6.0', 'Proposed Noise Limits', A));
-    els.push(dataTable([{ text: 'Location', width: Math.round(W * 0.24) }, { text: 'Period', width: Math.round(W * 0.16) }, { text: 'LAeq Limit', width: Math.round(W * 0.14) }, { text: 'LAmax Limit', width: Math.round(W * 0.14) }, { text: 'Basis', width: W - Math.round(W * 0.24) - Math.round(W * 0.16) - Math.round(W * 0.14) * 2 }],
-      d.proposedLimits.map(l => [{ text: l.location, bold: true }, { text: l.period }, { text: l.limitLaeq, bold: true }, { text: l.limitLamax }, { text: l.basis }]), A));
-  }
+  // NOISE IMPACT SUMMARY — KPI Dashboard
+  body.push(h.fullWidthSectionBar('', 'NOISE IMPACT SUMMARY', A));
+  body.push(h.spacer(80));
+  body.push(h.kpiDashboard([
+    { value: d.ambientLaeq || '—', label: 'Ambient LAeq (dB(A) daytime)' },
+    { value: d.predictedPiling || '—', label: 'Predicted Piling (dB(A) at NSR)' },
+    { value: d.exceedanceDb || '—', label: 'Exceedance (dB above ambient)' },
+    { value: d.bs5228CatAThreshold || '65', label: 'BS 5228 Cat A (dB(A) threshold)' },
+  ], A, W));
 
-  // 7 Monitoring
-  els.push(secHead('7.0', 'Monitoring Methodology', A));
-  if (d.monitoringPlan) els.push(prose(d.monitoringPlan));
-  if (d.monitoringLocations.length > 0) {
-    els.push(dataTable([{ text: 'ID', width: Math.round(W * 0.06) }, { text: 'Location', width: Math.round(W * 0.30) }, { text: 'Grid Ref', width: Math.round(W * 0.18) }, { text: 'Type', width: Math.round(W * 0.16) }, { text: 'Limit', width: W - Math.round(W * 0.06) - Math.round(W * 0.30) - Math.round(W * 0.18) - Math.round(W * 0.16) }],
-      d.monitoringLocations.map(m => [{ text: m.id, bold: true }, { text: m.description }, { text: m.gridRef }, { text: m.receptorType }, { text: m.consentLimit }]), A));
-  }
+  // BPM summary prose
+  body.push(h.spacer(80));
+  if (d.bpmStatement) body.push(...prose(d.bpmStatement));
 
-  // 8 Complaint Procedure
-  if (d.complaintProcedure.length > 0) {
-    els.push(secHead('8.0', 'Complaint Handling Procedure', A));
-    els.push(dataTable([{ text: '#', width: Math.round(W * 0.06) }, { text: 'Action', width: Math.round(W * 0.38) }, { text: 'Timeframe', width: Math.round(W * 0.18) }, { text: 'Responsible', width: W - Math.round(W * 0.06) - Math.round(W * 0.38) - Math.round(W * 0.18) }],
-      d.complaintProcedure.map(c => [{ text: c.step, bold: true }, { text: c.action }, { text: c.timeframe }, { text: c.responsible }]), A));
-  }
+  // Signature grid
+  body.push(h.spacer(200));
+  body.push(h.signatureGrid(['Applicant', 'LA Environmental Health'], A, W));
 
-  // 9 References
-  els.push(secHead('9.0', 'Regulatory References', A));
-  els.push(dataTable([{ text: 'Reference', width: Math.round(W * 0.38) }, { text: 'Description', width: W - Math.round(W * 0.38) }],
-    d.regulatoryReferences.map(r => [{ text: r.reference, bold: true }, { text: r.description }]), A));
+  // End mark
+  body.push(...h.endMark(A));
 
-  // 10 Declaration & Sign-Off
-  els.push(secHead('10.0', 'Section 61 Declaration & Sign-Off', A));
-  if (d.section61Declaration) els.push(prose(d.section61Declaration));
-  els.push(signOff(['Applicant', 'Environmental Manager', 'Project Manager'], A));
-  els.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400 }, border: { top: { style: BorderStyle.SINGLE, size: 1, color: h.GREY_MID } },
-    children: [new TextRun({ text: 'This application is submitted under Section 61 of the Control of Pollution Act 1974. Works shall not commence until consent is granted by the local authority.', size: SM, font: 'Arial', color: h.GREY_DARK, italics: true })] }));
-
-  return els;
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // Cover page
+      {
+        properties: { ...h.PORTRAIT_SECTION },
+        children: [
+          h.coverBlock(['SECTION 61', 'PRIOR CONSENT', 'APPLICATION'], `Control of Pollution Act 1974 — ${d.projectName}`, A, RED_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef },
+            { label: 'Date', value: d.assessmentDate },
+            { label: 'Submitted To', value: d.submittedTo || d.localAuthority },
+            { label: 'Applicant', value: d.applicantName || d.principalContractor },
+            { label: 'Site', value: `${d.projectName}, ${d.siteAddress}` },
+            { label: 'Works Duration', value: d.programmeDuration },
+            { label: 'Key Noise Source', value: d.keyNoiseSource || '' },
+          ], A, W),
+          h.coverFooterLine(),
+        ],
+      },
+      // Body
+      {
+        properties: { ...h.PORTRAIT_SECTION },
+        headers: { default: hdr },
+        footers: { default: ftr },
+        children: body,
+      },
+    ],
+  });
 }
 
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// T3 — MONITORING REPORT (teal, measurement results)
-// ═══════════════════════════════════════════════════════════════════════════════
-function buildT3(d: NoiseAssessmentData): (Paragraph | Table)[] {
-  const A = TEAL; const LBG = TEAL_BG; const LC = TEAL;
-  const els: (Paragraph | Table)[] = [];
+// ═════════════════════════════════════════════════════════════════════════════
+// T3 — MONITORING REPORT (Teal #0f766e · Measurement results)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT3(d: NoiseAssessmentData): Document {
+  const A = TEAL;
+  const hdr = h.accentHeader('Noise Monitoring Report', A);
+  const ftr = h.accentFooter(d.documentRef, 'Monitoring Report', A);
 
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 0 }, children: [new TextRun({ text: 'CONSTRUCTION NOISE MONITORING REPORT', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL }, spacing: { after: 80 }, children: [new TextRun({ text: 'BS 5228-1 \u00B7 Section 61 Compliance \u00B7 Measurement Results', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: TEAL_DARK }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.documentRef} | ${d.projectName} | ${d.assessmentDate}`, size: SM, font: 'Arial', color: 'ccfbf1' })] }));
+  const body: (Paragraph | Table)[] = [];
 
-  // 1 Summary
-  els.push(secHead('1.0', 'Monitoring Summary', A));
-  els.push(infoTable([
-    { label: 'Project', value: d.projectName }, { label: 'Report Period', value: d.assessmentDate },
-    { label: 'Monitored By', value: d.assessedBy }, { label: 'Consent Ref', value: d.documentRef },
-  ], LBG, LC));
-
-  // 2 Monitoring Locations
-  if (d.monitoringLocations.length > 0) {
-    els.push(secHead('2.0', 'Monitoring Locations', A));
-    els.push(dataTable([{ text: 'ID', width: Math.round(W * 0.06) }, { text: 'Description', width: Math.round(W * 0.28) }, { text: 'Grid Ref', width: Math.round(W * 0.18) }, { text: 'Type', width: Math.round(W * 0.16) }, { text: 'Consent Limit', width: W - Math.round(W * 0.06) - Math.round(W * 0.28) - Math.round(W * 0.18) - Math.round(W * 0.16) }],
-      d.monitoringLocations.map(m => [{ text: m.id, bold: true }, { text: m.description }, { text: m.gridRef }, { text: m.receptorType }, { text: m.consentLimit, bold: true }]), A, TEAL_BG));
-  }
-
-  // 3 Equipment & Calibration
-  if (d.calibrationRecords.length > 0) {
-    els.push(secHead('3.0', 'Equipment & Calibration', A));
-    els.push(dataTable([{ text: 'Instrument', width: Math.round(W * 0.22) }, { text: 'Serial No.', width: Math.round(W * 0.16) }, { text: 'Last Cal', width: Math.round(W * 0.16) }, { text: 'Next Cal', width: Math.round(W * 0.16) }, { text: 'Drift Check', width: W - Math.round(W * 0.22) - Math.round(W * 0.16) * 3 }],
-      d.calibrationRecords.map(c => [{ text: c.instrument, bold: true }, { text: c.serialNumber }, { text: c.lastCal }, { text: c.nextCal }, { text: c.driftCheck }]), A, TEAL_BG));
-  }
-
-  // 4 Measurement Results
+  // WEEKLY MONITORING RESULTS
+  body.push(h.fullWidthSectionBar('', 'WEEKLY MONITORING RESULTS — LAeq,1hr AT NSR', A));
+  body.push(h.spacer(80));
   if (d.measurementResults.length > 0) {
-    const mr = [Math.round(W * 0.06), Math.round(W * 0.10), Math.round(W * 0.08), Math.round(W * 0.08), Math.round(W * 0.08), Math.round(W * 0.08), Math.round(W * 0.08), Math.round(W * 0.18), W - Math.round(W * 0.06) - Math.round(W * 0.10) - Math.round(W * 0.08) * 5 - Math.round(W * 0.18)];
-    els.push(secHead('4.0', 'Measurement Results', A));
-    els.push(dataTable([{ text: 'Loc', width: mr[0] }, { text: 'Date', width: mr[1] }, { text: 'Start', width: mr[2] }, { text: 'End', width: mr[3] }, { text: 'LAeq', width: mr[4] }, { text: 'LAmax', width: mr[5] }, { text: 'LA90', width: mr[6] }, { text: 'Dominant Source', width: mr[7] }, { text: 'Comply?', width: mr[8] }],
-      d.measurementResults.map(m => [{ text: m.locationId, bold: true }, { text: m.date }, { text: m.startTime }, { text: m.endTime }, { text: m.laeq, bold: true }, { text: m.lamax }, { text: m.la90 }, { text: m.dominantSource }, { text: m.compliance, bold: true, color: ragC(m.compliance) }]), A, TEAL_BG));
+    const c = cols([0.10, 0.13, 0.10, 0.10, 0.10, 0.27, 0.20]);
+    body.push(dataTable(
+      [{ text: 'Date', w: c[0] }, { text: 'Time Period', w: c[1] }, { text: 'LAeq,1hr (dB)', w: c[2] },
+       { text: 'LAmax (dB)', w: c[3] }, { text: 'LA90 (dB)', w: c[4] },
+       { text: 'Site Activity', w: c[5] }, { text: 'Compliance', w: c[6] }],
+      d.measurementResults.map(m => [
+        { text: m.date }, { text: `${m.startTime}–${m.endTime}` },
+        { text: m.laeq, bold: true }, { text: m.lamax }, { text: m.la90 },
+        { text: m.dominantSource }, { text: m.compliance, bold: true, color: ragC(m.compliance) },
+      ]), A));
   }
 
-  // 5 Exceedances
-  if (d.exceedances.length > 0) {
-    els.push(secHead('5.0', 'Exceedance Analysis', A));
-    els.push(dataTable([{ text: 'Location', width: Math.round(W * 0.08) }, { text: 'Date', width: Math.round(W * 0.10) }, { text: 'Measured', width: Math.round(W * 0.10) }, { text: 'Limit', width: Math.round(W * 0.10) }, { text: 'Exceed', width: Math.round(W * 0.08) }, { text: 'Cause', width: Math.round(W * 0.24) }, { text: 'Corrective Action', width: W - Math.round(W * 0.08) - Math.round(W * 0.10) * 3 - Math.round(W * 0.08) - Math.round(W * 0.24) }],
-      d.exceedances.map(e => [{ text: e.locationId, bold: true }, { text: e.date }, { text: e.measuredLevel, bold: true, color: RED }, { text: e.limit }, { text: e.exceedanceDb, bold: true, color: RED }, { text: e.cause }, { text: e.correctiveAction }]), A, TEAL_BG));
+  // Monitoring note callout (amber)
+  if (d.monitoringNote) {
+    body.push(h.spacer(40));
+    body.push(h.calloutBox(d.monitoringNote, AMBER, 'FFFBEB', '92400E', W));
   }
 
-  // 6 Weather
-  if (d.weatherLogs.length > 0) {
-    els.push(secHead('6.0', 'Weather Conditions', A));
-    els.push(dataTable([{ text: 'Date', width: Math.round(W * 0.10) }, { text: 'Time', width: Math.round(W * 0.08) }, { text: 'Wind', width: Math.round(W * 0.10) }, { text: 'Dir', width: Math.round(W * 0.08) }, { text: 'Temp', width: Math.round(W * 0.08) }, { text: 'Rain', width: Math.round(W * 0.10) }, { text: 'Notes', width: W - Math.round(W * 0.10) - Math.round(W * 0.08) * 3 - Math.round(W * 0.10) * 2 }],
-      d.weatherLogs.map(w => [{ text: w.date }, { text: w.time }, { text: w.windSpeed }, { text: w.windDir }, { text: w.temp }, { text: w.rain }, { text: w.notes }]), A, TEAL_BG));
+  // WEEKLY SUMMARY — KPI Dashboard (5 boxes)
+  body.push(h.fullWidthSectionBar('', 'WEEKLY SUMMARY', A));
+  body.push(h.spacer(80));
+  body.push(h.kpiDashboard([
+    { value: d.weeklyMeanLaeq || '—', label: 'Mean LAeq (dB(A) weekly avg)' },
+    { value: d.weeklyMaxLaeq || '—', label: 'Max LAeq,1hr (dB(A))' },
+    { value: d.s61Limit || '65', label: 'S61 Limit (dB(A) LAeq,1hr)' },
+    { value: d.exceedanceCount || '0', label: 'Exceedances (of S61 limit)' },
+    { value: d.complaintCount || '0', label: 'Complaints (this week)' },
+  ], A, W));
+
+  // Compliance callout (teal)
+  if (d.complianceSummary) {
+    body.push(h.spacer(40));
+    body.push(h.calloutBox(d.complianceSummary, TEAL, TEAL_BG, '134E4A', W,
+      { boldPrefix: 'Compliance Statement:' }));
   }
 
-  // 7 Trend & Compliance
-  if (d.trendAnalysis) { els.push(secHead('7.0', 'Trend Analysis', A)); els.push(prose(d.trendAnalysis)); }
-  if (d.complianceSummary) { els.push(secHead('8.0', 'Compliance Summary', A)); els.push(prose(d.complianceSummary)); }
+  // Signature grid
+  body.push(h.spacer(200));
+  body.push(h.signatureGrid(['Monitored By', 'Submitted To'], A, W));
 
-  // 9 Sign-Off
-  els.push(secHead('9.0', 'Sign-Off', A));
-  els.push(signOff(['Monitored By', 'Environmental Manager', 'Project Manager'], A));
-  els.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400 }, border: { top: { style: BorderStyle.SINGLE, size: 1, color: h.GREY_MID } },
-    children: [new TextRun({ text: 'Monitoring conducted in accordance with BS 5228-1:2009+A1:2014 and Section 61 consent conditions.', size: SM, font: 'Arial', color: h.GREY_DARK, italics: true })] }));
+  // End mark
+  body.push(...h.endMark(A));
 
-  return els;
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // Cover page
+      {
+        properties: { ...h.PORTRAIT_SECTION },
+        children: [
+          h.coverBlock(['NOISE MONITORING', 'REPORT'], d.monitoringPeriod || `Weekly Monitoring Results — ${d.projectName}`, A, TEAL_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef },
+            { label: 'Monitoring Period', value: d.monitoringPeriod || d.assessmentDate },
+            { label: 'Monitor Location', value: d.monitorLocation || d.monitoringLocations?.[0]?.description || '' },
+            { label: 'Equipment', value: d.equipment || d.calibrationRecords?.[0]?.instrument || '' },
+            { label: 'Compliance', value: d.complianceStatus || 'All measurements within consent limits' },
+          ], A, W),
+          h.coverFooterLine(),
+        ],
+      },
+      // Body
+      {
+        properties: { ...h.PORTRAIT_SECTION },
+        headers: { default: hdr },
+        footers: { default: ftr },
+        children: body,
+      },
+    ],
+  });
 }
 
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// T4 — RESIDENT COMMUNICATION (navy, plain English)
-// ═══════════════════════════════════════════════════════════════════════════════
-function buildT4(d: NoiseAssessmentData): (Paragraph | Table)[] {
-  const A = NAVY; const LBG = NAVY_BG; const LC = NAVY; const ZB = 'f8fafc';
-  const els: (Paragraph | Table)[] = [];
+// ═════════════════════════════════════════════════════════════════════════════
+// T4 — RESIDENT COMMUNICATION (Navy #1E40AF · Plain English letter)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT4(d: NoiseAssessmentData): Document {
+  const A = NAVY;
+  const hdr = h.accentHeader('Resident Noise Notification', A);
+  const ftr = h.accentFooter(d.documentRef, 'Resident Communication', A);
 
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: 'CONSTRUCTION NOISE — RESIDENT INFORMATION', bold: true, size: XL, font: 'Arial', color: h.WHITE })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: NAVY }, alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new TextRun({ text: 'What to Expect \u00B7 What We\'re Doing \u00B7 How to Contact Us', size: SM, font: 'Arial', color: 'D9D9D9' })] }));
-  els.push(new Paragraph({ shading: { type: ShadingType.CLEAR, fill: '334155' }, spacing: { after: 60 }, children: [new TextRun({ text: `${d.projectName} | ${d.principalContractor} | ${d.assessmentDate}`, size: SM, font: 'Arial', color: 'cbd5e1' })] }));
+  const body: (Paragraph | Table)[] = [];
 
-  // 1 About the Works
-  els.push(secHead('', 'About the Works', A));
-  if (d.worksDescription) els.push(prose(d.worksDescription));
-  els.push(infoTable([{ label: 'Project Duration', value: d.programmeDuration }, { label: 'Location', value: d.siteAddress }], LBG, LC));
+  // IMPORTANT NOTICE heading bar
+  body.push(h.fullWidthSectionBar('', d.noticeSubject || `IMPORTANT NOTICE — WORKS STARTING ${d.assessmentDate}`, A));
+  body.push(h.spacer(80));
 
-  // 2 Working Hours
+  // Opening letter prose
+  body.push(new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: 'Dear Resident,', size: BODY, font: 'Arial' })] }));
+  body.push(...prose(d.worksDescription));
+
+  // WHAT TO EXPECT
+  if (d.whatYouMightNotice) {
+    body.push(h.fullWidthSectionBar('', 'WHAT TO EXPECT', A));
+    body.push(h.spacer(80));
+    body.push(...prose(d.whatYouMightNotice));
+  }
+
+  // WORKING HOURS
   if (d.workingHours.length > 0) {
-    els.push(secHead('', 'Our Committed Working Hours', A));
-    els.push(dataTable([{ text: 'Period', width: Math.round(W * 0.20) }, { text: 'Days', width: Math.round(W * 0.20) }, { text: 'Hours', width: Math.round(W * 0.20) }, { text: 'What\'s Happening', width: W - Math.round(W * 0.20) * 3 }],
-      d.workingHours.map(w => [{ text: w.period }, { text: w.days }, { text: w.hours, bold: true }, { text: w.noiseType }]), A, ZB));
+    body.push(h.fullWidthSectionBar('', 'WORKING HOURS', A));
+    body.push(h.spacer(80));
+    const c = cols([0.28, 0.28, 0.44]);
+    body.push(dataTable(
+      [{ text: 'Day', w: c[0] }, { text: 'Hours', w: c[1] }, { text: 'Notes', w: c[2] }],
+      d.workingHours.map(w => [
+        { text: w.period || w.days, bold: true }, { text: w.hours, bold: true }, { text: w.noiseType || w.justification },
+      ]), A));
   }
 
-  // 3 Everyday Comparisons
-  if (d.everydayComparisons.length > 0) {
-    els.push(secHead('', 'Expected Noise in Everyday Terms', A));
-    els.push(dataTable([{ text: 'Sound Source', width: Math.round(W * 0.28) }, { text: 'Noise Level', width: Math.round(W * 0.16) }, { text: 'How It Compares', width: W - Math.round(W * 0.28) - Math.round(W * 0.16) }],
-      d.everydayComparisons.map(e => [{ text: e.source, bold: true }, { text: e.level }, { text: e.comparison }]), A, ZB));
+  // WHAT WE'RE DOING TO MINIMISE DISRUPTION
+  if (d.whatWeAreDoing) {
+    body.push(h.fullWidthSectionBar('', 'WHAT WE\'RE DOING TO MINIMISE DISRUPTION', A));
+    body.push(h.spacer(80));
+    body.push(...prose(d.whatWeAreDoing));
   }
 
-  // 4 What You Might Notice
-  if (d.whatYouMightNotice) { els.push(secHead('', 'What You Might Notice', A)); els.push(prose(d.whatYouMightNotice)); }
-
-  // 5 What We're Doing
-  if (d.whatWeAreDoing) { els.push(secHead('', 'What We\'re Doing to Reduce Noise', A)); els.push(prose(d.whatWeAreDoing)); }
-  if (d.mitigationMeasures.length > 0) {
-    els.push(dataTable([{ text: 'Measure', width: Math.round(W * 0.50) }, { text: 'What It Does', width: W - Math.round(W * 0.50) }],
-      d.mitigationMeasures.map(m => [{ text: m.measure }, { text: m.expectedReduction }]), A, ZB));
+  // CONTACT US
+  body.push(h.fullWidthSectionBar('', 'CONTACT US', A));
+  body.push(h.spacer(80));
+  const contactText = [
+    d.contactName ? `Community Liaison: ${d.contactName}` : '',
+    d.contactPhone ? `Phone: ${d.contactPhone}` : '',
+    d.contactEmail ? `Email: ${d.contactEmail}` : '',
+    d.clientContact ? `${d.client || 'Client'}: ${d.clientContact}` : '',
+  ].filter(Boolean).join('\n');
+  if (contactText) {
+    body.push(h.calloutBox(
+      contactText + '\n\nWe are committed to being a good neighbour and will do everything we can to minimise the impact of these essential works on your daily life. We apologise in advance for any inconvenience caused.',
+      '2563EB', NAVY_BG, '1E40AF', W,
+      { boldPrefix: 'If you have any questions or concerns about noise from the site, please contact us:' }
+    ));
   }
 
-  // 6 Timeline
-  if (d.timelinePhases.length > 0) {
-    els.push(secHead('', 'Project Timeline — Key Noisy Phases', A));
-    els.push(dataTable([{ text: 'Phase', width: Math.round(W * 0.18) }, { text: 'Duration', width: Math.round(W * 0.14) }, { text: 'Key Plant', width: Math.round(W * 0.22) }, { text: 'Expected Noise', width: Math.round(W * 0.16) }, { text: 'Peak Period', width: W - Math.round(W * 0.18) - Math.round(W * 0.14) - Math.round(W * 0.22) - Math.round(W * 0.16) }],
-      d.timelinePhases.map(t => [{ text: t.phase, bold: true }, { text: t.duration }, { text: t.keyPlant }, { text: t.expectedNoise }, { text: t.peakPeriod }]), A, ZB));
-  }
+  // Signoff prose
+  body.push(h.spacer(80));
+  body.push(new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: 'Yours faithfully,', size: BODY, font: 'Arial' })] }));
+  body.push(new Paragraph({ spacing: { after: 20 }, children: [new TextRun({ text: d.contactName || d.assessedBy || '', bold: true, size: BODY, font: 'Arial' })] }));
+  body.push(new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: `${d.principalContractor || ''}${d.client ? `\nOn behalf of ${d.client}` : ''}`, size: BODY, font: 'Arial' })] }));
 
-  // 7 Complaint
-  if (d.complaintProcedure.length > 0) {
-    els.push(secHead('', 'How to Make a Complaint', A));
-    els.push(dataTable([{ text: '#', width: Math.round(W * 0.06) }, { text: 'What to Do', width: Math.round(W * 0.40) }, { text: 'Response Time', width: Math.round(W * 0.18) }, { text: 'Contact', width: W - Math.round(W * 0.06) - Math.round(W * 0.40) - Math.round(W * 0.18) }],
-      d.complaintProcedure.map(c => [{ text: c.step, bold: true }, { text: c.action }, { text: c.timeframe }, { text: c.responsible }]), A, ZB));
-  }
+  // Designed for letterbox distribution (instead of standard endMark)
+  body.push(new Paragraph({
+    border: { top: { style: BorderStyle.SINGLE, size: 1, color: h.GREY_MID, space: 8 } },
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 400, after: 40 },
+    children: [new TextRun({ text: '\u2014 Designed for letterbox distribution to all properties within 300m \u2014', size: SM, font: 'Arial', color: h.GREY_DARK, italics: true })],
+  }));
+  body.push(new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { after: 0 },
+    children: [new TextRun({ text: 'Generated by Ebrora \u2014 ebrora.com', size: SM, font: 'Arial', color: A, bold: true })],
+  }));
 
-  // 8 Contact
-  els.push(secHead('', 'Contact Us', A));
-  els.push(infoTable([
-    { label: 'Community Liaison', value: d.contactName }, { label: 'Phone', value: d.contactPhone },
-    { label: 'Email', value: d.contactEmail }, { label: 'Project Website', value: d.additionalNotes || '' },
-  ], LBG, LC));
-
-  els.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400 }, border: { top: { style: BorderStyle.SINGLE, size: 1, color: h.GREY_MID } },
-    children: [new TextRun({ text: 'We are committed to being good neighbours. If you have any concerns about noise from our works, please contact us using the details above. We will respond within 24 hours.', size: SM, font: 'Arial', color: h.GREY_DARK, italics: true })] }));
-
-  return els;
+  return new Document({
+    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
+    sections: [
+      // Cover page
+      {
+        properties: { ...h.PORTRAIT_SECTION },
+        children: [
+          h.coverBlock(['CONSTRUCTION NOISE', 'NOTIFICATION'], 'Important Information for Local Residents', A, NAVY_SUB),
+          h.spacer(200),
+          h.coverInfoTable([
+            { label: 'Reference', value: d.documentRef },
+            { label: 'Date', value: d.assessmentDate },
+            { label: 'From', value: `${d.principalContractor}${d.client ? ` — on behalf of ${d.client}` : ''}` },
+            { label: 'To', value: d.nearestReceptorSummary || 'All residents within 300m of site' },
+            { label: 'Subject', value: d.noticeSubject || `Advance notice of works — starting ${d.assessmentDate}` },
+            { label: 'Duration', value: d.noticeDuration || d.programmeDuration },
+          ], A, W),
+          h.coverFooterLine(),
+        ],
+      },
+      // Body
+      {
+        properties: { ...h.PORTRAIT_SECTION },
+        headers: { default: hdr },
+        footers: { default: ftr },
+        children: body,
+      },
+    ],
+  });
 }
 
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════════════
 // ROUTER
-// ═══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════════════
 export async function buildNoiseAssessmentTemplateDocument(
   content: any,
   templateSlug: NoiseAssessmentTemplateSlug
 ): Promise<Document> {
   const d = extract(content);
-  let children: (Paragraph | Table)[];
   switch (templateSlug) {
-    case 'ebrora-standard': children = buildT1(d); break;
-    case 'section-61':      children = buildT2(d); break;
-    case 'monitoring-report': children = buildT3(d); break;
-    case 'resident-communication': children = buildT4(d); break;
-    default:                children = buildT1(d); break;
+    case 'ebrora-standard':        return buildT1(d);
+    case 'section-61':             return buildT2(d);
+    case 'monitoring-report':      return buildT3(d);
+    case 'resident-communication': return buildT4(d);
+    default:                       return buildT1(d);
   }
-  const headerLabel = templateSlug === 'section-61' ? 'Section 61 Consent Application'
-    : templateSlug === 'monitoring-report' ? 'Noise Monitoring Report'
-    : templateSlug === 'resident-communication' ? 'Construction Noise — Resident Information'
-    : 'Construction Noise Assessment';
-  return new Document({
-    styles: { default: { document: { run: { font: 'Arial', size: BODY } } } },
-    sections: [{ properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader(headerLabel) }, footers: { default: h.ebroraFooter() }, children }],
-  });
 }

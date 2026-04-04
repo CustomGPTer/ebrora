@@ -1,567 +1,714 @@
 // =============================================================================
-// Quotation Builder — Multi-Template Engine
-// 4 templates, all consuming the same QuoteGenerator JSON.
+// Quotation Builder — Multi-Template Engine (REBUILT)
+// 4 templates matching HTML render library exactly.
 //
-// Templates:
-//   T1 — Full Tender         (deep green, Arial, all sections, branded cover)
-//   T2 — Formal Contract     (charcoal + burgundy, Cambria, clause-numbered)
-//   T3 — Standard Quote      (steel blue, Calibri, core sections only)
-//   T4 — Budget Estimate     (slate grey, Arial, minimal — BoQ + essentials)
+// T1 — Standard Quote      (#1E40AF, blue bands, Calibri, 01–07 numbered)
+// T2 — Formal Contract     (#2D2D2D bars + #7F1D1D accent, Cambria, clause 1.0–7.0)
+// T3 — Budget Estimate     (#475569 slate, Arial, 01–05, minimal + callout)
+// T4 — Full Tender         (#065F46 green, Arial, 01–07, all sections + HSE)
 // =============================================================================
 import {
   Document, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, WidthType, ShadingType, BorderStyle, VerticalAlign,
-  Header, Footer, PageNumber, PageBreak, TabStopType, TabStopPosition,
+  PageBreak,
 } from 'docx';
 import * as h from '@/lib/rams/docx-helpers';
 import type { QuoteTemplateSlug } from '@/lib/quote/types';
 
-// ── Layout ───────────────────────────────────────────────────────
+// ── Layout ───────────────────────────────────────────────────────────────────
 const W = h.A4_CONTENT_WIDTH; // 9026 DXA
-const cellPad = { top: 60, bottom: 60, left: 100, right: 100 };
-const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
-const borders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
-const noBorders = {
-  top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-  bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-  left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-  right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-};
+const SM = 16; const BODY = 18; const LG = 22; const XL = 24;
+const CM = { top: 80, bottom: 80, left: 120, right: 120 };
+const thin = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
+const bdr = { top: thin, bottom: thin, left: thin, right: thin };
+const ZEBRA = 'F2F2F2';
 
-// ── Palette ──────────────────────────────────────────────────────
-interface Palette {
-  primary: string;
-  primaryLight: string;
-  accent: string;
-  dark: string;
-  mid: string;
-  rowAlt: string;
+// ── Palette ──────────────────────────────────────────────────────────────────
+interface Pal {
+  accent: string;      // primary accent for headers, bands, KPIs
+  barBg: string;       // section bar background (same as accent except T2)
+  barNumColor: string; // section bar number colour (white except T2 = #FCA5A5)
+  coverAccent: string; // cover banner background
+  subtitleColor: string;
+  labelBg: string;     // info table label cell bg
+  labelColor: string;  // info table label text colour
+  dark: string;        // body text colour
+  mid: string;         // secondary grey
   font: string;
-  bodySize: number;
 }
 
-const PALETTES: Record<QuoteTemplateSlug, Palette> = {
-  'full-tender':      { primary: '065F46', primaryLight: 'E8F4F0', accent: '065F46', dark: '1A2E2A', mid: '6B7280', rowAlt: 'F2F2F2', font: 'Arial',   bodySize: 20 },
-  'formal-contract':  { primary: '2D2D2D', primaryLight: 'F5F5F5', accent: '7F1D1D', dark: '333333', mid: '666666', rowAlt: 'F8F8F8', font: 'Cambria', bodySize: 19 },
-  'standard-quote':   { primary: '1E40AF', primaryLight: 'EFF6FF', accent: '1E40AF', dark: '1E293B', mid: '64748B', rowAlt: 'F1F5F9', font: 'Calibri', bodySize: 20 },
-  'budget-estimate':  { primary: '475569', primaryLight: 'F8FAFC', accent: '475569', dark: '334155', mid: '94A3B8', rowAlt: 'F8FAFC', font: 'Arial',   bodySize: 20 },
+const PAL: Record<QuoteTemplateSlug, Pal> = {
+  'standard-quote':  { accent: '1E40AF', barBg: '1E40AF', barNumColor: 'FFFFFF', coverAccent: '1E40AF', subtitleColor: '93C5FD', labelBg: 'EFF6FF', labelColor: '1E40AF', dark: '1E293B', mid: '64748B', font: 'Calibri' },
+  'formal-contract': { accent: '7F1D1D', barBg: '2D2D2D', barNumColor: 'FCA5A5', coverAccent: '7F1D1D', subtitleColor: 'FCA5A5', labelBg: 'F5F5F5', labelColor: '2D2D2D', dark: '333333', mid: '666666', font: 'Cambria' },
+  'budget-estimate': { accent: '475569', barBg: '475569', barNumColor: 'FFFFFF', coverAccent: '475569', subtitleColor: 'CBD5E1', labelBg: 'F8FAFC', labelColor: '475569', dark: '334155', mid: '94A3B8', font: 'Arial' },
+  'full-tender':     { accent: '065F46', barBg: '065F46', barNumColor: 'FFFFFF', coverAccent: '065F46', subtitleColor: 'A7F3D0', labelBg: 'E8F4F0', labelColor: '065F46', dark: '1A2E2A', mid: '6B7280', font: 'Arial' },
 };
 
-// ── Detail level controls which sections render ──────────────────
-type DetailLevel = 'full' | 'detailed' | 'standard' | 'light';
-
-const DETAIL_LEVELS: Record<QuoteTemplateSlug, DetailLevel> = {
-  'full-tender': 'full',
-  'formal-contract': 'detailed',
-  'standard-quote': 'standard',
-  'budget-estimate': 'light',
-};
-
-function showSection(slug: QuoteTemplateSlug, section: string): boolean {
-  const level = DETAIL_LEVELS[slug];
-  const always = ['tender-particulars', 'boq', 'price-summary', 'inclusions', 'exclusions'];
-  const standard = [...always, 'scope', 'assumptions', 'programme', 'commercial-terms'];
-  const detailed = [...standard, 'milestones', 'daywork', 'provisional-sums'];
-  const full = [...detailed, 'hse', 'qualifications', 'company-profile', 'signature', 'quotation-summary'];
-
-  if (level === 'full') return full.includes(section);
-  if (level === 'detailed') return detailed.includes(section);
-  if (level === 'standard') return standard.includes(section);
-  return always.includes(section) || section === 'programme-light' || section === 'assumptions';
+// ── Data extraction ──────────────────────────────────────────────────────────
+interface QData {
+  documentRef: string; quotationDate: string; validUntil: string;
+  preparedBy: string; projectName: string; projectAddress: string;
+  client: string; mainContractor: string; tenderReference: string;
+  tenderReturnDate: string; contractRef: string;
+  quotationSummary: string; scopeOfWorks: string;
+  worksDescriptionShort: string; contractForm: string;
+  billOfQuantities: Array<{ ref: string; description: string; unit: string; quantity: string; rate: string; amount: string }>;
+  provisionalSums: Array<{ description: string; amount: string; basis: string }>;
+  dayworkAllowance: { included: boolean; labourRate: string; plantRates: string; materialsMarkup: string; basisOfRates: string };
+  priceSummary: { originalContractSum: string; provisionalSums: string; dayworkAllowance: string; totalTenderSum: string };
+  inclusions: string[]; exclusions: string[]; assumptions: string[];
+  programme: { proposedStartDate: string; duration: string; completionDate: string; keyMilestones: Array<{ milestone: string; targetDate: string; duration?: string }>; programmeNarrative: string };
+  commercialTerms: { paymentTerms: string; retentionRate: string; defectsLiabilityPeriod: string; retentionRelease: string; insuranceRequirements: string; contractualBasis: string };
+  healthSafetyEnvironmental: string; qualifications: string;
+  organisationProfile: string; validityStatement: string;
+  budgetEstimateNotice: string; relevantExperience: string;
 }
 
-// ── Shared helpers ───────────────────────────────────────────────
-function hdrCell(p: Palette, text: string, width: number): TableCell {
-  return new TableCell({
-    borders, width: { size: width, type: WidthType.DXA },
-    shading: { fill: p.primary, type: ShadingType.CLEAR },
-    margins: cellPad, verticalAlign: VerticalAlign.CENTER,
-    children: [new Paragraph({ children: [new TextRun({ text, bold: true, color: 'FFFFFF', font: p.font, size: p.bodySize })] })],
-  });
+function extract(c: any): QData {
+  const d = c || {};
+  const safe = (v: any) => (typeof v === 'string' ? v : '') || '';
+  const safeArr = (v: any, fallback: string[] = []) => (Array.isArray(v) ? v : fallback);
+  const prog = d.programme || {};
+  const ct = d.commercialTerms || {};
+  const ps = d.priceSummary || {};
+  const dw = d.dayworkAllowance || {};
+  return {
+    documentRef: safe(d.documentRef), quotationDate: safe(d.quotationDate),
+    validUntil: safe(d.validUntil), preparedBy: safe(d.preparedBy),
+    projectName: safe(d.projectName), projectAddress: safe(d.projectAddress),
+    client: safe(d.client), mainContractor: safe(d.mainContractor),
+    tenderReference: safe(d.tenderReference), tenderReturnDate: safe(d.tenderReturnDate),
+    contractRef: safe(d.contractRef || d.contractReference),
+    quotationSummary: safe(d.quotationSummary), scopeOfWorks: safe(d.scopeOfWorks),
+    worksDescriptionShort: safe(d.worksDescriptionShort || d.scopeOfWorks).slice(0, 300),
+    contractForm: safe(d.contractForm || d.contractualBasis || ct.contractualBasis),
+    billOfQuantities: safeArr(d.billOfQuantities).map((i: any) => ({
+      ref: safe(i.ref), description: safe(i.description), unit: safe(i.unit),
+      quantity: String(i.quantity ?? ''), rate: safe(i.rate), amount: safe(i.amount),
+    })),
+    provisionalSums: safeArr(d.provisionalSums).map((i: any) => ({
+      description: safe(i.description), amount: safe(i.amount), basis: safe(i.basis),
+    })),
+    dayworkAllowance: { included: !!dw.included, labourRate: safe(dw.labourRate), plantRates: safe(dw.plantRates), materialsMarkup: safe(dw.materialsMarkup), basisOfRates: safe(dw.basisOfRates) },
+    priceSummary: { originalContractSum: safe(ps.originalContractSum), provisionalSums: safe(ps.provisionalSums), dayworkAllowance: safe(ps.dayworkAllowance), totalTenderSum: safe(ps.totalTenderSum) },
+    inclusions: safeArr(d.inclusions), exclusions: safeArr(d.exclusions), assumptions: safeArr(d.assumptions),
+    programme: { proposedStartDate: safe(prog.proposedStartDate), duration: safe(prog.duration), completionDate: safe(prog.completionDate), keyMilestones: safeArr(prog.keyMilestones).map((m: any) => ({ milestone: safe(m.milestone), targetDate: safe(m.targetDate), duration: safe(m.duration) })), programmeNarrative: safe(prog.programmeNarrative) },
+    commercialTerms: { paymentTerms: safe(ct.paymentTerms), retentionRate: safe(ct.retentionRate), defectsLiabilityPeriod: safe(ct.defectsLiabilityPeriod), retentionRelease: safe(ct.retentionRelease), insuranceRequirements: safe(ct.insuranceRequirements), contractualBasis: safe(ct.contractualBasis) },
+    healthSafetyEnvironmental: safe(d.healthSafetyEnvironmental), qualifications: safe(d.qualifications),
+    organisationProfile: safe(d.organisationProfile), validityStatement: safe(d.validityStatement),
+    budgetEstimateNotice: safe(d.budgetEstimateNotice || 'This is an indicative budget price for planning purposes only. It is not a formal tender offer and is subject to revision upon receipt of final drawings, specifications, and ground investigation data. A formal quotation will be issued upon request.'),
+    relevantExperience: safe(d.relevantExperience),
+  };
 }
 
-function dCell(p: Palette, text: string, width: number, opts: { bold?: boolean; shade?: string; align?: (typeof AlignmentType)[keyof typeof AlignmentType] } = {}): TableCell {
-  return new TableCell({
-    borders, width: { size: width, type: WidthType.DXA },
-    shading: opts.shade ? { fill: opts.shade, type: ShadingType.CLEAR } : undefined,
-    margins: cellPad, verticalAlign: VerticalAlign.CENTER,
-    children: [new Paragraph({ alignment: opts.align, children: [new TextRun({ text, bold: !!opts.bold, font: p.font, size: p.bodySize, color: p.dark })] })],
-  });
-}
-
-function altRow(p: Palette, cells: [string, number, { bold?: boolean; align?: (typeof AlignmentType)[keyof typeof AlignmentType] }?][], idx: number): TableRow {
-  const shade = idx % 2 === 0 ? p.rowAlt : 'FFFFFF';
-  return new TableRow({
-    children: cells.map(([text, width, opts]) => dCell(p, text, width, { shade, ...opts })),
-  });
-}
-
-function bodyPara(p: Palette, text: string): Paragraph {
-  return new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text, font: p.font, size: p.bodySize, color: p.dark })] });
-}
-
+// ── Shared Helpers ───────────────────────────────────────────────────────────
 function gap(size = 200): Paragraph {
   return new Paragraph({ spacing: { after: size }, children: [] });
 }
 
-// ── Section headings — vary per template ─────────────────────────
-function sectionHead(slug: QuoteTemplateSlug, p: Palette, num: number, title: string): Paragraph | Table {
-  if (slug === 'full-tender') {
-    // Green underline rule
-    return new Paragraph({
-      spacing: { before: 360, after: 120 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: p.primary, space: 4 } },
-      children: [new TextRun({ text: `${num}. ${title.toUpperCase()}`, bold: true, font: p.font, size: 24, color: p.primary })],
-    });
-  }
-  if (slug === 'formal-contract') {
-    // Burgundy clause number + charcoal title
-    return new Paragraph({
-      spacing: { before: 400, after: 140 },
-      children: [
-        new TextRun({ text: `${num}.  `, bold: true, font: p.font, size: 24, color: p.accent }),
-        new TextRun({ text: title.toUpperCase(), bold: true, font: p.font, size: 24, color: p.primary }),
-      ],
-    });
-  }
-  if (slug === 'standard-quote') {
-    // Full-width blue band
-    const numStr = num < 10 ? `0${num}` : `${num}`;
-    return new Table({
-      width: { size: W, type: WidthType.DXA }, columnWidths: [W],
-      rows: [new TableRow({
-        children: [new TableCell({
-          borders: noBorders,
-          width: { size: W, type: WidthType.DXA },
-          shading: { fill: p.primary, type: ShadingType.CLEAR },
-          margins: { top: 80, bottom: 80, left: 160, right: 160 },
-          children: [new Paragraph({
-            children: [
-              new TextRun({ text: `${numStr}   `, bold: true, font: p.font, size: 22, color: 'FFFFFF' }),
-              new TextRun({ text: title.toUpperCase(), bold: true, font: p.font, size: 22, color: 'FFFFFF' }),
-            ],
-          })],
-        })],
-      })],
-    });
-  }
-  // budget-estimate — minimal left-border
-  return new Paragraph({
-    spacing: { before: 280, after: 100 },
-    border: { left: { style: BorderStyle.SINGLE, size: 14, color: p.primary, space: 6 } },
-    indent: { left: 80 },
-    children: [new TextRun({ text: `${title}`, bold: true, font: p.font, size: 22, color: p.dark })],
+function body(p: Pal, text: string, opts?: { bold?: boolean; size?: number }): Paragraph {
+  return new Paragraph({ spacing: { after: 120 }, children: [
+    new TextRun({ text, font: p.font, size: opts?.size || BODY, color: p.dark, bold: opts?.bold }),
+  ] });
+}
+
+function proseParas(p: Pal, text: string): Paragraph[] {
+  return (text || '').split(/\n\n?/).filter(Boolean).map(para => body(p, para));
+}
+
+function hdrCell(text: string, width: number, bg: string, font: string): TableCell {
+  return new TableCell({
+    width: { size: width, type: WidthType.DXA }, margins: CM, borders: bdr,
+    shading: { fill: bg, type: ShadingType.CLEAR }, verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ spacing: { after: 0 }, children: [
+      new TextRun({ text: text.toUpperCase(), bold: true, size: SM, font, color: h.WHITE }),
+    ] })],
   });
 }
 
-// ── Info table (key-value pairs) ─────────────────────────────────
-function buildInfoTable(p: Palette, rows: [string, string][]): Table {
+function dCell(text: string, width: number, font: string, dark: string, opts?: { bold?: boolean; shade?: string; align?: (typeof AlignmentType)[keyof typeof AlignmentType]; color?: string }): TableCell {
+  return new TableCell({
+    width: { size: width, type: WidthType.DXA }, margins: CM, borders: bdr,
+    shading: opts?.shade ? { fill: opts.shade, type: ShadingType.CLEAR } : undefined,
+    verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: opts?.align, spacing: { after: 0 }, children: [
+      new TextRun({ text: text || '\u2014', bold: opts?.bold, font, size: BODY, color: opts?.color || dark }),
+    ] })],
+  });
+}
+
+function accentInfoTable(p: Pal, rows: Array<{ label: string; value: string; valueBold?: boolean; valueColor?: string }>): Table {
+  const lw = Math.round(W * 0.28); const vw = W - lw;
   return new Table({
-    width: { size: W, type: WidthType.DXA }, columnWidths: [2800, W - 2800],
-    rows: rows.map(([label, value], i) =>
-      altRow(p, [[label, 2800, { bold: true }], [value, W - 2800]], i),
-    ),
+    width: { size: W, type: WidthType.DXA }, columnWidths: [lw, vw],
+    rows: rows.map(r => new TableRow({ children: [
+      new TableCell({ width: { size: lw, type: WidthType.DXA }, margins: CM, borders: bdr,
+        shading: { fill: p.labelBg, type: ShadingType.CLEAR },
+        children: [new Paragraph({ spacing: { after: 0 }, children: [
+          new TextRun({ text: r.label, bold: true, size: BODY, font: p.font, color: p.labelColor }),
+        ] })] }),
+      new TableCell({ width: { size: vw, type: WidthType.DXA }, margins: CM, borders: bdr,
+        children: [new Paragraph({ spacing: { after: 0 }, children: [
+          new TextRun({ text: r.value || '\u2014', size: BODY, font: p.font, color: r.valueColor || p.dark, bold: r.valueBold }),
+        ] })] }),
+    ] })),
   });
 }
 
-// ── Data table with headers ──────────────────────────────────────
-function buildDataTable(p: Palette, headers: [string, number][], data: string[][]): Table {
-  const colWidths = headers.map(([, w]) => w);
+function dataTable(p: Pal, headers: Array<{ text: string; width: number }>, data: string[][]): Table {
+  const colWidths = headers.map(h => h.width);
   return new Table({
     width: { size: W, type: WidthType.DXA }, columnWidths: colWidths,
     rows: [
-      new TableRow({ children: headers.map(([label, w]) => hdrCell(p, label, w)) }),
-      ...data.map((row, i) =>
-        altRow(p, row.map((text, ci) => [text, colWidths[ci]] as [string, number]), i),
-      ),
+      new TableRow({ children: headers.map(h => hdrCell(h.text, h.width, p.barBg, p.font)) }),
+      ...data.map((row, i) => {
+        const shade = i % 2 === 0 ? ZEBRA : h.WHITE;
+        return new TableRow({ children: row.map((text, ci) =>
+          dCell(text, colWidths[ci], p.font, p.dark, { shade, align: ci >= 3 ? AlignmentType.RIGHT : undefined }),
+        ) });
+      }),
     ],
   });
 }
 
-// ── Bullet list ──────────────────────────────────────────────────
-function buildBulletList(p: Palette, items: string[]): Paragraph[] {
-  return (items || []).map((item) =>
-    new Paragraph({
-      spacing: { after: 60 }, indent: { left: 280 },
-      children: [
-        new TextRun({ text: '•  ', font: p.font, size: p.bodySize, color: p.accent }),
-        new TextRun({ text: item, font: p.font, size: p.bodySize, color: p.dark }),
-      ],
-    }),
-  );
+function bulletList(p: Pal, items: string[]): Paragraph[] {
+  return (items || []).map(item => new Paragraph({
+    spacing: { after: 60 }, indent: { left: 280 },
+    children: [
+      new TextRun({ text: '\u2022  ', font: p.font, size: BODY, color: p.accent }),
+      new TextRun({ text: item, font: p.font, size: BODY, color: p.dark }),
+    ],
+  }));
 }
 
-// ── Cover pages ──────────────────────────────────────────────────
-function buildCover(slug: QuoteTemplateSlug, p: Palette, d: any): (Paragraph | Table)[] {
-  if (slug === 'full-tender') {
-    return [
-      gap(200),
-      new Table({
-        width: { size: W, type: WidthType.DXA }, columnWidths: [W],
-        rows: [new TableRow({
-          children: [new TableCell({
-            borders: noBorders,
-            width: { size: W, type: WidthType.DXA },
-            shading: { fill: p.primary, type: ShadingType.CLEAR },
-            margins: { top: 500, bottom: 500, left: 300, right: 300 },
-            children: [
-              new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: 'SUBCONTRACTOR QUOTATION', bold: true, font: p.font, size: 52, color: 'FFFFFF' })] }),
-              new Paragraph({ spacing: { after: 60 }, children: [new TextRun({ text: d.projectName || '', font: p.font, size: 28, color: 'A7F3D0' })] }),
-              new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: d.projectAddress || '', font: p.font, size: 22, color: 'D1FAE5' })] }),
-              new Paragraph({ children: [new TextRun({ text: `Ref: ${d.documentRef || ''}  |  ${d.quotationDate || ''}`, font: p.font, size: 20, color: 'D1FAE5' })] }),
-            ],
-          })],
-        })],
-      }),
-      gap(120),
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 40 },
-        children: [new TextRun({ text: 'COMMERCIAL IN CONFIDENCE', bold: true, font: p.font, size: 18, color: p.accent })],
-      }),
-      gap(300),
-    ];
-  }
-
-  if (slug === 'formal-contract') {
-    return [
-      gap(600),
-      new Paragraph({
-        alignment: AlignmentType.CENTER, spacing: { after: 40 },
-        children: [new TextRun({ text: 'SUBCONTRACTOR QUOTATION', bold: true, font: p.font, size: 56, color: p.primary })],
-      }),
-      new Paragraph({
-        alignment: AlignmentType.CENTER, spacing: { after: 60 },
-        border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 8 } },
-        children: [new TextRun({ text: d.projectName || '', font: p.font, size: 28, color: p.dark })],
-      }),
-      gap(80),
-      new Paragraph({
-        alignment: AlignmentType.CENTER, spacing: { after: 40 },
-        children: [new TextRun({ text: `Reference: ${d.documentRef || ''}`, font: p.font, size: 20, color: p.mid })],
-      }),
-      new Paragraph({
-        alignment: AlignmentType.CENTER, spacing: { after: 40 },
-        children: [new TextRun({ text: `Date: ${d.quotationDate || ''}  |  Valid Until: ${d.validUntil || ''}`, font: p.font, size: 20, color: p.mid })],
-      }),
-      gap(300),
-    ];
-  }
-
-  if (slug === 'standard-quote') {
-    return [
-      gap(400),
-      new Table({
-        width: { size: W, type: WidthType.DXA }, columnWidths: [W],
-        rows: [new TableRow({
-          children: [new TableCell({
-            borders: noBorders,
-            width: { size: W, type: WidthType.DXA },
-            shading: { fill: p.primary, type: ShadingType.CLEAR },
-            margins: { top: 400, bottom: 400, left: 300, right: 300 },
-            children: [
-              new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: 'QUOTATION', bold: true, font: p.font, size: 48, color: 'FFFFFF' })] }),
-              new Paragraph({ children: [new TextRun({ text: `${d.projectName || ''} — ${d.mainContractor || ''}`, font: p.font, size: 22, color: 'BFDBFE' })] }),
-            ],
-          })],
-        })],
-      }),
-      gap(300),
-    ];
-  }
-
-  // budget-estimate — no cover page, just a header
-  return [];
-}
-
-// ── Header / Footer ──────────────────────────────────────────────
-function makeHeader(slug: QuoteTemplateSlug, p: Palette, d: any): Header {
-  const label = slug === 'budget-estimate' ? 'BUDGET ESTIMATE' : 'QUOTATION';
-  return new Header({
-    children: [new Paragraph({
-      border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } },
-      children: [
-        new TextRun({ text: label, bold: true, font: p.font, size: 17, color: p.primary }),
-        new TextRun({ text: `\t${d.documentRef || ''}  |  ${d.quotationDate || ''}`, font: p.font, size: 16, color: p.mid }),
-      ],
-      tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-    })],
+// Section bar for T2 — charcoal bg with coloured clause number
+function formalSectionBar(num: string, title: string, barBg: string, numColor: string): Table {
+  return new Table({
+    width: { size: W, type: WidthType.DXA }, columnWidths: [W],
+    rows: [new TableRow({ children: [new TableCell({
+      width: { size: W, type: WidthType.DXA }, borders: h.NO_BORDERS,
+      shading: { fill: barBg, type: ShadingType.CLEAR },
+      margins: { top: 60, bottom: 60, left: 140, right: 140 },
+      children: [new Paragraph({ spacing: { after: 0 }, children: [
+        new TextRun({ text: num, bold: true, size: LG, font: 'Cambria', color: numColor }),
+        new TextRun({ text: `   ${title.toUpperCase()}`, bold: true, size: LG, font: 'Cambria', color: h.WHITE }),
+      ] })],
+    })] })],
   });
 }
 
-function makeFooter(p: Palette, d: any): Footer {
-  return new Footer({
-    children: [new Paragraph({
-      border: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent, space: 4 } },
-      children: [
-        new TextRun({ text: `Commercial in Confidence`, font: p.font, size: 16, color: p.mid }),
-        new TextRun({ text: '\tPage ', font: p.font, size: 16, color: p.mid }),
-        new TextRun({ children: [PageNumber.CURRENT], font: p.font, size: 16, color: p.mid }),
-      ],
-      tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-    })],
+// Clause-numbered paragraph for T2
+function clausePara(p: Pal, clauseNum: string, text: string, opts?: { boldPrefix?: string }): Paragraph {
+  const runs: TextRun[] = [
+    new TextRun({ text: `${clauseNum} `, bold: true, font: p.font, size: BODY, color: p.accent }),
+  ];
+  if (opts?.boldPrefix) {
+    runs.push(new TextRun({ text: opts.boldPrefix + ' ', bold: true, font: p.font, size: BODY, color: p.dark }));
+  }
+  runs.push(new TextRun({ text, font: p.font, size: BODY, color: p.dark }));
+  return new Paragraph({ spacing: { after: 120 }, children: runs });
+}
+
+// Price summary box (bordered box with rows + total)
+function priceSummaryBox(p: Pal, rows: Array<{ label: string; value: string; bold?: boolean }>, totalLabel: string, totalValue: string): Table {
+  const lw = Math.round(W * 0.68); const vw = W - lw;
+  const rowBorder = { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' };
+  const outerBorder = { style: BorderStyle.SINGLE, size: 3, color: p.accent };
+  return new Table({
+    width: { size: W, type: WidthType.DXA }, columnWidths: [lw, vw],
+    rows: [
+      ...rows.map(r => new TableRow({ children: [
+        new TableCell({ width: { size: lw, type: WidthType.DXA }, margins: CM,
+          borders: { top: rowBorder, bottom: rowBorder, left: outerBorder, right: rowBorder },
+          children: [new Paragraph({ spacing: { after: 0 }, children: [
+            new TextRun({ text: r.label, font: p.font, size: BODY, color: p.dark, bold: r.bold }),
+          ] })] }),
+        new TableCell({ width: { size: vw, type: WidthType.DXA }, margins: CM,
+          borders: { top: rowBorder, bottom: rowBorder, left: rowBorder, right: outerBorder },
+          children: [new Paragraph({ alignment: AlignmentType.RIGHT, spacing: { after: 0 }, children: [
+            new TextRun({ text: r.value, font: p.font, size: BODY, color: p.dark, bold: r.bold }),
+          ] })] }),
+      ] })),
+      // Total row
+      new TableRow({ children: [
+        new TableCell({ width: { size: lw, type: WidthType.DXA }, margins: CM,
+          borders: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent }, bottom: outerBorder, left: outerBorder, right: rowBorder },
+          children: [new Paragraph({ spacing: { after: 0 }, children: [
+            new TextRun({ text: totalLabel, bold: true, font: p.font, size: BODY, color: p.accent }),
+          ] })] }),
+        new TableCell({ width: { size: vw, type: WidthType.DXA }, margins: CM,
+          borders: { top: { style: BorderStyle.SINGLE, size: 4, color: p.accent }, bottom: outerBorder, left: rowBorder, right: outerBorder },
+          children: [new Paragraph({ alignment: AlignmentType.RIGHT, spacing: { after: 0 }, children: [
+            new TextRun({ text: totalValue, bold: true, font: p.font, size: BODY, color: p.accent }),
+          ] })] }),
+      ] }),
+    ],
   });
 }
 
-// =================================================================
-// MAIN BUILD FUNCTION
-// =================================================================
+// ═════════════════════════════════════════════════════════════════════════════
+// T1 — STANDARD QUOTE (#1E40AF)
+// Cover + 7 sections (01-numbered, blue bands)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT1(d: QData): Document {
+  const p = PAL['standard-quote'];
+  const children: (Paragraph | Table)[] = [];
+
+  // ── Cover ──
+  children.push(h.coverBlock(['SUBCONTRACTOR', 'QUOTATION'], `Standard Quotation \u2014 ${d.worksDescriptionShort || d.projectName}`, p.coverAccent, p.subtitleColor));
+  children.push(gap(300));
+  children.push(h.projectNameBar(d.projectName, p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Quotation Ref', value: d.documentRef },
+    { label: 'Date', value: d.quotationDate },
+    { label: 'Valid Until', value: d.validUntil },
+    { label: 'Prepared By', value: d.preparedBy },
+    { label: 'Project', value: d.projectName },
+    { label: 'Client', value: d.client },
+    { label: 'Main Contractor', value: d.mainContractor },
+    { label: 'Tender Reference', value: d.tenderReference },
+    { label: 'Site Address', value: d.projectAddress },
+  ], p.accent, W));
+  children.push(gap(200));
+  children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 01 TENDER PARTICULARS
+  children.push(h.fullWidthSectionBar('01', 'TENDER PARTICULARS', p.accent));
+  children.push(gap(80));
+  children.push(accentInfoTable(p, [
+    { label: 'Subcontractor', value: d.preparedBy },
+    { label: 'Works Description', value: d.worksDescriptionShort },
+    { label: 'Contract Form', value: d.contractForm },
+    { label: 'Total Tender Sum', value: d.priceSummary.totalTenderSum, valueBold: true, valueColor: p.accent },
+  ]));
+  children.push(gap(200));
+
+  // 02 BILL OF QUANTITIES
+  children.push(h.fullWidthSectionBar('02', 'BILL OF QUANTITIES', p.accent));
+  children.push(gap(80));
+  const refW = Math.round(W * 0.06); const descW = Math.round(W * 0.34);
+  const unitW = Math.round(W * 0.08); const qtyW = Math.round(W * 0.10);
+  const rateW = Math.round(W * 0.14); const amtW = W - refW - descW - unitW - qtyW - rateW;
+  children.push(dataTable(p,
+    [{ text: 'Ref', width: refW }, { text: 'Description', width: descW }, { text: 'Unit', width: unitW }, { text: 'Qty', width: qtyW }, { text: 'Rate (\u00A3)', width: rateW }, { text: 'Amount (\u00A3)', width: amtW }],
+    d.billOfQuantities.map(i => [i.ref, i.description, i.unit, i.quantity, i.rate, i.amount]),
+  ));
+  children.push(gap(120));
+
+  // Price Summary
+  children.push(priceSummaryBox(p,
+    [
+      { label: 'Original Contract Sum', value: d.priceSummary.originalContractSum, bold: true },
+      { label: `Provisional Sums${d.provisionalSums.length ? ` (${d.provisionalSums[0]?.description || ''})` : ''}`, value: d.priceSummary.provisionalSums },
+      { label: 'Daywork Allowance', value: d.priceSummary.dayworkAllowance },
+    ],
+    'TOTAL TENDER SUM (excl. VAT)', d.priceSummary.totalTenderSum,
+  ));
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 03 INCLUSIONS
+  children.push(h.fullWidthSectionBar('03', 'INCLUSIONS', p.accent));
+  children.push(gap(80));
+  children.push(...bulletList(p, d.inclusions));
+  children.push(gap(200));
+
+  // 04 EXCLUSIONS
+  children.push(h.fullWidthSectionBar('04', 'EXCLUSIONS', p.accent));
+  children.push(gap(80));
+  children.push(...bulletList(p, d.exclusions));
+  children.push(gap(200));
+
+  // 05 ASSUMPTIONS & QUALIFICATIONS
+  children.push(h.fullWidthSectionBar('05', 'ASSUMPTIONS & QUALIFICATIONS', p.accent));
+  children.push(gap(80));
+  children.push(...bulletList(p, d.assumptions));
+  children.push(gap(200));
+
+  // 06 PROGRAMME
+  children.push(h.fullWidthSectionBar('06', 'PROGRAMME', p.accent));
+  children.push(gap(80));
+  children.push(accentInfoTable(p, [
+    { label: 'Start Date', value: d.programme.proposedStartDate },
+    { label: 'Duration', value: d.programme.duration },
+    { label: 'Completion Date', value: d.programme.completionDate },
+  ]));
+  if (d.programme.keyMilestones.length > 0) {
+    children.push(gap(100));
+    const msW1 = Math.round(W * 0.50); const msW2 = Math.round(W * 0.25); const msW3 = W - msW1 - msW2;
+    children.push(dataTable(p,
+      [{ text: 'Milestone', width: msW1 }, { text: 'Target Date', width: msW2 }, { text: 'Duration', width: msW3 }],
+      d.programme.keyMilestones.map(m => [m.milestone, m.targetDate, m.duration || '']),
+    ));
+  }
+  children.push(gap(200));
+
+  // 07 COMMERCIAL TERMS
+  children.push(h.fullWidthSectionBar('07', 'COMMERCIAL TERMS', p.accent));
+  children.push(gap(80));
+  children.push(accentInfoTable(p, [
+    { label: 'Payment Terms', value: d.commercialTerms.paymentTerms },
+    { label: 'Retention', value: d.commercialTerms.retentionRate },
+    { label: 'Defects Period', value: d.commercialTerms.defectsLiabilityPeriod },
+    { label: 'Insurance', value: d.commercialTerms.insuranceRequirements },
+    { label: 'Contractual Basis', value: d.commercialTerms.contractualBasis },
+  ]));
+  children.push(gap(200));
+  children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: p.font, size: BODY, color: p.dark } } } },
+    sections: [{
+      properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('Quotation', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Standard Quote', p.accent) },
+      children,
+    }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T2 — FORMAL CONTRACT (#2D2D2D bars, #7F1D1D accent, Cambria, clause 1.0–7.0)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT2(d: QData): Document {
+  const p = PAL['formal-contract'];
+  const children: (Paragraph | Table)[] = [];
+
+  // ── Cover ──
+  children.push(h.coverBlock(['FORMAL CONTRACT', 'QUOTATION'], `Clause-Numbered Submission \u2014 ${d.contractForm || 'NEC4 ECS'}`, p.coverAccent, p.subtitleColor));
+  children.push(gap(300));
+  children.push(h.projectNameBar(`${d.projectName}${d.worksDescriptionShort ? ' \u00B7 ' + d.worksDescriptionShort.split(' ').slice(0, 6).join(' ') : ''}`, p.barBg));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Quotation Ref', value: d.documentRef },
+    { label: 'Date', value: d.quotationDate },
+    { label: 'Valid Until', value: d.validUntil },
+    { label: 'Subcontractor', value: d.preparedBy },
+    { label: 'Main Contractor', value: d.mainContractor },
+    { label: 'Tender Reference', value: d.tenderReference },
+    { label: 'Contract', value: d.contractForm },
+    { label: 'Total Tender Sum', value: d.priceSummary.totalTenderSum },
+  ], p.accent, W));
+  children.push(gap(200));
+  children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 1.0 SCOPE OF WORKS — clause-numbered prose
+  children.push(formalSectionBar('1.0', 'SCOPE OF WORKS', p.barBg, p.barNumColor));
+  children.push(gap(80));
+  const scopeParas = (d.scopeOfWorks || '').split(/\n\n/).filter(Boolean);
+  scopeParas.forEach((para, i) => {
+    children.push(clausePara(p, `1.${i + 1}`, para));
+  });
+  children.push(gap(200));
+
+  // 2.0 PRICING SCHEDULE
+  children.push(formalSectionBar('2.0', 'PRICING SCHEDULE', p.barBg, p.barNumColor));
+  children.push(gap(80));
+  const refW2 = Math.round(W * 0.06); const descW2 = Math.round(W * 0.38);
+  const unitW2 = Math.round(W * 0.07); const qtyW2 = Math.round(W * 0.09);
+  const rateW2 = Math.round(W * 0.14); const amtW2 = W - refW2 - descW2 - unitW2 - qtyW2 - rateW2;
+  children.push(dataTable(p,
+    [{ text: 'Ref', width: refW2 }, { text: 'Description', width: descW2 }, { text: 'Unit', width: unitW2 }, { text: 'Qty', width: qtyW2 }, { text: 'Rate (\u00A3)', width: rateW2 }, { text: 'Amount (\u00A3)', width: amtW2 }],
+    d.billOfQuantities.map(i => [i.ref, i.description, i.unit, i.quantity, i.rate, i.amount]),
+  ));
+  children.push(gap(200));
+
+  // 3.0 PROVISIONAL SUMS & DAYWORKS
+  children.push(formalSectionBar('3.0', 'PROVISIONAL SUMS & DAYWORKS', p.barBg, p.barNumColor));
+  children.push(gap(80));
+  let clauseN = 1;
+  d.provisionalSums.forEach(ps => {
+    children.push(clausePara(p, `3.${clauseN}`, `${ps.description}: ${ps.amount}. ${ps.basis}`, { boldPrefix: 'Provisional Sum \u2014' }));
+    clauseN++;
+  });
+  if (d.dayworkAllowance.included) {
+    children.push(clausePara(p, `3.${clauseN}`, `${d.priceSummary.dayworkAllowance}. Labour at ${d.dayworkAllowance.labourRate}. Plant at ${d.dayworkAllowance.basisOfRates} rates. Materials at cost ${d.dayworkAllowance.materialsMarkup}.`, { boldPrefix: 'Daywork Allowance:' }));
+  }
+  children.push(gap(120));
+
+  // Price Summary
+  children.push(priceSummaryBox(p,
+    [
+      { label: 'Original Contract Sum', value: d.priceSummary.originalContractSum, bold: true },
+      { label: 'Provisional Sums', value: d.priceSummary.provisionalSums },
+      { label: 'Daywork Allowance', value: d.priceSummary.dayworkAllowance },
+    ],
+    'TOTAL TENDER SUM (excl. VAT)', d.priceSummary.totalTenderSum,
+  ));
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 4.0 INCLUSIONS & EXCLUSIONS
+  children.push(formalSectionBar('4.0', 'INCLUSIONS & EXCLUSIONS', p.barBg, p.barNumColor));
+  children.push(gap(80));
+  children.push(clausePara(p, '4.1', d.inclusions.join('; ') + '.', { boldPrefix: 'Inclusions:' }));
+  children.push(clausePara(p, '4.2', d.exclusions.join('; ') + '.', { boldPrefix: 'Exclusions:' }));
+  children.push(gap(200));
+
+  // 5.0 PROGRAMME & MILESTONES
+  children.push(formalSectionBar('5.0', 'PROGRAMME & MILESTONES', p.barBg, p.barNumColor));
+  children.push(gap(80));
+  children.push(clausePara(p, '5.1', `The Works shall commence on ${d.programme.proposedStartDate} subject to notice and platform readiness confirmation. Total duration is ${d.programme.duration} with a completion date of ${d.programme.completionDate}.`));
+  const progParas = (d.programme.programmeNarrative || '').split(/\n\n/).filter(Boolean);
+  progParas.forEach((para, i) => {
+    children.push(clausePara(p, `5.${i + 2}`, para));
+  });
+  if (d.programme.keyMilestones.length > 0) {
+    children.push(gap(100));
+    const msColW1 = Math.round(W * 0.75); const msColW2 = W - msColW1;
+    children.push(dataTable(p,
+      [{ text: 'Milestone', width: msColW1 }, { text: 'Target', width: msColW2 }],
+      d.programme.keyMilestones.map(m => [m.milestone, m.targetDate]),
+    ));
+  }
+  children.push(gap(200));
+
+  // 6.0 COMMERCIAL TERMS
+  children.push(formalSectionBar('6.0', 'COMMERCIAL TERMS', p.barBg, p.barNumColor));
+  children.push(gap(80));
+  children.push(clausePara(p, '6.1', d.commercialTerms.paymentTerms, { boldPrefix: 'Payment:' }));
+  children.push(clausePara(p, '6.2', `${d.commercialTerms.retentionRate}. ${d.commercialTerms.retentionRelease}`, { boldPrefix: 'Retention:' }));
+  children.push(clausePara(p, '6.3', d.commercialTerms.insuranceRequirements, { boldPrefix: 'Insurance:' }));
+  children.push(clausePara(p, '6.4', d.commercialTerms.contractualBasis, { boldPrefix: 'Contractual Basis:' }));
+  children.push(gap(200));
+
+  // 7.0 SIGN-OFF
+  children.push(formalSectionBar('7.0', 'SIGN-OFF', p.barBg, p.barNumColor));
+  children.push(gap(100));
+  children.push(h.signatureGrid([`For and on behalf of ${d.preparedBy || 'Subcontractor'}`, `Accepted by ${d.mainContractor || 'Contractor'}`], p.accent, W));
+  children.push(gap(200));
+  children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: p.font, size: BODY, color: p.dark } } } },
+    sections: [{
+      properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('Formal Contract Quotation', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Formal Contract', p.accent) },
+      children,
+    }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T3 — BUDGET ESTIMATE (#475569 slate, minimal, 01–05)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT3(d: QData): Document {
+  const p = PAL['budget-estimate'];
+  const children: (Paragraph | Table)[] = [];
+
+  // ── Cover ──
+  children.push(h.coverBlock(['BUDGET', 'ESTIMATE'], `Indicative Pricing \u2014 ${d.worksDescriptionShort || d.projectName}`, p.coverAccent, p.subtitleColor));
+  children.push(gap(300));
+  children.push(h.projectNameBar(d.projectName, p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Reference', value: d.documentRef },
+    { label: 'Date', value: d.quotationDate },
+    { label: 'Valid Until', value: d.validUntil },
+    { label: 'From', value: d.preparedBy },
+    { label: 'To', value: d.mainContractor },
+    { label: 'Project', value: d.projectName },
+    { label: 'Budget Price', value: d.priceSummary.totalTenderSum },
+  ], p.accent, W));
+  children.push(gap(200));
+  children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // Budget Estimate Notice callout
+  children.push(h.calloutBox(
+    `Budget Estimate Notice: ${d.budgetEstimateNotice}`,
+    'D97706', 'FFFBEB', '92400E', W,
+  ));
+  children.push(gap(200));
+
+  // 01 PRICE SUMMARY — simplified BoQ (5 cols: Ref/Description/Qty/Rate/Amount)
+  children.push(h.fullWidthSectionBar('01', 'PRICE SUMMARY', p.accent));
+  children.push(gap(80));
+  const refW3 = Math.round(W * 0.06); const descW3 = Math.round(W * 0.44);
+  const qtyW3 = Math.round(W * 0.08); const rateW3 = Math.round(W * 0.14);
+  const amtW3 = W - refW3 - descW3 - qtyW3 - rateW3;
+  children.push(dataTable(p,
+    [{ text: 'Ref', width: refW3 }, { text: 'Description', width: descW3 }, { text: 'Qty', width: qtyW3 }, { text: 'Rate', width: rateW3 }, { text: 'Amount', width: amtW3 }],
+    d.billOfQuantities.map(i => [i.ref, i.description, i.quantity, i.rate, i.amount]),
+  ));
+  children.push(gap(120));
+  children.push(priceSummaryBox(p, [],
+    'BUDGET ESTIMATE TOTAL (excl. VAT)', d.priceSummary.totalTenderSum,
+  ));
+  children.push(gap(200));
+
+  // 02 KEY INCLUSIONS
+  children.push(h.fullWidthSectionBar('02', 'KEY INCLUSIONS', p.accent));
+  children.push(gap(80));
+  children.push(...bulletList(p, d.inclusions));
+  children.push(gap(200));
+
+  // 03 KEY EXCLUSIONS
+  children.push(h.fullWidthSectionBar('03', 'KEY EXCLUSIONS', p.accent));
+  children.push(gap(80));
+  children.push(...bulletList(p, d.exclusions));
+  children.push(gap(200));
+
+  // 04 KEY ASSUMPTIONS
+  children.push(h.fullWidthSectionBar('04', 'KEY ASSUMPTIONS', p.accent));
+  children.push(gap(80));
+  children.push(...bulletList(p, d.assumptions));
+  children.push(gap(200));
+
+  // 05 PROGRAMME & TERMS
+  children.push(h.fullWidthSectionBar('05', 'PROGRAMME & TERMS', p.accent));
+  children.push(gap(80));
+  children.push(accentInfoTable(p, [
+    { label: 'Estimated Duration', value: d.programme.duration },
+    { label: 'Payment', value: d.commercialTerms.paymentTerms },
+    { label: 'Retention', value: d.commercialTerms.retentionRate },
+    { label: 'Validity', value: `${d.validUntil ? d.validUntil + ' from date of issue' : '30 days from date of issue'}` },
+  ]));
+  children.push(gap(200));
+  children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: p.font, size: BODY, color: p.dark } } } },
+    sections: [{
+      properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('Budget Estimate', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Budget Estimate', p.accent) },
+      children,
+    }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// T4 — FULL TENDER (#065F46 green, 01–07, all sections + HSE + Profile)
+// ═════════════════════════════════════════════════════════════════════════════
+function buildT4(d: QData): Document {
+  const p = PAL['full-tender'];
+  const children: (Paragraph | Table)[] = [];
+
+  // ── Cover ──
+  children.push(h.coverBlock(['FULL TENDER', 'SUBMISSION'], `${d.worksDescriptionShort || d.projectName}`, p.coverAccent, p.subtitleColor));
+  children.push(gap(300));
+  children.push(h.projectNameBar(d.preparedBy || 'SUBCONTRACTOR', p.accent));
+  children.push(gap(200));
+  children.push(h.coverInfoTable([
+    { label: 'Quotation Ref', value: d.documentRef },
+    { label: 'Date', value: d.quotationDate },
+    { label: 'Valid Until', value: d.validUntil },
+    { label: 'Subcontractor', value: d.preparedBy },
+    { label: 'Project', value: d.projectName },
+    { label: 'Client', value: d.client },
+    { label: 'Main Contractor', value: d.mainContractor },
+    { label: 'Tender Ref', value: d.tenderReference },
+    { label: 'Contract', value: d.contractForm },
+    { label: 'Site Address', value: d.projectAddress },
+    { label: 'Total Tender Sum', value: d.priceSummary.totalTenderSum },
+  ], p.accent, W));
+  children.push(gap(200));
+  children.push(h.coverFooterLine());
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 01 EXECUTIVE SUMMARY
+  children.push(h.fullWidthSectionBar('01', 'EXECUTIVE SUMMARY', p.accent));
+  children.push(gap(80));
+  children.push(...proseParas(p, d.quotationSummary));
+  children.push(gap(200));
+
+  // 02 SCOPE OF WORKS
+  children.push(h.fullWidthSectionBar('02', 'SCOPE OF WORKS', p.accent));
+  children.push(gap(80));
+  children.push(...proseParas(p, d.scopeOfWorks));
+  children.push(gap(200));
+
+  // 03 BILL OF QUANTITIES
+  children.push(h.fullWidthSectionBar('03', 'BILL OF QUANTITIES', p.accent));
+  children.push(gap(80));
+  const refW4 = Math.round(W * 0.06); const descW4 = Math.round(W * 0.34);
+  const unitW4 = Math.round(W * 0.07); const qtyW4 = Math.round(W * 0.09);
+  const rateW4 = Math.round(W * 0.14); const amtW4 = W - refW4 - descW4 - unitW4 - qtyW4 - rateW4;
+  children.push(dataTable(p,
+    [{ text: 'Ref', width: refW4 }, { text: 'Description', width: descW4 }, { text: 'Unit', width: unitW4 }, { text: 'Qty', width: qtyW4 }, { text: 'Rate (\u00A3)', width: rateW4 }, { text: 'Amount (\u00A3)', width: amtW4 }],
+    d.billOfQuantities.map(i => [i.ref, i.description, i.unit, i.quantity, i.rate, i.amount]),
+  ));
+  children.push(gap(120));
+  children.push(priceSummaryBox(p,
+    [
+      { label: 'Original Contract Sum', value: d.priceSummary.originalContractSum, bold: true },
+      { label: 'Provisional Sums', value: d.priceSummary.provisionalSums },
+      { label: 'Daywork Allowance', value: d.priceSummary.dayworkAllowance },
+    ],
+    'TOTAL TENDER SUM (excl. VAT)', d.priceSummary.totalTenderSum,
+  ));
+  children.push(new Paragraph({ children: [new PageBreak()] }));
+
+  // 04 HEALTH, SAFETY & ENVIRONMENT
+  children.push(h.fullWidthSectionBar('04', 'HEALTH, SAFETY & ENVIRONMENT', p.accent));
+  children.push(gap(80));
+  children.push(...proseParas(p, d.healthSafetyEnvironmental));
+  children.push(gap(200));
+
+  // 05 COMPANY PROFILE & QUALIFICATIONS
+  children.push(h.fullWidthSectionBar('05', 'COMPANY PROFILE & QUALIFICATIONS', p.accent));
+  children.push(gap(80));
+  children.push(...proseParas(p, d.organisationProfile));
+  if (d.relevantExperience) {
+    children.push(gap(80));
+    children.push(h.calloutBox(
+      `Relevant Experience: ${d.relevantExperience}`,
+      '059669', 'D1FAE5', '065F46', W,
+    ));
+  }
+  children.push(gap(200));
+
+  // 06 QUALIFICATIONS & ALTERNATIVE PROPOSALS
+  children.push(h.fullWidthSectionBar('06', 'QUALIFICATIONS & ALTERNATIVE PROPOSALS', p.accent));
+  children.push(gap(80));
+  children.push(...proseParas(p, d.qualifications));
+  children.push(gap(200));
+
+  // 07 SIGN-OFF
+  children.push(h.fullWidthSectionBar('07', 'SIGN-OFF', p.accent));
+  children.push(gap(100));
+  children.push(h.signatureGrid([`For ${d.preparedBy || 'Subcontractor'}`, `Accepted by ${d.mainContractor || 'Contractor'}`], p.accent, W));
+  if (d.validityStatement) {
+    children.push(gap(100));
+    children.push(h.calloutBox(
+      `Validity Statement: ${d.validityStatement}`,
+      '2563EB', 'EFF6FF', '1E40AF', W,
+    ));
+  }
+  children.push(gap(200));
+  children.push(...h.endMark(p.accent));
+
+  return new Document({
+    styles: { default: { document: { run: { font: p.font, size: BODY, color: p.dark } } } },
+    sections: [{
+      properties: { ...h.PORTRAIT_SECTION },
+      headers: { default: h.accentHeader('Full Tender Submission', p.accent) },
+      footers: { default: h.accentFooter(d.documentRef, 'Full Tender', p.accent) },
+      children,
+    }],
+  });
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ROUTER
+// ═════════════════════════════════════════════════════════════════════════════
 export async function buildQuoteTemplateDocument(
   content: any,
   templateSlug: QuoteTemplateSlug,
 ): Promise<Document> {
-  const p = PALETTES[templateSlug];
-  const d = content;
-  let sec = 0;
-  const children: (Paragraph | Table)[] = [];
-
-  // ── Cover ──────────────────────────────────────────────────
-  const cover = buildCover(templateSlug, p, d);
-  if (cover.length > 0) {
-    children.push(...cover);
-    children.push(new Paragraph({ children: [new PageBreak()] }));
+  const d = extract(content);
+  switch (templateSlug) {
+    case 'standard-quote':   return buildT1(d);
+    case 'formal-contract':  return buildT2(d);
+    case 'budget-estimate':  return buildT3(d);
+    case 'full-tender':      return buildT4(d);
+    default:                 return buildT1(d);
   }
-
-  // ── Tender Particulars ─────────────────────────────────────
-  children.push(sectionHead(templateSlug, p, ++sec, 'Tender Particulars'));
-  children.push(buildInfoTable(p, [
-    ['Quotation Reference', d.documentRef || ''],
-    ['Date', d.quotationDate || ''],
-    ['Valid Until', d.validUntil || ''],
-    ['Project Name', d.projectName || ''],
-    ['Project Address', d.projectAddress || ''],
-    ['Client', d.client || ''],
-    ['Main Contractor', d.mainContractor || ''],
-    ['Tender Reference', d.tenderReference || ''],
-    ['Tender Return Date', d.tenderReturnDate || ''],
-    ['Prepared By', d.preparedBy || ''],
-  ]));
-  children.push(gap());
-
-  // ── Quotation Summary (full + detailed only) ───────────────
-  if (showSection(templateSlug, 'quotation-summary') && d.quotationSummary) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Quotation Summary'));
-    // Split into paragraphs
-    const paras = (d.quotationSummary as string).split(/\n\n?/).filter(Boolean);
-    for (const para of paras) {
-      children.push(bodyPara(p, para));
-    }
-    children.push(gap());
-  }
-
-  // ── Scope of Works (full + detailed + standard) ────────────
-  if (showSection(templateSlug, 'scope') && d.scopeOfWorks) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Scope of Works'));
-    const paras = (d.scopeOfWorks as string).split(/\n\n?/).filter(Boolean);
-    for (const para of paras) {
-      children.push(bodyPara(p, para));
-    }
-    children.push(gap());
-  }
-
-  // ── Bill of Quantities ─────────────────────────────────────
-  children.push(sectionHead(templateSlug, p, ++sec, 'Bill of Quantities'));
-  const boqItems = d.billOfQuantities || [];
-  if (boqItems.length > 0) {
-    const refW = Math.floor(W * 0.07);
-    const descW = Math.floor(W * 0.38);
-    const unitW = Math.floor(W * 0.08);
-    const qtyW = Math.floor(W * 0.10);
-    const rateW = Math.floor(W * 0.16);
-    const amtW = W - refW - descW - unitW - qtyW - rateW;
-
-    children.push(buildDataTable(p,
-      [['Ref', refW], ['Description', descW], ['Unit', unitW], ['Qty', qtyW], ['Rate (£)', rateW], ['Amount (£)', amtW]],
-      boqItems.map((item: any) => [
-        item.ref || '',
-        item.description || '',
-        item.unit || '',
-        String(item.quantity ?? ''),
-        item.rate || '',
-        item.amount || '',
-      ]),
-    ));
-  }
-  children.push(gap());
-
-  // ── Price Summary ──────────────────────────────────────────
-  children.push(sectionHead(templateSlug, p, ++sec, 'Price Summary'));
-  const ps = d.priceSummary || {};
-  children.push(buildInfoTable(p, [
-    ['Original Contract Sum', ps.originalContractSum || ''],
-    ['Provisional Sums', ps.provisionalSums || ''],
-    ['Daywork Allowance', ps.dayworkAllowance || ''],
-    ['TOTAL TENDER SUM', ps.totalTenderSum || ''],
-  ]));
-  children.push(gap());
-
-  // ── Provisional Sums (full + detailed) ─────────────────────
-  if (showSection(templateSlug, 'provisional-sums') && d.provisionalSums?.length) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Provisional Sums'));
-    const psDescW = Math.floor(W * 0.50);
-    const psAmtW = Math.floor(W * 0.22);
-    const psBasisW = W - psDescW - psAmtW;
-    children.push(buildDataTable(p,
-      [['Description', psDescW], ['Amount (£)', psAmtW], ['Basis', psBasisW]],
-      d.provisionalSums.map((item: any) => [item.description || '', item.amount || '', item.basis || '']),
-    ));
-    children.push(gap());
-  }
-
-  // ── Daywork Allowance (full + detailed) ────────────────────
-  if (showSection(templateSlug, 'daywork') && d.dayworkAllowance?.included) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Daywork Allowance'));
-    children.push(buildInfoTable(p, [
-      ['Labour Rate', d.dayworkAllowance.labourRate || ''],
-      ['Plant Rates', d.dayworkAllowance.plantRates || ''],
-      ['Materials Markup', d.dayworkAllowance.materialsMarkup || ''],
-      ['Basis of Rates', d.dayworkAllowance.basisOfRates || ''],
-    ]));
-    children.push(gap());
-  }
-
-  children.push(new Paragraph({ children: [new PageBreak()] }));
-
-  // ── Inclusions ─────────────────────────────────────────────
-  children.push(sectionHead(templateSlug, p, ++sec, 'Inclusions'));
-  children.push(...buildBulletList(p, d.inclusions || []));
-  children.push(gap());
-
-  // ── Exclusions ─────────────────────────────────────────────
-  children.push(sectionHead(templateSlug, p, ++sec, 'Exclusions'));
-  children.push(...buildBulletList(p, d.exclusions || []));
-  children.push(gap());
-
-  // ── Assumptions ────────────────────────────────────────────
-  if (showSection(templateSlug, 'assumptions')) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Assumptions & Qualifications'));
-    children.push(...buildBulletList(p, d.assumptions || []));
-    children.push(gap());
-  }
-
-  // ── Programme (standard+) ──────────────────────────────────
-  if (showSection(templateSlug, 'programme') && d.programme) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Programme'));
-    children.push(buildInfoTable(p, [
-      ['Proposed Start Date', d.programme.proposedStartDate || ''],
-      ['Duration', d.programme.duration || ''],
-      ['Completion Date', d.programme.completionDate || ''],
-    ]));
-    children.push(gap(80));
-    if (d.programme.programmeNarrative) {
-      const paras = (d.programme.programmeNarrative as string).split(/\n\n?/).filter(Boolean);
-      for (const para of paras) {
-        children.push(bodyPara(p, para));
-      }
-    }
-    // Milestones (full + detailed)
-    if (showSection(templateSlug, 'milestones') && d.programme.keyMilestones?.length) {
-      children.push(gap(80));
-      const msW1 = Math.floor(W * 0.70);
-      const msW2 = W - msW1;
-      children.push(buildDataTable(p,
-        [['Milestone', msW1], ['Target Date', msW2]],
-        d.programme.keyMilestones.map((m: any) => [m.milestone || '', m.targetDate || '']),
-      ));
-    }
-    children.push(gap());
-  }
-
-  // Budget estimate gets a lightweight programme
-  if (showSection(templateSlug, 'programme-light') && d.programme) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Programme'));
-    children.push(buildInfoTable(p, [
-      ['Proposed Start', d.programme.proposedStartDate || ''],
-      ['Duration', d.programme.duration || ''],
-      ['Completion', d.programme.completionDate || ''],
-    ]));
-    children.push(gap());
-  }
-
-  // ── Commercial Terms (standard+) ──────────────────────────
-  if (showSection(templateSlug, 'commercial-terms') && d.commercialTerms) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Commercial Terms'));
-    children.push(buildInfoTable(p, [
-      ['Payment Terms', d.commercialTerms.paymentTerms || ''],
-      ['Retention Rate', d.commercialTerms.retentionRate || ''],
-      ['Defects Liability Period', d.commercialTerms.defectsLiabilityPeriod || ''],
-      ['Retention Release', d.commercialTerms.retentionRelease || ''],
-      ['Insurance Requirements', d.commercialTerms.insuranceRequirements || ''],
-      ['Contractual Basis', d.commercialTerms.contractualBasis || ''],
-    ]));
-    children.push(gap());
-  }
-
-  // ── HSE (full only) ────────────────────────────────────────
-  if (showSection(templateSlug, 'hse') && d.healthSafetyEnvironmental) {
-    children.push(new Paragraph({ children: [new PageBreak()] }));
-    children.push(sectionHead(templateSlug, p, ++sec, 'Health, Safety & Environmental'));
-    const paras = (d.healthSafetyEnvironmental as string).split(/\n\n?/).filter(Boolean);
-    for (const para of paras) {
-      children.push(bodyPara(p, para));
-    }
-    children.push(gap());
-  }
-
-  // ── Qualifications (full only) ─────────────────────────────
-  if (showSection(templateSlug, 'qualifications') && d.qualifications) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Qualifications & Alternative Proposals'));
-    const paras = (d.qualifications as string).split(/\n\n?/).filter(Boolean);
-    for (const para of paras) {
-      children.push(bodyPara(p, para));
-    }
-    children.push(gap());
-  }
-
-  // ── Company Profile (full only) ────────────────────────────
-  if (showSection(templateSlug, 'company-profile') && d.organisationProfile) {
-    children.push(sectionHead(templateSlug, p, ++sec, 'Company Profile'));
-    const paras = (d.organisationProfile as string).split(/\n\n?/).filter(Boolean);
-    for (const para of paras) {
-      children.push(bodyPara(p, para));
-    }
-    children.push(gap());
-  }
-
-  // ── Signature (full + detailed) ────────────────────────────
-  if (showSection(templateSlug, 'signature')) {
-    children.push(gap(200));
-    const sigColW = [2200, 3200, 1800, W - 7200];
-    children.push(new Table({
-      width: { size: W, type: WidthType.DXA }, columnWidths: sigColW,
-      rows: [
-        new TableRow({ children: [hdrCell(p, 'Role', sigColW[0]), hdrCell(p, 'Name', sigColW[1]), hdrCell(p, 'Signature', sigColW[2]), hdrCell(p, 'Date', sigColW[3])] }),
-        altRow(p, [['Authorised Signatory', sigColW[0], { bold: true }], [d.preparedBy || '', sigColW[1]], ['', sigColW[2]], ['', sigColW[3]]], 0),
-        altRow(p, [['Accepted By', sigColW[0], { bold: true }], ['', sigColW[1]], ['', sigColW[2]], ['', sigColW[3]]], 1),
-      ],
-    }));
-  }
-
-  // ── End of document ────────────────────────────────────────
-  children.push(gap(300));
-  children.push(new Paragraph({
-    alignment: AlignmentType.CENTER,
-    children: [new TextRun({ text: '— End of Quotation —', italics: true, font: p.font, size: p.bodySize, color: p.mid })],
-  }));
-  children.push(gap(80));
-  children.push(new Paragraph({
-    alignment: AlignmentType.CENTER,
-    children: [new TextRun({ text: 'Generated by Ebrora — ebrora.com', font: p.font, size: 18, color: p.accent })],
-  }));
-
-  // ── Assemble ───────────────────────────────────────────────
-  return new Document({
-    styles: { default: { document: { run: { font: p.font, size: p.bodySize, color: p.dark } } } },
-    sections: [{
-      properties: {
-        page: {
-          size: { width: h.A4_WIDTH, height: h.A4_HEIGHT },
-          margin: { top: h.MARGIN_NORMAL, right: h.MARGIN_NORMAL, bottom: h.MARGIN_NORMAL, left: h.MARGIN_NORMAL },
-        },
-      },
-      headers: { default: makeHeader(templateSlug, p, d) },
-      footers: { default: makeFooter(p, d) },
-      children,
-    }],
-  });
 }
