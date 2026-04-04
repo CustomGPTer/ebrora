@@ -18,6 +18,21 @@ import type { PermitToDigTemplateSlug } from '@/lib/permit-to-dig/types';
 import type { PowraTemplateSlug } from '@/lib/powra/types';
 import type { EarlyWarningTemplateSlug } from '@/lib/early-warning/types';
 import type { ProgrammeCheckerTemplateSlug } from '@/lib/programme-checker/types';
+import type { TrafficTemplateSlug } from '@/lib/traffic/types';
+import type { WasteTemplateSlug } from '@/lib/waste/types';
+import type { ScopeTemplateSlug } from '@/lib/scope/types';
+import type { NcrTemplateSlug } from '@/lib/ncr/types';
+import type { CarbonFootprintTemplateSlug } from '@/lib/carbon-footprint/types';
+import type { CrpTemplateSlug } from '@/lib/carbon-reduction/types';
+import type { CeTemplateSlug } from '@/lib/ce/types';
+import type { DayworkSheetTemplateSlug } from '@/lib/daywork-sheet/types';
+import type { DelayTemplateSlug } from '@/lib/delay/types';
+import type { InvasiveTemplateSlug } from '@/lib/invasive/types';
+import type { QuoteTemplateSlug } from '@/lib/quote/types';
+import type { RfiTemplateSlug } from '@/lib/rfi/types';
+import type { VariationTemplateSlug } from '@/lib/variation/types';
+import type { WahTemplateSlug } from '@/lib/wah/types';
+import type { WbvTemplateSlug } from '@/lib/wbv/types';
 import { AI_TOOL_CONFIGS } from './tool-config';
 
 // ---------------------------------------------------------------------------
@@ -1507,7 +1522,7 @@ CRITICAL RULES:
     { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "risk": "string", "likelihood": "High | Medium | Low", "severity": "High | Medium | Low", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)", "residualRisk": "High | Medium | Low" }
   ],
   "contingencyProcedures": "string (min 100 words — what happens if the lift cannot proceed, load snagging, crane breakdown, sudden weather change)",
-  "emergencyProcedures": "string (min 150 words)",
+  "emergencyProcedures": "string (min 190 words)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 Minimum 5 proximity hazards. Minimum 6 risk assessment items.
@@ -1653,13 +1668,13 @@ Minimum 6 pre-activity checks. Minimum 8 during-activity checks. Minimum 4 post-
   'scope-of-works': `Generate a comprehensive Subcontractor Scope of Works JSON with the structure below.
 
 CRITICAL REQUIREMENTS:
-- Technical sections (scopeOverview, designResponsibility, materialsEquipment, testingCommissioning, healthSafetyEnvironmental): MINIMUM 60 words each.
-- Commercial/legal sections (contractBasisNotes, each commercial variable text): MINIMUM 40 words each.
+- Technical sections (scopeOverview, designResponsibility, materialsEquipment, testingCommissioning, healthSafetyEnvironmental): MINIMUM 75 words each.
+- Commercial/legal sections (contractBasisNotes, each commercial variable text): MINIMUM 50 words each.
 - Use precise UK construction terminology — CDM 2015, NEC4, JCT, PUWER, LOLER, COSHH, BS standards.
 - Reference specific regulations and standards by name and number.
 - All monetary values in GBP. All dates in DD/MM/YYYY format.
-- Inclusions: minimum 6 items. Exclusions: minimum 4 items. Interfaces: minimum 3 items. Deliverables: minimum 5 items.
-- Attendance: minimum 6 items showing clear PC vs subcontractor split.
+- Inclusions: minimum 6 items with detail min 75 words each. Exclusions: minimum 4 items with detail min 75 words each. Interfaces: minimum 3 items. Deliverables: minimum 8 items.
+- Attendance: minimum 8 items showing clear PC vs subcontractor split.
 - Insurance: always include Public Liability, Employer's Liability, Contractor's All Risks. Add Professional Indemnity if the subcontractor has any design responsibility.
 
 CONDITIONAL SECTIONS — include ONLY if relevant to the described works:
@@ -1680,19 +1695,19 @@ JSON STRUCTURE:
   "discipline": "string",
   "preparedBy": "string (use user's name if given, otherwise 'Project Manager')",
   "contractForm": "string (e.g. 'NEC4 ECS, Option A — Priced Contract with Activity Schedule')",
-  "contractBasisNotes": "string (min 120 words — precedence of documents, which conditions apply)",
+  "contractBasisNotes": "string (min 145 words — precedence of documents, which conditions apply)",
   "contractDocuments": ["string array — list all documents forming the subcontract"],
-  "scopeOverview": "string (min 200 words — comprehensive description of the works, objectives, standards, and context)",
+  "scopeOverview": "string (min 240 words — comprehensive description of the works, objectives, standards, and context)",
   "inclusions": [
     { "no": "1", "item": "string (short title)", "detail": "string (min 60 words — precise description)" }
   ],
   "exclusions": [
     { "no": "1", "item": "string", "detail": "string (min 60 words)" }
   ],
-  "designResponsibility": "string (min 120 words — who owns permanent design, temporary works, RFI process)",
-  "materialsEquipment": "string (min 120 words — what the sub supplies, certification requirements)",
+  "designResponsibility": "string (min 145 words — who owns permanent design, temporary works, RFI process)",
+  "materialsEquipment": "string (min 145 words — what the sub supplies, certification requirements)",
   "freeIssueItems": "string (what the PC provides, or 'No items are free-issued')",
-  "materialApprovalProcess": "string (min 80 words — submittal process, lead times)",
+  "materialApprovalProcess": "string (min 100 words — submittal process, lead times)",
   "attendance": [
     { "item": "string", "providedBy": "string (PC or Sub name)", "notes": "string" }
   ],
@@ -1700,15 +1715,15 @@ JSON STRUCTURE:
   "programmeCompletion": "DD/MM/YYYY",
   "workingHours": "string",
   "keyMilestones": "string (list key milestones with target weeks or dates)",
-  "programmeNotes": "string (min 100 words — programme submission and update requirements)",
+  "programmeNotes": "string (min 120 words — programme submission and update requirements)",
   "interfaces": [
     { "interfaceWith": "string", "description": "string", "responsibility": "string" }
   ],
-  "testingCommissioning": "string (min 120 words — specific tests, standards, witness requirements)",
+  "testingCommissioning": "string (min 145 words — specific tests, standards, witness requirements)",
   "deliverables": [
     { "document": "string", "requiredBy": "string", "format": "string" }
   ],
-  "healthSafetyEnvironmental": "string (min 140 words — CDM duties, RAMS, permits, environmental, waste)",
+  "healthSafetyEnvironmental": "string (min 170 words — CDM duties, RAMS, permits, environmental, waste)",
   "paymentBasis": "string (e.g. 'NEC4 Option A — Activity Schedule')",
   "paymentCycle": "string (e.g. 'Monthly')",
   "applicationDate": "string (e.g. '25th of each month')",
@@ -1728,9 +1743,9 @@ JSON STRUCTURE:
   "cisStatus": "string (e.g. 'Gross payment status')",
   "disputeNominatingBody": "string (e.g. 'RICS')",
   "governingLaw": "string (e.g. 'England and Wales')",
-  "groundConditions": "string (min 80 words) or null",
-  "priceEscalation": "string (min 80 words) or null",
-  "contaminationRisk": "string (min 80 words) or null"
+  "groundConditions": "string (min 100 words) or null",
+  "priceEscalation": "string (min 100 words) or null",
+  "contaminationRisk": "string (min 100 words) or null"
 }`,
 
   'permit-to-dig': `Generate a Permit to Dig JSON with this structure. Reference HSG47 (Avoiding danger from underground services) throughout.
@@ -1812,7 +1827,7 @@ CRITICAL RULES:
 - Names for preparedBy, permitHolder: leave blank if not provided by the user. Never invent names.
 - Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
-  powra: `Generate a Point of Work Risk Assessment (POWRA) JSON. This is a CONCISE, one-page field document — keep it practical and focused.
+  powra: `Generate a Point of Work Risk Assessment (POWRA) JSON. This is a practical field document — content must be detailed enough to be useful on site.
 {
   "documentRef": "string (format: POWRA-YYYY-NNN)",
   "date": "DD/MM/YYYY",
@@ -1821,41 +1836,49 @@ CRITICAL RULES:
   "projectName": "string",
   "siteAddress": "string",
   "location": "string (exact location on site)",
+  "contractReference": "string (contract number and form)",
+  "clientName": "string (client organisation)",
+  "principalContractor": "string (PC organisation)",
   "taskDescription": "string (min 200 words — comprehensive description of the specific task including location, equipment, materials, duration, number of operatives, and environmental conditions. Reference the parent RAMS and any applicable permits)",
   "ramsReference": "string (reference number of the RAMS covering this activity)",
-  "permitReferences": "string (any permits in place)",
+  "permitReferences": "string (any permits in place — type and reference number)",
   "conditions": {
-    "weather": "string (min 30 words — current conditions and forecast for the shift)",
-    "groundConditions": "string (min 30 words — surface type, stability, slope, wet/dry, proximity to excavations)",
-    "lighting": "string (min 20 words — natural/artificial, adequacy, task lighting requirements)",
-    "accessEgress": "string (min 30 words — access route, obstructions, emergency egress, welfare location)"
+    "weather": "string (min 40 words — current conditions, temperature, wind, precipitation, forecast for the shift, Met Office warnings)",
+    "groundConditions": "string (min 40 words — surface type, stability, slope, wet/dry, proximity to excavations, drainage)",
+    "lighting": "string (min 30 words — natural/artificial, adequacy, task lighting requirements, times when supplementary needed)",
+    "accessEgress": "string (min 40 words — access route, pedestrian/plant separation, emergency egress, muster point)",
+    "overhead": "string (min 25 words — overhead power lines, structures, crane movements, any obstructions)",
+    "adjacentWork": "string (min 25 words — other work activities in vicinity, potential interference, coordination)"
   },
   "hazards": [
     {
       "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)",
-      "consequence": "string (min 30 words — realistic consequence and severity)",
+      "consequence": "string (min 40 words — realistic consequence, severity, and type of injury)",
       "riskBefore": "High | Medium | Low",
-      "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)",
+      "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, how compliance is verified, and monitoring in place)",
       "riskAfter": "High | Medium | Low"
     }
   ],
-  "ppeRequired": ["string"],
+  "ppeRequired": ["string (include EN standard reference, e.g. 'Hard hat (EN 397)')"],
   "stopConditions": [
-    "string (conditions under which ALL WORK MUST STOP immediately)"
+    "string (min 15 words — specific measurable condition under which ALL WORK MUST STOP immediately)"
   ],
-  "emergencyArrangements": "string (nearest first aider, first aid kit, muster point, emergency number)",
+  "reassessmentTriggers": ["string (min 15 words — specific trigger event requiring POWRA reassessment)"],
+  "emergencyArrangements": "string (min 150 words — first aider name and qualification, first aid kit locations, muster point with grid ref, emergency access, site number, nearest A&E with distance, RIDDOR procedure)",
   "teamSignOn": [
-    { "name": "string", "role": "string", "signature": "string", "understood": "Yes" }
+    { "name": "string", "role": "string", "employer": "string", "briefed": true }
   ],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 5 hazards. Minimum 4 stop conditions. Minimum 3 team members in sign-on. Keep ALL text concise — this is a field document, not a report.
+Minimum 7 hazards (at least 4 High risk before controls). Minimum 7 stop conditions. Minimum 6 reassessment triggers. Minimum 7 PPE items with EN standards. Minimum 5 team members in sign-on.
 
 CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays.
-- Risk ratings must be numerically calculated (L × S) and internally consistent.
+- Risk ratings must show improvement — riskBefore MUST be higher than riskAfter where controls are applied.
+- Majority of hazards should start as High risk before controls, reducing to Low or Medium after.
 - Names for assessedBy, teamMembers: leave blank if not provided by the user. Never invent names.
-- This is a field document — keep content concise and practical, not verbose.`,
+- All controls must name specific individuals, equipment, and procedures — not generic statements.
+- UK construction terminology throughout — use correct regulation names, NEC clause numbers, BS/EN standards.`,
 
   'early-warning': `Generate an NEC Early Warning Notice JSON with this structure:
 {
@@ -2024,10 +2047,10 @@ CRITICAL RULES:
     "instructionDate": "string",
     "issuedBy": "string"
   },
-  "eventDescription": "string (min 300 words — detailed factual description of the compensation event. What happened, what changed, what instruction was given, and how it differs from the original Works Information / Scope)",
+  "eventDescription": "string (min 400 words — detailed factual description of the compensation event across 2-3 paragraphs. What happened, what changed, what instruction was given, how it differs from the original Works Information / Scope, technical details with drawing refs and quantities)",
   "originalScope": "string (min 100 words — describe what was originally required under the contract)",
   "changedScope": "string (min 100 words — describe what is now required as a result of the event)",
-  "entitlementBasis": "string (min 150 words — explain why this constitutes a compensation event under the cited clause. Reference the contract conditions and explain how the event meets the criteria)",
+  "entitlementBasis": "string (min 200 words — explain why this constitutes a compensation event under the cited clause. Quote contract wording, reference notification timeline under Cl.61.3, explain quotation process under Cl.62)",
   "programmeImpact": {
     "criticalPathAffected": "Yes | No",
     "estimatedDelay": "string (working days)",
@@ -2476,65 +2499,69 @@ JSON structure:
   "mainContractor": "string",
   "tenderReference": "string",
   "tenderReturnDate": "string",
-  "quotationSummary": "string (min 200 words — professional executive summary of what is being quoted and why the subcontractor is well placed to deliver)",
-  "scopeOfWorks": "string (min 300 words — comprehensive description of exactly what is included. No ambiguity. Reference drawings and specifications by number where provided)",
+  "contractForm": "string (e.g. NEC4 ECC Option A, JCT SBC 2016, etc.)",
+  "worksDescriptionShort": "string (max 300 chars — one-sentence description for cover page tender particulars table)",
+  "quotationSummary": "string (min 250 words — professional executive summary across 2 paragraphs. First paragraph: what is being quoted, package value, scope overview, contract framework. Second paragraph: why the subcontractor is well placed — experience, track record, proposed team. Use paragraph breaks \\\\n\\\\n)",
+  "scopeOfWorks": "string (min 375 words — comprehensive description across 3+ paragraphs separated by \\\\n\\\\n. Each paragraph should cover a distinct aspect of the works. Reference drawings, specifications, standards by number where provided. No ambiguity. For Formal Contract template this will be split into clause-numbered paragraphs)",
   "billOfQuantities": [
     {
-      "ref": "string",
-      "description": "string",
-      "unit": "string",
+      "ref": "string (e.g. 1.01, 2.01)",
+      "description": "string (specific — include sizes, specs, standards)",
+      "unit": "string (Nr, m, m², m³, Te, Item, Hr)",
       "quantity": "number",
-      "rate": "string (£/unit or 'Lump Sum')",
-      "amount": "string (£)"
+      "rate": "string (£ formatted, e.g. 1,850.00)",
+      "amount": "string (£ formatted, rate × quantity, e.g. 88,800.00)"
     }
   ],
   "provisionalSums": [
     {
-      "description": "string",
+      "description": "string (what the PS covers)",
       "amount": "string (£)",
-      "basis": "string"
+      "basis": "string (draw-down basis, how unused balance handled)"
     }
   ],
   "dayworkAllowance": {
     "included": "boolean",
-    "labourRate": "string (£/hr)",
-    "plantRates": "string",
-    "materialsMarkup": "string (%)",
+    "labourRate": "string (£/hr operative + supervisor rates)",
+    "plantRates": "string (basis of rates)",
+    "materialsMarkup": "string (% markup)",
     "basisOfRates": "CECA Schedule of Dayworks 2011 | Agreed Schedule | Other"
   },
   "priceSummary": {
-    "originalContractSum": "string (£)",
-    "provisionalSums": "string (£)",
+    "originalContractSum": "string (£ — sum of BoQ amounts)",
+    "provisionalSums": "string (£ — sum of PS amounts)",
     "dayworkAllowance": "string (£)",
-    "totalTenderSum": "string (£)"
+    "totalTenderSum": "string (£ — original + PS + daywork)"
   },
-  "inclusions": ["string (minimum 10 specific inclusions)"],
-  "exclusions": ["string (minimum 8 specific exclusions)"],
-  "assumptions": ["string (minimum 8 key assumptions and qualifications)"],
+  "inclusions": ["string (minimum 12 specific inclusions — every item the price covers)"],
+  "exclusions": ["string (minimum 10 specific exclusions — every item NOT covered)"],
+  "assumptions": ["string (minimum 9 key assumptions and qualifications the price is based on)"],
   "programme": {
     "proposedStartDate": "string",
-    "duration": "string (weeks)",
+    "duration": "string (weeks, including breakdown if phased)",
     "completionDate": "string",
     "keyMilestones": [
-      { "milestone": "string", "targetDate": "string" }
+      { "milestone": "string", "targetDate": "string", "duration": "string (optional — e.g. 3.5 weeks)" }
     ],
-    "programmeNarrative": "string (min 100 words)"
+    "programmeNarrative": "string (min 125 words — production rates, phasing logic, weather/access constraints, critical dependencies)"
   },
   "commercialTerms": {
-    "paymentTerms": "string",
-    "retentionRate": "string (%)",
+    "paymentTerms": "string (min 40 words — method, timing, clause reference)",
+    "retentionRate": "string (% and release mechanism)",
     "defectsLiabilityPeriod": "string",
-    "retentionRelease": "string",
-    "insuranceRequirements": "string",
-    "contractualBasis": "string"
+    "retentionRelease": "string (when each moiety released)",
+    "insuranceRequirements": "string (PI, PL, EL amounts)",
+    "contractualBasis": "string (contract form, option, Z-clauses if applicable)"
   },
-  "healthSafetyEnvironmental": "string (min 200 words — HSE commitment: RAMS process, CDM duties, key risks, environmental management, waste, HSE accreditations)",
-  "qualifications": "string (min 150 words — any additional qualifications or alternative proposals)",
-  "organisationProfile": "string (min 100 words — company profile, relevant experience, key personnel)",
-  "validityStatement": "string",
+  "healthSafetyEnvironmental": "string (min 250 words across 3 paragraphs separated by \\\\n\\\\n. Para 1: HSE management system, certifications, RIDDOR rate, accreditations. Para 2: site-specific hazard controls relevant to the works. Para 3: environmental management — waste, noise, vibration, pollution prevention)",
+  "qualifications": "string (min 190 words — qualifications, reservations, alternative proposals, value engineering options. Include specific clause references for compensation event reservations)",
+  "organisationProfile": "string (min 125 words — company background, fleet/capability, key personnel with qualifications)",
+  "relevantExperience": "string (min 80 words — 3+ comparable projects with client name, year, scope, value. For callout box in Full Tender template)",
+  "validityStatement": "string (min 60 words — validity period, what happens after expiry, basis of acceptance)",
+  "budgetEstimateNotice": "string (standard notice that this is indicative pricing only, not a formal offer, subject to revision)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 10 BoQ line items with realistic quantities. Minimum 10 inclusions. Minimum 8 exclusions. Minimum 8 assumptions.
+Minimum 11 BoQ line items with realistic quantities. Minimum 12 inclusions. Minimum 10 exclusions. Minimum 9 assumptions. Minimum 5 milestones.
 
 CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays.
@@ -2634,7 +2661,7 @@ JSON structure:
   "client": "string — leave blank if not provided by user",
   "principalContractor": "string — leave blank if not provided by user",
   "methodology": "ICE v3.2 (University of Bath Inventory of Carbon and Energy, Version 3.2)",
-  "assessmentScope": "string (min 280 words — project description, scope boundary, modules assessed per PAS 2080:2023)",
+  "assessmentScope": "string (min 350 words — project description, scope boundary, modules assessed per PAS 2080:2023, functional unit, reference study period, data sources)",
   "systemBoundary": "Modules A1-A5 per PAS 2080:2023",
   "functionalUnit": "string",
   "designLife": "string (e.g. 60 years)",
@@ -2700,7 +2727,7 @@ JSON structure:
       "measure": "string",
       "potentialSaving": "string (tCO2e or %)",
       "feasibility": "Low | Medium | High",
-      "recommendation": "string (min 80 words — how achieved, commercial implications, constraints)"
+      "recommendation": "string (min 100 words — how achieved, commercial implications, constraints, supplier/product names where known)"
     }
   ],
   "regulatoryReferences": [
@@ -2725,7 +2752,60 @@ CRITICAL RULES:
 - Every field in the JSON must be populated. Do not leave structured fields blank while putting data only in prose.
 - All tco2e values must be numerically calculated and internally consistent.
 - Names for assessedBy, client, principalContractor: leave blank if not provided by the user. Never invent names.
-Minimum 8 materials. Minimum 3 transport entries. Minimum 3 hotspots. Minimum 4 carbon reduction opportunities.`,
+Minimum 10 materials. Minimum 5 plant items. Minimum 5 transport entries. Minimum 5 waste entries. Minimum 3 hotspots. Minimum 5 carbon reduction opportunities. Minimum 5 assumptions (audit-ready only). Minimum 3 sensitivity analyses (audit-ready only). Minimum 6 ISO compliance items (audit-ready only). Minimum 6 regulatory references.
+
+ADDITIONAL FIELDS FOR PAS 2080 (T2) AND AUDIT-READY (T4) — populate these for ALL templates; T2/T4 will use them most:
+
+  "contractRef": "string (e.g. P50015 — NEC4 ECC Option A)",
+  "contractor": "string — leave blank if not provided",
+  "standard": "string (e.g. ICE v3.2 / DEFRA GHG 2025)",
+  "breeamCeequal": "string (e.g. CEEQUAL Whole Team — Mat 01 targeted)",
+  "buildNothingAssessment": "string (min 120 words — why build cannot be avoided, regulatory requirement, options assessed)",
+  "buildLessAssessment": "string (min 120 words — design optimisation, VE measures, material reductions achieved with quantities)",
+  "buildCleverAssessment": "string (min 120 words — low-carbon material substitutions adopted with carbon savings)",
+  "buildEfficientlyAssessment": "string (min 100 words — construction process efficiency measures, fuel strategy, waste strategy)",
+  "useStageMaintenanceCarbon": "string (min 120 words — Module B2 maintenance items with cycle counts and tCO2e per cycle)",
+  "useStageReplacementCarbon": "string (min 120 words — Module B4 replacement items with design lives and cycle counts)",
+  "endOfLifeCarbon": "string (min 150 words — Modules C1-C4 demolition, transport, processing, disposal with tCO2e per module)",
+  "moduleDCarbon": "string (min 120 words — beyond system boundary benefits, recycling credits, net scrap method, total Module D benefit)",
+  "wholeLifeSummary": [
+    { "module": "string (e.g. A1–A3)", "stage": "string", "tco2e": "string", "percentage": "string" }
+  ],
+  "wholeLifeTotal": "string (WLC total A–C)",
+  "benchmarkingNarrative": "string (min 150 words — benchmark against RIBA 2030, IStructE, LETI, UKWIR with specific targets and comparisons)",
+  "benchmarkKpis": [
+    { "value": "string", "label": "string", "sublabel": "string (optional)" }
+  ],
+  "kpiItems": [
+    { "value": "string (number)", "label": "string (short label)", "sublabel": "string (optional percentage or sub-note)" }
+  ],
+  "sensitivityAnalysis": [
+    { "parameter": "string", "baseCase": "string", "minusScenario": "string", "plusScenario": "string", "impactOnTotal": "string (e.g. ±7.8%)" }
+  ],
+  "sensitivityNarrative": "string (min 100 words — explain methodology, combined range, confidence interval)",
+  "isoComplianceChecklist": [
+    { "clause": "string (e.g. Cl. 5.2)", "requirement": "string", "status": "string (Compliant / Partial / Non-Compliant)", "evidenceSection": "string (e.g. Section 03)" }
+  ],
+  "confidentiality": "string (e.g. Commercial in Confidence — C2V+ Framework)",
+  "assumptions": [
+    { "assumption": "string", "justification": "string (min 30 words)", "dataQuality": "High | Medium | Low", "sensitivityImpact": "High | Medium | Low" }
+  ],
+  "revisionHistory": [
+    { "rev": "string", "date": "string", "description": "string", "author": "string" }
+  ]
+
+ADDITIONAL FIELDS IN EXISTING ARRAYS (for T4 audit verification — populate where applicable):
+  materials[].module: "A1–A3" (always)
+  materials[].qtyDataSource: "string (e.g. BQ Rev C, Item 3.1.1)"
+  materials[].dataQuality: "High | Medium | Low"
+  plant[].efSource: "string (e.g. DEFRA 2025, Diesel, 2.68/L)"
+  plant[].dataSource: "string (e.g. Fuel dipping logs Wk1–16)"
+  plant[].dataQuality: "High | Medium | Low"
+  transport[].efSource: "string (e.g. DEFRA 2025, HGV Rigid)"
+  transport[].qtySource: "string (e.g. Delivery tickets)"
+  waste[].efSource: "string (e.g. DEFRA 2025, Constr. Recycling)"
+  waste[].dataSource: "string (e.g. SWMP Rev B, WTN refs)"
+  carbonSummary[].dataQuality: "High | Medium | Low"`,
 
   'rams-review': `You are reviewing an uploaded RAMS document. Analyse it thoroughly against HSE guidance (HSG65, L153 CDM 2015), Management of Health and Safety at Work Regulations 1999, CDM 2015, and UK construction industry best practice.
 
@@ -2848,103 +2928,116 @@ JSON structure:
   "contractForm": "NEC3 ECC | NEC4 ECC | JCT SBC/Q 2016 | JCT D&B 2016 | JCT Minor Works 2016 | Other",
   "notificationClause": "string (e.g. 'NEC4 Clause 61.3' or 'JCT SBC/Q 2016 Clause 2.27.1')",
   "letterSubject": "string (formal subject line)",
-  "openingParagraph": "string (min 100 words — formal opening notifying the delay event. Reference contract, clause, and event date)",
-  "eventDescription": "string (min 300 words — detailed factual description: what instruction/condition/event; when; who issued/identified it; contractual reference; how it differs from original contract scope)",
+  "openingParagraph": "string (min 130 words — formal opening notifying the delay event. Reference contract, clause, event date, salutation to addressee. Include 'Dear [name]' if toParty name known)",
+  "eventDescription": "string (min 400 words across 2+ paragraphs — detailed factual description: what instruction/condition/event; when; who issued/identified it; contractual reference; how it differs from original contract scope; immediate actions taken; location/grid reference; technical detail)",
   "affectedActivities": [
     {
-      "activityRef": "string",
-      "originalDate": "string",
-      "revisedDate": "string",
+      "activityRef": "string (activity description)",
+      "originalDate": "string (DD/MM/YYYY or N/A)",
+      "revisedDate": "string (DD/MM/YYYY or date range)",
       "delayDays": "number",
       "criticalPath": "Yes | No",
       "notes": "string"
     }
   ],
-  "programmeImpact": "string (min 200 words — cause-and-effect on programme, critical path impact, key dates affected, estimated extension of time sought)",
-  "estimatedExtensionOfTime": "string (calendar/working days)",
-  "mitigationMeasures": "string (min 150 words — measures taken/to be taken to mitigate delay, and why they cannot fully recover programme)",
+  "programmeImpact": "string (min 260 words — cause-and-effect on programme, critical path impact, key dates affected, estimated extension of time sought, float consumption analysis, Planned Completion date movement)",
+  "estimatedExtensionOfTime": "string (working days)",
+  "mitigationMeasures": "string (min 200 words — measures taken/to be taken to mitigate delay, resource redeployment, fast-tracking attempts, why they cannot fully recover programme, sequential dependencies)",
   "costEntitlement": {
     "claimed": "Yes | No | Reserved",
-    "estimatedAdditionalCost": "string (£ or 'To be assessed separately')",
-    "costNarrative": "string (min 100 words — entitlement basis, cost categories, relevant clauses)"
+    "estimatedAdditionalCost": "string (£ amount or 'To be assessed separately')",
+    "costNarrative": "string (min 130 words — entitlement basis, cost categories with individual amounts, relevant clauses, reference to formal quotation to follow)"
   },
-  "contractualEntitlement": "string (min 200 words — why the Contractor is entitled to extension of time. Correct clause numbers for stated contract form. For NEC: which CE clause. For JCT: which Relevant Event)",
-  "requestedResponse": "string (min 80 words — what response is required, by when, consequences of non-response)",
+  "costItems": [
+    { "element": "string (cost description)", "amount": "string (£X,XXX)" }
+  ],
+  "programmeKpis": [
+    { "value": "string (e.g. '£68.4k')", "label": "string (e.g. 'Estimated Additional Cost')", "sublabel": "string (optional)" }
+  ],
+  "contractualEntitlement": "string (min 260 words — why the Contractor is entitled to extension of time. Correct clause numbers for stated contract form. For NEC: which CE clause, quote contract wording, explain how event meets criteria. For JCT: which Relevant Event. Reference notification timeline obligations.)",
+  "requestedResponse": "string (min 100 words — what response is required, by when, consequences of non-response under contract, deemed acceptance provisions, without-prejudice reservation)",
   "withoutPrejudice": "boolean",
   "supportingDocuments": [
     { "document": "string", "reference": "string", "status": "Attached | To Follow" }
   ],
-  "closingParagraph": "string",
-  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
+  "closingParagraph": "string (formal closing — 'Yours faithfully,' for formal-letter template)",
+  "additionalNotes": "string (min 130 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 affected activities. Minimum 4 supporting documents. Clause numbers must be correct for the stated contract form.
+Minimum 5 affected activities (include new activities created by the delay event e.g. surveys, design, diversions). Minimum 5 supporting documents. Minimum 5 cost items plus total. Minimum 3 programmeKpis (Cost/EOT/Revised Completion). Clause numbers must be correct for the stated contract form.
 
 CRITICAL RULES:
 - You MUST populate EVERY section. Never skip sections or leave them empty — all 8 sections (Notice Details through Required Actions) must have substantive content.
 - Section numbering must be sequential (1-8) with no gaps.
-- programmeImpact, contractualBasis, delayEvent, mitigationMeasures must all contain paragraph breaks (use \\n\\n) — never write as a single block.
+- eventDescription, programmeImpact, contractualEntitlement, mitigationMeasures, costNarrative must all contain paragraph breaks (use \\n\\n) — never write as a single block.
 - Names: leave blank if not provided by the user. Never invent names.
-- The sign-off must use the company name provided, not a made-up individual name.`,
+- The sign-off must use the company name provided, not a made-up individual name.
+- costItems array must have individual line items with £ amounts — these populate the cost breakdown table.
+- programmeKpis array must have 3 items — these populate the KPI dashboard boxes.`,
 
   'variation-confirmation': `Generate a formal Variation Confirmation Letter creating a written record of a verbal instruction and requesting formal written instruction.
 
 JSON structure:
 {
-  "documentRef": "string (format: VCL-YYYY-NNN)",
+  "documentRef": "string (format: VC-YYYY-NNN)",
   "letterDate": "DD/MM/YYYY",
-  "fromParty": "string",
-  "toParty": "string",
+  "fromParty": "string (name — role, company)",
+  "toParty": "string (name — role, company)",
   "projectName": "string",
   "projectAddress": "string",
   "contractReference": "string",
-  "contractForm": "NEC3 ECC | NEC4 ECC | JCT SBC/Q 2016 | JCT D&B 2016 | Bespoke Subcontract | Letter of Intent | No Formal Contract",
-  "letterSubject": "string",
-  "openingParagraph": "string (min 100 words — formal opening confirming this constitutes written notice and reserves all contractual rights)",
+  "contractForm": "NEC3 ECC | NEC4 ECC | JCT SBC/Q 2016 | JCT D&B 2016 | Bespoke Subcontract",
+  "letterSubject": "string (specific subject — describe the additional/varied works concisely)",
+  "openingParagraph": "string (min 125 words — formal opening confirming this constitutes written notice. State date/time/location, who gave instruction, witnesses. Reserve contractual rights)",
+  "instructionSummary": "string (min 125 words — flowing paragraph covering who/when/where/what/why for Corporate template)",
   "verbalInstructionDetails": {
-    "instructedBy": "string",
+    "instructedBy": "string (name — role, company)",
     "instructingParty": "string",
     "dateOfInstruction": "DD/MM/YYYY",
-    "timeOfInstruction": "string",
+    "timeOfInstruction": "string (HH:MM)",
     "locationOfInstruction": "string",
-    "witnessesPresent": "string"
+    "witnessesPresent": "string (names and roles)"
   },
-  "descriptionOfVariation": "string (min 300 words — precise description of varied/additional works. What exactly were you told to do? What is different from original scope? Quantities, dimensions, materials, method, location)",
-  "worksStatus": {
-    "worksStarted": "boolean",
-    "workComplete": "boolean",
-    "progressDescription": "string",
-    "materialsOrdered": "boolean",
-    "materialsDetail": "string"
-  },
+  "descriptionOfVariation": "string (min 375 words across 2+ paragraphs separated by \\n\\n. Para 1: precise scope — quantities, dimensions, materials, method, location, which drawings. Para 2: design dependencies, what differs from original scope)",
+  "costBreakdown": [
+    {
+      "ref": "string (V1, V2, etc.)",
+      "item": "string (specific description with dimensions/specs)",
+      "unit": "string (m³, Nr, m, Day, m², Item)",
+      "qty": "number",
+      "rate": "string (£ formatted)",
+      "amount": "string (£ formatted, rate × qty)"
+    }
+  ],
   "estimatedCostImpact": {
-    "estimatedTotalCost": "string (£)",
-    "labourCost": "string (£)",
-    "plantCost": "string (£)",
-    "materialsCost": "string (£)",
-    "overheadsAndProfit": "string",
-    "costBreakdownNarrative": "string (min 100 words)"
+    "estimatedTotalCost": "string (£ — sum of all amounts + fees)",
+    "directCosts": "string (£ — sum of costBreakdown amounts)",
+    "designFee": "string (£ — if applicable)",
+    "overheadsAndProfit": "string (included in rates or separate %)",
+    "costBreakdownNarrative": "string (min 125 words)"
   },
   "estimatedTimeImpact": {
     "timeImpactClaimed": "Yes | No | To Be Assessed",
+    "estimatedDelayDays": "string (e.g. 8 working days)",
     "affectedActivities": "string",
-    "estimatedDelayDays": "string",
-    "timeImpactNarrative": "string (min 80 words)"
+    "programmeImpact": "string (min 100 words — parallel or critical path, cascades, key dates)",
+    "latestDesignDate": "string (date by which design needed)",
+    "timeImpactNarrative": "string (min 100 words)"
   },
-  "contractualEntitlement": "string (min 150 words — basis for additional payment. Relevant clauses for variations/CEs. Carrying out verbal instruction does not constitute acceptance of original contract price for such works)",
-  "requestForWrittenInstruction": "string (min 100 words — formal request for written instruction: PMI (NEC) or AI/CAI (JCT))",
+  "ceClause": "string (e.g. NEC4 clause 60.1(1) — PM instruction changing the Works Information)",
+  "contractualEntitlement": "string (min 190 words — full clause reference, notification requirements, quotation timeline, reservation of rights)",
+  "requestForWrittenInstruction": "string (min 125 words — request for PMI/AI/CAI with correct clause, state position until received)",
   "withoutPrejudiceStatement": "string",
-  "responseDeadline": "string",
   "supportingDocuments": [
     { "document": "string", "reference": "string", "status": "Attached | To Follow" }
   ],
   "closingParagraph": "string",
-  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
+  "additionalNotes": "string (min 100 words)"
 }
-Minimum 3 supporting documents. Clause numbers must be correct for stated contract form.
+Minimum 8 cost breakdown items. Minimum 3 supporting documents. Clause numbers must be correct for stated contract form.
 
 CRITICAL RULES:
 - You MUST populate EVERY section. Never skip sections or leave them empty.
-- Section numbering must be sequential with no gaps.
+- All cost items must have rate AND quantity with a calculated amount (rate × quantity).
 - Names: leave blank if not provided by the user. Never invent names.
 - Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
@@ -2954,45 +3047,53 @@ JSON structure:
 {
   "documentRef": "string (format: RFI-YYYY-NNN)",
   "rfiDate": "DD/MM/YYYY",
-  "requiredResponseDate": "DD/MM/YYYY",
-  "raisedBy": "string",
-  "directedTo": "string",
+  "requiredResponseDate": "DD/MM/YYYY (e.g. 7, 14, or 21 calendar days from issue)",
+  "raisedBy": "string (name — role, company)",
+  "directedTo": "string (name — role, company)",
   "projectName": "string",
   "projectAddress": "string",
-  "contractReference": "string",
-  "rfiSubject": "string (clear specific subject line)",
-  "querySummary": "string (min 150 words — clear, precise summary. Technical, factual, no ambiguity)",
+  "contractReference": "string (contract number and form)",
+  "rfiSubject": "string (clear specific subject line — max 120 chars — describing the exact discrepancy, gap, or clarification needed)",
+  "urgencyNote": "string (for Quick Query: explain why this is urgent in 1-2 sentences, referencing the activity at risk and its date)",
+  "querySummary": "string (min 190 words — clear, precise summary of the query across 1-2 paragraphs. Technical, factual, no ambiguity. State what the discrepancy is, which documents conflict, and what decision is needed. Use paragraph breaks \\\\n\\\\n)",
   "relevantDocuments": [
     {
-      "documentType": "Drawing | Specification | Schedule | Standard | Other",
-      "reference": "string",
-      "revision": "string",
-      "title": "string",
-      "relevance": "string"
+      "documentType": "Drawing | Specification | Schedule | Standard | Report | Other",
+      "reference": "string (document number)",
+      "revision": "string (rev letter or dash)",
+      "title": "string (document title)",
+      "relevance": "string (what this document shows/says that is relevant to the query)"
     }
   ],
-  "detailedQuestion": "string (min 200 words — specific questions numbered if multiple. Precise about what decision is needed and in what format)",
-  "background": "string (min 250 words — context: what work, why needed, what has been considered, any partial information)",
-  "proposedSolution": {
-    "proposed": "boolean",
-    "description": "string"
-  },
+  "detailedQuestions": [
+    {
+      "question": "string (min 60 words per question — specific, precise, states what decision/confirmation is needed and in what format. Reference specific drawing numbers, clause numbers, or standards)"
+    }
+  ],
+  "background": "string (min 310 words across 3 paragraphs separated by \\\\n\\\\n. Para 1: what work is underway, what was found, procurement/programme context. Para 2: commercial or cost impact of proceeding without clarification. Para 3: chronology of how the discrepancy arose, what reviews have been done)",
+  "proposedSolution": "string (min 80 words — the Contractor's proposed resolution. Reference standards, calculations, or alternative approaches. If no proposal, leave empty string)",
   "programmeImplication": {
-    "activitiesAtRisk": ["string"],
+    "activitiesAtRisk": [
+      {
+        "activity": "string (specific activity name)",
+        "plannedStart": "string (date or status e.g. Held, awaiting RFI)",
+        "impact": "string (description of delay/cascade effect)"
+      }
+    ],
     "latestResponseDateForNoImpact": "DD/MM/YYYY",
-    "programmeNarrative": "string (min 100 words — specific activities, held/delayed if response not received, working days impact)"
+    "programmeNarrative": "string (min 125 words — procurement lead times, which activities held, cascade effect on downstream activities, key date impacts, working days calculation)"
   },
-  "impactOfNonResponse": "string (min 100 words — what happens if response not received: cost, programme, procurement lead times)",
-  "contractualReference": "string (clause for information provision, e.g. NEC4 Cl 27.1 or JCT SBC Cl 2.12)",
-  "distribution": ["string"],
-  "responseFormat": "string",
+  "impactOfNonResponse": "string (min 125 words — what the Contractor will do if response not received: proceed on conservative basis, claim compensation event, cost estimate of wrong option, contractual position)",
+  "contractualReference": "string (full clause reference with explanation, e.g. NEC4 clause 27.1 — the Contractor may submit a request for information regarding any ambiguity or inconsistency in the Works Information)",
+  "distribution": ["string (name, role, company — min 3 people)"],
+  "responseFormat": "string (what format the response should take: revised drawing, written confirmation, design calculation, etc.)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 3 relevant documents. Minimum 2 activities at risk. Programme implication must include specific activity names and dates.
+Minimum 4 relevant documents. Minimum 2 detailed questions (3 for Formal RFI). Minimum 3 activities at risk for Formal RFI (2 for Corporate). Minimum 3 distribution list entries.
 
 CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays.
-- detailedQuestion must be technically precise and specific to the information gap.
+- detailedQuestions must be technically precise and specific to the information gap.
 - relevantDocuments array must list specific drawing numbers, specification clauses, or document references.
 - Names for raisedBy: leave blank if not provided by the user. Never invent names.
 - Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
@@ -3210,13 +3311,13 @@ JSON structure:
   "organisationName": "string",
   "organisationAddress": "string",
   "companiesHouseNumber": "string",
-  "organisationDescription": "string (min 150 words)",
+  "organisationDescription": "string (min 200 words — sector, size, turnover, certifications, current major projects)",
   "netZeroCommitment": {
     "commitment": "string (must commit to net zero by 2050 at latest for UK operations)",
     "targetYear": "string",
     "interimTarget2030": "string (% reduction vs baseline)",
     "alignedWithSBTi": "boolean",
-    "governanceStatement": "string (min 100 words — how governed, monitored, reported at board level)"
+    "governanceStatement": "string (min 150 words — how governed, monitored, reported at board level, annual review cycle)"
   },
   "baselineEmissions": {
     "baselineYear": "string",
@@ -3224,7 +3325,7 @@ JSON structure:
     "baselineScope2": "string (tCO2e — market-based)",
     "baselineScope3": "string (tCO2e)",
     "totalBaselineUKOperations": "string (tCO2e)",
-    "baselineNarrative": "string (min 100 words — how calculated, data sources, limitations)"
+    "baselineNarrative": "string (min 150 words — how calculated, data sources, limitations, carbon intensity at baseline)"
   },
   "currentEmissions": {
     "reportingYear": "string",
@@ -3298,8 +3399,8 @@ JSON structure:
       "residualEmissionsStrategy": "string (min 80 words)"
     }
   },
-  "supplyChainEngagement": "string (min 150 words — how engaging supply chain on Scope 3: questionnaires, preferred supplier requirements, low-carbon procurement criteria)",
-  "reportingAndMeasurement": "string (min 100 words — measurement methodology, reporting frequency, standards, third-party verification)",
+  "supplyChainEngagement": "string (min 200 words — how engaging supply chain on Scope 3: questionnaires, preferred supplier requirements, low-carbon procurement criteria, specific examples from current projects)",
+  "reportingAndMeasurement": "string (min 150 words — measurement methodology, reporting frequency, standards, third-party verification plans, intensity metrics tracked)",
   "boardSignOff": {
     "signatoryName": "string",
     "signatoryTitle": "string (must be board-level — CEO, MD, Director)",
@@ -3309,7 +3410,44 @@ JSON structure:
   },
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Net zero commitment MUST reference 2050. Board sign-off mandatory per PPN 06/21. Minimum 3 completed initiatives. Minimum 5 planned initiatives. Minimum 5 Scope 3 categories.`,
+Net zero commitment MUST reference 2050. Board sign-off mandatory per PPN 06/21. Minimum 3 completed initiatives. Minimum 5 planned initiatives. Minimum 6 Scope 3 categories. Minimum 5 Scope 1 sources.
+
+ADDITIONAL FIELDS FOR SBTi (T2), ISO 14064 (T3), AND GHG Protocol (T4) — populate these for ALL templates:
+
+  "currentProject": "string (current major project name and reference)",
+  "framework": "string (e.g. C2V+ AMP8 — United Utilities)",
+  "sicCode": "string (e.g. 42110 — Construction of Roads / 42210 — Utility Projects)",
+  "baselineYear": "string (e.g. FY2021/22)",
+  "sbtiStatus": "string (e.g. Commitment Letter Submitted — Validation Pending)",
+  "nearTermPathway": "string (e.g. 1.5°C)",
+  "scope12Analysis": "string (min 200 words — detailed Scope 1 & 2 analysis with fleet numbers, fuel volumes, reduction achieved, gap to target, planned interventions)",
+  "scope2Analysis": "string (min 150 words — Scope 2 location vs market-based, renewable tariff details, efficiency measures)",
+  "organisationalBoundary": "string (min 200 words — operational control approach, what is included/excluded, JV treatment)",
+  "consolidationApproach": "string (e.g. Operational Control per ISO 14064-1 Cl. 5.1)",
+  "ghgSourceIdentification": [
+    { "isoCategory": "string (e.g. Cat 1 Direct)", "ghgSource": "string", "ghgSpecies": "string (e.g. CO₂, CH₄, N₂O)", "classification": "string (e.g. Scope 1)" }
+  ],
+  "quantificationMethodology": "string (min 200 words — calculation approach, activity data sources, emission factor sources, data quality framework)",
+  "quantificationTable": [
+    { "source": "string", "activityData": "string", "efSource": "string", "dataQuality": "Measured | Estimated | Modelled", "tCO2e": "string" }
+  ],
+  "baseYearRecalcPolicy": "string (min 150 words — recalculation triggers, threshold %, documentation requirements)",
+  "uncertaintyAssessment": "string (min 150 words — uncertainty by scope, combined range, dominant sources, improvement priorities)",
+  "verificationStatement": "string (min 100 words — current verification status, planned verification body, scope, timeline)",
+  "decarbonisationPathway": [
+    { "year": "string", "scope12": "string (tCO₂e)", "scope3": "string (tCO₂e)", "total": "string (tCO₂e)", "intensity": "string (tCO₂e/£M)", "interventions": "string" }
+  ],
+  "governanceNarrative": "string (min 150 words — board accountability, quarterly reporting, project-level monitoring, third-party verification plans)",
+  "kpiItems": [
+    { "value": "string", "label": "string", "sublabel": "string (optional)" }
+  ]
+
+Scope 3 categories[].relevant: "Relevant | Not Relevant | Minor" (for SBTi/GHG Protocol screening)
+Scope 3 categories[].methodology: "string (e.g. Hybrid, Activity-based, Spend-based, Survey-based)"
+Scope 1 sources[].activity: "string (activity data description)"
+Scope 1 sources[].quantity: "string (e.g. 724,000 litres diesel)"
+Minimum 7 decarbonisation pathway milestones (baseline, current, 2028, 2030, 2035, 2040, net zero year).
+Minimum 8 GHG source identifications (ISO 14064 template). Minimum 11 quantification table rows.`,
 
   // ── Batch 1 — Mandated tools ─────────────────────────────────────────────
 
@@ -3325,17 +3463,17 @@ JSON structure:
   "siteAddress": "string",
   "client": "string",
   "principalContractor": "string",
-  "taskDescription": "string (min 250 words — detailed description of the WAH activity including specific location, working height, access equipment, task duration, and environmental conditions. Reference WAH Regs 2005 Reg 4 duty to avoid, prevent, and mitigate falls from height)",
+  "taskDescription": "string (min 310 words — detailed description of the WAH activity including specific location, working height, access equipment, task duration, and environmental conditions. Reference WAH Regs 2005 Reg 4 duty to avoid, prevent, and mitigate falls from height)",
   "location": "string",
   "workingHeight": "string (e.g. '12m above ground level')",
   "accessMethod": "string (scaffold / MEWP / podium / ladder / rope access / other)",
-  "accessJustification": "string (min 150 words — detailed justification under the hierarchy of control explaining why each level was considered and why the selected access method is the safest reasonably practicable option. Reference WAH Regs 2005 Reg 6 and relevant Schedules)",
+  "accessJustification": "string (min 190 words — detailed justification under the hierarchy of control explaining why each level was considered and why the selected access method is the safest reasonably practicable option. Reference WAH Regs 2005 Reg 6 and relevant Schedules)",
   "duration": "string",
   "frequency": "string",
   "hierarchyOfControl": {
-    "avoidance": "string (min 100 words — detailed assessment of whether work at height can be avoided entirely. If not, explain why ground-level alternatives were considered and rejected. Reference Reg 6(2))",
-    "prevention": "string (min 150 words — comprehensive fall prevention measures including collective protection, personal protection, equipment specifications, and inspection requirements. Reference Reg 6(3) and applicable Schedules 1-6)",
-    "mitigation": "string (min 100 words — fall mitigation measures including equipment type, attachment points, maximum fall distance, and rescue implications. Reference Reg 6(4))"
+    "avoidance": "string (min 125 words — detailed assessment of whether work at height can be avoided entirely. If not, explain why ground-level alternatives were considered and rejected. Reference Reg 6(2))",
+    "prevention": "string (min 190 words — comprehensive fall prevention measures including collective protection, personal protection, equipment specifications, and inspection requirements. Reference Reg 6(3) and applicable Schedules 1-6)",
+    "mitigation": "string (min 125 words — fall mitigation measures including equipment type, attachment points, maximum fall distance, and rescue implications. Reference Reg 6(4))"
   },
   "hazards": [
     {
@@ -3354,12 +3492,12 @@ JSON structure:
   "equipmentRequired": [
     { "item": "string", "specification": "string", "inspectionRequired": "string" }
   ],
-  "rescuePlan": "string (min 200 words — specific rescue procedure detailing: who will perform the rescue, what equipment is available, where it is located, maximum rescue time target, communication method, and how the procedure has been rehearsed. Reference WAH Regs 2005 Reg 9 and HSE guidance INDG401)",
+  "rescuePlan": "string (min 250 words — specific rescue procedure detailing: who will perform the rescue, what equipment is available, where it is located, maximum rescue time target, communication method, and how the procedure has been rehearsed. Reference WAH Regs 2005 Reg 9 and HSE guidance INDG401)",
   "competencyRequirements": [
     { "role": "string", "qualification": "string", "verified": "string" }
   ],
-  "weatherRestrictions": "string (min 120 words — weather restrictions including specific wind speed abort limits, rain/ice policy, temperature limits, visibility minimums, and lightning procedure. Reference WAH Regs 2005 Reg 4(1)(b) and Schedule 4)",
-  "emergencyProcedures": "string (min 150 words — emergency procedures including nearest A&E with travel time, first aid provision, communication method between ground and height, emergency services access route, and assembly point. Include specific emergency contact numbers)",
+  "weatherRestrictions": "string (min 150 words — weather restrictions including specific wind speed abort limits, rain/ice policy, temperature limits, visibility minimums, and lightning procedure. Reference WAH Regs 2005 Reg 4(1)(b) and Schedule 4)",
+  "emergencyProcedures": "string (min 190 words — emergency procedures including nearest A&E with travel time, first aid provision, communication method between ground and height, emergency services access route, and assembly point. Include specific emergency contact numbers)",
   "additionalControls": "string",
   "signOff": [
     { "role": "string", "name": "string" }
@@ -3385,8 +3523,8 @@ JSON structure:
   "siteAddress": "string",
   "client": "string",
   "principalContractor": "string",
-  "assessmentScope": "string (min 180 words — comprehensive overview of the assessment scope including all equipment types, operative roles, ground conditions, and project context. Explain why this assessment is required under the Control of Vibration at Work Regulations 2005)",
-  "regulatoryContext": "string (min 150 words — detailed regulatory context referencing the Control of Vibration at Work Regulations 2005, HSE guidance L140, EAV 0.5 m/s², ELV 1.15 m/s²)",
+  "assessmentScope": "string (min 225 words — comprehensive overview of the assessment scope including all equipment types, operative roles, ground conditions, and project context. Explain why this assessment is required under the Control of Vibration at Work Regulations 2005)",
+  "regulatoryContext": "string (min 190 words — detailed regulatory context referencing the Control of Vibration at Work Regulations 2005, HSE guidance L140, EAV 0.5 m/s², ELV 1.15 m/s²)",
   "operatives": [
     {
       "name": "string (or 'Operative 1' etc.)",
@@ -3512,42 +3650,81 @@ JSON structure:
   "documentRef": "string (format: TMP-YYYY-NNN)",
   "planDate": "DD/MM/YYYY",
   "reviewDate": "DD/MM/YYYY",
+  "revision": "string (e.g. '0', '1')",
   "preparedBy": "string",
+  "approvedBy": "string",
   "projectName": "string",
   "siteAddress": "string",
   "client": "string",
   "principalContractor": "string",
-  "worksDescription": "string (min 250 words — comprehensive description of the works requiring traffic management, including road name, classification, speed limit, carriageway type, AADT, adjacent land use, pedestrian routes, and public transport routes affected. Reference Chapter 8 and HSG144 requirements)",
+  "worksDescription": "string (min 315 words — comprehensive description of the works requiring traffic management, including road name, classification, speed limit, carriageway type, AADT, adjacent land use, pedestrian routes, and public transport routes affected. Reference Chapter 8 and HSG144 requirements)",
+  "introductoryText": "string (min 200 words — regulatory introduction referencing Chapter 8, Safety at Street Works Code of Practice 2013, NRSWA 1991, TMA 2004, TSRGD 2016. Describe the TM arrangements at a high level with clause numbering 1.1, 1.2 etc.)",
   "tmType": "string (Lane Closure / Road Closure / Contraflow / Footway Closure / Site Access Only / Multi-Phase)",
   "roadDetails": {
     "roadName": "string",
     "classification": "string (Motorway / A-road / B-road / Unclassified)",
     "speedLimit": "string",
     "carriageway": "string (single / dual)",
-    "trafficVolume": "string",
+    "trafficVolume": "string (AADT with year and count point ref)",
     "workingLength": "string"
   },
+  "hgvPercentage": "string",
+  "peakHours": "string (AM and PM peak with veh/hr)",
+  "sensitiveReceptors": "string (residential, schools, hospitals within 500m)",
+  "publicTransportAffected": "string (bus routes, stop relocations needed)",
+  "submittedTo": "string (highway authority name and department)",
+  "nrswaReference": "string (NRSWA permit reference)",
+  "ttroReference": "string (Temporary Traffic Regulation Order ref if applicable)",
   "duration": "string",
   "workingHours": "string",
-  "signSchedule": [
-    { "ref": "string", "sign": "string", "tsrgdRef": "string", "location": "string", "quantity": "number" }
+  "tmControls": [
+    { "control": "string (e.g. 'Site speed limit', 'One-way system')", "detail": "string (min 20 words — specific detail of the control measure)" }
   ],
-  "phasingPlan": "string (min 200 words — detailed phasing plan covering TM setup sequence, works phases with durations, sign placement order, taper lengths per Chapter 8 Table A1, safety zone dimensions, lane widths, and removal procedure. Include timing for each phase)",
-  "vehicleManagement": "string (min 180 words — vehicle management plan covering designated routes, turning areas, speed limits within the works, banksman positions and communication, reversing procedures, plant/vehicle segregation, and delivery vehicle management. Reference HSG144)",
-  "pedestrianManagement": "string (min 150 words — pedestrian management plan including footway diversion routes, temporary crossings with dropped kerbs and tactile paving, barrier types and heights, lighting requirements, signage for pedestrians, and provisions for wheelchair/pushchair users and visually impaired persons)",
-  "emergencyAccess": "string (min 120 words — emergency vehicle access arrangements including how blue-light vehicles will be accommodated, minimum carriageway width maintained, communication procedure with emergency services, and contingency for rapid TM removal if required)",
+  "signSchedule": [
+    { "ref": "string (S1, S2, G1 etc.)", "sign": "string", "tsrgdRef": "string (TSRGD 2016 diagram number)", "size": "string (mm)", "location": "string", "quantity": "number" }
+  ],
+  "worksPhases": [
+    { "phase": "string (Phase 1, Phase 2 etc.)", "duration": "string (Days X-Y)", "works": "string (min 20 words)", "tmArrangement": "string (min 15 words)" }
+  ],
+  "temporarySignals": "string (min 190 words — signal specification including installer accreditation, signal type, operation mode (VA/fixed), monitoring, backup arrangements, night operation. Use clause numbering 3.1, 3.2 etc.)",
+  "temporarySpeedLimit": "string (min 125 words — TTRO details, reference RTRA 1984 Section 14, speed limit value, extent, signage)",
+  "signalsSpecification": [
+    { "field": "string (e.g. 'Installer', 'Signal Type', 'Operation')", "value": "string" }
+  ],
+  "chapter8Geometry": [
+    { "parameter": "string (e.g. 'Taper Length', 'Cone Spacing', 'Safety Zone')", "value": "string (with Chapter 8 table/paragraph reference)" }
+  ],
+  "phasingPlan": "string (min 250 words — detailed phasing plan covering TM setup sequence, works phases with durations, sign placement order, taper lengths per Chapter 8 Table C1, safety zone dimensions, lane widths, and removal procedure. Include timing for each phase)",
+  "vehicleManagement": "string (min 225 words — vehicle management plan covering designated routes, turning areas, speed limits within the works, banksman positions and communication, reversing procedures, plant/vehicle segregation, and delivery vehicle management. Reference HSG144)",
+  "pedestrianManagement": "string (min 190 words — pedestrian management plan including footway diversion routes, temporary crossings with dropped kerbs and tactile paving, barrier types and heights, lighting requirements, signage for pedestrians, and provisions for wheelchair/pushchair users and visually impaired persons)",
+  "emergencyAccess": "string (min 150 words — emergency vehicle access arrangements including how blue-light vehicles will be accommodated, minimum carriageway width maintained, communication procedure with emergency services, and contingency for rapid TM removal if required)",
   "publicTransport": "string (bus stop relocations, diversions, operator notification)",
+  "siteRoutes": [
+    { "route": "string", "users": "string", "description": "string (min 20 words)", "speedLimit": "string" }
+  ],
+  "segregationItems": [
+    { "location": "string", "barrierType": "string", "detail": "string (min 20 words)" }
+  ],
+  "banksmanPositions": [
+    { "position": "string", "banksman": "string (name or 'Assigned daily')", "duties": "string (min 20 words)" }
+  ],
+  "deliveryManagement": [
+    { "field": "string (e.g. 'Booking System', 'Driver Induction', 'Readymix Protocol')", "value": "string (min 20 words)" }
+  ],
+  "speedLimitSite": "string (e.g. '5')",
+  "speedLimitExcavation": "string (e.g. '3')",
+  "minBanksmen": "string (e.g. '2')",
   "riskAssessment": [
-    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "risk": "string", "control": "string", "residualRisk": "string" }
+    { "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "risk": "string (High/Medium/Low)", "likelihood": "string (1-5)", "severity": "string (1-5)", "control": "string (min 30 words)", "residualRisk": "string" }
   ],
   "operativeRoles": [
-    { "role": "string", "responsibility": "string", "qualification": "string" }
+    { "name": "string", "role": "string", "responsibility": "string (min 20 words)", "qualification": "string" }
   ],
-  "communicationPlan": "string (min 120 words — communication plan including advance warning signage, letter drops to affected properties, VMS board locations, local authority notification, public transport operator liaison, social media/website updates, and emergency contact details for the public)",
-  "monitoringArrangements": "string",
+  "communicationPlan": "string (min 150 words — advance warning signage, letter drops, VMS board locations, local authority notification, public transport operator liaison, social media/website updates, and emergency contact details for the public)",
+  "monitoringArrangements": "string (min 150 words — inspection frequency, NRSWA supervisor details, daily checklists, queue monitoring, cone/sign replacement timescales, plan review trigger points)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 8 signs in schedule. Minimum 5 risk assessment entries. Minimum 4 operative roles. Reference Chapter 8 and TSRGD numbers for all signs.`,
+Minimum 8 signs in schedule (with TSRGD 2016 diagram numbers). Minimum 5 risk assessment entries. Minimum 3 operative roles with names. Minimum 6 TM controls for quick brief. Reference Chapter 8 and TSRGD numbers for all signs.`,
 
   'waste-management': `Generate a Site Waste Management Plan compliant with EPA 1990 s.34, the Waste (England and Wales) Regulations 2011, and the waste hierarchy.
 
@@ -3556,41 +3733,66 @@ JSON structure:
   "documentRef": "string (format: SWMP-YYYY-NNN)",
   "planDate": "DD/MM/YYYY",
   "reviewDate": "DD/MM/YYYY",
+  "revision": "string (e.g. '0')",
   "preparedBy": "string",
+  "reviewedBy": "string",
+  "approvedBy": "string",
   "projectName": "string",
   "siteAddress": "string",
   "client": "string",
   "principalContractor": "string",
-  "projectOverview": "string (min 200 words — comprehensive project overview including type, scale, key construction activities, programme duration, estimated total waste volumes, and how the waste management plan relates to the project environmental management system)",
-  "regulatoryContext": "string (min 150 words — regulatory context referencing EPA 1990 Section 34, Waste (England and Wales) Regulations 2011, Environmental Protection (Duty of Care) Regulations 1991, Hazardous Waste Regulations 2005, and the waste hierarchy under the Waste Framework Directive. Include specific legal obligations and penalties for non-compliance)",
+  "contractReference": "string",
+  "estimatedProjectValue": "string (e.g. '£4.2m')",
+  "estimatedTotalWaste": "string (e.g. '2,420 m³ excl. reuse material')",
+  "diversionTarget": "string (e.g. '95%')",
+  "projectOverview": "string (min 250 words — comprehensive project overview including type, scale, key construction activities, programme duration, estimated total waste volumes, and how the waste management plan relates to the project environmental management system)",
+  "regulatoryContext": "string (min 190 words — regulatory context referencing EPA 1990 Section 34, Waste (England and Wales) Regulations 2011, Environmental Protection (Duty of Care) Regulations 1991, Hazardous Waste Regulations 2005, Environmental Permitting Regulations 2016, and the waste hierarchy under the Waste Framework Directive. Include specific legal obligations and penalties for non-compliance. Note whether SWMPs are mandatory or best practice.)",
   "wasteStreams": [
     {
       "stream": "string",
       "ewcCode": "string (6-digit EWC code)",
       "classification": "string (Inert / Non-Hazardous / Hazardous)",
       "estimatedVolume": "string (m³ or tonnes)",
-      "source": "string (which activity generates this waste)",
-      "segregationMethod": "string",
-      "disposalRoute": "string (Recycling / Recovery / Landfill / Licensed Facility)"
+      "container": "string (skip type and colour, or other container)",
+      "disposalRoute": "string (Reuse / Recycling / Recovery / Landfill / Licensed Facility)",
+      "hierarchyLevel": "string (Prevention / Reuse / Recycle / Recovery / Disposal)",
+      "carrier": "string (carrier company name)",
+      "facility": "string (destination facility name)",
+      "costEstimate": "string (£ estimated cost or rebate)",
+      "diversionRate": "string (percentage diverted from landfill)"
     }
   ],
-  "wasteHierarchy": "string (min 200 words — detailed application of the waste hierarchy with specific examples at each level: Prevention (design for material efficiency, just-in-time ordering), Reuse (site-won materials, temporary works), Recycling (segregation targets by stream), Recovery (energy from waste where applicable), and Disposal (last resort, licensed facilities only). Include measurable targets for each level — with specific examples for each level)",
-  "segregationPlan": "string (min 150 words — detailed segregation plan covering skip/container types, colour coding, labelling requirements, designated locations on site plan, operative responsibilities, contamination procedures, and how segregation compliance will be monitored and enforced)",
-  "carrierRegister": [
-    { "carrier": "string", "licenceNumber": "string", "wasteTypes": "string", "expiryDate": "string" }
+  "skipLog": [
+    { "skipId": "string (e.g. SK-01)", "type": "string", "size": "string", "location": "string", "delivered": "string (date)", "collected": "string (date or —)", "wtnRef": "string (or —)" }
   ],
-  "facilityRegister": [
-    { "facility": "string", "permitNumber": "string", "wasteTypes": "string", "location": "string" }
+  "transferNotes": [
+    { "wtnRef": "string", "date": "string", "wasteType": "string", "ewcCode": "string", "quantity": "string", "carrier": "string", "destination": "string" }
   ],
-  "transferNoteLog": "string (min 120 words — transfer note management process covering: who completes them, how they are checked, where records are stored, retention period (minimum 2 years, 3 years for hazardous), audit frequency, and corrective actions for non-compliance)",
+  "segregationChecklist": [
+    { "item": "string (min 15 words — specific segregation measure)", "checked": true, "notes": "string" }
+  ],
+  "hierarchySteps": [
+    { "level": "number (1-4)", "title": "string (Prevention / Reuse / Recycling / Disposal)", "description": "string (min 40 words — specific examples for this project)" }
+  ],
+  "carrierFacilities": [
+    { "company": "string", "role": "string (Carrier / Facility / Carrier+MRF / Haz Carrier)", "registration": "string (EA licence number)", "expiry": "string", "wasteTypes": "string", "verified": true }
+  ],
+  "kpiTargets": [
+    { "value": "string (e.g. '95%')", "label": "string (e.g. 'Landfill Diversion Target')" }
+  ],
+  "kpiNarrative": "string (min 80 words — how KPIs are tracked, reported, and reviewed)",
+  "dutyCareStatement": "string (min 125 words — duty of care obligations under EPA 1990 s.34, who is responsible, WTN retention periods, checking carrier/facility registrations)",
+  "wasteHierarchy": "string (min 250 words — detailed application of the waste hierarchy with specific examples at each level: Prevention, Reuse, Recycling, Recovery, Disposal. Include measurable targets.)",
+  "segregationPlan": "string (min 190 words — skip/container types, colour coding, labelling, locations, operative responsibilities, contamination procedures, monitoring)",
+  "transferNoteLog": "string (min 150 words — who completes WTNs, checking process, storage, retention periods, audit frequency, corrective actions)",
   "minimisationTargets": [
     { "target": "string", "measure": "string", "kpi": "string" }
   ],
   "contaminatedLand": "string (any contaminated material, classification required, disposal route)",
-  "monitoringSchedule": "string (min 120 words — monitoring schedule including weekly skip audits with contamination checks, monthly waste data reporting, quarterly management reviews against targets, annual plan review, and reporting format for client/project team)",
+  "monitoringSchedule": "string (min 150 words — weekly skip audits, monthly reporting, quarterly management reviews, annual plan review, reporting format)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 6 waste streams with EWC codes. Minimum 2 carriers. Minimum 2 facilities. Minimum 3 minimisation targets. EWC codes must be realistic 6-digit codes for UK construction waste.`,
+Minimum 7 waste streams with EWC codes (include at least 1 hazardous with * code). Minimum 5 skip/container entries. Minimum 3 carriers/facilities with EA licence numbers. Minimum 6 segregation checklist items. Minimum 4 hierarchy steps. Minimum 4 KPI targets. EWC codes must be realistic 6-digit codes for UK construction waste.`,
 
   'invasive-species': `Generate an Invasive Species Management Plan compliant with the Wildlife & Countryside Act 1981 (Section 14) and the Environmental Protection Act 1990.
 
@@ -3609,7 +3811,7 @@ JSON structure:
     "commonName": "string",
     "latinName": "string",
     "schedule": "string (e.g. 'Schedule 9 Part II, Wildlife & Countryside Act 1981')",
-    "identificationFeatures": "string (min 80 words — how to identify the species, seasonal variation, distinguishing from similar species)",
+    "identificationFeatures": "string (min 120 words — how to identify the species across all 4 seasons: spring emergence, summer growth, autumn/winter die-back, underground rhizome appearance. Include distinguishing features from similar species)",
     "photographicRecord": "string (reference to photographic survey)"
   },
   "infestationExtent": {
@@ -3629,7 +3831,7 @@ JSON structure:
     "programme": "string (treatment schedule — seasons, number of applications, monitoring intervals)",
     "contractor": "string (specialist contractor details if applicable)"
   },
-  "biosecurityProtocol": "string (min 180 words — detailed biosecurity protocol covering tool cleaning procedures, boot wash station locations and disinfectant type, vehicle wheel wash requirements, PPE disposal, contamination zone demarcation, and enforcement responsibilities, vehicle wheel wash, designated access routes, contamination zones, PPE requirements)",
+  "biosecurityProtocol": "string (min 200 words — detailed biosecurity protocol covering tool cleaning procedures, boot wash station locations and disinfectant type, vehicle wheel wash requirements, PPE disposal, contamination zone demarcation, enforcement responsibilities, designated access routes, and soil segregation procedures)",
   "disposalRoute": {
     "method": "string (Licensed landfill / On-site burial cell / Specialist contractor)",
     "facility": "string (if off-site — name, permit number, location)",
@@ -3952,17 +4154,33 @@ Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 // =============================================================================
 
 const CDM_CHECKER_TEMPLATE_STYLE: Record<CdmCheckerTemplateSlug, string> = {
-  'ebrora-standard': `TEMPLATE: Ebrora Standard (professional, green branded, cover page, duty holder sections)
-WRITING STYLE: Professional and thorough. Each duty holder gets their own section with regulation-by-regulation compliance checks. Findings should be specific to this project — not generic CDM guidance. Every non-compliant or partial finding must have a concrete recommendation with a named responsible party. The identified gaps section must be ranked by priority (High first). The compliance roadmap must include realistic target dates. Use formal but readable language suitable for a project team meeting.`,
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, comprehensive gap analysis, ~4 pages)
+AI INTERVIEW:
+Round 1: "Project details — name, contract, client, PD, PC, contractor, site address? Notifiable project (>30 days with >20 workers, or >500 person-days)?"
+Round 1: "F10 notification — submitted? Reference? Needs updating?"
+Round 1: "Duty holders — who is appointed as Client, PD, PC? Written appointments? CDM duties acknowledged?"
+Round 2: "Client compliance — arrangements for managing project? Sufficient time and resources? PCI compiled and distributed?"
+Round 2: "PC compliance — CPP prepared and approved? Site inductions? Subcontractor CDM vetting?"
+Round 2: "PD compliance — design risk register? H&S File compilation started? TW designer briefed on Reg. 9?"
+Round 2: "Key documents — PCI gaps? CPP status? H&S File status?"
+Generate 9 sections: 01 Project Overview (prose min 250 words), 02 F10 Notification Status (3-col table: Item + Status RAG + Detail, min 4 rows), 03 Duty Holder Appointments (5-col table: Holder + Name + Appointed RAG + Written Appt RAG + CDM Acknowledged RAG, min 5 rows), 04 Client Compliance Reg.4 (4-col table: Duty + Reg + Status RAG + Finding, min 5 rows), 05 PC Compliance Regs.13-14 (same format, min 6 rows), 06 PD Compliance Regs.11-12 (same format, min 5 rows), 07 Key Documents Assessment (3-col table: Document + Status RAG + Finding, 3 rows: PCI/CPP/H&S File), 08 Priority-Ranked Gap Register (4-col table: Priority RAG + Gap + Reg + Consequence, min 5 rows), 09 Compliance Roadmap (4-col table: Action + Responsible + Target + Priority RAG, min 7 rows) + amber callout with overall compliance narrative. Sig grid: Assessed By + Reviewed By.`,
 
-  'compliance-matrix': `TEMPLATE: Compliance Matrix (teal, matrix-heavy, visual gap scanning)
-WRITING STYLE: Data-dense, minimal prose. The template is dominated by a large compliance matrix showing every CDM regulation cross-referenced against all 5 duty holder types. Status values must be exactly one of: Compliant, Partial, Non-Compliant, Not Applicable, Unknown. Keep findings extremely concise — the matrix format has limited cell width. Focus on making non-compliant items immediately visible. The gaps and roadmap sections should be condensed but actionable.`,
+  'compliance-matrix': `TEMPLATE: Compliance Matrix (teal #0f766e, regulation x duty holder matrix, ~3 pages)
+AI INTERVIEW: Same questions as Ebrora Standard, PLUS: "For each regulation, assess compliance status for each of the 5 duty holder types (Client, PD, PC, Designers, Contractors). Use: Compliant/Partial/Non-Compliant/N/A."
+Generate: Cover page, then DUTY HOLDER COMPLIANCE SCORES (5-col KPI: Client%/PD%/PC%/Designers%/Contractors%), FULL COMPLIANCE MATRIX (7-col table: Reg + Duty + Client RAG + PD RAG + PC RAG + Designers RAG + Contractors RAG, min 18 rows covering Regs 4-15), CONDENSED GAPS AND IMMEDIATE ACTIONS (5-col table: Priority RAG + Gap + Action + Owner + By, min 5 rows). Sig grid: Assessed By + Reviewed By.
+Provide complianceScores array with 5 items (one per duty holder with % and x/y sublabel).
+Provide complianceMatrix array with regulation, duty, and status for each of 5 duty holders.`,
 
-  'audit-trail': `TEMPLATE: Audit Trail (navy, formal, evidence references, NCR register)
-WRITING STYLE: Formal audit language. Every compliance check must include an evidence reference — the specific document name, reference number, revision, and date that was reviewed. Use phrases like "Verified against [document]", "Evidence reviewed: [ref]", "No evidence available". Non-conformances must be logged with formal NCR numbers (NCR-001, NCR-002 etc.) and include corrective action, owner, and due date. Lower-priority items go in an Observations register (OBS-001 etc.). This template must survive an HSE inspector's document review — every claim needs a paper trail.`,
+  'audit-trail': `TEMPLATE: Audit Trail (navy #1e293b, evidence-referenced, NCR register, ~3 pages)
+AI INTERVIEW: Same questions as Ebrora Standard, PLUS: "For each compliance check — what specific document was reviewed? (document name, reference number, revision, date)"
+PLUS: "Who should approve this audit? Author, technical reviewer, client approver?"
+Generate 5 sections: 01 Document Control (5-col revision table), 02 Compliance Checks With Evidence References (6-col table: Ref + CDM Duty + Reg + Status RAG + Evidence Reviewed + Finding, min 12 rows with CHK-01 numbering), 03 Non-Conformance Register (7-col table: NCR No + Category + Description + Reg + Raised Against + Priority RAG + Target Close, min 3 rows with NCR-CDM-001 numbering), 04 Observations Register (3-col table: Obs No + Observation + Recommendation, min 3 rows with OBS-001 numbering), 05 Approval Chain (4-sig grid: Audit Author + Technical Reviewer + Client Approver + Distribution).
+Provide auditChecks, ncrRegister, observations arrays.`,
 
-  'executive-summary': `TEMPLATE: Executive Summary (charcoal/green, dashboard, management-focused)
-WRITING STYLE: Write for a client project director or board member — not a site team. Open with high-level compliance scores (percentage per duty holder). Lead with the most critical findings and their business impact (enforcement risk, programme delay, cost exposure). Recommendations should be actionable and addressed to specific roles. The narrative summary must be a standalone briefing — someone reading only that section should understand the full compliance position and what needs to happen next. Avoid technical jargon where possible; explain CDM regulation numbers in plain English.`,
+  'executive-summary': `TEMPLATE: Executive Summary (charcoal #2d3748, dashboard, management brief, ~2 pages)
+AI INTERVIEW: Same questions as Ebrora Standard but focus answers for a senior management audience.
+Generate: Cover page, then COMPLIANCE DASHBOARD (3-col KPI: Overall%/High Gaps/Medium Gaps + duty holder percentage scores), KEY FINDINGS PRIORITY RANKED (4-col table: # RAG + Finding + Risk + Action Required, min 5 rows), NARRATIVE RECOMMENDATIONS (prose min 300 words — standalone management briefing covering overall position, critical gaps, business risk, timeline to full compliance). Sig grid: Assessed By + For Client Review.
+Provide kpiItems, dutyHolderScores, keyFindings arrays, overallPercentage, highGapCount, mediumGapCount.`,
 };
 
 export function getCdmCheckerTemplateGenerationPrompt(templateSlug: CdmCheckerTemplateSlug): string {
@@ -4189,55 +4407,51 @@ Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 // =============================================================================
 
 const ERP_TEMPLATE_STYLE: Record<ErpTemplateSlug, string> = {
-  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, sequential scenario sections, comprehensive)
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, cover page, comprehensive ERP, ~3pp)
 AI INTERVIEW — ask these SPECIFIC questions during the conversation:
-Round 1: "Which emergency scenarios apply to your site? Select all that apply: fire/explosion, medical emergency, structural collapse, environmental spill, severe weather, confined space emergency, gas release (H₂S/CO/CH₄), bomb/security threat, utility failure (power/water), flooding, working over water, other. Are there any site-specific process hazards?"
-Round 1: "Who is appointed as Emergency Controller? Do you have designated Fire Marshals, First Aiders, and Environmental Officers? How many of each?"
-Round 2: "Where is your primary muster point? Is there a secondary muster point? What alarm signal do you use (air horn / siren / tannoy)?"
-Round 2: "What is the nearest A&E hospital, fire station, and their approximate distance/travel time from site?"
-Round 2: "Are there any operational processes running adjacent to the works that could create emergency scenarios (e.g. live sewage, chemical dosing, gas holders)?"
+Round 1: "Which emergency scenarios apply to your site? Select all that apply: fire/explosion, medical emergency, structural collapse, environmental spill, severe weather, confined space emergency, gas release (H₂S/CO/CH₄), bomb/security threat, utility failure, flooding, other."
+Round 1: "Who is appointed as Emergency Controller? Do you have designated Fire Marshals, First Aiders, CS Rescue Team? Names and contact numbers."
+Round 2: "Where is your primary muster point? What alarm signal do you use?"
+Round 2: "What is the nearest A&E hospital, fire station, and their distance from site?"
+Round 2: "Site address, grid reference, What3Words, gate code?"
 
-ONLY generate scenario sections for scenarios the user confirmed as relevant. Do NOT include gas/H₂S scenarios if the user did not select them.
+ONLY generate scenario sections for scenarios the user confirmed as relevant.
 
-WRITING STYLE: Professional, concise. Action step tables are the primary content — keep prose to the absolute minimum needed. Every step must name a responsible person/role. Equipment column must be specific (not "as required").`,
+Generate cover page with 10-row info table (Ref, Issue Date, Review Date, Prepared By, Project, Client, Site Address, Grid Ref, What3Words, Nearest A&E). Body with numbered full-width green section bars: 01 SITE DESCRIPTION & KEY HAZARDS (prose min 200 words — describe site, works, boundaries, peak workforce, key hazards), 02 EMERGENCY CONTACTS (3-col KPI: Emergency Services 999 / Nearest A&E / Fire Station, then 4-col contacts table: Role + Name + Phone + Backup, min 7 rows), 03 EVACUATION PROCEDURE (prose — muster point, alarm signal, headcount method). Then dynamic scenario sections (04 FIRE EMERGENCY, 05 FIRST AID ARRANGEMENTS, 06 ENVIRONMENTAL SPILL RESPONSE, etc.) each as prose. Sig grid: Prepared By + Approved By.`,
 
-  'quick-reference': `TEMPLATE: Quick Reference (red/orange, lamination-ready, 2 pages max, action cards)
+  'quick-reference': `TEMPLATE: Quick Reference (red #B91C1C, lamination-ready, single page content, ~2pp)
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "Which emergency scenarios apply? (fire, medical, spill, collapse, gas release, severe weather, other). Only selected scenarios will appear as action cards."
-Round 1: "What are the key emergency phone numbers for this site? (Site Manager, Client rep, Operations Control if applicable)"
-Round 2: "Where is the primary muster point? What alarm signal is used?"
-Round 2: "Where are emergency equipment locations? (first aid, AED, fire extinguishers, spill kits — give building/area names)"
-Round 2: "Nearest A&E hospital name, distance, and basic route direction?"
+Round 1: "Which emergency scenarios apply? (fire, medical, spill, collapse, gas, confined space, weather, other)"
+Round 1: "Key emergency phone numbers — Site Manager, First Aider, Fire Warden? Names and mobiles."
+Round 2: "Primary muster point location and alarm signal?"
+Round 2: "Nearest A&E name, distance? First aid kit and AED locations?"
+Round 2: "Site address, What3Words, gate code?"
 
-ONLY generate action cards for scenarios the user confirmed. Skip everything else.
+Generate cover with red banner "⚠ EMERGENCY QUICK REFERENCE". Body: large "IN AN EMERGENCY CALL 999" warning banner, site address + What3Words subtitle, 3 emergency contact KPI boxes (Site Manager / First Aider / Fire Warden), then WHAT TO DO — STEP BY STEP (2-col table: Step number + Action, 6 steps: Make Safe → Raise Alarm → Call 999 → Call Site Manager → First Aid → Guide Services). Then red callout: "CONFINED SPACE EMERGENCY: DO NOT ENTER without SCBA...". Footer: "Designed for printing, laminating, and displaying at all work fronts".
 
-WRITING STYLE: Extremely concise. This is a lamination-ready quick reference — NOT a report. Action cards must be single-line numbered steps (e.g. "1. Shout FIRE → 2. Call 999 → 3. Evacuate → 4. Headcount → 5. Meet FRS at gate"). Large-print emergency numbers. No paragraphs. No narrative.
+WRITING STYLE: Extremely concise. Large print. Numbered steps. No narrative. This is a lamination-ready card.`,
 
-The template renders actionCards array — each card has: scenario (name), colour (red/blue/amber/green/purple), steps (single string of numbered actions joined with →).`,
-
-  'role-based': `TEMPLATE: Role-Based (navy, organised by ROLE not scenario, standalone role cards)
+  'role-based': `TEMPLATE: Role-Based (navy #1E3A5F, organised by ROLE not scenario, ~2pp)
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "Which emergency roles are appointed on your site? (Emergency Controller, Deputy EC, Fire Marshal, First Aider, Environmental Officer, H₂S/Gas Coordinator, other). How many of each?"
-Round 1: "Which emergency scenarios apply? (fire, medical, spill, collapse, gas, weather, other)"
-Round 2: "For each role you listed — what specific equipment do they need access to and where is it located?"
-Round 2: "Do your Fire Marshals have designated sweep zones? If so, how many zones?"
-Round 2: "Do your First Aiders have any site-specific protocols (e.g. H₂S exposure treatment, leptospirosis awareness for wastewater sites)?"
+Round 1: "Which emergency roles are appointed? (Emergency Controller, Fire Marshal, First Aider, CS Rescue Team, others). Names for each?"
+Round 1: "Which emergency scenarios apply?"
+Round 2: "For each role — what specific responsibilities and equipment?"
+Round 2: "Peak workforce size and number of subcontractors?"
 
-ONLY generate role cards for roles the user confirmed exist on site. ONLY include scenarios the user selected within each role card.
+Generate cover with 5-row info table (Ref, Date, Site, Contractor, Peak Workforce). Body: EMERGENCY ROLES & RESPONSIBILITIES section bar, then role cards for each role. Each role card has: coloured title band (Emergency Controller = red #DC2626, First Aider = green #059669, Fire Warden = amber #D97706, CS Rescue = teal #0D9488, All Site Personnel = blue #2563EB), name/backup subtitle, then bulleted responsibilities (min 5 per role). Sig grid: Prepared By + Approved By.
 
-WRITING STYLE: Direct commands per role. Each role card reads like a personal briefing — "YOUR actions in a fire: ..." not "The Fire Marshal should...". Keep weekly duties to one sentence. The template renders roleCards array — each card has: role, icon (emoji), scenarioActions array [{scenario, actions, contact, equipment}], weeklyDuties string.`,
+Provide roleCards array — each with role, scenarioActions array, weeklyDuties. ONLY generate cards for roles the user confirmed.`,
 
-  'multi-scenario': `TEMPLATE: Multi-Scenario (teal, trigger→immediate→escalate→recover flowcharts per scenario)
+  'multi-scenario': `TEMPLATE: Multi-Scenario (amber #92400E, scenario response cards, ~2pp)
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "Which emergency scenarios apply to your site? (fire/explosion, medical, structural collapse, environmental spill, gas release, confined space emergency, severe weather, bomb/security, utility failure, flooding, other). I will create a 4-phase response flowchart for each selected scenario."
-Round 1: "For each scenario — what would be the TRIGGER event? (e.g. for gas: 'personal monitor alarm activates' vs 'smell of gas reported')"
-Round 2: "What severity rating would you assign each scenario? (Critical / High / Medium / Low)"
-Round 2: "What scenario-specific equipment is available? (e.g. for spill: spill kits + drain covers; for gas: SCBA + gas monitors)"
-Round 2: "Are there any severe weather triggers specific to your site? (wind speed for crane operations, flood levels, lightning protocol)"
+Round 1: "Which emergency scenarios apply? I will create a response card for each."
+Round 1: "For each scenario — what are the specific numbered action steps?"
+Round 2: "Scenario-specific equipment available for each?"
+Round 2: "Any special numbers to call per scenario? (e.g. EA hotline for spills, National Gas for gas strike)"
 
-ONLY generate flowScenarios for scenarios the user confirmed. Each flowScenario needs: trigger, immediate actions, escalation steps, recovery/stand-down steps — with responsibility and equipment for each phase.
+Generate cover with 4-row info table (Ref, Date, Site, Scenarios Covered count). Body: SCENARIO RESPONSE CARDS section bar, then individual scenario cards. Each card has: coloured left border and title (Fire = red #DC2626, Medical = green #059669, CS Emergency = purple #7C3AED, Flood = blue #2563EB, Spill = amber #D97706, Utilities = grey #6B7280), then numbered steps (min 5 per scenario). Each step is a single clear action. Sig grid: Prepared By + Approved By.
 
-WRITING STYLE: Phase-based, not narrative. Each phase (TRIGGER/IMMEDIATE/ESCALATE/RECOVER) must be a self-contained instruction. Keep each phase to 2–3 sentences max. The template renders flowScenarios array — each has: name, severity, trigger, immediate, escalate, recover + corresponding Resp and Equip fields for each phase.`,
+Provide flowScenarios or actionCards arrays. Min 4 scenarios. Each scenario min 5 steps.`,
 };
 
 const ERP_SCHEMA = `{
@@ -4253,7 +4467,7 @@ const ERP_SCHEMA = `{
   "client": "string",
   "workingHours": "string",
   "peakWorkforce": "string",
-  "siteSpecificHazards": "string (comma-separated list of site-specific hazards)",
+  "siteSpecificHazards": "string (min 200 words — full site description including: works description, location, boundaries, adjacent features, key hazards such as deep excavations, confined spaces, working at height, crane operations, live process connections, flood risk, etc. Also state peak workforce, working hours, and number of subcontractors)",
   "emergencyRoles": [
     { "role": "string (e.g. Emergency Controller)", "name": "string or 'TBC'", "contact": "string or 'TBC'", "responsibilities": "string (min 15 words)" }
   ],
@@ -4362,12 +4576,15 @@ Round 1: "Where exactly did the incident happen? (building, level, bay, grid ref
 Round 1: "Who was involved? (names, roles, employers). Were there any witnesses?"
 Round 2: "Walk me through the timeline — what happened in the minutes/hours leading up to the incident?"
 Round 2: "What do you think the immediate causes were? (substandard acts and/or substandard conditions)"
+Round 2: "Let's do a quick 5 Whys — starting with 'Why did this happen?', what's the answer at each level down to the root cause?"
 Round 2: "Is this RIDDOR reportable? If so, has the F2508 been submitted? What category? (specified injury, over-7-day, dangerous occurrence)"
+Round 2: "What was the risk rating before vs after corrective actions? (likelihood × severity)"
 Round 2: "What corrective actions have been taken or are planned? (immediate, short-term, long-term)"
+Round 2: "What are the key lessons learned? How will they be shared (toolbox talk, safety alert, RAMS update)?"
 
 Generate ALL sections: incident summary, persons involved, timeline, immediate causes, 5 Whys root cause analysis, contributing factors matrix (People/Plant/Process/Environment categories), RIDDOR assessment, evidence collected, risk re-rating (pre/post), corrective actions with priority/status/verification, lessons learned, regulatory references, distribution list.
 
-WRITING STYLE: Professional, thorough. Timeline must be chronological with specific times. 5 Whys must cascade logically to a root cause. Contributing factors must map to management system elements. Corrective actions need priority (IMMEDIATE/SHORT-TERM/LONG-TERM) and status (CLOSED/IN PROGRESS/PLANNED). Minimum 3 immediate causes, 5 contributing factors, 5 why entries, 6 corrective actions, 3 lessons learned.`,
+WRITING STYLE: Professional, thorough. Timeline must be chronological with specific times. 5 Whys must cascade logically to a root cause. Contributing factors must map to management system elements. Corrective actions need priority (IMMEDIATE/SHORT-TERM/LONG-TERM) and status (CLOSED/IN PROGRESS/PLANNED). Minimum 3 persons involved, 9 timeline entries, 3 immediate causes, 5 contributing factors, 5 why entries, 5 corrective actions, 3 lessons learned. Incident summary (briefDescription) min 200 words.`,
 
   'riddor-focused': `TEMPLATE: RIDDOR Focused (red, regulatory submission format, F2508 field mapping)
 AI INTERVIEW — ask these SPECIFIC questions:
@@ -4381,7 +4598,7 @@ Round 2: "List the witnesses and the key points from each witness statement."
 
 Generate ALL RIDDOR-specific sections: incident classification table (all 6 RIDDOR categories with Yes/No), statutory reporting timeline, injured person details (F2508 Part B fields), injury details (F2508 Part C), specified injuries checklist (Schedule 1 — minimum 8 items), dangerous occurrences checklist (Schedule 2 — minimum 6 items), HSE accident kind code, incident particulars, defective plant/equipment, witness statements summary, medical treatment record, immediate causes & root cause, corrective actions with F2508 linkage, enforcing authority notification details, statutory notification checklist (minimum 7 items).
 
-WRITING STYLE: Regulatory precision. Every F2508 field must be populated. Checklists must use ✓ YES / ✗ NO format. Medical details must be specific. Statutory deadlines must be calculated correctly (10 days for death/specified injury, 15 days for over-7-day). HSE accident kind codes must use the standard HSE classification system.`,
+WRITING STYLE: Regulatory precision. Every F2508 field must be populated. Checklists must use Yes/No format. Medical details must be specific. Statutory deadlines must be calculated correctly (10 days for death/specified injury, 15 days for over-7-day). HSE accident kind codes must use the standard HSE classification system. Minimum 3 witnesses with keyPoints min 40 words each. briefDescription (F2508 incident narrative) min 200 words. Minimum 4 reporting milestones, 4 dangerous occurrences checklist items.`,
 
   'root-cause': `TEMPLATE: Root Cause Analysis (navy, analytical, barrier analysis, systemic recommendations)
 AI INTERVIEW — ask these SPECIFIC questions:
@@ -4394,7 +4611,7 @@ Round 2: "What are your recommended corrective actions? Separate into systemic (
 
 Generate ALL analytical sections: investigation summary, incident facts, 5 Whys deep-dive (minimum 5 entries cascading to root cause), contributing factors matrix with 5 categories (People/Plant/Process/Place/Procedure — minimum 7 factors), barrier analysis (minimum 7 defence layers — each marked FAILED/WEAKENED/ABSENT), causal chain (minimum 5 steps), risk re-rating (pre/post/target), systemic recommendations (minimum 3), local recommendations (minimum 4), management system gaps (minimum 4 with ISO 45001 references), corrective actions with verification KPIs, close-out milestones (30/60/90/180 day).
 
-WRITING STYLE: Analytical, structured, evidence-based. Every factor must link to a management system element. Barrier analysis must identify each defence layer systematically (elimination → engineering → physical barrier → risk assessment → permit → supervision → individual → equipment → PPE). Root cause statement must be a systemic failure, not an individual blame statement. ISO 45001 clause references where applicable.`,
+WRITING STYLE: Analytical, structured, evidence-based. Every factor must link to a management system element. Barrier analysis must identify each defence layer systematically (elimination, engineering, physical barrier, risk assessment, permit, supervision, individual, equipment, PPE). Root cause statement must be a systemic failure, not an individual blame statement. ISO 45001 clause references where applicable. Minimum 6 barrier entries with status FAILED/WEAKENED/ABSENT/EFFECTIVE. Minimum 5 corrective actions with type classification (Immediate Fix / Systemic). Each why entry answer min 30 words. Contributing factors min 5 across all 5P categories.`,
 
   'near-miss': `TEMPLATE: Near Miss / Observation (amber, compact, prevention-focused)
 AI INTERVIEW — ask these SPECIFIC questions:
@@ -4408,7 +4625,7 @@ Round 2: "What prevention measures would you recommend? Split into immediate fix
 
 Generate ALL near-miss sections: observation details, classification table (4 types with Yes/No), primary classification with description, potential severity assessment with fatality-potential statement, severity assessment factors (actual outcome, potential worst case, probability of recurrence, persons exposed, frequency of exposure), hazard identification table, immediate actions taken, underlying causes (People/Process/Environment categories), prevention measures split into immediate fixes and systemic actions, similar previous occurrences with trend analysis, communication plan, positive observations (what went RIGHT — e.g. prompt reporting, stop-work exercised), reporter recognition statement, follow-up actions with dates.
 
-WRITING STYLE: Encouraging, prevention-focused. This is NOT a blame document — it celebrates reporting. The potential severity assessment must be honest about worst-case outcomes (including fatality potential where applicable). Trend analysis should identify patterns across multiple events. Positive observations section is MANDATORY — always find something the reporter or responders did well. Reporter recognition statement must thank the reporter by role.`,
+WRITING STYLE: Encouraging, prevention-focused. This is NOT a blame document — it celebrates reporting. The potential severity assessment must be honest about worst-case outcomes (including fatality potential where applicable). Trend analysis should identify patterns across multiple events. Positive observations section is MANDATORY — always find something the reporter or responders did well. Reporter recognition statement must thank the reporter by role (min 50 words). nmDescription min 120 words. Minimum 5 immediate actions taken. Minimum 3 immediate fixes and 3 systemic actions. Minimum 2 previous occurrences.`,
 };
 
 const INCIDENT_REPORT_SCHEMA = `{
@@ -4424,10 +4641,12 @@ const INCIDENT_REPORT_SCHEMA = `{
   "contractRef": "string",
   "incidentCategory": "string (e.g. 'Over-7-Day Injury', 'Near Miss', 'Dangerous Occurrence')",
   "riddorReportable": "string (e.g. 'YES — F2508 FILED', 'NO', 'N/A — Near Miss')",
+  "actualSeverity": "string (e.g. 'None', 'Minor', 'Major', 'Fatal')",
+  "potentialSeverity": "string (e.g. 'Minor', 'Major', 'Fatal' — worst case if circumstances had been different)",
   "exactLocation": "string (specific area, level, bay)",
   "activityAtTime": "string (min 20 words)",
   "weatherConditions": "string",
-  "briefDescription": "string (min 100 words — factual chronological account)",
+  "briefDescription": "string (min 200 words — factual chronological account of the incident, including what activity was being carried out, who was present, what happened, what the immediate outcome was, and what actions were taken)",
   "immediateOutcome": "string",
   "personsInvolved": [
     { "name": "string", "role": "string", "employer": "string", "injuryDescription": "string", "treatmentGiven": "string", "daysLost": "string", "returnDate": "string" }
@@ -4452,7 +4671,7 @@ const INCIDENT_REPORT_SCHEMA = `{
     { "injury": "string", "applicable": "✓ YES | ✗ NO", "notes": "string" }
   ],
   "dangerousOccurrences": [
-    { "occurrence": "string", "applicable": "✓ YES | ✗ NO", "notes": "string" }
+    { "paragraph": "string (Schedule 2 paragraph number, e.g. '14')", "occurrence": "string", "applicable": "✓ YES | ✗ NO", "notes": "string" }
   ],
   "f2508Ref": "string (or 'N/A')",
   "dateReported": "string",
@@ -4476,6 +4695,8 @@ const INCIDENT_REPORT_SCHEMA = `{
   "firstAidOnSite": "string", "hospitalTreatment": "string", "admittedOvernight": "string",
   "daysAbsent": "string", "returnToWorkDate": "string", "permanentDisability": "string",
   "hseAccidentKindCode": "string (e.g. '09 — Struck by moving, flying or falling object')",
+  "workProcessCode": "string (HSE work process code, e.g. '23 — Excavation and trenching')",
+  "agentCode": "string (HSE agent code, e.g. '24 — Earth, clay, soil, sand, gravel')",
   "agentInvolved": "string", "activityAtTimeHse": "string", "processHse": "string", "sicCode": "string",
   "defectiveItems": [
     { "item": "string", "idRef": "string", "defect": "string (min 15 words)", "actionTaken": "string", "status": "DEFECTIVE | SERVICEABLE | QUARANTINED" }
@@ -4512,7 +4733,7 @@ const INCIDENT_REPORT_SCHEMA = `{
     { "recipient": "string", "organisation": "string", "method": "string", "date": "string" }
   ],
   "barrierEntries": [
-    { "defenceLayer": "string (e.g. 'Hazard Elimination', 'Engineering Controls', 'Physical Barrier')", "expectedBarrier": "string", "status": "FAILED | WEAKENED | ABSENT", "failureMode": "string (min 10 words)" }
+    { "defenceLayer": "string (e.g. 'Hazard Elimination', 'Engineering Controls', 'Physical Barrier')", "expectedBarrier": "string", "barrierType": "string (Engineering | Administrative | Human)", "status": "FAILED | WEAKENED | ABSENT | EFFECTIVE", "failureMode": "string (min 10 words)" }
   ],
   "barrierSummary": "string (min 30 words — overall barrier analysis conclusion)",
   "causalChainSteps": [
@@ -4614,59 +4835,33 @@ Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 // =============================================================================
 
 const LIFT_PLAN_TEMPLATE_STYLE: Record<LiftPlanTemplateSlug, string> = {
-  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, 22-section ultra-comprehensive lift plan)
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, comprehensive lift plan, ~3pp)
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What is being lifted? Give me the load description, net weight, dimensions, and condition (new, used, fragile, flexible). How many lifts are planned?"
-Round 1: "What crane are you using? Type (mobile, tower, crawler), make/model, maximum SWL. Do you have a specific serial number or will it be confirmed on the day?"
-Round 1: "What is the maximum radius and lift height? Do you know the duty at that radius from the load chart? What boom/jib configuration?"
-Round 2: "What are the ground conditions? Bearing capacity (kN/m²), ground type (hardstanding, compacted gravel, soft ground). Are outrigger mats/timbers being used? What is the gradient?"
-Round 2: "What proximity hazards exist? (overhead power lines, adjacent structures, underground services, live traffic, public areas, operational plant). Distances?"
-Round 2: "Who are the appointed persons? (Appointed Person, Crane Supervisor, Slinger/Signaller, Crane Operator). Names and qualifications where known."
-Round 2: "What communication method will be used? (radio, hand signals, both). What are the weather limits? (max wind speed, visibility, lightning stand-down)."
-Round 2: "Describe the lift sequence step by step — from initial positioning through to load landed and crane stood down."
+Round 1: "What is being lifted? Load description, net weight, dimensions, lifting points."
+Round 1: "What crane? Type, make/model, maximum SWL. Serial number if known."
+Round 1: "Maximum radius and lift height? Duty at that radius from load chart? Boom/jib configuration?"
+Round 2: "Ground conditions? Bearing capacity, ground type, outrigger setup, gradient."
+Round 2: "Proximity hazards? (overhead power lines, structures, excavations, live traffic). Distances?"
+Round 2: "Appointed persons? (AP, Crane Op, Slinger, Banksman). Names and qualifications."
+Round 2: "Lift sequence step by step. Weather limits. Communication method."
 
-Generate ALL 22 sections: lift description, load details with lifting points, crane specification with thorough examination, lift geometry with % capacity calculation, rigging arrangement with certification, ground conditions with outrigger pad sizing, proximity hazards, overhead services assessment, exclusion zones, appointed persons with competence records, communication arrangements, weather limits, environmental considerations, pre-lift inspection checklist (minimum 10 items), lift sequence (minimum 8 steps), contingency & emergency procedures (minimum 5 scenarios), risk assessment (minimum 6 hazards), regulatory references, approval sign-off (5 roles), lift completion record, post-lift inspection checklist.
+Generate cover with 12-row info table (Ref, Date, Category, Project, Location, Crane, Load, Radius, Duty, % Capacity, AP, Contractor). Body with 9 numbered green section bars: 01 LOAD DETAILS (9-row info table), 02 CRANE SPECIFICATION (9-row info table), 03 LIFT GEOMETRY & CAPACITY (5-col KPI: Radius/Height/Duty/Load/% Capacity + green capacity callout), 04 RIGGING ARRANGEMENT (6-col table: Item + Spec + SWL + Cert + Expiry + Condition RAG, min 4 rows), 05 GROUND CONDITIONS & OUTRIGGERS (6-row info table), 06 PROXIMITY HAZARDS & EXCLUSION ZONES (3-col table + amber exclusion callout), 07 LIFT SEQUENCE (4-col table: Step + Action + Responsible + Signal, min 8 steps), 08 WEATHER LIMITS & ABORT CRITERIA (3-col table, min 5 rows), 09 APPOINTED PERSONS & COMPETENCE (4-col table). 4-role sig grid: AP + Crane Op + Slinger + Site Manager.`,
 
-WRITING STYLE: Technical, precise, BS 7121 compliant. Every dimension/weight must include units. % capacity must be calculated and stated. Rigging items need SWL and cert references. Pre-lift checklist items need specific verification criteria. Lift sequence must be numbered and name responsible person at each step. Risk assessment must show initial and residual ratings.`,
+  'operator-brief': `TEMPLATE: Crane Operator Brief (amber #D97706/cover #92400E, crane cab card, lamination-ready, ~2pp)
+AI INTERVIEW — ask same questions as ebrora-standard but keep content concise.
+Generate cover with amber banner, 5-row info table. Body: large-print "TOTAL LOAD: X TONNES" header with breakdown, 4-col KPI (Radius/Height/Duty/% Capacity), CRANE CONFIGURATION (6-row info table: Boom/Counterweight/Outriggers/Slew Limit/Pick-Up/Set-Down), LIFT SEQUENCE — QUICK STEPS (3-col table: # + Action + Signal, max 5 steps), ⚠ ABORT CRITERIA — STOP IMMEDIATELY IF: (red section bar, bulleted list of abort triggers). Footer: "Designed for laminating and placing in the crane cab".
 
-  'operator-brief': `TEMPLATE: Crane Operator Brief (amber, compact cab card, lamination-ready, 3 pages max)
-AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What is the total lifted weight (including rigging)? What is the duty at radius? What percentage of crane capacity?"
-Round 1: "Maximum radius, height, slew arc, and tail swing clearance?"
-Round 2: "Describe the lift sequence in simple numbered steps that the operator can follow."
-Round 2: "What are the abort criteria? (wind speed, load spinning, comms failure, obstruction in slew arc)"
-Round 2: "Key contacts — crane supervisor, slinger/signaller, banksman names?"
+WRITING STYLE: Large print. Numbered steps. No narrative. Cab reference card.`,
 
-Generate a CONCISE operator reference: key load/duty data (large-print), rigging summary, numbered lift sequence, exclusion zones, abort criteria, weather limits, emergency contacts, and communication channel. Maximum content for 3 pages. No engineering calculations — just the facts the operator needs in the cab.
+  'loler-compliance': `TEMPLATE: LOLER Compliance (navy #1e293b, regulatory checklists, ~2pp)
+AI INTERVIEW — ask about TE certificates, LOLER regulation compliance evidence, BS 7121 categorisation.
+Generate cover with 6-row info table (Ref, Date, Crane, Load, Category, LOLER Compliance status). Body: LOLER 1998 — REGULATION-BY-REGULATION COMPLIANCE (4-col table: Reg number + Requirement + Evidence + Status RAG ✓, min 11 rows covering Regs 4-11), THOROUGH EXAMINATION RECORDS (6-col table: Equipment + TE Date + Next Due + Cert Ref + Examiner + Status RAG, min 4 rows), LIFT CATEGORISATION BS 7121-1:2016 (4-row info table: Category + Justification + Parts + Plan Required), navy PUWER 1998 Compliance callout (Regs 4,5,6,8,9). Sig grid: AP + H&S Review.
+Provide lolerChecks array (min 11), equipmentRegister array (min 4).`,
 
-WRITING STYLE: Extremely concise. Large-print key data. Numbered steps not paragraphs. This is a cab reference card — the operator glances at it, not reads it. Every entry must be actionable.`,
-
-  'tandem-lift': `TEMPLATE: Tandem / Complex Lift (teal, dual-crane, multi-phase, BS 7121-1 Annex C)
-AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "How many cranes are involved? What are the types and capacities of each crane?"
-Round 1: "What is the total load weight and how will it be shared between cranes? What percentage does each crane take?"
-Round 1: "Is this a tandem lift (two cranes sharing one load), a relay lift (load transferred between cranes), or a multi-phase operation?"
-Round 2: "Describe each phase of the lift — what does each crane do at each phase? Include the load sharing percentage per phase if it changes."
-Round 2: "What communication method will be used BETWEEN the two crane operators? (dedicated radio channel, hand signals from AP, etc.)"
-Round 2: "What are the crane interaction zones? Minimum separation distances? What happens if one crane fails during the lift?"
-Round 2: "Are the ground conditions different at each crane position? Bearing capacity and outrigger setup per position?"
-
-Generate ALL tandem-specific sections: dual crane specifications side-by-side comparison, load sharing calculations, synchronisation plan with phased lift sequence (minimum 4 phases), inter-crane communication protocol, crane interaction zones, what-if failure analysis (minimum 4 scenarios: crane failure, comms failure, load shift, ground subsidence), ground conditions per crane position, risk assessment, engineering calculations summary, references (BS 7121-1 Annex C), sign-off for BOTH crane teams (7 roles).
-
-WRITING STYLE: Engineering-grade precision. Load sharing must be expressed as percentages. Phases must show what each crane does simultaneously. What-if scenarios must include consequence AND response. This is a complex lift — the documentation must demonstrate that every failure mode has been considered.`,
-
-  'loler-compliance': `TEMPLATE: LOLER Compliance (navy, regulatory checklists, thorough examination evidence)
-AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What category is this lift under BS 7121? (Routine, Non-routine, or Complex). What is the basis for that categorisation?"
-Round 1: "What lifting equipment is being used? For each item (crane, slings, shackles, spreader beams etc.) give me the SWL, last thorough examination date, and certificate reference."
-Round 2: "Who is the Competent Person under LOLER Reg 8 who planned this lift? What are their qualifications?"
-Round 2: "When was the last thorough examination of the crane (LOLER Reg 9/10)? Is the certificate current? Who was the examining body?"
-Round 2: "Have similar lifts been carried out before? If so, describe them and the outcome."
-Round 2: "What is the defect reporting procedure if any equipment is found to be defective before, during, or after the lift?"
-
-Generate ALL compliance sections: lift summary with BS 7121 categorisation, LOLER regulation-by-regulation compliance checklist (minimum 8 regulations: Reg 4 strength/stability, Reg 5 positioning, Reg 6 marking, Reg 7 organisation, Reg 8 planning, Reg 9 thorough examination, Reg 10 reports, Reg 11 defects), equipment register with thorough examination status, sling & shackle certification table, competent persons register (LOLER Reg 8), previous similar lifts log, risk assessment (MHSW Reg 3), pre-lift inspection checklist, post-lift inspection checklist, defect reporting procedure, regulatory cross-reference table. Sign-off includes H&S Advisor.
-
-WRITING STYLE: Regulatory audit-ready. Every compliance item must state the regulation number, the requirement, the compliance status (COMPLIANT/NON-COMPLIANT/N-A), and the evidence reference. Equipment register must show certificate status (CURRENT/EXPIRED/DUE). This document proves compliance — treat it as evidence for an HSE inspector.`,
+  'tandem-lift': `TEMPLATE: Tandem / Complex Lift (teal #0f766e, dual crane, ~2pp)
+AI INTERVIEW — ask about both cranes, load sharing, synchronisation, communication protocol, what-if failure analysis.
+Generate cover with 8-row info table (Ref, Date, Load, Crane 1, Crane 2, Load Share, Category "Complex — BS 7121-1 Clause 9.4", AP). Body: DUAL CRANE SPECIFICATIONS — SIDE BY SIDE (3-col table: Parameter + Crane 1 + Crane 2, 10 rows including % capacity for each), LOAD SHARING & SYNCHRONISATION (4-col KPI: Nett Load/Total+Rigging/Load Split %/Max % Capacity + synchronisation prose with countdown protocol and load cell monitoring), INTER-CRANE COMMUNICATION PROTOCOL (4-col table: Role + Radio + Channel + Call Sign, min 4 rows), red ⚠ TANDEM LIFT ADDITIONAL CONTROLS callout (6 requirements), WHAT-IF FAILURE ANALYSIS (3-col table: Scenario + Consequence + Control, min 3 rows: crane failure, comms failure, wind). 4-role sig grid: AP (Tandem endorsed) + Crane 1 Op + Crane 2 Op + Site Manager.
+Provide crane2Details, crane2Geometry, commItems, whatIfScenarios, loadShareCalc, syncPlan.`,
 };
 
 const LIFT_PLAN_SCHEMA = `{
@@ -4822,55 +5017,30 @@ Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 // =============================================================================
 
 const MANUAL_HANDLING_TEMPLATE_STYLE: Record<ManualHandlingTemplateSlug, string> = {
-  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, comprehensive TILE methodology, 15+ sections)
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, TILE methodology, ~3pp)
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "Describe the manual handling task — what is being lifted, carried, pushed or pulled? What does it weigh? How often is it done?"
-Round 1: "How is the task performed? Describe the start and end positions, distances carried, heights involved, and whether twisting or stooping is required."
-Round 2: "Is this a team lift? If so, how many people? What rest breaks are provided between lifts?"
-Round 2: "What are the environmental conditions? (indoor/outdoor, floor surface, gradients, lighting, temperature, wind, confined spaces)"
-Round 2: "Are there any individual factors to consider? (new/young workers, pregnancy, existing musculoskeletal conditions, training status)"
-Round 2: "Can this manual handling be avoided entirely? Are there mechanical aids available? (sack trucks, pallet trucks, hoists, conveyors)"
+Round 1: "Describe the manual handling task — what is being lifted/carried? Weight? Frequency?"
+Round 1: "How is the task performed? Postures, distances, heights, twisting/stooping required?"
+Round 2: "Team lift or solo? Environmental conditions? (floor surface, gradients, wind, temperature)"
+Round 2: "Individual factors? (training, fitness, PPE interference)"
+Round 2: "Can it be avoided? Mechanical aids available?"
+Generate cover with 8-row info table (Ref, Date, Review, Assessed By, Project, Task summary, Methodology "TILE", Residual Risk RAG). Body with 5 numbered green section bars: 01 TASK DESCRIPTION (prose min 200 words), 02 TILE ASSESSMENT (4 colour-coded sub-tables — T=green 3-col Factor/Assessment/Risk RAG min 6 rows, I=blue min 3 rows, L=amber min 4 rows, E=purple min 5 rows. Each sub-table has its own coloured block letter + header), 03 HIERARCHY OF CONTROL MEASURES (3-col: Level/Control/Implementation, 5 rows: Eliminate → Reduce Mechanical → Reduce Task → Reduce Environment → Reduce Individual), 04 RESIDUAL RISK RATING (3-col KPI + amber monitoring callout), 05 REGULATORY REFERENCES (paragraph). Sig grid: Assessed By + Reviewed By.
+Provide tileTask, tileIndividual, tileLoad, tileEnvironment arrays with RAG risk ratings. Provide controls array (5 hierarchy levels).`,
 
-Generate ALL TILE sections: activity description, avoidance assessment, Task analysis (16 fields including postures, grip, movement pattern, repetition), Individual factors (7 fields), Load characteristics (9 fields), Environment factors (9 fields), Schedule 1 risk factor checklist (minimum 10 factors), risk scoring matrix, control measures with hierarchy of controls, mechanical aids, residual risk, monitoring plan, legal basis, regulatory references, sign-off.
+  'mac-assessment': `TEMPLATE: MAC Assessment (amber #D97706, cover #92400E, HSE MAC scoring, ~2pp)
+AI INTERVIEW — ask about load weight, frequency, hand distance, vertical zone, twisting, grip, floor, carrying distance.
+Generate cover with 5-row info table (Ref, Date, Task, MAC Type "Team Handling Operation", Overall MAC Score with band). Body: MAC SCORING — TEAM HANDLING OPERATION (4-col table: MAC Factor A-I + Assessment + Colour Band RAG + Score, 9 rows), 4-col KPI (Total Score/Red count/Amber count/Green count), amber interpretation callout. Then PRIORITY IMPROVEMENTS — TARGETING RED FACTORS (3-col table: Red Factor + Improvement + Expected Score Change, 3+ rows + REVISED MAC SCORE total row). Sig grid: Assessed By + Reviewed By.
+Provide macFactors array (9 factors A-I with band/score), macTotal, macRedCount, macAmberCount, improvements array (targeting red factors).`,
 
-WRITING STYLE: Thorough, evidence-based. Every TILE field must be populated with specific detail — not generic statements. Weight must include units. Distances must be specific. Schedule 1 checklist must reference actual MHOR 1992 Schedule 1 factors. Control measures must follow hierarchy: eliminate → reduce → mechanical aid → administrative → PPE.`,
+  'rapp-assessment': `TEMPLATE: RAPP Assessment (teal #0f766e, Risk Assessment of Pushing & Pulling, ~2pp)
+AI INTERVIEW — ask about push/pull operation, force required, handle height, floor surface, gradient, wheel condition, frequency.
+Generate cover with 5-row info table (Ref, Date, Task, Equipment, RAPP Score with band). Body: TASK DESCRIPTION (prose), RAPP SCORING (4-col table: RAPP Factor A-I + Assessment + Band RAG + Score, 9 rows), 3-col KPI (RAPP Score/Red Factors/Amber Factors), teal outcome callout. Sig grid: Assessed By + Reviewed By.
+Provide rappFactors array (9 factors A-I with band/score), rappTotal, rappOutcome string.`,
 
-  'mac-assessment': `TEMPLATE: MAC Assessment (amber, HSE Manual Handling Assessment Charts scoring)
-AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What is the load weight and how often is it lifted? (I need to score this against the MAC weight/frequency chart)"
-Round 1: "Where are the hands relative to the body during the lift? (close to body / at arm's length / extended reach)"
-Round 2: "What vertical zone does the lift occur in? (floor to knuckle / knuckle to shoulder / above shoulder)"
-Round 2: "Is torso twisting involved? Are there any postural constraints (confined space, kneeling, one-handed)?"
-Round 2: "What is the grip quality? (good handles / reasonable grip / poor grip / gloves affecting grip)"
-Round 2: "What is the floor surface? (clean dry / slightly uncontaminated / wet/uneven/slippery). Is there carrying involved — if so, what distance?"
-
-Generate ALL MAC sections: task summary, MAC factor scoring table (minimum 8 factors: load weight/frequency, hand distance from body, vertical lift zone, torso twisting, postural constraints, grip quality, floor surface, carrying distance — each with score 0-3 and colour G/A/R/P), overall MAC score with priority level, factor-linked control measures, mechanical aids, references.
-
-WRITING STYLE: Scoring-focused. Each MAC factor must have a numerical score (0-3), a colour code (Green/Amber/Red/Purple), and a justification for that score. Total MAC score determines priority: 0-4 Low, 5-12 Medium, 13-20 High, 21+ Very High. Control measures must link to the specific factors scoring highest.`,
-
-  'rapp-assessment': `TEMPLATE: RAPP Assessment (teal, HSE Risk Assessment of Pushing and Pulling)
-AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "Describe the pushing or pulling operation — what is being moved, its weight, and is it on wheels or being dragged?"
-Round 1: "What force is required to start the push/pull (initial force) vs keep it moving (sustained force)? Can you estimate in kg?"
-Round 2: "What height are the handles or push points? Is the pushing one-handed or two-handed?"
-Round 2: "What distance is the load pushed/pulled? What is the floor surface and gradient?"
-Round 2: "If wheeled — what condition are the wheels/castors? Size? Swivel or fixed?"
-Round 2: "How often is this push/pull task performed? What is the duration of each push/pull?"
-
-Generate ALL RAPP sections: push/pull operation description, push/pull parameter details (minimum 10 parameters: load weight, initial force, sustained force, handle height, one/two-handed, distance, floor surface, gradient, wheel condition, frequency), RAPP factor scoring (minimum 6 factors with colour scores), RAPP total score and priority level, push/pull-specific control measures, mechanical alternatives, references.
-
-WRITING STYLE: Push/pull specific. Forces should be estimated in Newtons or kg-equivalent. Handle heights relative to body (elbow height ideal). Floor surfaces scored for coefficient of friction. Wheel/castor condition directly impacts force requirements. Control measures specific to pushing/pulling (maintain wheels, reduce loads, improve floor surface, correct handle height).`,
-
-  'training-briefing': `TEMPLATE: Training & Briefing Card (navy, compact operative training handout, lamination-ready)
-AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What specific manual handling task are your operatives doing? What does the load weigh?"
-Round 1: "What mechanical aids are available on site for this task? Where are they located?"
-Round 2: "Are there any specific hazards with this load? (sharp edges, hot surfaces, unstable contents, awkward shape)"
-Round 2: "What PPE is required for this manual handling task?"
-
-Generate ALL training sections: task-specific summary, safe lifting technique steps (minimum 8 steps with key points), HSE weight guideline figures table (shoulder, elbow, knuckle, mid-lower-leg zones for male and female), do's and don'ts (minimum 6 of each), common manual handling injuries with causes and prevention (minimum 4), mechanical aids available on site, reporting procedure for discomfort/pain, attendance register (7 sign-off rows).
-
-WRITING STYLE: Simple, direct, operative-friendly. No jargon. Short sentences. Numbered steps. This is a training card — it needs to be understood by everyone regardless of literacy level. The reporting section MUST emphasise that reporting pain/discomfort will NOT result in punishment — early reporting prevents serious injury.`,
+  'training-briefing': `TEMPLATE: Training & Briefing Card (navy #1e293b, compact operative handout, ~2pp)
+AI INTERVIEW — ask about task description, load weight, key rules for operatives.
+Generate cover with 4-row info table (Ref, Date, Task, Audience). Body: KEY RULES (2-col table: numbered Rule + Detail, min 8 rules — ALWAYS 2-PERSON, USE TROLLEY, NO TWISTING, POWER ZONE, COMMUNICATE, REPORT PAIN, ROTATE, WET CONDITIONS), CORRECT LIFTING TECHNIQUE (prose — Before/During/Placing paragraphs), navy callout "Stop Work Authority: Every operative has the right to stop work if unsafe...". Briefing sign-off line. Footer: "Designed for printing and issuing at task briefing".
+Provide trainingRules array (min 8 rules), liftingTechnique string.`,
 };
 
 const MANUAL_HANDLING_SCHEMA = `{
@@ -4993,92 +5163,138 @@ Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 // =============================================================================
 
 const NOISE_ASSESSMENT_TEMPLATE_STYLE: Record<NoiseAssessmentTemplateSlug, string> = {
-  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, comprehensive BS 5228-1:2009+A1:2014 noise assessment)
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, comprehensive BS 5228-1:2009+A1:2014 noise assessment)
+COVER PAGE: Green banner "CONSTRUCTION NOISE ASSESSMENT", subtitle with BS 5228 ref + project name in #A7F3D0. Info table: Reference, Date, Review Date, Assessed By, Project, Site Address, Nearest Sensitive Receptor, Key Activities, Predicted LAeq at NSR, BS 5228 Significance.
+SECTION BARS (green full-width, numbered 01-05):
+  01 SITE DESCRIPTION & SENSITIVE RECEPTORS — prose describing site, NSRs with distances and types, background ambient levels, monitoring equipment
+  02 NOISE SOURCE INVENTORY (BS 5228-1 TABLE C-SERIES) — table: Activity | Plant/Equipment | BS 5228 Ref | LAeq at 10m | Duration | Programme Phase (min 7 rows)
+  03 PREDICTED NOISE LEVELS AT NEAREST RECEPTOR — table: Activity | LAeq at 10m | Distance to NSR | Predicted LAeq at NSR | Ambient LAeq | Exceedance | Significance (min 4 rows with RAG pills)
+  CALLOUT BOX (amber): BS 5228 Significance (ABC Method) — explanation of worst-case and normal scenarios
+  04 NOISE MITIGATION MEASURES — table: Measure | Detail | Noise Reduction (min 7 rows)
+  05 REGULATORY REFERENCES — prose listing all applicable legislation
+SIGNATURE GRID: 2 boxes — Assessed By, Reviewed By
+END MARK: green accent
+
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What construction activities are planned? List all plant/equipment to be used (excavators, piling rigs, compactors, etc.)"
-Round 1: "Where are the nearest sensitive receptors? (residential, schools, hospitals, offices). What type and approximate distance from site boundary?"
-Round 2: "What are the proposed working hours? Any out-of-hours or weekend working planned?"
-Round 2: "Do you know the existing background noise levels at the receptors? (LAeq and LA90 if available)"
-Round 2: "Are there any Section 61 consent conditions already in place? What local authority area is the site in?"
-Round 2: "Are there any vibration-sensitive receptors nearby? (listed buildings, sensitive equipment, tunnels)"
+Round 1: "What construction activities and plant/equipment are planned? (excavators, piling rigs, compactors, generators, etc.)"
+Round 1: "Where are the nearest noise-sensitive receptors? (type, distance, direction from site boundary)"
+Round 2: "Do you know existing background noise levels at the receptors? (LAeq and LA90 if available)"
+Round 2: "What are the proposed working hours? Any weekend or out-of-hours working?"
+Round 2: "What local authority area? Any existing Section 61 consent conditions?"
 
-Generate ALL sections: site description, assessment basis/methodology, working hours, plant inventory with BS 5228 Table C source noise levels (minimum 5 items with LWA values), sensitive receptors (minimum 2), predicted LAeq at each receptor using distance attenuation, impact assessment using ABC method, BPM statement, mitigation measures (minimum 5), monitoring plan with locations, vibration screening (minimum 3 sources), regulatory references.
+Generate ALL 5 numbered sections. siteDescription must be min 150 words. plantItems min 7 rows with real BS 5228 Table C refs. predictedLevels min 4 rows including combined scenarios. mitigationMeasures min 7 rows with detail column populated. significanceCallout min 80 words explaining ABC method result.
 
-WRITING STYLE: Technical, BS 5228 compliant. Plant noise levels must reference BS 5228-1 Table C entries. Predictions must show the methodology (point source attenuation: LAeq = LWA - 20log(r) - 8). Impact must be assessed against the ABC method criteria from BS 5228-1. BPM statement must demonstrate Best Practicable Means per CoPA 1974.`,
+WRITING STYLE: Technical, BS 5228 compliant. Plant noise levels MUST reference BS 5228-1 Table C entries (e.g. C4.8, C2.21, C1.14). Predictions show distance attenuation. Significance assessed against ABC method.`,
 
-  'section-61': `TEMPLATE: Section 61 Application (red, Control of Pollution Act 1974 consent format)
+  'section-61': `TEMPLATE: Section 61 Application (dark red #991B1B, Control of Pollution Act 1974 prior consent)
+COVER PAGE: Dark red banner "SECTION 61 PRIOR CONSENT APPLICATION", subtitle with CoPA 1974 + project name in #FCA5A5. Info table: Reference, Date, Submitted To, Applicant, Site, Works Duration, Key Noise Source.
+BODY SECTIONS (dark red full-width bars, unnumbered):
+  RED CALLOUT BOX: Section 61(1) legal text explaining the application, defence under S.61(9), and consent conditions
+  PROPOSED WORKING HOURS — table: Period | Hours | Activities Permitted (min 4 rows incl. Mon-Fri, Sat, Sun/BH, Night if applicable)
+  PROPOSED NOISE CONTROL MEASURES — BEST PRACTICABLE MEANS — table: BPM Measure | Detail | BS 5228 Reference (min 7 rows)
+  NOISE IMPACT SUMMARY — 4 KPI boxes: Ambient LAeq (dB(A) daytime), Predicted Piling (dB(A) at NSR), Exceedance (dB above ambient), BS 5228 Cat A (dB(A) threshold)
+  BPM summary prose below KPIs
+SIGNATURE GRID: 2 boxes — Applicant, LA Environmental Health
+END MARK: dark red accent
+
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "Who is the applicant? (company name, address, contact person for the consent application)"
-Round 1: "What local authority will this be submitted to? What is the site address?"
-Round 2: "What are the proposed working hours and any justification for out-of-hours work?"
-Round 2: "What noise limits are you proposing at the site boundary or nearest receptor? (LAeq and LAmax)"
-Round 2: "How will you handle noise complaints from residents?"
+Round 1: "Who is the applicant and which local authority will this be submitted to?"
+Round 1: "What is the site address and what works are proposed?"
+Round 2: "What working hours are proposed, including any out-of-hours justification?"
+Round 2: "What noise control measures (BPM) are you proposing?"
+Round 2: "What are the predicted noise levels at the nearest receptor during the noisiest phase?"
 
-Generate ALL Section 61 sections: applicant details, site details, proposed works with programme, working hours table (with justification for any non-standard hours), plant list with predicted levels, BPM statement with mitigation measures, proposed noise limits at boundary/receptor locations, monitoring methodology and locations, complaint handling procedure (minimum 4 steps), Section 61 declaration, regulatory references.
+Generate ALL sections. section61Declaration min 100 words. workingHours min 4 rows. mitigationMeasures min 7 rows with bs5228Ref column. bpmStatement min 120 words. Populate ambientLaeq, predictedPiling, exceedanceDb, bs5228CatAThreshold for KPI boxes.
 
-WRITING STYLE: Formal application format suitable for local authority submission. Every field must be populated. Proposed limits must be justified against background levels or BS 5228 ABC criteria. BPM must demonstrate all practicable measures are being taken.`,
+WRITING STYLE: Formal application format for local authority submission. All proposed limits justified against BS 5228 ABC criteria. BPM must demonstrate Best Practicable Means per CoPA 1974.`,
 
-  'monitoring-report': `TEMPLATE: Monitoring Report (teal, ongoing measurement results)
+  'monitoring-report': `TEMPLATE: Monitoring Report (teal #0f766e, weekly measurement results)
+COVER PAGE: Teal banner "NOISE MONITORING REPORT", subtitle with monitoring period in #99F6E4. Info table: Reference, Monitoring Period, Monitor Location, Equipment, Compliance.
+BODY SECTIONS (teal full-width bars, unnumbered):
+  WEEKLY MONITORING RESULTS — LAeq,1hr AT NSR — table: Date | Time Period | LAeq,1hr (dB) | LAmax (dB) | LA90 (dB) | Site Activity | Compliance (min 10 rows with RAG pills: Pass=green, Note*=amber, Fail=red)
+  AMBER CALLOUT: Note explaining any elevated readings (e.g. "*Note — specific date/time: explanation of elevated reading, confirmation still within consent limit")
+  WEEKLY SUMMARY — 5 KPI boxes: Mean LAeq (dB(A) weekly avg), Max LAeq,1hr (dB(A)), S61 Limit (dB(A) LAeq,1hr), Exceedances (of S61 limit), Complaints (this week)
+  TEAL CALLOUT: Compliance Statement — confirmation all readings within limits, complaints summary, monitoring continuation plan
+SIGNATURE GRID: 2 boxes — Monitored By, Submitted To
+END MARK: teal accent
+
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What monitoring period does this report cover? What consent or criteria are you monitoring against?"
-Round 1: "What monitoring locations are being used? (describe locations, grid refs if known, receptor type)"
-Round 2: "What measurement equipment is being used? (make, model, serial number, last calibration date)"
-Round 2: "Have there been any exceedances of consent limits during this period? If so, what caused them?"
-Round 2: "What were the weather conditions during monitoring? (wind speed affects measurement validity)"
+Round 1: "What monitoring period does this report cover? (e.g. Week 3 — dates)"
+Round 1: "What equipment is being used and where is the monitor located?"
+Round 2: "What were the main site activities during each monitoring period?"
+Round 2: "Were there any elevated readings or exceedances? What caused them?"
+Round 2: "How many complaints were received this period?"
 
-Generate ALL monitoring sections: monitoring summary, monitoring locations table (minimum 3), equipment and calibration records, measurement results table with LAeq/LAmax/LA90 per location per period (minimum 6 results), exceedance analysis (if any), weather conditions log, trend analysis, compliance summary, corrective actions for any exceedances.
+Generate ALL sections. measurementResults min 10 rows covering 5 days × 2 periods each. monitoringNote min 60 words. complianceSummary min 80 words. Populate weeklyMeanLaeq, weeklyMaxLaeq, s61Limit, exceedanceCount, complaintCount for KPI boxes.
 
-WRITING STYLE: Data-driven, factual. Measurement results must include LAeq, LAmax, and LA90. Compliance must be stated clearly against specific limit values. Weather must be recorded as BS 5228-1 requires valid measurements below 5 m/s wind speed. Trends should identify whether levels are improving, stable, or worsening.`,
+WRITING STYLE: Data-driven, factual. All measurements must include LAeq, LAmax, and LA90. Compliance stated against specific limit values. Note any anomalies with explanation.`,
 
-  'resident-communication': `TEMPLATE: Resident Communication (navy, plain English stakeholder summary)
+  'resident-communication': `TEMPLATE: Resident Communication (navy #1E40AF, plain English notification letter)
+COVER PAGE: Deep blue banner "CONSTRUCTION NOISE NOTIFICATION", subtitle "Important Information for Local Residents" in #BFDBFE. Info table: Reference, Date, From, To, Subject, Duration.
+BODY SECTIONS (navy full-width bars, unnumbered):
+  IMPORTANT NOTICE — [subject line] — heading bar with specific works start date
+  Opening: "Dear Resident," followed by plain-English explanation of works and why they're needed (min 100 words)
+  WHAT TO EXPECT — prose explaining piling/construction method in everyday terms, comparison to normal sounds (min 80 words)
+  WORKING HOURS — table: Day | Hours | Notes (min 3 rows: Mon-Fri, Sat, Sun/BH)
+  WHAT WE'RE DOING TO MINIMISE DISRUPTION — prose listing measures in plain English (min 100 words)
+  CONTACT US — blue callout box with community liaison name, phone, email, client helpline, and commitment statement
+  Signoff: "Yours faithfully," + name, role, company
+FOOTER: "Designed for letterbox distribution to all properties within 300m" (instead of standard end mark)
+
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What works are you doing that residents need to know about? Describe in simple terms."
-Round 1: "What are the committed working hours? Any weekend or evening work?"
+Round 1: "What works are starting that residents need to know about? Describe simply."
+Round 1: "What are the committed working hours?"
 Round 2: "Who is the community liaison contact? (name, phone, email)"
-Round 2: "What are the noisiest phases and when will they happen?"
-Round 2: "What measures are you taking to reduce noise impact on residents?"
+Round 2: "When do the noisy works start and how long will they last?"
+Round 2: "What is the client's customer helpline number?"
 
-Generate ALL resident sections: plain English works summary (no jargon), committed working hours, everyday noise comparisons table (minimum 5 comparisons like 'normal conversation = 60 dB'), what residents might notice, what the project is doing to reduce noise, project timeline with noisy phases highlighted, complaint procedure (minimum 3 steps), contact details. NO technical terminology — explain everything in terms residents can understand.
+Generate ALL sections. worksDescription min 120 words (plain English, explain WHY the works benefit the community). whatYouMightNotice min 100 words. whatWeAreDoing min 120 words. workingHours min 3 rows. Populate contactName, contactPhone, contactEmail, clientContact, noticeSubject, noticeDuration.
 
-WRITING STYLE: Friendly, reassuring, plain English. NO dB values without everyday comparisons. NO technical jargon (LAeq, receptor, attenuation). Use phrases like "about as loud as a busy road" not "approximately 72 dB LAeq". Complaint procedure must be simple and non-intimidating. Tone should be: "we're your neighbours for the duration of this project and we want to minimise disruption."`,
+WRITING STYLE: Friendly, reassuring, plain English. NO technical jargon (LAeq, receptor, attenuation). Use everyday comparisons ("similar to normal road traffic noise"). Tone: "we're your neighbours and want to minimise disruption."`,
 };
 
 const NOISE_ASSESSMENT_SCHEMA = `{
-  "documentRef": "string (NA-YYYY-NNN)",
-  "assessmentDate": "DD/MM/YYYY",
+  "documentRef": "string (NA-YYYY-NNN or S61-YYYY-NNN or NMR-YYYY-NNN or RN-YYYY-NNN depending on template)",
+  "assessmentDate": "DD/MM/YYYY or date range for monitoring",
   "reviewDate": "DD/MM/YYYY",
-  "assessedBy": "string",
+  "assessedBy": "string (name — role, company)",
   "projectName": "string",
-  "siteAddress": "string",
+  "siteAddress": "string (full address with postcode)",
   "principalContractor": "string",
   "client": "string",
   "localAuthority": "string",
-  "siteDescription": "string (min 80 words)",
-  "worksDescription": "string (min 80 words)",
+  "siteDescription": "string (min 150 words — describe site location, surrounding area, NSR distances, background noise environment, measurement equipment and dates)",
+  "worksDescription": "string (min 120 words — for T4 resident letter: plain English, explain works and community benefit)",
   "programmeDuration": "string",
-  "assessmentBasis": "string (min 60 words — reference BS 5228-1, ABC method)",
-  "methodology": "string (min 60 words — prediction methodology)",
+  "assessmentBasis": "string (min 80 words — reference BS 5228-1, ABC method, prediction methodology)",
+  "methodology": "string (min 80 words — prediction methodology, formula, assumptions)",
+  "nearestReceptorSummary": "string (e.g. 'Residential properties, Livesey Branch Road — 250m north')",
+  "keyActivities": "string (comma-separated list of main activities)",
+  "predictedLaeqAtNsr": "string (e.g. '68 dB(A) during piling phase (BS 5228 ABC Method)')",
+  "bs5228Significance": "string (e.g. 'Potentially Significant — exceeds ambient by >5 dB')",
   "plantItems": [
-    { "plant": "string", "bs5228Ref": "string (Table C ref)", "lwa": "string (dB LWA)", "quantity": "string", "onTime": "string (%)", "usage": "string" }
+    { "plant": "string (equipment name and model)", "bs5228Ref": "string (Table C ref e.g. C4.8)", "lwa": "string (dB(A) LAeq at 10m)", "quantity": "string", "onTime": "string (duration e.g. '4 weeks')", "usage": "string (activity description)", "programmePhase": "string (e.g. 'Phase 1 (Mar-Apr 2026)')" }
   ],
   "receptors": [
     { "id": "string (R1, R2...)", "type": "string (Residential/School/Hospital)", "address": "string", "distance": "string (m)", "direction": "string", "existingBackground": "string (dB LA90)" }
   ],
   "predictedLevels": [
-    { "receptorId": "string", "receptorName": "string", "predictedLaeq": "string (dB)", "criterion": "string (dB)", "impact": "Negligible|Low|Moderate|Significant", "margin": "string (dB above/below criterion)" }
+    { "receptorId": "string", "receptorName": "string", "activity": "string (e.g. 'CFA Piling (worst case)')", "laeqAt10m": "string", "distanceToNsr": "string", "predictedLaeq": "string (dB)", "ambient": "string (dB)", "exceedance": "string (e.g. '+2 dB' or '-2 dB')", "significance": "Not Significant|Potentially Significant|Significant", "criterion": "string (dB)", "impact": "string", "margin": "string" }
   ],
-  "impactSummary": "string (min 60 words)",
-  "bpmStatement": "string (min 80 words — Best Practicable Means justification)",
+  "significanceCallout": "string (min 80 words — explain worst-case vs normal scenarios, ABC method thresholds, overall conclusion)",
+  "impactSummary": "string (min 80 words)",
+  "bpmStatement": "string (min 120 words — Best Practicable Means justification per CoPA 1974 S.72)",
   "mitigationMeasures": [
-    { "measure": "string", "type": "Source|Path|Receptor|Administrative", "expectedReduction": "string (dB)", "implementedBy": "string", "status": "Implemented|Planned" }
+    { "measure": "string (measure name)", "detail": "string (full description of the measure)", "expectedReduction": "string (dB reduction or N/A for management measures)", "type": "Source|Path|Receptor|Administrative", "implementedBy": "string", "status": "Implemented|Planned", "bs5228Ref": "string (BS 5228 Part 1 Annex B reference if applicable)" }
   ],
-  "monitoringPlan": "string (min 40 words)",
+  "monitoringPlan": "string (min 60 words)",
   "monitoringLocations": [
     { "id": "string (ML1...)", "description": "string", "gridRef": "string", "receptorType": "string", "consentLimit": "string (dB LAeq)" }
   ],
   "measurementResults": [
-    { "locationId": "string", "date": "string", "startTime": "string", "endTime": "string", "laeq": "string (dB)", "lamax": "string (dB)", "la90": "string (dB)", "dominantSource": "string", "compliance": "Compliant|Exceedance" }
+    { "locationId": "string", "date": "string (e.g. 'Mon 23/03')", "startTime": "string (e.g. '08:00')", "endTime": "string (e.g. '12:00')", "laeq": "string (dB)", "lamax": "string (dB)", "la90": "string (dB)", "dominantSource": "string (activity description)", "compliance": "Pass|Note*|Fail" }
   ],
+  "monitoringNote": "string (min 60 words — explain any Note* entries in measurement results, confirm within limits)",
   "exceedances": [
     { "locationId": "string", "date": "string", "measuredLevel": "string (dB)", "limit": "string (dB)", "exceedanceDb": "string", "cause": "string", "correctiveAction": "string" }
   ],
@@ -5088,10 +5304,10 @@ const NOISE_ASSESSMENT_SCHEMA = `{
   "calibrationRecords": [
     { "instrument": "string", "serialNumber": "string", "lastCal": "string", "nextCal": "string", "driftCheck": "string (dB)" }
   ],
-  "complianceSummary": "string (min 40 words)",
-  "trendAnalysis": "string (min 40 words)",
+  "complianceSummary": "string (min 80 words — for T3: state all within limits, no complaints, monitoring continuation plan)",
+  "trendAnalysis": "string (min 50 words)",
   "workingHours": [
-    { "period": "string (Daytime/Evening/Weekend)", "days": "string", "hours": "string", "noiseType": "string", "justification": "string" }
+    { "period": "string (Monday – Friday / Saturday / Sunday & Bank Holidays / Night works)", "days": "string", "hours": "string (e.g. '07:00 – 19:00')", "noiseType": "string (activities permitted)", "justification": "string" }
   ],
   "vibrationScreening": [
     { "source": "string", "ppv": "string (mm/s)", "distance": "string (m)", "criterion": "string", "impact": "Negligible|Low|Moderate|Significant" }
@@ -5108,25 +5324,39 @@ const NOISE_ASSESSMENT_SCHEMA = `{
   "everydayComparisons": [
     { "source": "string (e.g. 'Normal conversation')", "level": "string (e.g. '60 dB')", "comparison": "string (how our works compare)" }
   ],
-  "whatYouMightNotice": "string (min 40 words — plain English)",
-  "whatWeAreDoing": "string (min 60 words — plain English)",
+  "whatYouMightNotice": "string (min 100 words — plain English, explain what the noise sounds like, what method is being used and why it's quieter)",
+  "whatWeAreDoing": "string (min 120 words — plain English list of measures in prose form: quieter methods, hoarding, silenced plant, monitoring, hours restrictions)",
   "applicantName": "string", "applicantAddress": "string", "applicantContact": "string",
-  "section61Declaration": "string (formal declaration text)",
-  "contactName": "string", "contactPhone": "string", "contactEmail": "string",
+  "submittedTo": "string (e.g. 'Blackburn with Darwen Borough Council — Environmental Health')",
+  "keyNoiseSource": "string (e.g. 'CFA piling — 4 weeks, predicted 54 dB(A) at nearest receptor')",
+  "section61Declaration": "string (min 100 words — formal declaration text referencing S.61(1), BPM, proposed limits, requesting consent)",
+  "contactName": "string (community liaison name — role)", "contactPhone": "string", "contactEmail": "string",
+  "clientContact": "string (client helpline number e.g. '0345 672 3723')",
+  "monitorLocation": "string (for T3 cover: full location description)",
+  "equipment": "string (for T3 cover: instrument make/model + type)",
+  "complianceStatus": "string (for T3 cover: e.g. 'All measurements within Section 61 consent limits')",
+  "monitoringPeriod": "string (for T3 cover: e.g. 'Week 3 — 23–27 March 2026')",
+  "ambientLaeq": "string (number only for KPI box)", "predictedPiling": "string (number only)",
+  "exceedanceDb": "string (e.g. '+2')", "bs5228CatAThreshold": "string (e.g. '65')",
+  "weeklyMeanLaeq": "string (number for KPI)", "weeklyMaxLaeq": "string (number for KPI)",
+  "s61Limit": "string (number for KPI)", "exceedanceCount": "string (number for KPI)", "complaintCount": "string (number for KPI)",
+  "noticeSubject": "string (for T4: e.g. 'Advance notice of piling works — starting 16 March 2026')",
+  "noticeDuration": "string (for T4: e.g. 'Approximately 4 weeks (16 March – 17 April 2026)')",
   "regulatoryReferences": [{ "reference": "string", "description": "string" }],
-  "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
+  "additionalNotes": "string (min 100 words)"
 }
 
 CRITICAL RULES:
-- T1 needs: plantItems, receptors, predictedLevels, mitigationMeasures, monitoringLocations, workingHours, vibrationScreening.
-- T2 needs: workingHours, plantItems, mitigationMeasures, proposedLimits, monitoringLocations, complaintProcedure, applicant details.
-- T3 needs: monitoringLocations, calibrationRecords, measurementResults, exceedances (if any), weatherLogs.
-- T4 needs: workingHours, everydayComparisons, timelinePhases, mitigationMeasures, complaintProcedure, contact details.
-- Plant noise levels MUST reference real BS 5228-1 Table C entries with realistic LWA values.
+- T1 needs: siteDescription (150w), plantItems (7+), predictedLevels (4+), mitigationMeasures (7+), significanceCallout (80w), regulatoryReferences.
+- T2 needs: section61Declaration (100w), workingHours (4+), mitigationMeasures (7+ with bs5228Ref), bpmStatement (120w), ambientLaeq/predictedPiling/exceedanceDb/bs5228CatAThreshold for KPI boxes.
+- T3 needs: measurementResults (10+), monitoringNote (60w), complianceSummary (80w), weeklyMeanLaeq/weeklyMaxLaeq/s61Limit/exceedanceCount/complaintCount for KPI boxes.
+- T4 needs: worksDescription (120w plain English), whatYouMightNotice (100w), whatWeAreDoing (120w), workingHours (3+), contactName/contactPhone/contactEmail/clientContact, noticeSubject, noticeDuration.
+- Plant noise levels MUST reference real BS 5228-1 Table C entries with realistic LAeq at 10m values.
 - Predictions must use correct formula: LAeq = LWA - 20log(r) - 8 for point sources.
 - Impact assessment must use BS 5228-1 ABC method criteria.
 - Monitoring measurements invalid if wind speed > 5 m/s.
-- Resident communication MUST avoid all technical jargon — plain English only.`;
+- T4 MUST avoid all technical jargon — plain English only.
+- KPI box values must be numbers only (no units in the value field — units go in the label).`;
 
 export function getNoiseAssessmentTemplateGenerationPrompt(templateSlug: NoiseAssessmentTemplateSlug): string {
   const styleGuide = NOISE_ASSESSMENT_TEMPLATE_STYLE[templateSlug] || NOISE_ASSESSMENT_TEMPLATE_STYLE['ebrora-standard'];
@@ -5151,69 +5381,132 @@ Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 // =============================================================================
 
 const PERMIT_TO_DIG_TEMPLATE_STYLE: Record<PermitToDigTemplateSlug, string> = {
-  'ebrora-standard': `TEMPLATE: Ebrora Standard (green, cover page, comprehensive HSG47 permit)
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, HSG47 comprehensive permit)
+COVER PAGE: Green banner "PERMIT TO DIG", subtitle with HSG47 + project name in #A7F3D0. Info table: Permit Number, Date, Valid Until, Project, Location, Excavation Method, Known Services, Deepest Dig, Issued By.
+SECTION BARS (green full-width, numbered 01-04):
+  01 KNOWN SERVICES IN EXCAVATION ZONE — table: Service | Owner | Size | Depth (approx) | Status | Confirmed By (min 4 rows with RAG pills for status: Live=amber, Isolated/Dead=green, Clear=green)
+  RED CALLOUT: HSG47 Safe Digging Rules — 500mm hand dig rule, CAT & Genny before breaking ground, STOP procedure for unidentified services (min 60 words)
+  02 PRE-DIG CHECKS — bullet list (min 10 items covering statutory searches, PAS 128 survey, trial pits, CAT & Genny, ground marking, isolation certs, RAMS briefing, emergency contacts)
+  03 EXCAVATION CONTROLS — table: Zone | Method | Plant Permitted | Max Dig Speed (min 4 rows: 0-500mm, 500mm-1m, >1m, below service depth)
+  04 PERMIT AUTHORISATION — 4-box signature grid: Permit Issuer, Permit Recipient (Operator), CAT Operative, Permit Closure
+END MARK: green accent
+
 AI INTERVIEW — ask these SPECIFIC questions:
-Round 1: "What type of excavation is this? Dimensions — max depth, length, width?"
-Round 1: "Where on site? Grid ref/what3words? Ground conditions?"
-Round 1: "Statutory utility searches completed? Providers and reference numbers?"
-Round 2: "CAT & Genny scan done? Operator, model, cal date? Services detected?"
-Round 2: "Services identified? For each: type, depth, horizontal distance, verified?"
-Round 2: "Plant restrictions? Backfill spec? Permit issuer and validity?"
-Generate ALL sections. Minimum 5 statutory searches, 3 services, 4 CAT results, 3 hand-dig zones, 6 safe dig rules, 3 plant restrictions, 3 backfill layers, 4 strike actions. Hand-dig 500 mm per HSG47. Gas 0800 111 999, Electric 105.`,
+Round 1: "What type of excavation? Dimensions, depth, location on site?"
+Round 1: "What known services are in the excavation zone? For each: type, owner, size, depth, status (live/isolated/dead)."
+Round 2: "What CAT & Genny results were found? Who did the scan?"
+Round 2: "What excavation method and plant will be used?"
+Round 2: "Who is issuing the permit and who is the machine operator?"
 
-  'daily-permit': `TEMPLATE: Daily Permit (amber, ONE SHIFT ONLY)
-AI INTERVIEW: Round 1: "Date, shift time, location?" Round 1: "Weather and ground conditions?" Round 1: "Services present today?"
-Round 2: "Personnel on permit? Names, roles, employers." Round 2: "Pre-dig checklist completed? 10 items."
-Generate compact shift card. 10-item checklist, personnel table (6 rows), IF YOU STRIKE warning. Extremely concise.`,
+Generate ALL 4 numbered sections. servicesIdentified min 4 rows with full details. preDigChecks min 10 items. excavationControls min 4 zone rows. hsg47Callout min 60 words.`,
 
-  'utility-strike': `TEMPLATE: Utility Strike (red, emergency response)
-AI INTERVIEW: Round 1: "What utility struck? What happened?" Round 1: "Notification cascade — who, in what order?"
-Round 2: "Area made safe? Evacuation distance? Utility company called?" Round 2: "RIDDOR-reportable? Scene preserved?"
-Round 2: "What caused the strike? Corrective actions?"
-Generate: immediate actions by 4 service types, notification cascade 6+ contacts, 8-step strike response, scene preservation, investigation, RIDDOR assessment, lessons learned.`,
+  'daily-permit': `TEMPLATE: Daily Permit (amber #92400E, single-shift card)
+COVER PAGE: Amber banner "DAILY DIG PERMIT", subtitle "Single Shift — Valid Until 18:00 Today Only" in #FDE68A. Info table: Permit No, Date, Valid, Location, Operator, Services count.
+BODY SECTIONS (amber bars, unnumbered):
+  RED CALLOUT: Expiry warning — permit expires at 18:00, STOP procedure
+  SERVICES IN DIG ZONE — compact table: Service | Depth | Status | Rule (min 3 rows)
+  PRE-DIG CONFIRMATION — bullet list (min 5 items: CAT scan, marking, insulated tools, emergency numbers, briefing)
+  AUTHORISATION — info table: Permit Issued By, Received By (Operator), CAT Scan By (with name, signed, time fields)
+  PERMIT CLOSURE (END OF SHIFT) — info table: Work Complete? (checkbox), Services Intact? (checkbox), Closed By (name/signed/time)
+FOOTER: "Single-shift permit — expires 18:00 today" (instead of standard end mark)
 
-  'avoidance-plan': `TEMPLATE: Avoidance Plan (navy, site-wide strategy)
-AI INTERVIEW: Round 1: "Site details? How many excavation zones?" Round 1: "Statutory searches done? PAS 128 survey level?"
-Round 2: "Describe each zone: location, services, density High/Medium/Low, special measures?"
-Round 2: "CAT operators — names, certs, expiry? Permit procedure steps?"
-Round 2: "Monitoring and audit arrangements?"
-Generate: avoidance statement, statutory records, PAS 128, excavation zones with density, safe dig rules, competence register, permit procedure, audit plan. Min 3 zones, 6 rules, 3 competence, 5 procedure steps, 4 audit items.`,
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What date and shift time? Location?"
+Round 1: "What services are in today's dig zone?"
+Round 2: "Who is the operator? Who issued the permit?"
+
+Generate ALL sections. Compact and concise — this is a field card. servicesIdentified min 3 rows. preDigConfirmation min 5 items.`,
+
+  'utility-strike': `TEMPLATE: Utility Strike Response (red #DC2626, cover #991B1B, emergency response)
+COVER PAGE: Dark red banner "⚠ UTILITY STRIKE RESPONSE PLAN", subtitle "Emergency Procedures By Service Type" in #FCA5A5. Info table: Reference, Date, Site, Purpose, Display instruction.
+BODY SECTIONS:
+  DANGER BANNER: Full-width red "IF YOU STRIKE A SERVICE — STOP IMMEDIATELY"
+  Sub-text: "DO NOT attempt to repair. DO NOT backfill. Withdraw all personnel. Call Site Manager."
+  5 SERVICE-SPECIFIC COLOURED SECTION BARS + CALLOUT BOXES:
+    ⚡ ELECTRIC CABLE STRIKE (bar=#DC2626, callout=red) — electrocution risk, 10m distance, call 105
+    🔥 GAS PIPE STRIKE (bar=#D97706, callout=amber) — explosion risk, 50m evacuation, call 0800 111 999
+    💧 WATER MAIN STRIKE (bar=#2563EB, callout=blue) — flood risk, isolate if safe, call water company
+    🚰 SEWER / DRAIN STRIKE (bar=#7C3AED, callout=purple) — contamination risk, leptospirosis, call EA 0800 80 70 60
+    📡 TELECOM / FIBRE STRIKE (bar=#059669, callout=green) — service disruption, call Openreach 0800 023 2023
+  ALL STRIKES — COMMON ACTIONS (bar=#374151) — numbered table: 6 steps (STOP, WITHDRAW, CALL, PROTECT, PHOTOGRAPH, WAIT)
+FOOTER: "Print, laminate, display at all excavations and in plant cabs" (lamination-ready)
+
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What site is this for? What is the site manager's contact number?"
+Round 1: "What local utility companies and emergency numbers apply to this site?"
+Round 2: "Are there any site-specific strike procedures beyond the standard response?"
+
+Generate ALL 5 service-specific responses with correct emergency numbers and 6 common action steps. Each callout min 40 words. This is a lamination-ready emergency reference card.`,
+
+  'avoidance-plan': `TEMPLATE: Avoidance Plan (navy #1e293b, PAS 128 site-wide strategy)
+COVER PAGE: Navy banner "BURIED SERVICES AVOIDANCE PLAN", subtitle "PAS 128:2022 / HSG47 — Site-Wide Strategy" in #93C5FD. Info table: Reference, Date, Project, Survey Standard, Survey Level, Total Services Identified.
+SECTION BARS (navy full-width, numbered 01-03):
+  01 SURVEY METHODOLOGY — PAS 128:2022 — prose (min 200 words) describing survey phases (QL-B detection + QL-A verification), survey contractor, methods (EML/GPR/trial pits), coverage area, service plotting on drawings, NJUG colour marking
+  02 SERVICES REGISTER — FULL SITE — table: ID | Service | Owner | Size | Depth | Status | Survey Level | Risk to Works (min 8 rows with RAG pills: High=red, Medium=amber, Low=green)
+  03 SITE-WIDE AVOIDANCE PROCEDURES — table: Procedure | Detail | Reference (min 6 rows covering: PTD system, CAT & Genny, hand dig 500mm, service marking, toolbox talks, strike reporting)
+  NAVY CALLOUT: Plan Revision note — this is a live document, updated when new services found or scope changes
+SIGNATURE GRID: 2 boxes — Prepared By, Approved By
+END MARK: navy accent
+
+AI INTERVIEW — ask these SPECIFIC questions:
+Round 1: "What site? How many services have been identified? What PAS 128 survey level?"
+Round 1: "Describe the survey methodology — who conducted it, what methods, what phases?"
+Round 2: "List all known services: type, owner, size, depth, status, survey level, risk."
+Round 2: "What are the site-wide avoidance procedures?"
+
+Generate ALL 3 numbered sections. surveyMethodology min 200 words. servicesRegister min 8 rows with full 8 columns. avoidanceProcedures min 6 rows with HSG47/PAS 128/NJUG references. revisionCallout min 40 words.`,
 };
 
 const PERMIT_TO_DIG_SCHEMA = `{
-  "documentRef": "string (PTD-YYYY-NNN)", "issueDate": "DD/MM/YYYY", "reviewDate": "DD/MM/YYYY",
-  "preparedBy": "string", "projectName": "string", "siteAddress": "string",
-  "gridRef": "string", "what3Words": "string", "principalContractor": "string", "client": "string",
-  "excavationType": "string", "location": "string", "maxDepth": "string", "maxLength": "string", "maxWidth": "string",
-  "startDate": "DD/MM/YYYY", "endDate": "DD/MM/YYYY", "groundConditions": "string",
-  "nearStructures": "string", "previousExcavations": "string",
-  "statSearches": [{ "provider": "string", "completed": true, "date": "DD/MM/YYYY", "reference": "string" }],
-  "servicesIdentified": [{ "type": "gas | electric | water | telecom | sewer", "description": "string", "depth": "string", "horizontalDistance": "string", "verified": true, "notes": "string" }],
-  "catOperator": "string", "catModel": "string", "catCalDate": "DD/MM/YYYY", "gennyModel": "string", "gennyCalDate": "DD/MM/YYYY",
-  "catResults": [{ "location": "string", "serviceDetected": "string", "signalType": "string", "depth": "string", "action": "string" }],
-  "handDigZones": [{ "zone": "string", "services": "string", "radius": "string", "method": "string", "restrictions": "string" }],
-  "safeDig": ["string"], "plantRestrictions": [{ "plant": "string", "minimumDistance": "string", "condition": "string" }],
-  "backfillLayers": [{ "layer": "string", "material": "string", "compaction": "string", "thickness": "string" }],
-  "reinstatementSpec": "string",
-  "strikeActions": [{ "serviceType": "Gas | Electric | Water | Telecom", "immediateAction": "string", "evacuationDistance": "string", "emergencyNumber": "string", "doNot": "string" }],
-  "notificationCascade": [{ "order": "string", "role": "string", "name": "string", "number": "string", "when": "string" }],
-  "strikeSteps": [{ "step": "string", "action": "string", "responsibility": "string" }],
-  "investigationItems": [{ "question": "string", "response": "string" }],
-  "riddorAssessment": "string", "lessonsLearned": [{ "finding": "string (min 60 words — specific finding with evidence)", "action": "string", "responsible": "string", "dueDate": "DD/MM/YYYY" }],
-  "scenePreservation": "string", "avoidanceStatement": "string", "pas128Classification": "string",
-  "excavationZones": [{ "zone": "string", "location": "string", "serviceDensity": "High | Medium | Low", "servicesPresent": "string", "permitRequired": true, "specialMeasures": "string" }],
-  "safeDigRules": ["string"], "competenceRegister": [{ "name": "string", "role": "string", "catCert": "string", "certExpiry": "DD/MM/YYYY", "lastAssessed": "DD/MM/YYYY" }],
-  "permitProcedure": ["string"], "auditItems": [{ "item": "string", "frequency": "string", "responsibility": "string", "record": "string" }],
-  "shiftDate": "DD/MM/YYYY", "shiftTime": "string", "weatherConditions": "string", "groundConditionsToday": "string",
-  "preDigChecklist": [{ "item": "string", "checked": true }],
-  "personnelOnPermit": [{ "name": "string", "role": "string", "employer": "string", "signOn": "string", "signOff": "string" }],
-  "servicesInAreaToday": "string", "permitIssuer": "string", "permitIssuerRole": "string",
-  "permitValidity": "string", "extensionProcedure": "string",
+  "documentRef": "string (PTD-YYYY-NNN or USR-YYYY-NNN or BSAP-YYYY-NNN depending on template)",
+  "issueDate": "DD/MM/YYYY", "validUntil": "string (e.g. '14 April 2026, 18:00 (single shift)')",
+  "projectName": "string", "siteAddress": "string", "location": "string (specific dig location on site)",
+  "excavationMethod": "string (e.g. 'Machine excavation (CAT 320) + hand dig within 500mm of known services')",
+  "knownServicesCount": "string (e.g. '3 identified — 150mm water main, 450mm foul sewer, LV electric cable')",
+  "deepestDig": "string (e.g. '4.6m BGL (formation level)')",
+  "issuedBy": "string (name — role)", "preparedBy": "string",
+  "principalContractor": "string", "client": "string",
+  "operatorName": "string (machine operator name for T2)",
+  "servicesIdentified": [
+    { "type": "Water|Sewer|Electric|Telecom|Gas|Abandoned", "description": "string (e.g. 'Potable water main')", "owner": "string", "size": "string (e.g. '150mm MDPE')", "depth": "string (e.g. '0.9m BGL')", "status": "string (e.g. 'Live — to be protected')", "confirmedBy": "string (e.g. 'CAT & Genny + trial pit TP-04')", "rule": "string (for T2: e.g. 'Hand dig within 500mm')", "surveyLevel": "string (for T4: e.g. 'QL-A (TP-04)')", "riskToWorks": "High|Medium|Low" }
+  ],
+  "hsg47Callout": "string (min 60 words — HSG47 safe digging rules: 500mm hand dig, CAT & Genny, STOP procedure)",
+  "preDigChecks": [{ "item": "string" }],
+  "excavationControls": [
+    { "zone": "string (distance from service)", "method": "string", "plantPermitted": "string", "maxDigSpeed": "string" }
+  ],
+  "shiftDate": "DD/MM/YYYY", "shiftValid": "string (e.g. '07:30 – 18:00 TODAY ONLY')",
+  "expiryCallout": "string (expiry warning text for T2)",
+  "preDigConfirmation": [{ "item": "string" }],
+  "authorisationRows": [{ "label": "string", "value": "string (include signed/time fields)" }],
+  "closureRows": [{ "label": "string", "value": "string (include checkbox text)" }],
+  "strikeResponses": [
+    { "serviceType": "string (e.g. 'ELECTRIC CABLE STRIKE')", "icon": "string (emoji)", "colour": "string (hex)", "bgColour": "string (hex)", "textColour": "string (hex)", "calloutText": "string (min 40 words — danger description, evacuation distance, emergency number, DO NOTs)" }
+  ],
+  "commonActions": [{ "step": "string (1-6)", "action": "string (e.g. 'STOP all plant and excavation immediately')" }],
+  "dangerBannerText": "string (e.g. '⚠ IF YOU STRIKE A SERVICE — STOP IMMEDIATELY ⚠')",
+  "dangerSubText": "string (e.g. 'DO NOT attempt to repair. DO NOT backfill. Withdraw all personnel.')",
+  "strikePurpose": "string", "strikeDisplay": "string",
+  "surveyMethodology": "string (min 200 words — PAS 128 phases, survey contractor, methods, coverage, service plotting, NJUG marking)",
+  "surveyStandard": "string", "surveyLevel": "string (e.g. 'QL-B (Detection) + QL-A (Verification)')", "totalServicesCount": "string",
+  "servicesRegister": [
+    { "id": "string (S01, S02...)", "type": "string", "description": "string", "owner": "string", "size": "string", "depth": "string", "status": "string", "surveyLevel": "string (e.g. 'QL-A (TP-04)')", "riskToWorks": "High|Medium|Low" }
+  ],
+  "avoidanceProcedures": [
+    { "procedure": "string", "detail": "string (full description)", "reference": "string (e.g. 'HSG47 §3.2')" }
+  ],
+  "revisionCallout": "string (min 40 words — explain this is a live document, revision triggers)",
   "regulatoryReferences": [{ "reference": "string", "description": "string" }],
-  "signOffRoles": [{ "role": "string", "name": "string" }], "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
+  "additionalNotes": "string (min 100 words)"
 }
 
-CRITICAL: Populate arrays relevant to chosen template. ALWAYS populate regulatoryReferences and signOffRoles. Gas: 0800 111 999. Electric: 105. Hand-dig: 500 mm per HSG47.`;
+CRITICAL RULES:
+- T1 needs: servicesIdentified (4+), hsg47Callout (60w), preDigChecks (10+), excavationControls (4+).
+- T2 needs: servicesIdentified (3+), preDigConfirmation (5+), authorisationRows, closureRows.
+- T3 needs: strikeResponses (5 service types with correct colours), commonActions (6 steps), dangerBannerText.
+- T4 needs: surveyMethodology (200w), servicesRegister (8+), avoidanceProcedures (6+), revisionCallout (40w).
+- Gas: 0800 111 999. Electric: 105. Water: company emergency. Openreach: 0800 023 2023. EA: 0800 80 70 60.
+- Hand-dig: 500mm per HSG47. ALWAYS populate regulatoryReferences.`;
 
 export function getPermitToDigTemplateGenerationPrompt(templateSlug: PermitToDigTemplateSlug): string {
   const styleGuide = PERMIT_TO_DIG_TEMPLATE_STYLE[templateSlug] || PERMIT_TO_DIG_TEMPLATE_STYLE['ebrora-standard'];
@@ -5230,57 +5523,74 @@ const POWRA_TEMPLATE_STYLE: Record<PowraTemplateSlug, string> = {
 AI INTERVIEW: Round 1: "What task today? Activity, location, duration." Round 1: "Conditions? Weather, ground, lighting, access, overhead, adjacent work."
 Round 1: "Hazards identified? For each: what could go wrong, consequence, control measures."
 Round 2: "PPE required?" Round 2: "Stop conditions — when must ALL work stop?"
+Round 2: "What would trigger a reassessment of this POWRA during the shift? (weather change, scope change, new hazard, permit expiry, break)"
 Round 2: "Emergency arrangements? First aider, kit location, muster, number. Team today — names, roles, employers."
-Generate ALL sections. Min 6 hazards, 5 PPE, 5 stop conditions, 5 reassessment triggers, 4 team members. Risk ratings MUST show improvement.`,
+Generate ALL sections. Min 7 hazards (at least 4 High, 2 Medium), 7 PPE items with EN standards, 7 stop conditions, 6 reassessment triggers, 6 team members. Risk ratings MUST show improvement. Emergency arrangements min 150 words. Task description min 200 words. Each condition field min 40 words.`,
 
   'quick-card': `TEMPLATE: Quick Card (amber, STOP-THINK-ACT, 1 page)
 AI INTERVIEW: Round 1: "Task and location — brief." Round 1: "Conditions — weather, ground, overhead, access."
 Round 2: "Hazards — tick applicable: height, services, manual handling, plant, confined spaces, electrical, slips, noise. Others?"
 Round 2: "Key controls in 1-2 sentences."
-Generate compact card. 8-item checklist, controls summary, max 4 stop conditions. One page only.`,
+Generate compact card. 8-item checklist (each item min 15 words with context specific to this task), controls summary min 120 words, max 4 stop conditions. Task description min 80 words. One page only.`,
 
   'task-specific': `TEMPLATE: Task Specific (teal, phase-by-phase)
-AI INTERVIEW: Round 1: "Break task into phases/steps. What are they?"
+AI INTERVIEW: Round 1: "Describe the overall task — what are you doing today, RAMS reference, and permits in place?"
+Round 1: "Conditions today? Weather, ground conditions?"
+Round 1: "Break task into phases/steps. What are they? Give each a time window."
 Round 1: "For each phase — hazards and controls?"
 Round 2: "Plant and equipment? Pre-use check, operator, restrictions?"
 Round 2: "Permits required per phase? Type, reference, issuer."
 Round 2: "Team today? Phase-specific stop conditions?"
-Generate phase-by-phase sections. Min 3 phases, 2 hazards per phase, 2 plant items, 4 team members.`,
+Generate phase-by-phase sections. Min 4 phases (each with time window), 2 hazards per phase (each hazard min 60 words, each control min 80 words), 5 plant items with operator names and restrictions, 4 permits with issuer and validity, 5 team members. Phase descriptions min 80 words each. Task overview min 200 words. 2 phase-specific stop conditions per phase.`,
 
   'supervisor-review': `TEMPLATE: Supervisor Review (navy, audit layer)
 AI INTERVIEW: Round 1: "Task description, RAMS ref, permits."
+Round 1: "Conditions today? Weather, ground, lighting, access/egress, overhead, adjacent work?"
 Round 1: "Hazards — each with consequence, risk before, control, residual risk."
+Round 2: "PPE required for this task? Stop conditions — when must work cease?"
 Round 2: "Competency verification: CSCS? Training? RAMS briefing? PPE? Plant tickets?"
 Round 2: "Environmental considerations? Monitoring required? Close-out checks?"
 Round 2: "Lessons learned from similar tasks?"
-Generate ALL sections. Min 6 hazards, 5 competency checks, 4 monitoring items, 5 close-out items, 5 regulatory refs. Formal — file retention document.`,
+Generate ALL sections. Min 6 hazards (each control min 80 words), 7 competency checks (each min 20 words with evidence required), 6 monitoring items with named responsibility, 7 close-out items (each min 15 words), 3 lessons learned (each finding min 80 words with specific evidence from previous tasks), 9 regulatory references with specific clause numbers, 7 stop conditions. Environmental considerations min 150 words. Task description min 250 words. Formal — file retention document.`,
 };
 
 const POWRA_SCHEMA = `{
   "documentRef": "string (POWRA-YYYY-NNN)", "date": "DD/MM/YYYY", "time": "HH:MM",
   "assessedBy": "string", "projectName": "string", "siteAddress": "string",
   "location": "string", "ramsReference": "string", "permitReferences": "string",
-  "taskDescription": "string (min 80 words)",
-  "conditions": { "weather": "string", "groundConditions": "string", "lighting": "string", "accessEgress": "string", "overhead": "string", "adjacentWork": "string" },
-  "hazards": [{ "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "consequence": "string (min 30 words — realistic consequence and severity)", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string (min 15 words)", "riskAfter": "High | Medium | Low" }],
-  "ppeRequired": ["string"], "stopConditions": ["string"], "reassessmentTriggers": ["string"],
-  "emergencyArrangements": "string",
+  "contractReference": "string (contract number and form, e.g. P50027, NEC4 ECC Option A)",
+  "clientName": "string (client organisation name)",
+  "principalContractor": "string (PC organisation name)",
+  "taskDescription": "string (min 200 words — comprehensive description of the specific task including location, equipment, materials, duration, number of operatives, environmental conditions, reference to parent RAMS and applicable permits. Must fill a full paragraph when rendered.)",
+  "conditions": {
+    "weather": "string (min 40 words — current conditions including temperature, wind, precipitation, forecast for the shift, Met Office warnings if applicable)",
+    "groundConditions": "string (min 40 words — surface type, stability, slope, wet/dry, proximity to excavations, drainage status, bearing capacity considerations)",
+    "lighting": "string (min 30 words — natural/artificial, adequacy for task, supplementary requirements, times when additional lighting needed)",
+    "accessEgress": "string (min 40 words — primary access route, pedestrian/plant separation, emergency egress route, muster point location, welfare facilities)",
+    "overhead": "string (min 25 words — overhead power lines, structures, crane movements, any obstructions above the work area)",
+    "adjacentWork": "string (min 25 words — other work activities in the vicinity, potential interference, shared access routes, coordination required)"
+  },
+  "hazards": [{ "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "consequence": "string (min 40 words — realistic consequence, severity level, and type of injury including medical terminology)", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, how compliance is verified, and what monitoring is in place)", "riskAfter": "High | Medium | Low" }],
+  "ppeRequired": ["string (include EN standard reference for each PPE item, e.g. 'Hard hat (EN 397)')"],
+  "stopConditions": ["string (min 15 words — specific measurable condition with threshold where applicable, e.g. rainfall exceeds 10mm/hr)"],
+  "reassessmentTriggers": ["string (min 15 words — specific trigger event with action required)"],
+  "emergencyArrangements": "string (min 150 words — first aider name and qualification, first aid kit locations, muster point with grid ref, emergency services access, site emergency number, nearest A&E with distance and travel time, site-specific rescue plans, RIDDOR reporting procedure)",
   "teamSignOn": [{ "name": "string", "role": "string", "employer": "string", "briefed": true }],
-  "hazardChecklist": [{ "item": "string", "checked": true }],
-  "controlsSummary": "string",
-  "taskPhases": [{ "phase": "string", "description": "string", "hazards": [{ "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "consequence": "string (min 30 words — realistic consequence and severity)", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)", "riskAfter": "High | Medium | Low" }], "plantEquipment": "string", "permitsRequired": "string", "stopConditions": ["string"] }],
-  "plantRegister": [{ "item": "string", "checkCompleted": true, "operator": "string", "restrictions": "string" }],
-  "permitsCrossRef": [{ "type": "string", "reference": "string", "issuer": "string", "validity": "string" }],
-  "competencyChecks": [{ "item": "string", "verified": true, "verifiedBy": "string" }],
-  "environmentalConsiderations": "string",
-  "monitoringItems": [{ "item": "string", "frequency": "string", "responsibility": "string", "action": "string" }],
-  "closeOutItems": [{ "item": "string", "completed": true, "signedBy": "string" }],
-  "lessonsLearned": [{ "finding": "string (min 60 words — specific finding with evidence)", "action": "string", "responsible": "string" }],
-  "regulatoryReferences": [{ "reference": "string", "description": "string" }],
+  "hazardChecklist": [{ "item": "string (min 15 words — checklist item with brief context for this specific task)", "checked": true }],
+  "controlsSummary": "string (min 120 words — consolidated controls summary covering key risk controls, PPE requirements, and working arrangements for all identified hazards)",
+  "taskPhases": [{ "phase": "string (phase name with time window, e.g. 'Topsoil Strip & Service Verification (06:45 – 08:30)')", "description": "string (min 80 words — detailed description of phase activities)", "hazards": [{ "hazard": "string (min 60 words — specific hazard identified at point of work with root cause)", "consequence": "string (min 40 words — realistic consequence and severity)", "likelihood": "string", "severity": "string", "riskBefore": "High | Medium | Low", "controlMeasure": "string (min 80 words — specific control measure detailing who is responsible, what equipment/procedure is required, and how compliance is verified)", "riskAfter": "High | Medium | Low" }], "plantEquipment": "string (list all plant with model/size and operator name)", "permitsRequired": "string (permit type and reference number)", "stopConditions": ["string (phase-specific stop conditions)"] }],
+  "plantRegister": [{ "item": "string (plant type with make/model and size)", "checkCompleted": true, "operator": "string (name and competency card ref)", "restrictions": "string (specific operating restrictions)" }],
+  "permitsCrossRef": [{ "type": "string", "reference": "string", "issuer": "string (name and company)", "validity": "string (date and time range)" }],
+  "competencyChecks": [{ "item": "string (min 20 words — specific competency item with evidence required)", "verified": true, "verifiedBy": "string" }],
+  "environmentalConsiderations": "string (min 150 words — waste classification, contamination risk, discharge consents, fuel storage, spill kits, noise monitoring, ecological constraints, pollution incident response plan reference)",
+  "monitoringItems": [{ "item": "string (specific measurable item)", "frequency": "string", "responsibility": "string (name and role)", "action": "string (specific action if threshold exceeded)" }],
+  "closeOutItems": [{ "item": "string (min 15 words — specific close-out task with detail)", "completed": true, "signedBy": "string" }],
+  "lessonsLearned": [{ "finding": "string (min 80 words — specific finding from previous similar task with evidence, dates, reference numbers where applicable)", "action": "string (min 30 words — specific corrective action implemented)", "responsible": "string" }],
+  "regulatoryReferences": [{ "reference": "string (full regulation title)", "description": "string (specific clause/section and what it covers)" }],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
 
-CRITICAL: Populate arrays relevant to chosen template. ALWAYS populate conditions, teamSignOn, stopConditions. Risk ratings MUST show improvement. Controls must be SPECIFIC and ACTIONABLE. Hazards must be task-specific.`;
+CRITICAL: Populate arrays relevant to chosen template. ALWAYS populate conditions (all 6 fields), teamSignOn, stopConditions, reassessmentTriggers. Risk ratings MUST show improvement (riskBefore > riskAfter where controls are applied). Controls must be SPECIFIC and ACTIONABLE — name individuals, reference specific equipment, cite permit numbers. Hazards must be task-specific and realistic for UK construction sites.`;
 
 export function getPowraTemplateGenerationPrompt(templateSlug: PowraTemplateSlug): string {
   const styleGuide = POWRA_TEMPLATE_STYLE[templateSlug] || POWRA_TEMPLATE_STYLE['ebrora-standard'];
@@ -5294,7 +5604,7 @@ export function getPowraTemplateGenerationPrompt(templateSlug: PowraTemplateSlug
 // =============================================================================
 
 const EARLY_WARNING_TEMPLATE_STYLE: Record<EarlyWarningTemplateSlug, string> = {
-  'nec4-contractor-pm': `TEMPLATE: NEC4 Contractor → PM (navy + amber, standard EWN)
+  'nec4-contractor-pm': `TEMPLATE: NEC4 Contractor → PM (navy #1E3A5F + amber #D97706, standard EWN, ~2pp)
 AI INTERVIEW — ask these SPECIFIC questions:
 Round 1: "Which NEC contract form (NEC3/NEC4) and contract reference?"
 Round 1: "Who is the PM you're notifying? Their name and organisation."
@@ -5302,58 +5612,55 @@ Round 1: "When was this risk first identified and what evidence supports it?"
 Round 2: "Estimated cost impact (£ range) and programme delay (days/weeks)?"
 Round 2: "Is the critical path affected? Which Key Dates at risk?"
 Round 2: "Proposed mitigation measures — action, owner, target date for each?"
-Generate: notice details, risk description (min 200 words), evidence summary, cost impact with assumptions, programme impact with critical path and key dates, quality/performance impact, min 3 mitigation measures, risk reduction meeting, sign-off.`,
+Generate cover page with 9-row info table (Ref, Date, Contract, Project, From, To, Risk summary, Cost Impact £ range, Programme Impact). Body: amber direction badge "CONTRACTOR → PROJECT MANAGER", then 3 sections with numbered full-width navy bar headings: 01 RISK DESCRIPTION (prose min 350 words), 02 POTENTIAL IMPACT (3-col KPI dashboard: Cost Range amber / Working Days amber / Key Date at Risk red), 03 PROPOSED MITIGATION (4-col table: Action + Responsible + Target + Status RAG, min 4 rows). Then amber callout box: "Risk Reduction Meeting Request: In accordance with NEC4 Clause 15.2...". Sig grid: Contractor + Project Manager.`,
 
-  'nec4-pm-contractor': `TEMPLATE: NEC4 PM → Contractor (slate + teal, PM-issued warning)
+  'nec4-pm-contractor': `TEMPLATE: NEC4 PM → Contractor (dark slate #0F172A + teal #0D9488, PM-issued warning, ~2pp)
 AI INTERVIEW:
 Round 1: "What matter are you warning the Contractor about?" Round 1: "Contract reference and Contractor organisation?"
 Round 2: "What specific actions do you require the Contractor to take, with deadlines?"
 Round 2: "Your assessment of impact on Prices, Completion Date, and performance?"
-Round 2: "Are you convening a risk reduction meeting under Clause 15.2?"
-Generate: PM direction badge, matter description, PM's assessment of impact on Prices/Completion/Performance, actions required table (min 3 actions with due dates), risk reduction meeting convened under 15.2, Contractor response section (blank fields), sign-off.`,
+Round 2: "Are you convening a risk reduction meeting under Clause 15.2? Date and location?"
+Generate cover with 6-row info table. Body: teal direction badge "PROJECT MANAGER → CONTRACTOR", then section bars (no numbers, dark slate): MATTER GIVING RISE TO EARLY WARNING (prose min 350 words), PM'S ASSESSMENT OF IMPACT (prose), ACTIONS REQUIRED OF CONTRACTOR (2-col table: Action + Deadline, min 4 rows, teal headers). Then teal callout: "Risk Reduction Meeting (Clause 15.2): convened for [date] at [location]...". CONTRACTOR RESPONSE section with dashed-border blank fields (Root Cause, Recovery Plan, Additional Resources, Revised Completion). Sig grid: Project Manager + Contractor.`,
 
-  'nec4-sub-to-mc': `TEMPLATE: Subcontractor → Main Contractor (forest + gold, sub notification)
+  'nec4-sub-to-mc': `TEMPLATE: Subcontractor → Main Contractor (forest #1B4332 + gold #CA8A04, compact 1pp)
 AI INTERVIEW:
 Round 1: "Your company name, subcontract reference, and MC contact?"
 Round 1: "What is the risk — describe what happened or what you've discovered."
 Round 2: "Estimated cost and programme impact to your subcontract works?"
 Round 2: "Mitigation actions taken or planned?"
-Round 2: "Key Dates or milestones affected under the subcontract?"
-Generate: sub direction badge, subcontract + main contract refs, risk description, NEC4 ECS clause note, impact summary (cost + programme), mitigation table, sub/contractor sign-off. Keep concise — typically 1 page.`,
+Generate cover with 7-row info table (Ref, Date, Subcontract, Main Contract, From, To, Risk). Body: gold direction badge "SUBCONTRACTOR → MAIN CONTRACTOR", then: RISK DESCRIPTION (prose min 250 words), 2-col KPI boxes (Working Days Delay gold / Cost Impact gold), PROPOSED MITIGATION (3-col table: Action + Owner + Date, gold headers, min 3 rows). Amber callout: "NEC4 ECS Note: This early warning is issued under NEC4 ECS Clause 15.1...". Sig grid: Subcontractor + Main Contractor. Keep concise — 1 page.`,
 
-  'nec4-mc-to-sub': `TEMPLATE: Main Contractor → Subcontractor (charcoal + crimson, MC-issued warning)
+  'nec4-mc-to-sub': `TEMPLATE: Main Contractor → Subcontractor (charcoal #1F2937 + red #DC2626, contractual warning, ~2pp)
 AI INTERVIEW:
 Round 1: "Which subcontractor and subcontract reference?"
 Round 1: "What is the specific matter — non-compliance, missing docs, performance concern?"
-Round 2: "List specific outstanding items with due dates."
-Round 2: "What contractual consequences apply if not resolved (stop work, performance assessment)?"
+Round 2: "List specific outstanding items with due dates and days overdue."
+Round 2: "What contractual consequences apply if not resolved (stop work, contra-charges, performance assessment)?"
 Round 2: "By when do you require the sub's response?"
-Generate: MC direction badge, matter description, contractual warning box (potential consequences), outstanding items table (min 3 items with periods and due dates), expected sub response section (acknowledgement, rectification plan, root cause, preventive measures), response deadline, sign-off.`,
+Generate cover with 7-row info table including Warning Level row "Contractual Warning — Potential Stop Work". Body: red direction badge "MC → SUBCONTRACTOR — CONTRACTUAL WARNING", then red callout box with ⚠ CONTRACTUAL WARNING (consequences: stop work, contra-charges, performance assessment). OUTSTANDING DOCUMENTATION (4-col table: Document + Required By + Status RAG + Days Overdue, red headers, min 4 rows). EXPECTED SUBCONTRACTOR RESPONSE (dashed-border blank fields: Root Cause, Commitment Date, Preventive Measures, Signed Acknowledgement). Sig grid: Main Contractor + Subcontractor Acknowledgement (red accent).`,
 
-  'comprehensive-risk': `TEMPLATE: Comprehensive Risk Assessment (purple + orange, full matrix)
+  'comprehensive-risk': `TEMPLATE: Comprehensive Risk Assessment (purple #4C1D95 + orange #EA580C, full 5×5 matrix, ~2pp)
 AI INTERVIEW:
 Round 1: "Describe the risk event in detail."
 Round 1: "Pre-mitigation likelihood (1-5) and impact (1-5) with rationale?"
-Round 2: "Cost breakdown — list individual items and amounts."
-Round 2: "Programme impact — which activities delayed, by how long, critical path?"
-Round 2: "Post-mitigation likelihood and impact scores?"
-Round 2: "Mitigation actions with owner, target date, and status?"
-Round 2: "Risk register entry details — ID, category, owner, review frequency?"
-Round 2: "Linked CEs, previous EWNs, or RFIs?"
-Generate: 5x5 risk matrix scores (pre + post), cost breakdown items array (min 4 items with amounts + total), programme impact with critical path, mitigation plan with status column (min 4 actions), risk register entry, RRM with agenda items, 3-role sign-off. This is a 2-3 page document.`,
+Round 2: "Post-mitigation likelihood and impact scores with rationale?"
+Round 2: "Mitigation actions with owner and current status?"
+Round 2: "Risk register entry details — ID, category, owner?"
+Generate cover with 6-row info table (Ref, Date, Contract, Risk summary, Pre-Mitigation Score "20 (Very High) — 4×5", Post-Mitigation Score "8 (Medium) — 2×4"). Body: RISK DESCRIPTION & SCORING (prose min 350 words + two 5×5 colour-coded risk matrices side-by-side: Pre-Mitigation with highlighted cell ★score, Post-Mitigation with highlighted cell ★score, each with L×S label). MITIGATION PLAN (3-col table: Measure + Owner + Status RAG, orange headers, min 5 rows). Purple callout: "Risk Register Entry: Added as [ID]. Risk owner: [name]." Sig grid: Risk Owner + Project Manager.
+Provide riskScoring with preLikelihood, preImpact, postLikelihood, postImpact (all 1-5). Post-mitigation must show improvement.`,
 
-  'health-safety': `TEMPLATE: Health & Safety Risk (safety red, CDM-focused)
+  'health-safety': `TEMPLATE: Health & Safety Risk (safety red #7F1D1D + red #DC2626, CDM-focused, ~2pp)
 AI INTERVIEW:
 Round 1: "Describe the H&S risk — what was observed, measured, or identified."
-Round 1: "Hazard type? (confined space, height, toxic atmosphere, structural, live services, etc.)"
-Round 2: "Which regulations apply? (CDM 2015, Confined Spaces Regs, COSHH, EH40, LOLER, etc.)"
+Round 1: "Hazard type? (asbestos, confined space, height, toxic atmosphere, structural, live services)"
+Round 2: "Which regulations apply? (CDM 2015, CAR 2012, Confined Spaces Regs, COSHH, LOLER, etc.)"
 Round 2: "Immediate actions already taken to make area safe?"
 Round 2: "Hierarchy of control — what can be eliminated, substituted, engineered, administered? PPE?"
 Round 2: "RIDDOR reportable? Anyone exposed or injured?"
-Round 2: "Programme and cost impact?"
-Generate: H&S risk badge, CDM duty holder, applicable regulations array (min 4 refs with full titles), hierarchy of control array (5 levels: Eliminate, Substitute, Engineering, Administrative, PPE — each with specific measures), immediate actions table (min 3 actions), RIDDOR assessment, programme/cost impact, mitigation plan, SHE Manager notification, 3-role sign-off.`,
+Generate cover with 6-row info table (Ref, Date, Contract, Risk Category, Legislation, Immediate Action). Body: red direction badge "⚠ HEALTH & SAFETY RISK", then: RISK DESCRIPTION (prose min 350 words). Red callout: "⚠ APPLICABLE LEGISLATION: [full regulation titles]". HIERARCHY OF CONTROL (5 numbered rows with colour-coded level numbers: 1-Eliminate green, 2-Substitute teal, 3-Engineering blue, 4-Administrative amber, 5-PPE red — each with specific measures). IMMEDIATE ACTIONS TAKEN (4-col table: Action + By + Date/Time + Status RAG, red headers, min 4 rows). Red callout: "RIDDOR Assessment: [assessment text]". Sig grid: Site Manager + SHE Manager.
+Provide hierarchyOfControl array (5 levels), immediateActions array (min 4), applicableRegulations array (min 3 with full titles), riddorAssessment string.`,
 
-  'design-technical': `TEMPLATE: Design & Technical Risk (blueprint blue, design focus)
+  'design-technical': `TEMPLATE: Design & Technical Risk (blueprint #1E3A8A + blue #3B82F6, design focus, ~2pp)
 AI INTERVIEW:
 Round 1: "What design discrepancy, conflict, or technical issue?"
 Round 1: "Affected drawing references — number, title, revision for each?"
@@ -5361,17 +5668,18 @@ Round 2: "Which design disciplines involved (civil, structural, MEICA, electrica
 Round 2: "Physical impact if built to current drawings — what goes wrong?"
 Round 2: "Existing RFIs or TQs raised? References?"
 Round 2: "Resolution needed from designer and programme impact of waiting?"
-Generate: design discipline and stage, affected drawings table (min 3 drawings with ref, title, rev, issue description), design conflicts identified array (min 2), linked RFIs/TQs array, cost/programme/quality impact, resolution actions table (min 3 actions owned by designer), design coordination meeting, sign-off.`,
+Generate cover with 5-row info table (Ref, Date, Discipline, Risk summary, Linked RFI). Body: DESIGN CONFLICT IDENTIFIED (prose min 300 words — dimensions, levels, clashes, technical detail). AFFECTED DRAWINGS (5-col table: Drawing No. + Title + Rev + Discipline + Issue, blue headers, min 3 rows). IMPACT & PROPOSED RESOLUTION (prose — cost impact £ range, programme impact WDs, quality impact, resolution options lettered A/B/C). Sig grid: Contractor + Designer.
+Provide affectedDrawings array (min 3 with reference, title, revision, discipline, issue). Provide linkedRFIs array.`,
 
-  'weather-force-majeure': `TEMPLATE: Weather / Force Majeure (storm grey + amber, weather data)
+  'weather-force-majeure': `TEMPLATE: Weather / Force Majeure (storm grey #374151 + amber #F59E0B, weather data, ~2pp)
 AI INTERVIEW:
-Round 1: "Weather event type (rainfall, wind, snow, flooding, heatwave) and duration?"
-Round 1: "Weather station used and recorded measurement vs 10-year return threshold?"
-Round 2: "Daily weather log — date, measurement, site status, activities affected?"
-Round 2: "Working days lost and estimated recovery period?"
-Round 2: "Does this qualify as a CE under Clause 60.1(13)? Weather data comparison?"
-Round 2: "Mitigation — dewatering, programme recovery, weekend working?"
-Generate: weather event type and period, weather station, weather data summary (total measurement, 10-year threshold, peak daily, days lost), Met Office source reference, daily weather log table (min 5 days with date, rainfall, wind, status, activities), CE consideration narrative (referencing Clause 60.1(13) and actual vs threshold), programme/cost impact, mitigation table, sign-off.`,
+Round 1: "Weather event type (rainfall, wind, snow, flooding, heatwave) and forecast period?"
+Round 1: "Weather station used and 10-year return period threshold for this month?"
+Round 2: "Daily weather log — date, forecast measurement, wind speed, site status, activities affected?"
+Round 2: "Working days lost and estimated recovery options (overtime, weekend working)?"
+Round 2: "Does this qualify as a CE under Clause 60.1(13)? Actual vs threshold comparison?"
+Generate cover with 6-row info table (Ref, Date, Weather Event, Weather Station, CE Consideration, Affected Works). Body: WEATHER DATA SUMMARY (4-col KPI: 7-Day Forecast amber / Heaviest Day amber / 10-Year Avg grey / Days Lost red). DAILY WEATHER IMPACT LOG (5-col table: Day + Forecast + Wind + Site Status RAG + Affected Activities, amber headers with dark text, min 5 rows). CE CONSIDERATION — CLAUSE 60.1(13) (amber callout quoting Clause 60.1(13) wording, comparing actual measurement to threshold, stating whether CE threshold may be exceeded). PROPOSED MITIGATION & RECOVERY (prose — suspension triggers, recovery plan, overtime). Sig grid: Contractor + Project Manager.
+Provide dailyWeatherLog array (min 5 days). Provide weatherData object (totalMeasurement, tenYearThreshold, peakDaily, daysLost). Provide ceConsideration string (min 150 words).`,
 };
 
 const EARLY_WARNING_SCHEMA = `{
@@ -5392,8 +5700,8 @@ const EARLY_WARNING_SCHEMA = `{
   "identifiedBy": "string",
   "riskCategory": "string",
   "priority": "string",
-  "riskDescription": "string (min 200 words — detailed description of the matter)",
-  "evidenceSummary": "string (min 80 words)",
+  "riskDescription": "string (min 350 words — detailed description of the matter that could increase the total of the Prices, delay Completion, delay meeting a Key Date, or impair the performance of the works in use)",
+  "evidenceSummary": "string (min 100 words)",
   "potentialImpactOnCost": {
     "estimatedAdditionalCost": "string (£ range)",
     "costBreakdown": "string",
@@ -5466,7 +5774,7 @@ const EARLY_WARNING_SCHEMA = `{
   "ceConsideration": "string"
 }
 
-CRITICAL: Populate ONLY the fields relevant to the selected template. Always populate documentRef, noticeDate, notifiedBy/notifiedTo, contractReference, riskDescription, proposedMitigation, and riskReductionMeeting. Min 3 mitigation measures. riskDescription must be min 200 words.`;
+CRITICAL: Populate ONLY the fields relevant to the selected template. Always populate documentRef, noticeDate, notifiedBy/notifiedTo, contractReference, riskDescription, proposedMitigation, and riskReductionMeeting. Min 4 mitigation measures. riskDescription must be min 350 words.`;
 
 export function getEarlyWarningTemplateGenerationPrompt(templateSlug: EarlyWarningTemplateSlug): string {
   const styleGuide = EARLY_WARNING_TEMPLATE_STYLE[templateSlug] || EARLY_WARNING_TEMPLATE_STYLE['nec4-contractor-pm'];
@@ -5648,14 +5956,252 @@ const PC_COMPREHENSIVE_SCHEMA = `{
 }
 All 8 review areas assessed with extended findings (min 250 words each). Min 6 risk matrix items. Min 8 critical issues. Min 10 improvement plan actions. Float distribution must be analysed. Critical path narrative required. This is the most detailed template — maximise content depth.`;
 
+// =============================================================================
+// TRAFFIC MANAGEMENT — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const TRAFFIC_TEMPLATE_STYLE: Record<TrafficTemplateSlug, string> = {
+  'quick-brief': `TEMPLATE: Quick Brief (slate grey #475569, compact daily briefing, 1–2 pages)
+AI INTERVIEW:
+Round 1: "What works are happening today that need traffic management? Describe the activity, duration, and number of vehicle movements expected."
+Round 1: "What TM controls are in place? Speed limits, one-way systems, pedestrian segregation, banksman positions, signage, exclusion zones?"
+Round 2: "Who are the named operatives? For each: name, role (e.g. Banksman 1 — Gate), and specific responsibilities."
+Round 2: "What is the emergency procedure if there is a vehicle incident, breakdown, or collision on site?"
+Generate ALL 4 sections: 01 Works Summary (prose min 150 words), 02 TM Layout & Controls (table: Control + Detail, min 6 rows), 03 Operative Roles (table: Name + Role + Responsibilities, min 3 rows), 04 Emergency Procedure (callout box). This is a compact daily briefing — keep it practical.`,
+
+  'formal-highways': `TEMPLATE: Formal Highways (charcoal #2D2D2D + amber #B45309, authority submission format)
+AI INTERVIEW:
+Round 1: "What road are the works on? Name, classification (A/B/unclassified), speed limit, carriageway type, AADT?"
+Round 1: "What works are being carried out and what TM type is needed? (lane closure, signals, road closure etc.) What is the NRSWA permit reference?"
+Round 1: "Which highway authority is this being submitted to? Has a TTRO been applied for?"
+Round 2: "What signs are needed? For each: TSRGD diagram number, description, size, quantity, position."
+Round 2: "Describe the temporary traffic signal arrangements — installer, signal type (VA/fixed), monitoring, backup, night operation."
+Round 2: "What temporary speed restriction is proposed? TTRO reference?"
+Round 2: "What are the key traffic management hazards and controls? (vehicle strikes, signal failure, pedestrian conflict, queuing)"
+Generate ALL 6 sections: 1.0 Introduction & Regulatory Basis (prose with clause numbering, min 250 words, reference Chapter 8, Safety at Street Works 2013, NRSWA, TMA 2004, TSRGD 2016), 2.0 Sign Schedule TSRGD (table: Ref + TSRGD + Description + Size + Qty + Position, min 8 rows), 3.0 Temporary Traffic Signals (prose with clause numbering min 190 words), 4.0 Temporary Speed Limit (prose min 125 words, reference RTRA 1984 s.14), 5.0 Risk Assessment (table: Hazard + Risk + Control + Residual, min 4 rows), 6.0 Approval (sig grid: Prepared By + Approved By HA).`,
+
+  'full-chapter8': `TEMPLATE: Full Chapter 8 (deep green #065F46, comprehensive compliance, 3+ pages)
+AI INTERVIEW:
+Round 1: "What road, classification, speed limit, AADT, HGV%, peak hours, sensitive receptors nearby, and public transport affected?"
+Round 1: "Describe the works — what is being constructed/maintained, duration, working hours?"
+Round 1: "Which highway authority and NRSWA reference? Has a TTRO been applied for?"
+Round 2: "Break the works into phases. For each phase: duration, works description, and TM arrangement."
+Round 2: "Full sign schedule — for each sign: reference, TSRGD diagram number, description, size, quantity, and exact position."
+Round 2: "Temporary signals specification: installer (NHSS 12D?), signal type, VA/fixed mode, monitoring, backup, night operation?"
+Round 2: "Chapter 8 geometry: taper length (Table C1), cone spacing, safety zone, working zone dimensions, clear lane width, pedestrian width?"
+Round 2: "Risk assessment with L×S scoring: hazards, controls, residual risk?"
+Round 2: "Monitoring and review: NRSWA supervisor, inspection frequency, checklists, queue monitoring, review triggers?"
+Generate ALL 8 sections: 01 Introduction & Compliance (prose min 250 words), 02 Site Description & Traffic Data (info table: Road, Speed, AADT, HGV%, Peak, Receptors, Public Transport — min 7 rows), 03 Works Description & Phasing (prose + phases table min 4 phases), 04 Sign Schedule TSRGD 2016 (table min 10 rows with sizes), 05 Temporary Signals Specification (info table min 6 fields), 06 Chapter 8 Geometry (info table min 6 parameters with Ch8 references), 07 Risk Assessment (table with L and S columns, min 5 rows), 08 Monitoring & Review (prose min 150 words with NRSWA supervisor name and cert ref).`,
+
+  'site-plan': `TEMPLATE: Site Plan (steel blue #1E40AF, internal site operations)
+AI INTERVIEW:
+Round 1: "Describe the site layout — main gate, haul road, pedestrian routes, emergency route. What is the one-way system?"
+Round 1: "How are vehicles and pedestrians segregated? For each zone: location, barrier type, and specific detail."
+Round 2: "What are the site speed limits? (haul road, near excavation) How many banksmen minimum? What is the reversing policy?"
+Round 2: "For each banksman position: location, named person, and specific duties."
+Round 2: "How are deliveries managed? Booking system, driver induction, readymix protocol, abnormal loads procedure?"
+Round 2: "Emergency vehicle access — how is the gate kept clear, who has the gate code, what is the response time to the furthest point?"
+Generate ALL 5 sections: 01 Site Layout & Routes (prose + routes table: Route + Users + Description + Speed Limit, min 4 routes), 02 Vehicle/Pedestrian Segregation (table: Location + Barrier Type + Detail, min 4 rows), 03 Speed Limits & Banksmen (KPI dashboard: 4 boxes for speed/banksmen/reversing + banksmen table min 2 positions), 04 Delivery Management (info table: Booking + Induction + Readymix + Abnormal, min 4 fields), 05 Emergency Access (red callout box min 100 words).`,
+};
+
+export function getTrafficTemplateGenerationPrompt(templateSlug: TrafficTemplateSlug): string {
+  const styleGuide = TRAFFIC_TEMPLATE_STYLE[templateSlug] || TRAFFIC_TEMPLATE_STYLE['full-chapter8'];
+  const schema = TOOL_GENERATION_SCHEMAS['traffic-management'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nSite Traffic Management Plan\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Traffic Management Plan JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// WASTE MANAGEMENT — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const WASTE_TEMPLATE_STYLE: Record<WasteTemplateSlug, string> = {
+  'site-record': `TEMPLATE: Site Record (green #4D7C0F, practical tracking, skips & transfer notes)
+AI INTERVIEW:
+Round 1: "What waste streams will this project generate? For each: type, EWC code, estimated quantity, classification (inert/non-haz/hazardous), container type, and disposal route?"
+Round 1: "What skips/containers are on site? For each: ID, type, size, location, delivery date?"
+Round 2: "Have any waste transfers been made yet? If so: WTN reference, date, waste type, quantity, carrier, destination?"
+Round 2: "Segregation checks — are skips labelled? Signage up? Washout bay sealed? Hazardous area locked? TBT delivered? WTN file maintained?"
+Generate ALL 4 sections: 01 Waste Stream Summary (6-col table: Stream + EWC + Qty + Classification + Container + Disposal, min 7 rows incl 1 hazardous), 02 Skip/Container Log (7-col table min 5 rows), 03 Transfer Note Register (7-col table or "no transfers to date" placeholder), 04 Segregation Checklist (3-col table: Item + Check + Notes, min 6 rows with ✓/✗).`,
+
+  'corporate': `TEMPLATE: Corporate (navy #1E3A5F, client submission, waste hierarchy strategy)
+AI INTERVIEW:
+Round 1: "Describe the waste hierarchy strategy for this project. For each level (Prevention, Reuse, Recycling, Disposal) — what specific measures apply?"
+Round 1: "What waste streams are forecast? For each: EWC code, quantity, classification, disposal route, diversion rate, and estimated cost?"
+Round 2: "Which waste carriers and facilities will be used? For each: company, role, EA licence number, expiry date, waste types accepted?"
+Round 2: "What KPI targets apply? Landfill diversion %, duty of care breaches, soil reuse %, review frequency?"
+Generate ALL 4 sections: 01 Waste Hierarchy Strategy (numbered step blocks: level 1-4, each min 40 words with project-specific examples), 02 Waste Forecast (7-col table: Stream + EWC + Forecast + Class + Route + Diversion + Cost, min 7 rows), 03 Carrier & Facility Register (5-col table min 3 rows with EA licence numbers), 04 KPI Targets & Monitoring (KPI dashboard 4 boxes + sig grid).`,
+
+  'full-compliance': `TEMPLATE: Full Compliance (teal #0F766E, EPA 1990, full duty of care chain)
+AI INTERVIEW:
+Round 1: "Describe the legislative framework — which regulations apply to waste on this project? (EPA 1990, Waste Regs 2011, Hazardous Waste Regs 2005, Environmental Permitting Regs 2016)"
+Round 1: "What waste streams are forecast? For each: EWC code, quantity, classification, hierarchy level, carrier, facility, and cost?"
+Round 2: "Describe the duty of care chain. Who is the waste producer? Which carriers and facilities are registered? Have registrations been verified?"
+Round 2: "KPI targets? Landfill diversion, soil reuse, duty of care breaches, net disposal cost? How will KPIs be tracked and reported?"
+Generate ALL 4 sections: 01 Legislative Framework (prose min 190 words referencing EPA 1990, Waste Regs 2011, Haz Waste Regs 2005, Env Permitting Regs 2016), 02 Waste Stream Forecast & Management (8-col table: Stream + EWC + Qty + Class + Hierarchy + Carrier + Facility + Cost, min 7 rows), 03 Duty of Care Chain (green callout box min 125 words + 6-col carrier table with Verified column, min 4 rows incl producer), 04 KPI Targets (KPI dashboard 4 boxes + narrative min 80 words).`,
+};
+
+export function getWasteTemplateGenerationPrompt(templateSlug: WasteTemplateSlug): string {
+  const styleGuide = WASTE_TEMPLATE_STYLE[templateSlug] || WASTE_TEMPLATE_STYLE['full-compliance'];
+  const schema = TOOL_GENERATION_SCHEMAS['waste-management'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nSite Waste Management Plan\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Waste Management Plan JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// SCOPE OF WORKS — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const SCOPE_TEMPLATE_STYLE: Record<ScopeTemplateSlug, string> = {
+  'corporate-blue': `TEMPLATE: Corporate Blue (#1F4E79, comprehensive 9-section scope, numbered inclusion/exclusion items)
+AI INTERVIEW:
+Round 1: "What subcontractor discipline/package is this scope for? Who is the subcontractor? What contract form (NEC4 ECS Option A, etc.)?"
+Round 1: "Describe the scope of works — what exactly is the subcontractor responsible for? Be comprehensive: design, supply, install, test?"
+Round 1: "What are the specific inclusions? For each: a short title and detailed description of what's included."
+Round 2: "What is specifically excluded from this scope? For each: title and detail of what remains with the contractor."
+Round 2: "Attendance and interface — for each item (welfare, power, water, access, dewatering, banksman, TM, concrete): who provides it (PC or Sub) and any notes?"
+Round 2: "Programme — start date, completion date, duration, working hours, key milestones? Programme submission requirements under NEC4 clause 31?"
+Round 2: "H&S requirements — CDM duties, RAMS submission timescales, permits, CSCS, environmental obligations?"
+Round 2: "Commercial terms — payment basis, application date, payment days, retention %, defects period, insurance levels, bond %, governing law, dispute resolution?"
+Generate ALL 9 sections: 01 Document Control (rev table), 02 Scope Overview (prose min 240 words), 03 Inclusions (min 6 numbered items, each detail min 75 words), 04 Exclusions (min 4 numbered items, each detail min 75 words), 05 Attendance & Interface (3-col table min 8 rows), 06 Programme (info table + prose min 120 words), 07 Health Safety & Environment (prose min 170 words), 08 Commercial Terms (info table with 10 rows), 09 Approval (sig grid).`,
+
+  'formal-contract': `TEMPLATE: Formal Contract (charcoal #2D2D2D + red #C0392B, clause-numbered, NEC4 legal focus)
+AI INTERVIEW:
+Round 1: "What contract form and which conditions apply? What is the order of precedence between documents?"
+Round 1: "List all contract documents forming the subcontract (NEC4 ECS, Contract Data, this SOW, Activity Schedule, drawings, GI report, specifications)."
+Round 1: "Describe the full scope of the works — quantities, specifications, standards. What is included and what is excluded?"
+Round 2: "Design responsibility — who owns permanent design, temporary works design? What is the design review process? Interface with the Contractor's Designer?"
+Round 2: "Programme and milestones — start, completion, key dates? NEC4 clause 31 programme requirements?"
+Round 2: "Commercial terms — payment per NEC4 clause 51, retention, insurance with specific cover levels, performance bond, late payment interest?"
+Generate ALL 6 sections with clause numbering (1.1, 1.2, 2.1 etc.): 1.0 Contract Basis (prose with clauses 1.1-1.3, min 145 words, include precedence and documents schedule), 2.0 Scope of the Works (prose with clauses 2.1-2.3, min 240 words, inclusions and exclusions integrated), 3.0 Design Responsibility (prose with clause 3.1, min 145 words), 4.0 Programme & Milestones (prose with clauses 4.1-4.2, min 120 words), 5.0 Commercial Terms (prose with clauses 5.1-5.4 covering payment, retention, insurance, bond), 6.0 Approval (sig grid: For the Contractor + For the Subcontractor).`,
+
+  'executive-navy': `TEMPLATE: Executive Navy (#1B2A4A + teal #00897B, condensed executive format, comparison tables)
+AI INTERVIEW:
+Round 1: "What subcontract package is this? Subcontractor, discipline, contract form, programme dates?"
+Round 1: "Describe the scope overview — what is the subcontractor delivering?"
+Round 2: "Inclusions vs exclusions — for each inclusion item, what is the matching exclusion that stays with the contractor?"
+Round 2: "Design and materials — who is responsible for design? What materials does the sub supply? Standards and certifications?"
+Round 2: "Testing and deliverables — for each deliverable: what document, when required, what format?"
+Round 2: "Programme milestones — for each key milestone: description, target date, dependencies?"
+Round 2: "Commercial summary — payment terms, retention, insurance, bond, latent defects, governing law?"
+Generate ALL 6 sections: 01 Scope Overview (prose min 240 words), 02 Inclusions & Exclusions (2-col comparison table: Included vs Excluded, min 10 rows), 03 Design & Materials (prose with bold Design: and Materials: headings), 04 Testing & Deliverables (3-col table: Deliverable + Required By + Format, min 8 rows), 05 Programme & Milestones (3-col table: Milestone + Target Date + Dependencies, min 6 rows), 06 Commercial Summary (info table with 5 rows: Payment, Retention, Insurance, Bond, Latent Defects).`,
+};
+
+export function getScopeTemplateGenerationPrompt(templateSlug: ScopeTemplateSlug): string {
+  const styleGuide = SCOPE_TEMPLATE_STYLE[templateSlug] || SCOPE_TEMPLATE_STYLE['corporate-blue'];
+  const schema = TOOL_GENERATION_SCHEMAS['scope-of-works'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nSubcontractor Scope of Works\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Scope of Works JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// =============================================================================
+// NCR — Template-Specific Styles, Schema & Generation Prompt
+// =============================================================================
+
+const NCR_TEMPLATE_STYLE: Record<NcrTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, comprehensive NCR, root cause, corrective actions)
+AI INTERVIEW:
+Round 1: "What is the non-conformance? Describe exactly what was found, where, when, and by whom."
+Round 1: "What was the specification requirement? Reference the spec clause, standard, drawing, and acceptable tolerances."
+Round 2: "What is the root cause? Walk through a 5-Whys or similar analysis."
+Round 2: "What corrective actions are planned or taken? For each: action, owner, target date, and status."
+Round 2: "Any programme or cost impact from this NCR?"
+Generate 4 sections: 01 Non-Conformance Description (prose min 200 words), 02 Specification Requirement (info table: spec, clause, required value, actual result, shortfall, location, drawings), 03 Root Cause Analysis (prose min 150 words), 04 Corrective Actions (table: Action + Owner + Target + Status, min 5 rows). Plus interim measure callout if programme/cost impact. Sig grid: Raised By + Site Manager.`,
+
+  'iso-9001-formal': `TEMPLATE: ISO 9001 Formal (navy #1e293b, ISO clause structure, disposition)
+AI INTERVIEW:
+Round 1: "What is the NCR classification? Major or Minor? Product or Process NC? Which ISO 9001 clause applies?"
+Round 1: "Describe the non-conformance detail — what happened, what was the affected process/procedure?"
+Round 2: "Corrective actions per ISO 10.2.1 — for each clause requirement (a-f): what action is being taken?"
+Round 2: "Disposition of non-conforming product per ISO 8.7 — rework, accept by concession, reject, or regrade?"
+Generate 4 sections: 1.0 NCR Classification ISO 9001:2015 Cl.10.2 (info table: Classification, NC Type, ISO Clause, Affected Process, Identified By), 2.0 Non-Conformance Detail (prose), 3.0 Corrective Action ISO 9001 Cl.10.2.1 (table with ISO clause column: Cl + Requirement + Action + Owner + Due, min 5 rows referencing 10.2.1(b-f)), 4.0 Disposition Cl.8.7 (info table with options: Rework, Accept by Concession, Reject/Remove, Regrade, Current Status). Sig grid: Quality Manager + Management Rep (Cl.5.3).`,
+
+  'red-alert': `TEMPLATE: Red Alert (red #DC2626, urgent, KPI dashboard, stop-work banner)
+AI INTERVIEW:
+Round 1: "What is the safety or structural implication? Why is this RED alert level?"
+Round 1: "What element is affected? What are the key numbers (achieved vs required)?"
+Round 2: "What immediate actions are required? Number them 1-5 in priority order with STOP/NOTIFY/TEST/INVESTIGATE/PREVENT headings."
+Round 2: "What is the programme impact of this NCR? Estimated delay?"
+Generate: Danger banner (STOP message), Safety Implication callout (red), Non-Conformance Summary with KPI dashboard (4 boxes showing achieved/expected/shortfall/affected quantity), Immediate Actions Required (table: # + Action + Owner + Deadline, min 5 rows with bold numbered actions), Programme Impact callout. Sig grid: Raised By + Acknowledged By.`,
+
+  'compact-closeout': `TEMPLATE: Compact Close-Out (grey #374151, status tracker for QA register)
+AI INTERVIEW:
+Round 1: "NCR reference, date raised, close-out due date, category, element, non-conformance summary, root cause, disposition?"
+Round 2: "List all corrective actions with: action, owner, due date, current status (Done/In Progress/Planned/Pending), and closed date."
+Round 2: "Close-out verification — what evidence is needed? Core tests, engineer's decision, recurrence prevention?"
+Generate 3 sections: NCR Summary (info table: Ref, Category, Element, NC, Root Cause, Disposition), Corrective Actions Status Tracker (table: # + Action + Owner + Due + Status + Closed, min 6 rows), Close-Out Verification (info table with blank fields for results, decisions, signatures). No sig grid — close-out signature built into verification table.`,
+
+  'supplier-ncr': `TEMPLATE: Supplier NCR (orange #92400E, contra-charge, supplier response)
+AI INTERVIEW:
+Round 1: "Which supplier and what was supplied? PO reference, delivery note, delivery date?"
+Round 1: "What is the non-conformance? What was ordered vs what was received/tested?"
+Round 2: "Cost impact — list each cost element: testing, engineer fees, delay prelims, remediation. What is the estimated total contra-charge?"
+Round 2: "What response is required from the supplier? Root cause, corrective actions, contra-charge acceptance? Deadline?"
+Generate 3 sections: Supplier Non-Conformance Detail (info table: Supplier, Delivery Date, Delivery Notes, Ordered, NC), Cost Impact — Contra-Charge Notification (table: Cost Element + Estimate + Status, min 5 rows with total row), Supplier Response (info table with blank fields: Root Cause, Corrective Actions, Contra-Charge Accepted, Signature). Callout box for supplier response deadline. Sig grid: Commercial Manager + Supplier.`,
+
+  'audit-trail': `TEMPLATE: Audit Trail (teal #0f766e, document-controlled, evidence-grade)
+AI INTERVIEW:
+Round 1: "Document revision history — what revisions exist or are planned?"
+Round 1: "For each evidence item: what is it (pour record, cube test cert, delivery ticket, etc.), what detail, and what is the reference number?"
+Round 2: "Verification chain — for each role (originator, site manager, engineer, client PM): who is the person, what action did they take, and when?"
+Round 2: "Where are the evidence documents stored? (SharePoint path, site file cabinet location)"
+Generate 3 sections: Document Control (table: Rev + Date + Description + Author, min 2 rows), NCR Detail With Evidence References (table: Item + Detail + Evidence Reference, min 8 rows linking each fact to a document), Verification Chain (table: Role + Name + Action + Signature + Date, min 4 roles). Audit Trail Note callout box stating where evidence is stored. Sig grid: Quality Manager + H&S/Quality Director.`,
+};
+
+export function getNcrTemplateGenerationPrompt(templateSlug: NcrTemplateSlug): string {
+  const styleGuide = NCR_TEMPLATE_STYLE[templateSlug] || NCR_TEMPLATE_STYLE['ebrora-standard'];
+  const schema = TOOL_GENERATION_SCHEMAS['ncr'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nNon-Conformance Report (NCR)\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate an NCR JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
 const PC_TEMPLATE_STYLE: Record<ProgrammeCheckerTemplateSlug, string> = {
-  'scoring': `This is the SCORING template. Focus on numerical assessment. Every area must have a clear 0-10 score with explicit justification. Calculate weighted scores accurately. The overall weighted score must be mathematically correct. Rank deficiencies by score impact. Write improvement actions that are specific and measurable — each should state what score improvement is expected. Use precise, data-driven language. Reference specific activities from the programme where possible.`,
+  'scoring': `This is the SCORING template (falls back to RAG Report layout). Focus on numerical assessment. Every area must have a clear 0-10 score with explicit justification. Calculate weighted scores accurately (Logic 20%, Durations 15%, WBS 10%, CP 20%, Float 10%, Resources 5%, Milestones 15%, Gaps 5%). The overall weighted score must be mathematically correct. Write data-driven language referencing specific activities.`,
 
-  'email-summary': `This is the EMAIL SUMMARY template. Write as a professional formal letter/email addressed to the Project Manager. Use a clear, concise business writing style. The opening paragraph should set context and give the overall assessment immediately. Key findings should be punchy 1-2 sentence bullets. Critical issues should be actionable. The closing should be professional and invite discussion. Do NOT use technical jargon without explanation. This document will be sent as-is to senior stakeholders.`,
+  'email-summary': `TEMPLATE: Email Summary (navy #1e293b, professional letter format)
+COVER PAGE: Navy banner "PROGRAMME REVIEW EMAIL SUMMARY", subtitle in #94a3b8. Project name bar. Info table: Document Reference, Review Date, Reviewed By, Programme Title, Addressed To, From.
+BODY SECTIONS (navy bars, unnumbered):
+  EMAIL HEADER: To, From, Date, Ref fields with bottom borders, then bold Subject line with navy accent border
+  OPENING: "Dear [name]," followed by min 150 words opening paragraph summarising the review and overall assessment
+  KEY FINDINGS — table: Finding | Severity (min 8 rows with Critical=red, Significant=amber, Minor=green severity pills)
+  3 KPI BOXES: Activities count, Overall Assessment (RED/AMBER/GREEN), key stat (e.g. <5d Float %)
+  CRITICAL ISSUES REQUIRING ACTION — numbered callout boxes: red for critical, amber for significant (min 4)
+  RECOMMENDED NEXT STEPS — numbered list (min 6 items)
+  CLOSING: "Kind regards," + name + company + "Ebrora AI Programme Checker" italic
+END MARK: navy accent
 
-  'rag-report': `This is the standard RAG REPORT template. Each review area must have a clear RED, AMBER, or GREEN rating with detailed justification. Findings should reference specific activities, dates, and data from the uploaded programme. Issues should be specific and traceable. Recommendations should be practical and implementable. The executive summary should give the reader the full picture in one read.`,
+Write as professional formal correspondence. Opening paragraph should set context and give overall assessment immediately. Key findings should be punchy. Critical issues should be actionable with timeframes. This will be sent as-is to senior stakeholders.`,
 
-  'comprehensive': `This is the COMPREHENSIVE template — maximum detail and depth. Every section must be thorough. Extended findings must be 250+ words per area with specific programme references. The executive summary must be 500+ words. Include risk matrix with likelihood/impact scoring. Analyse float distribution with counts and percentages. Write a critical path narrative. Assess contractual compliance including key dates. The improvement plan must have target dates and expected benefits. Reference industry best practice (CIOB, APM, NEC guidance) where relevant. This is a formal programme audit document.`,
+  'rag-report': `TEMPLATE: RAG Report (dark forest green #1B5745, standard programme review)
+COVER PAGE: Green banner "PROGRAMME RAG REPORT", subtitle in #a7f3d0. Project name bar (full-width green). Info table: Document Reference, Review Date, Reviewed By, Programme Title, Programme Type, Programme Period, Overall RAG Rating.
+SECTION BARS (green full-width, numbered 01-04):
+  01 EXECUTIVE SUMMARY — min 350 words prose covering overall programme quality, strengths, weaknesses, critical path summary, key concerns, immediate priorities
+  02 PROGRAMME METRICS — 4 KPI boxes (Total Activities, Milestones, Critical Activities, Open Ends) + info table (Average Float, Critical Path Length, Near-Critical count)
+  03 RAG-RATED REVIEW AREAS — 8 review area blocks, each with:
+    - Coloured header bar (GREEN/AMBER/RED) showing area name + score/10 + rating
+    - Findings prose (min 150 words per area)
+    - Issues bullet list (min 3 per area)
+    - Recommendations bullet list (min 3 per area)
+  04 CRITICAL ISSUES — table: # | Issue | Impact | Recommendation | RAG (min 6 rows)
+END MARK: green accent
+
+All 8 areas: Programme Logic & Dependencies, Duration Analysis, WBS Structure & Activity Hierarchy, Critical Path Integrity, Float Analysis, Resource Loading & Constraints, Contractual Milestone Compliance, Missing Activities & Programme Gaps. Each must reference specific activities from the uploaded programme.`,
+
+  'comprehensive': `TEMPLATE: Comprehensive Report (charcoal #2d3748, full-depth analysis)
+COVER PAGE: Charcoal banner "COMPREHENSIVE PROGRAMME ANALYSIS", subtitle in #a0aec0. Project name bar. Info table: Document Reference, Review Date, Reviewed By, Programme Title, Programme Type, Programme Period, Contractor, Client, Overall Assessment + Weighted Score %.
+SECTION BARS (charcoal full-width, numbered 01-12):
+  01 EXECUTIVE SUMMARY — min 500 words prose
+  02 PROGRAMME METRICS DASHBOARD — 4 KPI boxes + extended info table (Average Float, Logic Density, CP Length, Near-Critical, CP %)
+  03 WEIGHTED SCORING SUMMARY — table: Review Area | Weight | Score | Weighted | RAG | Best Practice (8 rows + overall) — weights must sum to 100%
+  04 RISK MATRIX — table: Risk | L | I | Score | Mitigation | Owner (min 6 risks with L×I scoring, red ≥15, amber ≥8)
+  05 FLOAT DISTRIBUTION ANALYSIS — table: Float Range | Count | Percentage (5 rows: negative, zero, <5d, 5-20d, >20d) + red callout analysing distribution
+  06 CRITICAL PATH NARRATIVE — min 200 words prose describing CP sequence, drivers, vulnerabilities, near-critical paths
+  07 RESOURCE LOADING ASSESSMENT — min 200 words prose on resource data, gaps, NEC4 clause 31.2 compliance
+  08 CONTRACTUAL MILESTONE COMPLIANCE — contract info table + key dates table: Key Date | Contractual | Forecast | Status | Notes (min 6 KDs with RAG status)
+  09 CRITICAL ISSUES & ACTIONS — 7-column table: # | Issue | Impact | Action | Owner | Target | RAG (min 8 rows)
+  10 STRUCTURED IMPROVEMENT PLAN — table: Action | Priority | Owner | Target | Expected Benefit (min 10 rows)
+  11 METHODOLOGY & DEFINITIONS — min 200 words prose explaining methodology, weighting, grading scale, review basis
+  12 SIGN-OFF — 4-box signature grid (Reviewed By, Project Manager, Planning Manager, Client Representative)
+  BLUE CALLOUT: Document retention note
+END MARK: charcoal accent
+
+This is the maximum-depth template. Extended findings must be 250+ words per area. Reference CIOB Guide to Good Practice, APM guidance, NEC4 requirements. All mathematical calculations must be correct and internally consistent.`,
 };
 
 export function getProgrammeCheckerTemplateGenerationPrompt(templateSlug: ProgrammeCheckerTemplateSlug): string {
@@ -5688,4 +6234,515 @@ CRITICAL RULES:
 - Never fabricate programme data — if information is not available, state "Not stated in programme".
 
 Respond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Carbon Footprint Builder — Template Style Guidance
+// ---------------------------------------------------------------------------
+const CARBON_TEMPLATE_STYLE: Record<CarbonFootprintTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, comprehensive ICE v3.2 assessment, ~4 pages, min 2,800 words)
+AI INTERVIEW:
+Round 1: "Concrete specification — mixes and volumes (m³)? Cement type (CEM I vs CEM III/A with GGBS)? Any GGBS or PFA specified?"
+Round 1: "Steel — rebar (tonnes), structural steel, DI/CI pipe, HDPE pipe? Any recycled steel content specified?"
+Round 1: "Plant operations — fuel consumption estimates, or operating hours for each major item (excavators, cranes, pumps, generators, piling rigs)?"
+Round 1: "Earthworks and haulage — total excavation volume, volume reused vs removed, round-trip haulage distance, vehicle type?"
+Round 2: "Fill and aggregates — imported fill? Any recycled/secondary aggregates?"
+Round 2: "Other materials — formwork (m², type)? Geosynthetics? Significant MEP components?"
+Round 2: "Waste — total waste by type? Disposal route? Site segregation rate?"
+Generate 10 sections: 01 Assessment Basis & Methodology (prose min 250 words — ICE v3.2 methodology, system boundary A1–A5/C1–C4, functional unit, data sources), 02 Project Overview & Scope Boundary (prose min 250 words — key construction elements with quantities, programme duration), 03 Materials Carbon A1–A3 (6-col table: Material + Qty + Unit + EF + Source + tCO₂e, min 10 rows, plus callout for GGBS saving), 04 Plant & Equipment (6-col table: Item + Fuel + Hours + Litres + EF + tCO₂e, min 5 rows), 05 Transport & Logistics A4 (6-col table: Description + Loads + Distance + Vehicle + EF + tCO₂e, min 5 rows), 06 Waste & Disposal C1–C4 (5-col table, min 5 rows), 07 Carbon Summary Dashboard (4-col KPI: Total/Materials/Plant/Transport+Waste, plus 3-col summary table), 08 Hotspot Analysis (5-col table, min 3 rows), 09 Reduction Measures (4-col table with feasibility RAG, min 5 rows, plus intensity callout), 10 Sign-Off (2-sig grid: Assessed By + Reviewed By).`,
+
+  'pas-2080-technical': `TEMPLATE: PAS 2080 Technical (navy #1E3A5F, whole life carbon modules A–D, ~5 pages, min 4,200 words)
+AI INTERVIEW:
+Round 1: "All material quantities as per Ebrora Standard questions — concrete, steel, pipe, aggregates."
+Round 1: "Plant fuel data and transport data as per Ebrora Standard questions."
+Round 2: "Build Nothing assessment — was a do-nothing option assessed? Why was it rejected?"
+Round 2: "Build Less — what design optimisation or VE measures reduced material quantities? Specific savings?"
+Round 2: "Build Clever — what low-carbon material substitutions have been adopted? GGBS, EAF rebar, hired sheet piles?"
+Round 2: "Use stage — what components have shorter design lives than the asset? Maintenance cycles? Replacement cycles?"
+Round 2: "BREEAM or CEEQUAL targeting? Which credit and what evidence is needed?"
+Generate 11 sections: 01 PAS 2080:2023 Methodology & System Boundary (prose min 300 words — PAS 2080 framework, EN 15978 modules, RSP, functional unit, CEEQUAL), 02 Carbon Reduction Hierarchy (4 mono panels: Build Nothing + Build Less + Build Clever + Build Efficiently, each min 120 words), 03 Product Stage Carbon A1–A3 (7-col table adding Module column, min 10 rows), 04 Construction Process A4–A5 (prose + 3-col KPI: A4/A5/A1–A3 totals), 05 Use Stage B1–B5 (2 mono panels: B2 Maintenance + B4 Replacement, each min 120 words), 06 End of Life C1–C4 (prose min 150 words with module breakdown), 07 Module D (prose min 120 words + blue callout re: separate reporting), 08 Whole Life Carbon Summary (4-col table: Module + Stage + tCO₂e + %, plus total row and Module D row), 09 Benchmarking (prose min 150 words + 4-col KPI + amber CEEQUAL callout), 10 References & Standards (2-col table, min 8 refs), 11 Sign-Off (4-sig grid: Assessed By + Sustainability Lead + Principal Designer + Client).`,
+
+  'compact-summary': `TEMPLATE: Compact Summary (charcoal #4B5563, dense dashboard, ~3 pages, min 1,600 words)
+AI INTERVIEW:
+Round 1: Same material, plant, earthworks questions as Ebrora Standard.
+Round 2: Same fill, other materials, waste questions as Ebrora Standard.
+Generate: Cover page, then CARBON DASHBOARD (5-col KPI: Total/Materials/Plant/Transport/Waste), Materials Breakdown table (3-col: Material + tCO₂e + %, min 7 rows), Plant & Equipment table (3-col: Item + Litres + tCO₂e, min 5 rows), TRANSPORT & WASTE SUMMARY (prose summaries for each), TOP 5 REDUCTION MEASURES (4-col table with RAG feasibility), CARBON INTENSITY & BENCHMARK (3-col KPI: Current/Achievable/Target + blue callout for total potential saving + prose reference note), Sign-Off (2-sig grid: Assessed By + Reviewed By).`,
+
+  'audit-ready': `TEMPLATE: Audit-Ready (teal #0D9488, document-controlled, ISO 14064, ~5 pages, min 4,800 words)
+AI INTERVIEW:
+Round 1: Same material/plant/earthworks questions as Ebrora Standard, PLUS: "For each material — what is the quantity data source? (BQ item ref, drawing number, delivery ticket record)"
+Round 1: "For each plant item — what is the fuel data source? (Fuel dipping logs, hire company estimate, manufacturer data)"
+Round 2: Same fill/materials/waste questions, PLUS: "Assumptions — for each major assumption, what is the justification and how confident is the data? (High/Medium/Low)"
+Round 2: "Revision history — what revision is this? Any planned future revisions?"
+Round 2: "Approval chain — who are the author, technical reviewer, and client approver? Qualifications/positions?"
+Generate 12 sections: 01 Document Control & Revision History (table: Rev + Date + Description + Author, min 2 rows), 02 Approval Chain (5-col table: Role + Name + Qualification + Date + Signature, min 3 roles), 03 Assessment Scope & System Boundary (prose min 400 words — ISO 14064-1 methodology, calculation approach, GWP100, data quality framework), 04 Materials Carbon — Data Source Verification (8-col table: Material + Qty + Unit + EF + EF Source Ref + Qty Data Source + Quality RAG + tCO₂e, min 10 rows), 05 Plant & Equipment — Fuel Record Verification (8-col table: Item + Fuel + Hours + Litres + EF Source + Data Source + Quality RAG + tCO₂e, min 5 rows), 06 Transport — Verified Data (7-col table, min 5 rows), 07 Waste — SWMP Verified (7-col table, min 5 rows), 08 Assumption Register (4-col table: Assumption + Justification + Data Quality RAG + Sensitivity RAG, min 5 rows), 09 Carbon Summary — Auditable Totals (4-col KPI + 4-col table with Data Quality column), 10 Sensitivity Analysis (prose + 5-col table: Parameter + Base + −20% + +20% + Impact, min 3 rows), 11 ISO 14064 Compliance Checklist (4-col table: Clause + Requirement + Status RAG + Evidence Section, min 6 rows), 12 References & Audit Trail (prose + 4-sig grid: Author + Reviewer + Client + Distribution).`,
+};
+
+export function getCarbonFootprintTemplateGenerationPrompt(templateSlug: CarbonFootprintTemplateSlug): string {
+  const styleGuide = CARBON_TEMPLATE_STYLE[templateSlug] || CARBON_TEMPLATE_STYLE['ebrora-standard'];
+  const schema = TOOL_GENERATION_SCHEMAS['carbon-footprint'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nConstruction Carbon Footprint Assessment\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Carbon Footprint Assessment JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Carbon Reduction Plan Builder — Template Style Guidance
+// ---------------------------------------------------------------------------
+const CRP_TEMPLATE_STYLE: Record<CrpTemplateSlug, string> = {
+  'ppn-0621-standard': `TEMPLATE: PPN 06/21 Standard (GOV.UK green #00703C, Arial font, ~4 pages, PPN 06/21 compliant)
+AI INTERVIEW:
+Round 1: "Scope 1 (direct) — company vehicles (number, type, fuel), site plant (owned/hired), gas heating, refrigerants? Annual fuel consumption?"
+Round 1: "Scope 2 (electricity) — office/site electricity? Annual kWh? Renewable tariff?"
+Round 1: "Scope 3 (supply chain) — most significant sources? Purchased materials, business travel, commuting, hired plant fuel, waste?"
+Round 1: "Carbon history — previous measurement? Existing baseline year? Targets?"
+Round 2: "Reduction initiatives — completed and planned? (fleet electrification, HVO, LED, REGO, GGBS, supply chain questionnaires)"
+Round 2: "Governance — who holds board-level accountability? Named individual and title?"
+Round 2: "Net zero target — target date? Interim 2030 target? Science-based?"
+Generate 11 sections: 01 PPN 06/21 Compliance Declaration (callout), 02 Organisation Overview (prose min 200 words), 03 Net Zero Commitment (prose min 150 words), 04 Baseline Emissions (4-col table S1/S2/S3/Total + callout), 05 Current Emissions (4-col KPI + 5-col detailed source table min 12 rows), 06 Completed Initiatives (4-col table min 3 rows), 07 Planned Initiatives (5-col table min 5 rows), 08 Carbon Reduction Targets (3-col KPI + prose), 09 Supply Chain Engagement (prose min 200 words), 10 Reporting & Measurement (prose min 150 words), 11 Board Sign-Off (callout + 2-sig grid).`,
+
+  'sbti-aligned': `TEMPLATE: SBTi Aligned (deep navy #1A3C6E, Calibri font, ~4 pages, science-based targets)
+AI INTERVIEW:
+Round 1: Same Scope 1/2/3 questions as PPN 06/21, PLUS: "SBTi commitment status — letter submitted? Targets validated? Near-term pathway (1.5°C or well-below 2°C)?"
+Round 2: Same initiatives/governance/target questions, PLUS: "Scope 3 screening — which of the 15 GHG Protocol categories are material for your business?"
+Round 2: "Decarbonisation pathway — what are your stepped milestones from baseline to net zero? (e.g. 2028, 2030, 2035, 2040, 2045)"
+Generate 6 sections: 01 Organisational Boundary & Scope (prose min 200 words), 02 SBTi Target Summary (4-col KPI strip + 6-col target table + callout for validation status), 03 Scope 1 & 2 Analysis (prose min 200 words current vs baseline, gap analysis, planned interventions + Scope 2 location vs market-based), 04 Scope 3 Screening (6-col table: Cat + Name + tCO₂e + % + Material? RAG + Methodology, all 15 categories), 05 Decarbonisation Pathway (5-col table: Year + S1&2 + S3 + Total + Interventions, min 7 milestones), 06 Governance (prose min 150 words + 2-sig grid).`,
+
+  'iso-14064-compliant': `TEMPLATE: ISO 14064 Compliant (charcoal #2C3E50 + red #C0392B clause numbers, Cambria font, ~4 pages)
+AI INTERVIEW:
+Round 1: Same Scope 1/2/3 questions, PLUS: "Consolidation approach — operational control or equity share? What entities are included/excluded?"
+Round 1: "Data quality — for each emission source, is the data measured, estimated, or modelled?"
+Round 2: Same initiatives/governance questions, PLUS: "Verification — has the inventory been third-party verified? Plans for verification?"
+Round 2: "Uncertainty — key sources of uncertainty in the inventory? Confidence level?"
+Generate 9 sections: 1.0 Document Control (revision table), 2.0 Organisational Boundary Cl.5.1 (prose min 200 words), 3.0 GHG Source Identification Cl.5.2 (4-col table: ISO Category + Source + GHG Species + Classification, min 8 rows + callout for sinks/reservoirs), 4.0 Quantification Methodology Cl.5.3 (prose + 5-col table: Source + Activity Data + EF Source + Data Quality RAG + tCO₂e, min 11 rows), 5.0 Base Year & Recalculation Cl.5.4 (prose min 150 words), 6.0 Uncertainty Assessment (prose min 150 words), 7.0 Reduction Targets (4-col table with status RAG), 8.0 Verification Readiness ISO 14064-3 (red callout + prose), 9.0 Sign-Off (2-sig grid with qualifications).`,
+
+  'ghg-protocol-corporate': `TEMPLATE: GHG Protocol Corporate (teal #00897B / dark #004D40, Calibri font, ~4 pages)
+AI INTERVIEW:
+Round 1: Same Scope 1/2/3 questions, PLUS: "Full 15-category Scope 3 screening — for each category, is it relevant, not relevant, or minor? What methodology is used?"
+Round 2: Same initiatives/governance/target questions, PLUS: "Carbon intensity metric — what intensity metric do you track? (tCO₂e per £M turnover, per employee, per project)"
+Generate 6 sections: 01 Company Profile & Inventory Boundaries (prose min 200 words), 02 GHG Inventory Summary (5-col KPI: Total/S1/S2/S3/Intensity + 5-col year-on-year table: Scope + Source + Current + Baseline + Change%, with sub-rows per scope), 03 Scope 3 Category Screening (5-col table: # + Category + Relevant? RAG + tCO₂e + Method, all 15 categories), 04 Reduction Roadmap (5-col table: Milestone + S1&2 + S3 + Total + Intensity, min 7 milestones from baseline to net zero), 05 Supply Chain Decarbonisation Strategy (prose min 200 words), 06 Governance & Reporting Cycle (prose min 150 words + 2-sig grid).`,
+};
+
+export function getCrpTemplateGenerationPrompt(templateSlug: CrpTemplateSlug): string {
+  const styleGuide = CRP_TEMPLATE_STYLE[templateSlug] || CRP_TEMPLATE_STYLE['ppn-0621-standard'];
+  const schema = TOOL_GENERATION_SCHEMAS['carbon-reduction-plan'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nCarbon Reduction Plan\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Carbon Reduction Plan JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// CE Notification Builder — Template Style Guidance
+// ---------------------------------------------------------------------------
+const CE_TEMPLATE_STYLE: Record<CeTemplateSlug, string> = {
+  'formal-letter': `TEMPLATE: Formal Letter (dark green #065F46, Arial, underline section headings, ~3 pages)
+AI INTERVIEW: Standard CE interview questions per conversation prompt.
+Generate 7 sections with underline headings: 1. NOTIFICATION DETAILS (info table with all contract/CE details, 11 rows), 2. EVENT DESCRIPTION (prose min 300 words — detailed factual description with drawing refs, quantities, technical detail across 2-3 paragraphs), 3. CONTRACTUAL BASIS — ENTITLEMENT (prose min 200 words — cite specific NEC clause, quote contract wording, explain how event meets criteria, reference notification timeline), 4. PROGRAMME IMPACT (3-col KPI: Working Days/Critical Path/Revised Completion + prose min 150 words — cause-and-effect on programme with activity names and dates), 5. COST IMPLICATIONS (3-col cost table: Element + Description + Amount with min 6 rows plus total row + green callout re: quotation under Cl.62.3), 6. SUPPORTING EVIDENCE (3-col table: Document + Reference + Status RAG, min 4 rows), 7. RELATED NOTICES (paragraph linking early warnings, risk register entries). Sig grid: Notified By + Received By.
+Provide costItems array with element/description/amount. Provide programmeKpis array with 3 items. Provide evidence/supportingEvidence array.`,
+
+  'corporate': `TEMPLATE: Corporate (navy #1E3A5F, Cambria font, full-width bar headings, ~2 pages)
+AI INTERVIEW: Standard CE interview questions per conversation prompt.
+Generate 5 sections with numbered bar headings: 01 NOTIFICATION DETAILS (info table, 11 rows), 02 EVENT DESCRIPTION (2 prose paragraphs, min 250 words total), 03 ENTITLEMENT BASIS (prose min 150 words), 04 PROGRAMME & COST IMPACT (4-col KPI: Days/Cost/Revised Completion/Key Date + 3-col cost table min 6 rows + total), 05 SUPPORTING EVIDENCE (3-col table with RAG, min 4 rows). Sig grid: Notified By + Received By.
+Provide costItems, programmeKpis (4 items for KPI), evidence arrays.`,
+
+  'concise': `TEMPLATE: Concise (slate #475569, Arial, left-border headings, ~2 pages compact)
+AI INTERVIEW: Standard CE interview questions — gather minimum needed for a clear notification.
+Generate sections with left-border headings (no numbers): Notification Details (compact 8-row info table), Event Summary (single paragraph min 200 words — all key facts in one dense paragraph), Programme Impact (bold single paragraph with delay days, dates, critical path effect), Cost Impact (2-col table: Element + Amount, min 6 rows + total), Evidence (single paragraph listing all refs inline with status). Sig grid: Notified By + Received By.
+Keep total output concise — designed for quick reading and printing.`,
+};
+
+export function getCeTemplateGenerationPrompt(templateSlug: CeTemplateSlug): string {
+  const styleGuide = CE_TEMPLATE_STYLE[templateSlug] || CE_TEMPLATE_STYLE['formal-letter'];
+  const schema = TOOL_GENERATION_SCHEMAS['ce-notification'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nCompensation Event Notification (NEC Contract)\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a CE Notification JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Daywork Sheet Builder — Template Style Guidance
+// ---------------------------------------------------------------------------
+const DAYWORK_SHEET_TEMPLATE_STYLE: Record<DayworkSheetTemplateSlug, string> = {
+  'ebrora-standard': `TEMPLATE: Ebrora Standard (green #059669, standard layout, ~2 pages)
+Generate 5 sections: 01 Instruction & Activity Details (info table), 02 Labour Record (9-col table: Name + Trade + CSCS + Start + End + Normal + OT + Rate + Total, min 3 rows + total), 03 Plant & Equipment (7-col: Description + Hire Type + Hours + Productive + Standing + Rate + Total, min 2 rows + total), 04 Materials & Consumables (6-col: Description + Qty + Unit + Unit Cost + Total + Invoice, min 2 rows + total), 05 Supervision & Summary (supervision table + 2-col summary table with sub-total, O&P %, grand total). Sig grid: Contractor + Client/PM.`,
+
+  'ceca-civil': `TEMPLATE: CECA Civil Engineering (amber #92400E, CECA Schedule rates)
+Generate: LABOUR with CIJC grades (7-col: Name + CIJC Grade + Normal + OT + Basic Rate + NI+Holiday addition + CECA Total), PLANT at CECA schedule rates (5-col: Item + CECA Category + Hours + CECA Rate + Total), MATERIALS at invoice cost + 15% CECA addition (5-col: Material + Qty + Invoice Cost + CECA Addition + Total), CECA SUMMARY (4-col: Element + Nett + CECA Addition + Total). Use CIJC Working Rule Agreement grades and genuine CECA schedule rates.`,
+
+  'nec4-record': `TEMPLATE: NEC4 Compensation Event Record (dark blue #1e3a5f, Defined Cost)
+Generate: CE Description prose, PEOPLE Defined Cost (5-col: Person + Category + Hours + People Rate + Defined Cost), EQUIPMENT Defined Cost (5-col: Equipment + Ownership + Hours + Rate + Defined Cost), MATERIALS Defined Cost (4-col: Material + Qty + Defined Cost + Source), FEE & TOTAL (sub-total + fee % + total). NEC4 Cl.63.1 callout. Use Short Schedule of Cost Components terminology.`,
+
+  'subcontractor-valuation': `TEMPLATE: Subcontractor Valuation (orange #c2410c, Submitted vs Agreed rates)
+Generate: Labour with 6-col (Item + Hours + Submitted Rate + Agreed Rate + Variance + Assessed), Plant same format, Materials (5-col: Material + Submitted + Invoice + Agreed Markup + Assessed), Summary (4-col: Element + Submitted + Assessed + Variance with negative variances highlighted). Cumulative callout showing running total.`,
+
+  'compact-field': `TEMPLATE: Compact Field (grey #374151, single content page, field-ready)
+Generate: Instruction header line, then compact Labour table (5-col: Name + Trade + Hrs + Rate + Total), Plant table (4-col), Materials table (3-col), Summary table (2-col with O&P and grand total). Designed for printing on site.`,
+
+  'jct-prime-cost': `TEMPLATE: JCT Prime Cost (blue #1e40af, RICS definition)
+Generate: Labour with prime cost + percentage addition (6-col: Operative + Grade + Hrs + Prime Cost Rate + % Addition + Total), Plant at hire/RICS rates (5-col), Materials at net invoice + 15% (4-col: Material + Invoice Cost + % Addition + Total), JCT Summary (2-col). Use RICS Definition of Prime Cost terminology.`,
+
+  'weekly-summary': `TEMPLATE: Weekly Summary (teal #0f766e, Mon-Fri aggregated grid)
+Generate: Daily Sheet References (5-col: Day + DW Ref + Instruction + Activity + Daily Total, 5 rows Mon-Fri + weekly total), Weekly Labour Hours Grid (7-col: Operative + Mon + Tue + Wed + Thu + Fri + Week Total), Cumulative KPI dashboard (4 boxes: This Week + Cumulative + Labour Hours + PM Instructions count).`,
+
+  'audit-trail': `TEMPLATE: Audit Trail (navy #1e293b, evidence-grade, adjudication-ready)
+Generate 6 sections: 01 Instruction Record (info table: type, ref, issued by, witnessed by, diary entry), 02 Photographic Evidence Register (4-col: Photo Ref + Time + Description + Taken By, min 4 photos), 03 Labour with evidence refs (10-col including CSCS ref and evidence column), 04 Plant with hire invoices (6-col including hire company and invoice ref), 05 Materials with delivery tickets (5-col including supplier and delivery ticket ref), 06 Verification Chain (5-col: Role + Name + Signature + Date + Verification, min 4 roles). Blue dispute/adjudication callout.`,
+};
+
+export function getDayworkSheetTemplateGenerationPrompt(templateSlug: DayworkSheetTemplateSlug): string {
+  const styleGuide = DAYWORK_SHEET_TEMPLATE_STYLE[templateSlug] || DAYWORK_SHEET_TEMPLATE_STYLE['ebrora-standard'];
+  const schema = TOOL_GENERATION_SCHEMAS['daywork-sheet'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nDaywork Sheet\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Daywork Sheet JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Delay Notification Builder — Template Style Guidance
+// ---------------------------------------------------------------------------
+const DELAY_TEMPLATE_STYLE: Record<DelayTemplateSlug, string> = {
+  'formal-letter': `TEMPLATE: Formal Letter (dark red #991B1B, Arial, underline section headings, ~3 pages)
+AI INTERVIEW: Standard delay notification interview questions per conversation prompt.
+Generate 8 sections with underline headings: 1. FORMAL NOTICE OF DELAY (salutation "Dear [name]," + prose min 130 words — formal notification referencing contract, clause, event date), 2. EVENT DESCRIPTION (prose min 400 words across 2+ paragraphs — detailed factual account: what/when/who/where, grid reference, immediate actions taken, technical detail), 3. AFFECTED ACTIVITIES (6-col table: Activity + Original Date + Revised Date + Delay WD + Critical? RAG + Notes, min 5 rows including new activities created by the event), 4. PROGRAMME IMPACT (prose min 260 words — critical path analysis, float consumption, key date movement, Planned Completion shift, estimated EOT), 5. MITIGATION MEASURES (prose min 200 words — resource redeployment, fast-tracking, sequential dependencies preventing full recovery), 6. CONTRACTUAL ENTITLEMENT (prose min 260 words — clause references, contract wording, why event meets criteria, notification timeline), 7. COST ENTITLEMENT (3-col KPI dashboard: £Total/WDs EOT/Revised Completion + prose min 130 words + 2-col cost table: Element + £Amount, min 5 rows + total), 8. REQUIRED RESPONSE & SUPPORTING EVIDENCE (prose min 100 words + 3-col evidence table: Document + Reference + Status RAG, min 5 rows + "Yours faithfully,"). Sig grid: For and on behalf of Contractor + Received By.
+Provide costItems array, programmeKpis array (3 items), supportingDocuments array.`,
+
+  'corporate': `TEMPLATE: Corporate (navy #1E3A5F, Cambria font, full-width bar headings, ~2 pages)
+AI INTERVIEW: Standard delay notification interview questions per conversation prompt.
+Generate 5 sections with numbered bar headings: 01 NOTICE DETAILS (info table, 8 rows: Ref, Date, Contract, From, To, Clause, Event Date, Related EWN), 02 EVENT DESCRIPTION (prose min 300 words — factual account of delay event with technical detail), 03 PROGRAMME IMPACT (4-col KPI: Working Days EOT + Critical Path + Revised Completion + Key Date Affected, then 6-col activity table: Activity + Original + Revised + Delay WD + Critical? RAG + Notes, min 4 rows), 04 MITIGATION & ENTITLEMENT (prose min 250 words combined — mitigation measures + entitlement basis in one section), 05 COST IMPACT & EVIDENCE (2-col cost table: Element + £Estimate, min 5 rows + total row, then evidence paragraph with document refs inline). Sig grid: Contractor + Project Manager.
+Provide costItems, programmeKpis (4 items for KPI), affectedActivities, supportingDocuments arrays.`,
+
+  'concise': `TEMPLATE: Concise (slate #475569, Arial, left-border headings, ~2 pages compact)
+AI INTERVIEW: Standard delay notification interview questions — gather minimum needed for a clear notification.
+Generate sections with left-border headings (no numbers): Notice Details (compact 6-row info table: Ref, Date, Contract, From/To combined, Clause, Event Date), Event Summary (single paragraph min 200 words — all key facts in one dense paragraph including delay duration and CE clause), Programme Impact (bold single paragraph with extension days, date shifts, critical path effect, key date impact), Cost Impact — £X (reserved) (single paragraph listing cost items inline with amounts, reference to formal quotation to follow), Required Response (single paragraph — PM response deadline, deemed acceptance, without prejudice). Sig grid: Contractor + Project Manager.
+Keep total output concise — designed for quick reading and printing.`,
+};
+
+export function getDelayNotificationTemplateGenerationPrompt(templateSlug: DelayTemplateSlug): string {
+  const styleGuide = DELAY_TEMPLATE_STYLE[templateSlug] || DELAY_TEMPLATE_STYLE['formal-letter'];
+  const schema = TOOL_GENERATION_SCHEMAS['delay-notification'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nDelay Notification Letter\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Delay Notification JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Invasive Species Assessment — Template Style Guidance
+// ---------------------------------------------------------------------------
+const INVASIVE_TEMPLATE_STYLE: Record<InvasiveTemplateSlug, string> = {
+  'ecological-report': `TEMPLATE: Ecological Report (dark green #166534, Arial, formal ecological assessment, ~3pp)
+AI INTERVIEW: Standard invasive species interview questions per conversation prompt.
+Generate cover with 8-row info table (Ref, Survey Date, Review Date, Surveyed By, Project, Site Address, Species Identified with Latin name + Schedule reference, Extent with stand count + area). Body with numbered green section bars: 01 SURVEY METHODOLOGY & SCOPE (prose min 200 words — surveyor qualifications, methodology, PCA/EA protocol, survey timing, area covered), 02 SPECIES IDENTIFICATION & DISTRIBUTION (7-col table: Stand ID + Species + Grid Ref + Area m² + Distance to Works + Growth Stage + Condition, min 3 rows. Then red legal warning callout citing Wildlife & Countryside Act 1981 Section 14(2), penalties), 03 RISK ASSESSMENT — PROXIMITY TO WORKS (5-col table: Risk + Description + Likelihood RAG + Consequence RAG + Rating RAG, min 4 rows), 04 RECOMMENDED MANAGEMENT STRATEGY (prose min 200 words + 4-col control measures table: Measure + Timing + Responsible + Cost Estimate, min 4 rows), 05 REGULATORY REFERENCES (paragraph listing all relevant Acts). Sig grid: Surveyed By + Reviewed By.
+Provide stands array (min 3), risks array (min 4 with RAG ratings), controlMeasures array (min 4 with costs).`,
+
+  'site-management': `TEMPLATE: Site Management Plan (teal #0D9488, Calibri font, practical controls, ~2pp)
+AI INTERVIEW: Standard invasive species interview questions per conversation prompt.
+Generate cover with 6-row info table (Ref, Date, Project, Contractor, Species with count/area, Closest Stand). Body with numbered teal section bars (Calibri font): 01 SITE RULES (red ⚠ ALL PERSONNEL callout — criminal offence warning, do not enter zones, report new growth), 02 EXCLUSION ZONES & CONTROLS (4-col table: Control + Detail + Who + Frequency, min 8 rows covering: exclusion fencing, contamination zone marking, root barrier, wheel/boot wash, soil segregation, disposal route, herbicide programme, weekly inspection), 03 TOOLBOX TALK REQUIREMENTS (prose min 150 words — who needs briefing, content covered, refresher schedule, specific briefings for excavator operators), 04 MONITORING & REPORTING (3-col table: Activity + Frequency + Record, min 5 rows + teal callout on reporting new growth within 24hrs). Sig grid: Prepared By + Approved By.
+Provide exclusionControls array (min 8), monitoring array (min 5).`,
+
+  'briefing-note': `TEMPLATE: Briefing Note (slate #475569, Arial, awareness document for all personnel, ~2pp)
+AI INTERVIEW: Standard invasive species interview questions — gather minimum needed for an awareness briefing.
+Generate cover with 5-row info table (Ref, Date, Site, Audience "All site personnel", Key Message in red bold "X stands on site — DO NOT ENTER exclusion zones"). Body with slate section bars (no numbers): WHAT IS [SPECIES NAME]? (prose min 150 words — what it is, why it's dangerous, how it spreads, legal status), HOW TO IDENTIFY IT (seasonal identification guide for spring/summer/autumn/winter + underground), WHAT YOU MUST DO (✓ table with green ticks: STAY OUT + WASH DOWN + REPORT + SEGREGATE, 4 rows), WHAT YOU MUST NOT DO (✗ table with red crosses and RED header bar: DO NOT cut/strim + DO NOT move soil + DO NOT enter zones + DO NOT dispose in general waste, 4 rows). Red legal consequence callout (unlimited fine + 2 years imprisonment). Briefing sign-off line (delivered by + date + attendees). Footer: "Designed for printing and displaying at site induction point".
+Keep concise — this is a site display document.`,
+};
+
+export function getInvasiveTemplateGenerationPrompt(templateSlug: InvasiveTemplateSlug): string {
+  const styleGuide = INVASIVE_TEMPLATE_STYLE[templateSlug] || INVASIVE_TEMPLATE_STYLE['ecological-report'];
+  const schema = TOOL_GENERATION_SCHEMAS['invasive-species'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nInvasive Species Assessment\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate an Invasive Species Assessment JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Quote Generator — Template Style Guidance
+// ---------------------------------------------------------------------------
+const QUOTE_TEMPLATE_STYLE: Record<QuoteTemplateSlug, string> = {
+  'standard-quote': `TEMPLATE: Standard Quote (steel blue #1E40AF, Calibri, modern professional, ~6-10pp)
+AI INTERVIEW:
+Round 1: "Describe the works you are quoting for — what trade/discipline, what scope, which site/project? Include any drawing or spec references."
+Round 1: "What is your pricing structure — lump sum, measured BoQ, schedule of rates? List the main cost items with quantities, units, and rates."
+Round 2: "What are your key exclusions — items NOT included in your price? And key assumptions the price is based on?"
+Round 2: "Programme — proposed start, duration, key milestones? Commercial terms — payment terms, retention, defects period, contract form?"
+Round 2: "Any provisional sums or daywork allowance to include?"
+COVER PAGE: Blue gradient banner "SUBCONTRACTOR QUOTATION", subtitle in #93C5FD with template name + works type. Project name bar in accent blue. 9-row cover info table (Quotation Ref, Date, Valid Until, Prepared By, Project, Client, Main Contractor, Tender Reference, Site Address).
+BODY SECTIONS (blue section bars, numbered 01–07):
+  01 TENDER PARTICULARS — accent info table (4 rows: Subcontractor, Works Description, Contract Form, Total Tender Sum in bold accent)
+  02 BILL OF QUANTITIES — 6-col data table (Ref/Description/Unit/Qty/Rate £/Amount £, min 11 rows) + price summary box (Original Contract Sum, Provisional Sums, Daywork Allowance, TOTAL in accent)
+  03 INCLUSIONS — bullet list (min 12 items)
+  04 EXCLUSIONS — bullet list (min 10 items)
+  05 ASSUMPTIONS & QUALIFICATIONS — bullet list (min 9 items)
+  06 PROGRAMME — 3-row info table (Start/Duration/Completion) + milestones data table (Milestone/Target Date/Duration, min 5 rows)
+  07 COMMERCIAL TERMS — 5-row info table (Payment/Retention/Defects/Insurance/Contractual Basis)
+End mark in accent blue.`,
+
+  'formal-contract': `TEMPLATE: Formal Contract (charcoal #2D2D2D bars + burgundy #7F1D1D accent, Cambria serif, clause-numbered, ~8-14pp)
+AI INTERVIEW:
+Round 1: "Describe the works scope in detail — this will form clause 1.0 with sub-clauses 1.1, 1.2, 1.3. Include plant types, quantities, specifications, standards, and methodology."
+Round 1: "Provide your full BoQ with refs, descriptions, units, quantities, and rates. Include provisional sums and daywork rates."
+Round 2: "What contract form applies (NEC4/JCT)? What Z-clauses or amendments? What are your reservations or alternative proposals?"
+Round 2: "Programme details — start date, duration per phase, milestones? Production rate basis? Commercial terms — payment clause reference, retention mechanism, insurance levels?"
+COVER PAGE: Burgundy gradient banner "FORMAL CONTRACT QUOTATION", subtitle in #FCA5A5 with contract form. Charcoal project name bar. 8-row cover info table.
+BODY SECTIONS (charcoal #2D2D2D bars with burgundy #FCA5A5 clause numbers, numbered 1.0–7.0):
+  1.0 SCOPE OF WORKS — clause-numbered prose (1.1, 1.2, 1.3 etc.), burgundy clause numbers, min 3 paragraphs from scopeOfWorks split by \\n\\n
+  2.0 PRICING SCHEDULE — 6-col BoQ table (same as Standard Quote)
+  3.0 PROVISIONAL SUMS & DAYWORKS — clause prose (3.1 each PS with amount + basis, 3.2 daywork with rates)
+  Price summary box
+  4.0 INCLUSIONS & EXCLUSIONS — clause 4.1 Inclusions as prose, clause 4.2 Exclusions as prose
+  5.0 PROGRAMME & MILESTONES — clause 5.1 dates/duration, 5.2 production rate narrative + milestones table (2-col)
+  6.0 COMMERCIAL TERMS — clauses 6.1 Payment, 6.2 Retention, 6.3 Insurance, 6.4 Contractual Basis
+  7.0 SIGN-OFF — signature grid (Subcontractor + Contractor)
+End mark in burgundy.
+IMPORTANT: scopeOfWorks must have 3+ paragraphs separated by \\n\\n for clause numbering. programmeNarrative must have 2+ paragraphs.`,
+
+  'budget-estimate': `TEMPLATE: Budget Estimate (slate grey #475569, Arial, minimal, ~3-5pp)
+AI INTERVIEW:
+Round 1: "What works are you pricing? Give a brief scope and list the main cost items with approximate quantities and rates."
+Round 1: "Key exclusions and assumptions? How long will the works take?"
+After Round 1, respond with status "ready" — budget estimates need minimal detail.
+COVER PAGE: Slate gradient banner "BUDGET ESTIMATE", subtitle in #CBD5E1. Project name bar. 7-row cover info table (Reference, Date, Valid Until, From, To, Project, Budget Price).
+BODY: Amber callout box "Budget Estimate Notice" warning this is indicative pricing only.
+SECTIONS (slate bars, numbered 01–05):
+  01 PRICE SUMMARY — simplified 5-col BoQ (Ref/Description/Qty/Rate/Amount, 6+ summary line items) + total box
+  02 KEY INCLUSIONS — bullet list (5+ items, condensed)
+  03 KEY EXCLUSIONS — bullet list (3+ items, condensed)
+  04 KEY ASSUMPTIONS — bullet list (4+ items)
+  05 PROGRAMME & TERMS — 4-row info table (Duration/Payment/Retention/Validity)
+End mark in slate.
+NOTE: Budget estimates are deliberately concise. BoQ items can be summarised/grouped. Fewer inclusions/exclusions than formal templates.`,
+
+  'full-tender': `TEMPLATE: Full Tender (deep green #065F46, Arial, comprehensive branded submission, ~10-16pp)
+AI INTERVIEW:
+Round 1: "Describe the full scope of works including plant, methodology, specifications, standards, and quality requirements."
+Round 1: "Provide complete BoQ with all line items, quantities, units, rates. Include provisional sums and daywork."
+Round 2: "Company profile — background, fleet/capability, key personnel with qualifications? Relevant experience — 3+ comparable projects with client, year, value?"
+Round 2: "HSE commitment — management system certifications, incident rate, site-specific hazard controls, environmental management approach?"
+Round 2: "Programme, commercial terms, any alternative proposals or value engineering options?"
+COVER PAGE: Green gradient banner "FULL TENDER SUBMISSION", subtitle in #A7F3D0 with works/project. Company name bar. 11-row cover info table (Ref, Date, Valid Until, Subcontractor with address, Project, Client, Main Contractor, Tender Ref, Contract, Site Address, Total Tender Sum).
+BODY SECTIONS (green bars, numbered 01–07):
+  01 EXECUTIVE SUMMARY — 2+ paragraphs prose from quotationSummary (min 250 words)
+  02 SCOPE OF WORKS — 2+ paragraphs prose from scopeOfWorks (min 375 words)
+  03 BILL OF QUANTITIES — 6-col BoQ table + price summary box
+  04 HEALTH, SAFETY & ENVIRONMENT — 3 paragraphs prose (HSE system, site-specific controls, environmental)
+  05 COMPANY PROFILE & QUALIFICATIONS — prose + green callout box with relevant experience (3+ projects)
+  06 QUALIFICATIONS & ALTERNATIVE PROPOSALS — prose (min 190 words)
+  07 SIGN-OFF — signature grid + blue callout box with validity statement
+End mark in green.
+This is the most comprehensive template — every field must be fully populated with maximum detail.`,
+};
+
+export function getQuoteTemplateGenerationPrompt(templateSlug: QuoteTemplateSlug): string {
+  const styleGuide = QUOTE_TEMPLATE_STYLE[templateSlug] || QUOTE_TEMPLATE_STYLE['standard-quote'];
+  const schema = TOOL_GENERATION_SCHEMAS['quote-generator'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nSubcontractor Quotation\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Quotation JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// RFI Generator — Template Style Guidance
+// ---------------------------------------------------------------------------
+const RFI_TEMPLATE_STYLE: Record<RfiTemplateSlug, string> = {
+  'formal-letter': `TEMPLATE: Formal RFI (steel blue #1E40AF, Arial, comprehensive 8-section, period-numbered "1. TITLE")
+AI INTERVIEW:
+Round 1: "What is the design/specification discrepancy or information gap? Which specific drawings, specs, or documents conflict or are missing information?"
+Round 1: "Who is this directed to (name, role, company)? What contract/project references apply?"
+Round 2: "What is the programme impact if not answered? Which specific activities are held or at risk, with dates?"
+Round 2: "Do you have a proposed solution or preferred answer? What happens if no response is received — what will you do and what are the cost implications?"
+COVER PAGE: Blue gradient banner "REQUEST FOR INFORMATION", subtitle with template name + subject. Project name bar. 9-row cover info table (RFI Reference, Date Raised, Response Required By, Raised By, Directed To, Project, Contract, Site Address, Subject).
+BODY SECTIONS (blue section bars, period-numbered 1.–8.):
+  1. QUERY SUMMARY — prose min 190 words, 1-2 paragraphs summarising the discrepancy
+  2. RELEVANT DOCUMENTS — 5-col data table (Type/Reference/Rev/Title/Relevance, min 4 rows)
+  3. DETAILED QUESTIONS — numbered question boxes (Question 1, Question 2, Question 3) with accent left border, min 3 questions, each min 60 words
+  4. BACKGROUND & CONTEXT — prose min 310 words across 3 paragraphs (works context, commercial impact, chronology)
+  5. PROPOSED SOLUTION — blue callout box with Contractor's proposal (min 80 words)
+  6. PROGRAMME IMPLICATION — red callout (critical path impact), 3-col activities table (Activity at Risk/Planned Start/Impact, min 3 rows), prose min 125 words
+  7. IMPACT OF NON-RESPONSE — prose min 125 words (what Contractor will do, CE claim, cost estimate)
+  8. DISTRIBUTION & RESPONSE — info table (Contractual Basis, Response Format, Distribution), response box, sig grid (Raised By + Response By)
+End mark in accent blue. This is the most detailed and formal RFI template.`,
+
+  'corporate': `TEMPLATE: Corporate RFI (navy #1E3A5F, Cambria, professional 5-section, 01-numbered)
+AI INTERVIEW:
+Round 1: "Describe the query — what needs clarifying and which documents are involved?"
+Round 1: "Who is the RFI directed to and what is the response deadline?"
+Round 2: "Programme impact if not answered on time? Which activities affected?"
+COVER PAGE: Navy gradient banner "REQUEST FOR INFORMATION", subtitle with format + subject. Project bar. 8-row cover info table.
+BODY SECTIONS (navy section bars, 01–05 numbered):
+  01 QUERY DESCRIPTION — prose min 190 words across 2 paragraphs (combine querySummary content)
+  02 QUESTIONS — question boxes (Q1, Q2) with navy accent border, min 2 questions
+  03 RELEVANT DOCUMENTS — 4-col data table (Reference/Rev/Title/Relevance, min 3 rows)
+  04 PROGRAMME IMPACT — prose min 125 words (lead times, held activities, cascade)
+  05 RESPONSE REQUIRED — response box with optional format note + sig grid (Raised By + Response By)
+End mark in navy. Professional corporate format — fewer sections than Formal but still comprehensive.`,
+
+  'concise': `TEMPLATE: Quick Query (slate grey #475569, Arial, minimal, left-border headings)
+AI INTERVIEW:
+Round 1: "What is the single question you need answered? Be very specific — drawing ref, clause, what exactly needs confirming."
+Round 1: "Why is this urgent? What is the next activity that depends on the answer, and when is it scheduled?"
+After Round 1, respond with status "ready" — Quick Queries are fast-turnaround.
+COVER PAGE: Slate gradient banner "QUICK QUERY", project bar, 6-row cover info table (Reference, Date, Response Required, From, To, Project).
+BODY: Slate header bar "QUICK QUERY | ref | date" with project subtitle. Red urgency callout if deadline <7 days. Left-border section headings (no numbers, no full-width bars):
+  THE QUESTION — prominent question box with thick accent left border, single focused question
+  REFERENCE — info table (1-2 documents only)
+  WHY IT'S URGENT — prose (lead time, held activity, cost of delay)
+  RESPONSE — response box + sig grid
+End mark in slate. This is deliberately minimal — one page, one question, fast response expected. urgencyNote field is critical.`,
+};
+
+export function getRfiTemplateGenerationPrompt(templateSlug: RfiTemplateSlug): string {
+  const styleGuide = RFI_TEMPLATE_STYLE[templateSlug] || RFI_TEMPLATE_STYLE['formal-letter'];
+  const schema = TOOL_GENERATION_SCHEMAS['rfi-generator'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nRequest for Information (RFI)\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate an RFI JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Variation Confirmation — Template Style Guidance
+// ---------------------------------------------------------------------------
+const VARIATION_TEMPLATE_STYLE: Record<VariationTemplateSlug, string> = {
+  'formal-letter': `TEMPLATE: Formal Confirmation (teal #0F766E, Arial, comprehensive 6-section, cost table)
+AI INTERVIEW:
+Round 1: "Describe the verbal instruction — who gave it, when, where, and who was present? What exactly were you told to do?"
+Round 1: "What contract form applies? What is the contract/project reference?"
+Round 2: "Provide a detailed breakdown of the additional cost — itemise each element with quantities, units, and rates."
+Round 2: "What is the time impact? Which activities are affected? Is the work on the critical path?"
+Round 2: "What design input is needed? When must it be received to avoid programme delay?"
+COVER PAGE: Teal gradient banner "VARIATION CONFIRMATION", subtitle with contract form + CE notification. Project bar. 10-row cover info table (Reference, Date of Letter, Date of Instruction, Instructed By, Received By, Project, Contract, Subject, Estimated Cost Impact in accent bold, Estimated Time Impact in accent bold).
+BODY SECTIONS (teal section bars, 01–06):
+  01 RECORD OF VERBAL INSTRUCTION — accent info table (6 rows: Date & Time, Location, Instruction Given By, Instruction Received By, Witnesses Present, Instruction Summary)
+  02 SCOPE CHANGE DESCRIPTION — prose min 375 words across 2 paragraphs (scope detail + design dependencies)
+  03 COST IMPACT ASSESSMENT — 6-col cost table (Ref/Item/Unit/Qty/Rate £/Amount £, min 8 rows) + price summary box (Direct Costs, Contractor's Fee, Design Fee, ESTIMATED COST IMPACT total)
+  04 TIME IMPACT ASSESSMENT — 4-row info table (Duration, Programme Impact, Activities Affected, Latest Design Date)
+  05 CONTRACTUAL BASIS — amber callout box (CE clause + notification statement) + prose (request for PMI + reservation of rights)
+  06 SIGN-OFF — sig grid (Contractor + Project Manager Acknowledgement)
+End mark in teal. Maximum contractual protection template.`,
+
+  'corporate': `TEMPLATE: Corporate Letter (navy #1E3A5F, Cambria, letter format, 4 sections)
+AI INTERVIEW:
+Round 1: "Describe the verbal instruction and who gave it. What additional/varied works are required?"
+Round 1: "Contract form and reference? Estimated cost and time impact?"
+Round 2: "What is the programme impact? What CE clause applies?"
+COVER PAGE: Navy gradient banner "VARIATION CONFIRMATION", subtitle with subject. Project bar. 7-row cover info table.
+BODY: "Dear [name]," salutation then 4 navy section bars:
+  01 INSTRUCTION SUMMARY — prose min 125 words (who/when/where/what/why in flowing paragraph)
+  02 SCOPE DESCRIPTION — prose min 375 words (description of additional works)
+  03 IMPACT ASSESSMENT — 4-row info table (Estimated Cost bold, Estimated Duration, Programme Impact, CE Classification)
+  04 CONFIRMATION REQUESTED — prose min 125 words (request for PMI, reservation of rights)
+  "Kind regards," formal signoff with name/title + sig grid (Sent By + Acknowledged By)
+End mark in navy.`,
+
+  'concise': `TEMPLATE: Quick Confirmation (slate #475569, Arial, minimal, left-border headings)
+AI INTERVIEW:
+Round 1: "What verbal instruction was given, by whom, when? What's the estimated cost and time impact?"
+After Round 1, respond with status "ready" — Quick Confirmations are same-day issue.
+COVER PAGE: Slate gradient banner "QUICK CONFIRMATION", subtitle "Written Record of Verbal Instruction — Same Day Issue". Project bar. 5-row cover info table (Reference, Date, Instruction Date, From, To).
+BODY: Slate header bar "VARIATION CONFIRMATION | ref | date" with project subtitle. Left-border section headings:
+  VERBAL INSTRUCTION RECORD — 5-row info table (Who with arrow, When with time/location, Witnesses, What, Why)
+  KEY FACTS — 4-row info table (Estimated Cost bold, Estimated Time bold, CE Clause, Design Needed By)
+  ACTION REQUIRED — amber callout box (request for formal PMI, CE notification, quotation to follow, reservation of rights)
+  Sig grid (Sent By + Acknowledged)
+End mark in slate. Deliberately minimal — one page, same-day turnaround.`,
+};
+
+export function getVariationTemplateGenerationPrompt(templateSlug: VariationTemplateSlug): string {
+  const styleGuide = VARIATION_TEMPLATE_STYLE[templateSlug] || VARIATION_TEMPLATE_STYLE['formal-letter'];
+  const schema = TOOL_GENERATION_SCHEMAS['variation-confirmation'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nVariation Confirmation Letter\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a Variation Confirmation JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Working at Height Assessment — Template Style Guidance
+// ---------------------------------------------------------------------------
+const WAH_TEMPLATE_STYLE: Record<WahTemplateSlug, string> = {
+  'site-ready': `TEMPLATE: Site-Ready (steel blue #1E40AF, Arial, practical, 4 sections 01-numbered)
+AI INTERVIEW:
+Round 1: "Describe the working at height task — what is being done, at what height, using what equipment, where on site?"
+Round 1: "What are the main fall hazards? Who is at risk?"
+Round 2: "What fall prevention and protection measures are in place? Equipment specifications and inspection status?"
+COVER: Blue gradient banner "WORKING AT HEIGHT ASSESSMENT", subtitle with task summary. 7-row cover info table.
+SECTIONS (blue bars 01–04):
+  01 TASK & LOCATION — prose description of the WAH activity
+  02 HAZARD IDENTIFICATION — 5-col table (Hazard bold/Consequence/Risk RAG/Control Measure/Residual RAG, min 5 rows)
+  03 EQUIPMENT CHECKLIST — 3-col table (Item bold/Checked green tick/Notes, min 6 rows)
+  04 SIGN-OFF — sig grid (Assessor + Scaffold Supervisor)`,
+
+  'formal-hse': `TEMPLATE: Formal HSE (amber #B45309 + charcoal #2D2D2D bars, Cambria, clause-numbered 1.0–4.0)
+AI INTERVIEW:
+Round 1: "Describe the task and the regulatory framework — which WAH Regs 2005 schedules apply?"
+Round 1: "Walk through the hierarchy of control — can the work be avoided? What collective protection? What personal protection?"
+Round 2: "What inspection and review schedule is needed? What competency requirements apply?"
+COVER: Amber gradient banner, charcoal project bar. 7-row info table.
+SECTIONS (charcoal bars with amber #FDE68A clause numbers):
+  1.0 REGULATORY FRAMEWORK — clause-numbered prose (1.1, 1.2) referencing WAH Regs schedules
+  2.0 HIERARCHY OF CONTROL — 4 numbered hierarchy steps (red 1/amber 2/green 3/blue 4) with coloured number badges
+  3.0 HAZARD REGISTER — 6-col table (amber header: #/Hazard/Risk RAG/Control with Reg ref/Residual RAG/Responsible, min 5 rows)
+  4.0 INSPECTION & REVIEW SCHEDULE — 4-col table (Inspection/Frequency/By Whom/Record, min 5 rows)
+Sig grid (Assessed By + Reviewed By H&S).`,
+
+  'quick-check': `TEMPLATE: Quick Check (slate #475569, Arial, pre-task checklist, left-border headings)
+AI INTERVIEW:
+Round 1: "What WAH task is being checked? What height? What equipment is in use?"
+After Round 1, respond with status "ready" — Quick Checks are rapid pre-task documents.
+COVER: Slate gradient banner "WAH QUICK CHECK". 5-row info table.
+BODY: Slate header bar "WAH QUICK CHECK | ref | date". Left-border sections:
+  TASK SUMMARY — 3-row info table (Task, Height, Equipment)
+  KEY HAZARDS & CONTROLS — 3-col table (Hazard/Control/OK? with green ticks, min 5 rows)
+  EQUIPMENT CHECK — 3-col table (Item/Checked green/Notes, min 6 rows)
+  Red warning banner "DO NOT ACCESS IF ANY CHECK FAILS"
+Sig grid (Checked By + Operatives Briefed). Valid for single shift only.`,
+
+  'full-compliance': `TEMPLATE: Full Compliance (deep green #065F46, Arial, comprehensive, 5 sections 01-numbered)
+AI INTERVIEW:
+Round 1: "Describe the WAH task, height, and equipment. What hierarchy of control assessment has been done?"
+Round 1: "What are the hazards? Provide likelihood and severity scores (1-5) for each, before and after controls."
+Round 2: "What is the rescue plan if someone falls? Equipment, method, time target, who performs it?"
+Round 2: "Competency requirements — who needs what qualifications? Weather abort limits?"
+COVER: Green gradient banner "WORKING AT HEIGHT FULL COMPLIANCE ASSESSMENT", subtitle listing WAH Regs + Rescue + Competency + Emergency. 8-row info table (including Risk Level in red bold).
+SECTIONS (green bars 01–05):
+  01 HIERARCHY OF CONTROL (Regulation 6) — 4 hierarchy steps with coloured number badges (red/amber/green/blue)
+  02 RISK MATRIX — 8-col table (Hazard/L/S/Risk/Control/L/S/Res., min 6 rows with L×S calculated RAG scores)
+  03 RESCUE PLAN (Regulation 9) — red callout (rescue scenario) + prose min 250 words across 2 paras
+  04 COMPETENCY MATRIX — 5-col table (Person/Role/Qualification/Expiry/Verified tick, min 5 rows)
+  05 WEATHER RESTRICTIONS — 4-row info table (Wind erection, Wind use, Rain/Ice, Lightning)
+4-box sig grid (Assessed By + H&S Review + Scaffold Co. Acceptance + Client/PC). Most comprehensive template.`,
+};
+
+export function getWahTemplateGenerationPrompt(templateSlug: WahTemplateSlug): string {
+  const styleGuide = WAH_TEMPLATE_STYLE[templateSlug] || WAH_TEMPLATE_STYLE['site-ready'];
+  const schema = TOOL_GENERATION_SCHEMAS['wah-assessment'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nWorking at Height Assessment\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a WAH Assessment JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
+}
+
+// ---------------------------------------------------------------------------
+// Whole Body Vibration Assessment — Template Style Guidance
+// ---------------------------------------------------------------------------
+const WBV_TEMPLATE_STYLE: Record<WbvTemplateSlug, string> = {
+  'site-practical': `TEMPLATE: Site Practical (lime green #4D7C0F, Arial, 3 sections, exposure summary + operative sign-off)
+AI INTERVIEW:
+Round 1: "What plant/equipment are the operators using? For each: make/model, estimated vibration magnitude (m/s²), and daily operating hours."
+Round 1: "Who are the operators? Names (or 'Agency Driver 1' etc.) and their equipment assignments."
+Round 2: "What controls are in place? Seat condition, haul road maintenance, speed limits, task rotation, health surveillance status?"
+COVER: Lime gradient banner "WHOLE BODY VIBRATION ASSESSMENT", subtitle with equipment list. 5-row info table.
+SECTIONS (lime bars 01–03):
+  01 EQUIPMENT & EXPOSURE SUMMARY — 7-col table (Equipment bold/Vibration/Daily Use/A(8) bold/vs EAV RAG/vs ELV RAG/Action, min 3 rows) + amber callout explaining EAV 0.5 and ELV 1.15
+  02 CONTROLS — bullet list (min 6 controls with bold titles: Seat condition, Haul road, Speed limits, Task rotation, Training, Health surveillance)
+  03 OPERATIVE ACKNOWLEDGEMENT — 5-col table (Name bold/Equipment/Max Daily Hrs/Briefed green tick/Signature blank, min 3 rows) + blue review callout
+End mark.`,
+
+  'compliance': `TEMPLATE: Compliance (navy #1E3A5F, Arial, 5 sections, regulatory, clause-numbered)
+AI INTERVIEW:
+Round 1: "Equipment details: make/model, vibration magnitude, daily exposure hours, vibration data source?"
+Round 1: "Regulation references — which Vibration Regs 2005 clauses apply? What health surveillance is in place?"
+Round 2: "Control measures mapped to Regulation 6(2)(a-f)? Risk assessment with L×S scores?"
+COVER: Navy gradient banner "WHOLE BODY VIBRATION COMPLIANCE ASSESSMENT". 6-row info table.
+SECTIONS (navy bars 01–05):
+  01 REGULATORY THRESHOLDS — 3-col table (Threshold/Value in colour/Legal Requirement, 2 rows: EAV amber + ELV red)
+  02 EXPOSURE ASSESSMENT (Regulation 5) — clause 2.1 prose with formula + 7-col exposure table (Equipment/ahv/T/A(8) bold/vs EAV/vs ELV/Source) + amber callout
+  03 RISK ASSESSMENT MATRIX — 6-col table (Hazard bold/L/S/Risk RAG/Control with Reg ref/Residual RAG, min 3 rows)
+  04 CONTROL MEASURES (Regulation 6(2)) — 5-col table (Ref e.g. 6(2)(a)/Regulation/Control Measure/Owner/Frequency, min 6 rows mapped to each sub-clause)
+  05 HEALTH SURVEILLANCE (Regulation 7) — clause 5.1 prose (min 190 words — who is on register, questionnaire process, OH referral trigger, record retention)
+Sig grid (Assessed By + Reviewed By). Formal regulatory compliance template.`,
+
+  'professional': `TEMPLATE: Professional (teal #0F766E, Arial, 4 sections, full A(8) calcs, KPI dashboard, action plan)
+AI INTERVIEW:
+Round 1: "Full equipment register: make/model, year, vibration magnitude, source, seat type, seat condition?"
+Round 1: "Operator names, equipment assignments, and maximum daily hours for each?"
+Round 2: "Health surveillance status for each operator: on register? last assessment date? next due?"
+Round 2: "Action plan: what actions to reduce exposure, who owns them, priority, target date, expected benefit?"
+COVER: Teal gradient banner "WHOLE BODY VIBRATION PROFESSIONAL ASSESSMENT", subtitle with A(8)/Health/Action Plan. 8-row info table (including Overall Status in amber bold).
+SECTIONS (teal bars 01–04):
+  01 EQUIPMENT REGISTER — 7-col table (Equipment bold/Model/Year/WBV m/s²/Source/Seat Type/Condition, min 3 rows)
+  02 A(8) EXPOSURE CALCULATIONS — formula paragraph + 7-col calculation table (Operator bold/Equipment/ahv/T hrs/√(T/8)/A(8) bold/Status RAG, min 3 rows) + 3-box KPI dashboard (Highest A(8), EAV 0.50, ELV 1.15)
+  03 HEALTH SURVEILLANCE PROGRAMME — 5-col table (Operator bold/Status/Last Assessment/Next Due/Notes, min 3 rows)
+  04 ACTION PLAN — 6-col table (#/Action/Owner/Priority in colour (Immediate=red, Short-term=amber, Medium=grey)/Target/Expected Benefit, min 5 rows) + blue review schedule callout
+Sig grid (Assessed By + H&S Manager). Most comprehensive WBV template with full calculations.`,
+};
+
+export function getWbvTemplateGenerationPrompt(templateSlug: WbvTemplateSlug): string {
+  const styleGuide = WBV_TEMPLATE_STYLE[templateSlug] || WBV_TEMPLATE_STYLE['site-practical'];
+  const schema = TOOL_GENERATION_SCHEMAS['wbv-assessment'] || '';
+  return `${GENERATION_PREAMBLE}\n\n--- DOCUMENT TYPE ---\nWhole Body Vibration Assessment\n\n--- TEMPLATE STYLE GUIDANCE ---\n${styleGuide}\n\n--- OUTPUT JSON SCHEMA ---\nGenerate a WBV Assessment JSON with this structure:\n${schema}\n\nRespond ONLY with the JSON object. No markdown. No code fences. No preamble.`;
 }
