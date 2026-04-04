@@ -729,6 +729,7 @@ export async function generateAiToolDocument(
   if (toolSlug === 'dse') {
     const { buildDseDocument } = await import('./templates/dse-template');
     const doc = await buildDseDocument(content as any);
+    const { Packer } = await import('docx');
     return Buffer.from(await Packer.toBuffer(doc));
   }
 
