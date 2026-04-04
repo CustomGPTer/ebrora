@@ -693,3 +693,491 @@ export function richBodyText(
     children: [new TextRun({ text: '[No content provided]', size: fontSize, font: 'Arial', italics: true, color: '999999' })],
   })];
 }
+
+// =============================================================================
+// PARAMETERISED ACCENT-COLOUR HELPERS
+// Used by multi-template rebuilds. Existing functions above are untouched.
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Accent Header — page header using the template's accent colour
+// ---------------------------------------------------------------------------
+export function accentHeader(title: string, accent: string): Header {
+  return new Header({
+    children: [
+      new Paragraph({
+        border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: accent, space: 1 } },
+        spacing: { after: 0 },
+        children: [
+          new TextRun({ text: title, bold: true, size: 16, font: 'Arial', color: accent }),
+        ],
+      }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Accent Footer — doc ref left, page number right, accent top border
+// ---------------------------------------------------------------------------
+export function accentFooter(docRef: string, templateName: string, accent: string): Footer {
+  return new Footer({
+    children: [
+      new Paragraph({
+        border: { top: { style: BorderStyle.SINGLE, size: 4, color: accent, space: 1 } },
+        spacing: { before: 0 },
+        tabStops: [{ type: 'right' as any, position: A4_CONTENT_WIDTH }],
+        children: [
+          new TextRun({ text: `${docRef} · ${templateName}`, size: 14, font: 'Arial', color: GREY_DARK }),
+          new TextRun({ text: '\t', size: 14, font: 'Arial' }),
+          new TextRun({ text: 'Page ', size: 14, font: 'Arial', color: GREY_DARK }),
+          new TextRun({ children: [PageNumber.CURRENT], size: 14, font: 'Arial', color: GREY_DARK }),
+        ],
+      }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Full-Width Section Bar — coloured background spanning margin to margin
+// Uses a single-cell borderless table with shading for reliable full-width fill
+// ---------------------------------------------------------------------------
+export function fullWidthSectionBar(num: string, title: string, accent: string): Table {
+  return new Table({
+    width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
+    columnWidths: [A4_CONTENT_WIDTH],
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
+            shading: { fill: accent, type: ShadingType.CLEAR },
+            borders: NO_BORDERS,
+            margins: { top: 60, bottom: 60, left: 140, right: 140 },
+            children: [
+              new Paragraph({
+                spacing: { after: 0 },
+                children: [
+                  new TextRun({
+                    text: `${num}   ${title.toUpperCase()}`,
+                    bold: true,
+                    size: 22,
+                    font: 'Arial',
+                    color: WHITE,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Cover Block — full-width accent banner for cover page
+// Simulates the HTML gradient cover block as a solid accent band
+// ---------------------------------------------------------------------------
+export function coverBlock(
+  titleLines: string[],
+  subtitle: string,
+  accent: string,
+  subtitleColor: string
+): Table {
+  return new Table({
+    width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
+    columnWidths: [A4_CONTENT_WIDTH],
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
+            shading: { fill: accent, type: ShadingType.CLEAR },
+            borders: NO_BORDERS,
+            margins: { top: 600, bottom: 400, left: 300, right: 300 },
+            children: [
+              ...titleLines.map(line =>
+                new Paragraph({
+                  spacing: { after: 40 },
+                  children: [
+                    new TextRun({
+                      text: line.toUpperCase(),
+                      bold: true,
+                      size: 52,
+                      font: 'Arial',
+                      color: WHITE,
+                    }),
+                  ],
+                })
+              ),
+              new Paragraph({
+                spacing: { before: 120, after: 0 },
+                children: [
+                  new TextRun({
+                    text: subtitle,
+                    size: 22,
+                    font: 'Arial',
+                    color: subtitleColor,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Project Name Bar — centred accent band with project name
+// ---------------------------------------------------------------------------
+export function projectNameBar(text: string, accent: string): Table {
+  return new Table({
+    width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
+    columnWidths: [A4_CONTENT_WIDTH],
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
+            shading: { fill: accent, type: ShadingType.CLEAR },
+            borders: NO_BORDERS,
+            margins: { top: 80, bottom: 80, left: 140, right: 140 },
+            verticalAlign: VerticalAlign.CENTER,
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 0 },
+                children: [
+                  new TextRun({
+                    text: text.toUpperCase(),
+                    bold: true,
+                    size: 26,
+                    font: 'Arial',
+                    color: WHITE,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Cover Info Table — label/value pairs with accent-coloured labels
+// ---------------------------------------------------------------------------
+export function coverInfoTable(
+  rows: Array<{ label: string; value: string }>,
+  accent: string,
+  totalWidth: number
+): Table {
+  const lw = Math.round(totalWidth * 0.32);
+  const vw = totalWidth - lw;
+  const border = { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' };
+  const borders = { top: border, bottom: border, left: border, right: border };
+  return new Table({
+    width: { size: totalWidth, type: WidthType.DXA },
+    columnWidths: [lw, vw],
+    rows: rows.map(r =>
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: lw, type: WidthType.DXA },
+            shading: { fill: 'F9FAFB', type: ShadingType.CLEAR },
+            borders,
+            margins: { top: 60, bottom: 60, left: 120, right: 120 },
+            children: [
+              new Paragraph({
+                spacing: { after: 0 },
+                children: [
+                  new TextRun({ text: r.label, bold: true, size: 18, font: 'Arial', color: accent }),
+                ],
+              }),
+            ],
+          }),
+          new TableCell({
+            width: { size: vw, type: WidthType.DXA },
+            borders,
+            margins: { top: 60, bottom: 60, left: 120, right: 120 },
+            children: [
+              new Paragraph({
+                spacing: { after: 0 },
+                children: [
+                  new TextRun({ text: r.value || '\u2014', size: 18, font: 'Arial' }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      })
+    ),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Signature Grid — 2×2 box layout with role, Name, Signature, Date lines
+// ---------------------------------------------------------------------------
+export function signatureGrid(roles: string[], accent: string, totalWidth: number): Table {
+  const cellW = Math.floor(totalWidth / 2);
+  const border = { style: BorderStyle.SINGLE, size: 1, color: 'D1D5DB' };
+  const borders = { top: border, bottom: border, left: border, right: border };
+  const sigLine = (label: string) => new Paragraph({
+    spacing: { after: 20 },
+    border: { bottom: { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB', space: 4 } },
+    children: [new TextRun({ text: `${label}:`, size: 16, font: 'Arial', color: GREY_DARK })],
+  });
+
+  const buildCell = (role: string): TableCell =>
+    new TableCell({
+      width: { size: cellW, type: WidthType.DXA },
+      borders,
+      margins: { top: 100, bottom: 100, left: 140, right: 140 },
+      children: [
+        new Paragraph({
+          spacing: { after: 80 },
+          children: [
+            new TextRun({ text: role.toUpperCase(), bold: true, size: 18, font: 'Arial', color: accent }),
+          ],
+        }),
+        sigLine('Name'),
+        sigLine('Signature'),
+        sigLine('Date'),
+      ],
+    });
+
+  // Pad to even number
+  const padded = [...roles];
+  if (padded.length % 2 !== 0) padded.push('');
+
+  const rows: TableRow[] = [];
+  for (let i = 0; i < padded.length; i += 2) {
+    rows.push(
+      new TableRow({
+        children: [
+          buildCell(padded[i]),
+          padded[i + 1] ? buildCell(padded[i + 1]) : new TableCell({
+            width: { size: cellW, type: WidthType.DXA },
+            borders: NO_BORDERS,
+            children: [new Paragraph({ children: [] })],
+          }),
+        ],
+      })
+    );
+  }
+
+  return new Table({
+    width: { size: totalWidth, type: WidthType.DXA },
+    columnWidths: [cellW, cellW],
+    rows,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Callout Box — left-bordered box with shaded background
+// ---------------------------------------------------------------------------
+export function calloutBox(
+  text: string,
+  borderColor: string,
+  bgColor: string,
+  textColor: string,
+  totalWidth: number,
+  opts?: { boldPrefix?: string }
+): Table {
+  const border = { style: BorderStyle.NONE, size: 0, color: WHITE };
+  const leftBorder = { style: BorderStyle.SINGLE, size: 24, color: borderColor };
+  return new Table({
+    width: { size: totalWidth, type: WidthType.DXA },
+    columnWidths: [totalWidth],
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: totalWidth, type: WidthType.DXA },
+            shading: { fill: bgColor, type: ShadingType.CLEAR },
+            borders: { top: border, bottom: border, right: border, left: leftBorder },
+            margins: { top: 80, bottom: 80, left: 160, right: 160 },
+            children: [
+              new Paragraph({
+                spacing: { after: 0 },
+                children: [
+                  ...(opts?.boldPrefix
+                    ? [new TextRun({ text: `${opts.boldPrefix} `, bold: true, size: 18, font: 'Arial', color: textColor })]
+                    : []),
+                  new TextRun({ text: text, size: 18, font: 'Arial', color: textColor }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// KPI Dashboard — row of KPI metric boxes (for tools that need them)
+// ---------------------------------------------------------------------------
+export function kpiDashboard(
+  items: Array<{ value: string; label: string }>,
+  accent: string,
+  totalWidth: number
+): Table {
+  const cellW = Math.floor(totalWidth / items.length);
+  const border = { style: BorderStyle.SINGLE, size: 1, color: 'D1D5DB' };
+  const borders = { top: border, bottom: border, left: border, right: border };
+
+  return new Table({
+    width: { size: totalWidth, type: WidthType.DXA },
+    columnWidths: items.map(() => cellW),
+    rows: [
+      new TableRow({
+        children: items.map(item =>
+          new TableCell({
+            width: { size: cellW, type: WidthType.DXA },
+            borders,
+            margins: { top: 120, bottom: 120, left: 80, right: 80 },
+            verticalAlign: VerticalAlign.CENTER,
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 40 },
+                children: [
+                  new TextRun({ text: item.value, bold: true, size: 44, font: 'Arial', color: accent }),
+                ],
+              }),
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 0 },
+                children: [
+                  new TextRun({
+                    text: item.label.toUpperCase(),
+                    size: 14,
+                    font: 'Arial',
+                    color: GREY_DARK,
+                    bold: true,
+                  }),
+                ],
+              }),
+            ],
+          })
+        ),
+      }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Warning Banner — full-width accent warning bar
+// ---------------------------------------------------------------------------
+export function warningBanner(text: string, bg: string, colour: string, totalWidth: number): Table {
+  return new Table({
+    width: { size: totalWidth, type: WidthType.DXA },
+    columnWidths: [totalWidth],
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: totalWidth, type: WidthType.DXA },
+            shading: { fill: bg, type: ShadingType.CLEAR },
+            borders: NO_BORDERS,
+            margins: { top: 80, bottom: 80, left: 140, right: 140 },
+            verticalAlign: VerticalAlign.CENTER,
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 0 },
+                children: [
+                  new TextRun({ text: `\u26A0  ${text}  \u26A0`, bold: true, size: 28, font: 'Arial', color: colour }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Stop Condition Line — red X with shaded background
+// ---------------------------------------------------------------------------
+export function stopConditionLine(text: string): Paragraph {
+  return new Paragraph({
+    spacing: { after: 40 },
+    shading: { type: ShadingType.CLEAR, fill: 'FEF2F2' },
+    indent: { left: 240 },
+    children: [
+      new TextRun({ text: `\u2717  ${text}`, bold: true, size: 18, font: 'Arial', color: '991B1B' }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// End Mark — "— End of Document —" + Ebrora branding
+// ---------------------------------------------------------------------------
+export function endMark(accent: string): Paragraph[] {
+  return [
+    new Paragraph({
+      border: { top: { style: BorderStyle.SINGLE, size: 1, color: GREY_MID, space: 8 } },
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 400, after: 40 },
+      children: [
+        new TextRun({ text: '\u2014 End of Document \u2014', size: 18, font: 'Arial', color: GREY_DARK, italics: true }),
+      ],
+    }),
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 0 },
+      children: [
+        new TextRun({ text: 'Generated by Ebrora \u2014 ebrora.com', size: 16, font: 'Arial', color: accent, bold: true }),
+      ],
+    }),
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// Cover Footer — small italic grey "Generated by Ebrora" at bottom of cover
+// ---------------------------------------------------------------------------
+export function coverFooterLine(): Paragraph {
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 400, after: 0 },
+    children: [
+      new TextRun({ text: 'Generated by Ebrora \u2014 www.ebrora.com', size: 16, font: 'Arial', color: '9CA3AF', italics: true }),
+    ],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Phase Band — full-width tinted bar for phase headings (task-specific templates)
+// ---------------------------------------------------------------------------
+export function phaseBand(text: string, accent: string): Table {
+  return new Table({
+    width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
+    columnWidths: [A4_CONTENT_WIDTH],
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
+            shading: { fill: accent, type: ShadingType.CLEAR },
+            borders: NO_BORDERS,
+            margins: { top: 60, bottom: 60, left: 140, right: 140 },
+            children: [
+              new Paragraph({
+                spacing: { after: 0 },
+                children: [
+                  new TextRun({ text: text.toUpperCase(), bold: true, size: 20, font: 'Arial', color: WHITE }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
