@@ -15,7 +15,12 @@ export const SCOPE_TEMPLATE_CONFIGS: Record<ScopeTemplateSlug, ScopeTemplateConf
     style: 'Modern corporate with banded headers and structured tables',
     pageCount: '8–12',
     thumbnailPath: '/product-images/scope-templates/thumb-corporate-blue.jpg',
-    previewPaths: ['/product-images/scope-templates/preview-corporate-blue-p1.jpg'],
+    previewPaths: [
+      '/product-images/scope-templates/preview-corporate-blue-p1.jpg',
+      '/product-images/scope-templates/preview-corporate-blue-p2.jpg',
+      '/product-images/scope-templates/preview-corporate-blue-p3.jpg',
+      '/product-images/scope-templates/preview-corporate-blue-p4.jpg',
+    ],
     keySections: ['Document Control Table', 'Approval Sign-Off', 'Inclusions & Exclusions Tables', 'Commercial Boilerplate Clauses'],
   },
   'formal-contract': {
@@ -29,7 +34,11 @@ export const SCOPE_TEMPLATE_CONFIGS: Record<ScopeTemplateSlug, ScopeTemplateConf
     style: 'Traditional contract format with clause numbering',
     pageCount: '7–10',
     thumbnailPath: '/product-images/scope-templates/thumb-formal-contract.jpg',
-    previewPaths: ['/product-images/scope-templates/preview-formal-contract-p1.jpg'],
+    previewPaths: [
+      '/product-images/scope-templates/preview-formal-contract-p1.jpg',
+      '/product-images/scope-templates/preview-formal-contract-p2.jpg',
+      '/product-images/scope-templates/preview-formal-contract-p3.jpg',
+    ],
     keySections: ['Red Clause Numbering', 'Sub-Clause Structure (1.1, 1.2)', 'Formal Approval Table', 'Contract Document Schedule'],
   },
   'executive-navy': {
@@ -43,7 +52,11 @@ export const SCOPE_TEMPLATE_CONFIGS: Record<ScopeTemplateSlug, ScopeTemplateConf
     style: 'Contemporary executive with full-width section bars',
     pageCount: '8–11',
     thumbnailPath: '/product-images/scope-templates/thumb-executive-navy.jpg',
-    previewPaths: ['/product-images/scope-templates/preview-executive-navy-p1.jpg'],
+    previewPaths: [
+      '/product-images/scope-templates/preview-executive-navy-p1.jpg',
+      '/product-images/scope-templates/preview-executive-navy-p2.jpg',
+      '/product-images/scope-templates/preview-executive-navy-p3.jpg',
+    ],
     keySections: ['Navy Cover Block', 'Full-Width Teal Section Bars', 'Banded Data Tables', 'Insurance & Commercial Summary'],
   },
 };
