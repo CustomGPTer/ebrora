@@ -16,7 +16,11 @@ export const WASTE_TEMPLATE_CONFIGS: Record<WasteTemplateSlug, WasteTemplateConf
     pageCount: '8–12',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/waste-templates/thumb-full-compliance.jpg',
-    previewPaths: ['/product-images/waste-templates/preview-full-compliance-p1.jpg'],
+    previewPaths: [
+      '/product-images/waste-templates/preview-full-compliance-p1.jpg',
+      '/product-images/waste-templates/preview-full-compliance-p2.jpg',
+      '/product-images/waste-templates/preview-full-compliance-p3.jpg',
+    ],
     keySections: ['Cover Page & Document Control', 'Waste Stream Forecast', 'Duty of Care Chain', 'Carrier & Facility Register', 'KPI Targets'],
   },
   'corporate': {
@@ -31,7 +35,11 @@ export const WASTE_TEMPLATE_CONFIGS: Record<WasteTemplateSlug, WasteTemplateConf
     pageCount: '6–9',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/waste-templates/thumb-corporate.jpg',
-    previewPaths: ['/product-images/waste-templates/preview-corporate-p1.jpg'],
+    previewPaths: [
+      '/product-images/waste-templates/preview-corporate-p1.jpg',
+      '/product-images/waste-templates/preview-corporate-p2.jpg',
+      '/product-images/waste-templates/preview-corporate-p3.jpg',
+    ],
     keySections: ['Waste Hierarchy Strategy', 'Segregation Plan', 'Carrier Register', 'Monitoring Schedule', 'Reporting'],
   },
   'site-record': {
@@ -46,7 +54,11 @@ export const WASTE_TEMPLATE_CONFIGS: Record<WasteTemplateSlug, WasteTemplateConf
     pageCount: '3–5',
     detailLevel: 'Practical',
     thumbnailPath: '/product-images/waste-templates/thumb-site-record.jpg',
-    previewPaths: ['/product-images/waste-templates/preview-site-record-p1.jpg'],
+    previewPaths: [
+      '/product-images/waste-templates/preview-site-record-p1.jpg',
+      '/product-images/waste-templates/preview-site-record-p2.jpg',
+      '/product-images/waste-templates/preview-site-record-p3.jpg',
+    ],
     keySections: ['Waste Stream Summary', 'Skip / Container Log', 'Transfer Note Register', 'Segregation Checklist'],
   },
 };
