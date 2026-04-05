@@ -34,11 +34,13 @@ export const PROGRAMME_CHECKER_TEMPLATE_CONFIGS: Record<ProgrammeCheckerTemplate
     displayName: 'Email Summary',
     description:
       'Concise professional email-style summary of programme findings. Formatted as a letter addressed to the Project Manager with key issues, headline statistics, and recommended next steps. Perfect for attaching to emails or dropping into project reports without reformatting.',
-    pageCount: 1,
+    pageCount: 3,
     layout: 'email',
     thumbnailPath: '/product-images/programme-checker-templates/thumb-email-summary.jpg',
     previewPaths: [
       '/product-images/programme-checker-templates/preview-email-summary-p1.jpg',
+      '/product-images/programme-checker-templates/preview-email-summary-p2.jpg',
+      '/product-images/programme-checker-templates/preview-email-summary-p3.jpg',
     ],
     keySections: [
       'Addressed To / From / Date / Subject',
@@ -56,13 +58,17 @@ export const PROGRAMME_CHECKER_TEMPLATE_CONFIGS: Record<ProgrammeCheckerTemplate
     displayName: 'RAG Report',
     description:
       'Red-Amber-Green rated programme review across 8 assessment areas. Each area receives a RAG rating with detailed findings, issues, and recommendations. Includes executive summary, programme metrics, critical issues table, and recommended actions \u2014 the standard programme review format.',
-    pageCount: 3,
+    pageCount: 7,
     layout: 'rag',
     thumbnailPath: '/product-images/programme-checker-templates/thumb-rag-report.jpg',
     previewPaths: [
       '/product-images/programme-checker-templates/preview-rag-report-p1.jpg',
       '/product-images/programme-checker-templates/preview-rag-report-p2.jpg',
       '/product-images/programme-checker-templates/preview-rag-report-p3.jpg',
+      '/product-images/programme-checker-templates/preview-rag-report-p4.jpg',
+      '/product-images/programme-checker-templates/preview-rag-report-p5.jpg',
+      '/product-images/programme-checker-templates/preview-rag-report-p6.jpg',
+      '/product-images/programme-checker-templates/preview-rag-report-p7.jpg',
     ],
     keySections: [
       'Executive Summary',
@@ -81,7 +87,7 @@ export const PROGRAMME_CHECKER_TEMPLATE_CONFIGS: Record<ProgrammeCheckerTemplate
     displayName: 'Comprehensive Report',
     description:
       'Full-detail programme analysis covering every aspect. RAG ratings with numerical scores, extended findings (250+ words per area), risk matrix, float distribution analysis, critical path narrative, resource loading assessment, contractual compliance check, and a structured improvement plan with owners and deadlines.',
-    pageCount: 4,
+    pageCount: 8,
     layout: 'comprehensive',
     thumbnailPath: '/product-images/programme-checker-templates/thumb-comprehensive.jpg',
     previewPaths: [
@@ -89,6 +95,10 @@ export const PROGRAMME_CHECKER_TEMPLATE_CONFIGS: Record<ProgrammeCheckerTemplate
       '/product-images/programme-checker-templates/preview-comprehensive-p2.jpg',
       '/product-images/programme-checker-templates/preview-comprehensive-p3.jpg',
       '/product-images/programme-checker-templates/preview-comprehensive-p4.jpg',
+      '/product-images/programme-checker-templates/preview-comprehensive-p5.jpg',
+      '/product-images/programme-checker-templates/preview-comprehensive-p6.jpg',
+      '/product-images/programme-checker-templates/preview-comprehensive-p7.jpg',
+      '/product-images/programme-checker-templates/preview-comprehensive-p8.jpg',
     ],
     keySections: [
       'Executive Summary (500+ Words)',
