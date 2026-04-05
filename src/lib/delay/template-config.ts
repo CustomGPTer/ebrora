@@ -12,7 +12,12 @@ export const DELAY_TEMPLATE_CONFIGS: Record<DelayTemplateSlug, DelayTemplateConf
     pageCount: '5-8',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/delay-templates/thumb-formal-letter.jpg',
-    previewPaths: ['/product-images/delay-templates/preview-formal-letter-p1.jpg'],
+    previewPaths: [
+      '/product-images/delay-templates/preview-formal-letter-p1.jpg',
+      '/product-images/delay-templates/preview-formal-letter-p2.jpg',
+      '/product-images/delay-templates/preview-formal-letter-p3.jpg',
+      '/product-images/delay-templates/preview-formal-letter-p4.jpg',
+    ],
     keySections: ['Contract Clause References', 'Delay Event Analysis', 'Critical Path Impact', 'Mitigation Measures', 'Time & Cost Entitlement'],
   },
   'corporate': {
@@ -26,7 +31,11 @@ export const DELAY_TEMPLATE_CONFIGS: Record<DelayTemplateSlug, DelayTemplateConf
     pageCount: '3-5',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/delay-templates/thumb-corporate.jpg',
-    previewPaths: ['/product-images/delay-templates/preview-corporate-p1.jpg'],
+    previewPaths: [
+      '/product-images/delay-templates/preview-corporate-p1.jpg',
+      '/product-images/delay-templates/preview-corporate-p2.jpg',
+      '/product-images/delay-templates/preview-corporate-p3.jpg',
+    ],
     keySections: ['Event Description', 'Programme Impact', 'Mitigation Summary', 'Entitlement Reserved'],
   },
   'concise': {
@@ -40,7 +49,10 @@ export const DELAY_TEMPLATE_CONFIGS: Record<DelayTemplateSlug, DelayTemplateConf
     pageCount: '1-2',
     detailLevel: 'Light',
     thumbnailPath: '/product-images/delay-templates/thumb-concise.jpg',
-    previewPaths: ['/product-images/delay-templates/preview-concise-p1.jpg'],
+    previewPaths: [
+      '/product-images/delay-templates/preview-concise-p1.jpg',
+      '/product-images/delay-templates/preview-concise-p2.jpg',
+    ],
     keySections: ['Triggering Event', 'Affected Activities', 'Estimated Impact'],
   },
 };
