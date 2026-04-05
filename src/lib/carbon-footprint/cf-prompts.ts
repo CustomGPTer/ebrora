@@ -38,7 +38,9 @@ GOOD QUESTIONS — THIS IS THE STANDARD YOU MUST HIT:
 
 After the final round, ALWAYS respond with status "ready".
 
-Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "roundNumber": N, "message": "..." }`;
+Respond with JSON: { "status": "more_questions" | "ready", "questions": [{ "id": "r{round}q{n}", "question": "Your question text here", "context": "Optional helpful context" }], "roundNumber": N, "message": "..." }
+
+CRITICAL: Each question in the "questions" array MUST be an object with an "id" field and a "question" field containing the full question text. Never return questions as plain strings.`;
 
   const prompts: Record<CarbonFootprintTemplateSlug, string> = {
     'ebrora-standard': `You are an expert UK construction carbon measurement specialist conducting a targeted interview to gather information for a comprehensive Construction Carbon Footprint Assessment using ICE v3.2 emission factors.
