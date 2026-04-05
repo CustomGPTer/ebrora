@@ -15,7 +15,15 @@ export const CRP_TEMPLATE_CONFIGS: Record<CrpTemplateSlug, CrpTemplateConfig> = 
     style: 'Government green with structured compliance tables',
     pageCount: '8–12',
     thumbnailPath: '/product-images/crp-templates/thumb-crp-ppn0621.jpg',
-    previewPaths: ['/product-images/crp-templates/preview-crp-ppn0621-p1.jpg'],
+    previewPaths: [
+      '/product-images/crp-templates/preview-crp-ppn0621-p1.jpg',
+      '/product-images/crp-templates/preview-crp-ppn0621-p2.jpg',
+      '/product-images/crp-templates/preview-crp-ppn0621-p3.jpg',
+      '/product-images/crp-templates/preview-crp-ppn0621-p4.jpg',
+      '/product-images/crp-templates/preview-crp-ppn0621-p5.jpg',
+      '/product-images/crp-templates/preview-crp-ppn0621-p6.jpg',
+      '/product-images/crp-templates/preview-crp-ppn0621-p7.jpg',
+    ],
     keySections: [
       'PPN 06/21 Compliance Declaration',
       'Net Zero Commitment Statement',
@@ -39,7 +47,13 @@ export const CRP_TEMPLATE_CONFIGS: Record<CrpTemplateSlug, CrpTemplateConfig> = 
     style: 'Corporate navy with gradient accents and KPI boxes',
     pageCount: '10–14',
     thumbnailPath: '/product-images/crp-templates/thumb-crp-sbti.jpg',
-    previewPaths: ['/product-images/crp-templates/preview-crp-sbti-p1.jpg'],
+    previewPaths: [
+      '/product-images/crp-templates/preview-crp-sbti-p1.jpg',
+      '/product-images/crp-templates/preview-crp-sbti-p2.jpg',
+      '/product-images/crp-templates/preview-crp-sbti-p3.jpg',
+      '/product-images/crp-templates/preview-crp-sbti-p4.jpg',
+      '/product-images/crp-templates/preview-crp-sbti-p5.jpg',
+    ],
     keySections: [
       'Organisational Boundary',
       'SBTi Target Summary (Near & Long-Term)',
@@ -63,7 +77,13 @@ export const CRP_TEMPLATE_CONFIGS: Record<CrpTemplateSlug, CrpTemplateConfig> = 
     style: 'Formal clause-numbered with verification tables',
     pageCount: '9–13',
     thumbnailPath: '/product-images/crp-templates/thumb-crp-iso14064.jpg',
-    previewPaths: ['/product-images/crp-templates/preview-crp-iso14064-p1.jpg'],
+    previewPaths: [
+      '/product-images/crp-templates/preview-crp-iso14064-p1.jpg',
+      '/product-images/crp-templates/preview-crp-iso14064-p2.jpg',
+      '/product-images/crp-templates/preview-crp-iso14064-p3.jpg',
+      '/product-images/crp-templates/preview-crp-iso14064-p4.jpg',
+      '/product-images/crp-templates/preview-crp-iso14064-p5.jpg',
+    ],
     keySections: [
       'Organisational Boundary & Consolidation Approach',
       'GHG Source Identification (ISO 14064-1 Clause 5.2)',
@@ -87,7 +107,12 @@ export const CRP_TEMPLATE_CONFIGS: Record<CrpTemplateSlug, CrpTemplateConfig> = 
     style: 'Contemporary teal with scope-grouped data tables',
     pageCount: '11–15',
     thumbnailPath: '/product-images/crp-templates/thumb-crp-ghg-protocol.jpg',
-    previewPaths: ['/product-images/crp-templates/preview-crp-ghg-protocol-p1.jpg'],
+    previewPaths: [
+      '/product-images/crp-templates/preview-crp-ghg-protocol-p1.jpg',
+      '/product-images/crp-templates/preview-crp-ghg-protocol-p2.jpg',
+      '/product-images/crp-templates/preview-crp-ghg-protocol-p3.jpg',
+      '/product-images/crp-templates/preview-crp-ghg-protocol-p4.jpg',
+    ],
     keySections: [
       'Company Profile & Inventory Boundaries',
       'Consolidation Approach (Operational Control)',
