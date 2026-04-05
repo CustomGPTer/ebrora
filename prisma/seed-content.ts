@@ -57,6 +57,7 @@ const freeTools = [
   { name: "Office Fire Risk Assessment", slug: "fire-risk-assessment", description: "Complete fire risk assessment system for construction site offices. 38 fire safety questions across 17 sections with automated compliance scoring, 5x5 risk matrix, live dashboard, and action plan tracker.", features: "38 questions across 17 sections,5x5 risk matrix,Live dashboard,Action plan tracker,Fire Safety Order 2005 aligned", status: ToolStatus.COMING_SOON, route: "/tools/fire-risk-assessment", gumroadUrl: "https://ebrora.gumroad.com/l/office-fire-risk-assessment", order: 2 },
   { name: "Civil Engineering Materials Converter", slug: "materials-converter", description: "Convert between tonnes, cubic metres, kilograms, litres, square metres, bulk bags, and wagon loads for 100+ civil engineering materials. Includes loose and compacted densities, cost estimating, and embodied carbon calculations using ICE v3 emission factors.", features: "100+ materials,7 unit types,Loose vs compacted density,Cost estimating with editable rates,ICE v3/v4 carbon factors,Live category subtotals,Multi-row take-off with CSV export,Editable assumptions", status: ToolStatus.LIVE, route: "/tools/materials-converter", gumroadUrl: "https://ebrora.gumroad.com/l/civil-engineering-materials-converter", order: 3 },
   { name: "Confined Space Category Calculator", slug: "confined-space-calculator", description: "Calculate the confined space risk category (NC1 Low Risk through to NC4 High Risk with Rescue) using a weighted scoring system covering specified risks, depth, access, ventilation, atmosphere, and communication.", features: "NC1 to NC4 categories,Weighted scoring,Full requirements output,C&G 6160 mapping,Equipment and permit requirements", status: ToolStatus.COMING_SOON, route: "/tools/confined-space-calculator", gumroadUrl: "https://ebrora.gumroad.com/l/confined-space-calculator", order: 4 },
+  { name: "Access Equipment Selector", slug: "access-equipment-selector", description: "HSE hierarchy-compliant decision-support tool for selecting the safest reasonably practicable access equipment. Enter your site conditions and get ranked recommendations across 14 equipment types — with full justification, training requirements, rescue plan notes, and a print-ready PDF assessment.", features: "HSE Hierarchy Compliant,14 Equipment Types,Automated Ranking,Scoring Transparency,PDF Export,Diesel MEWP Auto-Select", status: ToolStatus.LIVE, route: "/tools/access-equipment-selector", gumroadUrl: "https://ebrora.gumroad.com/l/access-equipment-selector", order: 5 },
 ];
 
 export async function seedContent(prisma: PrismaClient) {
@@ -80,7 +81,7 @@ export async function seedContent(prisma: PrismaClient) {
     });
   }
 
-  console.log("  Seeding 4 free tool definitions...");
+  console.log("  Seeding 5 free tool definitions...");
   for (const tool of freeTools) {
     await prisma.freeTool.upsert({
       where: { slug: tool.slug },
@@ -89,5 +90,5 @@ export async function seedContent(prisma: PrismaClient) {
     });
   }
 
-  console.log("  Content seed complete (27 categories + 15 templates + 4 tools).");
+  console.log("  Content seed complete (27 categories + 15 templates + 5 tools).");
 }
