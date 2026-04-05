@@ -16,7 +16,11 @@ export const INVASIVE_TEMPLATE_CONFIGS: Record<InvasiveTemplateSlug, InvasiveTem
     pageCount: '8–14',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/invasive-templates/thumb-ecological-report.jpg',
-    previewPaths: ['/product-images/invasive-templates/preview-ecological-report-p1.jpg'],
+    previewPaths: [
+      '/product-images/invasive-templates/preview-ecological-report-p1.jpg',
+      '/product-images/invasive-templates/preview-ecological-report-p2.jpg',
+      '/product-images/invasive-templates/preview-ecological-report-p3.jpg',
+    ],
     keySections: ['Cover Page & Document Control', 'Species Identification', 'Legal Framework', 'Treatment Methodology', 'Biosecurity & Monitoring'],
   },
   'site-management': {
@@ -31,7 +35,11 @@ export const INVASIVE_TEMPLATE_CONFIGS: Record<InvasiveTemplateSlug, InvasiveTem
     pageCount: '5–8',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/invasive-templates/thumb-site-management.jpg',
-    previewPaths: ['/product-images/invasive-templates/preview-site-management-p1.jpg'],
+    previewPaths: [
+      '/product-images/invasive-templates/preview-site-management-p1.jpg',
+      '/product-images/invasive-templates/preview-site-management-p2.jpg',
+      '/product-images/invasive-templates/preview-site-management-p3.jpg',
+    ],
     keySections: ['Species & Location', 'Exclusion Zones', 'Handling Procedures', 'Disposal Route', 'Operative Briefing'],
   },
   'briefing-note': {
@@ -46,7 +54,11 @@ export const INVASIVE_TEMPLATE_CONFIGS: Record<InvasiveTemplateSlug, InvasiveTem
     pageCount: '2–3',
     detailLevel: 'Light',
     thumbnailPath: '/product-images/invasive-templates/thumb-briefing-note.jpg',
-    previewPaths: ['/product-images/invasive-templates/preview-briefing-note-p1.jpg'],
+    previewPaths: [
+      '/product-images/invasive-templates/preview-briefing-note-p1.jpg',
+      '/product-images/invasive-templates/preview-briefing-note-p2.jpg',
+      '/product-images/invasive-templates/preview-briefing-note-p3.jpg',
+    ],
     keySections: ['Species ID & Photos', 'Key Rules', 'What To Do If Found', 'Contact Details'],
   },
 };
