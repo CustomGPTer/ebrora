@@ -1746,7 +1746,15 @@ JSON STRUCTURE:
   "groundConditions": "string (min 100 words) or null",
   "priceEscalation": "string (min 100 words) or null",
   "contaminationRisk": "string (min 100 words) or null"
-}`,
+}
+
+SCOPE OF WORKS ADDITIONAL RULES — CRITICAL:
+- PERFORMANCE BOND: bondPercent MUST be a realistic value (typically 10% for UK construction). NEVER output 0% — that is a placeholder. bondDeliveryDays MUST be a realistic value (typically 14 or 28 days). NEVER output 0 days.
+- CONTRACT FORM CONSISTENCY: The contractForm field value MUST be used identically everywhere in the document. If the scope says "NEC4 ECC Option A" in scopeOverview, the cover page MUST also say "NEC4 ECC Option A" — not "NEC4 ECS Option A". ECC = Engineering and Construction Contract (main contract). ECS = Engineering and Construction Subcontract. Use ECC if this is a main contract scope, ECS if this is a subcontract scope. Be consistent throughout.
+- DOUBLE PUNCTUATION: Never output consecutive full stops (".."). Check all text fields for this.
+- PROGRAMME DUPLICATION: The keyMilestones field and programmeNotes field MUST contain DIFFERENT content. keyMilestones should list specific dates/weeks for each milestone. programmeNotes should describe programme submission requirements, update cycles, and NEC4 clause references. NEVER copy the same text into both fields.
+- ISSUE DATE: The issueDate should reflect when the document is being created (today's date or a date provided by the user). Do not set arbitrary future dates unless the user specifically requests a planned issue date.
+- TEXT INTEGRITY: When referencing regulations (e.g. "Confined Spaces Regulations 1997"), the regulation name and year MUST appear in the same paragraph/sentence. Never split "Regulations" onto one line and "1997" onto the next as a separate paragraph. Keep regulation references as continuous text.`,
 
   'permit-to-dig': `Generate a Permit to Dig JSON with this structure. Reference HSG47 (Avoiding danger from underground services) throughout.
 {
@@ -3915,7 +3923,13 @@ const TBT_BASE_SCHEMA = `{
   "relevantStandards": ["string"],
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-MINIMUMS: 5+ hazards, 6+ controls, 4+ discussion points, 5+ do's, 5+ don'ts. Each hazard/control must have 30+ words. Add more items if the topic warrants it.`;
+MINIMUMS: 5+ hazards, 6+ controls, 4+ discussion points, 5+ do's, 5+ don'ts. Each hazard/control must have 30+ words. Add more items if the topic warrants it.
+
+REGULATORY REFERENCE ACCURACY — CRITICAL:
+- relevantStandards MUST only cite guidance documents that are directly relevant to the topic. Do NOT use generic references.
+- For scaffold/working at height topics: Use NASC SG4:15 (Preventing Falls in Scaffolding Operations), TG20:21 (Guide to Good Practice for Scaffolding), HSE INDG401 (Work at Height), Work at Height Regulations 2005 (Regs 6, 8, 12), BS EN 12811-1:2003, BS EN 361:2002. Do NOT cite HSG33 (Health and safety in roof work) unless the topic is specifically about roof work — HSG33 is NOT a scaffold reference.
+- For excavation topics: Use HSG47. For confined spaces: Use L101. For manual handling: Use L23, INDG143. For COSHH: Use L5, EH40. For noise: Use L108. For lifting: Use L113, BS 7121.
+- Always use the full title and year of the standard on first reference.`;
 
 const TBT_TEMPLATE_STYLE: Record<TbtTemplateSlug, string> = {
   'ebrora-branded': `TEMPLATE: Ebrora Branded (professional, numbered sections)
@@ -4129,7 +4143,12 @@ const COSHH_EXPANDED_SCHEMA = `{
 
 MINIMUMS: 4+ composition rows (including water/balance), 4 exposure routes (inhalation, skin, eyes, ingestion), 2+ WEL rows, 5 control measures (one per hierarchy level), 5+ PPE items, 4+ training types, 4+ first aid scenarios, 5+ spill response steps, 6+ regulatory references.
 
-CRITICAL: Use real SDS data for this product. The hazard classifications, H-statements, CAS numbers, WELs, and first aid measures must match the actual manufacturer Safety Data Sheet. This is a legal compliance document — do not fabricate chemical data. If unsure about a specific value, state "Refer to manufacturer SDS" rather than guessing.`;
+CRITICAL: Use real SDS data for this product. The hazard classifications, H-statements, CAS numbers, WELs, and first aid measures must match the actual manufacturer Safety Data Sheet. This is a legal compliance document — do not fabricate chemical data. If unsure about a specific value, state "Refer to manufacturer SDS" rather than guessing.
+
+REGULATORY REFERENCE ACCURACY:
+- EH40/2005 Workplace Exposure Limits: The current edition is the **4th Edition (2020)**. ALWAYS cite it as "EH40/2005 Workplace Exposure Limits (4th Edition, 2020)". Do NOT cite it as "2nd Edition" or "3rd Edition" — those are superseded.
+- COSHH Regulations: Cite as "Control of Substances Hazardous to Health Regulations 2002 (as amended), SI 2002/2677".
+- CLP Regulation: Cite as "Classification, Labelling and Packaging of Substances and Mixtures Regulation (EC) No 1272/2008 (retained EU law)".`;
 
 export function getCoshhTemplateGenerationPrompt(templateSlug: CoshhTemplateSlug): string {
   const styleGuide = COSHH_TEMPLATE_STYLE[templateSlug] || COSHH_TEMPLATE_STYLE['ebrora-standard'];
@@ -4381,7 +4400,21 @@ const CONFINED_SPACES_EXPANDED_SCHEMA = `{
 
 MINIMUMS: 4+ atmospheric params (O₂, H₂S, LEL, CO minimum), 7+ hazards, 5+ adjacent spaces for WwTW, 2+ historical readings, 4+ SIMOPS, 8+ isolations, 8+ entry steps, 6+ PPE items, 7+ rescue steps, 4+ extraction steps, 4+ multi-casualty scenarios, 10+ rescue equipment items, 5+ comms cascade entries, 7+ post-incident steps, 5+ emergency scenarios, 4+ competency roles, 19+ pre-entry checklist items, 7+ regulatory references.
 
-CRITICAL: This is a LIFE-SAFETY document. Atmospheric data must be realistic for the space type described. For wastewater confined spaces, H₂S is the primary killer — always include it with historical data showing real levels. Residual severity for atmospheric hazards STAYS at 5 (fatal) — only likelihood is reduced by controls. Reference L101 ACoP throughout.`;
+CRITICAL: This is a LIFE-SAFETY document. Atmospheric data must be realistic for the space type described. For wastewater confined spaces, H₂S is the primary killer — always include it with historical data showing real levels. Residual severity for atmospheric hazards STAYS at 5 (fatal) — only likelihood is reduced by controls. Reference L101 ACoP throughout.
+
+MANDATORY FIELD RULES — NEVER leave these empty:
+- simops: EVERY row MUST have potentialImpact (min 15 words) and controlMeasure (min 30 words) populated. Never leave impact or control columns blank.
+- entrySteps: MUST have minimum 8 steps with action, responsibility, and verification all populated.
+- durationLimits / maxContinuousWork / maxShiftDuration: MUST specify work/rest cycles, shift limits, and hydration requirements.
+- rescuePlan / emergencyRescuePlan.procedureDescription: MUST be min 150 words describing the full rescue procedure.
+- controlsSummary / safeSystemOfWork: MUST be min 200 words. This is the core control measures narrative.
+- ppeItems: MUST have minimum 6 items, each with specification and EN standard.
+- competencyRoles: MUST have minimum 4 roles with requiredTraining and evidence fields populated.
+- regulatoryReferences: MUST be an array with minimum 6 entries, each with reference name and description.
+- historicalReadings: MUST have minimum 2 entries with realistic gas values for the space type.
+- contractor: If not provided by user, use the company name from the project context. Never leave as "—" or blank.
+- maxDuration: Always specify (e.g. "45 minutes continuous, 15 minutes rest"). Never leave as "—" or blank.
+- NEVER output the text "[No content provided]" in any field. If you lack information, generate realistic site-specific content based on the space type and hazards described.`;
 
 export function getConfinedSpacesTemplateGenerationPrompt(templateSlug: ConfinedSpacesTemplateSlug): string {
   const styleGuide = CONFINED_SPACES_TEMPLATE_STYLE[templateSlug] || CONFINED_SPACES_TEMPLATE_STYLE['ebrora-standard'];
@@ -4809,7 +4842,14 @@ CRITICAL RULES:
 - Every corrective action must name a specific owner role (not "someone" or "TBC").
 - For near-miss template: potentialOutcomeStatement MUST honestly assess worst-case, including fatality potential where applicable. positiveObservations and reporterRecognition are MANDATORY.
 - RIDDOR categories must use correct regulation numbers. Specified injuries must match Schedule 1. Dangerous occurrences must match Schedule 2.
-- Contributing factors MUST map to management system elements. Barrier analysis must use the hierarchy of controls.`;
+- Contributing factors MUST map to management system elements. Barrier analysis must use the hierarchy of controls.
+
+RIDDOR CLASSIFICATION ACCURACY — CRITICAL:
+- If the incident involves physical contact with or damage to a live underground or overhead electrical cable/line, it IS a Dangerous Occurrence under RIDDOR 2013 Schedule 2 Paragraph 11, regardless of whether injury occurred. Mark Para 11 as "✓ YES" and classify as "Dangerous Occurrence" — NOT "Near Miss". A near-miss that meets Schedule 2 criteria IS a dangerous occurrence.
+- If the incident involves any excavation collapse (even partial), it IS a Dangerous Occurrence under Schedule 2 Paragraph 3. Mark accordingly.
+- If the incident meets ANY Schedule 2 paragraph criteria, the classification MUST be "Dangerous Occurrence", the HSE Notification field MUST NOT be "N/A", and the Enforcing Authority MUST be notified via online F2508 within 10 days (or immediately by phone for fatalities/specified injuries).
+- The classification, RIDDOR Schedule reference, dangerousOccurrences checklist, and HSE notification fields MUST all be internally consistent. If you mark any Schedule 2 paragraph as "✓ YES", the document MUST classify as a Dangerous Occurrence and MUST require HSE notification.
+- NEVER classify an incident as "Near Miss" if it meets any Schedule 1, 2, or 3 criteria. A near-miss with Schedule 2 characteristics is a reportable dangerous occurrence under RIDDOR 2013 Reg 6(1).`;
 
 export function getIncidentReportTemplateGenerationPrompt(templateSlug: IncidentReportTemplateSlug): string {
   const styleGuide = INCIDENT_REPORT_TEMPLATE_STYLE[templateSlug] || INCIDENT_REPORT_TEMPLATE_STYLE['ebrora-standard'];
@@ -4988,6 +5028,8 @@ CRITICAL RULES:
 - Always populate regulatoryReferences (minimum 5 entries).
 - crane2Details and crane2Geometry should ONLY be populated for tandem-lift template. Leave empty objects for single-crane templates.
 - % capacity MUST be calculated: (total lifted weight / duty at radius) × 100. Must be below 80% for routine lifts, below 90% for non-routine.
+- LIFT CATEGORY CONSISTENCY: The liftCategory field ("Routine", "Non-routine", "Complex", "Tandem") MUST be used consistently throughout the document. If liftCategory is "Routine", the capacity check statement MUST reference the routine lift limit (typically 80% per BS 7121-1:2016), NOT the non-routine limit. If liftCategory is "Non-routine", reference the non-routine limit. NEVER describe a lift as "Routine" in the header but reference "non-routine" limits in the body, or vice versa.
+- BS 7121-1:2016 lift categories: Routine = % capacity ≤80%, standard planning; Non-routine = unusual conditions, requires additional controls; Complex = requires engineering calculation or specialist AP review.
 - Every lift step must name a SPECIFIC role as responsible (not "someone").
 - Equipment certification must show realistic dates and status.
 - Pre-lift checklist items must have specific pass/fail verification criteria.
@@ -5137,7 +5179,18 @@ CRITICAL RULES:
 - HSE guideline weight figures: shoulder height male 10kg/female 7kg, elbow height male 25kg/female 16kg, knuckle height male 20kg/female 13kg, mid-lower leg male 10kg/female 7kg. These are GUIDELINE figures, not limits.
 - MAC scores: 0=Green, 1=Amber, 2=Red, 3=Purple. Total determines priority.
 - Control measures must follow the hierarchy: eliminate → reduce load → mechanical aid → administrative → training → PPE.
-- Schedule 1 factors come from MHOR 1992 Schedule 1 — use the actual regulatory wording.`;
+- Schedule 1 factors come from MHOR 1992 Schedule 1 — use the actual regulatory wording.
+
+MANDATORY FIELD RULES — NEVER leave these empty:
+- taskDescription / activityDescription: MUST be populated with min 100 words describing the task. NEVER leave as "—" or blank.
+- For T2 (MAC): Every macFactors entry MUST have assessment (min 10 words describing the factor), band (one of: Green, Amber, Red), and score (integer 0-4) all populated. NEVER leave assessment or band columns blank.
+- For T2 (MAC): macTotal MUST equal the sum of all factor scores. macRedCount/macAmberCount/macGreenCount MUST equal the actual count of factors in each band. NEVER return all three counts as "0" when scores are populated.
+- For T2 (MAC): macInterpretation MUST be min 60 words explaining what the total score means and what actions are required. NEVER use generic "see scoring table above" text.
+- For T2 (MAC): improvements array MUST contain at least one entry for every Red factor, with specific improvement actions and expected score reduction.
+- For T1 (TILE): Every tileTask/tileIndividual/tileLoad/tileEnvironment entry MUST have the risk column populated with High, Medium, or Low. NEVER leave risk columns blank.
+- For T1 (TILE): controls array MUST have minimum 5 entries following the hierarchy (Elimination, Substitution, Engineering, Administrative, PPE), each with level, control, and implementation all populated. NEVER leave the controls table empty.
+- For T1 (TILE): residualRisk MUST be populated (High, Medium, or Low).
+- NEVER output "—" as a value for any mandatory field. If information is not provided by the user, generate realistic content based on the task described.`;
 
 export function getManualHandlingTemplateGenerationPrompt(templateSlug: ManualHandlingTemplateSlug): string {
   const styleGuide = MANUAL_HANDLING_TEMPLATE_STYLE[templateSlug] || MANUAL_HANDLING_TEMPLATE_STYLE['ebrora-standard'];
@@ -5506,7 +5559,13 @@ CRITICAL RULES:
 - T3 needs: strikeResponses (5 service types with correct colours), commonActions (6 steps), dangerBannerText.
 - T4 needs: surveyMethodology (200w), servicesRegister (8+), avoidanceProcedures (6+), revisionCallout (40w).
 - Gas: 0800 111 999. Electric: 105. Water: company emergency. Openreach: 0800 023 2023. EA: 0800 80 70 60.
-- Hand-dig: 500mm per HSG47. ALWAYS populate regulatoryReferences.`;
+- Hand-dig: 500mm per HSG47. ALWAYS populate regulatoryReferences.
+
+CONSISTENCY RULES — CRITICAL:
+- EXPIRY TIME CONSISTENCY: The validUntil, shiftValid, expiryCallout, and any footer expiry text MUST all show the SAME expiry time. If the permit expires at 17:30, ALL fields must say 17:30 — not "18:00" in the header and "17:30" in the body. Pick ONE time and use it everywhere. For single-shift daily permits, the format should be: "07:30 – 17:30 TODAY ONLY" in shiftValid and "Valid Until 17:30 Today Only" in the header.
+- SERVICE COUNT ACCURACY: The knownServicesCount field (e.g. "3 identified") MUST exactly match the number of actual service entries in servicesIdentified that have status "Live" or "Decommissioned". Do NOT count "No known services" confirmation entries or "Confirmed clear" entries as identified services. Do NOT count abandoned/cleared services in the headline count unless they require protective measures. Count ONLY services that require active management during excavation.
+- SINGLE SHIFT vs MULTI-DAY: If validUntil spans more than one calendar day, do NOT describe it as "(single shift)". Use "(multi-shift)" or specify the number of working days. A single shift is one day only.
+- For T2 (daily dig permit): The permit MUST expire on the same day it is issued. validUntil must show the same date as issueDate/shiftDate.`;
 
 export function getPermitToDigTemplateGenerationPrompt(templateSlug: PermitToDigTemplateSlug): string {
   const styleGuide = PERMIT_TO_DIG_TEMPLATE_STYLE[templateSlug] || PERMIT_TO_DIG_TEMPLATE_STYLE['ebrora-standard'];
