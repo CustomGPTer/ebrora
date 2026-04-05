@@ -1,6 +1,6 @@
 // src/app/tools/[slug]/page.tsx
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -29,13 +29,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+// Slugs that have their own dedicated route — exclude from dynamic [slug]
+const DEDICATED_ROUTES = ["materials-converter"];
+
 export async function generateStaticParams() {
   const tools = await prisma.freeTool.findMany({ select: { slug: true } });
-  return tools.map((t) => ({ slug: t.slug }));
+  return tools
+    .filter((t) => !DEDICATED_ROUTES.includes(t.slug))
+    .map((t) => ({ slug: t.slug }));
 }
 
 export default async function ToolPage({ params }: PageProps) {
   const { slug } = await params;
+
+  // Redirect to dedicated route if one exists
+  if (DEDICATED_ROUTES.includes(slug)) {
+    redirect(`/tools/${slug}`);
+  }
+
   const tool = await prisma.freeTool.findUnique({ where: { slug } });
 
   if (!tool) notFound();
