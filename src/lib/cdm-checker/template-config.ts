@@ -10,13 +10,16 @@ export const CDM_CHECKER_TEMPLATE_CONFIGS: Record<CdmCheckerTemplateSlug, CdmChe
     displayName: 'Ebrora Standard',
     description:
       'Professional green-branded CDM gap analysis with cover page, duty holder sections, regulation-by-regulation compliance tables with RAG status, identified gaps ranked by priority, and compliance roadmap.',
-    pageCount: 3,
+    pageCount: 6,
     layout: 'standard',
     thumbnailPath: '/product-images/cdm-templates/thumb-ebrora-standard.jpg',
     previewPaths: [
       '/product-images/cdm-templates/preview-ebrora-standard-p1.jpg',
       '/product-images/cdm-templates/preview-ebrora-standard-p2.jpg',
       '/product-images/cdm-templates/preview-ebrora-standard-p3.jpg',
+      '/product-images/cdm-templates/preview-ebrora-standard-p4.jpg',
+      '/product-images/cdm-templates/preview-ebrora-standard-p5.jpg',
+      '/product-images/cdm-templates/preview-ebrora-standard-p6.jpg',
     ],
     keySections: [
       'Green Branded Cover Page',
@@ -33,12 +36,13 @@ export const CDM_CHECKER_TEMPLATE_CONFIGS: Record<CdmCheckerTemplateSlug, CdmChe
     displayName: 'Compliance Matrix',
     description:
       'Teal-accented, matrix-heavy layout. One large table showing every CDM regulation cross-referenced against all 5 duty holders with tick/triangle/cross status cells. Designed for instant visual gap scanning.',
-    pageCount: 2,
+    pageCount: 3,
     layout: 'matrix',
     thumbnailPath: '/product-images/cdm-templates/thumb-compliance-matrix.jpg',
     previewPaths: [
       '/product-images/cdm-templates/preview-compliance-matrix-p1.jpg',
       '/product-images/cdm-templates/preview-compliance-matrix-p2.jpg',
+      '/product-images/cdm-templates/preview-compliance-matrix-p3.jpg',
     ],
     keySections: [
       'Duty Holder Summary Table',
@@ -77,12 +81,13 @@ export const CDM_CHECKER_TEMPLATE_CONFIGS: Record<CdmCheckerTemplateSlug, CdmChe
     displayName: 'Executive Summary',
     description:
       'Dark charcoal/green management-focused layout. Opens with a visual compliance dashboard showing percentage scores per duty holder, then priority-ranked findings, narrative recommendations, and compliance roadmap. Designed for client or board audiences.',
-    pageCount: 2,
+    pageCount: 3,
     layout: 'executive',
     thumbnailPath: '/product-images/cdm-templates/thumb-executive-summary.jpg',
     previewPaths: [
       '/product-images/cdm-templates/preview-executive-summary-p1.jpg',
       '/product-images/cdm-templates/preview-executive-summary-p2.jpg',
+      '/product-images/cdm-templates/preview-executive-summary-p3.jpg',
     ],
     keySections: [
       'Compliance Dashboard with % Scores',
