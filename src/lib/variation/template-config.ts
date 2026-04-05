@@ -12,7 +12,11 @@ export const VARIATION_TEMPLATE_CONFIGS: Record<VariationTemplateSlug, Variation
     pageCount: '4-6',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/variation-templates/thumb-formal-letter.jpg',
-    previewPaths: ['/product-images/variation-templates/preview-formal-letter-p1.jpg'],
+    previewPaths: [
+      '/product-images/variation-templates/preview-formal-letter-p1.jpg',
+      '/product-images/variation-templates/preview-formal-letter-p2.jpg',
+      '/product-images/variation-templates/preview-formal-letter-p3.jpg',
+    ],
     keySections: ['Instruction Record', 'Scope Change Description', 'Cost & Time Impact', 'Contractual Basis', 'Formal Instruction Request'],
   },
   'corporate': {
@@ -26,7 +30,11 @@ export const VARIATION_TEMPLATE_CONFIGS: Record<VariationTemplateSlug, Variation
     pageCount: '2-4',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/variation-templates/thumb-corporate.jpg',
-    previewPaths: ['/product-images/variation-templates/preview-corporate-p1.jpg'],
+    previewPaths: [
+      '/product-images/variation-templates/preview-corporate-p1.jpg',
+      '/product-images/variation-templates/preview-corporate-p2.jpg',
+      '/product-images/variation-templates/preview-corporate-p3.jpg',
+    ],
     keySections: ['Instruction Summary', 'Scope Description', 'Impact Assessment', 'Confirmation Requested'],
   },
   'concise': {
@@ -40,7 +48,10 @@ export const VARIATION_TEMPLATE_CONFIGS: Record<VariationTemplateSlug, Variation
     pageCount: '1-2',
     detailLevel: 'Light',
     thumbnailPath: '/product-images/variation-templates/thumb-concise.jpg',
-    previewPaths: ['/product-images/variation-templates/preview-concise-p1.jpg'],
+    previewPaths: [
+      '/product-images/variation-templates/preview-concise-p1.jpg',
+      '/product-images/variation-templates/preview-concise-p2.jpg',
+    ],
     keySections: ['Verbal Instruction Record', 'Key Facts', 'Action Required'],
   },
 };
