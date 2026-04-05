@@ -10,7 +10,7 @@ export const CARBON_FOOTPRINT_TEMPLATE_CONFIGS: Record<CarbonFootprintTemplateSl
     displayName: 'Ebrora Standard',
     description:
       'Professional green-branded layout with cover page, ICE v3.2 emission factors, category breakdown tables for materials, plant, transport, waste, and temporary works. Includes carbon summary dashboard, hotspot analysis, and reduction opportunities. The comprehensive standard carbon footprint format.',
-    pageCount: 4,
+    pageCount: 6,
     layout: 'standard',
     thumbnailPath: '/product-images/carbon-footprint-templates/thumb-ebrora-standard.jpg',
     previewPaths: [
@@ -18,6 +18,8 @@ export const CARBON_FOOTPRINT_TEMPLATE_CONFIGS: Record<CarbonFootprintTemplateSl
       '/product-images/carbon-footprint-templates/preview-ebrora-standard-p2.jpg',
       '/product-images/carbon-footprint-templates/preview-ebrora-standard-p3.jpg',
       '/product-images/carbon-footprint-templates/preview-ebrora-standard-p4.jpg',
+      '/product-images/carbon-footprint-templates/preview-ebrora-standard-p5.jpg',
+      '/product-images/carbon-footprint-templates/preview-ebrora-standard-p6.jpg',
     ],
     keySections: [
       'Green Branded Cover Page',
@@ -36,7 +38,7 @@ export const CARBON_FOOTPRINT_TEMPLATE_CONFIGS: Record<CarbonFootprintTemplateSl
     displayName: 'PAS 2080 Technical',
     description:
       'Full life cycle carbon assessment structured to PAS 2080:2023 modules (A1–A5 Product & Construction, B1–B5 Use, C1–C4 End of Life, D Beyond Boundary). Navy technical layout with monospace data panels, BREEAM/CEEQUAL cross-references, and carbon reduction hierarchy (Build Nothing → Build Less → Build Clever → Build Efficiently). For infrastructure clients and sustainability leads.',
-    pageCount: 5,
+    pageCount: 8,
     layout: 'technical',
     thumbnailPath: '/product-images/carbon-footprint-templates/thumb-pas-2080-technical.jpg',
     previewPaths: [
@@ -45,6 +47,9 @@ export const CARBON_FOOTPRINT_TEMPLATE_CONFIGS: Record<CarbonFootprintTemplateSl
       '/product-images/carbon-footprint-templates/preview-pas-2080-technical-p3.jpg',
       '/product-images/carbon-footprint-templates/preview-pas-2080-technical-p4.jpg',
       '/product-images/carbon-footprint-templates/preview-pas-2080-technical-p5.jpg',
+      '/product-images/carbon-footprint-templates/preview-pas-2080-technical-p6.jpg',
+      '/product-images/carbon-footprint-templates/preview-pas-2080-technical-p7.jpg',
+      '/product-images/carbon-footprint-templates/preview-pas-2080-technical-p8.jpg',
     ],
     keySections: [
       'PAS 2080:2023 Module Structure (A–D)',
@@ -65,12 +70,13 @@ export const CARBON_FOOTPRINT_TEMPLATE_CONFIGS: Record<CarbonFootprintTemplateSl
     displayName: 'Compact Summary',
     description:
       'Dense 2-page carbon summary designed for site notice boards and project reviews. No cover page — straight into a single-page carbon dashboard with category totals, then a second page of reduction measures and benchmarks. Ideal for printing, laminating, and displaying in site offices.',
-    pageCount: 2,
+    pageCount: 3,
     layout: 'compact',
     thumbnailPath: '/product-images/carbon-footprint-templates/thumb-compact-summary.jpg',
     previewPaths: [
       '/product-images/carbon-footprint-templates/preview-compact-summary-p1.jpg',
       '/product-images/carbon-footprint-templates/preview-compact-summary-p2.jpg',
+      '/product-images/carbon-footprint-templates/preview-compact-summary-p3.jpg',
     ],
     keySections: [
       'No Cover Page — Straight to Dashboard',
@@ -88,7 +94,7 @@ export const CARBON_FOOTPRINT_TEMPLATE_CONFIGS: Record<CarbonFootprintTemplateSl
     displayName: 'Audit-Ready',
     description:
       'Formal document-controlled carbon assessment with teal accent, revision history table, 3-person approval chain, data source verification columns, and assumption registers. Every emission factor is traceable to its source (ICE v3.2, DEFRA GHG, BEIS). Built to satisfy ISO 14064, client sustainability audits, and BREEAM/CEEQUAL evidence submissions.',
-    pageCount: 5,
+    pageCount: 8,
     layout: 'audit',
     thumbnailPath: '/product-images/carbon-footprint-templates/thumb-audit-ready.jpg',
     previewPaths: [
@@ -97,6 +103,9 @@ export const CARBON_FOOTPRINT_TEMPLATE_CONFIGS: Record<CarbonFootprintTemplateSl
       '/product-images/carbon-footprint-templates/preview-audit-ready-p3.jpg',
       '/product-images/carbon-footprint-templates/preview-audit-ready-p4.jpg',
       '/product-images/carbon-footprint-templates/preview-audit-ready-p5.jpg',
+      '/product-images/carbon-footprint-templates/preview-audit-ready-p6.jpg',
+      '/product-images/carbon-footprint-templates/preview-audit-ready-p7.jpg',
+      '/product-images/carbon-footprint-templates/preview-audit-ready-p8.jpg',
     ],
     keySections: [
       'Document Control Block & Revision History',
