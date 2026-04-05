@@ -12,7 +12,12 @@ export const CE_TEMPLATE_CONFIGS: Record<CeTemplateSlug, CeTemplateConfig> = {
     pageCount: '4-7',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/ce-templates/thumb-formal-letter.jpg',
-    previewPaths: ['/product-images/ce-templates/preview-formal-letter-p1.jpg'],
+    previewPaths: [
+      '/product-images/ce-templates/preview-formal-letter-p1.jpg',
+      '/product-images/ce-templates/preview-formal-letter-p2.jpg',
+      '/product-images/ce-templates/preview-formal-letter-p3.jpg',
+      '/product-images/ce-templates/preview-formal-letter-p4.jpg',
+    ],
     keySections: ['NEC4 Clause References', 'Event Description & Evidence', 'Programme Impact Assessment', 'Cost Entitlement Argument', 'Required Actions'],
   },
   'corporate': {
@@ -26,7 +31,11 @@ export const CE_TEMPLATE_CONFIGS: Record<CeTemplateSlug, CeTemplateConfig> = {
     pageCount: '3-5',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/ce-templates/thumb-corporate.jpg',
-    previewPaths: ['/product-images/ce-templates/preview-corporate-p1.jpg'],
+    previewPaths: [
+      '/product-images/ce-templates/preview-corporate-p1.jpg',
+      '/product-images/ce-templates/preview-corporate-p2.jpg',
+      '/product-images/ce-templates/preview-corporate-p3.jpg',
+    ],
     keySections: ['Event Identification', 'Impact Summary', 'Entitlement Statement', 'Response Required'],
   },
   'concise': {
@@ -40,7 +49,10 @@ export const CE_TEMPLATE_CONFIGS: Record<CeTemplateSlug, CeTemplateConfig> = {
     pageCount: '1-2',
     detailLevel: 'Light',
     thumbnailPath: '/product-images/ce-templates/thumb-concise.jpg',
-    previewPaths: ['/product-images/ce-templates/preview-concise-p1.jpg'],
+    previewPaths: [
+      '/product-images/ce-templates/preview-concise-p1.jpg',
+      '/product-images/ce-templates/preview-concise-p2.jpg',
+    ],
     keySections: ['Event & Clause Reference', 'Brief Description', 'Action Required'],
   },
 };
