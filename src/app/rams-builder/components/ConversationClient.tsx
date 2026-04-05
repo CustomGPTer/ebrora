@@ -234,49 +234,56 @@ export default function ConversationClient({
         </div>
       )}
 
-      {/* Current round questions */}
+      {/* Current round questions — round card layout (matches AI tools) */}
       {currentQuestions.length > 0 && (
-        <div ref={currentRoundRef} className="questionnaire-questions">
-          {currentQuestions.map((q) => {
-            const wordCount = getWordCount(answers[q.id] || '');
-            const isOverLimit = wordCount > MAX_WORDS_PER_ANSWER;
-            const isNearLimit = wordCount >= 80;
+        <div ref={currentRoundRef} className="conversation-round-summary" style={{ borderColor: '#1B5745' }}>
+          <div className="conversation-round-header" style={{ background: '#E8F0EC' }}>
+            <span className="conversation-round-badge">Round {currentRoundNumber}</span>
+            <span className="conversation-round-count">Current</span>
+          </div>
+          <div className="conversation-round-qa">
+            {currentQuestions.map((q) => {
+              const wordCount = getWordCount(answers[q.id] || '');
+              const isOverLimit = wordCount > MAX_WORDS_PER_ANSWER;
+              const isNearLimit = wordCount >= 80;
 
-            return (
-              <div key={q.id} className="questionnaire-item">
-                <label className="questionnaire-label">
-                  <span className="questionnaire-number">
-                    {q.id.replace(/^r\d+q/, '')}
-                  </span>
-                  <span className="questionnaire-question-text">{q.question}</span>
-                </label>
-                {q.context && (
-                  <p className="questionnaire-context">{q.context}</p>
-                )}
-                <div className="questionnaire-input-wrap">
-                  <textarea
-                    value={answers[q.id] || ''}
-                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                    placeholder="Type your answer here..."
-                    rows={4}
-                    className={isOverLimit ? 'over-limit' : ''}
-                  />
-                  <div
-                    className={`questionnaire-counter ${
-                      isOverLimit ? 'over-limit' : isNearLimit ? 'near-limit' : ''
-                    }`}
-                  >
-                    {wordCount} / {MAX_WORDS_PER_ANSWER} words
+              return (
+                <div key={q.id} className="conversation-qa-pair">
+                  <div className="conversation-q">
+                    <span className="conversation-q-label">Q:</span> {q.question}
+                    {q.context && <p className="conversation-context">{q.context}</p>}
+                  </div>
+                  <div className="questionnaire-input-wrap">
+                    <textarea
+                      value={answers[q.id] || ''}
+                      onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                      placeholder="Type your answer here..."
+                      rows={3}
+                      className={isOverLimit ? 'over-limit' : ''}
+                      disabled={isLoading}
+                    />
+                    <div
+                      className={`scope-input-counter ${
+                        isOverLimit ? 'over-limit' : isNearLimit ? 'near-limit' : ''
+                      }`}
+                    >
+                      {wordCount} / {MAX_WORDS_PER_ANSWER}
+                    </div>
                   </div>
                 </div>
-                {isOverLimit && (
-                  <p className="questionnaire-warning">
-                    Please keep your answer under {MAX_WORDS_PER_ANSWER} words.
-                  </p>
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          <div style={{ padding: '0 1rem 1rem' }}>
+            <button
+              className="rams-primary-btn"
+              onClick={handleSubmitRound}
+              disabled={!currentAnswersValid || isLoading}
+            >
+              {isLoading ? 'Submitting...' : 'Submit Answers →'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -305,26 +312,6 @@ export default function ConversationClient({
           <span>{error}</span>
           <button onClick={() => setError(null)} className="rams-error-close">
             ×
-          </button>
-        </div>
-      )}
-
-      {/* Navigation */}
-      {!readyMessage && currentQuestions.length > 0 && (
-        <div className="questionnaire-nav">
-          <div />
-          <button
-            className="rams-primary-btn"
-            onClick={handleSubmitRound}
-            disabled={!currentAnswersValid || isLoading}
-          >
-            {isLoading ? (
-              <>
-                <span className="rams-spinner" /> Getting next questions...
-              </>
-            ) : (
-              'Submit Answers →'
-            )}
           </button>
         </div>
       )}
