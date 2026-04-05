@@ -16,7 +16,11 @@ export const WBV_TEMPLATE_CONFIGS: Record<WbvTemplateSlug, WbvTemplateConfig> = 
     pageCount: '6–9',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/wbv-templates/thumb-professional.jpg',
-    previewPaths: ['/product-images/wbv-templates/preview-professional-p1.jpg'],
+    previewPaths: [
+      '/product-images/wbv-templates/preview-professional-p1.jpg',
+      '/product-images/wbv-templates/preview-professional-p2.jpg',
+      '/product-images/wbv-templates/preview-professional-p3.jpg',
+    ],
     keySections: ['Cover Page & Document Control', 'Equipment Register', 'Exposure Calculations (A(8))', 'Health Surveillance', 'Action Plan'],
   },
   'compliance': {
@@ -31,7 +35,11 @@ export const WBV_TEMPLATE_CONFIGS: Record<WbvTemplateSlug, WbvTemplateConfig> = 
     pageCount: '5–8',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/wbv-templates/thumb-compliance.jpg',
-    previewPaths: ['/product-images/wbv-templates/preview-compliance-p1.jpg'],
+    previewPaths: [
+      '/product-images/wbv-templates/preview-compliance-p1.jpg',
+      '/product-images/wbv-templates/preview-compliance-p2.jpg',
+      '/product-images/wbv-templates/preview-compliance-p3.jpg',
+    ],
     keySections: ['Regulation References', 'Exposure Threshold Table', 'Risk Assessment Matrix', 'Control Measures', 'Review Schedule'],
   },
   'site-practical': {
@@ -46,7 +54,10 @@ export const WBV_TEMPLATE_CONFIGS: Record<WbvTemplateSlug, WbvTemplateConfig> = 
     pageCount: '3–5',
     detailLevel: 'Practical',
     thumbnailPath: '/product-images/wbv-templates/thumb-site-practical.jpg',
-    previewPaths: ['/product-images/wbv-templates/preview-site-practical-p1.jpg'],
+    previewPaths: [
+      '/product-images/wbv-templates/preview-site-practical-p1.jpg',
+      '/product-images/wbv-templates/preview-site-practical-p2.jpg',
+    ],
     keySections: ['Equipment & Exposure Summary', 'Controls Checklist', 'Operative Acknowledgement', 'Review Date'],
   },
 };
