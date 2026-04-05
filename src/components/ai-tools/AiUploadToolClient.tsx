@@ -585,6 +585,18 @@ export default function AiUploadToolClient({ toolConfig, programmeCheckerTemplat
           >
             Analyse another file
           </button>
+
+          {/* Disclaimer */}
+          <p style={{
+            marginTop: '2rem',
+            fontSize: '0.75rem',
+            color: '#6B7280',
+            maxWidth: '400px',
+            textAlign: 'center',
+            lineHeight: '1.5',
+          }}>
+            Ebrora can make mistakes. Always review AI-generated documents before use and verify compliance with current regulations and site-specific requirements.
+          </p>
         </div>
       </div>
     );
