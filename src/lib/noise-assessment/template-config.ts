@@ -44,7 +44,8 @@ export const NOISE_ASSESSMENT_TEMPLATE_CONFIGS: Record<NoiseAssessmentTemplateSl
     thumbnailPath: '/product-images/noise-assessment-templates/thumb-section-61.jpg',
     previewPaths: [
       '/product-images/noise-assessment-templates/preview-section-61-p1.jpg',
-      '/product-images/noise-assessment-templates/preview-section-61-p2.jpg'
+      '/product-images/noise-assessment-templates/preview-section-61-p2.jpg',
+      '/product-images/noise-assessment-templates/preview-section-61-p3.jpg',
     ],
     keySections: [
       'Applicant & Site Details (LA Format)',
