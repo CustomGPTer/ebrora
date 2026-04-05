@@ -110,7 +110,7 @@ function MaterialCombobox({
         onChange={(e) => setSearch(e.target.value)}
       />
       {open && (
-        <div className="absolute z-50 mt-1 w-72 max-h-72 overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-xl">
+        <div className="absolute z-[200] mt-1 w-72 max-h-72 overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-xl">
           {Object.entries(filtered).length === 0 ? (
             <div className="px-3 py-4 text-sm text-gray-400 text-center">
               No materials found
@@ -231,19 +231,19 @@ export default function MaterialsConverterClient() {
             return (
               <div
                 key={c.category}
-                className={`${colors.bg} ${colors.border} border rounded-xl p-3.5 transition-all`}
+                className={`${colors.bg} ${colors.border} border rounded-xl p-5 transition-all`}
               >
-                <div className="flex items-center gap-1.5 mb-2">
-                  <span className={`w-2 h-2 rounded-full ${colors.dot}`} />
-                  <span className={`text-[11px] font-bold uppercase tracking-wide ${colors.text}`}>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className={`w-2.5 h-2.5 rounded-full ${colors.dot}`} />
+                  <span className={`text-[13px] font-bold uppercase tracking-wide ${colors.text}`}>
                     {c.label}
                   </span>
                 </div>
-                <div className="space-y-0.5">
-                  <div className="text-lg font-bold text-gray-900">
-                    {fmtNum(c.tonnes, 1)}<span className="text-xs font-normal text-gray-500 ml-1">t</span>
+                <div className="space-y-1">
+                  <div className="text-xl font-bold text-gray-900">
+                    {fmtNum(c.tonnes, 1)}<span className="text-sm font-normal text-gray-500 ml-1">t</span>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-sm text-gray-500">
                     {fmtNum(c.volumeM3, 1)} m³ · {fmtCurrency(c.cost, assumptions.currency)} · {fmtNum(c.carbonT, 3)} tCO₂e
                   </div>
                 </div>
@@ -252,17 +252,17 @@ export default function MaterialsConverterClient() {
           })}
         {/* Grand Total */}
         {grandTotal.tonnes > 0 && (
-          <div className="col-span-2 lg:col-span-1 bg-ebrora-light border border-ebrora-mid rounded-xl p-3.5">
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="w-2 h-2 rounded-full bg-ebrora" />
-              <span className="text-[11px] font-bold uppercase tracking-wide text-ebrora-dark">
+          <div className="col-span-2 lg:col-span-1 bg-ebrora-light border border-ebrora-mid rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-ebrora" />
+              <span className="text-[13px] font-bold uppercase tracking-wide text-ebrora-dark">
                 Grand Total
               </span>
             </div>
-            <div className="text-lg font-bold text-gray-900">
-              {fmtNum(grandTotal.tonnes, 1)}<span className="text-xs font-normal text-gray-500 ml-1">t</span>
+            <div className="text-xl font-bold text-gray-900">
+              {fmtNum(grandTotal.tonnes, 1)}<span className="text-sm font-normal text-gray-500 ml-1">t</span>
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-sm text-gray-500">
               {fmtNum(grandTotal.volumeM3, 1)} m³ · {fmtCurrency(grandTotal.cost, assumptions.currency)} · {fmtNum(grandTotal.carbonT, 3)} tCO₂e
             </div>
           </div>
@@ -396,29 +396,29 @@ export default function MaterialsConverterClient() {
       )}
 
       {/* ── Desktop Table ──────────────────────────────────── */}
-      <div className="hidden lg:block overflow-x-auto border border-gray-200 rounded-xl">
+      <div className="hidden lg:block border border-gray-200 rounded-xl overflow-visible">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="px-2 py-2.5 text-left text-[11px] font-bold uppercase tracking-wide text-gray-500 w-56">Material</th>
+              <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500 w-56">Material</th>
               <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500 w-24">State</th>
-              <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500 w-20">Qty</th>
+              <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500 w-20">Qty</th>
               <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500 w-16">Unit</th>
-              <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500 w-16">mm</th>
-              {columns.tonnes && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">Tonnes</th>}
-              {columns.volumeM3 && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">m³</th>}
-              {columns.massKg && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">kg</th>}
-              {columns.volumeL && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">Litres</th>}
-              {columns.areaM2 && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">m²</th>}
-              {columns.bulkBags && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">Bags</th>}
-              {columns.loads && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">Loads</th>}
+              <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500 w-16">mm</th>
+              {columns.tonnes && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">Tonnes</th>}
+              {columns.volumeM3 && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">m³</th>}
+              {columns.massKg && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">kg</th>}
+              {columns.volumeL && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">Litres</th>}
+              {columns.areaM2 && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">m²</th>}
+              {columns.bulkBags && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">Bags</th>}
+              {columns.loads && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">Loads</th>}
               {columns.cost && (
-                <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">
+                <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">
                   {assumptions.currency}/t
                 </th>
               )}
-              {columns.cost && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">Cost</th>}
-              {columns.carbon && <th className="px-2 py-2.5 text-right text-[11px] font-bold uppercase tracking-wide text-gray-500">tCO₂e</th>}
+              {columns.cost && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">Cost</th>}
+              {columns.carbon && <th className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">tCO₂e</th>}
               <th className="px-2 py-2.5 w-8" />
             </tr>
           </thead>
@@ -469,7 +469,7 @@ export default function MaterialsConverterClient() {
                           inputQty: e.target.value === "" ? null : parseFloat(e.target.value),
                         })
                       }
-                      className="w-full px-2 py-1.5 text-sm text-right border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums"
+                      className="w-full px-2 py-1.5 text-sm text-center border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums"
                     />
                   </td>
                   {/* Unit */}
@@ -497,20 +497,20 @@ export default function MaterialsConverterClient() {
                             thicknessMm: e.target.value === "" ? null : parseFloat(e.target.value),
                           })
                         }
-                        className="w-full px-2 py-1.5 text-sm text-right border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums"
+                        className="w-full px-2 py-1.5 text-sm text-center border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums"
                       />
                     ) : (
                       <span className="text-gray-300 text-xs block text-center">—</span>
                     )}
                   </td>
                   {/* Output columns */}
-                  {columns.tonnes && <td className="px-2 py-1.5 text-right tabular-nums font-medium text-gray-800">{fmtNum(out.tonnes)}</td>}
-                  {columns.volumeM3 && <td className="px-2 py-1.5 text-right tabular-nums text-gray-600">{fmtNum(out.volumeM3)}</td>}
-                  {columns.massKg && <td className="px-2 py-1.5 text-right tabular-nums text-gray-600">{fmtNum(out.massKg, 0)}</td>}
-                  {columns.volumeL && <td className="px-2 py-1.5 text-right tabular-nums text-gray-600">{fmtNum(out.volumeL, 0)}</td>}
-                  {columns.areaM2 && <td className="px-2 py-1.5 text-right tabular-nums text-gray-600">{fmtNum(out.areaM2)}</td>}
-                  {columns.bulkBags && <td className="px-2 py-1.5 text-right tabular-nums text-gray-600">{fmtNum(out.bulkBags)}</td>}
-                  {columns.loads && <td className="px-2 py-1.5 text-right tabular-nums text-gray-600">{fmtNum(out.loads)}</td>}
+                  {columns.tonnes && <td className="px-2 py-1.5 text-center tabular-nums font-medium text-gray-800">{fmtNum(out.tonnes)}</td>}
+                  {columns.volumeM3 && <td className="px-2 py-1.5 text-center tabular-nums text-gray-600">{fmtNum(out.volumeM3)}</td>}
+                  {columns.massKg && <td className="px-2 py-1.5 text-center tabular-nums text-gray-600">{fmtNum(out.massKg, 0)}</td>}
+                  {columns.volumeL && <td className="px-2 py-1.5 text-center tabular-nums text-gray-600">{fmtNum(out.volumeL, 0)}</td>}
+                  {columns.areaM2 && <td className="px-2 py-1.5 text-center tabular-nums text-gray-600">{fmtNum(out.areaM2)}</td>}
+                  {columns.bulkBags && <td className="px-2 py-1.5 text-center tabular-nums text-gray-600">{fmtNum(out.bulkBags)}</td>}
+                  {columns.loads && <td className="px-2 py-1.5 text-center tabular-nums text-gray-600">{fmtNum(out.loads)}</td>}
                   {/* Rate */}
                   {columns.cost && (
                     <td className="px-2 py-1.5">
@@ -524,22 +524,22 @@ export default function MaterialsConverterClient() {
                             ratePer: e.target.value === "" ? null : parseFloat(e.target.value),
                           })
                         }
-                        className="w-full px-2 py-1.5 text-sm text-right border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums"
+                        className="w-full px-2 py-1.5 text-sm text-center border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums"
                       />
                     </td>
                   )}
                   {/* Cost */}
                   {columns.cost && (
-                    <td className="px-2 py-1.5 text-right tabular-nums font-medium text-gray-800">
+                    <td className="px-2 py-1.5 text-center tabular-nums font-medium text-gray-800">
                       {fmtCurrency(out.cost, assumptions.currency)}
                     </td>
                   )}
                   {/* Carbon */}
                   {columns.carbon && (
-                    <td className="px-2 py-1.5 text-right tabular-nums text-gray-600 relative group/carbon">
+                    <td className="px-2 py-1.5 text-center tabular-nums text-gray-600 relative group/carbon">
                       {fmtNum(out.carbonT, 4)}
                       {material && material.carbonSource && out.carbonT !== null && (
-                        <div className="absolute hidden group-hover/carbon:block bottom-full right-0 mb-1 w-56 p-2 bg-gray-900 text-white text-[10px] rounded-lg shadow-lg z-50 leading-relaxed">
+                        <div className="absolute hidden group-hover/carbon:block bottom-full right-0 mb-1 w-56 p-2 bg-gray-900 text-white text-[10px] rounded-lg shadow-lg z-[200] leading-relaxed">
                           <div className="font-bold mb-0.5">{material.carbonSource}</div>
                           {material.carbonScope && <div className="text-gray-400">Scope: {material.carbonScope}</div>}
                           <div className="text-gray-400">Factor: {material.carbonFactor} kgCO₂e/t</div>
