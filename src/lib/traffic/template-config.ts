@@ -16,7 +16,13 @@ export const TRAFFIC_TEMPLATE_CONFIGS: Record<TrafficTemplateSlug, TrafficTempla
     pageCount: '10–16',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/traffic-templates/thumb-full-chapter8.jpg',
-    previewPaths: ['/product-images/traffic-templates/preview-full-chapter8-p1.jpg'],
+    previewPaths: [
+      '/product-images/traffic-templates/preview-full-chapter8-p1.jpg',
+      '/product-images/traffic-templates/preview-full-chapter8-p2.jpg',
+      '/product-images/traffic-templates/preview-full-chapter8-p3.jpg',
+      '/product-images/traffic-templates/preview-full-chapter8-p4.jpg',
+      '/product-images/traffic-templates/preview-full-chapter8-p5.jpg',
+    ],
     keySections: ['Branded Cover Page', 'Chapter 8 Compliance', 'Sign Schedule (TSRGD)', 'Phasing & Sequencing', 'Risk Assessment'],
   },
   'formal-highways': {
@@ -31,7 +37,11 @@ export const TRAFFIC_TEMPLATE_CONFIGS: Record<TrafficTemplateSlug, TrafficTempla
     pageCount: '8–12',
     detailLevel: 'Detailed',
     thumbnailPath: '/product-images/traffic-templates/thumb-formal-highways.jpg',
-    previewPaths: ['/product-images/traffic-templates/preview-formal-highways-p1.jpg'],
+    previewPaths: [
+      '/product-images/traffic-templates/preview-formal-highways-p1.jpg',
+      '/product-images/traffic-templates/preview-formal-highways-p2.jpg',
+      '/product-images/traffic-templates/preview-formal-highways-p3.jpg',
+    ],
     keySections: ['Authority Submission Header', 'Regulatory References', 'Sign & Guard Schedule', 'Temporary Speed Limits', 'Review & Approval'],
   },
   'site-plan': {
@@ -46,7 +56,11 @@ export const TRAFFIC_TEMPLATE_CONFIGS: Record<TrafficTemplateSlug, TrafficTempla
     pageCount: '5–8',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/traffic-templates/thumb-site-plan.jpg',
-    previewPaths: ['/product-images/traffic-templates/preview-site-plan-p1.jpg'],
+    previewPaths: [
+      '/product-images/traffic-templates/preview-site-plan-p1.jpg',
+      '/product-images/traffic-templates/preview-site-plan-p2.jpg',
+      '/product-images/traffic-templates/preview-site-plan-p3.jpg',
+    ],
     keySections: ['Site Layout & Routes', 'Vehicle / Pedestrian Segregation', 'Speed Limits & Banksmen', 'Delivery Management', 'Emergency Access'],
   },
   'quick-brief': {
@@ -61,7 +75,10 @@ export const TRAFFIC_TEMPLATE_CONFIGS: Record<TrafficTemplateSlug, TrafficTempla
     pageCount: '2–4',
     detailLevel: 'Light',
     thumbnailPath: '/product-images/traffic-templates/thumb-quick-brief.jpg',
-    previewPaths: ['/product-images/traffic-templates/preview-quick-brief-p1.jpg'],
+    previewPaths: [
+      '/product-images/traffic-templates/preview-quick-brief-p1.jpg',
+      '/product-images/traffic-templates/preview-quick-brief-p2.jpg',
+    ],
     keySections: ['Works Summary', 'TM Layout & Signs', 'Operative Roles', 'Emergency Procedure'],
   },
 };
