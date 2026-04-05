@@ -8,7 +8,7 @@ function ConverterSkeleton() {
     <div className="space-y-5 animate-pulse">
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-gray-100 rounded-xl h-24" />
+          <div key={i} className="bg-gray-100 rounded-xl h-28" />
         ))}
       </div>
       <div className="flex gap-2">
@@ -98,19 +98,19 @@ export default function MaterialsConverterPage() {
         />
 
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2.5 mb-2">
-            <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-full bg-emerald-100 text-emerald-700">
+        <div className="mb-8 text-center">
+          <div className="flex items-center justify-center gap-2.5 mb-3">
+            <span className="inline-flex items-center px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-full bg-emerald-100 text-emerald-700">
               Live
             </span>
-            <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-full bg-blue-50 text-blue-600">
+            <span className="inline-flex items-center px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-full bg-blue-50 text-blue-600">
               Free
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
             Civil Engineering Materials Converter
           </h1>
-          <p className="text-base text-gray-500 mt-2 max-w-3xl leading-relaxed">
+          <p className="text-base text-gray-500 mt-2 max-w-3xl mx-auto leading-relaxed">
             Convert between tonnes, m³, kg, litres, m², bulk bags and wagon loads for 100+ civil
             engineering materials — with built-in cost estimating and ICE v3 embodied carbon
             calculations.
