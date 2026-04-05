@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // Slugs that have their own dedicated route — exclude from dynamic [slug]
-const DEDICATED_ROUTES = ["materials-converter"];
+const DEDICATED_ROUTES = ["materials-converter", "access-equipment-selector"];
 
 export async function generateStaticParams() {
   const tools = await prisma.freeTool.findMany({ select: { slug: true } });
