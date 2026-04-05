@@ -44,7 +44,8 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
     thumbnailPath: '/product-images/manual-handling-templates/thumb-mac-assessment.jpg',
     previewPaths: [
       '/product-images/manual-handling-templates/preview-mac-assessment-p1.jpg',
-      '/product-images/manual-handling-templates/preview-mac-assessment-p2.jpg'
+      '/product-images/manual-handling-templates/preview-mac-assessment-p2.jpg',
+      '/product-images/manual-handling-templates/preview-mac-assessment-p3.jpg',
     ],
     keySections: [
       'MAC Factor Scoring Table',
@@ -68,7 +69,8 @@ export const MANUAL_HANDLING_TEMPLATE_CONFIGS: Record<ManualHandlingTemplateSlug
     thumbnailPath: '/product-images/manual-handling-templates/thumb-rapp-assessment.jpg',
     previewPaths: [
       '/product-images/manual-handling-templates/preview-rapp-assessment-p1.jpg',
-      '/product-images/manual-handling-templates/preview-rapp-assessment-p2.jpg'
+      '/product-images/manual-handling-templates/preview-rapp-assessment-p2.jpg',
+      '/product-images/manual-handling-templates/preview-rapp-assessment-p3.jpg',
     ],
     keySections: [
       'Push/Pull Operation Description',
