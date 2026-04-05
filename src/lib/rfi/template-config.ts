@@ -12,7 +12,12 @@ export const RFI_TEMPLATE_CONFIGS: Record<RfiTemplateSlug, RfiTemplateConfig> = 
     pageCount: '3-5',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/rfi-templates/thumb-formal-letter.jpg',
-    previewPaths: ['/product-images/rfi-templates/preview-formal-letter-p1.jpg'],
+    previewPaths: [
+      '/product-images/rfi-templates/preview-formal-letter-p1.jpg',
+      '/product-images/rfi-templates/preview-formal-letter-p2.jpg',
+      '/product-images/rfi-templates/preview-formal-letter-p3.jpg',
+      '/product-images/rfi-templates/preview-formal-letter-p4.jpg',
+    ],
     keySections: ['Drawing & Spec References', 'Numbered Questions', 'Impact of Non-Response', 'Response Deadline', 'Attachments Schedule'],
   },
   'corporate': {
@@ -26,7 +31,11 @@ export const RFI_TEMPLATE_CONFIGS: Record<RfiTemplateSlug, RfiTemplateConfig> = 
     pageCount: '2-3',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/rfi-templates/thumb-corporate.jpg',
-    previewPaths: ['/product-images/rfi-templates/preview-corporate-p1.jpg'],
+    previewPaths: [
+      '/product-images/rfi-templates/preview-corporate-p1.jpg',
+      '/product-images/rfi-templates/preview-corporate-p2.jpg',
+      '/product-images/rfi-templates/preview-corporate-p3.jpg',
+    ],
     keySections: ['Query Description', 'Questions', 'Response Required By'],
   },
   'concise': {
@@ -40,7 +49,10 @@ export const RFI_TEMPLATE_CONFIGS: Record<RfiTemplateSlug, RfiTemplateConfig> = 
     pageCount: '1',
     detailLevel: 'Light',
     thumbnailPath: '/product-images/rfi-templates/thumb-concise.jpg',
-    previewPaths: ['/product-images/rfi-templates/preview-concise-p1.jpg'],
+    previewPaths: [
+      '/product-images/rfi-templates/preview-concise-p1.jpg',
+      '/product-images/rfi-templates/preview-concise-p2.jpg',
+    ],
     keySections: ['Question', 'Reference', 'Deadline'],
   },
 };
