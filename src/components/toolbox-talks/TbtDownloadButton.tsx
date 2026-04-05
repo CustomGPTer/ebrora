@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import UpgradeModal from "@/components/shared/UpgradeModal";
@@ -11,61 +11,74 @@ interface TbtDownloadButtonProps {
 }
 
 export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
-  const [status, setStatus] = useState<"idle" | "loading">("idle");
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({ used: 0, limit: 0, tier: "FREE" });
+  const [usageOk, setUsageOk] = useState<boolean | null>(null);
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
 
-  const handleDownload = useCallback(async () => {
-    // Not logged in -> redirect to login
+  // Pre-fetch usage on mount so click handler can stay synchronous
+  useEffect(() => {
+    if (sessionStatus !== "authenticated") return;
+
+    fetch("/api/downloads/usage")
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => {
+        if (!data) return;
+        const remaining = data?.tbt?.remaining ?? 0;
+        const limit = data?.tbt?.limit ?? 0;
+        const used = data?.tbt?.used ?? 0;
+        const tier = data?.tier ?? "FREE";
+        setModalData({ used, limit, tier });
+        setUsageOk(remaining > 0);
+      })
+      .catch(() => {
+        // If check fails, allow download anyway
+        setUsageOk(true);
+      });
+  }, [sessionStatus]);
+
+  const handleDownload = useCallback(() => {
+    // Not logged in
     if (sessionStatus !== "authenticated" || !session) {
       router.push("/auth/login");
       return;
     }
 
-    setStatus("loading");
-
-    try {
-      // Check and record download in one call
-      const checkRes = await fetch("/api/downloads/usage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: "TOOLBOX_TALK" }),
-      });
-
-      if (checkRes.status === 401) {
-        router.push("/auth/login");
-        setStatus("idle");
-        return;
-      }
-
-      if (checkRes.status === 429) {
-        const data = await checkRes.json();
-        setModalData({ used: data.used, limit: data.limit, tier: data.tier });
-        setShowModal(true);
-        setStatus("idle");
-        return;
-      }
-
-      if (!checkRes.ok) {
-        throw new Error("Download check failed");
-      }
-
-      // Usage check passed - open the HTML with ?print param
-      // The injected script in the HTML auto-triggers window.print() on load
-      const url = `/toolbox-talks/${htmlFile}?print`;
-      const win = window.open(url, "_blank");
-      if (!win) {
-        // Popup was blocked - fall back to navigating current tab
-        window.location.href = url;
-      }
-      setStatus("idle");
-    } catch (err) {
-      console.error("PDF download error:", err);
-      setStatus("idle");
+    // Over limit — show upgrade modal
+    if (usageOk === false) {
+      setShowModal(true);
+      return;
     }
-  }, [htmlFile, title, session, sessionStatus, router]);
+
+    // Open the HTML with ?print — triggers browser print dialog on load
+    window.open(`/toolbox-talks/${htmlFile}?print`, "_blank");
+
+    // Record the download in the background (fire-and-forget)
+    fetch("/api/downloads/usage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contentType: "TOOLBOX_TALK" }),
+    })
+      .then((res) => {
+        if (res.status === 429) {
+          return res.json().then((data) => {
+            setModalData({ used: data.used, limit: data.limit, tier: data.tier });
+            setUsageOk(false);
+          });
+        }
+        return res.json().then((data) => {
+          if (data?.tbt) {
+            setModalData({ used: data.tbt.used, limit: data.tbt.limit, tier: data.tier });
+            setUsageOk(data.tbt.remaining > 0);
+          }
+        });
+      })
+      .catch(() => {});
+  }, [htmlFile, session, sessionStatus, router, usageOk]);
 
   function handlePrint() {
     window.open(`/toolbox-talks/${htmlFile}`, "_blank");
@@ -77,36 +90,22 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={handleDownload}
-            disabled={status === "loading"}
-            className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-all ${
-              status === "loading"
-                ? "bg-[#1B5745]/80 text-white cursor-wait"
-                : "bg-[#1B5745] text-white hover:bg-[#164a3b] active:scale-[0.98]"
-            }`}
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg transition-all bg-[#1B5745] text-white hover:bg-[#164a3b] active:scale-[0.98]"
           >
-            {status === "loading" ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Generating PDF&hellip;
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                  />
-                </svg>
-                Download PDF
-              </>
-            )}
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+              />
+            </svg>
+            Download PDF
           </button>
           <button
             onClick={handlePrint}
