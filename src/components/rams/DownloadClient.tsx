@@ -165,6 +165,19 @@ function InlineDownload({
         <button className="rams-secondary-btn download-start-over" onClick={onStartOver}>
           Generate Another RAMS
         </button>
+
+        {/* Disclaimer */}
+        <p style={{
+          marginTop: '2rem',
+          fontSize: '0.75rem',
+          color: '#6B7280',
+          maxWidth: '400px',
+          textAlign: 'center',
+          lineHeight: '1.5',
+          margin: '2rem auto 0',
+        }}>
+          Ebrora can make mistakes. Always review AI-generated documents before use and verify compliance with current regulations and site-specific requirements.
+        </p>
       </div>
     </div>
   );
@@ -334,6 +347,19 @@ function StandaloneDownload({
         <a href="/rams-builder" className="rams-secondary-btn download-start-over" style={{ marginTop: '1rem', display: 'inline-block' }}>
           Generate Another RAMS
         </a>
+
+        {/* Disclaimer */}
+        <p style={{
+          marginTop: '2rem',
+          fontSize: '0.75rem',
+          color: '#6B7280',
+          maxWidth: '400px',
+          textAlign: 'center',
+          lineHeight: '1.5',
+          margin: '2rem auto 0',
+        }}>
+          Ebrora can make mistakes. Always review AI-generated documents before use and verify compliance with current regulations and site-specific requirements.
+        </p>
       </div>
     </div>
   );
