@@ -10,7 +10,7 @@ export const CONFINED_SPACES_TEMPLATE_CONFIGS: Record<ConfinedSpacesTemplateSlug
     displayName: 'Ebrora Standard',
     description:
       'Comprehensive 22-section assessment with cover page. Adjacent/connected space mapping, historical gas readings, SIMOPS assessment, atmospheric monitoring, isolation matrix, duration/heat stress limits, welfare and decontamination, full rescue plan, and regulatory references.',
-    pageCount: 5,
+    pageCount: 6,
     layout: 'standard',
     thumbnailPath: '/product-images/confined-spaces-templates/thumb-ebrora-standard.jpg',
     previewPaths: [
@@ -19,6 +19,7 @@ export const CONFINED_SPACES_TEMPLATE_CONFIGS: Record<ConfinedSpacesTemplateSlug
       '/product-images/confined-spaces-templates/preview-ebrora-standard-p3.jpg',
       '/product-images/confined-spaces-templates/preview-ebrora-standard-p4.jpg',
       '/product-images/confined-spaces-templates/preview-ebrora-standard-p5.jpg',
+      '/product-images/confined-spaces-templates/preview-ebrora-standard-p6.jpg',
     ],
     keySections: [
       'Adjacent & Connected Spaces Table',
