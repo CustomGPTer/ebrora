@@ -64,12 +64,13 @@ export const NCR_TEMPLATE_CONFIGS: Record<NcrTemplateSlug, NcrTemplateConfig> = 
     displayName: 'Red Alert',
     description:
       'Bold severity-first NCR with red banner header, prominent severity rating (Critical/Major/Minor), stop-work indicator, and high-visibility callout boxes for immediate actions required. Designed for critical non-conformances that demand urgent attention — structural defects, safety-critical failures, or specification deviations that could compromise asset integrity. Built to visually communicate urgency.',
-    pageCount: 2,
+    pageCount: 3,
     layout: 'alert',
     thumbnailPath: '/product-images/ncr-templates/thumb-red-alert.jpg',
     previewPaths: [
       '/product-images/ncr-templates/preview-red-alert-p1.jpg',
       '/product-images/ncr-templates/preview-red-alert-p2.jpg',
+      '/product-images/ncr-templates/preview-red-alert-p3.jpg',
     ],
     keySections: [
       'Red Banner Header with Severity Rating',
