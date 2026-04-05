@@ -16,7 +16,11 @@ export const WAH_TEMPLATE_CONFIGS: Record<WahTemplateSlug, WahTemplateConfig> = 
     pageCount: '8–12',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/wah-templates/thumb-full-compliance.jpg',
-    previewPaths: ['/product-images/wah-templates/preview-full-compliance-p1.jpg'],
+    previewPaths: [
+      '/product-images/wah-templates/preview-full-compliance-p1.jpg',
+      '/product-images/wah-templates/preview-full-compliance-p2.jpg',
+      '/product-images/wah-templates/preview-full-compliance-p3.jpg',
+    ],
     keySections: ['Branded Cover Page', 'Hierarchy of Control', 'Risk Matrix', 'Rescue Plan', 'Competency & Emergency'],
   },
   'formal-hse': {
@@ -31,7 +35,11 @@ export const WAH_TEMPLATE_CONFIGS: Record<WahTemplateSlug, WahTemplateConfig> = 
     pageCount: '6–10',
     detailLevel: 'Detailed',
     thumbnailPath: '/product-images/wah-templates/thumb-formal-hse.jpg',
-    previewPaths: ['/product-images/wah-templates/preview-formal-hse-p1.jpg'],
+    previewPaths: [
+      '/product-images/wah-templates/preview-formal-hse-p1.jpg',
+      '/product-images/wah-templates/preview-formal-hse-p2.jpg',
+      '/product-images/wah-templates/preview-formal-hse-p3.jpg',
+    ],
     keySections: ['Regulation References', 'Clause-Numbered Sections', 'Detailed Hazard Table', 'Control Hierarchy', 'Review Schedule'],
   },
   'site-ready': {
@@ -46,7 +54,11 @@ export const WAH_TEMPLATE_CONFIGS: Record<WahTemplateSlug, WahTemplateConfig> = 
     pageCount: '4–7',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/wah-templates/thumb-site-ready.jpg',
-    previewPaths: ['/product-images/wah-templates/preview-site-ready-p1.jpg'],
+    previewPaths: [
+      '/product-images/wah-templates/preview-site-ready-p1.jpg',
+      '/product-images/wah-templates/preview-site-ready-p2.jpg',
+      '/product-images/wah-templates/preview-site-ready-p3.jpg',
+    ],
     keySections: ['Task & Location Details', 'Hazard Table with RAG', 'Equipment Checklist', 'Controls & Sign-Off'],
   },
   'quick-check': {
@@ -61,7 +73,10 @@ export const WAH_TEMPLATE_CONFIGS: Record<WahTemplateSlug, WahTemplateConfig> = 
     pageCount: '2–3',
     detailLevel: 'Light',
     thumbnailPath: '/product-images/wah-templates/thumb-quick-check.jpg',
-    previewPaths: ['/product-images/wah-templates/preview-quick-check-p1.jpg'],
+    previewPaths: [
+      '/product-images/wah-templates/preview-quick-check-p1.jpg',
+      '/product-images/wah-templates/preview-quick-check-p2.jpg',
+    ],
     keySections: ['Task Summary', 'Key Hazards & Controls', 'Equipment Check', 'Team Sign-Off'],
   },
 };
