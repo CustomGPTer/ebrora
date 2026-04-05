@@ -18,6 +18,7 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
   const router = useRouter();
 
   const handleDownload = useCallback(async () => {
+    // Not logged in -> redirect to login
     if (sessionStatus !== "authenticated" || !session) {
       router.push("/auth/login");
       return;
@@ -25,9 +26,8 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
 
     setStatus("loading");
 
-    const printWindow = window.open("about:blank", "_blank");
-
     try {
+      // Check and record download in one call
       const checkRes = await fetch("/api/downloads/usage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,14 +35,12 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
       });
 
       if (checkRes.status === 401) {
-        printWindow?.close();
         router.push("/auth/login");
         setStatus("idle");
         return;
       }
 
       if (checkRes.status === 429) {
-        printWindow?.close();
         const data = await checkRes.json();
         setModalData({ used: data.used, limit: data.limit, tier: data.tier });
         setShowModal(true);
@@ -51,16 +49,19 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
       }
 
       if (!checkRes.ok) {
-        printWindow?.close();
         throw new Error("Download check failed");
       }
 
-      if (printWindow) {
-        printWindow.location.href = `/toolbox-talks/${htmlFile}?print`;
+      // Usage check passed - open the HTML with ?print param
+      // The injected script in the HTML auto-triggers window.print() on load
+      const url = `/toolbox-talks/${htmlFile}?print`;
+      const win = window.open(url, "_blank");
+      if (!win) {
+        // Popup was blocked - fall back to navigating current tab
+        window.location.href = url;
       }
       setStatus("idle");
     } catch (err) {
-      printWindow?.close();
       console.error("PDF download error:", err);
       setStatus("idle");
     }
