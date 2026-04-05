@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Powers of the HSE - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '\2022'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '\2713'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '\2717'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Powers of the HSE</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-CDM-030 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> April 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>The Health and Safety Executive (HSE) is Britain's national regulator for workplace health and safety.</li>
+      <li>HSE inspectors have the legal power to enter any workplace at any time without prior notice or appointment.</li>
+      <li>Inspectors can examine, investigate, take photographs, and seize articles or documents during a visit.</li>
+      <li>They can interview any person on site under caution — statements may be used as evidence in prosecution.</li>
+      <li>HSE can issue Improvement Notices requiring specific actions within a stated timescale to comply with law.</li>
+      <li>Prohibition Notices stop an activity immediately where there is a risk of serious personal injury.</li>
+      <li>Failure to comply with a notice is a criminal offence carrying unlimited fines or up to two years' imprisonment.</li>
+      <li>HSE publishes all enforcement notices and prosecution outcomes on a public register accessible to anyone.</li>
+      <li>Fee for Intervention (FFI) charges the duty holder £174 per hour for the time inspectors spend on a breach.</li>
+      <li>HSE can prosecute individuals including directors, managers, and supervisors — not just the company.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Unannounced visits</td><td>HSE inspectors arrive without warning and have the legal right to enter — you cannot refuse them access.</td></tr>
+    <tr><td class="reason">Personal liability</td><td>Individual managers, supervisors, and even workers can be personally prosecuted for safety failures.</td></tr>
+    <tr><td class="reason">Financial penalty</td><td>FFI charges begin immediately upon finding a breach — plus fines, legal costs, and reputational damage.</td></tr>
+    <tr><td class="reason">Public record</td><td>All enforcement actions are published publicly, visible to clients, competitors, and future employers.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr><td class="col-header do-h">Do</td><td class="col-header dont-h">Don't</td></tr>
+    <tr>
+      <td><ul class="do-items">
+          <li>Cooperate fully and politely with any HSE inspector visiting your site.</li>
+          <li>Notify your site manager immediately when an HSE inspector arrives on site.</li>
+          <li>Provide access to all areas, documents, and records the inspector requests.</li>
+          <li>Answer questions honestly — providing false information is a criminal offence.</li>
+          <li>Maintain high safety standards daily so inspections do not find avoidable breaches.</li>
+          <li>Keep risk assessments, permits, training records, and inspection logs current and accessible.</li>
+          <li>Accompany the inspector during their visit and take notes of all discussions.</li>
+          <li>Act on any verbal advice given by the inspector before a formal notice follows.</li>
+          <li>Brief your team on any findings or required actions after the visit concludes.</li>
+          <li>Use the visit as a learning opportunity to improve your safety management system.</li>
+        </ul></td>
+      <td><ul class="dont-items">
+          <li>DON'T refuse entry, obstruct, or delay an HSE inspector from accessing the site.</li>
+          <li>DON'T attempt to hide, move, or destroy evidence before or during an inspection.</li>
+          <li>DON'T provide misleading or false statements to the inspector under any circumstances.</li>
+          <li>DON'T argue with the inspector on site — use the formal appeal process instead.</li>
+          <li>DON'T panic — maintain composure and demonstrate your safety management systems calmly.</li>
+          <li>DON'T coach workers on what to say — inspectors will identify rehearsed responses.</li>
+          <li>DON'T assume a friendly visit means no enforcement action will follow afterwards.</li>
+          <li>DON'T ignore FFI invoices — they are legally enforceable debts owed to the HSE.</li>
+          <li>DON'T wait for an inspection to fix known problems — address hazards proactively today.</li>
+          <li>DON'T discuss the visit with external parties without management and legal approval.</li>
+        </ul>
+        <p class="see-also">See also: Improvement and Prohibition Notices | CDM 2015 Awareness</p></td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

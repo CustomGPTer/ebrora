@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signing In and Out Procedures - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '\2022'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '\2713'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '\2717'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Signing In and Out Procedures</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WEL-026 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> April 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Every person must sign in on arrival and sign out on departure from a construction site.</li>
+      <li>The sign-in register provides the roll call used during emergency evacuations to account for everyone.</li>
+      <li>CDM 2015 requires the principal contractor to maintain a record of all persons present on site.</li>
+      <li>If you are not signed in and an evacuation occurs, rescuers may enter a dangerous area looking for you.</li>
+      <li>Most sites use electronic turnstiles, biometric scanners, or manual sign-in sheets at the gate.</li>
+      <li>Visitors, delivery drivers, and client representatives must also sign in through the same system.</li>
+      <li>Sign-in data is also used for workforce planning, attendance monitoring, and security management.</li>
+      <li>Leaving site without signing out creates a false headcount that compromises emergency response accuracy.</li>
+      <li>Short-term absences from site, such as going to collect materials, must also be recorded.</li>
+      <li>The fire assembly point roll call relies entirely on the accuracy of the sign-in register.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Emergency evacuation</td><td>The sign-in register is the only way to confirm everyone is accounted for after an emergency evacuation.</td></tr>
+    <tr><td class="reason">Legal requirement</td><td>CDM 2015 requires the principal contractor to know who is on site at all times for safety purposes.</td></tr>
+    <tr><td class="reason">Rescue risk</td><td>If the register shows you on site but you have left, emergency services may risk their lives searching for you.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr><td class="col-header do-h">Do</td><td class="col-header dont-h">Don't</td></tr>
+    <tr>
+      <td><ul class="do-items">
+          <li>Sign in at the gate or reception point every time you arrive on site.</li>
+          <li>Sign out every time you leave site, even if only for a short period.</li>
+          <li>Carry your site access card or ID badge visibly at all times on site.</li>
+          <li>Report any problems with the sign-in system to the gateman or site office.</li>
+          <li>Ensure visitors you are hosting sign in and out through the correct process.</li>
+          <li>Check your sign-in status if you are unsure whether the system registered you.</li>
+          <li>Know the location of the fire assembly point and attend it during all drills.</li>
+          <li>Update your personal details on the system if your phone number or employer changes.</li>
+          <li>Use the buddy system to confirm your workmate has also signed in on arrival.</li>
+          <li>Cooperate with roll call procedures during fire drills and actual evacuations.</li>
+        </ul></td>
+      <td><ul class="dont-items">
+          <li>DON'T enter site without signing in — even if you are running late for a briefing.</li>
+          <li>DON'T tailgate through a turnstile behind another person using their card.</li>
+          <li>DON'T sign in for someone else or let another person use your access card.</li>
+          <li>DON'T leave site without signing out — the register must reflect who is present.</li>
+          <li>DON'T assume the gateman saw you arrive — complete the sign-in process yourself.</li>
+          <li>DON'T ignore a failed card swipe — report it and sign in manually instead.</li>
+          <li>DON'T bypass the sign-in point by entering through an alternative route or gap.</li>
+          <li>DON'T lend your access card to a colleague who has forgotten theirs today.</li>
+          <li>DON'T treat sign-in as a minor admin task — it is a critical safety control.</li>
+          <li>DON'T skip the fire drill because you are busy — attend the assembly point.</li>
+        </ul>
+        <p class="see-also">See also: Site Emergency Plan Awareness | Site Induction Requirements</p></td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

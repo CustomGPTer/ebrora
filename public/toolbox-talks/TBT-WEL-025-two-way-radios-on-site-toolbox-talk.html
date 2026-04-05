@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two Way Radios on Site - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '\2022'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '\2713'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '\2717'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Two Way Radios on Site</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WEL-025 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> April 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Two-way radios are the primary communication tool on many construction sites for safety-critical messages.</li>
+      <li>They enable instant communication between supervisors, banksmen, plant operators, and the site office.</li>
+      <li>Radios must be used according to the site communication protocol, including correct channel allocation.</li>
+      <li>Battery life must be checked at the start of every shift — a dead radio in an emergency is useless.</li>
+      <li>Radio discipline means keeping messages short, clear, and using the agreed call signs and procedures.</li>
+      <li>Emergency messages take priority over all other traffic — all users must stop and listen immediately.</li>
+      <li>Radios are especially important for lone workers, banksmen, and confined space entry teams.</li>
+      <li>Interference from other sites or services can occur — report persistent problems to your supervisor.</li>
+      <li>Two-way radios must be intrinsically safe (ATEX rated) when used in classified explosive atmosphere zones.</li>
+      <li>A broken or missing radio should be reported and replaced before work begins in the affected area.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Emergency communication</td><td>Radios provide instant contact with emergency services coordination, first aiders, and the site control point.</td></tr>
+    <tr><td class="reason">Banksman coordination</td><td>Clear radio communication between banksmen and plant operators prevents struck-by and crush injuries.</td></tr>
+    <tr><td class="reason">Lone worker safety</td><td>Lone workers rely on radios as their primary means of raising an alarm if injured or incapacitated.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr><td class="col-header do-h">Do</td><td class="col-header dont-h">Don't</td></tr>
+    <tr>
+      <td><ul class="do-items">
+          <li>Check your radio battery level and test transmission at the start of every shift.</li>
+          <li>Use the correct channel allocated to your work area or team at all times.</li>
+          <li>Keep messages brief, clear, and professional — state your call sign first.</li>
+          <li>Carry the radio on your person at all times, not left in the cabin or vehicle.</li>
+          <li>Stop all radio traffic immediately when an emergency message is broadcast.</li>
+          <li>Report a faulty or lost radio to your supervisor and obtain a replacement promptly.</li>
+          <li>Use ATEX-rated radios only when working within classified explosive atmosphere zones.</li>
+          <li>Charge radios fully overnight so they are ready for the full shift duration.</li>
+          <li>Learn the site emergency radio procedure and distress call protocol during induction.</li>
+          <li>Confirm received messages by repeating key information back to the sender.</li>
+        </ul></td>
+      <td><ul class="dont-items">
+          <li>DON'T use personal mobile phones as a substitute for the site two-way radio system.</li>
+          <li>DON'T use radios for casual conversation — keep the channel clear for work messages.</li>
+          <li>DON'T shout over other transmissions — wait for the channel to clear before speaking.</li>
+          <li>DON'T ignore radio calls directed to your call sign — respond promptly every time.</li>
+          <li>DON'T start work as a banksman without confirming radio contact with the operator.</li>
+          <li>DON'T take a radio into an ATEX zone unless it is confirmed as intrinsically safe.</li>
+          <li>DON'T leave your radio in the welfare cabin during your shift — it must be on you.</li>
+          <li>DON'T assume someone else will hear an emergency call — respond if you are nearest.</li>
+          <li>DON'T use aggressive or abusive language on the radio — all traffic may be recorded.</li>
+          <li>DON'T continue working without a radio if one is required by the safe system of work.</li>
+        </ul>
+        <p class="see-also">See also: Lone Working Awareness | Site Emergency Plan Awareness</p></td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

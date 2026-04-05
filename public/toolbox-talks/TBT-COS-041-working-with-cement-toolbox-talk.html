@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working with Cement - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '\2022'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '\2713'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '\2717'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Working with Cement</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-COS-041 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> April 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Cement is one of the most common causes of occupational skin disease in the UK construction industry.</li>
+      <li>Wet cement is highly alkaline with a pH of 12 to 13 — it causes chemical burns on prolonged skin contact.</li>
+      <li>Chromium VI (hexavalent chromium) in cement causes allergic contact dermatitis, a lifelong condition.</li>
+      <li>Once sensitised to chromium VI, even brief contact with cement will trigger a severe skin reaction.</li>
+      <li>COSHH 2002 requires a risk assessment and control measures for all activities involving cement contact.</li>
+      <li>Cement dust is also a respiratory hazard — inhalation irritates airways and can cause chronic bronchitis.</li>
+      <li>The workplace exposure limit for cement dust is 10 mg/m3 total inhalable dust and 4 mg/m3 respirable.</li>
+      <li>Cement burns often go unnoticed because the alkaline reaction destroys nerve endings before pain is felt.</li>
+      <li>Kneeling in wet cement without waterproof knee pads is a common cause of severe knee burns.</li>
+      <li>EU regulations have reduced chromium VI content in cement, but the risk is not eliminated entirely.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Chemical burns</td><td>Wet cement at pH 13 causes deep chemical burns that destroy skin tissue — burns worsen the longer contact continues.</td></tr>
+    <tr><td class="reason">Lifelong dermatitis</td><td>Chromium VI sensitisation is permanent — once developed, every future cement contact causes painful skin reactions.</td></tr>
+    <tr><td class="reason">Hidden damage</td><td>Cement burns destroy nerve endings first — workers often do not feel the burn until significant damage is done.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr><td class="col-header do-h">Do</td><td class="col-header dont-h">Don't</td></tr>
+    <tr>
+      <td><ul class="do-items">
+          <li>Wear waterproof gloves when mixing, placing, or handling wet cement products.</li>
+          <li>Use long-sleeved clothing and waterproof trousers to prevent skin contact throughout.</li>
+          <li>Wear waterproof knee pads when kneeling in or near wet concrete or screed.</li>
+          <li>Wash cement off skin immediately with clean water — do not wait until break time.</li>
+          <li>Apply barrier cream before starting work and moisturiser after washing at end of shift.</li>
+          <li>Wear safety goggles when mixing dry cement to prevent dust entering your eyes.</li>
+          <li>Use an FFP2 mask minimum when cutting, grinding, or mixing dry cement products.</li>
+          <li>Check the COSHH assessment for the specific cement product before starting the task.</li>
+          <li>Report any skin redness, cracking, itching, or irritation to your supervisor immediately.</li>
+          <li>Attend dermatitis health surveillance when offered by your occupational health provider.</li>
+        </ul></td>
+      <td><ul class="dont-items">
+          <li>DON'T handle wet cement or concrete with bare hands under any circumstances.</li>
+          <li>DON'T kneel in wet concrete without waterproof knee pads protecting your skin.</li>
+          <li>DON'T allow cement-contaminated clothing to remain in contact with skin — change promptly.</li>
+          <li>DON'T use solvents, white spirit, or thinners to clean cement off your skin.</li>
+          <li>DON'T ignore dry, cracked, or itchy hands — these are early signs of dermatitis.</li>
+          <li>DON'T wash hands with abrasive cleaners after cement work — use mild soap only.</li>
+          <li>DON'T eat, drink, or smoke without washing cement residue from your hands first.</li>
+          <li>DON'T create unnecessary cement dust by dry sweeping or tipping bags aggressively.</li>
+          <li>DON'T reuse cement-contaminated gloves that have been soaked through to the inside.</li>
+          <li>DON'T dismiss cement dermatitis as minor — it can end your construction career permanently.</li>
+        </ul>
+        <p class="see-also">See also: Skin Protection and Dermatitis Prevention | COSHH Awareness</p></td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>

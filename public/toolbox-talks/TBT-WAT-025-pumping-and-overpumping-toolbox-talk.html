@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pumping and Overpumping - Construction Toolbox Talk | ebrora.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #e5e7eb; }
+  body { font-family: 'Open Sans', sans-serif; color: #1e293b; background: #fff; width: 210mm; min-height: 297mm; margin: 20px auto; padding: 10mm 12mm 12mm 12mm; border: 1px solid #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  @page { size: A4 portrait; margin: 0; }
+  @media print { html { background: #fff; } body { margin: 0; padding: 10mm 12mm 12mm 12mm; border: none; box-shadow: none; width: 210mm; height: 297mm; overflow: hidden; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .screen-footer { display: none; } }
+  .header { text-align: center; padding-bottom: 14px; border-bottom: 3px double #1e3a5f; margin-bottom: 14px; }
+  .header h1 { font-family: 'Merriweather', serif; font-size: 20px; font-weight: 900; color: #1e3a5f; margin-bottom: 2px; }
+  .header h2 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #475569; }
+  .header .ref-line { margin-top: 8px; font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+  .header .ref-line strong { color: #1e3a5f; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .meta-table td { padding: 5px 8px; border: 1px solid #cbd5e1; font-size: 11px; vertical-align: bottom; }
+  .meta-table .lbl { background: #f1f5f9; font-weight: 700; color: #1e3a5f; width: 10%; font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.8px; vertical-align: middle; padding: 4px 6px; }
+  .meta-table .val { width: 40%; min-height: 22px; }
+  .section { margin-bottom: 10px; break-inside: avoid; }
+  .section h3 { font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; color: #1e3a5f; padding: 4px 0; border-bottom: 2px solid #1e3a5f; margin-bottom: 6px; }
+  .what-block { background: #f8fafc; border-left: 4px solid #1e3a5f; padding: 8px 12px; }
+  .what-list { list-style: none; padding: 0; }
+  .what-list li { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 2px; font-size: 10px; line-height: 1.45; color: #334155; }
+  .what-list li::before { content: '\2022'; color: #1e3a5f; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .why-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .why-table td { padding: 5px 8px; border: 1px solid #cbd5e1; vertical-align: top; line-height: 1.5; }
+  .why-table .reason { font-weight: 700; color: #1e3a5f; width: 20%; background: #f1f5f9; font-style: italic; }
+  .do-dont-table { width: 100%; border-collapse: collapse; }
+  .do-dont-table .col-header { padding: 6px 10px; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+  .do-dont-table .col-header.do-h { background: #1e6b3a; }
+  .do-dont-table .col-header.dont-h { background: #8b1a1a; }
+  .do-dont-table td { vertical-align: top; border: 1px solid #cbd5e1; padding: 8px 10px; width: 50%; }
+  .do-items, .dont-items { list-style: none; padding: 0; }
+  .do-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .do-items li::before { content: '\2713'; color: #1e6b3a; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .dont-items li { display: flex; gap: 5px; align-items: flex-start; margin-bottom: 3px; font-size: 10px; line-height: 1.4; color: #334155; }
+  .dont-items li::before { content: '\2717'; color: #b91c1c; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+  .see-also { font-size: 8px; color: #64748b; font-style: italic; margin-top: 6px; }
+  .footer { margin-top: 12px; padding-top: 8px; border-top: 3px double #1e3a5f; text-align: center; font-family: 'Merriweather', serif; font-size: 12px; font-weight: 400; color: #1B5745; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Pumping and Overpumping</h1>
+  <h2>Toolbox Talk Record</h2>
+  <div class="ref-line"><strong>Ref:</strong> TBT-WAT-025 &nbsp;|&nbsp; <strong>Issue:</strong> 1 &nbsp;|&nbsp; <strong>Date:</strong> April 2026</div>
+</div>
+<table class="meta-table">
+  <tr><td class="lbl">Presenter</td><td class="val"></td><td class="lbl">Project</td><td class="val"></td></tr>
+  <tr><td class="lbl">Location</td><td class="val"></td><td class="lbl">Date</td><td class="val"></td></tr>
+</table>
+<div class="section">
+  <h3>What?</h3>
+  <div class="what-block">
+    <ul class="what-list">
+      <li>Pumping and overpumping involves managing water flows on construction and wastewater treatment sites.</li>
+      <li>Overpumping maintains sewage treatment during shutdowns by bypassing flows around offline assets.</li>
+      <li>Failure of overpumping systems can cause raw sewage to overflow into watercourses and public areas.</li>
+      <li>The Water Industry Act 1991 makes it a criminal offence to discharge polluting matter into controlled waters.</li>
+      <li>Pumps used for overpumping must be maintained, tested, and have standby backup systems available.</li>
+      <li>Hose connections, couplings, and pipework must be rated for the pressures and flows being handled.</li>
+      <li>Dewatering excavations requires consent if discharge enters a watercourse or public sewer system.</li>
+      <li>Workers near pumping operations face slip, trip, noise, vibration, and manual handling hazards.</li>
+      <li>Pump failures during overpumping are emergency situations requiring immediate escalation to the client.</li>
+      <li>All pumping operations must have a written procedure covering normal operation and emergency response.</li>
+    </ul>
+  </div>
+</div>
+<div class="section">
+  <h3>Why?</h3>
+  <table class="why-table">
+    <tr><td class="reason">Prevent pollution</td><td>A pump failure during overpumping can release thousands of litres of raw sewage into the environment within minutes.</td></tr>
+    <tr><td class="reason">Regulatory prosecution</td><td>The Environment Agency prosecutes sewage pollution incidents with unlimited fines — contractors share liability.</td></tr>
+    <tr><td class="reason">Client relationship</td><td>Causing a pollution incident on a client's operational site damages the working relationship and future opportunities.</td></tr>
+  </table>
+</div>
+<div class="section">
+  <table class="do-dont-table">
+    <tr><td class="col-header do-h">Do</td><td class="col-header dont-h">Don't</td></tr>
+    <tr>
+      <td><ul class="do-items">
+          <li>Check all pump connections, hoses, and couplings before starting any pumping operation.</li>
+          <li>Ensure standby pumps are primed, tested, and ready for immediate changeover if needed.</li>
+          <li>Monitor pump performance continuously and record flow rates and pressures at set intervals.</li>
+          <li>Follow the written overpumping procedure and escalation plan for the specific site.</li>
+          <li>Obtain discharge consent before pumping any water into a watercourse or public sewer.</li>
+          <li>Use sediment settlement and filtration before discharging site water to any receiving body.</li>
+          <li>Secure all hoses and connections to prevent burst joints under pressure during operation.</li>
+          <li>Brief all operatives on the emergency response procedure for pump failure scenarios.</li>
+          <li>Maintain fuel supplies for diesel pumps to prevent generators running dry mid-operation.</li>
+          <li>Report any unusual pump noises, vibration, or drop in performance immediately.</li>
+        </ul></td>
+      <td><ul class="dont-items">
+          <li>DON'T leave pumping operations unattended without continuous monitoring in place.</li>
+          <li>DON'T discharge pumped water directly into watercourses without consent and treatment.</li>
+          <li>DON'T use hoses or fittings that are not rated for the system operating pressure.</li>
+          <li>DON'T allow sewage overpumping to operate without a tested standby pump available.</li>
+          <li>DON'T ignore a pump alarm or warning light — investigate and respond immediately.</li>
+          <li>DON'T walk over or drive vehicles across pumping hoses laid on the ground surface.</li>
+          <li>DON'T attempt to repair hose connections or couplings while the system is pressurised.</li>
+          <li>DON'T pump contaminated groundwater without testing and appropriate disposal arrangements.</li>
+          <li>DON'T assume overpumping is low risk — a failure has immediate regulatory consequences.</li>
+          <li>DON'T delay reporting a pump failure to the client — every minute increases pollution risk.</li>
+        </ul>
+        <p class="see-also">See also: Silt and Sediment Control | Pollution Incident Reporting</p></td>
+    </tr>
+  </table>
+</div>
+<div class="footer">ebrora.com</div>
+</body>
+</html>
