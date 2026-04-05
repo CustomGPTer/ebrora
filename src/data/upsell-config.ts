@@ -153,9 +153,9 @@ export const TOOL_UPSELLS: Record<string, UpsellItem> = {
     price: "£4.99",
   },
   "materials-converter": {
-    title: "Get the Full Excel Version",
+    title: "Download the Offline Excel Version",
     description:
-      "The complete Civil Engineering Materials Converter with 100+ materials, cost estimating, and ICE v3 carbon calculations.",
+      "Take the Materials Converter on site — same 100+ materials, densities, carbon factors and cost estimating in a standalone Excel workbook. No internet required.",
     gumroadUrl: "/products#civil-engineering-materials-converter",
     price: "£4.99",
   },
