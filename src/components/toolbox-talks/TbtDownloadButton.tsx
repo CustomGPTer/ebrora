@@ -52,76 +52,85 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
         throw new Error("Download check failed");
       }
 
-      // Proceed with client-side PDF generation
-      const res = await fetch(`/toolbox-talks/${htmlFile}`);
-      if (!res.ok) throw new Error("Failed to fetch");
-      const html = await res.text();
-
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "fixed";
-      iframe.style.left = "-9999px";
-      iframe.style.top = "0";
-      iframe.style.width = "210mm";
-      iframe.style.height = "297mm";
-      iframe.style.border = "none";
-      document.body.appendChild(iframe);
-
-      const doc = iframe.contentDocument || iframe.contentWindow?.document;
-      if (!doc) throw new Error("Could not access iframe");
-
-      doc.open();
-      doc.write(html);
-      doc.close();
-
-      await new Promise<void>((resolve) => {
-        if (iframe.contentWindow) {
-          iframe.contentWindow.onload = () => resolve();
-          setTimeout(resolve, 3000);
-        } else {
-          setTimeout(resolve, 3000);
-        }
-      });
-
-      await new Promise((r) => setTimeout(r, 500));
-
-      const [html2canvasModule, jsPDFModule] = await Promise.all([
-        import("html2canvas"),
-        import("jspdf"),
-      ]);
-      const html2canvas = html2canvasModule.default;
-      const { jsPDF } = jsPDFModule;
-
-      const canvas = await html2canvas(doc.body, {
-        scale: 4,
-        useCORS: true,
-        allowTaint: true,
-        width: 794,
-        height: 1123,
-        windowWidth: 794,
-        windowHeight: 1123,
-        backgroundColor: "#ffffff",
-      });
-
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-        compress: true,
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      pdf.addImage(imgData, "PNG", 0, 0, 210, 297, undefined, "FAST");
-
-      const safeTitle = title
-        .replace(/[^a-zA-Z0-9 -]/g, "")
-        .replace(/\s+/g, "-");
-      pdf.save(`${safeTitle}.pdf`);
-
-      document.body.removeChild(iframe);
+      // Open HTML with ?print param — the HTML auto-triggers window.print() on load
+      window.open(`/toolbox-talks/${htmlFile}?print`, "_blank");
       setStatus("idle");
+
+      // ──────────────────────────────────────────────────────────────────
+      // FUTURE: Client-side PDF auto-download via html2canvas + jsPDF
+      // Uncomment the block below to switch back to direct PDF download
+      // (no print dialog). Currently disabled — html2canvas struggles
+      // with Google Fonts and complex CSS in the toolbox talk HTML.
+      // ──────────────────────────────────────────────────────────────────
+      //
+      // const res = await fetch(`/toolbox-talks/${htmlFile}`);
+      // if (!res.ok) throw new Error("Failed to fetch");
+      // const html = await res.text();
+      //
+      // const iframe = document.createElement("iframe");
+      // iframe.style.position = "fixed";
+      // iframe.style.left = "-9999px";
+      // iframe.style.top = "0";
+      // iframe.style.width = "210mm";
+      // iframe.style.height = "297mm";
+      // iframe.style.border = "none";
+      // document.body.appendChild(iframe);
+      //
+      // const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      // if (!iframeDoc) throw new Error("Could not access iframe");
+      //
+      // iframeDoc.open();
+      // iframeDoc.write(html);
+      // iframeDoc.close();
+      //
+      // await new Promise<void>((resolve) => {
+      //   if (iframe.contentWindow) {
+      //     iframe.contentWindow.onload = () => resolve();
+      //     setTimeout(resolve, 3000);
+      //   } else {
+      //     setTimeout(resolve, 3000);
+      //   }
+      // });
+      //
+      // await new Promise((r) => setTimeout(r, 500));
+      //
+      // const [html2canvasModule, jsPDFModule] = await Promise.all([
+      //   import("html2canvas"),
+      //   import("jspdf"),
+      // ]);
+      // const html2canvas = html2canvasModule.default;
+      // const { jsPDF } = jsPDFModule;
+      //
+      // const canvas = await html2canvas(iframeDoc.body, {
+      //   scale: 4,
+      //   useCORS: true,
+      //   allowTaint: true,
+      //   width: 794,
+      //   height: 1123,
+      //   windowWidth: 794,
+      //   windowHeight: 1123,
+      //   backgroundColor: "#ffffff",
+      // });
+      //
+      // const pdf = new jsPDF({
+      //   orientation: "portrait",
+      //   unit: "mm",
+      //   format: "a4",
+      //   compress: true,
+      // });
+      //
+      // const imgData = canvas.toDataURL("image/png");
+      // pdf.addImage(imgData, "PNG", 0, 0, 210, 297, undefined, "FAST");
+      //
+      // const safeTitle = title
+      //   .replace(/[^a-zA-Z0-9 -]/g, "")
+      //   .replace(/\s+/g, "-");
+      // pdf.save(`${safeTitle}.pdf`);
+      //
+      // document.body.removeChild(iframe);
+      // setStatus("idle");
     } catch (err) {
-      console.error("PDF generation error:", err);
-      window.open(`/toolbox-talks/${htmlFile}`, "_blank");
+      console.error("PDF download error:", err);
       setStatus("idle");
     }
   }, [htmlFile, title, session, sessionStatus, router]);
