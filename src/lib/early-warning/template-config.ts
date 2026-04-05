@@ -58,11 +58,12 @@ export const EARLY_WARNING_TEMPLATE_CONFIGS: Record<EarlyWarningTemplateSlug, Ea
     displayName: 'Subcontractor \u2192 MC',
     description:
       'Subcontractor notification to Main Contractor under NEC4 Engineering & Construction Subcontract Clause 15.1. Compact format with impact cards showing cost and programme estimates, mitigation table, clause reference note, and subcontractor/contractor sign-off.',
-    pageCount: 1,
+    pageCount: 2,
     layout: 'subcontract',
     thumbnailPath: '/product-images/early-warning-templates/thumb-nec4-sub-to-mc.jpg',
     previewPaths: [
       '/product-images/early-warning-templates/preview-nec4-sub-to-mc-p1.jpg',
+      '/product-images/early-warning-templates/preview-nec4-sub-to-mc-p2.jpg',
     ],
     keySections: [
       'Sub \u2192 MC Direction Badge',
