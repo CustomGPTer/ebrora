@@ -19,7 +19,6 @@ import {
   CATEGORY_LABELS,
 } from "@/types/materials-converter";
 import {
-  MATERIALS_LIBRARY,
   getMaterial,
   getGroupedMaterials,
 } from "@/data/materials-library";
