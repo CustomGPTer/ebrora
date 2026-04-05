@@ -16,7 +16,13 @@ export const QUOTE_TEMPLATE_CONFIGS: Record<QuoteTemplateSlug, QuoteTemplateConf
     pageCount: '10–16',
     detailLevel: 'Full',
     thumbnailPath: '/product-images/quote-templates/thumb-full-tender.jpg',
-    previewPaths: ['/product-images/quote-templates/preview-full-tender-p1.jpg'],
+    previewPaths: [
+      '/product-images/quote-templates/preview-full-tender-p1.jpg',
+      '/product-images/quote-templates/preview-full-tender-p2.jpg',
+      '/product-images/quote-templates/preview-full-tender-p3.jpg',
+      '/product-images/quote-templates/preview-full-tender-p4.jpg',
+      '/product-images/quote-templates/preview-full-tender-p5.jpg',
+    ],
     keySections: [
       'Branded Cover Page',
       'Executive Summary',
@@ -37,7 +43,13 @@ export const QUOTE_TEMPLATE_CONFIGS: Record<QuoteTemplateSlug, QuoteTemplateConf
     pageCount: '8–14',
     detailLevel: 'Detailed',
     thumbnailPath: '/product-images/quote-templates/thumb-formal-contract.jpg',
-    previewPaths: ['/product-images/quote-templates/preview-formal-contract-p1.jpg'],
+    previewPaths: [
+      '/product-images/quote-templates/preview-formal-contract-p1.jpg',
+      '/product-images/quote-templates/preview-formal-contract-p2.jpg',
+      '/product-images/quote-templates/preview-formal-contract-p3.jpg',
+      '/product-images/quote-templates/preview-formal-contract-p4.jpg',
+      '/product-images/quote-templates/preview-formal-contract-p5.jpg',
+    ],
     keySections: [
       'Clause-Numbered Sections',
       'Sub-Clause Commercial Terms',
@@ -58,7 +70,13 @@ export const QUOTE_TEMPLATE_CONFIGS: Record<QuoteTemplateSlug, QuoteTemplateConf
     pageCount: '6–10',
     detailLevel: 'Standard',
     thumbnailPath: '/product-images/quote-templates/thumb-standard-quote.jpg',
-    previewPaths: ['/product-images/quote-templates/preview-standard-quote-p1.jpg'],
+    previewPaths: [
+      '/product-images/quote-templates/preview-standard-quote-p1.jpg',
+      '/product-images/quote-templates/preview-standard-quote-p2.jpg',
+      '/product-images/quote-templates/preview-standard-quote-p3.jpg',
+      '/product-images/quote-templates/preview-standard-quote-p4.jpg',
+      '/product-images/quote-templates/preview-standard-quote-p5.jpg',
+    ],
     keySections: [
       'Tender Particulars Table',
       'BoQ / Pricing Schedule',
@@ -79,7 +97,10 @@ export const QUOTE_TEMPLATE_CONFIGS: Record<QuoteTemplateSlug, QuoteTemplateConf
     pageCount: '3–5',
     detailLevel: 'Light',
     thumbnailPath: '/product-images/quote-templates/thumb-budget-estimate.jpg',
-    previewPaths: ['/product-images/quote-templates/preview-budget-estimate-p1.jpg'],
+    previewPaths: [
+      '/product-images/quote-templates/preview-budget-estimate-p1.jpg',
+      '/product-images/quote-templates/preview-budget-estimate-p2.jpg',
+    ],
     keySections: [
       'Price Summary & BoQ',
       'Inclusions & Exclusions',
