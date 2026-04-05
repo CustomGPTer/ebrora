@@ -98,7 +98,7 @@ export async function buildCeNotificationDocument(content: any): Promise<Documen
           h.spacer(200),
 
           section('Cost Implications'),
-          new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.5), W - Math.round(W * 0.5)], rows: [
             new TableRow({ children: [h.headerCell('Cost Element', Math.round(W * 0.5), { fontSize: 16 }), h.headerCell('Estimated Cost', W - Math.round(W * 0.5), { fontSize: 16 })] }),
             new TableRow({ children: [h.dataCell('Labour', Math.round(W * 0.5), { fontSize: 16 }), h.dataCell(cost.labourCost || 'TBC', W - Math.round(W * 0.5), { fontSize: 16 })] }),
             new TableRow({ children: [h.dataCell('Plant', Math.round(W * 0.5), { fontSize: 16, fillColor: h.GREY_LIGHT }), h.dataCell(cost.plantCost || 'TBC', W - Math.round(W * 0.5), { fontSize: 16, fillColor: h.GREY_LIGHT })] }),
@@ -123,7 +123,7 @@ export async function buildCeNotificationDocument(content: any): Promise<Documen
           h.spacer(200),
 
           section('Supporting Evidence'),
-          ...(Array.isArray(content.supportingEvidence) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.supportingEvidence) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.44), Math.round(W * 0.28), W - Math.round(W * 0.78)], rows: [
             new TableRow({ children: [
               h.headerCell('No.', Math.round(W * 0.06), { fontSize: 14 }),
               h.headerCell('Document', Math.round(W * 0.44), { fontSize: 14 }),

@@ -53,7 +53,7 @@ export async function buildScopeOfWorksDocument(content: any): Promise<Document>
           ...h.prose(content.scopeOverview),
           h.spacer(200),
           section('Inclusions'),
-          ...(Array.isArray(content.inclusions) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.inclusions) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.3), W - Math.round(W * 0.36)], rows: [
             new TableRow({ children: [h.headerCell('No.', Math.round(W * 0.06), { fontSize: 14 }), h.headerCell('Item', Math.round(W * 0.3), { fontSize: 14 }), h.headerCell('Detail', W - Math.round(W * 0.36), { fontSize: 14 })] }),
             ...content.inclusions.map((inc: any, i: number) => new TableRow({ children: [
               h.dataCell(String(i + 1), Math.round(W * 0.06), { fontSize: 14, alignment: AlignmentType.CENTER }),
@@ -63,7 +63,7 @@ export async function buildScopeOfWorksDocument(content: any): Promise<Document>
           ] })] : []),
           h.spacer(200),
           section('Exclusions'),
-          ...(Array.isArray(content.exclusions) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.exclusions) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.3), W - Math.round(W * 0.36)], rows: [
             new TableRow({ children: [h.headerCell('No.', Math.round(W * 0.06), { fontSize: 14 }), h.headerCell('Item', Math.round(W * 0.3), { fontSize: 14 }), h.headerCell('Detail', W - Math.round(W * 0.36), { fontSize: 14 })] }),
             ...content.exclusions.map((exc: any, i: number) => new TableRow({ children: [
               h.dataCell(String(i + 1), Math.round(W * 0.06), { fontSize: 14, alignment: AlignmentType.CENTER }),
@@ -94,7 +94,7 @@ export async function buildScopeOfWorksDocument(content: any): Promise<Document>
           ...h.prose(prog.sequenceConstraints),
           h.spacer(200),
           section('Interface Requirements'),
-          ...(Array.isArray(content.interfaceRequirements) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.interfaceRequirements) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.25), Math.round(W * 0.45), W - Math.round(W * 0.7)], rows: [
             new TableRow({ children: [
               h.headerCell('Interface With', Math.round(W * 0.25), { fontSize: 14 }),
               h.headerCell('Description', Math.round(W * 0.45), { fontSize: 14 }),
@@ -111,7 +111,7 @@ export async function buildScopeOfWorksDocument(content: any): Promise<Document>
           ...h.prose(content.testingAndCommissioning),
           h.spacer(200),
           section('Deliverables'),
-          ...(Array.isArray(content.deliverables) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.deliverables) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.45), Math.round(W * 0.3), W - Math.round(W * 0.75)], rows: [
             new TableRow({ children: [
               h.headerCell('Document', Math.round(W * 0.45), { fontSize: 14 }),
               h.headerCell('Required By', Math.round(W * 0.3), { fontSize: 14 }),

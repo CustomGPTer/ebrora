@@ -73,7 +73,7 @@ export async function buildPermitToDigDocument(content: any): Promise<Document> 
         properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader() }, footers: { default: h.ebroraFooter() },
         children: [
           section('Utility Search Records'),
-          new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.3), Math.round(W * 0.12), Math.round(W * 0.2), W - Math.round(W * 0.62)], rows: [
             new TableRow({ children: [
               h.headerCell('Search Type', Math.round(W * 0.3), { fontSize: 14 }),
               h.headerCell('Done', Math.round(W * 0.12), { fontSize: 14, alignment: AlignmentType.CENTER }),
@@ -88,7 +88,7 @@ export async function buildPermitToDigDocument(content: any): Promise<Document> 
           h.spacer(200),
 
           section('Services Identified'),
-          ...(Array.isArray(content.servicesIdentified) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.servicesIdentified) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.16), Math.round(W * 0.1), Math.round(W * 0.1), Math.round(W * 0.12), Math.round(W * 0.12), Math.round(W * 0.12), W - Math.round(W * 0.72)], rows: [
             new TableRow({ children: [
               h.headerCell('Service', Math.round(W * 0.16), { fontSize: 12 }),
               h.headerCell('Size', Math.round(W * 0.1), { fontSize: 12 }),
@@ -149,7 +149,7 @@ export async function buildPermitToDigDocument(content: any): Promise<Document> 
           section('Emergency Procedures — Service Strike'),
           ...h.prose(emerg.serviceStrike),
           h.spacer(80),
-          ...(Array.isArray(emerg.emergencyContacts) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(emerg.emergencyContacts) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.5), W - Math.round(W * 0.5)], rows: [
             new TableRow({ children: [h.headerCell('Service', Math.round(W * 0.5), { fontSize: 14 }), h.headerCell('Emergency Number', W - Math.round(W * 0.5), { fontSize: 14 })] }),
             ...emerg.emergencyContacts.map((c: any) => new TableRow({ children: [
               h.dataCell(c.service || '', Math.round(W * 0.5), { fontSize: 14 }),

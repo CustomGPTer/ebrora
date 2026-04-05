@@ -387,7 +387,7 @@ function riskMatrixTable(accent: string, likehood: number, impact: number, label
     ] }));
   }
 
-  return new Table({ width: { size: Math.round(W * 0.45), type: WidthType.DXA }, rows: [headerRow, ...rows] });
+  return new Table({ width: { size: Math.round(W * 0.45), type: WidthType.DXA }, columnWidths: Array(6).fill(cellW), rows: [headerRow, ...rows] });
 }
 
 function buildT5(p: Pal, c: any): Document {

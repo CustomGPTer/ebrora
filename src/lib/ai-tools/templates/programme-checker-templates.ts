@@ -52,6 +52,7 @@ function cols(fracs: number[]): number[] { return fracs.map(f => Math.round(W * 
 function dataTable(hdrs: Array<{ text: string; w: number }>, rows: Array<Array<{ text: string; bold?: boolean; color?: string }>>, accent: string): Table {
   return new Table({
     width: { size: W, type: WidthType.DXA },
+    columnWidths: hdrs.map(col => col.w),
     rows: [
       new TableRow({ children: hdrs.map(col => hdrCell(col.text, col.w, accent)) }),
       ...rows.map((row, ri) => new TableRow({

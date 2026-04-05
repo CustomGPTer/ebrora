@@ -108,7 +108,7 @@ export async function buildNcrDocument(content: any): Promise<Document> {
           h.spacer(200),
 
           section('Immediate Containment Actions'),
-          ...(Array.isArray(content.immediateContainmentActions) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.immediateContainmentActions) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.45), Math.round(W * 0.2), Math.round(W * 0.18), W - Math.round(W * 0.83)], rows: [
             new TableRow({ children: [
               h.headerCell('Action', Math.round(W * 0.45), { fontSize: 14 }),
               h.headerCell('Taken By', Math.round(W * 0.2), { fontSize: 14 }),
@@ -125,7 +125,7 @@ export async function buildNcrDocument(content: any): Promise<Document> {
           h.spacer(200),
 
           section('Corrective Actions'),
-          ...(Array.isArray(content.correctiveActions) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.correctiveActions) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.30), Math.round(W * 0.15), Math.round(W * 0.11), Math.round(W * 0.09), Math.round(W * 0.09), W - Math.round(W * 0.80)], rows: [
             new TableRow({ children: [
               h.headerCell('No.', Math.round(W * 0.06), { fontSize: 13 }),
               h.headerCell('Corrective Action', Math.round(W * 0.30), { fontSize: 13 }),
@@ -151,7 +151,7 @@ export async function buildNcrDocument(content: any): Promise<Document> {
         properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader() }, footers: { default: h.ebroraFooter() },
         children: [
           section('Preventive Actions'),
-          ...(Array.isArray(content.preventiveActions) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.preventiveActions) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.38), Math.round(W * 0.18), Math.round(W * 0.14), Math.round(W * 0.10), W - Math.round(W * 0.86)], rows: [
             new TableRow({ children: [
               h.headerCell('No.', Math.round(W * 0.06), { fontSize: 14 }),
               h.headerCell('Preventive Action', Math.round(W * 0.38), { fontSize: 14 }),

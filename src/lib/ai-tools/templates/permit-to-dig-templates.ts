@@ -160,6 +160,7 @@ function cols(fracs: number[]): number[] { return fracs.map(f => Math.round(W * 
 function dataTable(hdrs: Array<{ text: string; w: number }>, rows: Array<Array<{ text: string; bold?: boolean; color?: string }>>, accent: string): Table {
   return new Table({
     width: { size: W, type: WidthType.DXA },
+    columnWidths: hdrs.map(col => col.w),
     rows: [
       new TableRow({ children: hdrs.map(col => hdrCell(col.text, col.w, accent)) }),
       ...rows.map((row, ri) => new TableRow({
@@ -190,6 +191,7 @@ function infoTable2(rows: Array<{ label: string; value: string }>, accent: strin
   const borders = { top: border, bottom: border, left: border, right: border };
   return new Table({
     width: { size: W, type: WidthType.DXA },
+    columnWidths: [lw, W - lw],
     rows: rows.map(r => new TableRow({ children: [
       new TableCell({ width: { size: lw, type: WidthType.DXA }, borders, margins: { top: 50, bottom: 50, left: 100, right: 100 },
         children: [new Paragraph({ children: [new TextRun({ text: r.label, bold: true, size: BODY, font: 'Arial' })] })] }),

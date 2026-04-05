@@ -387,6 +387,7 @@ function infoTable(rows: Array<{ label: string; value: string }>, labelBg: strin
   const valueW = W - labelW;
   return new Table({
     width: { size: W, type: WidthType.DXA },
+    columnWidths: [labelW, valueW],
     rows: rows.map((r, i) => infoRow(r.label, r.value, labelW, valueW, labelBg, labelColor, i)),
   });
 }
@@ -402,6 +403,7 @@ function dataTable(
 ): Table {
   return new Table({
     width: { size: W, type: WidthType.DXA },
+    columnWidths: headers.map(hdr => hdr.width),
     rows: [
       new TableRow({
         children: headers.map(hdr => new TableCell({
@@ -436,6 +438,7 @@ function dataTable(
 function signOff(roles: string[], headerBg: string, cols: Array<{ text: string; width: number }>): Table {
   return new Table({
     width: { size: W, type: WidthType.DXA },
+    columnWidths: cols.map(c => c.width),
     rows: [
       new TableRow({
         children: cols.map(c => new TableCell({
@@ -488,6 +491,7 @@ function buildProductIdSection(d: CoshhData, num: string, accent: string, labelB
     secHead(num, 'Product Identification', accent, font),
     new Table({
       width: { size: W, type: WidthType.DXA },
+      columnWidths: [labelW, valueW],
       rows: [
         infoRow('Product Name', d.productName, labelW, valueW, labelBg, labelColor, 0),
         infoRow('Manufacturer', d.manufacturer, labelW, valueW, labelBg, labelColor, 1),
@@ -527,6 +531,7 @@ function buildGhsSection(d: CoshhData, num: string, accent: string, labelBg: str
     secHead(num, 'GHS Classification & Hazard Statements', accent, font),
     new Table({
       width: { size: W, type: WidthType.DXA },
+      columnWidths: [labelW, valueW],
       rows: [
         infoRowWithChildren('GHS Pictograms', ghsPills(d.hazardClassification), labelW, valueW, labelBg, labelColor),
         infoRow('Signal Word', d.signalWord, labelW, valueW, labelBg, labelColor, 1),

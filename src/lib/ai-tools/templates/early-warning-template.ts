@@ -85,7 +85,7 @@ export async function buildEarlyWarningDocument(content: any): Promise<Document>
           h.spacer(200),
 
           section('Proposed Mitigation Measures'),
-          ...(Array.isArray(content.proposedMitigation) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.proposedMitigation) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.38), Math.round(W * 0.2), Math.round(W * 0.18), W - Math.round(W * 0.82)], rows: [
             new TableRow({ children: [
               h.headerCell('No.', Math.round(W * 0.06), { fontSize: 14 }),
               h.headerCell('Mitigation Action', Math.round(W * 0.38), { fontSize: 14 }),

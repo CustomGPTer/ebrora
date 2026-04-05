@@ -115,7 +115,7 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
 
           section('Persons Involved'),
           ...(Array.isArray(content.personsInvolved) && content.personsInvolved.length > 0
-            ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+            ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.18), Math.round(W * 0.15), Math.round(W * 0.15), Math.round(W * 0.22), Math.round(W * 0.18), W - Math.round(W * 0.88)], rows: [
                 new TableRow({ children: [
                   h.headerCell('Name', Math.round(W * 0.18), { fontSize: 14 }),
                   h.headerCell('Role', Math.round(W * 0.15), { fontSize: 14 }),
@@ -139,7 +139,7 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
 
           section('Witnesses'),
           ...(Array.isArray(content.witnesses) && content.witnesses.length > 0
-            ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+            ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.4), Math.round(W * 0.3), W - Math.round(W * 0.7)], rows: [
                 new TableRow({ children: [
                   h.headerCell('Name', Math.round(W * 0.4), { fontSize: 14 }),
                   h.headerCell('Role', Math.round(W * 0.3), { fontSize: 14 }),
@@ -164,7 +164,7 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
         children: [
           section('Immediate Causes'),
           ...(Array.isArray(content.immediateCauses) && content.immediateCauses.length > 0
-            ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+            ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.35), W - Math.round(W * 0.35)], rows: [
                 new TableRow({ children: [
                   h.headerCell('Cause', Math.round(W * 0.35), { fontSize: 14 }),
                   h.headerCell('Detail', W - Math.round(W * 0.35), { fontSize: 14 }),
@@ -211,7 +211,7 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
         children: [
           section('Immediate Actions Taken'),
           ...(Array.isArray(content.immediateActionsTaken) && content.immediateActionsTaken.length > 0
-            ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+            ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.5), Math.round(W * 0.3), W - Math.round(W * 0.8)], rows: [
                 new TableRow({ children: [
                   h.headerCell('Action', Math.round(W * 0.5), { fontSize: 14 }),
                   h.headerCell('Taken By', Math.round(W * 0.3), { fontSize: 14 }),
@@ -229,7 +229,7 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
 
           section('Corrective Actions'),
           ...(Array.isArray(content.correctiveActions) && content.correctiveActions.length > 0
-            ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+            ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.44), Math.round(W * 0.22), Math.round(W * 0.16), W - Math.round(W * 0.88)], rows: [
                 new TableRow({ children: [
                   h.headerCell('No.', Math.round(W * 0.06), { fontSize: 14 }),
                   h.headerCell('Corrective Action', Math.round(W * 0.44), { fontSize: 14 }),
@@ -251,7 +251,7 @@ export async function buildIncidentReportDocument(content: any): Promise<Documen
 
           section('Preventive Actions'),
           ...(Array.isArray(content.preventiveActions) && content.preventiveActions.length > 0
-            ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+            ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.44), Math.round(W * 0.22), Math.round(W * 0.16), W - Math.round(W * 0.88)], rows: [
                 new TableRow({ children: [
                   h.headerCell('No.', Math.round(W * 0.06), { fontSize: 14 }),
                   h.headerCell('Preventive Action', Math.round(W * 0.44), { fontSize: 14 }),

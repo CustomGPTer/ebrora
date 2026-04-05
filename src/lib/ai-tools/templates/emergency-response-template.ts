@@ -64,7 +64,7 @@ export async function buildEmergencyResponseDocument(content: any): Promise<Docu
         properties: { ...h.PORTRAIT_SECTION }, headers: { default: h.ebroraHeader() }, footers: { default: h.ebroraFooter() },
         children: [
           section('Key Site Contacts'),
-          ...(Array.isArray(content.keyContacts) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.keyContacts) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.35), Math.round(W * 0.35), W - Math.round(W * 0.7)], rows: [
             new TableRow({ children: [
               h.headerCell('Role', Math.round(W * 0.35), { fontSize: 14 }),
               h.headerCell('Name', Math.round(W * 0.35), { fontSize: 14 }),
@@ -143,7 +143,7 @@ export async function buildEmergencyResponseDocument(content: any): Promise<Docu
           h.spacer(200),
 
           section('Site-Specific Emergencies'),
-          ...(Array.isArray(content.siteSpecificEmergencies) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.siteSpecificEmergencies) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.35), W - Math.round(W * 0.35)], rows: [
             new TableRow({ children: [
               h.headerCell('Scenario', Math.round(W * 0.35), { fontSize: 14 }),
               h.headerCell('Procedure', W - Math.round(W * 0.35), { fontSize: 14 }),

@@ -16,7 +16,7 @@ function section(text: string): Paragraph {
 // prose() now imported from docx-helpers via h.prose()
 
 function checkTable(items: any[], W: number): Table {
-  return new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.06), Math.round(W * 0.28), Math.round(W * 0.26), Math.round(W * 0.12), Math.round(W * 0.06), Math.round(W * 0.1), W - Math.round(W * 0.88)], rows: [
     new TableRow({ children: [
       h.headerCell('Ref', Math.round(W * 0.06), { fontSize: 12 }),
       h.headerCell('Check Item', Math.round(W * 0.28), { fontSize: 12 }),
@@ -97,7 +97,7 @@ export async function buildQualityChecklistDocument(content: any): Promise<Docum
           h.spacer(200),
 
           section('Material Verification'),
-          ...(Array.isArray(content.materialVerification) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.materialVerification) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.3), Math.round(W * 0.25), Math.round(W * 0.3), W - Math.round(W * 0.85)], rows: [
             new TableRow({ children: [
               h.headerCell('Material', Math.round(W * 0.3), { fontSize: 14 }),
               h.headerCell('Specified Grade', Math.round(W * 0.25), { fontSize: 14 }),
@@ -114,7 +114,7 @@ export async function buildQualityChecklistDocument(content: any): Promise<Docum
           h.spacer(200),
 
           section('Testing Requirements'),
-          ...(Array.isArray(content.testingRequirements) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.testingRequirements) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.25), Math.round(W * 0.18), Math.round(W * 0.18), Math.round(W * 0.27), W - Math.round(W * 0.88)], rows: [
             new TableRow({ children: [
               h.headerCell('Test', Math.round(W * 0.25), { fontSize: 14 }),
               h.headerCell('Standard', Math.round(W * 0.18), { fontSize: 14 }),

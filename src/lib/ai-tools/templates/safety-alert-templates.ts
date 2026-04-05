@@ -77,6 +77,7 @@ function dCell(text: string, width: number, opts?: { fill?: string }) {
 function dataTable(headers: { text: string; width: number }[], rows: any[][], color = EBRORA): Table {
   return new Table({
     width: { size: W, type: WidthType.DXA },
+    columnWidths: headers.map(hd => hd.width),
     rows: [
       new TableRow({ children: headers.map(hd => hdrCell(hd.text, hd.width, color)) }),
       ...rows.map((cells, i) => new TableRow({

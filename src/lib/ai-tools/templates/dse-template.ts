@@ -156,6 +156,7 @@ export async function buildDseDocument(content: any): Promise<Document> {
     const cw = [Math.round(W*0.14), Math.round(W*0.30), Math.round(W*0.08), Math.round(W*0.30), Math.round(W*0.09), W - Math.round(W*0.14) - Math.round(W*0.30) - Math.round(W*0.08) - Math.round(W*0.30) - Math.round(W*0.09)];
     children.push(new Table({
       width: { size: W, type: WidthType.DXA },
+      columnWidths: [cw[0], cw[1], cw[2], cw[3], cw[4], cw[5]],
       rows: [
         new TableRow({ children: [
           h.headerCell('Area', cw[0]), h.headerCell('Finding', cw[1]),

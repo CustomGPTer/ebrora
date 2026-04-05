@@ -166,6 +166,7 @@ export function documentControlTable(
   const col = Math.floor(W / 5);
   return new Table({
     width: { size: W, type: WidthType.DXA },
+    columnWidths: [col, col, col, col, col],
     rows: [
       new TableRow({ children: [
         h.headerCell('Doc Ref',    col, { fontSize: 14 }),
@@ -245,7 +246,7 @@ export function dataTableSection(
 
   return [
     sectionBand(heading, accentHex),
-    new Table({ width: { size: W, type: WidthType.DXA }, rows: [headerRow, ...dataRows] }),
+    new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: colWidths, rows: [headerRow, ...dataRows] }),
     h.spacer(80),
   ];
 }

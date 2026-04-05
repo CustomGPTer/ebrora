@@ -130,7 +130,7 @@ export async function buildLiftPlanDocument(content: any): Promise<Document> {
           h.spacer(160),
 
           section('Proximity Hazards'),
-          ...(Array.isArray(content.proximityHazards) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.proximityHazards) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.35), Math.round(W * 0.2), W - Math.round(W * 0.55)], rows: [
             new TableRow({ children: [
               h.headerCell('Hazard', Math.round(W * 0.35), { fontSize: 14 }),
               h.headerCell('Distance', Math.round(W * 0.2), { fontSize: 14 }),
@@ -172,7 +172,7 @@ export async function buildLiftPlanDocument(content: any): Promise<Document> {
           h.spacer(160),
 
           section('Risk Assessment'),
-          ...(Array.isArray(content.riskAssessment) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+          ...(Array.isArray(content.riskAssessment) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.22), Math.round(W * 0.18), Math.round(W * 0.08), Math.round(W * 0.08), Math.round(W * 0.32), W - Math.round(W * 0.88)], rows: [
             new TableRow({ children: [
               h.headerCell('Hazard', Math.round(W * 0.22), { fontSize: 12 }),
               h.headerCell('Risk', Math.round(W * 0.18), { fontSize: 12 }),

@@ -57,7 +57,7 @@ export async function buildPowraDocument(content: any): Promise<Document> {
         h.spacer(120),
 
         section('Hazards, Controls & Risk Rating'),
-        ...(Array.isArray(content.hazards) ? [new Table({ width: { size: W, type: WidthType.DXA }, rows: [
+        ...(Array.isArray(content.hazards) ? [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W * 0.22), Math.round(W * 0.18), Math.round(W * 0.1), Math.round(W * 0.38), W - Math.round(W * 0.88)], rows: [
           new TableRow({ children: [
             h.headerCell('Hazard', Math.round(W * 0.22), { fontSize: 13 }),
             h.headerCell('Consequence', Math.round(W * 0.18), { fontSize: 13 }),

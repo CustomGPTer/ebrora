@@ -52,33 +52,132 @@ interface MhData {
 
 function extract(c: any): MhData {
   const s = (k: string, fb = '') => (typeof c?.[k] === 'string' ? c[k] : fb);
+  const sf = (keys: string[], fb = '') => {
+    for (const k of keys) { if (typeof c?.[k] === 'string' && c[k].trim()) return c[k]; }
+    return fb;
+  };
   const a = (k: string) => (Array.isArray(c?.[k]) ? c[k] : []);
+  const af = (keys: string[]) => {
+    for (const k of keys) { if (Array.isArray(c?.[k]) && c[k].length > 0) return c[k]; }
+    return [];
+  };
   const tile = c?.tileAssessment || {};
   const mac = c?.macScoring || {};
   const rapp = c?.rappScoring || {};
+
+  // Map task description from multiple possible field names
+  const taskDescription = sf(['taskDescription', 'activityDescription', 'task']);
+
+  // Map TILE arrays — check both top-level and nested tileAssessment object
+  const tileTask = af(['tileTask']).length > 0 ? af(['tileTask']) : (Array.isArray(tile.task) ? tile.task : []);
+  const tileIndividual = af(['tileIndividual']).length > 0 ? af(['tileIndividual']) : (Array.isArray(tile.individual) ? tile.individual : []);
+  const tileLoad = af(['tileLoad']).length > 0 ? af(['tileLoad']) : (Array.isArray(tile.load) ? tile.load : []);
+  const tileEnvironment = af(['tileEnvironment']).length > 0 ? af(['tileEnvironment']) : (Array.isArray(tile.environment) ? tile.environment : []);
+
+  // Map controls from multiple possible field names
+  const controls = af(['controls', 'hierarchyOfControl', 'controlMeasures']).map((ctrl: any) => ({
+    level: ctrl.level || ctrl.hierarchy || ctrl.controlLevel || '',
+    control: ctrl.control || ctrl.measure || ctrl.description || '',
+    implementation: ctrl.implementation || ctrl.detail || ctrl.how || '',
+  }));
+
+  // Get MAC factors — normalise field names
+  const rawMacFactors = af(['macFactors']).length > 0 ? af(['macFactors']) : (Array.isArray(mac.factors) ? mac.factors : []);
+  const macFactors = rawMacFactors.map((f: any) => ({
+    factor: f.factor || f.name || '',
+    assessment: f.assessment || f.description || f.detail || '',
+    band: f.band || f.colourBand || f.colour || f.color || '',
+    score: String(f.score ?? ''),
+  }));
+
+  // Auto-compute MAC totals from factors when AI returns 0 or blank
+  let macTotalRaw = s('macTotal') || mac.total || '';
+  let macRedCountRaw = s('macRedCount') || mac.redCount || '';
+  let macAmberCountRaw = s('macAmberCount') || mac.amberCount || '';
+  let macGreenCountRaw = s('macGreenCount') || mac.greenCount || '';
+
+  if (macFactors.length > 0) {
+    // Sum scores
+    const computedTotal = macFactors.reduce((sum: number, f: any) => sum + (Number(f.score) || 0), 0);
+    if (!macTotalRaw || macTotalRaw === '0' || macTotalRaw === '—') {
+      macTotalRaw = String(computedTotal);
+    }
+
+    // Count colour bands
+    const computedRed = macFactors.filter((f: any) => {
+      const b = (f.band || '').toLowerCase();
+      const sc = Number(f.score) || 0;
+      return b.includes('red') || b === 'r' || sc >= 4;
+    }).length;
+    const computedAmber = macFactors.filter((f: any) => {
+      const b = (f.band || '').toLowerCase();
+      const sc = Number(f.score) || 0;
+      return b.includes('amber') || b === 'a' || (sc >= 2 && sc < 4 && !b.includes('red') && !b.includes('green'));
+    }).length;
+    const computedGreen = macFactors.filter((f: any) => {
+      const b = (f.band || '').toLowerCase();
+      const sc = Number(f.score) || 0;
+      return b.includes('green') || b === 'g' || sc <= 1;
+    }).length;
+
+    if (!macRedCountRaw || macRedCountRaw === '0') macRedCountRaw = String(computedRed);
+    if (!macAmberCountRaw || macAmberCountRaw === '0') macAmberCountRaw = String(computedAmber);
+    if (!macGreenCountRaw || macGreenCountRaw === '0') macGreenCountRaw = String(computedGreen);
+
+    // Auto-assign colour bands if missing
+    macFactors.forEach((f: any) => {
+      if (!f.band) {
+        const sc = Number(f.score) || 0;
+        if (sc >= 4) f.band = 'Red';
+        else if (sc >= 2) f.band = 'Amber';
+        else f.band = 'Green';
+      }
+    });
+  }
+
+  // Auto-compute MAC interpretation if generic
+  let macInterpretation = s('macInterpretation') || mac.interpretation || '';
+  if (!macInterpretation || macInterpretation.includes('see scoring table above')) {
+    const total = Number(macTotalRaw) || 0;
+    const redCount = Number(macRedCountRaw) || 0;
+    if (total >= 21 || redCount >= 3) {
+      macInterpretation = `The total MAC score of ${total} places this task in the RED zone, indicating an unacceptable level of risk requiring immediate action. ${redCount} individual factor(s) scored in the red band. The task must not continue in its current form — engineering controls, mechanical aids, or task redesign must be implemented before the next shift. A revised assessment is required after changes are made.`;
+    } else if (total >= 7) {
+      macInterpretation = `The total MAC score of ${total} places this task in the AMBER zone, indicating a moderate level of risk that warrants further investigation and improvement. Priority should be given to reducing the ${redCount > 0 ? redCount + ' red-banded factor(s)' : 'highest-scoring factors'} through engineering controls, work organisation changes, or mechanical aids. The assessment should be reviewed within 4 weeks of implementing improvements.`;
+    } else {
+      macInterpretation = `The total MAC score of ${total} places this task in the GREEN zone, indicating that the manual handling risks are adequately controlled under current arrangements. No immediate action is required, but the assessment should be reviewed annually, after any incident, or if the task, load, or environment changes. Supervisors should continue to monitor handling technique.`;
+    }
+  }
+
+  // Auto-compute residual risk if blank
+  let residualRisk = sf(['residualRisk', 'overallRisk']);
+  if (!residualRisk) {
+    const total = Number(macTotalRaw) || 0;
+    if (total >= 21) residualRisk = 'High';
+    else if (total >= 7) residualRisk = 'Medium';
+    else if (total > 0) residualRisk = 'Low';
+  }
+
   return {
     documentRef: s('documentRef', 'MH-001'), assessmentDate: s('assessmentDate') || s('planDate'),
     reviewDate: s('reviewDate'), assessedBy: s('assessedBy') || s('preparedBy'),
     projectName: s('projectName'), siteAddress: s('siteAddress'),
-    taskDescription: s('taskDescription'), methodology: s('methodology') || 'TILE',
-    residualRisk: s('residualRisk'),
-    tileTask: a('tileTask').length > 0 ? a('tileTask') : (tile.task || []),
-    tileIndividual: a('tileIndividual').length > 0 ? a('tileIndividual') : (tile.individual || []),
-    tileLoad: a('tileLoad').length > 0 ? a('tileLoad') : (tile.load || []),
-    tileEnvironment: a('tileEnvironment').length > 0 ? a('tileEnvironment') : (tile.environment || []),
-    controls: a('controls').length > 0 ? a('controls') : a('hierarchyOfControl'),
+    taskDescription, methodology: s('methodology') || 'TILE',
+    residualRisk,
+    tileTask, tileIndividual, tileLoad, tileEnvironment,
+    controls,
     residualKpis: a('residualKpis'),
-    macFactors: a('macFactors').length > 0 ? a('macFactors') : (mac.factors || []),
-    macTotal: s('macTotal') || mac.total || '', macRedCount: s('macRedCount') || mac.redCount || '',
-    macAmberCount: s('macAmberCount') || mac.amberCount || '', macGreenCount: s('macGreenCount') || mac.greenCount || '',
-    macInterpretation: s('macInterpretation') || mac.interpretation || '',
-    improvements: a('improvements').length > 0 ? a('improvements') : a('priorityImprovements'),
+    macFactors,
+    macTotal: macTotalRaw, macRedCount: macRedCountRaw,
+    macAmberCount: macAmberCountRaw, macGreenCount: macGreenCountRaw,
+    macInterpretation,
+    improvements: af(['improvements', 'priorityImprovements']),
     revisedMacScore: s('revisedMacScore') || mac.revisedScore || '',
-    rappFactors: a('rappFactors').length > 0 ? a('rappFactors') : (rapp.factors || []),
+    rappFactors: af(['rappFactors']).length > 0 ? af(['rappFactors']) : (Array.isArray(rapp.factors) ? rapp.factors : []),
     rappTotal: s('rappTotal') || rapp.total || '', rappRedCount: s('rappRedCount') || rapp.redCount || '',
     rappAmberCount: s('rappAmberCount') || rapp.amberCount || '',
     rappOutcome: s('rappOutcome') || rapp.outcome || '',
-    trainingRules: a('trainingRules').length > 0 ? a('trainingRules') : a('keyRules'),
+    trainingRules: af(['trainingRules', 'keyRules']),
     liftingTechnique: s('liftingTechnique') || s('correctTechnique'),
     regulatoryRefs: s('regulatoryReferences') || (a('regulatoryReferences').map((r: any) => `${r.reference} — ${r.description}`).join('. ')),
     additionalNotes: s('additionalNotes'), monitoringNote: s('monitoringNote'),

@@ -62,26 +62,134 @@ interface CsData {
 
 function extract(c: any): CsData {
   const s = (k: string, fb = '') => (typeof c?.[k] === 'string' ? c[k] : fb);
+  // Try primary key then fallback key(s)
+  const sf = (keys: string[], fb = '') => {
+    for (const k of keys) { if (typeof c?.[k] === 'string' && c[k].trim()) return c[k]; }
+    return fb;
+  };
   const a = (k: string) => (Array.isArray(c?.[k]) ? c[k] : []);
+  // Try primary key then fallback key(s) for arrays
+  const af = (keys: string[]) => {
+    for (const k of keys) { if (Array.isArray(c?.[k]) && c[k].length > 0) return c[k]; }
+    return [];
+  };
+
+  // Map simops fields: schema uses potentialImpact/controlMeasure, builder expects impact/control
+  const rawSimops = af(['simops']);
+  const simops = rawSimops.map((s2: any) => ({
+    activity: s2.activity || '',
+    impact: s2.impact || s2.potentialImpact || '',
+    control: s2.control || s2.controlMeasure || '',
+    risk: s2.risk || '',
+    acceptable: s2.acceptable || '',
+  }));
+
+  // Map competency: schema uses competencyRoles[], builder expects competencyRequirements[]
+  const rawComp = af(['competencyRequirements', 'competencyRoles']);
+  const competencyRequirements = rawComp.map((cr: any) => ({
+    role: cr.role || '',
+    training: cr.training || cr.requiredTraining || '',
+    evidence: cr.evidence || '',
+    refresher: cr.refresher || '',
+  }));
+
+  // Map PPE: schema uses ppeItems[], builder expects ppeEquipment[]
+  const ppeEquipment = af(['ppeEquipment', 'ppeItems']).map((p: any) => ({
+    item: p.item || p.type || '',
+    specification: p.specification || '',
+    standard: p.standard || '',
+    mandatory: p.mandatory || 'Yes',
+  }));
+
+  // Build durationLimits from separate fields if not a single string
+  let durationLimits = sf(['durationLimits']);
+  if (!durationLimits) {
+    const parts: string[] = [];
+    if (c?.maxContinuousWork) parts.push(`Maximum continuous work period: ${c.maxContinuousWork}.`);
+    if (c?.maxShiftDuration) parts.push(`Maximum shift duration: ${c.maxShiftDuration}.`);
+    if (c?.hydration) parts.push(`Hydration: ${c.hydration}.`);
+    if (c?.heatStressIndicators) parts.push(`Heat stress indicators: ${c.heatStressIndicators}.`);
+    if (c?.scbaWeightFactor) parts.push(`SCBA weight factor: ${c.scbaWeightFactor}.`);
+    if (parts.length > 0) durationLimits = parts.join('\n\n');
+  }
+
+  // Build rescuePlan from emergencyRescuePlan object if not a single string
+  let rescuePlan = sf(['rescuePlan']);
+  if (!rescuePlan && c?.emergencyRescuePlan) {
+    const erp = c.emergencyRescuePlan;
+    const parts: string[] = [];
+    if (erp.rescueMethod) parts.push(`Rescue method: ${erp.rescueMethod}.`);
+    if (erp.rescueEquipment) parts.push(`Equipment: ${erp.rescueEquipment}.`);
+    if (erp.rescueTeamDetails) parts.push(`Rescue team: ${erp.rescueTeamDetails}.`);
+    if (erp.procedureDescription) parts.push(erp.procedureDescription);
+    if (parts.length > 0) rescuePlan = parts.join('\n\n');
+  }
+
+  // Build controlsSummary from safeSystemOfWork if not directly provided
+  const controlsSummary = sf(['controlsSummary', 'safeSystemOfWork']);
+
+  // Build regulatoryReferences — handle both string and array formats
+  let regulatoryReferences = sf(['regulatoryReferences']);
+  if (!regulatoryReferences && Array.isArray(c?.regulatoryReferences)) {
+    regulatoryReferences = c.regulatoryReferences
+      .map((r: any) => `${r.reference || r.ref || ''} — ${r.description || ''}`)
+      .join('\n\n');
+  }
+
+  // Map gasReadings: schema uses historicalReadings, builder expects gasReadings
+  const gasReadings = af(['gasReadings', 'historicalReadings']);
+
+  // Map isolationMatrix: schema uses isolations, builder expects isolationMatrix
+  const isolationMatrix = af(['isolationMatrix', 'isolations']);
+
+  // Map entryProcedure: schema uses entrySteps, builder expects entryProcedure
+  const entryProcedure = af(['entryProcedure', 'entrySteps', 'entrySequence']);
+
+  // Map multiCasualtyDecisions: schema uses multiCasualtyScenarios
+  const multiCasualtyDecisions = af(['multiCasualtyDecisions', 'multiCasualtyScenarios']);
+
+  // Map frsDetails from separate fields if not an array
+  let frsDetails = af(['frsDetails']);
+  if (frsDetails.length === 0) {
+    const frs: Array<{ label: string; value: string }> = [];
+    if (c?.frsPreNotify) frs.push({ label: 'Pre-Notified', value: c.frsPreNotify });
+    if (c?.frsContact) frs.push({ label: 'FRS Contact', value: c.frsContact });
+    if (c?.frsInfoProvided) frs.push({ label: 'Info Provided', value: c.frsInfoProvided });
+    if (c?.frsAccess) frs.push({ label: 'Site Access', value: c.frsAccess });
+    frsDetails = frs;
+  }
+
+  // Map hospitalDetails from separate fields if not an array
+  let hospitalDetails = af(['hospitalDetails']);
+  if (hospitalDetails.length === 0) {
+    const hosp: Array<{ label: string; value: string }> = [];
+    if (c?.hospitalName || c?.nearestAE) hosp.push({ label: 'Hospital', value: c.hospitalName || c.nearestAE || '' });
+    if (c?.hospitalDistance) hosp.push({ label: 'Distance', value: c.hospitalDistance });
+    if (c?.hospitalRoute) hosp.push({ label: 'Route', value: c.hospitalRoute });
+    if (c?.hospitalGridRef) hosp.push({ label: 'Grid Ref', value: c.hospitalGridRef });
+    hospitalDetails = hosp;
+  }
+
   return {
     documentRef: s('documentRef', 'CS-001'), assessmentDate: s('assessmentDate'), reviewDate: s('reviewDate'),
     assessedBy: s('assessedBy'), projectName: s('projectName'), siteAddress: s('siteAddress'),
-    contractor: s('contractor'), spaceName: s('spaceName'), classification: s('classification'),
-    accessType: s('accessType'), task: s('task'), maxDuration: s('maxDuration'),
+    contractor: sf(['contractor'], '—'), spaceName: s('spaceName'), classification: s('classification'),
+    accessType: s('accessType'), task: sf(['task', 'reasonForEntry']),
+    maxDuration: sf(['maxDuration', 'maxContinuousWork'], '—'),
     spaceIdentification: a('spaceIdentification'), hazards: a('hazards'),
-    adjacentSpaces: a('adjacentSpaces'), gasReadings: a('gasReadings'),
-    atmosphericParams: a('atmosphericParams'), isolationMatrix: a('isolationMatrix'),
-    simops: a('simops'), entryProcedure: a('entryProcedure'),
-    durationLimits: s('durationLimits'), rescuePlan: s('rescuePlan'),
-    ppeEquipment: a('ppeEquipment'), competencyRequirements: a('competencyRequirements'),
-    regulatoryReferences: s('regulatoryReferences'),
-    dangerBoxes: a('dangerBoxes'), controlsSummary: s('controlsSummary'),
+    adjacentSpaces: a('adjacentSpaces'), gasReadings,
+    atmosphericParams: a('atmosphericParams'), isolationMatrix,
+    simops, entryProcedure,
+    durationLimits, rescuePlan,
+    ppeEquipment, competencyRequirements,
+    regulatoryReferences,
+    dangerBoxes: a('dangerBoxes'), controlsSummary,
     rescuerFatalityWarning: s('rescuerFatalityWarning'),
     preEntryChecklist: a('preEntryChecklist'), authorisationChain: a('authorisationChain'),
     permitCancellation: a('permitCancellation'),
     rescueSteps: a('rescueSteps'), extractionMethod: s('extractionMethod'),
-    multiCasualtyDecisions: a('multiCasualtyDecisions'),
-    frsDetails: a('frsDetails'), hospitalDetails: a('hospitalDetails'),
+    multiCasualtyDecisions,
+    frsDetails, hospitalDetails,
     rescueEquipment: a('rescueEquipment'), additionalNotes: s('additionalNotes'),
   };
 }
@@ -262,7 +370,7 @@ function buildT1(d: CsData): Document {
             d.competencyRequirements.map(c => [c.role, c.training, c.evidence, c.refresher])
           )] : []),
           h.spacer(80), h.fullWidthSectionBar('13', 'REGULATORY REFERENCES', A), h.spacer(80),
-          ...h.richBodyText(d.regulatoryReferences || 'Confined Spaces Regulations 1997. HSE ACOP L101. EH40/2005. COSHH 2002. WAH Regs 2005. PUWER 1998.'),
+          ...h.richBodyText(d.regulatoryReferences || 'Confined Spaces Regulations 1997 — Primary legislation governing entry into confined spaces, requiring risk assessment and safe systems of work.\n\nHSE ACoP L101 — Approved Code of Practice and guidance on the Confined Spaces Regulations 1997.\n\nEH40/2005 Workplace Exposure Limits (4th Edition, 2020) — Occupational exposure limits for hazardous substances including H₂S, CO, and O₂ thresholds.\n\nCOSHH Regulations 2002 — Control of substances hazardous to health, applicable to atmospheric contaminants.\n\nWork at Height Regulations 2005 — Applies to ladder access, harness use, and fall protection during entry/egress.\n\nPUWER 1998 — Provision and Use of Work Equipment Regulations, applicable to gas monitors, ventilation, rescue equipment.'),
           h.spacer(80),
           h.signatureGrid(['Assessed By', 'Approved By'], A, W),
           h.spacer(80), ...h.endMark(A),
