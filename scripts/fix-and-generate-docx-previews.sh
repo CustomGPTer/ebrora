@@ -78,9 +78,25 @@ done
 if [[ "$install_needed" == "true" ]]; then
   echo ""
   echo "  Installing missing dependencies..."
-  sudo apt-get update -qq
+
+  # Codespaces ships a Yarn repo with an expired GPG key that
+  # poisons apt-get update. Disable it temporarily if present.
+  YARN_LIST="/etc/apt/sources.list.d/yarn.list"
+  YARN_DISABLED=false
+  if [[ -f "$YARN_LIST" ]]; then
+    sudo mv "$YARN_LIST" "${YARN_LIST}.disabled"
+    YARN_DISABLED=true
+    echo "  (disabled broken yarn repo for apt-get update)"
+  fi
+
+  sudo apt-get update -qq 2>/dev/null
   sudo apt-get install -y -qq libreoffice-writer poppler-utils imagemagick fonts-dejavu >/dev/null 2>&1
   echo "  ✓ Dependencies installed"
+
+  # Re-enable yarn repo
+  if [[ "$YARN_DISABLED" == "true" && -f "${YARN_LIST}.disabled" ]]; then
+    sudo mv "${YARN_LIST}.disabled" "$YARN_LIST"
+  fi
 fi
 
 # Font fallback
