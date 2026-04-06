@@ -46,36 +46,45 @@ async function exportPDF(
   drawFld("Date:", header.date, M + CW / 2, y, 30);
   y += 9;
 
-  doc.setFillColor(245, 245, 245); doc.rect(M, y - 2, CW, 5, "F");
+  // Data table — dark header + bordered cells
+  const tblCols = [12, 47, 22, 22, 22, 35, 28, 28, 28, 25];
   doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
-  const cols = [0, 8, 55, 80, 105, 130, 160, 195, 225, 255];
-  ["#", "Area/Element", "L (m)", "W (m)", "D (m)", "Soil Type", "Bank m³", "Bulked m³", "Tonnes", "Wagons"].forEach((h, i) => doc.text(h, M + cols[i], y + 1));
-  y += 5.5; doc.setFont("helvetica", "normal");
+  let cx = M;
+  ["#", "Area/Element", "L (m)", "W (m)", "D (m)", "Soil Type", "Bank m3", "Bulked m3", "Tonnes", "Wagons"].forEach((h, i) => {
+    doc.setFillColor(30, 30, 30); doc.rect(cx, y, tblCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += tblCols[i];
+  });
+  doc.setTextColor(0, 0, 0); y += 6;
 
+  doc.setFontSize(6); doc.setDrawColor(200, 200, 200);
   rows.forEach((row, i) => {
     const res = calculateExcavation(row, wagonTonnes);
     if (res.bankM3 === 0) return;
     if (y > 195) { doc.addPage(); y = M; }
     const soil = SOIL_TYPES.find(s => s.id === row.soilTypeId);
-    doc.text(String(i + 1), M + cols[0], y);
-    doc.text(row.label || `Area ${i + 1}`, M + cols[1], y);
-    doc.text(fmtNum(row.length ?? 0, 1), M + cols[2], y);
-    doc.text(fmtNum(row.width ?? 0, 1), M + cols[3], y);
-    doc.text(fmtNum(row.depth ?? 0, 1), M + cols[4], y);
-    doc.text(soil?.name || "—", M + cols[5], y);
-    doc.text(fmtNum(res.bankM3, 1), M + cols[6], y);
-    doc.text(fmtNum(res.bulkedM3, 1), M + cols[7], y);
-    doc.text(fmtNum(res.tonnes, 1), M + cols[8], y);
-    doc.text(fmtNum(res.wagonLoads, 1), M + cols[9], y);
-    y += 4.5;
+    const rowH = 5.5; cx = M;
+    [String(i + 1), row.label || `Area ${i + 1}`, fmtNum(row.length ?? 0, 1), fmtNum(row.width ?? 0, 1), fmtNum(row.depth ?? 0, 1), soil?.name || "-", fmtNum(res.bankM3, 1), fmtNum(res.bulkedM3, 1), fmtNum(res.tonnes, 1), fmtNum(res.wagonLoads, 1)].forEach((t, ci) => {
+      doc.rect(cx, y, tblCols[ci], rowH, "D");
+      doc.setTextColor(0, 0, 0); doc.setFont("helvetica", ci <= 1 ? "bold" : "normal");
+      const lines = doc.splitTextToSize(t, tblCols[ci] - 4);
+      doc.text(lines, cx + 2, y + 3.5); cx += tblCols[ci];
+    });
+    y += rowH;
   });
 
-  y += 2; doc.setDrawColor(30, 30, 30); doc.line(M, y, W - M, y); y += 4;
-  doc.setFont("helvetica", "bold"); doc.setFontSize(7); doc.text("TOTALS", M, y);
-  doc.text(fmtNum(totals.bankM3, 1), M + cols[6], y);
-  doc.text(fmtNum(totals.bulkedM3, 1), M + cols[7], y);
-  doc.text(fmtNum(totals.tonnes, 1), M + cols[8], y);
-  doc.text(`${Math.ceil(totals.wagonLoads)}`, M + cols[9], y);
+  // Totals row
+  y += 1; cx = M;
+  const emptyBefore = tblCols.slice(0, 6).reduce((s, w) => s + w, 0);
+  doc.setFillColor(245, 245, 245); doc.setDrawColor(200, 200, 200);
+  doc.rect(M, y, emptyBefore, 6, "FD");
+  doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold"); doc.setFontSize(7);
+  doc.text("TOTALS", M + 2, y + 4);
+  cx = M + emptyBefore;
+  [fmtNum(totals.bankM3, 1), fmtNum(totals.bulkedM3, 1), fmtNum(totals.tonnes, 1), `${Math.ceil(totals.wagonLoads)}`].forEach((t, i) => {
+    doc.setFillColor(245, 245, 245); doc.rect(cx, y, tblCols[6 + i], 6, "FD");
+    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold"); doc.text(t, cx + 2, y + 4);
+    cx += tblCols[6 + i];
+  });
 
   // Sign-off
   y += 12; if (y > 180) { doc.addPage(); y = M; }
