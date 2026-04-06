@@ -116,6 +116,16 @@ const TOOL_META: Record<
     accent: "#0E7490",
     accentLight: "rgba(14,116,144,0.08)",
   },
+  "brick-block-calculator": {
+    icon: "🧱",
+    accent: "#DC2626",
+    accentLight: "rgba(220,38,38,0.08)",
+  },
+  "concrete-pour-planner": {
+    icon: "🏗️",
+    accent: "#4F46E5",
+    accentLight: "rgba(79,70,229,0.08)",
+  },
 };
 
 const DEFAULT_META = {
