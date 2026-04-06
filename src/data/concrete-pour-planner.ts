@@ -184,7 +184,7 @@ export function calculatePour(inputs: PourInputs): PourResult {
 
   return {
     totalLoads,
-    totalPourDuration: lastEndMin - startMin,
+    totalPourDuration: lastEndMin >= startMin ? lastEndMin - startMin : (1440 - startMin) + lastEndMin,
     firstTruckArrival: minToTime(startMin),
     lastDischargeEnd: schedule.length > 0 ? schedule[schedule.length - 1].dischargeEnd : startTime,
     schedule,
