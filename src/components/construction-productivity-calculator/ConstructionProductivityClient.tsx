@@ -158,7 +158,7 @@ async function exportPDF(
 
     if (qty > 0) {
       const days = result.dailyOutput > 0 ? qty / result.dailyOutput : 0;
-      doc.text(`  Total quantity: ${fmtNum(qty, 0)} → ${fmtNum(days)} working days`, M + 2, y);
+      doc.text(`  Total quantity: ${fmtNum(qty, 0)} = ${fmtNum(days)} working days`, M + 2, y);
       y += 4;
     }
     // Section separator between tasks
