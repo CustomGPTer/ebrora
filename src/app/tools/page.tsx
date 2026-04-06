@@ -133,6 +133,17 @@ const TOOL_META: Record<
   },
 };
 
+const PAID_TOOL_SLUGS = new Set([
+  "concrete-volume-calculator",
+  "aggregate-calculator",
+  "excavation-spoil-calculator",
+  "trench-backfill-calculator",
+  "brick-block-calculator",
+  "concrete-pour-planner",
+  "hav-calculator",
+  "confined-space-calculator",
+]);
+
 const DEFAULT_META = {
   icon: "🔧",
   accent: "#1B5745",
@@ -152,8 +163,9 @@ export default async function ToolsPage() {
       />
       <PageHero
         badge="Free Tools"
-        title="Construction Calculators"
-        subtitle="Interactive tools for site supervisors, foremen, and safety professionals. Based on HSE methodologies and UK regulations."
+        title="Construction Calculators — The Biggest Selection of Construction Tools Available"
+        subtitle="Ready to download and attach to your safety packs and RAMS. Interactive calculators for site supervisors, foremen, and safety professionals. Based on HSE methodologies and UK regulations."
+        centered
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <BreadcrumbNav items={[{ label: "Free Tools" }]} />
@@ -205,9 +217,15 @@ export default async function ToolsPage() {
                           Coming Soon
                         </span>
                       )}
-                      <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
-                        Free
-                      </span>
+                      {PAID_TOOL_SLUGS.has(tool.slug) ? (
+                        <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                          Paid
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                          Free
+                        </span>
+                      )}
                     </div>
                   </div>
 
