@@ -7,6 +7,7 @@ import {
   MATERIALS, MATERIAL_CATEGORIES, DEFAULT_WAGON_TONNES, DEFAULT_BULK_BAG_TONNES,
   createEmptyRow, calculateRow,
 } from "@/data/aggregate-calculator";
+import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 
 function fmtNum(v: number, dp = 2): string {
   if (!Number.isFinite(v) || v === 0) return "—";
@@ -193,11 +194,13 @@ export default function AggregateCalculatorClient() {
           Settings
         </button>
         <div className="flex-1" />
+        <PaidDownloadButton hasData={hasData}>
         <button onClick={handleExport} disabled={!hasData || exporting}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${hasData ? "text-ebrora-dark bg-ebrora-light hover:bg-ebrora-mid" : "text-gray-400 bg-gray-100 cursor-not-allowed"}`}>
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
           {exporting ? "Generating…" : "Download PDF"}
         </button>
+        </PaidDownloadButton>
         <button onClick={clearAll} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">Clear All</button>
       </div>
 
