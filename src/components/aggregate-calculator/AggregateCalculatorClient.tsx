@@ -22,7 +22,7 @@ const GROUPED_MATERIALS = Object.entries(MATERIAL_CATEGORIES).map(([catId, catLa
 
 // ─── PDF (white-label) ───────────────────────────────────────────
 async function exportPDF(
-  header: { site: string; manager: string; preparedBy: string; date: string },
+  header: { company: string; site: string; manager: string; preparedBy: string; date: string },
   rows: AggregateRow[],
   wagonTonnes: number,
   bulkBagTonnes: number,
@@ -44,7 +44,7 @@ async function exportPDF(
   y = 28; doc.setTextColor(0, 0, 0);
 
   doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
-  doc.roundedRect(M, y - 3, CW, 14, 1, 1, "FD");
+  doc.roundedRect(M, y - 3, CW, 19, 1, 1, "FD");
   doc.setFontSize(8);
   const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
     doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
@@ -55,7 +55,9 @@ async function exportPDF(
   drawFld("Site:", header.site, M + 3, y, 50);
   drawFld("Site Manager:", header.manager, M + CW / 2, y, 40);
   y += 5;
-  drawFld("Prepared By:", header.preparedBy, M + 3, y, 50);
+  drawFld("Company:", header.company, M + 3, y, 50);
+  drawFld("Prepared By:", header.preparedBy, M + CW / 2, y, 40);
+  y += 5;
   drawFld("Date:", header.date, M + CW / 2, y, 30);
   y += 9;
 
@@ -133,7 +135,7 @@ export default function AggregateCalculatorClient() {
   const [wagonTonnes, setWagonTonnes] = useState(DEFAULT_WAGON_TONNES);
   const [bulkBagTonnes, setBulkBagTonnes] = useState(DEFAULT_BULK_BAG_TONNES);
   const [site, setSite] = useState(""); const [manager, setManager] = useState("");
-  const [preparedBy, setPreparedBy] = useState(""); const [assessDate, setAssessDate] = useState(todayISO());
+  const [preparedBy, setPreparedBy] = useState(""); const [company, setCompany] = useState(""); const [assessDate, setAssessDate] = useState(todayISO());
   const [showSettings, setShowSettings] = useState(false);
   const [exporting, setExporting] = useState(false);
 
@@ -159,7 +161,7 @@ export default function AggregateCalculatorClient() {
 
   const handleExport = useCallback(async () => {
     setExporting(true);
-    try { await exportPDF({ site, manager, preparedBy, date: assessDate }, rows, wagonTonnes, bulkBagTonnes, totals); }
+    try { await exportPDF({ company, site, manager, preparedBy, date: assessDate }, rows, wagonTonnes, bulkBagTonnes, totals); }
     finally { setExporting(false); }
   }, [site, manager, preparedBy, assessDate, rows, wagonTonnes, bulkBagTonnes, totals]);
 
