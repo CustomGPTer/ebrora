@@ -141,14 +141,14 @@ async function exportPDF(
 
     // Check rows
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(5);
+    doc.setFontSize(7);
     checks.forEach((check, ci) => {
       if (y > 270) { doc.addPage(); y = ML; }
 
       // Alternate row bg
       if (ci % 2 === 0) {
         doc.setFillColor(250, 250, 250);
-        doc.rect(ML, y - 2, CW, 4.5, "F");
+        doc.rect(ML, y - 2, CW, 5.5, "F");
       }
 
       doc.setTextColor(0, 0, 0);
@@ -160,24 +160,24 @@ async function exportPDF(
       while (doc.getTextWidth(txt) > maxW && txt.length > 10) {
         txt = txt.slice(0, -1);
       }
-      if (txt !== check) txt += "…";
+      if (txt !== check) txt += "...";
       doc.text(txt, ML + numCol + 1, y + 0.5);
 
       // Day cells
       DAYS.forEach((_, di) => {
         const dx = ML + numCol + checkColW + di * dayColW;
         doc.setDrawColor(220, 220, 220);
-        doc.rect(dx, y - 2, dayColW, 4.5);
+        doc.rect(dx, y - 2, dayColW, 5.5);
 
         if (!blankMode) {
           const key = `${ci}-${di}`;
           const mark = marks[key];
-          if (mark === "pass") { doc.setTextColor(22, 163, 74); doc.text("✓", dx + dayColW / 2 - 1, y + 0.5); }
-          else if (mark === "fail") { doc.setTextColor(220, 38, 38); doc.text("✗", dx + dayColW / 2 - 1, y + 0.5); }
+          if (mark === "pass") { doc.setTextColor(22, 163, 74); doc.text("Y", dx + dayColW / 2 - 1, y + 0.5); }
+          else if (mark === "fail") { doc.setTextColor(220, 38, 38); doc.text("X", dx + dayColW / 2 - 1, y + 0.5); }
           else if (mark === "na") { doc.setTextColor(120, 120, 120); doc.text("N/A", dx + dayColW / 2 - 3, y + 0.5); }
         }
       });
-      y += 4.5;
+      y += 5.5;
     });
 
     // Defect section
@@ -186,7 +186,7 @@ async function exportPDF(
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(6.5);
     doc.setFont("helvetica", "bold");
-    doc.text("DEFECT DETAILS / COMMENTS — If ✗ is placed in any box above, complete below AND inform Supervisor / Foreman IMMEDIATELY", ML, y);
+    doc.text("DEFECT DETAILS / COMMENTS — If X is placed in any box above, complete below AND inform Supervisor / Foreman IMMEDIATELY", ML, y);
     y += 4;
     for (let i = 0; i < 4; i++) {
       doc.setDrawColor(200, 200, 200);
