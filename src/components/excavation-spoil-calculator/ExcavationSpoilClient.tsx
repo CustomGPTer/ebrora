@@ -19,21 +19,29 @@ async function exportPDF(
   const doc = new jsPDF("l", "mm", "a4");
   const W = 297; const M = 12; const CW = W - M * 2; let y = 0;
 
+  const docRef = `EXC-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
   doc.setFillColor(30, 30, 30); doc.rect(0, 0, W, 22, "F");
   doc.setTextColor(255, 255, 255); doc.setFontSize(13); doc.setFont("helvetica", "bold");
   doc.text("EXCAVATION & SPOIL CALCULATION", M, 10);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text(`Generated ${new Date().toLocaleDateString("en-GB")} | Wagon: ${wagonTonnes}t`, M, 17);
+  doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")} | Wagon: ${wagonTonnes}t`, M, 17);
   y = 28; doc.setTextColor(0, 0, 0);
 
+  doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
+  doc.roundedRect(M, y - 3, CW, 14, 1, 1, "FD");
   doc.setFontSize(8);
-  [["Site:", header.site], ["Site Manager:", header.manager], ["Prepared By:", header.preparedBy], ["Date:", header.date]].forEach(([l, v], i) => {
-    const col = i % 2 === 0 ? M : M + CW / 2;
-    if (i > 0 && i % 2 === 0) y += 5;
-    doc.setFont("helvetica", "bold"); doc.text(l, col, y);
-    doc.setFont("helvetica", "normal"); doc.text(v || "—", col + 25, y);
-  });
-  y += 8;
+  const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
+    doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
+    const lw = doc.getTextWidth(label) + 2;
+    if (value) { doc.setFont("helvetica", "normal"); doc.text(value, x + lw, fy); }
+    else { doc.setDrawColor(180, 180, 180); doc.line(x + lw, fy, x + lw + lineW, fy); }
+  };
+  drawFld("Site:", header.site, M + 3, y, 50);
+  drawFld("Site Manager:", header.manager, M + CW / 2, y, 40);
+  y += 5;
+  drawFld("Prepared By:", header.preparedBy, M + 3, y, 50);
+  drawFld("Date:", header.date, M + CW / 2, y, 30);
+  y += 9;
 
   doc.setFillColor(245, 245, 245); doc.rect(M, y - 2, CW, 5, "F");
   doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
@@ -79,7 +87,7 @@ async function exportPDF(
   const pc = doc.getNumberOfPages();
   for (let p = 1; p <= pc; p++) { doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
     doc.text("Planning estimate. Verify with site investigations. Bulking factors and densities are typical UK values.", M, 205);
-    doc.text(`Page ${p} of ${pc}`, W - M - 20, 205);
+    doc.text(`Ref: ${docRef} | Page ${p} of ${pc}`, W - M - 50, 205);
   }
   doc.save(`excavation-spoil-${todayISO()}.pdf`);
 }
