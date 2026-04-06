@@ -86,6 +86,16 @@ const TOOL_META: Record<
     accent: "#DC2626",
     accentLight: "rgba(220,38,38,0.08)",
   },
+  "plant-pre-use-checksheet": {
+    icon: "📋",
+    accent: "#0D9488",
+    accentLight: "rgba(13,148,136,0.08)",
+  },
+  "construction-productivity-calculator": {
+    icon: "📊",
+    accent: "#7C3AED",
+    accentLight: "rgba(124,58,237,0.08)",
+  },
 };
 
 const DEFAULT_META = {
