@@ -128,10 +128,11 @@ async function exportPDF(
   ];
 
   const welCols = [70, 30, 30, 25, 31];
-  doc.setFillColor(30, 30, 30); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   let cx = M;
   ["Exposure Type", "8hr TWA", "WEL", "% of WEL", "Status"].forEach((h, i) => {
-    doc.rect(cx, y, welCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += welCols[i];
+    doc.setFillColor(30, 30, 30); doc.rect(cx, y, welCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += welCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
@@ -166,10 +167,11 @@ async function exportPDF(
   doc.text("Task Exposure Breakdown", M, y); y += 5;
 
   const tCols = [50, 20, 25, 25, 25, 41];
-  doc.setFillColor(30, 30, 30); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   cx = M;
   ["Activity", "Dur (min)", "RCS (mg/m3)", "Resp (mg/m3)", "Inhal (mg/m3)", "Controls Applied"].forEach((h, i) => {
-    doc.rect(cx, y, tCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += tCols[i];
+    doc.setFillColor(30, 30, 30); doc.rect(cx, y, tCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += tCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
