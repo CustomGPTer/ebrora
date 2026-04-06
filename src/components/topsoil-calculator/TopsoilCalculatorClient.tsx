@@ -80,10 +80,11 @@ async function exportPDF(
   doc.text("Area Take-Off", M, y); y += 5;
 
   const tCols = [40, 22, 22, 26, 26, 25, 25];
-  doc.setFillColor(27, 87, 69); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   let cx = M;
   ["Area", "m2", "Depth mm", "Vol m3", "Vol + Settle", "Tonnes (low)", "Tonnes (high)"].forEach((h, i) => {
-    doc.rect(cx, y, tCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += tCols[i];
+    doc.setFillColor(27, 87, 69); doc.rect(cx, y, tCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += tCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
@@ -99,9 +100,10 @@ async function exportPDF(
     y += 5.5;
   }
   // Totals row
-  doc.setFillColor(245, 245, 245); cx = M;
+  cx = M;
   ["TOTAL", "", "", fmtNum(totals.vol, 2), fmtNum(totals.volS, 2), fmtNum(totals.tonLow, 1), fmtNum(totals.tonHigh, 1)].forEach((t, i) => {
-    doc.rect(cx, y, tCols[i], 6, "FD"); doc.setFont("helvetica", "bold"); doc.text(t, cx + 2, y + 4); cx += tCols[i];
+    doc.setFillColor(245, 245, 245); doc.setDrawColor(200, 200, 200); doc.rect(cx, y, tCols[i], 6, "FD");
+    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold"); doc.text(t, cx + 2, y + 4); cx += tCols[i];
   });
   y += 12;
 
@@ -131,10 +133,11 @@ async function exportPDF(
   doc.text("BS 3882:2015 Topsoil Grade Specifications", M, y); y += 5;
 
   const gCols = [32, 35, 32, 87];
-  doc.setFillColor(27, 87, 69); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   cx = M;
   ["Grade", "Density (t/m3)", "pH Range", "Suitable For"].forEach((h, i) => {
-    doc.rect(cx, y, gCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += gCols[i];
+    doc.setFillColor(27, 87, 69); doc.rect(cx, y, gCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += gCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
@@ -144,16 +147,18 @@ async function exportPDF(
     const rowH = Math.max(5.5, suitLines.length * 2.5 + 2);
     checkPage(rowH);
     const isCurrent = g.id === grade.id;
-    if (isCurrent) doc.setFillColor(232, 240, 236);
     cx = M;
     [g.name, `${g.densityLow} - ${g.densityHigh}`, g.phRange].forEach((t, i) => {
-      doc.rect(cx, y, gCols[i], rowH, isCurrent ? "FD" : "D");
+      if (isCurrent) { doc.setFillColor(232, 240, 236); doc.rect(cx, y, gCols[i], rowH, "FD"); }
+      else { doc.rect(cx, y, gCols[i], rowH, "D"); }
+      doc.setTextColor(0, 0, 0);
       doc.setFont("helvetica", i === 0 || isCurrent ? "bold" : "normal");
       doc.text(t, cx + 2, y + 3.5);
       cx += gCols[i];
     });
-    doc.rect(cx, y, gCols[3], rowH, isCurrent ? "FD" : "D");
-    doc.setFont("helvetica", "normal");
+    if (isCurrent) { doc.setFillColor(232, 240, 236); doc.rect(cx, y, gCols[3], rowH, "FD"); }
+    else { doc.rect(cx, y, gCols[3], rowH, "D"); }
+    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
     doc.text(suitLines, cx + 2, y + 3.5);
     y += rowH;
   }
