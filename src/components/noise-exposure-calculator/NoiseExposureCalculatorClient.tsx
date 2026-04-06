@@ -148,9 +148,9 @@ async function exportPDF(
     { label: "Exposure Limit Value", value: "87 dB(A) LEP,d / 140 dB(C) peak (with HPE)", result: (protectedLEPd ?? lepd) >= ELV ? "EXCEEDED" : "OK" },
   ];
   const eCols = [60, 70, 56];
-  doc.setFillColor(30, 30, 30); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   let cx = M;
-  ["Threshold", "Value", "Status"].forEach((h, i) => { doc.rect(cx, y, eCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += eCols[i]; });
+  ["Threshold", "Value", "Status"].forEach((h, i) => { doc.setFillColor(30, 30, 30); doc.rect(cx, y, eCols[i], 6, "F"); doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += eCols[i]; });
   doc.setTextColor(0, 0, 0); y += 6;
   doc.setFontSize(6); doc.setDrawColor(200, 200, 200);
   for (const r of ealvRows) {
@@ -170,10 +170,11 @@ async function exportPDF(
   doc.text("Task Exposure Breakdown", M, y); y += 5;
 
   const tCols = [52, 22, 22, 22, 28, 40];
-  doc.setFillColor(30, 30, 30); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   cx = M;
   ["Activity", "Level dB(A)", "Peak dB(C)", "Dur (min)", "Partial LEP,d", "Max @ 85 dB(A)"].forEach((h, i) => {
-    doc.rect(cx, y, tCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += tCols[i];
+    doc.setFillColor(30, 30, 30); doc.rect(cx, y, tCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += tCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
