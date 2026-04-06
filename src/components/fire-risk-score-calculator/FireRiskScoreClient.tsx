@@ -75,7 +75,7 @@ async function exportPDF(
   const fields: [string, string][] = [
     ["Site:", header.site], ["Site Manager:", header.manager],
     ["Assessed By:", header.assessedBy], ["Date:", header.date],
-    ["Assessment Type:", `${modeLabel.icon} ${modeLabel.label}`],
+    ["Assessment Type:", modeLabel.label],
   ];
   const halfW = CW / 2;
   fields.forEach(([lbl, val], i) => {
@@ -244,7 +244,7 @@ async function exportPDF(
     section.questions.forEach(q => {
       checkPage(5);
       const answer = ss.answers[q.id];
-      const answerText = answer === "yes" ? "✓ Yes" : answer === "no" ? "✗ No" : answer === "na" ? "N/A" : "—";
+      const answerText = answer === "yes" ? "[YES]" : answer === "no" ? "[NO]" : answer === "na" ? "N/A" : "—";
       doc.text(`${answerText}  ${q.text}`, M + 2, y);
       y += 3.5;
     });
