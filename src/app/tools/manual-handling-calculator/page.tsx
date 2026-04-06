@@ -49,7 +49,7 @@ export default function ManualHandlingCalculatorPage() {
         ]}
       />
 
-      <div className="mb-6">
+      <div className="mb-6 text-center">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
           Manual Handling Risk Score Calculator
         </h1>
