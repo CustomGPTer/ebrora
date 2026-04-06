@@ -197,8 +197,8 @@ async function exportPDF(
   doc.setFillColor(245, 245, 245);
   doc.rect(M, y - 2, CW, 5, "F");
   doc.setFontSize(6.5);
-  const sCols = [0, 55, 90, 115, 135, 155];
-  ["Section", "Regulatory Reference", "Likelihood", "Consequence", "Score", "Rating"].forEach((h, i) => {
+  const sCols = [0, 50, 110, 130, 148, 163];
+  ["Section", "Regulatory Reference", "L", "C", "Score", "Rating"].forEach((h, i) => {
     doc.text(h, M + sCols[i], y + 1);
   });
   y += 5.5;
@@ -211,11 +211,11 @@ async function exportPDF(
     const hasAnswers = Object.values(ss.answers).some(a => a !== null);
     if (!hasAnswers) return;
 
-    doc.setFontSize(6.5);
-    doc.text(section.title.slice(0, 35), M + sCols[0], y);
-    doc.text(section.regulatoryRef.slice(0, 25), M + sCols[1], y);
-    doc.text(String(ss.likelihood), M + sCols[2] + 5, y);
-    doc.text(String(ss.consequence), M + sCols[3] + 5, y);
+    doc.setFontSize(6);
+    doc.text(section.title, M + sCols[0], y);
+    doc.text(section.regulatoryRef, M + sCols[1], y);
+    doc.text(String(ss.likelihood), M + sCols[2] + 3, y);
+    doc.text(String(ss.consequence), M + sCols[3] + 3, y);
     doc.text(String(ss.score), M + sCols[4] + 3, y);
 
     const ratingDef = OVERALL_RISK_DEFS.find(d => d.level === ss.rating)!;
