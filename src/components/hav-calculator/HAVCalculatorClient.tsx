@@ -10,6 +10,7 @@ import {
   newId, EAV_POINTS, ELV_POINTS,
   type DayData, type OperativeData, type ExposureEntry, type ViewMode, type ToolEntry,
 } from "@/data/hav-calculator";
+import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 
 function todayISO() { return new Date().toISOString().slice(0, 10); }
 function fmtNum(v: number, dp = 1): string { if (!Number.isFinite(v) || v === 0) return "--"; return v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
@@ -441,9 +442,11 @@ export default function HAVCalculatorClient() {
         <button onClick={switchToWeekly} className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${viewMode === "weekly" ? "text-purple-700 bg-purple-100 hover:bg-purple-200" : "text-gray-600 bg-gray-100 hover:bg-gray-200"}`}>
           {viewMode === "weekly" ? "Switch to Daily" : "Switch to Weekly"}</button>
         <div className="flex-1" />
+        <PaidDownloadButton hasData={hasData}>
         <button onClick={handleExport} disabled={!hasData || exporting} className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${hasData ? "text-ebrora-dark bg-ebrora-light hover:bg-ebrora-mid" : "text-gray-400 bg-gray-100 cursor-not-allowed"}`}>
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
           {exporting ? "Generating..." : "Download PDF"}</button>
+        </PaidDownloadButton>
         <button onClick={clearAll} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">Clear All</button>
       </div>
 
