@@ -117,7 +117,10 @@ async function exportPDF(
     drawPF("Plant No:", item.plantNumber, ML + CW / 2, y, 35);
     y += 4;
     drawPF("Operator:", item.operatorName, ML, y, 40);
-    drawPF("Week Commencing:", header.weekCommencing, ML + CW / 2, y, 30);
+    // Week commencing + auto-calculated week number
+    const wcDate = header.weekCommencing ? new Date(header.weekCommencing) : null;
+    const weekNo = wcDate ? Math.ceil((((wcDate.getTime() - new Date(wcDate.getFullYear(), 0, 1).getTime()) / 86400000) + new Date(wcDate.getFullYear(), 0, 1).getDay() + 1) / 7) : 0;
+    drawPF("Week Commencing:", header.weekCommencing ? `${header.weekCommencing} (Wk ${weekNo})` : "", ML + CW / 2, y, 30);
     y += 4;
     drawPF("CPCS/NPORS:", item.cpcsNumber, ML, y, 35);
     drawPF("Expiry:", item.cpcsExpiry, ML + CW / 2, y, 30);
