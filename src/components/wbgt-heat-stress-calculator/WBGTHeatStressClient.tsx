@@ -228,39 +228,43 @@ async function exportPDF(
     }
   });
 
-  // ── Sign-off section
-  checkPage(45);
+  // ── Sign-off section (bordered table)
+  checkPage(50);
   y += 4;
   doc.setDrawColor(27, 87, 69);
   doc.line(M, y, W - M, y);
-  y += 8;
+  y += 6;
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
   doc.text("SIGN-OFF", M, y);
-  y += 8;
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
+  y += 6;
 
-  const signFields = [
-    { label: "Assessed By:", lineW: 70 },
-    { label: "Signature:", lineW: 70 },
-    { label: "Date:", lineW: 40 },
-  ];
-  signFields.forEach(sf => {
-    doc.text(sf.label, M, y);
-    doc.setDrawColor(180, 180, 180);
-    doc.line(M + 25, y, M + 25 + sf.lineW, y);
-    y += 8;
+  // Bordered sign-off table
+  const soW = CW / 2 - 2; // half width for 2 columns
+  const soH = 8; // row height
+  doc.setDrawColor(200, 200, 200);
+  doc.setFontSize(7.5);
+
+  // Headers
+  doc.setFillColor(245, 245, 245);
+  doc.rect(M, y, soW, soH, "FD");
+  doc.rect(M + soW + 4, y, soW, soH, "FD");
+  doc.setFont("helvetica", "bold");
+  doc.text("Assessed By", M + 3, y + 5.5);
+  doc.text("Site Manager / Reviewer", M + soW + 7, y + 5.5);
+  y += soH;
+
+  // Rows: Name, Position, Signature, Date
+  doc.setFont("helvetica", "normal");
+  ["Name:", "Position:", "Signature:", "Date:"].forEach(label => {
+    doc.rect(M, y, soW, soH, "D");
+    doc.rect(M + soW + 4, y, soW, soH, "D");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(6.5);
+    doc.text(label, M + 3, y + 5.5);
+    doc.text(label, M + soW + 7, y + 5.5);
+    doc.setFont("helvetica", "normal");
+    y += soH;
   });
-  y += 2;
-  doc.text("Site Manager:", M, y);
-  doc.line(M + 25, y, M + 95, y);
-  y += 8;
-  doc.text("Signature:", M, y);
-  doc.line(M + 25, y, M + 95, y);
-  y += 8;
-  doc.text("Date:", M, y);
-  doc.line(M + 25, y, M + 65, y);
 
   // ── Footer on all pages
   const pageCount = doc.getNumberOfPages();
