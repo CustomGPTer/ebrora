@@ -221,7 +221,7 @@ async function exportPDF(
   doc.text(fmtCost(totalCostWk), M + cols[12], y);
   doc.text(fmtNum(totalCarbonDay, 1), M + cols[13], y);
 
-  // Sign-off
+  // Sign-off (bordered table)
   y += 6;
   doc.setDrawColor(27, 87, 69);
   doc.line(M, y, W - M, y);
@@ -231,14 +231,19 @@ async function exportPDF(
   doc.setTextColor(0, 0, 0);
   doc.text("SIGN-OFF", M, y);
   y += 6;
-  doc.setFontSize(8);
+  const soW = Math.min(CW / 2 - 2, 120); const soH = 7;
+  doc.setDrawColor(200, 200, 200); doc.setFontSize(7);
+  doc.setFillColor(245, 245, 245);
+  doc.rect(M, y, soW, soH, "FD"); doc.rect(M + soW + 4, y, soW, soH, "FD");
+  doc.setFont("helvetica", "bold");
+  doc.text("Prepared By", M + 3, y + 5); doc.text("Approved By", M + soW + 7, y + 5);
+  y += soH;
   doc.setFont("helvetica", "normal");
-  ["Prepared By:", "Signature:", "Date:", "Approved By:", "Signature:", "Date:"].forEach((lbl, i) => {
-    if (i === 3) y += 3;
-    doc.text(lbl, M, y);
-    doc.setDrawColor(180, 180, 180);
-    doc.line(M + 25, y, M + (lbl === "Date:" ? 65 : 95), y);
-    y += 6;
+  ["Name:", "Position:", "Signature:", "Date:"].forEach(label => {
+    doc.rect(M, y, soW, soH, "D"); doc.rect(M + soW + 4, y, soW, soH, "D");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(6);
+    doc.text(label, M + 3, y + 5); doc.text(label, M + soW + 7, y + 5);
+    doc.setFont("helvetica", "normal"); y += soH;
   });
 
   // Footer on all pages
