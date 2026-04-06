@@ -64,8 +64,8 @@ export default function FireRiskScoreCalculatorPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <BreadcrumbNav items={[{ label: "Free Tools", href: "/tools" }, { label: "Fire Risk Score Calculator" }]} />
 
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="mb-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
             <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
             </span>
@@ -76,7 +76,7 @@ export default function FireRiskScoreCalculatorPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
             Fire Risk Score Calculator
           </h1>
-          <p className="text-base text-gray-500 mt-2 max-w-2xl leading-relaxed">
+          <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
             Score fire risk using PAS 79 methodology aligned to the Regulatory Reform (Fire Safety) Order 2005. Choose your site type, answer section questions, and generate a prioritised action plan with professional PDF export.
           </p>
         </div>
