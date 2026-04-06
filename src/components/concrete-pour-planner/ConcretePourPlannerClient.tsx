@@ -8,20 +8,32 @@ import { CONCRETE_MIXES, DEFAULT_INPUTS, calculatePour } from "@/data/concrete-p
 function fmtNum(v: number, dp = 1): string { if (!Number.isFinite(v) || v === 0) return "—"; return v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
 function todayISO() { return new Date().toISOString().slice(0, 10); }
 
+// Wagon colour for schedule readability
+const WAGON_COLOURS = [
+  { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
+  { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" },
+  { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
+  { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200" },
+  { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200" },
+  { bg: "bg-cyan-50", text: "text-cyan-700", border: "border-cyan-200" },
+  { bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200" },
+  { bg: "bg-indigo-50", text: "text-indigo-700", border: "border-indigo-200" },
+];
+
 async function exportPDF(
   header: { site: string; manager: string; preparedBy: string; date: string },
   inputs: PourInputs, result: ReturnType<typeof calculatePour>,
 ) {
   const { default: jsPDF } = await import("jspdf");
-  const doc = new jsPDF("p", "mm", "a4");
-  const W = 210; const M = 14; const CW = W - M * 2; let y = 0;
+  const doc = new jsPDF("l", "mm", "a4"); // landscape for wide schedule
+  const W = 297; const M = 12; const CW = W - M * 2; let y = 0;
 
-  doc.setFillColor(30, 30, 30); doc.rect(0, 0, W, 24, "F");
-  doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.setFont("helvetica", "bold");
-  doc.text("CONCRETE POUR PLAN", M, 11);
+  doc.setFillColor(30, 30, 30); doc.rect(0, 0, W, 22, "F");
+  doc.setTextColor(255, 255, 255); doc.setFontSize(13); doc.setFont("helvetica", "bold");
+  doc.text("CONCRETE POUR PLAN — TRUCK DISPATCH SCHEDULE", M, 10);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text(`Ready-Mix Logistics Planner — Generated ${new Date().toLocaleDateString("en-GB")}`, M, 18);
-  y = 30; doc.setTextColor(0, 0, 0);
+  doc.text(`Ready-Mix Logistics — Generated ${new Date().toLocaleDateString("en-GB")}`, M, 17);
+  y = 28; doc.setTextColor(0, 0, 0);
 
   doc.setFontSize(8);
   [["Site:", header.site], ["Site Manager:", header.manager], ["Prepared By:", header.preparedBy], ["Date:", header.date]].forEach(([l, v], i) => {
@@ -32,62 +44,64 @@ async function exportPDF(
   });
   y += 10;
 
-  // Pour summary
+  // Summary
   doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Pour Summary", M, y); y += 5;
   doc.setFontSize(7.5);
   [
-    ["Pour Volume:", `${inputs.pourVolume} m³`],
-    ["Concrete Mix:", inputs.mixDesignation],
-    ["Pump Rate:", `${inputs.pumpRate} m³/hr`],
-    ["Truck Capacity:", `${inputs.truckCapacity} m³`],
-    ["Round-Trip Time:", `${inputs.roundTripMinutes} min`],
-    ["Start Time:", inputs.startTime],
-    ["Trucks Required:", `${result.trucksRequired}`],
-    ["Trucks On-Site (concurrent):", `${result.trucksOnSite}`],
+    ["Pour Volume:", `${inputs.pourVolume} m³`], ["Mix:", inputs.mixDesignation],
+    ["Pump Rate:", `${inputs.pumpRate} m³/hr`], ["Truck Capacity:", `${inputs.truckCapacity} m³`],
+    ["Fleet Size:", `${inputs.fleetSize} wagons`], ["Stagger:", `${inputs.staggerMinutes} min between first arrivals`],
+    ["Round-Trip:", `${inputs.roundTripMinutes} min`], ["TACO Limit:", `${inputs.tacoMinutes} min`],
+    ["Start:", inputs.startTime], ["Total Loads:", `${result.totalLoads}`],
     ["Pour Duration:", `${result.totalPourDuration} min (${fmtNum(result.totalPourDuration / 60)} hrs)`],
-    ["Pour End Time:", result.pourEndTime],
+    ["Pour Complete:", result.lastDischargeEnd],
+    ["Peak Wagons On-Site:", `${result.peakWagonsOnSite}`],
+    ["TACO Breaches:", result.tacoBreaches > 0 ? `⚠ ${result.tacoBreaches}` : "None"],
   ].forEach(([l, v]) => {
     doc.setFont("helvetica", "bold"); doc.text(l, M, y);
-    doc.setFont("helvetica", "normal"); doc.text(v, M + 55, y); y += 4.5;
+    doc.setFont("helvetica", "normal"); doc.text(v, M + 45, y); y += 4;
   });
   y += 4;
 
-  function checkPage(n: number) { if (y + n > 280) { doc.addPage(); y = M; } }
+  function checkPage(n: number) { if (y + n > 200) { doc.addPage(); y = M; } }
 
-  // Truck schedule
-  checkPage(20);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Truck Dispatch Schedule", M, y); y += 5;
-
+  // Schedule table
+  checkPage(15);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Dispatch Schedule", M, y); y += 5;
   doc.setFillColor(245, 245, 245); doc.rect(M, y - 2, CW, 5, "F");
-  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
-  const cols = [0, 20, 50, 85, 115, 150];
-  ["Truck #", "Arrival", "Depart", "Load (m³)", "Cumulative (m³)", "Status"].forEach((h, i) => doc.text(h, M + cols[i], y + 1));
-  y += 5.5; doc.setFont("helvetica", "normal");
+  doc.setFontSize(6); doc.setFont("helvetica", "bold");
+  const cols = [0, 15, 35, 55, 80, 105, 125, 150, 175, 200, 225, 250];
+  ["Load", "Wagon", "Trip", "Arrival", "Discharge", "End", "Depart", "Load m³", "Cumul. m³", "Wait", "TACO", "Status"].forEach((h, i) => doc.text(h, M + cols[i], y + 1));
+  y += 5; doc.setFont("helvetica", "normal");
 
-  result.schedule.forEach(t => {
-    checkPage(5);
-    doc.text(String(t.truckNumber), M + cols[0], y);
-    doc.text(t.arrivalTime, M + cols[1], y);
-    doc.text(t.departTime, M + cols[2], y);
-    doc.text(fmtNum(t.loadM3, 1), M + cols[3], y);
-    doc.text(fmtNum(t.cumulativeM3, 1), M + cols[4], y);
-    const pct = (t.cumulativeM3 / (inputs.pourVolume || 1)) * 100;
-    doc.text(`${fmtNum(pct, 0)}%`, M + cols[5], y);
+  result.schedule.forEach((t, i) => {
+    checkPage(4.5);
+    const vals = [
+      String(i + 1), `W${t.truckNumber}`, `T${t.tripNumber}`,
+      t.arrivalTime, t.dischargeStart, t.dischargeEnd, t.departTime,
+      fmtNum(t.loadM3, 1), fmtNum(t.cumulativeM3, 1),
+      t.waitMinutes > 0 ? `${t.waitMinutes}m` : "—",
+      `${t.tacoElapsedMin}m`,
+      t.tacoOk ? "OK" : "⚠ BREACH",
+    ];
+    if (!t.tacoOk) { doc.setTextColor(220, 38, 38); } else { doc.setTextColor(0, 0, 0); }
+    vals.forEach((v, j) => doc.text(v, M + cols[j], y));
+    doc.setTextColor(0, 0, 0);
     y += 4;
   });
 
   // Sign-off
-  checkPage(45); y += 6; doc.setDrawColor(30, 30, 30); doc.line(M, y, W - M, y); y += 8;
-  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("SIGN-OFF", M, y); y += 8;
-  doc.setFontSize(8); doc.setFont("helvetica", "normal");
+  checkPage(45); y += 6; doc.setDrawColor(30, 30, 30); doc.line(M, y, W - M, y); y += 6;
+  doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.text("SIGN-OFF", M, y); y += 6;
+  doc.setFont("helvetica", "normal");
   ["Prepared By:", "Signature:", "Date:", "Site Manager:", "Signature:", "Date:"].forEach((lbl, i) => {
-    if (i === 3) y += 4; doc.text(lbl, M, y); doc.setDrawColor(180, 180, 180); doc.line(M + 25, y, M + (lbl === "Date:" ? 65 : 95), y); y += 7;
+    if (i === 3) y += 3; doc.text(lbl, M, y); doc.setDrawColor(180, 180, 180); doc.line(M + 25, y, M + (lbl === "Date:" ? 65 : 95), y); y += 6;
   });
 
   const pc = doc.getNumberOfPages();
   for (let p = 1; p <= pc; p++) { doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Ready-mix logistics plan. Confirm truck availability with batch plant. Adjust pump rate to site conditions.", M, 290);
-    doc.text(`Page ${p} of ${pc}`, W - M - 20, 290); }
+    doc.text("Ready-mix logistics plan. Confirm wagon availability with batch plant. TACO = Time Allowed for Completion of Operations (BS 8500).", M, 205);
+    doc.text(`Page ${p} of ${pc}`, W - M - 20, 205); }
   doc.save(`concrete-pour-plan-${todayISO()}.pdf`);
 }
 
@@ -99,7 +113,7 @@ export default function ConcretePourPlannerClient() {
 
   const update = useCallback((patch: Partial<PourInputs>) => { setInputs(prev => ({ ...prev, ...patch })); }, []);
   const result = useMemo(() => calculatePour(inputs), [inputs]);
-  const hasData = result.trucksRequired > 0;
+  const hasData = result.totalLoads > 0;
 
   const clearAll = useCallback(() => { setInputs({ ...DEFAULT_INPUTS }); setSite(""); setManager(""); setPreparedBy(""); }, []);
   const handleExport = useCallback(async () => { setExporting(true); try { await exportPDF({ site, manager, preparedBy, date: assessDate }, inputs, result); } finally { setExporting(false); } }, [site, manager, preparedBy, assessDate, inputs, result]);
@@ -109,11 +123,11 @@ export default function ConcretePourPlannerClient() {
       {hasData && (
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           {[
-            { label: "Trucks Required", value: `${result.trucksRequired}`, sub: `${result.trucksOnSite} on-site`, bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-800", dot: "bg-blue-500" },
+            { label: "Total Loads", value: `${result.totalLoads}`, sub: `${inputs.fleetSize} wagons × ${fmtNum((result.totalLoads / inputs.fleetSize), 1)} trips`, bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-800", dot: "bg-blue-500" },
             { label: "Pour Duration", value: `${result.totalPourDuration} min`, sub: `${fmtNum(result.totalPourDuration / 60)} hrs`, bg: "bg-slate-50", border: "border-slate-200", text: "text-slate-800", dot: "bg-slate-500" },
-            { label: "First Truck", value: result.firstTruckArrival, sub: "Arrival time", bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-800", dot: "bg-emerald-500" },
-            { label: "Last Truck", value: result.lastTruckArrival, sub: "Arrival time", bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-800", dot: "bg-amber-500" },
-            { label: "Pour Complete", value: result.pourEndTime, sub: `${inputs.pourVolume} m³ placed`, bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-800", dot: "bg-purple-500" },
+            { label: "Peak On-Site", value: `${result.peakWagonsOnSite}`, sub: "Max wagons at once", bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-800", dot: "bg-emerald-500" },
+            { label: "Pour Complete", value: result.lastDischargeEnd, sub: `Started ${result.firstTruckArrival}`, bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-800", dot: "bg-purple-500" },
+            { label: "TACO", value: result.tacoBreaches > 0 ? `⚠ ${result.tacoBreaches}` : "All OK", sub: `${inputs.tacoMinutes} min limit`, bg: result.tacoBreaches > 0 ? "bg-red-50" : "bg-green-50", border: result.tacoBreaches > 0 ? "border-red-200" : "border-green-200", text: result.tacoBreaches > 0 ? "text-red-800" : "text-green-800", dot: result.tacoBreaches > 0 ? "bg-red-500" : "bg-green-500" },
           ].map(c => (
             <div key={c.label} className={`border rounded-xl p-4 ${c.bg} ${c.border}`}>
               <div className="flex items-center gap-2 mb-2"><span className={`w-2.5 h-2.5 rounded-full ${c.dot}`} /><span className={`text-[11px] font-bold uppercase tracking-wide ${c.text}`}>{c.label}</span></div>
@@ -121,6 +135,20 @@ export default function ConcretePourPlannerClient() {
               <div className={`text-xs mt-0.5 opacity-70 ${c.text}`}>{c.sub}</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* TACO breach warning */}
+      {result.tacoBreaches > 0 && (
+        <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 flex gap-3 items-start">
+          <span className="text-2xl">⚠️</span>
+          <div>
+            <div className="text-sm font-bold text-red-800">TACO BREACH — {result.tacoBreaches} load{result.tacoBreaches > 1 ? "s" : ""} exceed{result.tacoBreaches === 1 ? "s" : ""} the {inputs.tacoMinutes}-minute limit</div>
+            <div className="text-xs text-red-700 mt-1">
+              Concrete in these wagons will exceed the Time Allowed for Completion of Operations before discharge starts.
+              Consider adding more wagons, reducing round-trip time, or accepting a slower pump rate.
+            </div>
+          </div>
         </div>
       )}
 
@@ -146,7 +174,7 @@ export default function ConcretePourPlannerClient() {
       {/* Pour Inputs */}
       <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-4">
         <h3 className="text-sm font-bold text-gray-800">Pour Parameters</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Pour Volume (m³)</label>
             <input type="number" step={1} min={1} value={inputs.pourVolume ?? ""} placeholder="100"
               onChange={e => update({ pourVolume: e.target.value === "" ? null : parseFloat(e.target.value) })}
@@ -159,19 +187,43 @@ export default function ConcretePourPlannerClient() {
             <input type="number" step={0.5} min={1} max={12} value={inputs.truckCapacity}
               onChange={e => update({ truckCapacity: parseFloat(e.target.value) || 6 })}
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Round-Trip (min)</label>
-            <input type="number" step={5} min={10} value={inputs.roundTripMinutes ?? ""} placeholder="45"
-              onChange={e => update({ roundTripMinutes: e.target.value === "" ? null : parseFloat(e.target.value) })}
-              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
-            <p className="text-[10px] text-gray-400 mt-0.5">Plant to site and back</p></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Start Time</label>
-            <input type="time" value={inputs.startTime} onChange={e => update({ startTime: e.target.value })}
-              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Concrete Mix</label>
             <select value={inputs.mixDesignation} onChange={e => update({ mixDesignation: e.target.value })}
               className="w-full px-2.5 py-2 text-sm border border-ebrora/30 bg-ebrora-light/40 rounded-lg outline-none">
               {CONCRETE_MIXES.map(m => <option key={m.designation} value={m.designation}>{m.designation} — {m.description}</option>)}
             </select></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Start Time</label>
+            <input type="time" value={inputs.startTime} onChange={e => update({ startTime: e.target.value })}
+              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
+        </div>
+
+        <h3 className="text-sm font-bold text-gray-800 pt-2">Fleet & Logistics</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Number of Wagons</label>
+            <input type="number" step={1} min={1} max={20} value={inputs.fleetSize}
+              onChange={e => update({ fleetSize: parseInt(e.target.value) || 1 })}
+              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
+            <p className="text-[10px] text-gray-400 mt-0.5">Total wagons in rotation</p></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Stagger (min)</label>
+            <input type="number" step={5} min={0} max={60} value={inputs.staggerMinutes}
+              onChange={e => update({ staggerMinutes: parseInt(e.target.value) || 0 })}
+              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
+            <p className="text-[10px] text-gray-400 mt-0.5">Gap between first arrivals</p></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Round-Trip (min)</label>
+            <input type="number" step={5} min={10} value={inputs.roundTripMinutes ?? ""} placeholder="45"
+              onChange={e => update({ roundTripMinutes: e.target.value === "" ? null : parseFloat(e.target.value) })}
+              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
+            <p className="text-[10px] text-gray-400 mt-0.5">Site → plant → load → site</p></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">TACO Limit (min)</label>
+            <input type="number" step={10} min={30} max={240} value={inputs.tacoMinutes}
+              onChange={e => update({ tacoMinutes: parseInt(e.target.value) || 120 })}
+              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
+            <p className="text-[10px] text-gray-400 mt-0.5">BS 8500 — typically 120 min</p></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Discharge Time (min)</label>
+            <input type="number" step={1} min={1} value={inputs.dischargeMinutes ?? ""} placeholder={inputs.pumpRate ? fmtNum((inputs.truckCapacity / inputs.pumpRate) * 60, 0) : "auto"}
+              onChange={e => update({ dischargeMinutes: e.target.value === "" ? null : parseFloat(e.target.value) })}
+              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
+            <p className="text-[10px] text-gray-400 mt-0.5">Leave blank = auto from pump rate</p></div>
         </div>
       </div>
 
@@ -180,31 +232,40 @@ export default function ConcretePourPlannerClient() {
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
             <h3 className="text-sm font-bold text-gray-700">Truck Dispatch Schedule</h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">{result.trucksRequired} loads, {result.trucksOnSite} trucks on-site concurrently to keep pump fed.</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">{result.totalLoads} loads across {inputs.fleetSize} wagons. Peak {result.peakWagonsOnSite} on-site simultaneously.</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-gray-200">
-                {["Truck #", "Arrival", "Depart", "Load (m³)", "Cumulative (m³)", "Progress"].map(h => (
-                  <th key={h} className="px-4 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">{h}</th>
+                {["#", "Wagon", "Trip", "Arrival", "Discharge", "End", "Depart", "Load", "Cumul.", "Wait", "TACO", "Progress"].map(h => (
+                  <th key={h} className="px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-wide text-gray-500">{h}</th>
                 ))}
               </tr></thead>
               <tbody className="divide-y divide-gray-50">
-                {result.schedule.map(t => {
+                {result.schedule.map((t, i) => {
                   const pct = (t.cumulativeM3 / (inputs.pourVolume || 1)) * 100;
+                  const wc = WAGON_COLOURS[(t.truckNumber - 1) % WAGON_COLOURS.length];
                   return (
-                    <tr key={t.truckNumber} className="hover:bg-blue-50/20">
-                      <td className="px-4 py-2 text-center font-medium">{t.truckNumber}</td>
-                      <td className="px-4 py-2 text-center tabular-nums font-medium text-emerald-700">{t.arrivalTime}</td>
-                      <td className="px-4 py-2 text-center tabular-nums text-gray-500">{t.departTime}</td>
-                      <td className="px-4 py-2 text-center tabular-nums">{fmtNum(t.loadM3, 1)}</td>
-                      <td className="px-4 py-2 text-center tabular-nums font-medium">{fmtNum(t.cumulativeM3, 1)}</td>
-                      <td className="px-4 py-2">
+                    <tr key={i} className={`hover:bg-blue-50/20 ${!t.tacoOk ? "bg-red-50/30" : ""}`}>
+                      <td className="px-3 py-1.5 text-center text-gray-500 tabular-nums">{i + 1}</td>
+                      <td className="px-3 py-1.5 text-center">
+                        <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full ${wc.bg} ${wc.text} border ${wc.border}`}>W{t.truckNumber}</span>
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-gray-500 tabular-nums">T{t.tripNumber}</td>
+                      <td className="px-3 py-1.5 text-center tabular-nums font-medium">{t.arrivalTime}</td>
+                      <td className="px-3 py-1.5 text-center tabular-nums text-emerald-700 font-medium">{t.dischargeStart}</td>
+                      <td className="px-3 py-1.5 text-center tabular-nums text-gray-500">{t.dischargeEnd}</td>
+                      <td className="px-3 py-1.5 text-center tabular-nums text-gray-500">{t.departTime}</td>
+                      <td className="px-3 py-1.5 text-center tabular-nums">{fmtNum(t.loadM3, 1)}</td>
+                      <td className="px-3 py-1.5 text-center tabular-nums font-medium">{fmtNum(t.cumulativeM3, 1)}</td>
+                      <td className="px-3 py-1.5 text-center tabular-nums text-gray-400">{t.waitMinutes > 0 ? `${t.waitMinutes}m` : "—"}</td>
+                      <td className={`px-3 py-1.5 text-center tabular-nums text-xs font-medium ${t.tacoOk ? "text-green-600" : "text-red-600"}`}>{t.tacoElapsedMin}m {!t.tacoOk && "⚠"}</td>
+                      <td className="px-3 py-1.5">
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                             <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
                           </div>
-                          <span className="text-xs tabular-nums text-gray-500 w-10">{fmtNum(pct, 0)}%</span>
+                          <span className="text-[10px] tabular-nums text-gray-400 w-8">{fmtNum(pct, 0)}%</span>
                         </div>
                       </td>
                     </tr>
@@ -216,8 +277,8 @@ export default function ConcretePourPlannerClient() {
         </div>
       )}
 
-      <div className="pt-4 border-t border-gray-100"><p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-        Ready-mix logistics plan. Confirm truck availability and plant capacity with your batch plant. Adjust pump rate to actual site conditions. Round-trip time includes loading at plant, travel to site, unloading, and return. White-label PDF.</p></div>
+      <div className="pt-4 border-t border-gray-100"><p className="text-[11px] text-gray-400 leading-relaxed max-w-xl">
+        Ready-mix logistics plan. Wagons cycle: arrive → discharge at pump → depart → round trip to plant → reload → return. Stagger controls the gap between first arrivals only — subsequent arrivals are determined by the cycling schedule. TACO (Time Allowed for Completion of Operations) per BS 8500, typically 120 minutes from batching to discharge. White-label PDF.</p></div>
     </div>
   );
 }
