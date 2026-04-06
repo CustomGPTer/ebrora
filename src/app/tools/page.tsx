@@ -131,6 +131,41 @@ const TOOL_META: Record<
     accent: "#4F46E5",
     accentLight: "rgba(79,70,229,0.08)",
   },
+  "welfare-facilities-calculator": {
+    icon: "🏠",
+    accent: "#7C3AED",
+    accentLight: "rgba(124,58,237,0.08)",
+  },
+  "dust-silica-calculator": {
+    icon: "🌫️",
+    accent: "#EA580C",
+    accentLight: "rgba(234,88,12,0.08)",
+  },
+  "noise-exposure-calculator": {
+    icon: "🔊",
+    accent: "#7C3AED",
+    accentLight: "rgba(124,58,237,0.08)",
+  },
+  "slip-risk-calculator": {
+    icon: "⚠️",
+    accent: "#CA8A04",
+    accentLight: "rgba(202,138,4,0.08)",
+  },
+  "cbr-modulus-converter": {
+    icon: "🧪",
+    accent: "#0891B2",
+    accentLight: "rgba(8,145,178,0.08)",
+  },
+  "topsoil-calculator": {
+    icon: "🌱",
+    accent: "#65A30D",
+    accentLight: "rgba(101,163,13,0.08)",
+  },
+  "drainage-pipe-flow-calculator": {
+    icon: "🚿",
+    accent: "#0284C7",
+    accentLight: "rgba(2,132,199,0.08)",
+  },
 };
 
 const PAID_TOOL_SLUGS = new Set([
@@ -142,6 +177,11 @@ const PAID_TOOL_SLUGS = new Set([
   "concrete-pour-planner",
   "hav-calculator",
   "confined-space-calculator",
+  "welfare-facilities-calculator",
+  "dust-silica-calculator",
+  "noise-exposure-calculator",
+  "slip-risk-calculator",
+  "drainage-pipe-flow-calculator",
 ]);
 
 const DEFAULT_META = {
