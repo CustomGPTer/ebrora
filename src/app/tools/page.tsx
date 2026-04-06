@@ -76,6 +76,11 @@ const TOOL_META: Record<
     accent: "#0369A1",
     accentLight: "rgba(3,105,161,0.08)",
   },
+  "fuel-usage-calculator": {
+    icon: "⛽",
+    accent: "#EA580C",
+    accentLight: "rgba(234,88,12,0.08)",
+  },
 };
 
 const DEFAULT_META = {
