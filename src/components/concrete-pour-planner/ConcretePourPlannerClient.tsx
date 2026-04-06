@@ -71,7 +71,17 @@ async function exportPDF(
   });
   y += 4;
 
-  function checkPage(n: number) { if (y + n > 200) { doc.addPage(); y = M; } }
+  function checkPage(n: number) {
+    if (y + n > 200) {
+      doc.addPage();
+      doc.setFillColor(30, 30, 30); doc.rect(0, 0, W, 10, "F");
+      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+      doc.text("CONCRETE POUR PLAN (continued)", M, 7);
+      doc.setFontSize(6); doc.setFont("helvetica", "normal");
+      doc.text(`${docRef} | ${header.site || ""}`, W - M - 55, 7);
+      doc.setTextColor(0, 0, 0); y = 14;
+    }
+  }
 
   // Schedule table
   checkPage(15);
