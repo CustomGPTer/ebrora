@@ -101,9 +101,20 @@ async function exportPDF(
   doc.setDrawColor(30, 30, 30); doc.line(M, y, W - M, y); y += 6;
   doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.text("SIGN-OFF", M, y); y += 6;
   doc.setFont("helvetica", "normal");
-  ["Prepared By:", "Signature:", "Date:", "Approved By:", "Signature:", "Date:"].forEach((lbl, i) => {
-    if (i === 3) y += 3;
-    doc.text(lbl, M, y); doc.setDrawColor(180, 180, 180); doc.line(M + 25, y, M + (lbl === "Date:" ? 65 : 95), y); y += 6;
+  // Bordered sign-off table
+  const soW2 = Math.min(CW / 2 - 2, 85); const soH2 = 8;
+  doc.setDrawColor(200, 200, 200); doc.setFontSize(7);
+  doc.setFillColor(245, 245, 245);
+  doc.rect(M, y, soW2, soH2, "FD"); doc.rect(M + soW2 + 4, y, soW2, soH2, "FD");
+  doc.setFont("helvetica", "bold");
+  doc.text("Prepared By", M + 3, y + 5.5); doc.text("Approved By", M + soW2 + 7, y + 5.5);
+  y += soH2;
+  doc.setFont("helvetica", "normal");
+  ["Name:", "Position:", "Signature:", "Date:"].forEach(label => {
+    doc.rect(M, y, soW2, soH2, "D"); doc.rect(M + soW2 + 4, y, soW2, soH2, "D");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(6.5);
+    doc.text(label, M + 3, y + 5.5); doc.text(label, M + soW2 + 7, y + 5.5);
+    doc.setFont("helvetica", "normal"); y += soH2;
   });
 
   const pc = doc.getNumberOfPages();
