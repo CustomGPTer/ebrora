@@ -168,7 +168,7 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
   }, [htmlFile, title, session, sessionStatus, router, usageOk]);
 
   function handlePrint() {
-    window.open(`/toolbox-talks/${htmlFile}`, "_blank");
+    window.open(`/toolbox-talks/${htmlFile}?print`, "_blank");
   }
 
   return (
