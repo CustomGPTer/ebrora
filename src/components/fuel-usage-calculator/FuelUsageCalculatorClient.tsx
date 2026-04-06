@@ -159,7 +159,7 @@ async function exportPDF(
   doc.setFontSize(6.5);
   doc.setFont("helvetica", "bold");
   const cols = [0, 8, 50, 80, 100, 118, 130, 142, 155, 168, 182, 200, 220, 245];
-  const headers = ["#", "Machine", "Type", "Size", "kW", "Duty", "Qty", "Hrs", "L/h", "L/day", "L/wk", "Cost/day", "Cost/wk", "kgCO₂e/day"];
+  const headers = ["#", "Machine", "Type", "Size", "kW", "Duty", "Qty", "Hrs", "L/h", "L/day", "L/wk", "Cost/day", "Cost/wk", "kgCO2e/day"];
   headers.forEach((h, i) => doc.text(h, M + cols[i], y + 1));
   y += 5;
 
