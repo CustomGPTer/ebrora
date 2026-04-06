@@ -183,7 +183,7 @@ async function exportPDF(
         doc.text(`${ar.wbgtLimit}°C`, M + rCols[1], y + 0.5);
         doc.text(`${ar.ratio.workMinutes}`, M + rCols[2], y + 0.5);
         doc.text(`${ar.ratio.restMinutes}`, M + rCols[3], y + 0.5);
-        const status = wbgt <= ar.wbgtLimit ? "✓ Within limit" : "✗ Exceeded";
+        const status = wbgt <= ar.wbgtLimit ? "OK - Within limit" : "EXCEEDED";
         doc.text(`${ar.applicable ? "► " : ""}${status}`, M + rCols[4], y + 0.5);
         y += 4.5;
       });
@@ -201,7 +201,7 @@ async function exportPDF(
           checkPage(10);
           doc.setFontSize(6.5);
           doc.setFont("helvetica", "bold");
-          doc.text(`• ${ctrl.title}`, M + 2, y);
+          doc.text(`- ${ctrl.title}`, M + 2, y);
           doc.setFont("helvetica", "normal");
           y += 3;
           const lines = doc.splitTextToSize(ctrl.description, CW - 8);
