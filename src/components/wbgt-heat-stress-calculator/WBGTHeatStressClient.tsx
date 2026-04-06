@@ -95,6 +95,17 @@ async function exportPDF(
   drawFld("Assessment Type:", outputMode === "daily" ? "Daily Assessment" : "Weekly (5-Day) Planner", M + 3, y, 0);
   y += 8;
 
+  // Scope statement
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "italic");
+  doc.setTextColor(80, 80, 80);
+  const scopeText = `This heat stress assessment covers ${header.site || "the above site"} as at ${header.date || new Date().toLocaleDateString("en-GB")}. It uses the ISO 7243:2017 WBGT methodology with the Lemke & Kjellstrom (2012) simplified estimation. Work/rest ratios assume acclimatised workers. This is a planning aid and does not replace site-specific monitoring with calibrated instruments.`;
+  const scopeLines = doc.splitTextToSize(scopeText, CW);
+  doc.text(scopeLines, M, y);
+  y += scopeLines.length * 3 + 3;
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal");
+
   // Helper to add new page if needed
   function checkPage(need: number) {
     if (y + need > 280) {
