@@ -222,9 +222,16 @@ async function exportPDF(
     doc.text(String(ss.consequence), M + sCols[3] + 3, y);
     doc.text(String(ss.score), M + sCols[4] + 3, y);
 
+    // Colour-coded risk badge
     const ratingDef = OVERALL_RISK_DEFS.find(d => d.level === ss.rating)!;
+    const rRGB = ss.rating === "low" ? [22, 163, 74] : ss.rating === "medium" ? [217, 119, 6] : [220, 38, 38];
+    doc.setFillColor(rRGB[0], rRGB[1], rRGB[2]);
+    doc.roundedRect(M + sCols[5], y - 3, 18, 4.5, 1, 1, "F");
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.text(ratingDef.label, M + sCols[5], y);
+    doc.setFontSize(5.5);
+    doc.text(ratingDef.label, M + sCols[5] + 1.5, y);
+    doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "normal");
     y += 4.5;
   });
@@ -281,10 +288,14 @@ async function exportPDF(
       doc.text(descLines, M + aCols[1], y);
       doc.text(action.responsiblePerson || "TBC", M + aCols[2], y);
       doc.text(action.targetDate || "TBC", M + aCols[3], y);
-      doc.setFont("helvetica", "bold");
+      // Colour-coded priority badge
       const rDef = OVERALL_RISK_DEFS.find(d => d.level === action.priority);
-      doc.text(rDef?.label || "", M + aCols[4], y);
-      doc.setFont("helvetica", "normal");
+      const pRGB = action.priority === "medium" ? [217, 119, 6] : [220, 38, 38];
+      doc.setFillColor(pRGB[0], pRGB[1], pRGB[2]);
+      doc.roundedRect(M + aCols[4], y - 3, 18, 4.5, 1, 1, "F");
+      doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(5.5);
+      doc.text(rDef?.label || "", M + aCols[4] + 1.5, y);
+      doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(6.5);
       y += Math.max(descLines.length * 3.5, 5);
     });
   }
