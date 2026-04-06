@@ -71,6 +71,11 @@ const TOOL_META: Record<
     accent: "#7C3AED",
     accentLight: "rgba(124,58,237,0.08)",
   },
+  "hav-calculator": {
+    icon: "📳",
+    accent: "#DC2626",
+    accentLight: "rgba(220,38,38,0.08)",
+  },
   "access-equipment-selector": {
     icon: "🪜",
     accent: "#0369A1",
