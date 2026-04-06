@@ -69,23 +69,31 @@ async function exportPDF(
     doc.text("Combined Summary", M, y);
     y += 5;
 
-    doc.setFillColor(245, 245, 245);
-    doc.rect(M, y - 2, CW, 5, "F");
+    // Table header with borders
+    doc.setDrawColor(200, 200, 200);
+    doc.setFillColor(240, 240, 240);
+    doc.rect(M, y - 2, CW, 5.5, "FD");
     doc.setFontSize(6.5);
     const sCols = [0, 55, 100, 140];
-    ["Task", "Daily Output", "Total Quantity", "Days to Complete"].forEach((h, i) => doc.text(h, M + sCols[i], y + 1));
+    const sWidths = [55, 45, 40, CW - 140];
+    ["Task", "Daily Output", "Total Quantity", "Days to Complete"].forEach((h, i) => doc.text(h, M + sCols[i] + 2, y + 1.5));
     y += 5.5;
     doc.setFont("helvetica", "normal");
 
-    activeTasks.forEach(task => {
+    activeTasks.forEach((task, ti) => {
       const result = allResults[task.id];
       const qty = allQuantities[task.id] || 0;
       const days = qty > 0 && result.dailyOutput > 0 ? qty / result.dailyOutput : 0;
-      doc.text(task.name, M + sCols[0], y);
-      doc.text(`${fmtNum(result.dailyOutput)} ${task.unit}`, M + sCols[1], y);
-      doc.text(qty > 0 ? `${fmtNum(qty, 0)} ${task.unit.replace("/day", "").replace(" (bank)", "")}` : "—", M + sCols[2], y);
-      doc.text(days > 0 ? `${fmtNum(days)} days` : "—", M + sCols[3], y);
-      y += 4.5;
+      // Alternating row bg
+      if (ti % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(M, y - 2, CW, 5, "F"); }
+      // Cell borders
+      doc.setDrawColor(220, 220, 220);
+      sWidths.forEach((w, i) => doc.rect(M + sCols[i], y - 2, w, 5, "D"));
+      doc.text(task.name, M + sCols[0] + 2, y + 1);
+      doc.text(`${fmtNum(result.dailyOutput)} ${task.unit}`, M + sCols[1] + 2, y + 1);
+      doc.text(qty > 0 ? `${fmtNum(qty, 0)} ${task.unit.replace("/day", "").replace(" (bank)", "")}` : "—", M + sCols[2] + 2, y + 1);
+      doc.text(days > 0 ? `${fmtNum(days)} days` : "—", M + sCols[3] + 2, y + 1);
+      y += 5;
     });
     y += 6;
   }
