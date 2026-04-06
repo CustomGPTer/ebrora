@@ -73,22 +73,29 @@ async function exportPDF(
     doc.text(`Trench: ${row.trenchLength}m × ${row.trenchWidth}m × ${row.trenchDepth}m | Pipe OD: ${row.pipeOD}mm | Reuse backfill: ${row.backfillReuse ? "Yes" : "No"}`, M, y);
     y += 5;
 
-    // Zone table
-    doc.setFillColor(248, 248, 248); doc.rect(M, y - 2, CW, 5, "F");
+    // Zone table — dark header + bordered cells
+    const zCols = [35, 75, 35, 37];
+    let zcx = M;
     doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
-    ["Zone", "Material", "Volume (m³)", "Tonnes"].forEach((h, i) => doc.text(h, M + [0, 35, 110, 145][i], y + 1));
-    y += 5.5; doc.setFont("helvetica", "normal");
+    ["Zone", "Material", "Volume (m3)", "Tonnes"].forEach((h, i) => {
+      doc.setFillColor(30, 30, 30); doc.rect(zcx, y, zCols[i], 6, "F");
+      doc.setTextColor(255, 255, 255); doc.text(h, zcx + 2, y + 4); zcx += zCols[i];
+    });
+    doc.setTextColor(0, 0, 0); y += 6;
 
+    doc.setFontSize(6); doc.setDrawColor(200, 200, 200);
     [
-      ["Bedding", bMat?.name || "—", res.beddingM3, res.beddingTonnes],
-      ["Side Fill (haunch)", sMat?.name || "—", res.sideFillM3, res.sideFillTonnes],
-      ["Backfill", bfMat?.name || "—", res.backfillM3, res.backfillTonnes],
+      ["Bedding", bMat?.name || "-", res.beddingM3, res.beddingTonnes],
+      ["Side Fill (haunch)", sMat?.name || "-", res.sideFillM3, res.sideFillTonnes],
+      ["Backfill", bfMat?.name || "-", res.backfillM3, res.backfillTonnes],
     ].forEach(([zone, mat, vol, tonnes]) => {
-      doc.text(zone as string, M, y);
-      doc.text(mat as string, M + 35, y);
-      doc.text(fmtNum(vol as number, 2), M + 110, y);
-      doc.text(fmtNum(tonnes as number, 1), M + 145, y);
-      y += 4;
+      zcx = M;
+      [zone as string, mat as string, fmtNum(vol as number, 2), fmtNum(tonnes as number, 1)].forEach((t, i) => {
+        doc.rect(zcx, y, zCols[i], 5.5, "D");
+        doc.setTextColor(0, 0, 0); doc.setFont("helvetica", i === 0 ? "bold" : "normal");
+        doc.text(t, zcx + 2, y + 3.5); zcx += zCols[i];
+      });
+      y += 5.5;
     });
 
     y += 2;
