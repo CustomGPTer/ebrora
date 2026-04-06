@@ -111,9 +111,12 @@ export function calculateTrenchZones(row: TrenchRow): TrenchZoneResult {
     : beddingTonnes + sideFillTonnes + backfillTonnes;
 
   // Export: total excavated minus what's re-used as backfill
-  const totalExcavatedTonnes = totalTrenchM3 * 1.65; // assume average excavated density
+  // Excavated material density assumption (typical mixed ground)
+  // TODO: Could be made configurable per row in future
+  const EXCAVATED_DENSITY = 1.65;
+  const totalExcavatedTonnes = totalTrenchM3 * EXCAVATED_DENSITY;
   const exportTonnes = row.backfillReuse
-    ? totalExcavatedTonnes - backfillM3 * 1.65 // rough: exported = total minus backfill volume at excavated density
+    ? totalExcavatedTonnes - backfillM3 * EXCAVATED_DENSITY
     : totalExcavatedTonnes;
 
   return { beddingM3, sideFillM3, backfillM3, totalTrenchM3, pipeVolumeM3, beddingTonnes, sideFillTonnes, backfillTonnes, importTonnes, exportTonnes: Math.max(exportTonnes, 0) };
