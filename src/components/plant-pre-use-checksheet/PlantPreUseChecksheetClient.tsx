@@ -92,6 +92,7 @@ async function exportPDF(
     let y = 0;
 
     // Header bar
+    const docRef = `PCS-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     doc.setFillColor(27, 87, 69);
     doc.rect(0, 0, W, 20, "F");
     doc.setTextColor(255, 255, 255);
@@ -100,24 +101,29 @@ async function exportPDF(
     doc.text("PLANT PRE-USE INSPECTION CHECK SHEET", ML, 8);
     doc.setFontSize(6.5);
     doc.setFont("helvetica", "normal");
-    doc.text("Daily Pre-Start Checks — HSE / PUWER Compliant — ebrora.com", ML, 15);
+    doc.text(`Ref: ${docRef} | Rev 0 | HSE / PUWER Compliant — ebrora.com`, ML, 15);
     y = 24;
     doc.setTextColor(0, 0, 0);
 
-    // Info fields
+    // Info fields with underlines for empty values
     doc.setFontSize(7);
-    doc.setFont("helvetica", "bold");
-    doc.text("PLANT TYPE:", ML, y); doc.setFont("helvetica", "normal"); doc.text(pt.name, ML + 25, y);
-    doc.setFont("helvetica", "bold"); doc.text("Plant No:", ML + CW / 2, y); doc.setFont("helvetica", "normal"); doc.text(item.plantNumber || blankMode ? "" : "—", ML + CW / 2 + 20, y);
+    const drawPF = (label: string, value: string, x: number, fy: number, lineW: number) => {
+      doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
+      const lw = doc.getTextWidth(label) + 2;
+      if (value) { doc.setFont("helvetica", "normal"); doc.text(value, x + lw, fy); }
+      else { doc.setDrawColor(180, 180, 180); doc.line(x + lw, fy, x + lw + lineW, fy); }
+    };
+    drawPF("PLANT TYPE:", pt.name, ML, y, 0);
+    drawPF("Plant No:", item.plantNumber, ML + CW / 2, y, 35);
     y += 4;
-    doc.setFont("helvetica", "bold"); doc.text("Operator:", ML, y); doc.setFont("helvetica", "normal"); doc.text(item.operatorName || blankMode ? "" : "—", ML + 25, y);
-    doc.setFont("helvetica", "bold"); doc.text("Week Commencing:", ML + CW / 2, y); doc.setFont("helvetica", "normal"); doc.text(header.weekCommencing || "", ML + CW / 2 + 35, y);
+    drawPF("Operator:", item.operatorName, ML, y, 40);
+    drawPF("Week Commencing:", header.weekCommencing, ML + CW / 2, y, 30);
     y += 4;
-    doc.setFont("helvetica", "bold"); doc.text("CPCS/NPORS:", ML, y); doc.setFont("helvetica", "normal"); doc.text(item.cpcsNumber || "", ML + 25, y);
-    doc.setFont("helvetica", "bold"); doc.text("Expiry:", ML + CW / 2, y); doc.setFont("helvetica", "normal"); doc.text(item.cpcsExpiry || "", ML + CW / 2 + 15, y);
+    drawPF("CPCS/NPORS:", item.cpcsNumber, ML, y, 35);
+    drawPF("Expiry:", item.cpcsExpiry, ML + CW / 2, y, 30);
     y += 4;
-    doc.setFont("helvetica", "bold"); doc.text("Site:", ML, y); doc.setFont("helvetica", "normal"); doc.text(header.site || "", ML + 25, y);
-    doc.setFont("helvetica", "bold"); doc.text("Site Manager:", ML + CW / 2, y); doc.setFont("helvetica", "normal"); doc.text(header.manager || "", ML + CW / 2 + 28, y);
+    drawPF("Site:", header.site, ML, y, 40);
+    drawPF("Site Manager:", header.manager, ML + CW / 2, y, 35);
     y += 5;
 
     // Check grid
