@@ -97,7 +97,15 @@ async function exportPDF(
 
   // Helper to add new page if needed
   function checkPage(need: number) {
-    if (y + need > 280) { doc.addPage(); y = M; }
+    if (y + need > 280) {
+      doc.addPage();
+      doc.setFillColor(27, 87, 69); doc.rect(0, 0, W, 10, "F");
+      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+      doc.text("WBGT HEAT STRESS ASSESSMENT (continued)", M, 7);
+      doc.setFontSize(6); doc.setFont("helvetica", "normal");
+      doc.text(`${docRef} | ${header.site || ""}`, W - M - 55, 7);
+      doc.setTextColor(0, 0, 0); y = 14;
+    }
   }
 
   // ── Process each day entry
