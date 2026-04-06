@@ -69,17 +69,37 @@ async function exportPDF(
     y += 8;
   });
 
-  // Totals
-  checkPage(20); doc.setDrawColor(30, 30, 30); doc.line(M, y, W - M, y); y += 5;
-  doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.text("COMBINED TOTALS", M, y); y += 5;
-  doc.setFontSize(7.5);
-  [
-    ["Net wall area:", `${fmtNum(totals.netArea, 2)} m²`],
-    ["Total units:", `${fmtNum(totals.unitCount, 0)}`],
-    ["Total mortar:", `${fmtNum(totals.mortarM3, 3)} m³`],
-    ["Cement (25kg bags):", `${totals.cementBags}`],
-    ["Sand:", `${fmtNum(totals.sandTonnes, 2)} tonnes`],
-  ].forEach(([l, v]) => { doc.setFont("helvetica", "bold"); doc.text(l, M, y); doc.setFont("helvetica", "normal"); doc.text(v, M + 45, y); y += 4.5; });
+  // Totals table
+  checkPage(35);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  doc.text("COMBINED TOTALS", M, y); y += 5;
+
+  const totCols = [55, 55, 36, 20];
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  let tcx = M;
+  ["Metric", "Value", "Material", "Quantity"].forEach((h, i) => {
+    doc.setFillColor(30, 30, 30); doc.rect(tcx, y, totCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, tcx + 2, y + 4); tcx += totCols[i];
+  });
+  doc.setTextColor(0, 0, 0); y += 6;
+
+  doc.setFontSize(6); doc.setDrawColor(200, 200, 200);
+  const totRows = [
+    ["Net wall area", `${fmtNum(totals.netArea, 2)} m2`, "Cement (25kg bags)", `${totals.cementBags}`],
+    ["Total units", `${fmtNum(totals.unitCount, 0)}`, "Sand", `${fmtNum(totals.sandTonnes, 2)} t`],
+    ["Total mortar", `${fmtNum(totals.mortarM3, 3)} m3`, "", ""],
+  ];
+  for (const tr of totRows) {
+    tcx = M;
+    tr.forEach((t, i) => {
+      doc.rect(tcx, y, totCols[i], 5.5, "D");
+      doc.setFont("helvetica", i === 0 || i === 2 ? "bold" : "normal");
+      doc.setTextColor(0, 0, 0); doc.text(t, tcx + 2, y + 3.5);
+      tcx += totCols[i];
+    });
+    y += 5.5;
+  }
+  y += 4;
 
   // Sign-off
   checkPage(45); y += 6; doc.setDrawColor(30, 30, 30); doc.line(M, y, W - M, y); y += 8;
