@@ -410,6 +410,17 @@ async function exportPDF(
 }
 
 // ─── Main Component ──────────────────────────────────────────────
+// Text input helper (defined outside component to avoid re-creation on render)
+function TI({ label, value, onChange: oc, placeholder, type, span }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; span?: number }) {
+  return (
+    <div style={span ? { gridColumn: `span ${span}` } : undefined}>
+      <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</label>
+      <input type={type || "text"} value={value} onChange={e => oc(e.target.value)} placeholder={placeholder}
+        className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora focus:ring-1 focus:ring-ebrora/20 outline-none transition-colors" />
+    </div>
+  );
+}
+
 export default function ManualHandlingCalculatorClient() {
   // Header
   const [project, setProject] = useState("");
@@ -513,14 +524,7 @@ export default function ManualHandlingCalculatorClient() {
     } finally { setExporting(false); }
   }, [project, location, taskName, loadDescription, handlingTypes, assessedBy, assessDate, supervisor, reviewDate, score, selectedControls, customControls, rescoreResult]);
 
-  // Text input helper
-  const TI = ({ label, value, onChange: oc, placeholder, type, span }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; span?: number }) => (
-    <div style={span ? { gridColumn: `span ${span}` } : undefined}>
-      <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">{label}</label>
-      <input type={type || "text"} value={value} onChange={e => oc(e.target.value)} placeholder={placeholder}
-        className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora focus:ring-1 focus:ring-ebrora/20 outline-none transition-colors" />
-    </div>
-  );
+  // Text input helper — defined outside component, see below
 
   return (
     <div className="space-y-5">
