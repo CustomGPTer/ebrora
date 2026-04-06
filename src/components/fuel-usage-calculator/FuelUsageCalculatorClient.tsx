@@ -125,6 +125,7 @@ async function exportPDF(
   let y = M;
 
   // Title
+  const docRef = `FUC-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
   doc.setFillColor(27, 87, 69);
   doc.rect(0, 0, W, 24, "F");
   doc.setTextColor(255, 255, 255);
@@ -135,20 +136,28 @@ async function exportPDF(
   doc.setFont("helvetica", "normal");
   doc.text("Plant fuel planning estimate — ebrora.com/tools/fuel-usage-calculator", M, 17);
   doc.setFontSize(7);
-  doc.text(`Generated ${new Date().toLocaleDateString("en-GB")}`, W - M - 45, 17);
+  doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 17);
   y = 30;
   doc.setTextColor(0, 0, 0);
 
-  // Header
+  // Header info panel
+  doc.setFillColor(248, 248, 248);
+  doc.setDrawColor(220, 220, 220);
+  doc.roundedRect(M, y - 3, CW, 16, 1, 1, "FD");
   doc.setFontSize(8);
-  doc.setFont("helvetica", "bold");
-  doc.text("Project:", M, y); doc.setFont("helvetica", "normal"); doc.text(header.project || "—", M + 20, y);
-  doc.setFont("helvetica", "bold"); doc.text("Site:", M + CW / 3, y); doc.setFont("helvetica", "normal"); doc.text(header.site || "—", M + CW / 3 + 14, y);
-  doc.setFont("helvetica", "bold"); doc.text("Prepared by:", M + CW * 2 / 3, y); doc.setFont("helvetica", "normal"); doc.text(header.assessedBy || "—", M + CW * 2 / 3 + 28, y);
-  y += 4;
-  doc.setFont("helvetica", "bold"); doc.text("Date:", M, y); doc.setFont("helvetica", "normal"); doc.text(header.date || "—", M + 20, y);
-  doc.setFont("helvetica", "bold"); doc.text("Fuel cost:", M + CW / 3, y); doc.setFont("helvetica", "normal"); doc.text(`£${costPerLitre.toFixed(2)}/L`, M + CW / 3 + 22, y);
-  y += 6;
+  const drawField = (label: string, value: string, x: number, fy: number, lineW: number) => {
+    doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
+    const labelW = doc.getTextWidth(label) + 2;
+    if (value) { doc.setFont("helvetica", "normal"); doc.text(value, x + labelW, fy); }
+    else { doc.setDrawColor(180, 180, 180); doc.line(x + labelW, fy, x + labelW + lineW, fy); }
+  };
+  drawField("Project:", header.project, M + 3, y, 50);
+  drawField("Site:", header.site, M + CW / 3, y, 40);
+  drawField("Prepared by:", header.assessedBy, M + CW * 2 / 3, y, 40);
+  y += 5;
+  drawField("Date:", header.date, M + 3, y, 30);
+  drawField("Fuel cost:", `£${costPerLitre.toFixed(2)}/L`, M + CW / 3, y, 0);
+  y += 9;
 
   // Table header
   doc.setDrawColor(200, 200, 200);
@@ -212,14 +221,37 @@ async function exportPDF(
   doc.text(fmtCost(totalCostWk), M + cols[12], y);
   doc.text(fmtNum(totalCarbonDay, 1), M + cols[13], y);
 
-  // Footer
-  y = H - 12;
-  doc.setFontSize(6);
+  // Sign-off
+  y += 6;
+  doc.setDrawColor(27, 87, 69);
+  doc.line(M, y, W - M, y);
+  y += 6;
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(0, 0, 0);
+  doc.text("SIGN-OFF", M, y);
+  y += 6;
+  doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(120, 120, 120);
-  doc.text("Fuel rates are planning estimates based on OEM data. Real-world usage varies with load factor, idling, ambient temperature, and operator behaviour.", M, y);
-  y += 2.5;
-  doc.text("Weekly figures assume 5 working days. Carbon factors: UK Gov GHG Conversion Factors 2024.", M, y);
+  ["Prepared By:", "Signature:", "Date:", "Approved By:", "Signature:", "Date:"].forEach((lbl, i) => {
+    if (i === 3) y += 3;
+    doc.text(lbl, M, y);
+    doc.setDrawColor(180, 180, 180);
+    doc.line(M + 25, y, M + (lbl === "Date:" ? 65 : 95), y);
+    y += 6;
+  });
+
+  // Footer on all pages
+  const pageCount = doc.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(120, 120, 120);
+    doc.text("Fuel rates are planning estimates based on OEM data. Real-world usage varies with load factor, idling, ambient temperature, and operator behaviour.", M, H - 10);
+    doc.text("Weekly figures assume 5 working days. Carbon factors: UK Gov GHG Conversion Factors 2024.", M, H - 7);
+    doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, H - 7);
+  }
 
   doc.save(`fuel-usage-calculation-${todayISO()}.pdf`);
 }
