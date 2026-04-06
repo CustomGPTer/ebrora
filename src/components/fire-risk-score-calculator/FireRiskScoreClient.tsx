@@ -294,25 +294,33 @@ async function exportPDF(
   y += 6;
   doc.setDrawColor(27, 87, 69);
   doc.line(M, y, W - M, y);
-  y += 8;
+  y += 6;
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
   doc.text("SIGN-OFF", M, y);
-  y += 8;
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
+  y += 6;
 
-  const signFields = [
-    "Assessed By:", "Signature:", "Date:",
-    "Site Manager:", "Signature:", "Date:",
-  ];
-  for (let i = 0; i < signFields.length; i++) {
-    if (i === 3) y += 4; // extra gap before site manager
-    doc.text(signFields[i], M, y);
-    doc.setDrawColor(180, 180, 180);
-    doc.line(M + 25, y, M + (signFields[i] === "Date:" ? 65 : 95), y);
-    y += 7;
-  }
+  const soW = CW / 2 - 2;
+  const soH = 8;
+  doc.setDrawColor(200, 200, 200);
+  doc.setFontSize(7.5);
+  doc.setFillColor(245, 245, 245);
+  doc.rect(M, y, soW, soH, "FD");
+  doc.rect(M + soW + 4, y, soW, soH, "FD");
+  doc.setFont("helvetica", "bold");
+  doc.text("Assessed By", M + 3, y + 5.5);
+  doc.text("Site Manager / Reviewer", M + soW + 7, y + 5.5);
+  y += soH;
+  doc.setFont("helvetica", "normal");
+  ["Name:", "Position:", "Signature:", "Date:"].forEach(label => {
+    doc.rect(M, y, soW, soH, "D");
+    doc.rect(M + soW + 4, y, soW, soH, "D");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(6.5);
+    doc.text(label, M + 3, y + 5.5);
+    doc.text(label, M + soW + 7, y + 5.5);
+    doc.setFont("helvetica", "normal");
+    y += soH;
+  });
 
   // ── Footer
   const pageCount = doc.getNumberOfPages();
