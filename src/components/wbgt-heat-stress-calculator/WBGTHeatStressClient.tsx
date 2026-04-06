@@ -59,6 +59,7 @@ async function exportPDF(
   let y = 0;
 
   // ── Header bar
+  const docRef = `WBGT-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
   doc.setFillColor(27, 87, 69);
   doc.rect(0, 0, W, 28, "F");
   doc.setTextColor(255, 255, 255);
@@ -69,26 +70,29 @@ async function exportPDF(
   doc.setFont("helvetica", "normal");
   doc.text("ISO 7243 / HSE Thermal Comfort — ebrora.com/tools/wbgt-heat-stress-calculator", M, 19);
   doc.setFontSize(7);
-  doc.text(`Generated ${new Date().toLocaleDateString("en-GB")}`, W - M - 40, 19);
+  doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34;
   doc.setTextColor(0, 0, 0);
 
-  // ── Site info
+  // ── Site info panel
+  doc.setFillColor(248, 248, 248);
+  doc.setDrawColor(220, 220, 220);
+  doc.roundedRect(M, y - 3, CW, 20, 1, 1, "FD");
   doc.setFontSize(8);
   const halfW = CW / 2;
-  const fields = [
-    ["Site:", header.site], ["Site Manager:", header.manager],
-    ["Assessed By:", header.assessedBy], ["Date:", header.date],
-    ["Assessment Type:", outputMode === "daily" ? "Daily Assessment" : "Weekly (5-Day) Planner"],
-  ];
-  fields.forEach(([lbl, val], i) => {
-    const col = i % 2 === 0 ? M : M + halfW;
-    if (i > 0 && i % 2 === 0) y += 5;
-    doc.setFont("helvetica", "bold");
-    doc.text(lbl, col, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(val || "—", col + 28, y);
-  });
+  const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
+    doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
+    const lw = doc.getTextWidth(label) + 2;
+    if (value) { doc.setFont("helvetica", "normal"); doc.text(value, x + lw, fy); }
+    else { doc.setDrawColor(180, 180, 180); doc.line(x + lw, fy, x + lw + lineW, fy); }
+  };
+  drawFld("Site:", header.site, M + 3, y, 50);
+  drawFld("Site Manager:", header.manager, M + halfW, y, 40);
+  y += 5;
+  drawFld("Assessed By:", header.assessedBy, M + 3, y, 50);
+  drawFld("Date:", header.date, M + halfW, y, 30);
+  y += 5;
+  drawFld("Assessment Type:", outputMode === "daily" ? "Daily Assessment" : "Weekly (5-Day) Planner", M + 3, y, 0);
   y += 8;
 
   // Helper to add new page if needed
@@ -258,12 +262,16 @@ async function exportPDF(
   doc.text("Date:", M, y);
   doc.line(M + 25, y, M + 65, y);
 
-  // ── Footer disclaimer
-  y = 287;
-  doc.setFontSize(5.5);
-  doc.setTextColor(130, 130, 130);
-  doc.text("This assessment uses the simplified Lemke & Kjellstrom (2012) WBGT estimation method and ISO 7243 work/rest reference values.", M, y);
-  doc.text("It is intended as a planning tool only. Site-specific monitoring with calibrated instruments should be used for definitive assessments. ebrora.com", M, y + 2.5);
+  // ── Footer on all pages
+  const pageCount = doc.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(130, 130, 130);
+    doc.text("This assessment uses the Lemke & Kjellstrom (2012) WBGT estimation and ISO 7243 work/rest reference values. Planning tool only.", M, 287);
+    doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, 287);
+  }
 
   doc.save(`wbgt-heat-stress-assessment-${todayISO()}.pdf`);
 }
