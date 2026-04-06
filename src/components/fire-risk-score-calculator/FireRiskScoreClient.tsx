@@ -92,6 +92,17 @@ async function exportPDF(
   drawFld("Assessment Type:", modeLabel.label, M + 3, y, 0);
   y += 8;
 
+  // Scope statement
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "italic");
+  doc.setTextColor(80, 80, 80);
+  const scopeText = `This fire risk score assessment covers ${header.site || "the above site"} (${modeLabel.label.toLowerCase()}) as at ${header.date || new Date().toLocaleDateString("en-GB")}. It is a screening tool aligned to PAS 79:2020 and the Regulatory Reform (Fire Safety) Order 2005. It does not replace a formal fire risk assessment by a competent fire risk assessor.`;
+  const scopeLines = doc.splitTextToSize(scopeText, CW);
+  doc.text(scopeLines, M, y);
+  y += scopeLines.length * 3 + 3;
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal");
+
   // Helper
   function checkPage(need: number) {
     if (y + need > 280) {
