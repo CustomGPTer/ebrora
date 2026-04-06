@@ -56,7 +56,17 @@ async function exportPDF(
   });
   y += 10;
 
-  function checkPage(need: number) { if (y + need > 280) { doc.addPage(); y = M; } }
+  function checkPage(need: number) {
+    if (y + need > 280) {
+      doc.addPage();
+      doc.setFillColor(27, 87, 69); doc.rect(0, 0, W, 10, "F");
+      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+      doc.text("CONSTRUCTION PRODUCTIVITY CALCULATOR (continued)", M, 7);
+      doc.setFontSize(6); doc.setFont("helvetica", "normal");
+      doc.text(`${header.project || header.site || ""}`, W - M - 40, 7);
+      doc.setTextColor(0, 0, 0); y = 14;
+    }
+  }
 
   // Active tasks
   const activeTasks = TASKS.filter(t => allResults[t.id] && allResults[t.id].dailyOutput > 0);
@@ -151,6 +161,10 @@ async function exportPDF(
       doc.text(`  Total quantity: ${fmtNum(qty, 0)} → ${fmtNum(days)} working days`, M + 2, y);
       y += 4;
     }
+    // Section separator between tasks
+    y += 2;
+    doc.setDrawColor(220, 220, 220);
+    doc.line(M, y, W - M, y);
     y += 4;
   });
 
