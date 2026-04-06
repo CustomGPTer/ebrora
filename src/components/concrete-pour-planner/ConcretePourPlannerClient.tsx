@@ -86,29 +86,45 @@ async function exportPDF(
     }
   }
 
-  // Schedule table
+  // Schedule table — dark header + bordered cells
   checkPage(15);
   doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Dispatch Schedule", M, y); y += 5;
-  doc.setFillColor(245, 245, 245); doc.rect(M, y - 2, CW, 5, "F");
-  doc.setFontSize(6); doc.setFont("helvetica", "bold");
-  const cols = [0, 15, 35, 55, 80, 105, 125, 150, 175, 200, 225, 250];
-  ["Load", "Wagon", "Trip", "Arrival", "Discharge", "End", "Depart", "Load m³", "Cumul. m³", "Wait", "TACO", "Status"].forEach((h, i) => doc.text(h, M + cols[i], y + 1));
-  y += 5; doc.setFont("helvetica", "normal");
+  const dCols = [15, 20, 20, 25, 25, 20, 25, 25, 25, 25, 25, 23];
+  doc.setFontSize(5.5); doc.setFont("helvetica", "bold");
+  let cx = M;
+  ["Load", "Wagon", "Trip", "Arrival", "Discharge", "End", "Depart", "Load m3", "Cumul. m3", "Wait", "TACO", "Status"].forEach((h, i) => {
+    doc.setFillColor(30, 30, 30); doc.rect(cx, y, dCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += dCols[i];
+  });
+  doc.setTextColor(0, 0, 0); y += 6;
 
+  doc.setFontSize(5.5); doc.setDrawColor(200, 200, 200);
   result.schedule.forEach((t, i) => {
     checkPage(4.5);
     const vals = [
       String(i + 1), `W${t.truckNumber}`, `T${t.tripNumber}`,
       t.arrivalTime, t.dischargeStart, t.dischargeEnd, t.departTime,
       fmtNum(t.loadM3, 1), fmtNum(t.cumulativeM3, 1),
-      t.waitMinutes > 0 ? `${t.waitMinutes}m` : "—",
+      t.waitMinutes > 0 ? `${t.waitMinutes}m` : "-",
       `${t.tacoElapsedMin}m`,
-      t.tacoOk ? "OK" : "!! BREACH",
+      t.tacoOk ? "OK" : "BREACH",
     ];
-    if (!t.tacoOk) { doc.setTextColor(220, 38, 38); } else { doc.setTextColor(0, 0, 0); }
-    vals.forEach((v, j) => doc.text(v, M + cols[j], y));
+    const rowH = 4.5; cx = M;
+    vals.forEach((v, j) => {
+      if (j === 11 && !t.tacoOk) {
+        doc.setFillColor(254, 226, 226); doc.rect(cx, y, dCols[j], rowH, "FD");
+        doc.setTextColor(220, 38, 38); doc.setFont("helvetica", "bold");
+      } else if (j === 11 && t.tacoOk) {
+        doc.setFillColor(236, 253, 245); doc.rect(cx, y, dCols[j], rowH, "FD");
+        doc.setTextColor(22, 163, 74); doc.setFont("helvetica", "bold");
+      } else {
+        doc.rect(cx, y, dCols[j], rowH, "D");
+        doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
+      }
+      doc.text(v, cx + 2, y + 3); cx += dCols[j];
+    });
     doc.setTextColor(0, 0, 0);
-    y += 4;
+    y += rowH;
   });
 
   // Sign-off (bordered table)
