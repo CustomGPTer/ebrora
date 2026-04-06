@@ -114,10 +114,11 @@ async function exportPDF(
   doc.text("Zone Assessment Summary", M, y); y += 5;
 
   const zCols = [30, 40, 32, 30, 22, 32];
-  doc.setFillColor(30, 30, 30); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   let cx = M;
   ["Zone", "Surface", "Contamination", "Footwear", "Score", "Risk Level"].forEach((h, i) => {
-    doc.rect(cx, y, zCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += zCols[i];
+    doc.setFillColor(30, 30, 30); doc.rect(cx, y, zCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += zCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
