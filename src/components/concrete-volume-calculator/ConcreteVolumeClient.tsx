@@ -74,13 +74,13 @@ async function exportPDF(
     const netVol = row.overrideVolume ?? calculateShapeVolume(row.shape, row.values);
     const grossVol = netVol * (1 + wastePercent / 100);
     const shapeDef = SHAPES.find(s => s.id === row.shape);
-    const dims = shapeDef?.inputs.map(inp => `${inp.label}: ${row.values[inp.id] ?? "—"} ${inp.unit}`).join(", ") || "";
+    const dims = shapeDef?.inputs.map(inp => `${row.values[inp.id] ?? "—"}${inp.unit}`).join(" x ") || "";
 
     doc.text(String(i + 1), M + cols[0], y);
     doc.text(row.label || `Element ${i + 1}`, M + cols[1], y);
     doc.text(shapeDef?.label || "", M + cols[2], y);
     doc.setFontSize(5.5);
-    doc.text(dims.slice(0, 55), M + cols[3], y);
+    doc.text(dims, M + cols[3], y);
     doc.setFontSize(6.5);
     doc.text(fmtNum(netVol, 3), M + cols[4], y);
     doc.text(fmtNum(grossVol, 3), M + cols[5], y);
