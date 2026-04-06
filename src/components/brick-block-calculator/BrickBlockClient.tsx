@@ -9,7 +9,7 @@ function fmtNum(v: number, dp = 1): string { if (!Number.isFinite(v) || v === 0)
 function todayISO() { return new Date().toISOString().slice(0, 10); }
 
 async function exportPDF(
-  header: { site: string; manager: string; preparedBy: string; date: string },
+  header: { company: string; site: string; manager: string; preparedBy: string; date: string },
   rows: WallRow[], results: WallResult[], totals: WallResult,
 ) {
   const { default: jsPDF } = await import("jspdf");
@@ -25,7 +25,7 @@ async function exportPDF(
   y = 30; doc.setTextColor(0, 0, 0);
 
   doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
-  doc.roundedRect(M, y - 3, CW, 14, 1, 1, "FD");
+  doc.roundedRect(M, y - 3, CW, 19, 1, 1, "FD");
   doc.setFontSize(8);
   const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
     doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
@@ -36,7 +36,9 @@ async function exportPDF(
   drawFld("Site:", header.site, M + 3, y, 50);
   drawFld("Site Manager:", header.manager, M + CW / 2, y, 40);
   y += 5;
-  drawFld("Prepared By:", header.preparedBy, M + 3, y, 50);
+  drawFld("Company:", header.company, M + 3, y, 50);
+  drawFld("Prepared By:", header.preparedBy, M + CW / 2, y, 40);
+  y += 5;
   drawFld("Date:", header.date, M + CW / 2, y, 30);
   y += 9;
 
@@ -108,7 +110,7 @@ async function exportPDF(
 export default function BrickBlockClient() {
   const [rows, setRows] = useState<WallRow[]>([createEmptyWallRow()]);
   const [site, setSite] = useState(""); const [manager, setManager] = useState("");
-  const [preparedBy, setPreparedBy] = useState(""); const [assessDate, setAssessDate] = useState(todayISO());
+  const [preparedBy, setPreparedBy] = useState(""); const [company, setCompany] = useState(""); const [assessDate, setAssessDate] = useState(todayISO());
   const [showSettings, setShowSettings] = useState(false); const [exporting, setExporting] = useState(false);
 
   const updateRow = useCallback((id: string, patch: Partial<WallRow>) => { setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r)); }, []);
@@ -130,7 +132,7 @@ export default function BrickBlockClient() {
   }), { grossArea: 0, openingArea: 0, netArea: 0, unitCount: 0, mortarM3: 0, cementBags: 0, sandTonnes: 0 }), [results]);
   const hasData = totals.unitCount > 0;
 
-  const handleExport = useCallback(async () => { setExporting(true); try { await exportPDF({ site, manager, preparedBy, date: assessDate }, rows, results, totals); } finally { setExporting(false); } }, [site, manager, preparedBy, assessDate, rows, results, totals]);
+  const handleExport = useCallback(async () => { setExporting(true); try { await exportPDF({ company, site, manager, preparedBy, date: assessDate }, rows, results, totals); } finally { setExporting(false); } }, [site, manager, preparedBy, assessDate, rows, results, totals]);
 
   return (
     <div className="space-y-5">
@@ -164,7 +166,7 @@ export default function BrickBlockClient() {
 
       {showSettings && (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[{l:"Site Name",v:site,s:setSite},{l:"Site Manager",v:manager,s:setManager},{l:"Prepared By",v:preparedBy,s:setPreparedBy}].map(f=>(
+          {[{l:"Company",v:company,s:setCompany},{l:"Site Name",v:site,s:setSite},{l:"Site Manager",v:manager,s:setManager},{l:"Prepared By",v:preparedBy,s:setPreparedBy}].map(f=>(
             <div key={f.l}><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">{f.l}</label><input type="text" value={f.v} onChange={e=>f.s(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none" /></div>
           ))}
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Date</label><input type="date" value={assessDate} onChange={e=>setAssessDate(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none" /></div>
