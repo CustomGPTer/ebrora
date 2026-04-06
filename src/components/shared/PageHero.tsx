@@ -1,7 +1,7 @@
 // src/components/shared/PageHero.tsx
 
 interface PageHeroProps {
-  title: string;
+  title: React.ReactNode;
   subtitle?: string;
   badge?: string;
   centered?: boolean;
