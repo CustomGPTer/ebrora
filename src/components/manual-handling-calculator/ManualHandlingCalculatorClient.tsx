@@ -361,7 +361,7 @@ async function exportPDF(
   if (controls.length > 0) {
     controls.forEach(c => {
       if (y > 275) { doc.addPage(); y = M; }
-      doc.text(`• ${c}`, M + 2, y);
+      doc.text(`- ${c}`, M + 2, y);
       y += 3.5;
     });
   }
