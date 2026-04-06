@@ -183,37 +183,34 @@ export default function TrenchBackfillClient() {
 
               {/* Dimensions */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { id: "trenchLength", label: "Trench Length", unit: "m", step: 0.1 },
-                  { id: "trenchWidth", label: "Trench Width", unit: "m", step: 0.05 },
-                  { id: "trenchDepth", label: "Trench Depth", unit: "m", step: 0.05 },
-                  { id: "pipeOD", label: "Pipe OD", unit: "mm", step: 1 },
-                ].map(f => (
-                  <div key={f.id}>
-                    <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">{f.label} <span className="text-gray-400 normal-case">({f.unit})</span></label>
-                    <input type="number" step={f.step} min={0} value={(row as Record<string, unknown>)[f.id] as number ?? ""}
-                      onChange={e => updateRow(row.id, { [f.id]: e.target.value === "" ? null : parseFloat(e.target.value) })}
-                      className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
-                  </div>
-                ))}
+                <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Trench Length <span className="text-gray-400 normal-case">(m)</span></label>
+                  <input type="number" step={0.1} min={0} value={row.trenchLength ?? ""} onChange={e => updateRow(row.id, { trenchLength: e.target.value === "" ? null : parseFloat(e.target.value) })}
+                    className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
+                <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Trench Width <span className="text-gray-400 normal-case">(m)</span></label>
+                  <input type="number" step={0.05} min={0} value={row.trenchWidth ?? ""} onChange={e => updateRow(row.id, { trenchWidth: e.target.value === "" ? null : parseFloat(e.target.value) })}
+                    className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
+                <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Trench Depth <span className="text-gray-400 normal-case">(m)</span></label>
+                  <input type="number" step={0.05} min={0} value={row.trenchDepth ?? ""} onChange={e => updateRow(row.id, { trenchDepth: e.target.value === "" ? null : parseFloat(e.target.value) })}
+                    className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
+                <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Pipe OD <span className="text-gray-400 normal-case">(mm)</span></label>
+                  <input type="number" step={1} min={0} value={row.pipeOD ?? ""} onChange={e => updateRow(row.id, { pipeOD: e.target.value === "" ? null : parseFloat(e.target.value) })}
+                    className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
               </div>
 
               {/* Materials per zone */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {[
-                  { id: "beddingMaterialId", label: "Bedding Material" },
-                  { id: "sideFillMaterialId", label: "Side Fill Material" },
-                  { id: "backfillMaterialId", label: "Backfill Material" },
-                ].map(f => (
-                  <div key={f.id}>
-                    <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">{f.label}</label>
-                    <select value={(row as Record<string, unknown>)[f.id] as string}
-                      onChange={e => updateRow(row.id, { [f.id]: e.target.value })}
-                      className="w-full px-2.5 py-2 text-sm border border-ebrora/30 bg-ebrora-light/40 rounded-lg outline-none">
-                      {BACKFILL_MATERIALS.map(m => <option key={m.id} value={m.id}>{m.name} ({m.densityTPerM3} t/m³)</option>)}
-                    </select>
-                  </div>
-                ))}
+                <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Bedding Material</label>
+                  <select value={row.beddingMaterialId} onChange={e => updateRow(row.id, { beddingMaterialId: e.target.value })}
+                    className="w-full px-2.5 py-2 text-sm border border-ebrora/30 bg-ebrora-light/40 rounded-lg outline-none">
+                    {BACKFILL_MATERIALS.map(m => <option key={m.id} value={m.id}>{m.name} ({m.densityTPerM3} t/m³)</option>)}</select></div>
+                <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Side Fill Material</label>
+                  <select value={row.sideFillMaterialId} onChange={e => updateRow(row.id, { sideFillMaterialId: e.target.value })}
+                    className="w-full px-2.5 py-2 text-sm border border-ebrora/30 bg-ebrora-light/40 rounded-lg outline-none">
+                    {BACKFILL_MATERIALS.map(m => <option key={m.id} value={m.id}>{m.name} ({m.densityTPerM3} t/m³)</option>)}</select></div>
+                <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Backfill Material</label>
+                  <select value={row.backfillMaterialId} onChange={e => updateRow(row.id, { backfillMaterialId: e.target.value })}
+                    className="w-full px-2.5 py-2 text-sm border border-ebrora/30 bg-ebrora-light/40 rounded-lg outline-none">
+                    {BACKFILL_MATERIALS.map(m => <option key={m.id} value={m.id}>{m.name} ({m.densityTPerM3} t/m³)</option>)}</select></div>
               </div>
 
               {/* Overrides & reuse toggle */}
