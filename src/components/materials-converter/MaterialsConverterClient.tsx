@@ -63,6 +63,138 @@ function createEmptyRow(): ConverterRow {
   };
 }
 
+// ─── PDF Export ──────────────────────────────────────────────────
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+
+async function exportMaterialsPDF(
+  rows: ConverterRow[],
+  outputs: RowOutputs[],
+  assumptions: ConverterAssumptions,
+  catTotals: { category: MaterialCategory; label: string; tonnes: number; volumeM3: number; cost: number; carbonT: number }[],
+  grandTotal: { tonnes: number; volumeM3: number; cost: number; carbonT: number },
+) {
+  const { default: jsPDF } = await import("jspdf");
+  const doc = new jsPDF("l", "mm", "a4"); // landscape for wide table
+  const W = 297; const H = 210; const M = 12; const CW = W - M * 2; let y = 0;
+
+  const docRef = `MAT-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+
+  // Green Ebrora header (FREE tool)
+  doc.setFillColor(27, 87, 69); doc.rect(0, 0, W, 22, "F");
+  doc.setTextColor(255, 255, 255); doc.setFontSize(13); doc.setFont("helvetica", "bold");
+  doc.text("CIVIL ENGINEERING MATERIALS TAKE-OFF", M, 10);
+  doc.setFontSize(7); doc.setFont("helvetica", "normal");
+  doc.text(`Ref: ${docRef} | Rev 0 | ebrora.com | ${new Date().toLocaleDateString("en-GB")}`, M, 17);
+  y = 28; doc.setTextColor(0, 0, 0);
+
+  // Summary boxes
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Summary", M, y); y += 5;
+  const boxW = 50; let bx = M;
+  catTotals.filter(c => c.tonnes > 0).forEach(c => {
+    doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
+    doc.roundedRect(bx, y, boxW, 12, 1, 1, "FD");
+    doc.setFontSize(6); doc.setFont("helvetica", "bold"); doc.text(c.label, bx + 2, y + 4);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(7);
+    doc.text(`${fmtNum(c.tonnes, 1)} t | ${fmtNum(c.volumeM3, 1)} m3 | ${fmtCurrency(c.cost, assumptions.currency)}`, bx + 2, y + 9);
+    bx += boxW + 3;
+  });
+  if (grandTotal.tonnes > 0) {
+    doc.setFillColor(232, 240, 236); doc.setDrawColor(27, 87, 69);
+    doc.roundedRect(bx, y, boxW + 10, 12, 1, 1, "FD");
+    doc.setFontSize(6); doc.setFont("helvetica", "bold"); doc.setTextColor(27, 87, 69);
+    doc.text("GRAND TOTAL", bx + 2, y + 4);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(7);
+    doc.text(`${fmtNum(grandTotal.tonnes, 1)} t | ${fmtNum(grandTotal.volumeM3, 1)} m3 | ${fmtCurrency(grandTotal.cost, assumptions.currency)} | ${fmtNum(grandTotal.carbonT, 3)} tCO2e`, bx + 2, y + 9);
+    doc.setTextColor(0, 0, 0);
+  }
+  y += 18;
+
+  // Table
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Materials Take-Off", M, y); y += 5;
+
+  // Header
+  const cols = [0, 60, 80, 95, 115, 135, 150, 165, 185, 205, 228, 250];
+  const heads = ["Material", "State", "Qty", "Unit", "Tonnes", "Volume m3", "Bags", "Loads", "Rate/t", "Cost", "Carbon kgCO2e", "Carbon tCO2e"];
+  doc.setFillColor(27, 87, 69); doc.setTextColor(255, 255, 255);
+  doc.rect(M, y, CW, 5, "F");
+  doc.setFontSize(5.5); doc.setFont("helvetica", "bold");
+  heads.forEach((h, i) => doc.text(h, M + cols[i] + 1, y + 3.5));
+  doc.setTextColor(0, 0, 0); y += 5;
+
+  doc.setFontSize(5.5); doc.setFont("helvetica", "normal"); doc.setDrawColor(230, 230, 230);
+  rows.forEach((row, idx) => {
+    if (!row.materialName || row.inputQty === null) return;
+    const out = outputs[idx];
+    if (!out) return;
+
+    if (y + 4.5 > 200) {
+      doc.addPage();
+      doc.setFillColor(27, 87, 69); doc.rect(0, 0, W, 10, "F");
+      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+      doc.text("MATERIALS TAKE-OFF (continued)", M, 7);
+      doc.setFontSize(6); doc.setFont("helvetica", "normal");
+      doc.text(`${docRef} | ebrora.com`, W - M - 50, 7);
+      doc.setTextColor(0, 0, 0); y = 14;
+      doc.setFontSize(5.5); doc.setDrawColor(230, 230, 230);
+    }
+
+    if (idx % 2 === 0) { doc.setFillColor(248, 248, 248); doc.rect(M, y - 1, CW, 4.5, "F"); }
+    doc.line(M, y + 3, M + CW, y + 3);
+
+    const matName = row.materialName.length > 32 ? row.materialName.slice(0, 30) + ".." : row.materialName;
+    const vals = [
+      matName, row.state, row.inputQty !== null ? fmtNum(row.inputQty, 2) : "--", row.inputUnit,
+      fmtNum(out.tonnes, 1), fmtNum(out.volumeM3, 1),
+      fmtNum(out.bulkBags, 0), fmtNum(out.loads, 1),
+      fmtCurrency(row.ratePer, assumptions.currency), fmtCurrency(out.cost, assumptions.currency),
+      fmtNum(out.carbonKg, 1), fmtNum(out.carbonT, 3),
+    ];
+    vals.forEach((v, i) => doc.text(v, M + cols[i] + 1, y + 2));
+    y += 4.5;
+  });
+
+  // Assumptions
+  y += 5;
+  if (y + 12 > 200) {
+    doc.addPage();
+    doc.setFillColor(27, 87, 69); doc.rect(0, 0, W, 10, "F");
+    doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+    doc.text("MATERIALS TAKE-OFF (continued)", M, 7);
+    doc.setTextColor(0, 0, 0); y = 14;
+  }
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); doc.text("Assumptions", M, y); y += 4;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(6);
+  doc.text(`Bulk bag: ${assumptions.bulkBagTonnes} t | Wagon load: ${assumptions.loadTonnes} t | Default thickness: ${assumptions.defaultThicknessMm} mm | Carbon factors: ICE v3/v4`, M, y);
+  y += 8;
+
+  // Sign-off
+  doc.setDrawColor(27, 87, 69); doc.line(M, y, W - M, y); y += 6;
+  doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.text("SIGN-OFF", M, y); y += 6;
+  const soW = Math.min(CW / 2 - 2, 120); const soH = 7;
+  doc.setDrawColor(200, 200, 200); doc.setFontSize(7);
+  doc.setFillColor(245, 245, 245);
+  doc.rect(M, y, soW, soH, "FD"); doc.rect(M + soW + 4, y, soW, soH, "FD");
+  doc.setFont("helvetica", "bold");
+  doc.text("Prepared By", M + 3, y + 5); doc.text("Checked By", M + soW + 7, y + 5);
+  y += soH;
+  doc.setFont("helvetica", "normal");
+  (["Name:", "Position:", "Signature:", "Date:"] as const).forEach(label => {
+    doc.rect(M, y, soW, soH, "D"); doc.rect(M + soW + 4, y, soW, soH, "D");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(6);
+    doc.text(label, M + 3, y + 5); doc.text(label, M + soW + 7, y + 5);
+    doc.setFont("helvetica", "normal"); y += soH;
+  });
+
+  // Footer
+  const pc = doc.getNumberOfPages();
+  for (let p = 1; p <= pc; p++) {
+    doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
+    doc.text("Civil engineering materials take-off. Densities are indicative - confirm with supplier. Carbon factors per ICE Database v3/v4. ebrora.com", M, 205);
+    doc.text(`Ref: ${docRef} | Page ${p} of ${pc}`, W - M - 50, 205);
+  }
+  doc.save(`materials-takeoff-${todayISO()}.pdf`);
+}
+
 // ─── Material Search Combobox ────────────────────────────────────
 function MaterialCombobox({
   value,
@@ -152,6 +284,7 @@ export default function MaterialsConverterClient() {
   const [columns, setColumns] = useState<ColumnVisibility>(DEFAULT_COLUMN_VISIBILITY);
   const [showSettings, setShowSettings] = useState(false);
   const [showColumns, setShowColumns] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // Compute outputs for all rows
   const outputs: RowOutputs[] = useMemo(
@@ -213,6 +346,13 @@ export default function MaterialsConverterClient() {
     a.click();
     URL.revokeObjectURL(url);
   }, [rows, outputs, assumptions]);
+
+  const handlePDFExport = useCallback(async () => {
+    setExporting(true);
+    try {
+      await exportMaterialsPDF(rows, outputs, assumptions, categories, grandTotal);
+    } finally { setExporting(false); }
+  }, [rows, outputs, assumptions, categories, grandTotal]);
 
   // Active output column count for table layout
   const colKeys: (keyof ColumnVisibility)[] = [
@@ -299,6 +439,16 @@ export default function MaterialsConverterClient() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
           </svg>
           Export CSV
+        </button>
+        <button
+          onClick={handlePDFExport}
+          disabled={exporting || grandTotal.tonnes === 0}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${grandTotal.tonnes > 0 ? "text-ebrora-dark bg-ebrora-light hover:bg-ebrora-mid" : "text-gray-400 bg-gray-100 cursor-not-allowed"}`}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          {exporting ? "Generating..." : "Download PDF"}
         </button>
         <button
           onClick={clearAll}
