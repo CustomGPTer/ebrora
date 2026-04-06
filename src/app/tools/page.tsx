@@ -96,6 +96,16 @@ const TOOL_META: Record<
     accent: "#7C3AED",
     accentLight: "rgba(124,58,237,0.08)",
   },
+  "concrete-volume-calculator": {
+    icon: "🧱",
+    accent: "#64748B",
+    accentLight: "rgba(100,116,139,0.08)",
+  },
+  "aggregate-calculator": {
+    icon: "🪨",
+    accent: "#B45309",
+    accentLight: "rgba(180,83,9,0.08)",
+  },
 };
 
 const DEFAULT_META = {
