@@ -21,12 +21,13 @@ export interface PlantMachine {
 }
 
 export type DutyCycle = '100' | '75' | '50' | '25';
+export type DutyCycleKey = 'fuel100' | 'fuel75' | 'fuel50' | 'fuel25';
 
-export const DUTY_CYCLES: { id: DutyCycle; label: string; description: string }[] = [
-  { id: '100', label: '100%', description: 'Full load — maximum continuous output' },
-  { id: '75', label: '75%', description: 'Heavy duty — typical hard digging or loaded haul' },
-  { id: '50', label: '50%', description: 'Medium duty — mixed work with some idle' },
-  { id: '25', label: '25%', description: 'Light duty — intermittent use or mostly idle' },
+export const DUTY_CYCLES: { id: DutyCycle; key: DutyCycleKey; label: string; description: string }[] = [
+  { id: '100', key: 'fuel100', label: '100%', description: 'Full load — maximum continuous output' },
+  { id: '75', key: 'fuel75', label: '75%', description: 'Heavy duty — typical hard digging or loaded haul' },
+  { id: '50', key: 'fuel50', label: '50%', description: 'Medium duty — mixed work with some idle' },
+  { id: '25', key: 'fuel25', label: '25%', description: 'Light duty — intermittent use or mostly idle' },
 ];
 
 export function getFuelRate(machine: PlantMachine, duty: DutyCycle): number {
@@ -287,3 +288,9 @@ export const GENERIC_MACHINES: PlantMachine[] = [
 ];
 
 export const ALL_MACHINES: PlantMachine[] = [...PLANT_DATABASE, ...GENERIC_MACHINES];
+
+// ─── Compatibility aliases (component uses these names) ──────────
+export type Machine = PlantMachine;
+export const MACHINES = ALL_MACHINES;
+export const CARBON_FACTORS = FUEL_CARBON_FACTORS;
+export const DEFAULT_FUEL_COST = DEFAULT_FUEL_PRICE;
