@@ -56,7 +56,7 @@ const TOOL_META: Record<
     accent: "#2563EB",
     accentLight: "rgba(37,99,235,0.08)",
   },
-  "fire-risk-assessment": {
+  "fire-risk-score-calculator": {
     icon: "🔥",
     accent: "#DC2626",
     accentLight: "rgba(220,38,38,0.08)",
@@ -80,6 +80,11 @@ const TOOL_META: Record<
     icon: "⛽",
     accent: "#EA580C",
     accentLight: "rgba(234,88,12,0.08)",
+  },
+  "wbgt-heat-stress-calculator": {
+    icon: "🌡️",
+    accent: "#DC2626",
+    accentLight: "rgba(220,38,38,0.08)",
   },
 };
 
