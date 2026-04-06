@@ -66,59 +66,58 @@ async function exportPDF(
 
   function checkPage(n: number) { if (y + n > 280) { doc.addPage(); y = M; } }
 
-  // Elements table
-  doc.setFillColor(245, 245, 245);
-  doc.rect(M, y - 2, CW, 5, "F");
-  doc.setFontSize(6.5);
-  doc.setFont("helvetica", "bold");
-  const cols = [0, 8, 50, 95, 130, 155];
-  ["#", "Element", "Shape", "Dimensions", "Net Vol (m³)", "Gross Vol (m³)"].forEach((h, i) => doc.text(h, M + cols[i], y + 1));
-  y += 5.5;
-  doc.setFont("helvetica", "normal");
+  // Elements table — dark header + bordered cells
+  const tblCols = [12, 38, 32, 40, 30, 30];
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  let cx = M;
+  ["#", "Element", "Shape", "Dimensions", "Net Vol (m3)", "Gross Vol (m3)"].forEach((h, i) => {
+    doc.setFillColor(30, 30, 30); doc.rect(cx, y, tblCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += tblCols[i];
+  });
+  doc.setTextColor(0, 0, 0); y += 6;
 
   const activeRows = rows.filter(r => {
     const vol = r.overrideVolume ?? calculateShapeVolume(r.shape, r.values);
     return vol > 0;
   });
 
+  doc.setFontSize(6); doc.setDrawColor(200, 200, 200);
   activeRows.forEach((row, i) => {
     checkPage(6);
     const netVol = row.overrideVolume ?? calculateShapeVolume(row.shape, row.values);
     const grossVol = netVol * (1 + wastePercent / 100);
     const shapeDef = SHAPES.find(s => s.id === row.shape);
-    const dims = shapeDef?.inputs.map(inp => `${row.values[inp.id] ?? "—"}${inp.unit}`).join(" x ") || "";
-
-    doc.text(String(i + 1), M + cols[0], y);
-    doc.text(row.label || `Element ${i + 1}`, M + cols[1], y);
-    doc.text(shapeDef?.label || "", M + cols[2], y);
-    doc.setFontSize(5.5);
-    doc.text(dims, M + cols[3], y);
-    doc.setFontSize(6.5);
-    doc.text(fmtNum(netVol, 3), M + cols[4], y);
-    doc.text(fmtNum(grossVol, 3), M + cols[5], y);
-    y += 4.5;
+    const dims = shapeDef?.inputs.map(inp => `${row.values[inp.id] ?? "-"}${inp.unit}`).join(" x ") || "";
+    const rowH = 5.5;
+    cx = M;
+    [String(i + 1), row.label || `Element ${i + 1}`, shapeDef?.label || "", dims, fmtNum(netVol, 3), fmtNum(grossVol, 3)].forEach((t, ci) => {
+      doc.rect(cx, y, tblCols[ci], rowH, "D");
+      doc.setFont("helvetica", ci <= 1 ? "bold" : "normal");
+      doc.setTextColor(0, 0, 0);
+      const lines = doc.splitTextToSize(t, tblCols[ci] - 4);
+      doc.text(lines, cx + 2, y + 3.5);
+      cx += tblCols[ci];
+    });
+    y += rowH;
   });
 
   // Totals
   y += 2;
-  doc.setDrawColor(30, 30, 30);
-  doc.line(M, y, W - M, y);
-  y += 5;
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "bold");
-  doc.text("TOTALS", M, y);
-  y += 5;
-  doc.setFontSize(7.5);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  doc.text("TOTALS", M, y); y += 5;
+  doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
+  doc.roundedRect(M, y, CW, 22, 1, 1, "FD");
+  doc.setFontSize(7.5); doc.setTextColor(0, 0, 0);
   [
-    [`Net Volume:`, `${fmtNum(totals.net, 3)} m³`],
-    [`Gross Volume (inc. ${wastePercent}% waste):`, `${fmtNum(totals.gross, 3)} m³`],
-    [`Truck Loads (${truckCapacity} m³ capacity):`, `${Math.ceil(totals.trucks)} loads`],
+    [`Net Volume:`, `${fmtNum(totals.net, 3)} m3`],
+    [`Gross Volume (inc. ${wastePercent}% waste):`, `${fmtNum(totals.gross, 3)} m3`],
+    [`Truck Loads (${truckCapacity} m3 capacity):`, `${Math.ceil(totals.trucks)} loads`],
     [`Concrete Mix:`, mix],
-  ].forEach(([l, v]) => {
-    doc.setFont("helvetica", "bold"); doc.text(l, M, y);
-    doc.setFont("helvetica", "normal"); doc.text(v, M + 65, y);
-    y += 4.5;
+  ].forEach(([l, v], i) => {
+    doc.setFont("helvetica", "bold"); doc.text(l, M + 4, y + 5 + i * 4.5);
+    doc.setFont("helvetica", "normal"); doc.text(v, M + 70, y + 5 + i * 4.5);
   });
+  y += 27;
 
   // Sign-off
   checkPage(45); y += 6;
