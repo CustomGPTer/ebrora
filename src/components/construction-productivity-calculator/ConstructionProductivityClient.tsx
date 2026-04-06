@@ -101,7 +101,7 @@ async function exportPDF(
     doc.setFont("helvetica", "bold");
     doc.setFillColor(232, 240, 236);
     doc.rect(M, y - 3, CW, 7, "F");
-    doc.text(`${task.icon} ${task.name}`, M + 3, y + 1);
+    doc.text(task.name, M + 3, y + 1);
     doc.setFont("helvetica", "normal");
     doc.text(`Output: ${fmtNum(result.dailyOutput)} ${task.unit}`, M + CW - 60, y + 1);
     y += 8;
