@@ -106,6 +106,16 @@ const TOOL_META: Record<
     accent: "#B45309",
     accentLight: "rgba(180,83,9,0.08)",
   },
+  "excavation-spoil-calculator": {
+    icon: "⛏️",
+    accent: "#92400E",
+    accentLight: "rgba(146,64,14,0.08)",
+  },
+  "trench-backfill-calculator": {
+    icon: "🔧",
+    accent: "#0E7490",
+    accentLight: "rgba(14,116,144,0.08)",
+  },
 };
 
 const DEFAULT_META = {
