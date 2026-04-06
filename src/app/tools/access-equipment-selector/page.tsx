@@ -50,7 +50,7 @@ export default function AccessEquipmentSelectorPage() {
         ]}
       />
 
-      <div className="mb-6">
+      <div className="mb-6 text-center">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
           Access Equipment Selector
         </h1>
