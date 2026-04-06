@@ -40,7 +40,17 @@ async function exportPDF(
   drawFld("Date:", header.date, M + CW / 2, y, 30);
   y += 9;
 
-  function checkPage(n: number) { if (y + n > 280) { doc.addPage(); y = M; } }
+  function checkPage(n: number) {
+    if (y + n > 280) {
+      doc.addPage();
+      doc.setFillColor(30, 30, 30); doc.rect(0, 0, W, 10, "F");
+      doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+      doc.text("TRENCH BACKFILL & PIPE BEDDING (continued)", M, 7);
+      doc.setFontSize(6); doc.setFont("helvetica", "normal");
+      doc.text(`${docRef} | ${header.site || ""}`, W - M - 55, 7);
+      doc.setTextColor(0, 0, 0); y = 14;
+    }
+  }
 
   rows.forEach((row, idx) => {
     const res = results[idx];
