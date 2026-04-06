@@ -50,15 +50,15 @@ export default function ConstructionProductivityCalculatorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <BreadcrumbNav items={[{ label: "Free Tools", href: "/tools" }, { label: "Construction Productivity Calculator" }]} />
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="mb-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
             <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
             </span>
             <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">Free</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Construction Productivity Calculator</h1>
-          <p className="text-base text-gray-500 mt-2 max-w-2xl leading-relaxed">
+          <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
             Estimate daily outputs for 9 UK civil engineering task types. Based on Spon&apos;s, CIRIA and industry norms with full calculation chain visibility, days-to-complete planning, and professional PDF export. All rates overridable.
           </p>
         </div>
