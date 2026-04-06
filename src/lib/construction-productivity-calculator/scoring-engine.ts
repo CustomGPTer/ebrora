@@ -55,10 +55,9 @@ export function calculateOutput(task: TaskConfig, inputs: TaskInputs): CalcBreak
     if (field.id === "gangCount") return; // handled above
 
     if (task.id === "muck-shift" && field.id === "primaryPlant") {
-      // Primary plant overrides the base rate
+      // Primary plant overrides the base rate (shown as base rate in chain, not as separate factor)
       const plantRate = getSelectFactor(field.options!, inputVal as string);
       effectiveBaseRate = plantRate;
-      taskFactors.push({ label: field.label, value: plantRate });
       return;
     }
 
