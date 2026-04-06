@@ -250,3 +250,77 @@ export function getCategory(totalScore: number): CategoryResult {
 export function getRequirements(cat: NCCategory): CategoryRequirements {
   return CATEGORY_REQUIREMENTS[cat];
 }
+
+/* ── Risk-specific additional controls ────────────────────────── */
+/* Per Confined Spaces Regulations 1997, L101 ACOP, Water UK Guidance */
+
+export interface RiskSpecificControl {
+  riskLabel: string;
+  controls: string[];
+}
+
+export const RISK_SPECIFIC_CONTROLS: Record<string, RiskSpecificControl> = {
+  fire_explosion: {
+    riskLabel: "Fire / Explosion",
+    controls: [
+      "All electrical equipment brought into the confined space must be intrinsically safe (ATEX rated)",
+      "Activities such as cutting or welding must not generate sparks unless conditions to eliminate likelihood of fire or explosion have been met",
+      "Hot works permit required in addition to confined space permit",
+      "Flammable atmosphere testing must be carried out before and during entry",
+      "Fire extinguisher(s) suitable for the environment must be available at point of entry",
+      "Sources of ignition must be identified and eliminated or controlled",
+    ],
+  },
+  temperature: {
+    riskLabel: "Increased Body Temperature",
+    controls: [
+      "Work rate and duration must be managed to prevent heat stress",
+      "Cool drinking water must be available at point of entry",
+      "Rest periods must be planned and enforced",
+      "Temperature monitoring of the space and operatives must be carried out",
+      "Emergency cooling measures must be available",
+    ],
+  },
+  gas_fume: {
+    riskLabel: "Gas / Fume / Vapour / Lack of Oxygen",
+    controls: [
+      "The confined space must be opened and allowed to vent for a minimum period of 15 minutes before entry",
+      "Barriers and warning signage must be positioned to keep people away during venting",
+      "Atmosphere must be tested in 3 areas (top, middle, bottom) for a minimum of 5 minutes per location",
+      "Gas monitor must have a valid calibration date",
+      "Continuous atmosphere monitoring must be carried out whilst personnel are inside",
+      "If the gas monitor emits an alarm, all personnel must immediately don escape BA and evacuate",
+      "All gas alarm activations must be reported as a Near Miss",
+    ],
+  },
+  drowning: {
+    riskLabel: "Drowning",
+    controls: [
+      "Physically lock off all flow valves or discharge pipes that may affect the confined space",
+      "Confirmation of all isolations must be recorded and signed off on the entry permit",
+      "Water level monitoring must be in place throughout the entry",
+      "Emergency pump or drainage must be available at point of entry",
+      "Personnel must wear suitable waterproof PPE",
+    ],
+  },
+  free_flowing_solid: {
+    riskLabel: "Free-Flowing Solid / Entrapment",
+    controls: [
+      "All feed mechanisms and conveyors must be physically isolated and locked off",
+      "Confirmation of isolation must be recorded and signed off on the entry permit",
+      "Material levels must be monitored throughout the entry",
+      "Suitable rescue equipment must be available for entrapment scenarios",
+      "Personnel must not stand on or work below stored free-flowing materials",
+    ],
+  },
+};
+
+/** Map foreseeable risk option index to risk-specific control key */
+export const RISK_INDEX_TO_KEY: Record<number, string> = {
+  0: "fire_explosion",
+  1: "temperature",
+  2: "gas_fume",
+  3: "drowning",
+  4: "free_flowing_solid",
+};
+
