@@ -9,7 +9,7 @@ function fmtNum(v: number, dp = 2): string { if (!Number.isFinite(v) || v === 0)
 function todayISO() { return new Date().toISOString().slice(0, 10); }
 
 async function exportPDF(
-  header: { site: string; manager: string; preparedBy: string; date: string },
+  header: { company: string; site: string; manager: string; preparedBy: string; date: string },
   rows: TrenchRow[], results: TrenchZoneResult[], totals: TrenchZoneResult,
 ) {
   const { default: jsPDF } = await import("jspdf");
@@ -25,7 +25,7 @@ async function exportPDF(
   y = 30; doc.setTextColor(0, 0, 0);
 
   doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
-  doc.roundedRect(M, y - 3, CW, 14, 1, 1, "FD");
+  doc.roundedRect(M, y - 3, CW, 19, 1, 1, "FD");
   doc.setFontSize(8);
   const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
     doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
@@ -36,7 +36,9 @@ async function exportPDF(
   drawFld("Site:", header.site, M + 3, y, 50);
   drawFld("Site Manager:", header.manager, M + CW / 2, y, 40);
   y += 5;
-  drawFld("Prepared By:", header.preparedBy, M + 3, y, 50);
+  drawFld("Company:", header.company, M + 3, y, 50);
+  drawFld("Prepared By:", header.preparedBy, M + CW / 2, y, 40);
+  y += 5;
   drawFld("Date:", header.date, M + CW / 2, y, 30);
   y += 9;
 
@@ -139,7 +141,7 @@ async function exportPDF(
 export default function TrenchBackfillClient() {
   const [rows, setRows] = useState<TrenchRow[]>([createEmptyTrenchRow()]);
   const [site, setSite] = useState(""); const [manager, setManager] = useState("");
-  const [preparedBy, setPreparedBy] = useState(""); const [assessDate, setAssessDate] = useState(todayISO());
+  const [preparedBy, setPreparedBy] = useState(""); const [company, setCompany] = useState(""); const [assessDate, setAssessDate] = useState(todayISO());
   const [showSettings, setShowSettings] = useState(false); const [exporting, setExporting] = useState(false);
 
   const updateRow = useCallback((id: string, patch: Partial<TrenchRow>) => { setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r)); }, []);
@@ -156,7 +158,7 @@ export default function TrenchBackfillClient() {
   }), { beddingM3: 0, sideFillM3: 0, backfillM3: 0, totalTrenchM3: 0, pipeVolumeM3: 0, beddingTonnes: 0, sideFillTonnes: 0, backfillTonnes: 0, importTonnes: 0, exportTonnes: 0 }), [results]);
   const hasData = totals.totalTrenchM3 > 0;
 
-  const handleExport = useCallback(async () => { setExporting(true); try { await exportPDF({ site, manager, preparedBy, date: assessDate }, rows, results, totals); } finally { setExporting(false); } }, [site, manager, preparedBy, assessDate, rows, results, totals]);
+  const handleExport = useCallback(async () => { setExporting(true); try { await exportPDF({ company, site, manager, preparedBy, date: assessDate }, rows, results, totals); } finally { setExporting(false); } }, [site, manager, preparedBy, assessDate, rows, results, totals]);
 
   return (
     <div className="space-y-5">
