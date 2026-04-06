@@ -161,10 +161,11 @@ async function exportPDF(
   doc.text("Comparison Across Methods", M, y); y += 5;
 
   const mCols = [60, 40, 40, 46];
-  doc.setFillColor(27, 87, 69); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   let cx = M;
   ["Method", "CBR (%)", "Modulus (MPa)", "Subgrade Class"].forEach((h, i) => {
-    doc.rect(cx, y, mCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += mCols[i];
+    doc.setFillColor(27, 87, 69); doc.rect(cx, y, mCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += mCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
@@ -192,10 +193,11 @@ async function exportPDF(
   doc.text("DMRB Subgrade Classification (HD 26)", M, y); y += 5;
 
   const sCols = [25, 20, 25, 116];
-  doc.setFillColor(27, 87, 69); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   cx = M;
   ["Class", "CBR (%)", "Rating", "Design Guidance"].forEach((h, i) => {
-    doc.rect(cx, y, sCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += sCols[i];
+    doc.setFillColor(27, 87, 69); doc.rect(cx, y, sCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += sCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
@@ -204,16 +206,18 @@ async function exportPDF(
     const isCurrent = sc.id === subgrade.id;
     const guidanceLines = doc.splitTextToSize(sc.designGuidance, sCols[3] - 4);
     const rowH = Math.max(5.5, guidanceLines.length * 2.5 + 2);
-    if (isCurrent) { doc.setFillColor(232, 240, 236); } else { doc.setFillColor(255, 255, 255); }
     cx = M;
     [sc.className, `${sc.cbrMin}-${sc.cbrMax}`, sc.label].forEach((t, i) => {
-      doc.rect(cx, y, sCols[i], rowH, isCurrent ? "FD" : "D");
+      if (isCurrent) { doc.setFillColor(232, 240, 236); doc.rect(cx, y, sCols[i], rowH, "FD"); }
+      else { doc.setFillColor(255, 255, 255); doc.rect(cx, y, sCols[i], rowH, "D"); }
+      doc.setTextColor(0, 0, 0);
       doc.setFont("helvetica", i === 0 || isCurrent ? "bold" : "normal");
       doc.text(t, cx + 2, y + 3.5);
       cx += sCols[i];
     });
-    doc.rect(cx, y, sCols[3], rowH, isCurrent ? "FD" : "D");
-    doc.setFont("helvetica", "normal");
+    if (isCurrent) { doc.setFillColor(232, 240, 236); doc.rect(cx, y, sCols[3], rowH, "FD"); }
+    else { doc.rect(cx, y, sCols[3], rowH, "D"); }
+    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
     doc.text(guidanceLines, cx + 2, y + 3.5);
     y += rowH;
   }
@@ -224,10 +228,11 @@ async function exportPDF(
   doc.text("Common Soil Types - Typical CBR Ranges", M, y); y += 5;
 
   const rCols = [46, 22, 22, 22, 22, 52];
-  doc.setFillColor(27, 87, 69); doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   cx = M;
   ["Soil Type", "CBR Low", "CBR Mid", "CBR High", "Class", "Notes"].forEach((h, i) => {
-    doc.rect(cx, y, rCols[i], 6, "F"); doc.text(h, cx + 2, y + 4); cx += rCols[i];
+    doc.setFillColor(27, 87, 69); doc.rect(cx, y, rCols[i], 6, "F");
+    doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += rCols[i];
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
