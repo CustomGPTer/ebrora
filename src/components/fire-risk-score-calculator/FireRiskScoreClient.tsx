@@ -94,7 +94,19 @@ async function exportPDF(
 
   // Helper
   function checkPage(need: number) {
-    if (y + need > 280) { doc.addPage(); y = M; }
+    if (y + need > 280) {
+      doc.addPage();
+      // Condensed continuation header
+      doc.setFillColor(27, 87, 69);
+      doc.rect(0, 0, W, 10, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8); doc.setFont("helvetica", "bold");
+      doc.text("FIRE RISK SCORE ASSESSMENT (continued)", M, 7);
+      doc.setFontSize(6); doc.setFont("helvetica", "normal");
+      doc.text(`${docRef} | ${header.site || ""}`, W - M - 55, 7);
+      doc.setTextColor(0, 0, 0);
+      y = 14;
+    }
   }
 
   // ── Overall Risk Rating
