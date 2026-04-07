@@ -25,6 +25,13 @@ const TOOL_CATEGORIES = {
       "lone-worker-risk-calculator",
       "fatigue-risk-calculator",
       "first-aid-needs-calculator",
+    ]),
+  },
+  "Temporary Works": {
+    icon: "🏗️",
+    accent: "#64748B",
+    accentLight: "rgba(100,116,139,0.08)",
+    slugs: new Set([
       "scaffold-load-calculator",
       "formwork-pressure-calculator",
     ]),
@@ -54,15 +61,34 @@ const TOOL_CATEGORIES = {
       "access-equipment-selector",
     ]),
   },
-  "Civils & Earthworks": {
+  "Earthworks & Ground": {
     icon: "⛏️",
     accent: "#0891B2",
     accentLight: "rgba(8,145,178,0.08)",
     slugs: new Set([
       "cbr-modulus-converter",
-  "drainage-pipe-flow-calculator",
+      "drainage-pipe-flow-calculator",
+    ]),
+  },
+  "Programme & Commercial": {
+    icon: "📊",
+    accent: "#7C3AED",
+    accentLight: "rgba(124,58,237,0.08)",
+    slugs: new Set([
       "construction-productivity-calculator",
     ]),
+  },
+  "Environmental & Ecology": {
+    icon: "🌿",
+    accent: "#16A34A",
+    accentLight: "rgba(22,163,74,0.08)",
+    slugs: new Set<string>([]),
+  },
+  "Utilities & Services": {
+    icon: "⚡",
+    accent: "#0284C7",
+    accentLight: "rgba(2,132,199,0.08)",
+    slugs: new Set<string>([]),
   },
 } as const;
 
