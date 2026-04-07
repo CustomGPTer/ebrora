@@ -155,7 +155,7 @@ async function exportPDF(
 
   // Info panel
   doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
-  doc.roundedRect(M, y - 3, CW, 30, 1, 1, "FD"); doc.setFontSize(8);
+  doc.roundedRect(M, y - 3, CW, 40, 1, 1, "FD"); doc.setFontSize(8);
   const halfW = CW / 2;
   const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
     doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
@@ -178,6 +178,12 @@ async function exportPDF(
   y += 5;
   drawFld("Bay:", `${inputs.bayWidth}m W x ${inputs.bayLength}m L`, M + 3, y, 0);
   drawFld("Wind Zone:", WIND_ZONES.find(w => w.zone === inputs.windZone)!.label, M + halfW, y, 0);
+  y += 5;
+  drawFld("Sheeted:", inputs.sheeted ? "Yes" : "No", M + 3, y, 0);
+  drawFld("Debris Net:", inputs.debrisNet ? "Yes" : "No", M + 50, y, 0);
+  drawFld("Freestanding:", inputs.freestanding ? "Yes" : "No", M + halfW, y, 0);
+  y += 5;
+  drawFld("Loaded Bays:", String(inputs.loadedBays), M + 3, y, 0);
   y += 8;
 
   function checkPage(need: number) {
