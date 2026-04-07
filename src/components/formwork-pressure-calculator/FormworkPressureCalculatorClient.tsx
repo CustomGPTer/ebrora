@@ -108,7 +108,7 @@ async function exportPDF(
   y = 34; doc.setTextColor(0, 0, 0);
 
   doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
-  doc.roundedRect(M, y - 3, CW, 30, 1, 1, "FD"); doc.setFontSize(8);
+  doc.roundedRect(M, y - 3, CW, 35, 1, 1, "FD"); doc.setFontSize(8);
   const halfW = CW / 2;
   const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
     doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
@@ -122,11 +122,15 @@ async function exportPDF(
   drawFld("Assessed By:", header.assessedBy, M + halfW, y, 40); y += 5;
   drawFld("Date:", header.date, M + 3, y, 30);
   drawFld("Pour Rate:", `${inputs.pourRate} m/hr`, M + halfW, y, 0); y += 5;
-  drawFld("Temperature:", `${inputs.temperature}C`, M + 3, y, 0);
+  drawFld("Temperature:", `${inputs.temperature}\u00B0C`, M + 3, y, 0);
   drawFld("Head Height:", `${inputs.headHeight}m`, M + halfW, y, 0); y += 5;
   const ctData = CONCRETE_TYPES.find(c => c.type === inputs.concreteType)!;
+  const finishData = FORMWORK_FINISHES.find(f => f.finish === inputs.formworkFinish)!;
   drawFld("Concrete:", ctData.label, M + 3, y, 0);
   drawFld("Vibrated:", inputs.vibrated ? "Yes" : "No", M + halfW, y, 0);
+  y += 5;
+  drawFld("Formwork Finish:", finishData.label, M + 3, y, 0);
+  drawFld("Tie Capacity:", `${inputs.tieCapacity} kN`, M + halfW, y, 0);
   y += 8;
 
   function checkPage(need: number) {
