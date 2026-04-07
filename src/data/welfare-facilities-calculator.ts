@@ -45,17 +45,23 @@ export interface WelfareUnitConfig {
 // ── Constants & Calculation Logic ──────────────────────────────
 
 /**
- * Calculate toilet requirements per BS 6465-1:2006 and HSG150
- * Male: 1 WC per 25 + urinals 1 per 25 (up to 100), then 1 per 50
- * Female: 1 WC per 1-12, 2 per 13-25, 3 per 26-40, 4 per 41-57, 5 per 58-77, 6 per 78-100
- * Construction site simplified: 1 WC per 7 operatives (HSG150 guideline)
+ * Calculate toilet requirements per HSG150 Table 2 (construction sites)
+ * Male WCs: stepped lookup per HSG150 — 1 per 7 (small sites) to 1 per 15 (large sites)
+ * Female: per BS 6465-1:2006 female ratios (more generous than male)
+ * Construction site simplified: HSG150 is the primary reference for site welfare
  */
 
 export function calcMaleToilets(count: number): { wcs: number; urinals: number } {
   if (count <= 0) return { wcs: 0, urinals: 0 };
-  // BS 6465 male: 1 WC per 15 men + urinals
-  // HSG150 simplified: 1 per 7 for site work
-  const wcs = Math.max(1, Math.ceil(count / 15));
+  // HSG150 Table 2 — construction site toilet provision
+  let wcs: number;
+  if (count <= 7) wcs = 1;
+  else if (count <= 20) wcs = 2;
+  else if (count <= 35) wcs = 3;
+  else if (count <= 50) wcs = 4;
+  else if (count <= 65) wcs = 5;
+  else if (count <= 80) wcs = 6;
+  else wcs = 6 + Math.ceil((count - 80) / 15);
   const urinals = count <= 6 ? 0 : Math.max(1, Math.ceil(count / 25));
   return { wcs, urinals };
 }
