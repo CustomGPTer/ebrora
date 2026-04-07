@@ -37,10 +37,10 @@ export interface LoneWorkerResult {
 
 // ─── Risk Band Definitions ───────────────────────────────────
 export const RISK_BAND_DEFS: { band: RiskBand; label: string; description: string; minScore: number; maxScore: number; bgClass: string; textClass: string; borderClass: string; dotClass: string; colour: string; gaugeRGB: number[] }[] = [
-  { band: "low", label: "Low", description: "Lone working acceptable with standard precautions. Ensure operative has a charged mobile phone and someone knows their location and expected return time.", minScore: 0, maxScore: 50, bgClass: "bg-emerald-50", textClass: "text-emerald-800", borderClass: "border-emerald-200", dotClass: "bg-emerald-500", colour: "#22C55E", gaugeRGB: [22, 163, 74] },
-  { band: "medium", label: "Medium", description: "Lone working acceptable with enhanced precautions. Regular check-ins required at defined intervals. Supervisor to be informed of lone working activity.", minScore: 51, maxScore: 200, bgClass: "bg-amber-50", textClass: "text-amber-800", borderClass: "border-amber-200", dotClass: "bg-amber-500", colour: "#EAB308", gaugeRGB: [234, 179, 8] },
-  { band: "high", label: "High", description: "Lone working acceptable ONLY with specific controls in place. GPS tracking, automatic welfare alerts, reduced check-in intervals, site-specific emergency procedure, and informed site manager required.", minScore: 201, maxScore: 600, bgClass: "bg-red-50", textClass: "text-red-800", borderClass: "border-red-200", dotClass: "bg-red-500", colour: "#EF4444", gaugeRGB: [239, 68, 68] },
-  { band: "unacceptable", label: "Unacceptable", description: "Lone working MUST NOT proceed. Implement a buddy system, additional operative, or alternative working arrangements. The combination of risk factors makes lone working unacceptably dangerous.", minScore: 601, maxScore: 99999, bgClass: "bg-gray-900 bg-opacity-90", textClass: "text-white", borderClass: "border-gray-700", dotClass: "bg-gray-900", colour: "#1F2937", gaugeRGB: [31, 41, 55] },
+  { band: "low", label: "Low", description: "Lone working acceptable with standard precautions. Ensure operative has a charged mobile phone and someone knows their location and expected return time.", minScore: 0, maxScore: 100, bgClass: "bg-emerald-50", textClass: "text-emerald-800", borderClass: "border-emerald-200", dotClass: "bg-emerald-500", colour: "#22C55E", gaugeRGB: [22, 163, 74] },
+  { band: "medium", label: "Medium", description: "Lone working acceptable with enhanced precautions. Regular check-ins required at defined intervals. Supervisor to be informed of lone working activity.", minScore: 101, maxScore: 300, bgClass: "bg-amber-50", textClass: "text-amber-800", borderClass: "border-amber-200", dotClass: "bg-amber-500", colour: "#EAB308", gaugeRGB: [234, 179, 8] },
+  { band: "high", label: "High", description: "Lone working acceptable ONLY with specific controls in place. GPS tracking, automatic welfare alerts, reduced check-in intervals, site-specific emergency procedure, and informed site manager required.", minScore: 301, maxScore: 700, bgClass: "bg-red-50", textClass: "text-red-800", borderClass: "border-red-200", dotClass: "bg-red-500", colour: "#EF4444", gaugeRGB: [239, 68, 68] },
+  { band: "unacceptable", label: "Unacceptable", description: "Lone working MUST NOT proceed. Implement a buddy system, additional operative, or alternative working arrangements. The combination of risk factors makes lone working unacceptably dangerous.", minScore: 701, maxScore: 99999, bgClass: "bg-gray-900 bg-opacity-90", textClass: "text-white", borderClass: "border-gray-700", dotClass: "bg-gray-900", colour: "#1F2937", gaugeRGB: [31, 41, 55] },
 ];
 
 export function getRiskBandDef(band: RiskBand) {
@@ -48,9 +48,9 @@ export function getRiskBandDef(band: RiskBand) {
 }
 
 export function scoreToRiskBand(score: number): RiskBand {
-  if (score <= 50) return "low";
-  if (score <= 200) return "medium";
-  if (score <= 600) return "high";
+  if (score <= 100) return "low";
+  if (score <= 300) return "medium";
+  if (score <= 700) return "high";
   return "unacceptable";
 }
 
@@ -168,7 +168,7 @@ export function calculateScore(selections: Record<string, number>): LoneWorkerRe
     const selectedValue = selections[factor.id] ?? factor.options[0].value;
     const option = factor.options.find(o => o.value === selectedValue) || factor.options[0];
     const weighted = factor.weight * option.score;
-    product *= (1 + weighted / 10); // Multiplicative compound
+    product *= (1 + weighted / 25); // Multiplicative compound (calibrated to real-world scenarios)
 
     const maxOptionScore = Math.max(...factor.options.map(o => o.score));
     const normalised = option.score / maxOptionScore;
