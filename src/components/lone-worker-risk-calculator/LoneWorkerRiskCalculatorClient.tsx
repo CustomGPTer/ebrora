@@ -214,13 +214,29 @@ async function exportPDF(
     const fs = result.factorScores[idx];
     const option = factor.options.find(o => o.value === fs.selectedValue) || factor.options[0];
     const weighted = (factor.weight * fs.score).toFixed(1);
+    const weightedNum = factor.weight * fs.score;
     cx = M;
     const rowData = [factor.label, option.label.slice(0, 35), factor.weight.toFixed(1), String(fs.score), weighted];
     rowData.forEach((t, i) => {
-      if (idx % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], 5.5, "FD"); }
-      else { doc.rect(cx, y, cols[i], 5.5, "D"); }
-      doc.setTextColor(0, 0, 0); doc.setFont("helvetica", i === 0 ? "bold" : "normal"); doc.setFontSize(5.5);
-      doc.text(t, cx + 2, y + 3.8);
+      if (i === 4) {
+        // Colour-coded weighted column based on intensity
+        const intensity = Math.min(1, weightedNum / 20);
+        if (intensity < 0.25) { doc.setFillColor(220, 252, 231); doc.setTextColor(22, 101, 52); }
+        else if (intensity < 0.5) { doc.setFillColor(254, 249, 195); doc.setTextColor(133, 77, 14); }
+        else if (intensity < 0.75) { doc.setFillColor(255, 237, 213); doc.setTextColor(154, 52, 18); }
+        else { doc.setFillColor(254, 226, 226); doc.setTextColor(153, 27, 27); }
+        doc.rect(cx, y, cols[i], 5.5, "F");
+        doc.setFont("helvetica", "bold"); doc.setFontSize(5.5);
+        doc.text(t, cx + 2, y + 3.8);
+        doc.setTextColor(0, 0, 0);
+      } else {
+        if (factor.id === result.maxFactorId && i === 0) {
+          doc.setFillColor(254, 226, 226); doc.rect(cx, y, cols[i], 5.5, "FD");
+        } else if (idx % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], 5.5, "FD"); }
+        else { doc.rect(cx, y, cols[i], 5.5, "D"); }
+        doc.setTextColor(0, 0, 0); doc.setFont("helvetica", i === 0 ? "bold" : "normal"); doc.setFontSize(5.5);
+        doc.text(t, cx + 2, y + 3.8);
+      }
       cx += cols[i];
     });
     y += 5.5;
