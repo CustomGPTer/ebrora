@@ -18,19 +18,21 @@ export function UpsellBanner({
 }: UpsellBannerProps) {
   if (variant === "bottom") {
     return (
-      <div className="mt-12 bg-gradient-to-r from-[#1B5745] to-[#236b55] rounded-2xl p-6 sm:p-8 text-white">
-        <div className="flex flex-col items-center text-center gap-4 sm:gap-5">
-          <div>
-            <h3 className="font-bold text-white" style={{ fontSize: '22px' }}>{title}</h3>
-            <p className="text-sm text-white/80 mt-1 leading-relaxed">{description}</p>
-          </div>
+      <div className="mt-12 bg-[#faf9f7] border border-[#e0ddd7] rounded-2xl p-8 sm:p-10 text-center">
+        <div className="flex flex-col items-center gap-4">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1B5745] rounded-full text-[11px] font-bold text-white uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#5de8b5] animate-pulse" />
+            Now live
+          </span>
+          <h3 className="font-extrabold text-gray-900 leading-tight" style={{ fontSize: '24px' }}>{title}</h3>
+          <p className="text-sm text-gray-500 max-w-lg leading-relaxed">{description}</p>
           <Link
             href={href}
             target={href.startsWith("http") ? "_blank" : undefined}
             rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1B5745] text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-7 py-3 bg-[#1B5745] text-white text-sm font-bold rounded-xl hover:bg-[#164a3b] transition-colors"
           >
-            {price ? `View - ${price}` : "Learn More"}
+            {price ? `View - ${price}` : "Try RAMS Builder"}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
