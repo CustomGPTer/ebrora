@@ -10,7 +10,7 @@ interface PageHeroProps {
 export function PageHero({ title, subtitle, badge, centered }: PageHeroProps) {
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white border-b border-gray-100">
-      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 ${centered ? "text-center" : ""}`}>
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-5 sm:pt-14 sm:pb-7 ${centered ? "text-center" : ""}`}>
         {badge && (
           <span className={`inline-block text-xs font-semibold uppercase tracking-wider text-[#1B5745] bg-[#1B5745]/8 px-3 py-1 rounded-full mb-4`}>
             {badge}
