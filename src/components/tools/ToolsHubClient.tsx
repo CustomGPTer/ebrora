@@ -20,6 +20,13 @@ const TOOL_CATEGORIES = {
       "dust-silica-calculator",
       "noise-exposure-calculator",
       "slip-risk-calculator",
+      "uv-index-exposure-checker",
+      "cold-stress-wind-chill-calculator",
+      "lone-worker-risk-calculator",
+      "fatigue-risk-calculator",
+      "first-aid-needs-calculator",
+      "scaffold-load-calculator",
+      "formwork-pressure-calculator",
     ]),
   },
   "Materials & Quantities": {
@@ -53,7 +60,7 @@ const TOOL_CATEGORIES = {
     accentLight: "rgba(8,145,178,0.08)",
     slugs: new Set([
       "cbr-modulus-converter",
-      "drainage-pipe-flow-calculator",
+  "drainage-pipe-flow-calculator",
       "construction-productivity-calculator",
     ]),
   },
@@ -88,6 +95,13 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "cbr-modulus-converter": { icon: "🧪", accent: "#0891B2", accentLight: "rgba(8,145,178,0.08)" },
   "topsoil-calculator": { icon: "🌱", accent: "#65A30D", accentLight: "rgba(101,163,13,0.08)" },
   "drainage-pipe-flow-calculator": { icon: "🚿", accent: "#0284C7", accentLight: "rgba(2,132,199,0.08)" },
+  "uv-index-exposure-checker": { icon: "☀️", accent: "#F59E0B", accentLight: "rgba(245,158,11,0.08)" },
+  "cold-stress-wind-chill-calculator": { icon: "🥶", accent: "#0EA5E9", accentLight: "rgba(14,165,233,0.08)" },
+  "lone-worker-risk-calculator": { icon: "🚶", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
+  "fatigue-risk-calculator": { icon: "😴", accent: "#6366F1", accentLight: "rgba(99,102,241,0.08)" },
+  "first-aid-needs-calculator": { icon: "🏥", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
+  "scaffold-load-calculator": { icon: "🏗️", accent: "#64748B", accentLight: "rgba(100,116,139,0.08)" },
+  "formwork-pressure-calculator": { icon: "🧱", accent: "#92400E", accentLight: "rgba(146,64,14,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -97,6 +111,9 @@ const PAID_TOOL_SLUGS = new Set([
   "trench-backfill-calculator", "brick-block-calculator", "concrete-pour-planner",
   "hav-calculator", "confined-space-calculator", "welfare-facilities-calculator",
   "dust-silica-calculator", "noise-exposure-calculator", "slip-risk-calculator",
+    "lone-worker-risk-calculator",
+  "scaffold-load-calculator",
+  "formwork-pressure-calculator",
   "drainage-pipe-flow-calculator",
 ]);
 
