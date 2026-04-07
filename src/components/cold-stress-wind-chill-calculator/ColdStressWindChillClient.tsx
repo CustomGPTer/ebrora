@@ -189,7 +189,7 @@ async function exportPDF(
   doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("COLD STRESS / WIND CHILL ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("North American WCI / Environment Canada -- ebrora.com/tools/cold-stress-wind-chill-calculator", M, 19);
+  doc.text("North American WCI / Environment Canada / CSA Z1004-12 / BS 7915 -- ebrora.com/tools/cold-stress-wind-chill-calculator", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34;
@@ -251,10 +251,12 @@ async function exportPDF(
   doc.text(`Frostbite: ${result.frostbiteRisk.label} | Hypothermia: ${result.hypothermiaRisk.label} | Duration: ${fmtDuration(durationMinutes)}`, M + 5, y + 11);
   doc.setTextColor(0, 0, 0); y += 20;
 
-  // ── Summary
-  checkPage(30);
+  // ── Summary (coloured panel)
+  checkPage(55);
+  doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
+  doc.roundedRect(M, y - 2, CW, 50, 1.5, 1.5, "FD");
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Assessment Summary", M, y); y += 5;
+  doc.text("Assessment Summary", M + 4, y + 2); y += 6;
 
   const items = [
     ["Air Temperature", `${result.airTemp}C`],
@@ -269,14 +271,19 @@ async function exportPDF(
     ["Planned Duration", fmtDuration(durationMinutes)],
     ["Duration Safe?", result.durationSafe ? "YES" : "NO -- EXCEEDS SAFE LIMIT"],
   ];
-  items.forEach(([label, value]) => {
-    doc.setFontSize(7); doc.setFont("helvetica", "bold");
-    doc.text(label + ":", M, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(value, M + 55, y);
-    y += 4;
+  items.forEach(([label, value], si) => {
+    doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+    doc.text(label + ":", M + 4, y);
+    doc.setFont("helvetica", "bold");
+    if (si === 3) { doc.setTextColor(rgb[0], rgb[1], rgb[2]); }
+    else if (si === 10 && !result.durationSafe) { doc.setTextColor(220, 38, 38); }
+    else if (si === 10) { doc.setTextColor(22, 163, 74); }
+    else { doc.setTextColor(17, 24, 39); }
+    doc.text(value, M + 59, y);
+    doc.setTextColor(0, 0, 0);
+    y += 3.8;
   });
-  y += 4;
+  y += 6;
 
   // ── Wind Chill Matrix
   checkPage(65);
@@ -387,6 +394,66 @@ async function exportPDF(
   const hypoLines = doc.splitTextToSize(result.hypothermiaRisk.description, CW - 4);
   doc.text(hypoLines, M + 2, y);
   y += hypoLines.length * 3.5 + 4;
+
+  // ── Wind Chill vs Wind Speed Chart
+  checkPage(75);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  doc.text("Wind Chill vs Wind Speed (at entered temperature)", M, y);
+  doc.setFontSize(6); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
+  doc.text(`Shows how wind chill decreases as wind speed increases at ${result.airTemp}C. Your conditions marked with a dot.`, M, y + 4);
+  doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
+  y += 8;
+
+  {
+    const curve = generateWindCurve(result.airTemp, 80, 5);
+    const chartX = M + 12, chartY2 = y, chartW2 = CW - 24, chartH2 = 45;
+    const minWCI = Math.min(...curve.map(p => p.wci), result.windChillTemp) - 5;
+    const maxWCI = Math.max(...curve.map(p => p.wci), result.airTemp) + 2;
+    const wciRange = maxWCI - minWCI;
+    const maxWind = 80;
+
+    // Background
+    doc.setFillColor(248, 250, 252); doc.rect(chartX, chartY2, chartW2, chartH2, "F");
+
+    // Grid + Y labels
+    doc.setDrawColor(220, 220, 220); doc.setFontSize(5); doc.setTextColor(130, 130, 130);
+    const yGridStep = Math.ceil(wciRange / 5);
+    for (let v = Math.ceil(minWCI / yGridStep) * yGridStep; v <= maxWCI; v += yGridStep) {
+      const yp = chartY2 + chartH2 - ((v - minWCI) / wciRange) * chartH2;
+      doc.line(chartX, yp, chartX + chartW2, yp);
+      doc.text(`${v}`, chartX - 7, yp + 1.5);
+    }
+    // X grid
+    for (let w = 0; w <= maxWind; w += 10) {
+      const xp = chartX + (w / maxWind) * chartW2;
+      doc.line(xp, chartY2, xp, chartY2 + chartH2);
+      doc.text(`${w}`, xp - 2, chartY2 + chartH2 + 4);
+    }
+
+    // Curve line
+    doc.setDrawColor(14, 165, 233); doc.setLineWidth(0.6);
+    for (let i = 1; i < curve.length; i++) {
+      const x1 = chartX + (curve[i - 1].wind / maxWind) * chartW2;
+      const y1 = chartY2 + chartH2 - ((curve[i - 1].wci - minWCI) / wciRange) * chartH2;
+      const x2 = chartX + (curve[i].wind / maxWind) * chartW2;
+      const y2v = chartY2 + chartH2 - ((curve[i].wci - minWCI) / wciRange) * chartH2;
+      doc.line(x1, y1, x2, y2v);
+    }
+
+    // User's point
+    const userX = chartX + (result.windSpeedKmh / maxWind) * chartW2;
+    const userY = chartY2 + chartH2 - ((result.windChillTemp - minWCI) / wciRange) * chartH2;
+    doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(userX, userY, 1.5, "F");
+    doc.setFontSize(5); doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+    doc.text(`${fmtTemp(result.windChillTemp)}C`, userX + 3, userY - 1);
+
+    // Labels
+    doc.setTextColor(80, 80, 80); doc.setFontSize(5.5);
+    doc.text("Wind Chill (C)", chartX - 10, chartY2 - 2);
+    doc.text("Wind Speed (km/h)", chartX + chartW2 / 2 - 10, chartY2 + chartH2 + 8);
+    doc.setLineWidth(0.2); doc.setDrawColor(220, 220, 220); doc.setTextColor(0, 0, 0);
+    y = chartY2 + chartH2 + 12;
+  }
 
   // ── Sign-off
   checkPage(50);
