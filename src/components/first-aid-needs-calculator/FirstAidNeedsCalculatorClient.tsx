@@ -60,7 +60,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("FIRST AID NEEDS ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("HSE L74 / First-Aid Regulations 1981 / BS 8599-1:2019 -- ebrora.com/tools/first-aid-needs-calculator", M, 19);
+  doc.text("HSE L74 / SI 1981/917 / First-Aid Regulations 1981 / BS 8599-1:2019 -- ebrora.com/tools/first-aid-needs-calculator", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34; doc.setTextColor(0, 0, 0);
@@ -102,28 +102,32 @@ async function exportPDF(
     }
   }
 
-  // Requirements summary
-  checkPage(30);
+  // Requirements summary (coloured panel)
+  checkPage(40);
+  doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
+  doc.roundedRect(M, y - 2, CW, 35, 1.5, 1.5, "FD");
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Minimum First Aid Requirements", M, y); y += 5;
+  doc.text("Minimum First Aid Requirements", M + 4, y + 2); y += 6;
 
   const summaryItems = [
-    ["FAW First Aiders (total)", String(req.fawFirstAiders)],
-    ["EFAW Appointed Persons (total)", String(req.efawAppointed)],
-    ["First Aid Kits (BS 8599-1)", String(req.firstAidKits)],
-    ["AED Units (recommended)", String(req.aedRecommended)],
-    ["Per Shift: FAW", String(req.perShiftFAW)],
-    ["Per Shift: EFAW", String(req.perShiftEFAW)],
-    ["Kit Size", kitSize(Math.ceil(inputs.totalWorkers / Math.max(1, inputs.multipleLocations ? inputs.numLocations : 1)))],
+    ["FAW First Aiders (total)", String(req.fawFirstAiders), [220, 38, 38]],
+    ["EFAW Appointed Persons (total)", String(req.efawAppointed), [234, 88, 12]],
+    ["First Aid Kits (BS 8599-1)", String(req.firstAidKits), [59, 130, 246]],
+    ["AED Units (recommended)", String(req.aedRecommended), [124, 58, 237]],
+    ["Per Shift: FAW", String(req.perShiftFAW), [220, 38, 38]],
+    ["Per Shift: EFAW", String(req.perShiftEFAW), [234, 88, 12]],
+    ["Kit Size", kitSize(Math.ceil(inputs.totalWorkers / Math.max(1, inputs.multipleLocations ? inputs.numLocations : 1))), [100, 116, 139]],
   ];
-  summaryItems.forEach(([label, value]) => {
-    doc.setFontSize(7); doc.setFont("helvetica", "bold");
-    doc.text(label + ":", M, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(value, M + 60, y);
-    y += 4;
+  summaryItems.forEach(([label, value, colour]) => {
+    doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+    doc.text(label + ":", M + 4, y);
+    const c = colour as number[];
+    doc.setTextColor(c[0], c[1], c[2]); doc.setFont("helvetica", "bold");
+    doc.text(value as string, M + 64, y);
+    doc.setTextColor(0, 0, 0);
+    y += 3.8;
   });
-  y += 4;
+  y += 5;
 
   // Compliance (if current provision entered)
   if (showCurrent) {
@@ -140,11 +144,25 @@ async function exportPDF(
     doc.setTextColor(0, 0, 0); y += 6;
     checks.forEach((c, idx) => {
       cx = M;
-      [c.item, String(c.required), c.current !== null ? String(c.current) : "--", c.current !== null ? String(c.shortfall) : "--", c.status === "compliant" ? "PASS" : c.status === "shortfall" ? "FAIL" : "--"].forEach((t, i) => {
-        if (idx % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols2[i], 5.5, "FD"); }
-        else { doc.rect(cx, y, cols2[i], 5.5, "D"); }
-        doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(6);
-        doc.text(t, cx + 2, y + 3.8); cx += cols2[i];
+      const statusText = c.status === "compliant" ? "PASS" : c.status === "shortfall" ? "FAIL" : "--";
+      [c.item, String(c.required), c.current !== null ? String(c.current) : "--", c.current !== null ? String(c.shortfall) : "--", statusText].forEach((t, i) => {
+        if (i === 4 && statusText === "PASS") {
+          doc.setFillColor(220, 252, 231); doc.rect(cx, y, cols2[i], 5.5, "F");
+          doc.setTextColor(22, 101, 52); doc.setFont("helvetica", "bold"); doc.setFontSize(6);
+        } else if (i === 4 && statusText === "FAIL") {
+          doc.setFillColor(254, 226, 226); doc.rect(cx, y, cols2[i], 5.5, "F");
+          doc.setTextColor(153, 27, 27); doc.setFont("helvetica", "bold"); doc.setFontSize(6);
+        } else if (i === 3 && c.shortfall !== null && c.shortfall > 0) {
+          doc.setFillColor(254, 243, 199); doc.rect(cx, y, cols2[i], 5.5, "F");
+          doc.setTextColor(133, 77, 14); doc.setFont("helvetica", "bold"); doc.setFontSize(6);
+        } else {
+          if (idx % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols2[i], 5.5, "FD"); }
+          else { doc.rect(cx, y, cols2[i], 5.5, "D"); }
+          doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(6);
+        }
+        doc.text(t, cx + 2, y + 3.8);
+        doc.setTextColor(0, 0, 0);
+        cx += cols2[i];
       });
       y += 5.5;
     });
