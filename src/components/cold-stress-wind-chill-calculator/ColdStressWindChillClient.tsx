@@ -212,13 +212,13 @@ async function exportPDF(
   drawFld("Assessed By:", header.assessedBy, M + 3, y, 50);
   drawFld("Date:", header.date, M + halfW, y, 30);
   y += 5;
-  drawFld("Air Temp:", `${result.airTemp}C`, M + 3, y, 0);
+  drawFld("Air Temp:", `${result.airTemp}\u00B0C`, M + 3, y, 0);
   drawFld("Wind Speed:", displayWind, M + halfW, y, 0);
   y += 8;
 
   // ── Scope
   doc.setFontSize(7); doc.setFont("helvetica", "italic"); doc.setTextColor(80, 80, 80);
-  const scopeText = `Cold stress assessment for ${header.site || "the above site"}. Air temperature: ${result.airTemp}C. Wind speed: ${displayWind}. Planned exposure: ${fmtDuration(durationMinutes)}. Wind chill calculated using the North American Wind Chill Index formula (Environment Canada / US NWS). Frostbite and hypothermia risk per Environment Canada thresholds and CSA Z1004-12 guidance.`;
+  const scopeText = `Cold stress assessment for ${header.site || "the above site"}. Air temperature: ${result.airTemp}\u00B0C. Wind speed: ${displayWind}. Planned exposure: ${fmtDuration(durationMinutes)}. Wind chill calculated using the North American Wind Chill Index formula (Environment Canada / US NWS). Frostbite and hypothermia risk per Environment Canada thresholds and CSA Z1004-12 guidance.`;
   const scopeLines = doc.splitTextToSize(scopeText, CW);
   doc.text(scopeLines, M, y);
   y += scopeLines.length * 3 + 3;
@@ -246,7 +246,7 @@ async function exportPDF(
   doc.setFillColor(rgb[0], rgb[1], rgb[2]);
   doc.roundedRect(M, y, CW, 14, 2, 2, "F");
   doc.setTextColor(255, 255, 255); doc.setFontSize(12); doc.setFont("helvetica", "bold");
-  doc.text(`WIND CHILL: ${fmtTemp(result.windChillTemp)}C -- ${band.label.toUpperCase()} RISK`, M + 5, y + 6);
+  doc.text(`WIND CHILL: ${fmtTemp(result.windChillTemp)}\u00B0C -- ${band.label.toUpperCase()} RISK`, M + 5, y + 6);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text(`Frostbite: ${result.frostbiteRisk.label} | Hypothermia: ${result.hypothermiaRisk.label} | Duration: ${fmtDuration(durationMinutes)}`, M + 5, y + 11);
   doc.setTextColor(0, 0, 0); y += 20;
@@ -259,9 +259,9 @@ async function exportPDF(
   doc.text("Assessment Summary", M + 4, y + 2); y += 6;
 
   const items = [
-    ["Air Temperature", `${result.airTemp}C`],
+    ["Air Temperature", `${result.airTemp}\u00B0C`],
     ["Wind Speed", displayWind],
-    ["Wind Chill Temperature", `${fmtTemp(result.windChillTemp)}C`],
+    ["Wind Chill Temperature", `${fmtTemp(result.windChillTemp)}\u00B0C`],
     ["Risk Category", band.label],
     ["Frostbite Risk", result.frostbiteRisk.label],
     ["Frostbite Time (exposed skin)", result.frostbiteRisk.timeMinutes ? `${result.frostbiteRisk.timeMinutes} minutes` : "N/A"],
@@ -299,7 +299,7 @@ async function exportPDF(
   doc.setFontSize(5.5); doc.setFont("helvetica", "bold");
   MATRIX_TEMPS.forEach(t => {
     doc.setFillColor(30, 30, 30); doc.rect(cx, y, mCellW, mCellH, "F");
-    doc.setTextColor(255, 255, 255); doc.text(`${t}C`, cx + 1, y + 3.5);
+    doc.setTextColor(255, 255, 255); doc.text(`${t}\u00B0C`, cx + 1, y + 3.5);
     cx += mCellW;
   });
   doc.setTextColor(0, 0, 0); y += mCellH;
@@ -445,7 +445,7 @@ async function exportPDF(
     const userY = chartY2 + chartH2 - ((result.windChillTemp - minWCI) / wciRange) * chartH2;
     doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(userX, userY, 1.5, "F");
     doc.setFontSize(5); doc.setTextColor(rgb[0], rgb[1], rgb[2]);
-    doc.text(`${fmtTemp(result.windChillTemp)}C`, userX + 3, userY - 1);
+    doc.text(`${fmtTemp(result.windChillTemp)}\u00B0C`, userX + 3, userY - 1);
 
     // Labels
     doc.setTextColor(80, 80, 80); doc.setFontSize(5.5);
