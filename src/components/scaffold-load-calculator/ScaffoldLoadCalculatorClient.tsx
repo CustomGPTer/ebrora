@@ -148,7 +148,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("SCAFFOLD LOAD ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("BS EN 12811-1 / BS 5975 / SG4:10", M, 19);
+  doc.text("BS EN 12811-1 / BS 5975 / SG4:10 / NASC TG20 / BS EN 12810-1", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34; doc.setTextColor(0, 0, 0);
@@ -201,22 +201,78 @@ async function exportPDF(
   doc.text(`Total: ${result.loads.totalLoadPerStandard} kN per standard | Capacity: ${result.loads.allowableCapacity} kN`, M + 5, y + 11);
   doc.setTextColor(0, 0, 0); y += 20;
 
-  // Load breakdown
-  checkPage(25);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Load Breakdown per Standard", M, y); y += 5;
+  // Load breakdown (coloured panel)
+  checkPage(40);
+  doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
+  doc.roundedRect(M, y - 2, CW, 30, 1.5, 1.5, "FD");
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Load Breakdown per Standard", M + 4, y + 2); y += 6;
   const items = [
-    ["Dead Load (self-weight)", `${result.loads.deadLoadPerStandard} kN`],
-    ["Imposed Load (platform)", `${result.loads.imposedLoadPerStandard} kN`],
-    ["Wind Load", `${result.loads.windLoadPerStandard} kN`],
-    ["TOTAL", `${result.loads.totalLoadPerStandard} kN`],
-    ["Allowable Capacity", `${result.loads.allowableCapacity} kN`],
-    ["Utilisation", `${result.loads.utilisationPercent}%`],
+    ["Dead Load (self-weight)", `${result.loads.deadLoadPerStandard} kN`, [100, 116, 139]],
+    ["Imposed Load (platform)", `${result.loads.imposedLoadPerStandard} kN`, [59, 130, 246]],
+    ["Wind Load", `${result.loads.windLoadPerStandard} kN`, [234, 88, 12]],
+    ["TOTAL", `${result.loads.totalLoadPerStandard} kN`, [17, 24, 39]],
+    ["Allowable Capacity", `${result.loads.allowableCapacity} kN`, [100, 116, 139]],
+    ["Utilisation", `${result.loads.utilisationPercent}%`, rgb],
   ];
-  items.forEach(([label, value]) => {
-    doc.setFontSize(7); doc.setFont("helvetica", label === "TOTAL" ? "bold" : "normal");
-    doc.text(label + ":", M, y); doc.text(value, M + 55, y); y += 4;
+  items.forEach(([label, value, colour]) => {
+    doc.setFontSize(7);
+    doc.setFont("helvetica", label === "TOTAL" || label === "Utilisation" ? "bold" : "normal");
+    doc.setTextColor(55, 65, 81); doc.text(label + ":", M + 4, y);
+    const c = colour as number[];
+    doc.setTextColor(c[0], c[1], c[2]); doc.setFont("helvetica", "bold");
+    doc.text(value as string, M + 59, y);
+    doc.setTextColor(0, 0, 0);
+    y += 3.8;
   });
-  y += 3;
+  y += 5;
+
+  // Stacked bar chart
+  checkPage(60);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  doc.text("Load Component Breakdown", M, y);
+  doc.setFontSize(6); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
+  doc.text("Stacked bar showing dead, imposed, and wind load components per standard at base level.", M, y + 4);
+  doc.setTextColor(0, 0, 0); y += 8;
+
+  {
+    const barX = M + 30, barW = CW - 60, barH = 14;
+    const total = result.loads.totalLoadPerStandard;
+    const cap = result.loads.allowableCapacity;
+    const scale = barW / cap;
+    const deadW = result.loads.deadLoadPerStandard * scale;
+    const impW = result.loads.imposedLoadPerStandard * scale;
+    const windW = result.loads.windLoadPerStandard * scale;
+
+    // Capacity outline
+    doc.setDrawColor(180, 180, 180); doc.setLineWidth(0.3);
+    doc.rect(barX, y, barW, barH, "D");
+
+    // Stacked bars
+    let bx = barX;
+    doc.setFillColor(100, 116, 139); doc.rect(bx, y, deadW, barH, "F"); bx += deadW;
+    doc.setFillColor(59, 130, 246); doc.rect(bx, y, impW, barH, "F"); bx += impW;
+    doc.setFillColor(234, 88, 12); doc.rect(bx, y, windW, barH, "F");
+
+    // Utilisation line
+    const utilX = barX + total * scale;
+    doc.setDrawColor(rgb[0], rgb[1], rgb[2]); doc.setLineWidth(0.5);
+    doc.line(utilX, y - 2, utilX, y + barH + 2);
+    doc.setFontSize(5); doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+    doc.text(`${result.loads.utilisationPercent}%`, utilX + 1, y - 1);
+
+    // Legend
+    const legY = y + barH + 5;
+    doc.setFontSize(5); doc.setTextColor(80, 80, 80);
+    doc.setFillColor(100, 116, 139); doc.rect(barX, legY, 4, 2.5, "F");
+    doc.text(`Dead (${result.loads.deadLoadPerStandard} kN)`, barX + 6, legY + 2);
+    doc.setFillColor(59, 130, 246); doc.rect(barX + 40, legY, 4, 2.5, "F");
+    doc.text(`Imposed (${result.loads.imposedLoadPerStandard} kN)`, barX + 46, legY + 2);
+    doc.setFillColor(234, 88, 12); doc.rect(barX + 90, legY, 4, 2.5, "F");
+    doc.text(`Wind (${result.loads.windLoadPerStandard} kN)`, barX + 96, legY + 2);
+
+    doc.setLineWidth(0.2); doc.setDrawColor(220, 220, 220); doc.setTextColor(0, 0, 0);
+    y = legY + 8;
+  }
 
   // Tie calculation
   checkPage(15);
