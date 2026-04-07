@@ -195,7 +195,7 @@ async function exportPDF(
   // ── Site info panel
   doc.setFillColor(248, 248, 248);
   doc.setDrawColor(220, 220, 220);
-  doc.roundedRect(M, y - 3, CW, 25, 1, 1, "FD");
+  doc.roundedRect(M, y - 3, CW, 30, 1, 1, "FD");
   doc.setFontSize(8);
   const halfW = CW / 2;
   const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
@@ -215,6 +215,17 @@ async function exportPDF(
   y += 5;
   drawFld("Working Hours:", `${startHour}:00 -- ${endHour}:00`, M + 3, y, 0);
   drawFld("Cloud Cover:", CLOUD_MULTIPLIERS[cloudCover].label, M + halfW, y, 0);
+  y += 5;
+  // Sunrise/sunset
+  const dateObj2 = new Date(assessDate + "T12:00:00");
+  const doy2 = Math.floor((dateObj2.getTime() - new Date(dateObj2.getFullYear(), 0, 0).getTime()) / 86400000);
+  const bstOff = isBST(dateObj2) ? 1 : 0;
+  const [sr, ss] = sunriseSunset(lat, doy2);
+  const srL = sr + bstOff, ssL = ss + bstOff;
+  const srS = `${Math.floor(srL).toString().padStart(2, "0")}:${Math.round((srL % 1) * 60).toString().padStart(2, "0")}`;
+  const ssS = `${Math.floor(ssL).toString().padStart(2, "0")}:${Math.round((ssL % 1) * 60).toString().padStart(2, "0")}`;
+  drawFld("Sunrise/Sunset:", `${srS} / ${ssS} (${isBST(dateObj2) ? "BST" : "GMT"})`, M + 3, y, 0);
+  drawFld("Daylight:", `${(ssL - srL).toFixed(1)} hours`, M + halfW, y, 0);
   y += 8;
 
   // ── Scope statement
@@ -307,7 +318,7 @@ async function exportPDF(
 
   // Header row
   const cols = [18, 22, 22, 28, 24, 24, 24, 20];
-  const headers = ["Time", "Solar El.", "Clear UV", "Adjusted UV", "Risk", "SED", "Prot. SED", "Prot. UV"];
+  const headers = ["Time", "Solar El.", "Clear UV", "Adjusted UV", "Risk", "Cum. SED", "Prot. SED", "Prot. UV"];
   let cx = M;
   headers.forEach((h, i) => {
     doc.setFillColor(30, 30, 30); doc.rect(cx, y, cols[i], 6, "F");
