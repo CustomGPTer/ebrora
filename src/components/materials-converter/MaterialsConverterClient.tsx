@@ -749,7 +749,7 @@ export default function MaterialsConverterClient() {
               </div>
 
               {/* Inputs row */}
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 <div>
                   <label className="block text-[10px] text-gray-400 mb-0.5">State</label>
                   <select
@@ -788,11 +788,9 @@ export default function MaterialsConverterClient() {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-[10px] text-gray-400 mb-0.5">
-                    {showThickness ? "mm" : `${assumptions.currency}/t`}
-                  </label>
-                  {showThickness ? (
+                {showThickness && (
+                  <div>
+                    <label className="block text-[10px] text-gray-400 mb-0.5">mm</label>
                     <input
                       type="number"
                       step="5"
@@ -805,7 +803,11 @@ export default function MaterialsConverterClient() {
                       }
                       className="w-full px-2 py-1.5 text-sm text-right border border-gray-200 rounded-lg bg-blue-50/40 tabular-nums"
                     />
-                  ) : (
+                  </div>
+                )}
+                {columns.cost && (
+                  <div>
+                    <label className="block text-[10px] text-gray-400 mb-0.5">{assumptions.currency}/t</label>
                     <input
                       type="number"
                       step="0.5"
@@ -818,8 +820,8 @@ export default function MaterialsConverterClient() {
                       }
                       className="w-full px-2 py-1.5 text-sm text-right border border-gray-200 rounded-lg bg-blue-50/40 tabular-nums"
                     />
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
               {/* Outputs */}
