@@ -135,7 +135,7 @@ async function exportPDF(
   doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("LONE WORKER RISK SCORE ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("HSE INDG73 / BS 8484:2016 Lone Worker Services", M, 19);
+  doc.text("HSE INDG73 / BS 8484:2016 / Confined Spaces Regulations 1997", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34;
