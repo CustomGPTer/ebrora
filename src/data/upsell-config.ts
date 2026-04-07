@@ -5,7 +5,7 @@ import { UpsellItem } from "@/types/content";
 
 // RAMS Builder upsell - shown on every content page
 export const RAMS_BUILDER_UPSELL: UpsellItem = {
-  title: "RAMS Builder",
+  title: "Generate professional RAMS in under 5 minutes",
   description:
     "Generate professional Risk Assessment and Method Statements in minutes. 10 document formats, site-specific content, instant Word download.",
   gumroadUrl: "/rams-builder",
