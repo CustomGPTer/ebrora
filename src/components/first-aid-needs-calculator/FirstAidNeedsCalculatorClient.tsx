@@ -182,6 +182,28 @@ async function exportPDF(
     y += 4;
   }
 
+  // Specific hazards identified
+  if (inputs.specificHazards.length > 0) {
+    checkPage(15);
+    doc.setFontSize(9); doc.setFont("helvetica", "bold");
+    doc.text("Specific Hazards Identified", M, y); y += 5;
+    doc.setFontSize(7); doc.setFont("helvetica", "normal");
+    const hazardLabels = inputs.specificHazards.map(h => {
+      const def = SPECIFIC_HAZARDS.find(sh => sh.id === h);
+      return def ? `${def.label} — ${def.description}` : h;
+    });
+    hazardLabels.forEach(label => {
+      checkPage(4);
+      doc.setFillColor(254, 243, 199); doc.setDrawColor(234, 179, 8);
+      doc.roundedRect(M + 2, y - 2, CW - 4, 4, 0.5, 0.5, "FD");
+      doc.setTextColor(133, 77, 14); doc.setFont("helvetica", "bold"); doc.setFontSize(6);
+      doc.text(`⚠  ${label}`, M + 4, y + 0.5);
+      doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
+      y += 5;
+    });
+    y += 3;
+  }
+
   // Supplementary equipment
   if (req.supplementaryEquipment.length > 0) {
     checkPage(15);
