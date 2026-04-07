@@ -71,8 +71,8 @@ export default async function ToolsPage() {
       />
       <PageHero
         badge="Free Tools"
-        title={<>Construction Calculators<br /><span className="text-gray-400 font-semibold">The Biggest Selection of Construction Tools Available</span></>}
-        subtitle="Ready to download and attach to your safety packs and RAMS. Interactive calculators for site supervisors, foremen, and safety professionals. Based on HSE methodologies and UK regulations."
+        title={<>Construction Calculators<br /><span className="text-gray-400 font-semibold mt-2 inline-block">The Biggest Selection of Construction Tools Available</span></>}
+        subtitle="Free interactive calculators for health & safety, temporary works, earthworks, materials, plant, programme, commercial, environmental, and utilities. Built for site supervisors, foremen, engineers, and safety professionals. Based on HSE methodologies and UK regulations."
         centered
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
