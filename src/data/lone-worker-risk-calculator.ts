@@ -189,8 +189,25 @@ export function calculateScore(selections: Record<string, number>): LoneWorkerRe
 
   // Scale product to 0-1000 range for meaningful bands
   const compositeScore = Math.round((product - 1) * 100);
-  const riskBand = scoreToRiskBand(compositeScore);
+  let riskBand = scoreToRiskBand(compositeScore);
+
+  // ── Regulatory override: confined space entry is NEVER permitted as lone work
+  const isConfinedSpace = selections.activity === 7;
+  if (isConfinedSpace) {
+    riskBand = "unacceptable";
+  }
+
   const recommendations = getRecommendations(riskBand, selections, compositeScore);
+
+  // Prepend regulatory prohibition for confined space
+  if (isConfinedSpace) {
+    recommendations.unshift(
+      "REGULATORY PROHIBITION: Confined space entry must NEVER be carried out by a lone worker. The Confined Spaces Regulations 1997 (Reg 5) requires rescue arrangements including a standby person at all times. This is a legal requirement, not a risk-scored decision.",
+      "The Management of Health and Safety at Work Regulations 1999 and HSE INDG258 (Safe work in confined spaces) reinforce that a minimum of one trained attendant must remain at the entry point throughout the operation.",
+      "This assessment is automatically classified as UNACCEPTABLE regardless of all other factors."
+    );
+  }
+
   const checklistItems = getChecklist(riskBand, selections);
 
   return {
@@ -250,7 +267,7 @@ function getRecommendations(band: RiskBand, selections: Record<string, number>, 
     recs.push("Dynamic risk assessment to be completed by the operative on arrival");
     recs.push("Rescue plan in place with identified rescuers briefed and on standby");
     if (selections.activity >= 6) {
-      recs.push("CRITICAL: Work at height or confined space entry while lone working is extremely high risk -- consider whether the task can be rescheduled with a second person");
+      recs.push("CRITICAL: Work at height while lone working is extremely high risk -- consider whether the task can be rescheduled with a second person");
     }
     if (selections.timeOfDay >= 2) {
       recs.push("Reduced visibility increases risk -- ensure adequate task lighting and hi-vis PPE");
