@@ -127,6 +127,7 @@ function RiskBarsChart({ result }: { result: FatigueResult }) {
 async function exportPDF(
   header: { site: string; manager: string; assessedBy: string; date: string },
   result: FatigueResult, commuteMinutes: number, mode: PatternMode,
+  shiftEntries: ShiftEntry[],
 ) {
   const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF("l", "mm", "a4"); // Landscape for the wide tables
@@ -139,7 +140,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.setFont("helvetica", "bold");
   doc.text("FATIGUE RISK ASSESSMENT (SHIFT PATTERNS)", M, 10);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text("HSE RR446 / Working Time Regulations 1998 -- ebrora.com/tools/fatigue-risk-calculator", M, 16);
+  doc.text("HSE RR446 / Working Time Regulations 1998 / HSE GEIS1 -- ebrora.com/tools/fatigue-risk-calculator", M, 16);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 16);
   y = 28; doc.setTextColor(0, 0, 0);
 
@@ -207,11 +208,15 @@ async function exportPDF(
     checkPage(5);
     const shift = result.shifts[idx];
     // Find original shift entry for times
+    const entry = shiftEntries[idx];
     const isRest = s.shiftLength === 0;
     cx = M;
     const rowData = [
-      s.dayLabel.slice(0, 6), isRest ? "--" : "start", isRest ? "--" : "end",
-      isRest ? "--" : "brk", isRest ? "REST" : `${s.shiftLength}h`,
+      s.dayLabel.slice(0, 6),
+      isRest ? "--" : (entry?.startTime || "--"),
+      isRest ? "--" : (entry?.endTime || "--"),
+      isRest ? "--" : `${entry?.breakMinutes || 0}m`,
+      isRest ? "REST" : `${s.shiftLength}h`,
       isRest ? "--" : (s.isNight ? "YES" : "No"),
       isRest ? "--" : String(s.consecutiveDays),
       isRest ? "--" : `${s.restBeforeHours}h`,
@@ -222,12 +227,18 @@ async function exportPDF(
       isRest ? "1.0x" : `${s.riskMultiplier}x`,
       getFatigueLevelDef(s.level).label,
     ];
+    const levelDef = getFatigueLevelDef(s.level);
+    const levelRGB = levelDef.colour;
+    const lr = parseInt(levelRGB.slice(1, 3), 16), lg = parseInt(levelRGB.slice(3, 5), 16), lb = parseInt(levelRGB.slice(5, 7), 16);
     rowData.forEach((t, i) => {
       if (isRest) { doc.setFillColor(240, 240, 255); doc.rect(cx, y, cols[i], 4.5, "FD"); }
-      else if (idx % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], 4.5, "FD"); }
-      else { doc.rect(cx, y, cols[i], 4.5, "D"); }
-      doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(5);
+      else if (i === 13) { doc.setFillColor(lr, lg, lb); doc.rect(cx, y, cols[i], 4.5, "F"); doc.setTextColor(255, 255, 255); }
+      else if (i === 11 && s.fatigueIndex > 35) { doc.setFillColor(lr, lg, lb, 0.15); doc.rect(cx, y, cols[i], 4.5, "FD"); doc.setTextColor(0, 0, 0); }
+      else if (idx % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], 4.5, "FD"); doc.setTextColor(0, 0, 0); }
+      else { doc.rect(cx, y, cols[i], 4.5, "D"); doc.setTextColor(0, 0, 0); }
+      doc.setFont("helvetica", "normal"); doc.setFontSize(5);
       doc.text(t, cx + 1, y + 3.2);
+      doc.setTextColor(0, 0, 0);
       cx += cols[i];
     });
     y += 4.5;
@@ -240,12 +251,17 @@ async function exportPDF(
   doc.text("Working Time Regulations Compliance", M, y); y += 4;
   result.wtrChecks.forEach(check => {
     checkPage(5);
-    doc.setFontSize(6); doc.setFont("helvetica", "bold");
+    doc.setFontSize(6);
+    if (check.compliant) { doc.setFillColor(220, 252, 231); doc.setTextColor(22, 101, 52); }
+    else { doc.setFillColor(254, 226, 226); doc.setTextColor(153, 27, 27); }
+    doc.roundedRect(M + 2, y - 2.5, CW - 4, 4.5, 0.5, 0.5, "F");
+    doc.setFont("helvetica", "bold");
     const status = check.compliant ? "[PASS]" : "[FAIL]";
-    doc.text(`${status} ${check.rule}: `, M + 2, y);
+    doc.text(`${status} ${check.rule}: `, M + 4, y);
     doc.setFont("helvetica", "normal");
-    doc.text(`${check.actual} (Req: ${check.requirement}) -- ${check.reference}`, M + 55, y);
-    y += 4;
+    doc.text(`${check.actual} (Req: ${check.requirement}) -- ${check.reference}`, M + 57, y);
+    doc.setTextColor(0, 0, 0);
+    y += 5;
   });
   y += 4;
 
@@ -260,6 +276,79 @@ async function exportPDF(
     doc.text(lines, M + 2, y);
     y += lines.length * 3;
   });
+
+  // Fatigue Index Chart
+  checkPage(65);
+  doc.setFontSize(8); doc.setFont("helvetica", "bold");
+  doc.text("Fatigue Index Across Pattern", M, y);
+  doc.setFontSize(5.5); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
+  doc.text("Chart shows estimated fatigue index (0-100) for each day. Shaded bands: green = acceptable (0-35), amber = elevated (36-55), orange = high (56-75), red = very high (76+).", M, y + 3.5);
+  doc.setTextColor(0, 0, 0); y += 7;
+
+  {
+    const chartX = M + 12, chartY4 = y, chartW4 = CW - 30, chartH4 = 40;
+    const shifts2 = result.shifts;
+    const xStep = shifts2.length > 1 ? chartW4 / (shifts2.length - 1) : chartW4;
+
+    // Band backgrounds
+    const fatBands = [
+      { min: 0, max: 35, r: 220, g: 252, b: 231 },
+      { min: 35, max: 55, r: 254, g: 249, b: 195 },
+      { min: 55, max: 75, r: 255, g: 237, b: 213 },
+      { min: 75, max: 100, r: 254, g: 226, b: 226 },
+    ];
+    fatBands.forEach(band2 => {
+      const top = chartY4 + chartH4 - (band2.max / 100) * chartH4;
+      const bot = chartY4 + chartH4 - (band2.min / 100) * chartH4;
+      doc.setFillColor(band2.r, band2.g, band2.b);
+      doc.rect(chartX, top, chartW4, bot - top, "F");
+    });
+
+    // Grid
+    doc.setDrawColor(200, 200, 200); doc.setFontSize(4.5); doc.setTextColor(130, 130, 130);
+    [0, 25, 50, 75, 100].forEach(v => {
+      const yp = chartY4 + chartH4 - (v / 100) * chartH4;
+      doc.line(chartX, yp, chartX + chartW4, yp);
+      doc.text(String(v), chartX - 6, yp + 1.5);
+    });
+
+    // Threshold lines
+    doc.setDrawColor(234, 179, 8); doc.setLineWidth(0.3);
+    const threshY = chartY4 + chartH4 - (35 / 100) * chartH4;
+    doc.line(chartX, threshY, chartX + chartW4, threshY);
+
+    // Fatigue line
+    doc.setDrawColor(99, 102, 241); doc.setLineWidth(0.6);
+    for (let i = 1; i < shifts2.length; i++) {
+      const x1 = chartX + (i - 1) * xStep;
+      const y1 = chartY4 + chartH4 - (shifts2[i - 1].fatigueIndex / 100) * chartH4;
+      const x2 = chartX + i * xStep;
+      const y2v = chartY4 + chartH4 - (shifts2[i].fatigueIndex / 100) * chartH4;
+      doc.line(x1, y1, x2, y2v);
+    }
+
+    // Data dots with level colour
+    shifts2.forEach((s2, i) => {
+      const px = chartX + i * xStep;
+      const py = chartY4 + chartH4 - (s2.fatigueIndex / 100) * chartH4;
+      const lDef = getFatigueLevelDef(s2.level);
+      const cr = parseInt(lDef.colour.slice(1, 3), 16);
+      const cg = parseInt(lDef.colour.slice(3, 5), 16);
+      const cb = parseInt(lDef.colour.slice(5, 7), 16);
+      doc.setFillColor(cr, cg, cb); doc.circle(px, py, 1, "F");
+    });
+
+    // X labels
+    doc.setTextColor(80, 80, 80); doc.setFontSize(4.5);
+    shifts2.forEach((s2, i) => {
+      doc.text(s2.dayLabel.slice(0, 3), chartX + i * xStep - 3, chartY4 + chartH4 + 3.5);
+    });
+
+    doc.setFontSize(5); doc.setTextColor(80, 80, 80);
+    doc.text("Fatigue Index", chartX - 10, chartY4 - 2);
+    doc.setLineWidth(0.2); doc.setDrawColor(220, 220, 220); doc.setTextColor(0, 0, 0);
+    y = chartY4 + chartH4 + 8;
+  }
 
   // Sign-off
   checkPage(45); y += 4;
@@ -338,7 +427,7 @@ export default function FatigueRiskCalculatorClient() {
 
   const handleExport = useCallback(async () => {
     setExporting(true);
-    try { await exportPDF({ site, manager, assessedBy, date: assessDate }, result, commuteMinutes, mode); }
+    try { await exportPDF({ site, manager, assessedBy, date: assessDate }, result, commuteMinutes, mode, shifts); }
     finally { setExporting(false); }
   }, [site, manager, assessedBy, assessDate, result, commuteMinutes, mode]);
 
