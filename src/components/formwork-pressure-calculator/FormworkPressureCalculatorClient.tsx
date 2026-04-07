@@ -102,7 +102,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("FORMWORK LATERAL PRESSURE ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("CIRIA Report 108 / DIN 18218:2010", M, 19);
+  doc.text("CIRIA Report 108 / DIN 18218:2010 / BS 5975:2019 / BS EN 13670", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34; doc.setTextColor(0, 0, 0);
@@ -139,20 +139,95 @@ async function exportPDF(
     }
   }
 
-  // Results
-  checkPage(40);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Pressure Results", M, y); y += 5;
-  [
-    ["CIRIA R108 Max Pressure", `${result.maxPressureCIRIA} kN/m2`],
-    ["DIN 18218 Max Pressure", `${result.maxPressureDIN} kN/m2`],
-    ["Full Hydrostatic Pressure", `${result.maxPressureHydro} kN/m2`],
-    ["Effective Head (CIRIA)", `${result.effectiveHead}m`],
-    ["Saving vs Hydrostatic", `${result.savingPercent}%`],
-    ["Tie Spacing (H x V)", `${result.tieSpacing.hSpacing}m x ${result.tieSpacing.vSpacing}m`],
-    ["Ties per m2", `${result.tieSpacing.tiesPerM2}`],
-    ["Tie Capacity Used", `${inputs.tieCapacity} kN`],
-  ].forEach(([l, v]) => { doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.text(l + ":", M, y); doc.setFont("helvetica", "normal"); doc.text(v, M + 60, y); y += 4; });
-  y += 3;
+  // Results (coloured panel)
+  checkPage(45);
+  doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
+  doc.roundedRect(M, y - 2, CW, 38, 1.5, 1.5, "FD");
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Pressure Results", M + 4, y + 2); y += 6;
+  const resultItems: [string, string, number[]][] = [
+    ["CIRIA R108 Max Pressure", `${result.maxPressureCIRIA} kN/m2`, [59, 130, 246]],
+    ["DIN 18218 Max Pressure", `${result.maxPressureDIN} kN/m2`, [100, 116, 139]],
+    ["Full Hydrostatic Pressure", `${result.maxPressureHydro} kN/m2`, [234, 88, 12]],
+    ["Effective Head (CIRIA)", `${result.effectiveHead}m`, [17, 24, 39]],
+    ["Saving vs Hydrostatic", `${result.savingPercent}%`, [22, 163, 74]],
+    ["Tie Spacing (H x V)", `${result.tieSpacing.hSpacing}m x ${result.tieSpacing.vSpacing}m`, [17, 24, 39]],
+    ["Ties per m2", `${result.tieSpacing.tiesPerM2}`, [17, 24, 39]],
+    ["Tie Capacity Used", `${inputs.tieCapacity} kN`, [17, 24, 39]],
+  ];
+  resultItems.forEach(([l, v, c]) => {
+    doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+    doc.text(l + ":", M + 4, y);
+    doc.setTextColor(c[0], c[1], c[2]); doc.setFont("helvetica", "bold");
+    doc.text(v, M + 64, y);
+    doc.setTextColor(0, 0, 0); y += 3.8;
+  });
+  y += 5;
+
+  // Pressure vs Depth Chart
+  checkPage(70);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  doc.text("Lateral Pressure vs Depth", M, y);
+  doc.setFontSize(6); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
+  doc.text("CIRIA R108 bilinear envelope (blue) vs full hydrostatic (orange). Difference shows formwork design saving.", M, y + 4);
+  doc.setTextColor(0, 0, 0); y += 8;
+
+  {
+    const chartX = M + 15, chartY3 = y, chartW3 = 70, chartH3 = 50;
+    const maxP = result.maxPressureHydro * 1.1;
+    const maxD = inputs.headHeight;
+
+    // Background
+    doc.setFillColor(252, 252, 253); doc.rect(chartX, chartY3, chartW3, chartH3, "F");
+
+    // Grid
+    doc.setDrawColor(220, 220, 220); doc.setFontSize(4.5); doc.setTextColor(130, 130, 130);
+    for (let p = 0; p <= maxP; p += Math.ceil(maxP / 5)) {
+      const xp = chartX + (p / maxP) * chartW3;
+      doc.line(xp, chartY3, xp, chartY3 + chartH3);
+      doc.text(`${Math.round(p)}`, xp - 2, chartY3 + chartH3 + 3.5);
+    }
+    for (let d = 0; d <= maxD; d += Math.max(0.5, Math.ceil(maxD / 5))) {
+      const yp = chartY3 + (d / maxD) * chartH3;
+      doc.line(chartX, yp, chartX + chartW3, yp);
+      doc.text(`${d.toFixed(1)}m`, chartX - 10, yp + 1.5);
+    }
+
+    // Hydrostatic line (orange)
+    doc.setDrawColor(234, 88, 12); doc.setLineWidth(0.5);
+    doc.line(chartX, chartY3, chartX + (result.maxPressureHydro / maxP) * chartW3, chartY3 + chartH3);
+
+    // CIRIA line (blue bilinear)
+    doc.setDrawColor(59, 130, 246); doc.setLineWidth(0.6);
+    const effDepth = Math.min(result.effectiveHead, maxD);
+    const ciriaX = chartX + (result.maxPressureCIRIA / maxP) * chartW3;
+    const effY = chartY3 + (effDepth / maxD) * chartH3;
+    doc.line(chartX, chartY3, ciriaX, effY); // hydrostatic portion
+    doc.line(ciriaX, effY, ciriaX, chartY3 + chartH3); // constant portion
+
+    // Saving area fill (simplified)
+    doc.setFillColor(220, 252, 231);
+    // Triangle approximation of saving area
+    const hydroEndX = chartX + (result.maxPressureHydro / maxP) * chartW3;
+    const botY = chartY3 + chartH3;
+    // small green indicator at bottom right
+    doc.setFontSize(6); doc.setTextColor(22, 163, 74); doc.setFont("helvetica", "bold");
+    doc.text(`${result.savingPercent}% saving`, ciriaX + 3, botY - 3);
+
+    // Labels
+    doc.setTextColor(80, 80, 80); doc.setFontSize(5);
+    doc.text("Pressure (kN/m2)", chartX + chartW3 / 2 - 10, chartY3 + chartH3 + 7);
+    doc.text("Depth", chartX - 12, chartY3 - 2);
+
+    // Legend
+    const legX = chartX + chartW3 + 10, legY2 = chartY3 + 5;
+    doc.setFillColor(59, 130, 246); doc.rect(legX, legY2, 5, 2, "F");
+    doc.setFontSize(5); doc.setTextColor(80, 80, 80); doc.text("CIRIA R108", legX + 7, legY2 + 1.8);
+    doc.setFillColor(234, 88, 12); doc.rect(legX, legY2 + 5, 5, 2, "F");
+    doc.text("Hydrostatic", legX + 7, legY2 + 6.8);
+
+    doc.setLineWidth(0.2); doc.setDrawColor(220, 220, 220); doc.setTextColor(0, 0, 0);
+    y = chartY3 + chartH3 + 12;
+  }
 
   // Recommendations
   checkPage(15);
