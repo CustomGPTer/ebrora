@@ -186,7 +186,7 @@ async function exportPDF(
   doc.text("UV INDEX EXPOSURE ASSESSMENT", M, 12);
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
-  doc.text("HSE UV Guidance / WHO UV Index -- ebrora.com/tools/uv-index-exposure-checker", M, 19);
+  doc.text("HSE UV Guidance / WHO UV Index / HSE INDG147 / EN 172 -- ebrora.com/tools/uv-index-exposure-checker", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34;
@@ -262,11 +262,14 @@ async function exportPDF(
   doc.setTextColor(0, 0, 0);
   y += 20;
 
-  // ── Summary Box
-  checkPage(25);
+  // ── Summary Box (coloured panel)
+  checkPage(40);
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(200, 210, 220);
+  doc.roundedRect(M, y - 2, CW, 38, 1.5, 1.5, "FD");
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Assessment Summary", M, y);
-  y += 5;
+  doc.text("Assessment Summary", M + 4, y + 2);
+  y += 6;
 
   const summaryItems = [
     ["Peak UV Index", formatUV(assessment.peakUV)],
@@ -280,15 +283,21 @@ async function exportPDF(
   ];
 
   const sumCols = [0, 60];
-  summaryItems.forEach(([label, value]) => {
+  summaryItems.forEach(([label, value], si) => {
     doc.setFontSize(7);
+    doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+    doc.text(label + ":", M + sumCols[0] + 4, y);
     doc.setFont("helvetica", "bold");
-    doc.text(label + ":", M + sumCols[0], y);
-    doc.setFont("helvetica", "normal");
-    doc.text(value, M + sumCols[1], y);
-    y += 4;
+    // Colour key values
+    if (si === 5 && assessment.totalSED > 2) { doc.setTextColor(220, 38, 38); }
+    else if (si === 5) { doc.setTextColor(22, 163, 74); }
+    else if (si === 0) { doc.setTextColor(riskRGB[0], riskRGB[1], riskRGB[2]); }
+    else { doc.setTextColor(17, 24, 39); }
+    doc.text(value, M + sumCols[1] + 4, y);
+    doc.setTextColor(0, 0, 0);
+    y += 3.8;
   });
-  y += 4;
+  y += 5;
 
   // ── Hourly UV Table
   checkPage(15);
@@ -308,10 +317,19 @@ async function exportPDF(
   });
   doc.setTextColor(0, 0, 0); y += 6;
 
+  // Risk colour lookup
+  const riskColours: Record<string, number[]> = {
+    low: [220, 252, 231], moderate: [254, 249, 195], high: [255, 237, 213],
+    "very-high": [254, 226, 226], extreme: [237, 233, 254],
+  };
+  const riskTextColours: Record<string, number[]> = {
+    low: [22, 101, 52], moderate: [133, 77, 14], high: [154, 52, 18],
+    "very-high": [153, 27, 27], extreme: [91, 33, 182],
+  };
+
   // Data rows (every 30 min)
   assessment.hourly.forEach((h, idx) => {
     checkPage(5);
-    const isHighlight = h.adjustedUV >= 6;
     cx = M;
     const rowData = [
       h.label,
@@ -324,11 +342,21 @@ async function exportPDF(
       ppe.enabled ? formatUV(h.protectedUV) : "--",
     ];
     rowData.forEach((t, i) => {
-      if (isHighlight) { doc.setFillColor(254, 226, 226); doc.rect(cx, y, cols[i], 5, "FD"); }
-      else if (idx % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], 5, "FD"); }
-      else { doc.rect(cx, y, cols[i], 5, "D"); }
-      doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(5.5);
-      doc.text(t, cx + 1.5, y + 3.5);
+      if (i === 4) {
+        // Colour-coded risk cell
+        const rc = riskColours[h.risk] || [250, 250, 250];
+        const tc = riskTextColours[h.risk] || [0, 0, 0];
+        doc.setFillColor(rc[0], rc[1], rc[2]); doc.rect(cx, y, cols[i], 5, "F");
+        doc.setTextColor(tc[0], tc[1], tc[2]); doc.setFont("helvetica", "bold"); doc.setFontSize(5.5);
+        doc.text(t, cx + 1.5, y + 3.5);
+        doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
+      } else {
+        if (h.adjustedUV >= 6 && i >= 2 && i <= 3) { doc.setFillColor(254, 226, 226); doc.rect(cx, y, cols[i], 5, "FD"); }
+        else if (idx % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], 5, "FD"); }
+        else { doc.rect(cx, y, cols[i], 5, "D"); }
+        doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(5.5);
+        doc.text(t, cx + 1.5, y + 3.5);
+      }
       cx += cols[i];
     });
     y += 5;
@@ -386,6 +414,82 @@ async function exportPDF(
     doc.text(`SED reduction: ${formatSED(assessment.totalSED)} --> ${formatSED(assessment.protectedSED)} SED (${Math.round((1 - assessment.protectedSED / Math.max(assessment.totalSED, 0.01)) * 100)}% reduction)`, M + 2, y);
     doc.setFont("helvetica", "normal");
     y += 6;
+  }
+
+  // ── UV Index Chart (drawn with jsPDF)
+  checkPage(75);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  doc.text("UV Index Across Working Day", M, y);
+  doc.setFontSize(6); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
+  doc.text("Chart shows adjusted UV index for each 30-minute interval. Shaded bands indicate WHO/WMO risk categories.", M, y + 4);
+  doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
+  y += 8;
+
+  {
+    const chartX = M + 10, chartY = y, chartW = CW - 20, chartH = 55;
+    const maxUV = Math.max(12, ...assessment.hourly.map(h => h.adjustedUV));
+    const xStep = chartW / Math.max(1, assessment.hourly.length - 1);
+
+    // Band backgrounds
+    const bands = [
+      { min: 0, max: 2, r: 220, g: 252, b: 231 }, // green
+      { min: 2, max: 5, r: 254, g: 249, b: 195 }, // yellow
+      { min: 5, max: 7, r: 255, g: 237, b: 213 }, // orange
+      { min: 7, max: 10, r: 254, g: 226, b: 226 }, // red
+      { min: 10, max: maxUV, r: 237, g: 233, b: 254 }, // purple
+    ];
+    bands.forEach(b => {
+      const top = chartY + chartH - (Math.min(b.max, maxUV) / maxUV) * chartH;
+      const bot = chartY + chartH - (b.min / maxUV) * chartH;
+      if (bot > top) {
+        doc.setFillColor(b.r, b.g, b.b); doc.rect(chartX, top, chartW, bot - top, "F");
+      }
+    });
+
+    // Grid lines and Y labels
+    doc.setDrawColor(200, 200, 200); doc.setFontSize(5); doc.setTextColor(130, 130, 130);
+    [0, 2, 4, 6, 8, 10, 12].filter(v => v <= maxUV).forEach(v => {
+      const yPos = chartY + chartH - (v / maxUV) * chartH;
+      doc.line(chartX, yPos, chartX + chartW, yPos);
+      doc.text(String(v), chartX - 5, yPos + 1.5);
+    });
+
+    // UV line
+    doc.setDrawColor(239, 68, 68); doc.setLineWidth(0.6);
+    for (let i = 1; i < assessment.hourly.length; i++) {
+      const x1 = chartX + (i - 1) * xStep;
+      const y1 = chartY + chartH - (assessment.hourly[i - 1].adjustedUV / maxUV) * chartH;
+      const x2 = chartX + i * xStep;
+      const y2v = chartY + chartH - (assessment.hourly[i].adjustedUV / maxUV) * chartH;
+      doc.line(x1, y1, x2, y2v);
+    }
+    // Data dots
+    assessment.hourly.forEach((h, i) => {
+      const px = chartX + i * xStep;
+      const py = chartY + chartH - (h.adjustedUV / maxUV) * chartH;
+      doc.setFillColor(239, 68, 68); doc.circle(px, py, 0.8, "F");
+    });
+
+    // X labels (every 2nd)
+    doc.setTextColor(100, 100, 100); doc.setFontSize(5);
+    assessment.hourly.filter((_, i) => i % 2 === 0).forEach(h => {
+      const i = assessment.hourly.indexOf(h);
+      doc.text(h.label, chartX + i * xStep - 3, chartY + chartH + 4);
+    });
+
+    // Axis labels
+    doc.setFontSize(5.5); doc.setTextColor(80, 80, 80);
+    doc.text("UV Index", chartX - 8, chartY - 2);
+    doc.text("Time of Day", chartX + chartW / 2 - 8, chartY + chartH + 8);
+
+    // Legend
+    doc.setFillColor(239, 68, 68); doc.rect(chartX + chartW - 40, chartY + 2, 6, 2, "F");
+    doc.setFontSize(5); doc.setTextColor(100, 100, 100);
+    doc.text("Adjusted UV", chartX + chartW - 32, chartY + 3.8);
+
+    doc.setLineWidth(0.2); doc.setDrawColor(220, 220, 220);
+    doc.setTextColor(0, 0, 0);
+    y = chartY + chartH + 12;
   }
 
   // ── Sign-off
