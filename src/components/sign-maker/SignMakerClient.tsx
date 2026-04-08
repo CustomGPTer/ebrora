@@ -350,26 +350,26 @@ export default function SignMakerClient() {
   return (
     <div className="space-y-4">
       <button onClick={goBack} className="text-sm font-semibold text-[#1B5B50] hover:underline flex items-center gap-1">← {isCustom ? "Back to categories" : "Back to icons"}</button>
+      {selectedIcons.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{selectedIcons.length} Icon{selectedIcons.length !== 1 ? "s" : ""} Selected</span>
+            <button onClick={() => setStep(1)} className="text-xs font-semibold text-[#1B5B50] hover:underline">Change</button>
+          </div>
+          <div className="flex gap-2">
+            {selectedIcons.map((icon) => (
+              <div key={icon.code} className="flex flex-col items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={iconSrc(icon.code)} alt={icon.label} className="w-10 h-10 object-contain" />
+                <span className="text-[9px] text-gray-500 uppercase mt-0.5">{icon.code}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {isCustom && <div className="bg-white rounded-xl border border-gray-200 p-3"><div className="font-bold text-sm text-gray-900">Custom Text-Only Sign</div><div className="text-xs text-gray-500">No icon — pick your own colours</div></div>}
       <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6 items-start">
         <div className="space-y-4">
-          {selectedIcons.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{selectedIcons.length} Icon{selectedIcons.length !== 1 ? "s" : ""} Selected</span>
-                <button onClick={() => setStep(1)} className="text-xs font-semibold text-[#1B5B50] hover:underline">Change</button>
-              </div>
-              <div className="flex gap-2">
-                {selectedIcons.map((icon) => (
-                  <div key={icon.code} className="flex flex-col items-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={iconSrc(icon.code)} alt={icon.label} className="w-10 h-10 object-contain" />
-                    <span className="text-[9px] text-gray-500 uppercase mt-0.5">{icon.code}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {isCustom && <div className="bg-white rounded-xl border border-gray-200 p-3"><div className="font-bold text-sm text-gray-900">Custom Text-Only Sign</div><div className="text-xs text-gray-500">No icon — pick your own colours</div></div>}
           {!isCustom && (
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Layout Template</label>
@@ -459,7 +459,6 @@ export default function SignMakerClient() {
           {!fontsLoaded && <div className="flex items-center gap-2 text-xs text-amber-600 font-semibold"><span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />Loading fonts…</div>}
         </div>
         <div className="flex flex-col items-center gap-3">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live Preview</div>
           <div className="bg-gray-200 rounded-xl p-6 inline-flex items-center justify-center">{renderPreview()}</div>
           <div className="text-xs text-gray-400">{paperSize.toUpperCase()} · {orientation} · {fn.label} · {ts.label} text · {TEMPLATES.find((t) => t.id === template)?.label}</div>
         </div>
