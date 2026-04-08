@@ -377,27 +377,29 @@ export default function SignMakerClient() {
             </div>
           )}
           {selectedIcons.length > 0 && (
-            <div>
-              <div className="inline-grid grid-cols-3 gap-1" style={{ width: "calc(3 * 2.25rem + 2 * 0.25rem)" }}>
-                <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1">Icon Position</label><div />
-                <div /><button onClick={() => setIconOffsetY((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move up">↑</button><div />
-                <button onClick={() => setIconOffsetX((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move left">←</button>
-                <button onClick={() => { setIconOffsetX(0); setIconOffsetY(-8); }} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-[#1B5B50] font-bold text-[10px] transition-colors" title="Reset">↺</button>
-                <button onClick={() => setIconOffsetX((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move right">→</button>
-                <div /><button onClick={() => setIconOffsetY((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move down">↓</button><div />
+            <div className="flex gap-4">
+              <div>
+                <div className="inline-grid grid-cols-3 gap-1" style={{ width: "calc(3 * 2.25rem + 2 * 0.25rem)" }}>
+                  <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1">Icon</label><div />
+                  <div /><button onClick={() => setIconOffsetY((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move up">↑</button><div />
+                  <button onClick={() => setIconOffsetX((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move left">←</button>
+                  <button onClick={() => { setIconOffsetX(0); setIconOffsetY(-8); }} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-[#1B5B50] font-bold text-[10px] transition-colors" title="Reset">↺</button>
+                  <button onClick={() => setIconOffsetX((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move right">→</button>
+                  <div /><button onClick={() => setIconOffsetY((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move down">↓</button><div />
+                </div>
               </div>
-            </div>
-          )}
-          {(template === "panel" || template === "banner") && (
-            <div>
-              <div className="inline-grid grid-cols-3 gap-1" style={{ width: "calc(3 * 2.25rem + 2 * 0.25rem)" }}>
-                <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1">Text Box</label><div />
-                <div /><button onClick={() => setPanelOffsetY((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box up">↑</button><div />
-                <button onClick={() => setPanelOffsetX((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box left">←</button>
-                <button onClick={() => { setPanelOffsetX(0); setPanelOffsetY(0); }} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-[#1B5B50] font-bold text-[10px] transition-colors" title="Reset">↺</button>
-                <button onClick={() => setPanelOffsetX((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box right">→</button>
-                <div /><button onClick={() => setPanelOffsetY((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box down">↓</button><div />
-              </div>
+              {(template === "panel" || template === "banner") && (
+                <div>
+                  <div className="inline-grid grid-cols-3 gap-1" style={{ width: "calc(3 * 2.25rem + 2 * 0.25rem)" }}>
+                    <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1">Text Box</label><div />
+                    <div /><button onClick={() => setPanelOffsetY((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box up">↑</button><div />
+                    <button onClick={() => setPanelOffsetX((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box left">←</button>
+                    <button onClick={() => { setPanelOffsetX(0); setPanelOffsetY(0); }} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-[#1B5B50] font-bold text-[10px] transition-colors" title="Reset">↺</button>
+                    <button onClick={() => setPanelOffsetX((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box right">→</button>
+                    <div /><button onClick={() => setPanelOffsetY((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box down">↓</button><div />
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <div>
