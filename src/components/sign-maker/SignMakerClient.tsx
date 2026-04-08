@@ -182,13 +182,18 @@ export default function SignMakerClient() {
     div.style.cssText = `width:${w}px;height:${h}px;background:${signBg};${item.showBorder ? `border:${w * 0.015}px solid ${border};` : ""}border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:${tpl === "default" ? "center" : "flex-start"};box-sizing:border-box;font-family:${bFn.family};overflow:hidden;`;
     if (hasIcons) {
       const iconArea = document.createElement("div");
-      const iconFlex = tpl === "banner" ? "55" : tpl === "half" ? "55" : tpl === "panel" ? "60" : "50";
+      const bLandscape = w > h;
+      const iconFlex = bLandscape
+        ? (tpl === "banner" ? "42" : tpl === "half" ? "42" : tpl === "panel" ? "45" : "38")
+        : (tpl === "banner" ? "55" : tpl === "half" ? "55" : tpl === "panel" ? "60" : "50");
       const iconCount = item.icons.length;
+      const size = bLandscape
+        ? (iconCount === 1 ? 45 : iconCount === 2 ? 30 : 28)
+        : (iconCount === 1 ? 70 : iconCount === 2 ? 45 : 40);
       iconArea.style.cssText = `flex:0 0 ${iconFlex}%;width:100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;padding:${w * 0.04}px;box-sizing:border-box;transform:translate(${item.iconOffsetX * w / 100}px,${item.iconOffsetY * h / 100}px);`;
       for (const icon of item.icons) {
         const img = document.createElement("img");
         img.src = iconSrc(icon.code);
-        const size = iconCount === 1 ? 70 : iconCount === 2 ? 45 : 40;
         img.style.cssText = `width:${size}%;max-height:${iconCount <= 2 ? "90" : "45"}%;object-fit:contain;padding:${w * 0.01}px;`;
         iconArea.appendChild(img);
       }
@@ -223,9 +228,13 @@ export default function SignMakerClient() {
     const isPanel = template !== "default";
     const signBg = isPanel ? "#FFFFFF" : catColour;
     const useTxtCol = template === "default" ? textColourDefault : panelTextColour;
-    const iconFlex = template === "banner" ? "55%" : template === "half" ? "55%" : template === "panel" ? "60%" : "50%";
+    const iconFlex = isLandscape
+      ? (template === "banner" ? "42%" : template === "half" ? "42%" : template === "panel" ? "45%" : "38%")
+      : (template === "banner" ? "55%" : template === "half" ? "55%" : template === "panel" ? "60%" : "50%");
     const iconCount = selectedIcons.length;
-    const iconSize = iconCount === 1 ? "70%" : iconCount === 2 ? "45%" : "40%";
+    const iconSize = isLandscape
+      ? (iconCount === 1 ? "45%" : iconCount === 2 ? "30%" : "28%")
+      : (iconCount === 1 ? "70%" : iconCount === 2 ? "45%" : "40%");
     const iconMaxH = iconCount <= 2 ? "90%" : "45%";
 
     const renderText = () => {
