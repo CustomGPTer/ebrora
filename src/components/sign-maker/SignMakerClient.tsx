@@ -43,6 +43,8 @@ interface BatchItem {
   customTextColour: string;
   iconOffsetX: number;
   iconOffsetY: number;
+  panelOffsetX: number;
+  panelOffsetY: number;
 }
 
 export default function SignMakerClient() {
@@ -64,6 +66,8 @@ export default function SignMakerClient() {
   const [customTextColour, setCustomTextColour] = useState("#333333");
   const [iconOffsetX, setIconOffsetX] = useState(0);
   const [iconOffsetY, setIconOffsetY] = useState(-8);
+  const [panelOffsetX, setPanelOffsetX] = useState(0);
+  const [panelOffsetY, setPanelOffsetY] = useState(0);
   const [batch, setBatch] = useState<BatchItem[]>([]);
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -106,14 +110,14 @@ export default function SignMakerClient() {
     return ICONS.filter((i) => i.category === selectedCat && i.relevance === 3).length;
   }, [selectedCat]);
 
-  const selectCat = (id: SignCategory | "custom") => { setSelectedCat(id); setSelectedIcons([]); setSearch(""); setShowAllIcons(false); setLines([""]); setTemplate("default"); setIconOffsetX(0); setIconOffsetY(-8); if (id === "custom") { setStep(2); } else { setStep(1); } };
+  const selectCat = (id: SignCategory | "custom") => { setSelectedCat(id); setSelectedIcons([]); setSearch(""); setShowAllIcons(false); setLines([""]); setTemplate("default"); setIconOffsetX(0); setIconOffsetY(-8); setPanelOffsetX(0); setPanelOffsetY(0); if (id === "custom") { setStep(2); } else { setStep(1); } };
   const toggleIcon = (icon: SignIcon) => { setSelectedIcons((prev) => { const exists = prev.find((i) => i.code === icon.code); if (exists) return prev.filter((i) => i.code !== icon.code); if (prev.length >= 4) return prev; return [...prev, icon]; }); };
   const goToEditor = () => { if (selectedIcons.length > 0) { setIconOffsetX(0); setIconOffsetY(-8); setStep(2); } };
   const goBack = () => { if (step === 2 && !isCustom) setStep(1); else if (step === 2 && isCustom) setStep(0); else if (step === 1) setStep(0); };
   const updateLine = (i: number, val: string) => { const n = [...lines]; n[i] = val; setLines(n); };
   const addLine = () => { if (lines.length < 4) setLines([...lines, ""]); };
   const removeLine = (i: number) => { if (lines.length > 1) setLines(lines.filter((_, j) => j !== i)); };
-  const addToBatch = () => { setBatch((prev) => [...prev, { icons: [...selectedIcons], lines: [...lines], textSize, font, paperSize, orientation, showBorder, template, customBg, customBorder, customTextColour, iconOffsetX, iconOffsetY }]); };
+  const addToBatch = () => { setBatch((prev) => [...prev, { icons: [...selectedIcons], lines: [...lines], textSize, font, paperSize, orientation, showBorder, template, customBg, customBorder, customTextColour, iconOffsetX, iconOffsetY, panelOffsetX, panelOffsetY }]); };
 
   const exportPDF = useCallback(async () => {
     if (!fontsLoaded) { alert("Fonts still loading — please wait a moment."); return; }
@@ -195,9 +199,9 @@ export default function SignMakerClient() {
       const pad = w * 0.04;
       const useTxt = tpl === "default" ? defaultTxt : panelTxt;
       if (tpl === "default") { textArea.style.cssText = `flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:${pad}px;box-sizing:border-box;`; }
-      else if (tpl === "panel") { textArea.style.cssText = `flex:0 0 auto;width:85%;background:${bg};border-radius:${w * 0.03}px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:${pad * 1.2}px ${pad}px;margin-bottom:${pad}px;box-sizing:border-box;`; }
+      else if (tpl === "panel") { textArea.style.cssText = `flex:0 0 auto;width:85%;background:${bg};border-radius:${w * 0.03}px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:${pad * 1.2}px ${pad}px;margin-bottom:${pad}px;box-sizing:border-box;transform:translate(${item.panelOffsetX * w / 100}px,${item.panelOffsetY * h / 100}px);`; }
       else if (tpl === "half") { textArea.style.cssText = `flex:1;width:100%;background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:${pad}px;box-sizing:border-box;`; }
-      else { textArea.style.cssText = `flex:0 0 auto;width:100%;background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:${pad * 0.8}px ${pad}px;box-sizing:border-box;`; }
+      else { textArea.style.cssText = `flex:0 0 auto;width:100%;background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:${pad * 0.8}px ${pad}px;box-sizing:border-box;transform:translate(${item.panelOffsetX * w / 100}px,${item.panelOffsetY * h / 100}px);`; }
       for (const line of textLines) {
         const p = document.createElement("div");
         p.textContent = line;
@@ -231,9 +235,9 @@ export default function SignMakerClient() {
         <div key={i} style={{ fontSize: fontSize * scale, fontWeight: 700, color: useTxtCol, textAlign: "center", lineHeight: 1.2, letterSpacing: "0.02em", textTransform: "uppercase", wordBreak: "break-word", maxWidth: "95%" }}>{line}</div>
       ));
       if (template === "default") return <div style={{ flex: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", padding: pad, boxSizing: "border-box", gap: fontSize * 0.2 * scale }}>{textContent}</div>;
-      if (template === "panel") return <div style={{ flex: "0 0 auto", width: "85%", background: catColour, borderRadius: w * 0.03, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: `${pad * 1.2}px ${pad}px`, marginBottom: pad, boxSizing: "border-box", gap: fontSize * 0.2 * scale }}>{textContent}</div>;
+      if (template === "panel") return <div style={{ flex: "0 0 auto", width: "85%", background: catColour, borderRadius: w * 0.03, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: `${pad * 1.2}px ${pad}px`, marginBottom: pad, boxSizing: "border-box", gap: fontSize * 0.2 * scale, transform: `translate(${panelOffsetX * w / 100}px, ${panelOffsetY * h / 100}px)` }}>{textContent}</div>;
       if (template === "half") return <div style={{ flex: "1", width: "100%", background: catColour, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: pad, boxSizing: "border-box", gap: fontSize * 0.2 * scale }}>{textContent}</div>;
-      return <div style={{ flex: "0 0 auto", width: "100%", background: catColour, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: `${pad * 0.8}px ${pad}px`, boxSizing: "border-box", gap: fontSize * 0.2 * scale }}>{textContent}</div>;
+      return <div style={{ flex: "0 0 auto", width: "100%", background: catColour, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: `${pad * 0.8}px ${pad}px`, boxSizing: "border-box", gap: fontSize * 0.2 * scale, transform: `translate(${panelOffsetX * w / 100}px, ${panelOffsetY * h / 100}px)` }}>{textContent}</div>;
     };
 
     return (
@@ -255,7 +259,7 @@ export default function SignMakerClient() {
     const active = template === tpl.id;
     const w = 56; const h = 72; const col = catColour; const bdr = catBorder;
     return (
-      <button key={tpl.id} onClick={() => setTemplate(tpl.id)} className={cx("rounded-lg border-2 p-1 transition-all", active ? "border-[#1B5B50] shadow-md" : "border-gray-200 hover:border-gray-300")} title={tpl.desc}>
+      <button key={tpl.id} onClick={() => { setTemplate(tpl.id); setPanelOffsetX(0); setPanelOffsetY(0); }} className={cx("rounded-lg border-2 p-1 transition-all", active ? "border-[#1B5B50] shadow-md" : "border-gray-200 hover:border-gray-300")} title={tpl.desc}>
         <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h}>
           {tpl.id === "default" ? <rect x="1" y="1" width={w-2} height={h-2} rx="3" fill={col} stroke={bdr} strokeWidth="1" /> : <rect x="1" y="1" width={w-2} height={h-2} rx="3" fill="white" stroke={bdr} strokeWidth="1" />}
           <circle cx={w/2} cy={tpl.id === "default" ? 28 : 26} r={12} fill={tpl.id === "default" ? "rgba(255,255,255,0.4)" : col} opacity={0.7} />
@@ -374,13 +378,25 @@ export default function SignMakerClient() {
           )}
           {selectedIcons.length > 0 && (
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Icon Position</label>
-              <div className="inline-grid grid-cols-3 gap-1">
+              <div className="inline-grid grid-cols-3 gap-1" style={{ width: "calc(3 * 2.25rem + 2 * 0.25rem)" }}>
+                <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1">Icon Position</label><div />
                 <div /><button onClick={() => setIconOffsetY((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move up">↑</button><div />
                 <button onClick={() => setIconOffsetX((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move left">←</button>
                 <button onClick={() => { setIconOffsetX(0); setIconOffsetY(-8); }} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-[#1B5B50] font-bold text-[10px] transition-colors" title="Reset">↺</button>
                 <button onClick={() => setIconOffsetX((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move right">→</button>
                 <div /><button onClick={() => setIconOffsetY((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move down">↓</button><div />
+              </div>
+            </div>
+          )}
+          {(template === "panel" || template === "banner") && (
+            <div>
+              <div className="inline-grid grid-cols-3 gap-1" style={{ width: "calc(3 * 2.25rem + 2 * 0.25rem)" }}>
+                <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1">Text Box</label><div />
+                <div /><button onClick={() => setPanelOffsetY((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box up">↑</button><div />
+                <button onClick={() => setPanelOffsetX((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box left">←</button>
+                <button onClick={() => { setPanelOffsetX(0); setPanelOffsetY(0); }} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-[#1B5B50] font-bold text-[10px] transition-colors" title="Reset">↺</button>
+                <button onClick={() => setPanelOffsetX((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box right">→</button>
+                <div /><button onClick={() => setPanelOffsetY((v) => v + 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box down">↓</button><div />
               </div>
             </div>
           )}
