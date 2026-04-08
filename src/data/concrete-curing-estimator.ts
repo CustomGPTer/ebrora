@@ -63,7 +63,7 @@ export interface CuringResult {
 // ─── Constants ───────────────────────────────────────────────
 export const CEMENT_TYPES: CementInfo[] = [
   { type: "CEM_I_525R",  label: "CEM I 52.5R (Rapid)",        s: 0.20, datumTemp: -10, description: "Rapid hardening Portland cement" },
-  { type: "CEM_I_425R",  label: "CEM I 42.5R (Standard Rapid)", s: 0.25, datumTemp: -10, description: "Standard rapid Portland cement" },
+  { type: "CEM_I_425R",  label: "CEM I 42.5R (Standard Rapid)", s: 0.20, datumTemp: -10, description: "Standard rapid Portland cement" },
   { type: "CEM_I_425N",  label: "CEM I 42.5N (Normal)",        s: 0.25, datumTemp: -10, description: "Normal Portland cement" },
   { type: "CEM_IIA_L",   label: "CEM II/A-L 32.5R (Limestone)", s: 0.25, datumTemp: -10, description: "Portland-limestone cement" },
   { type: "CEM_IIB_V",   label: "CEM II/B-V 32.5R (PFA)",     s: 0.38, datumTemp: -10, description: "Portland-fly ash cement" },
@@ -115,9 +115,7 @@ function strengthAtAge(fcm28: number, s: number, tDays: number): number {
 function ageForStrength(fcm28: number, s: number, targetMPa: number): number {
   if (targetMPa <= 0) return 0;
   if (targetMPa >= fcm28) return 28 / Math.pow(1 - Math.log(targetMPa / fcm28) / s, 2);
-  const ratio = targetMPa / fcm28;
-  if (ratio >= 1) return Infinity;
-  const lnRatio = Math.log(ratio);
+  const lnRatio = Math.log(targetMPa / fcm28);
   const bracket = 1 - lnRatio / s;
   if (bracket <= 0) return Infinity;
   return 28 / (bracket * bracket);
@@ -287,7 +285,7 @@ export function calculateCuring(
     recommendations.push(`${cemInfo.label} has slower early strength gain (s=${cemInfo.s}). Extended curing periods are required compared to CEM I cements. Do not strike formwork based on CEM I timings.`);
   }
   if (realDays > 7) {
-    recommendations.push(`Estimated curing time of ${realDays.toFixed(1)} days exceeds 7 days. Consider upgrading to a higher strength class or faster cement to reduce programme impact.`);
+    recommendations.push(`Estimated curing time of ${realDays.toFixed(1)} days exceeds 7 days. Consider using a faster cement type (e.g. CEM I 42.5R or 52.5R) or reducing the target strength threshold to reduce programme impact.`);
   }
   recommendations.push("This is an estimate based on the Eurocode maturity method. Actual strength should be verified by cube testing per BS EN 12390-3 before striking formwork or applying loads.");
   recommendations.push("Ensure curing protection is maintained continuously. Interruptions in curing can permanently reduce final strength.");
