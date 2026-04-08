@@ -430,24 +430,24 @@ async function exportPDF(
   y += 56;
 
   // ── Summary panel
-  checkPage(40);
-  doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
-  doc.roundedRect(M, y, CW, 32, 1.5, 1.5, "FD");
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Solar Summary", M + 4, y + 5); y += 8;
-
   const summaryItems = [
-    ["City", `${city.name}, ${city.region} (${city.lat.toFixed(4)}°N, ${Math.abs(city.lng).toFixed(4)}°W)`],
+    ["City", `${city.name}, ${city.region} (${city.lat.toFixed(4)}\u00B0N, ${Math.abs(city.lng).toFixed(4)}\u00B0W)`],
     ["Civil Twilight Start", fmtTime(daySolar.civilTwilightStart)],
     ["Sunrise", fmtTime(daySolar.sunrise)],
-    ["Solar Noon", `${fmtTime(daySolar.solarNoon)} (altitude ${daySolar.sunAltitudeNoon.toFixed(1)}°)`],
+    ["Solar Noon", `${fmtTime(daySolar.solarNoon)} (altitude ${daySolar.sunAltitudeNoon.toFixed(1)}\u00B0)`],
     ["Sunset", fmtTime(daySolar.sunset)],
     ["Civil Twilight End", fmtTime(daySolar.civilTwilightEnd)],
     ["Daylight Hours", fmtDuration(daySolar.daylightMinutes)],
-    ["Usable Work Hours (twilight–twilight)", fmtDuration(daySolar.usableWorkMinutes)],
-    ["Recommended Working Hours", `${daySolar.recommendedStart} – ${daySolar.recommendedEnd}`],
+    ["Usable Work Hours (twilight\u2013twilight)", fmtDuration(daySolar.usableWorkMinutes)],
+    ["Recommended Working Hours", `${daySolar.recommendedStart} \u2013 ${daySolar.recommendedEnd}`],
     ["Timezone", tzLabel],
   ];
+  const panelH = 8 + summaryItems.length * 3.2 + 3;
+  checkPage(panelH + 5);
+  doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
+  doc.roundedRect(M, y, CW, panelH, 1.5, 1.5, "FD");
+  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  doc.text("Solar Summary", M + 4, y + 5); y += 8;
   summaryItems.forEach(([label, value]) => {
     doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
     doc.text(label + ":", M + 4, y);
@@ -469,7 +469,7 @@ async function exportPDF(
 
   // Table header
   const cols = ["Date", "Civ. Twi.", "Sunrise", "Noon", "Sunset", "Civ. Twi.", "Daylight", "Work Hrs"];
-  const colWidths = [26, 18, 18, 18, 18, 18, 22, 26]; // sum ~164 ~= CW minus some
+  const colWidths = [26, 18, 18, 18, 18, 18, 26, 30];
   const colX: number[] = [];
   let cxPos = M;
   colWidths.forEach(w => { colX.push(cxPos); cxPos += w; });
@@ -483,12 +483,19 @@ async function exportPDF(
   doc.setTextColor(0, 0, 0);
 
   // Data rows
+  const maxDL = Math.max(...tableData.map(d => d.daylightMinutes));
   tableData.forEach((s, ri) => {
     checkPage(6);
     const isEven = ri % 2 === 0;
     if (isEven) { doc.setFillColor(248, 250, 252); doc.rect(M, y, CW, 5, "F"); }
 
-    doc.setFontSize(5.5); doc.setFont("helvetica", "normal"); doc.setTextColor(30, 30, 30);
+    // Draw daylight bar FIRST (behind text)
+    const barW = maxDL > 0 ? (s.daylightMinutes / maxDL) * (colWidths[6] - 4) : 0;
+    doc.setFillColor(253, 224, 71);
+    doc.roundedRect(colX[6] + 2, y + 0.5, barW, 4, 1, 1, "F");
+
+    // Then draw ALL text on top
+    doc.setFontSize(5.5); doc.setFont("helvetica", "normal");
     doc.setDrawColor(220, 220, 220);
 
     const rowData = [
@@ -499,22 +506,16 @@ async function exportPDF(
       fmtTime(s.sunset),
       fmtTime(s.civilTwilightEnd),
       fmtDuration(s.daylightMinutes),
-      `${s.recommendedStart} – ${s.recommendedEnd}`,
+      `${s.recommendedStart} \u2013 ${s.recommendedEnd}`,
     ];
     rowData.forEach((val, ci) => {
-      // Colour-code sunrise/sunset columns
       if (ci === 2) doc.setTextColor(180, 120, 0);
       else if (ci === 4) doc.setTextColor(200, 80, 0);
+      else if (ci === 6) doc.setTextColor(80, 60, 0);
       else if (ci === 7) doc.setTextColor(27, 87, 69);
       else doc.setTextColor(30, 30, 30);
       doc.text(val, colX[ci] + 2, y + 3.5);
     });
-
-    // Daylight bar in daylight column
-    const maxDL = Math.max(...tableData.map(d => d.daylightMinutes));
-    const barW = maxDL > 0 ? (s.daylightMinutes / maxDL) * (colWidths[6] - 14) : 0;
-    doc.setFillColor(253, 224, 71);
-    doc.roundedRect(colX[6] + 2, y + 0.5, barW, 3.5, 1, 1, "F");
 
     doc.setDrawColor(220, 220, 220);
     doc.line(M, y + 5, M + CW, y + 5);
