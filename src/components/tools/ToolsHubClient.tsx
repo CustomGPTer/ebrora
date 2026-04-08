@@ -82,6 +82,7 @@ const TOOL_CATEGORIES = {
       "construction-productivity-calculator",
       "sunrise-sunset-times",
       "working-days-calculator",
+      "daywork-rate-calculator",
     ]),
   },
   "Environmental & Ecology": {
@@ -141,6 +142,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "cable-trench-depth-checker": { icon: "⚡", accent: "#0284C7", accentLight: "rgba(2,132,199,0.08)" },
   "concrete-curing-estimator": { icon: "⏱️", accent: "#64748B", accentLight: "rgba(100,116,139,0.08)" },
   "working-days-calculator": { icon: "📅", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
+  "daywork-rate-calculator": { icon: "💷", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -158,6 +160,7 @@ const PAID_TOOL_SLUGS = new Set([
   "cable-trench-depth-checker",
   "concrete-curing-estimator",
   "working-days-calculator",
+  "daywork-rate-calculator",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
