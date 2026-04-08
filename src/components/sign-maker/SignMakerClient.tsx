@@ -99,9 +99,9 @@ export default function SignMakerClient() {
   const textColour = isCustom
     ? customTextColour
     : selectedCat === "warning"
-      ? "#333"
+      ? "#21251E"
       : selectedCat === "prohibition"
-        ? "#333"
+        ? "#0E1313"
         : "#FFF";
 
   // filtered icons for current category
@@ -253,7 +253,7 @@ export default function SignMakerClient() {
         const bg = item.icon ? (bCat?.bg || "#fff") : item.customBg;
         const border = item.icon ? (bCat?.border || "#333") : item.customBorder;
         const txtCol = item.icon
-          ? (item.icon.category === "warning" || item.icon.category === "prohibition" ? "#333" : "#FFF")
+          ? (item.icon.category === "warning" ? "#21251E" : item.icon.category === "prohibition" ? "#0E1313" : "#FFF")
           : item.customTextColour;
 
         const div = document.createElement("div");
@@ -425,17 +425,17 @@ export default function SignMakerClient() {
                     "w-12 h-12 mx-auto mb-2 flex items-center justify-center",
                     c.shape === "circle" || c.shape === "circle-bar" ? "rounded-full" : "rounded-lg"
                   )}
-                  style={{ background: c.shape === "triangle" ? "transparent" : c.id === "prohibition" ? "#D42C2C" : c.bg }}
+                  style={{ background: c.shape === "triangle" ? "transparent" : c.id === "prohibition" ? "#A1262D" : c.bg }}
                 >
                   {c.shape === "triangle" ? (
                     <svg viewBox="0 0 40 36" className="w-10 h-9">
-                      <polygon points="20,2 38,34 2,34" fill="#FFC72C" stroke="#333" strokeWidth="2" />
-                      <text x="20" y="28" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#333">!</text>
+                      <polygon points="20,2 38,34 2,34" fill="#F5CA2B" stroke="#21251E" strokeWidth="2" />
+                      <text x="20" y="28" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#21251E">!</text>
                     </svg>
                   ) : c.shape === "circle-bar" ? (
                     <svg viewBox="0 0 40 40" className="w-8 h-8">
-                      <circle cx="20" cy="20" r="17" fill="white" stroke="#D42C2C" strokeWidth="3" />
-                      <line x1="8" y1="32" x2="32" y2="8" stroke="#D42C2C" strokeWidth="3" />
+                      <circle cx="20" cy="20" r="17" fill="white" stroke="#A1262D" strokeWidth="3" />
+                      <line x1="8" y1="32" x2="32" y2="8" stroke="#A1262D" strokeWidth="3" />
                     </svg>
                   ) : (
                     <svg viewBox="0 0 24 24" className="w-6 h-6" fill="white">
@@ -484,7 +484,7 @@ export default function SignMakerClient() {
         <div className="flex items-center gap-3">
           <div
             className="w-4 h-4 rounded-sm flex-shrink-0"
-            style={{ background: cat.id === "prohibition" ? "#D42C2C" : cat.bg }}
+            style={{ background: cat.id === "prohibition" ? "#A1262D" : cat.bg }}
           />
           <h2 className="text-xl font-bold text-gray-900">{cat.label} Signs</h2>
           <span className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
