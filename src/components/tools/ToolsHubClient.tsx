@@ -69,6 +69,7 @@ const TOOL_CATEGORIES = {
     slugs: new Set([
       "cbr-modulus-converter",
       "drainage-pipe-flow-calculator",
+      "soil-compaction-calculator",
     ]),
   },
   "Programme & Commercial": {
@@ -130,6 +131,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "scaffold-load-calculator": { icon: "🏗️", accent: "#64748B", accentLight: "rgba(100,116,139,0.08)" },
   "formwork-pressure-calculator": { icon: "🧱", accent: "#92400E", accentLight: "rgba(146,64,14,0.08)" },
   "sling-swl-calculator": { icon: "🏗️", accent: "#EA580C", accentLight: "rgba(234,88,12,0.08)" },
+  "soil-compaction-calculator": { icon: "⛏️", accent: "#0891B2", accentLight: "rgba(8,145,178,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -143,6 +145,7 @@ const PAID_TOOL_SLUGS = new Set([
   "scaffold-load-calculator",
   "formwork-pressure-calculator",
   "drainage-pipe-flow-calculator",
+  "soil-compaction-calculator",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
