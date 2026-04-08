@@ -269,7 +269,7 @@ function MonthCalendar({ data, year, month }: { data: SolarTimes[]; year: number
 
   return (
     <div className="overflow-x-auto">
-      <div className="grid grid-cols-7 gap-1 min-w-[640px]">
+      <div className="grid grid-cols-7 gap-1.5 min-w-[770px]">
         {/* Header */}
         {DAY_LABELS.map(d => (
           <div key={d} className="text-center text-[10px] font-bold uppercase tracking-wider text-gray-400 py-1">{d}</div>
