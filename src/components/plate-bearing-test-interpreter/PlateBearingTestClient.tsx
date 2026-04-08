@@ -23,7 +23,7 @@ function LoadSettlementChart({
   const all = [...test.firstLoad, ...test.unload, ...test.reload];
   if (all.length < 2) return <div className="text-center text-sm text-gray-400 py-10">Enter at least 2 readings to see the chart</div>;
 
-  const padL = 58, padR = 20, padT = 25, padB = 40;
+  const padL = 58, padR = 65, padT = 25, padB = 40;
   const W = 600, H = 360;
   const cW = W - padL - padR, cH = H - padT - padB;
 
@@ -37,13 +37,20 @@ function LoadSettlementChart({
     if (readings.length === 0) return null;
     const sorted = [...readings].sort((a, b) => a.stress - b.stress);
     const pts = sorted.map(r => `${sx(r.stress)},${sy(r.settlement)}`).join(" ");
+    const lastX = sx(sorted[sorted.length - 1].stress);
+    const lastY = sy(sorted[sorted.length - 1].settlement);
+    // Position label left of point if it would overflow right edge
+    const labelRight = lastX + 5;
+    const overflows = labelRight + 50 > W;
+    const labelX = overflows ? lastX - 5 : lastX + 5;
+    const anchor = overflows ? "end" as const : "start" as const;
     return (
       <g>
         <polyline points={pts} fill="none" stroke={colour} strokeWidth={2.5} strokeLinejoin="round" />
         {sorted.map(r => (
-          <circle key={r.id} cx={sx(r.stress)} cy={sy(r.settlement)} r={3.5} fill={colour} stroke="white" strokeWidth={1.5} />
+          <circle key={r.id} cx={sx(r.stress)} cy={sy(r.settlement)} r={sorted.length === 1 ? 5 : 3.5} fill={colour} stroke="white" strokeWidth={1.5} />
         ))}
-        <text x={sx(sorted[sorted.length - 1].stress) + 5} y={sy(sorted[sorted.length - 1].settlement) + 3} fontSize={9} fontWeight={600} fill={colour}>{label}</text>
+        <text x={labelX} y={lastY + 3} textAnchor={anchor} fontSize={9} fontWeight={600} fill={colour}>{label}</text>
       </g>
     );
   };
