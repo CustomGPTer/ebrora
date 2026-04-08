@@ -58,7 +58,7 @@ function GanttCalendar({ result }: { result: WorkingDaysResult }) {
             {mDays.map((d, di) => {
               const x = PAD_L + di * cellW;
               let fill = "#E8F0EC"; // working day — ebrora light green
-              if (d.isWeekend) fill = "#E5E7EB"; // grey
+              if (d.isWeekend) fill = "#CBD5E1"; // weekend grey (darker)
               else if (d.isBankHoliday) fill = "#BFDBFE"; // blue
               else if (d.isCustomExclusion) fill = "#FECACA"; // red
               return (
@@ -72,7 +72,7 @@ function GanttCalendar({ result }: { result: WorkingDaysResult }) {
       })}
       {/* Legend */}
       {[
-        { fill: "#E8F0EC", label: "Working" }, { fill: "#E5E7EB", label: "Weekend" },
+        { fill: "#E8F0EC", label: "Working" }, { fill: "#CBD5E1", label: "Weekend" },
         { fill: "#BFDBFE", label: "Bank Hol" }, { fill: "#FECACA", label: "Exclusion" },
       ].map((l, i) => (
         <g key={l.label}>
@@ -110,7 +110,7 @@ function MonthlyBarChart({ result }: { result: WorkingDaysResult }) {
             <text x={PAD.left - 4} y={y + barH / 2 + 3} textAnchor="end" fontSize={8} fill="#374151" fontWeight={600}>{m.label}</text>
             <rect x={x} y={y} width={wW} height={barH} fill="#1B5745" rx={2} />
             {(() => { x += wW; return null; })()}
-            <rect x={x} y={y} width={weW} height={barH} fill="#D1D5DB" />
+            <rect x={x} y={y} width={weW} height={barH} fill="#CBD5E1" />
             {(() => { x += weW; return null; })()}
             <rect x={x} y={y} width={bhW} height={barH} fill="#93C5FD" />
             {(() => { x += bhW; return null; })()}
@@ -122,7 +122,7 @@ function MonthlyBarChart({ result }: { result: WorkingDaysResult }) {
       })}
       {/* Legend */}
       {[
-        { fill: "#1B5745", label: "Working" }, { fill: "#D1D5DB", label: "Weekend" },
+        { fill: "#1B5745", label: "Working" }, { fill: "#CBD5E1", label: "Weekend" },
         { fill: "#93C5FD", label: "Bank Hol" }, { fill: "#FCA5A5", label: "Exclusion" },
       ].map((l, i) => (
         <g key={l.label}>
@@ -364,7 +364,7 @@ async function exportPDF(
       mDays.forEach((d, di) => {
         const x = M + 18 + di * cellW2;
         let r2 = 200, g = 230, b = 210; // working (green-ish)
-        if (d.isWeekend) { r2 = 220; g = 220; b = 220; }
+        if (d.isWeekend) { r2 = 203; g = 213; b = 225; }
         else if (d.isBankHoliday) { r2 = 180; g = 210; b = 255; }
         else if (d.isCustomExclusion) { r2 = 255; g = 180; b = 180; }
         doc.setFillColor(r2, g, b);
@@ -401,7 +401,7 @@ async function exportPDF(
       // Working
       doc.setFillColor(27, 87, 69); doc.rect(bx, y, m.workingDays * scale, barH2, "F"); bx += m.workingDays * scale;
       // Weekends
-      doc.setFillColor(200, 200, 200); doc.rect(bx, y, m.weekendDays * scale, barH2, "F"); bx += m.weekendDays * scale;
+      doc.setFillColor(203, 213, 225); doc.rect(bx, y, m.weekendDays * scale, barH2, "F"); bx += m.weekendDays * scale;
       // Bank hols
       doc.setFillColor(147, 197, 253); doc.rect(bx, y, m.bankHolidays * scale, barH2, "F"); bx += m.bankHolidays * scale;
       // Exclusions
