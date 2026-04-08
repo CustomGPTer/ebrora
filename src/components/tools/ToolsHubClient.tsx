@@ -92,7 +92,7 @@ const TOOL_CATEGORIES = {
     icon: "⚡",
     accent: "#0284C7",
     accentLight: "rgba(2,132,199,0.08)",
-    slugs: new Set<string>([]),
+    slugs: new Set<string>(["cable-trench-depth-checker"]),
   },
 } as const;
 
@@ -136,6 +136,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "soil-compaction-calculator": { icon: "⛏️", accent: "#0891B2", accentLight: "rgba(8,145,178,0.08)" },
   "sunrise-sunset-times": { icon: "🌅", accent: "#F59E0B", accentLight: "rgba(245,158,11,0.08)" },
   "plate-bearing-test-interpreter": { icon: "🔬", accent: "#0891B2", accentLight: "rgba(8,145,178,0.08)" },
+  "cable-trench-depth-checker": { icon: "⚡", accent: "#0284C7", accentLight: "rgba(2,132,199,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -150,6 +151,7 @@ const PAID_TOOL_SLUGS = new Set([
   "formwork-pressure-calculator",
   "drainage-pipe-flow-calculator",
   "soil-compaction-calculator",
+  "cable-trench-depth-checker",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
