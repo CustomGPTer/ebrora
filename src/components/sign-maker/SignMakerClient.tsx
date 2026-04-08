@@ -205,7 +205,7 @@ export default function SignMakerClient() {
       for (const line of textLines) {
         const p = document.createElement("div");
         p.textContent = line;
-        p.style.cssText = `font-size:${fontSize}px;font-weight:700;color:${useTxt};text-align:center;line-height:1.2;letter-spacing:0.02em;text-transform:uppercase;word-break:break-word;max-width:95%;`;
+        p.style.cssText = `font-size:${fontSize}px;font-weight:700;color:${useTxt};text-align:center;line-height:1.2;letter-spacing:0.02em;text-transform:uppercase;word-break:break-word;width:100%;`;
         textArea.appendChild(p);
       }
       div.appendChild(textArea);
@@ -232,7 +232,7 @@ export default function SignMakerClient() {
       if (textLines.length === 0 && hasIcons) return null;
       const displayLines = textLines.length > 0 ? textLines : [isCustom ? "YOUR TEXT HERE" : ""];
       const textContent = displayLines.map((line, i) => (
-        <div key={i} style={{ fontSize: fontSize * scale, fontWeight: 700, color: useTxtCol, textAlign: "center", lineHeight: 1.2, letterSpacing: "0.02em", textTransform: "uppercase", wordBreak: "break-word", maxWidth: "95%" }}>{line}</div>
+        <div key={i} style={{ fontSize: fontSize * scale, fontWeight: 700, color: useTxtCol, textAlign: "center", lineHeight: 1.2, letterSpacing: "0.02em", textTransform: "uppercase", wordBreak: "break-word", width: "100%" }}>{line}</div>
       ));
       if (template === "default") return <div style={{ flex: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", padding: pad, boxSizing: "border-box", gap: fontSize * 0.2 * scale }}>{textContent}</div>;
       if (template === "panel") return <div style={{ flex: "0 0 auto", width: "85%", background: catColour, borderRadius: w * 0.03, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: `${pad * 1.2}px ${pad}px`, marginBottom: pad, boxSizing: "border-box", gap: fontSize * 0.2 * scale, transform: `translate(${panelOffsetX * w / 100}px, ${panelOffsetY * h / 100}px)` }}>{textContent}</div>;
