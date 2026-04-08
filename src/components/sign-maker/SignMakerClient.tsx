@@ -30,6 +30,8 @@ interface BatchItem {
   customBg: string;
   customBorder: string;
   customTextColour: string;
+  iconOffsetX: number;
+  iconOffsetY: number;
 }
 
 /* ─────────────── component ─────────────── */
@@ -53,6 +55,8 @@ export default function SignMakerClient() {
   const [customBg, setCustomBg] = useState("#FFFFFF");
   const [customBorder, setCustomBorder] = useState("#333333");
   const [customTextColour, setCustomTextColour] = useState("#333333");
+  const [iconOffsetX, setIconOffsetX] = useState(0);
+  const [iconOffsetY, setIconOffsetY] = useState(-8); // default 8% higher than centre
 
   // batch
   const [batch, setBatch] = useState<BatchItem[]>([]);
@@ -131,6 +135,8 @@ export default function SignMakerClient() {
     setSearch("");
     setShowAllIcons(false);
     setLines([""]);
+    setIconOffsetX(0);
+    setIconOffsetY(-8);
     if (id === "custom") {
       setStep(2);
     } else {
@@ -140,6 +146,8 @@ export default function SignMakerClient() {
 
   const selectIcon = (icon: SignIcon) => {
     setSelectedIcon(icon);
+    setIconOffsetX(0);
+    setIconOffsetY(-8);
     setStep(2);
   };
 
@@ -164,7 +172,7 @@ export default function SignMakerClient() {
   const addToBatch = () => {
     setBatch((prev) => [
       ...prev,
-      { icon: selectedIcon, lines: [...lines], textSize, font, paperSize, orientation, showBorder, customBg, customBorder, customTextColour },
+      { icon: selectedIcon, lines: [...lines], textSize, font, paperSize, orientation, showBorder, customBg, customBorder, customTextColour, iconOffsetX, iconOffsetY },
     ]);
   };
 
@@ -285,10 +293,13 @@ export default function SignMakerClient() {
         div.style.cssText = `width:${w}px;height:${h}px;background:${bg};${item.showBorder ? `border:${w * 0.015}px solid ${border};` : ""}border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:${w * 0.06}px;box-sizing:border-box;font-family:${bFn.family};`;
 
         if (hasIcon) {
+          const iconWrap = document.createElement("div");
+          iconWrap.style.cssText = `width:100%;display:flex;align-items:center;justify-content:center;flex:0 0 ${iconScale * 50}%;margin-bottom:${w * 0.03}px;transform:translate(${item.iconOffsetX * w / 100}px, ${item.iconOffsetY * h / 100}px);`;
           const img = document.createElement("img");
           img.src = iconSrc(item.icon!.code);
-          img.style.cssText = `width:${iconScale * 50}%;max-height:${iconScale * 50}%;object-fit:contain;margin-bottom:${w * 0.03}px;`;
-          div.appendChild(img);
+          img.style.cssText = `width:${iconScale * 50}%;max-height:100%;object-fit:contain;`;
+          iconWrap.appendChild(img);
+          div.appendChild(iconWrap);
         }
 
         for (const line of textLines) {
@@ -371,6 +382,7 @@ export default function SignMakerClient() {
               justifyContent: "center",
               width: "100%",
               marginBottom: w * 0.03,
+              transform: `translate(${iconOffsetX * w / 100}px, ${iconOffsetY * h / 100}px)`,
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -601,6 +613,56 @@ export default function SignMakerClient() {
             <div className="bg-white rounded-xl border border-gray-200 p-3">
               <div className="font-bold text-sm text-gray-900">Custom Text-Only Sign</div>
               <div className="text-xs text-gray-500">No icon — pick your own colours</div>
+            </div>
+          )}
+
+          {/* Icon position */}
+          {selectedIcon && (
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Icon Position
+              </label>
+              <div className="inline-grid grid-cols-3 gap-1">
+                <div />
+                <button
+                  onClick={() => setIconOffsetY((v) => v - 4)}
+                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors"
+                  title="Move icon up"
+                >
+                  ↑
+                </button>
+                <div />
+                <button
+                  onClick={() => setIconOffsetX((v) => v - 4)}
+                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors"
+                  title="Move icon left"
+                >
+                  ←
+                </button>
+                <button
+                  onClick={() => { setIconOffsetX(0); setIconOffsetY(-8); }}
+                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-[#1B5B50] font-bold text-[10px] transition-colors"
+                  title="Reset to default position"
+                >
+                  ↺
+                </button>
+                <button
+                  onClick={() => setIconOffsetX((v) => v + 4)}
+                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors"
+                  title="Move icon right"
+                >
+                  →
+                </button>
+                <div />
+                <button
+                  onClick={() => setIconOffsetY((v) => v + 4)}
+                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors"
+                  title="Move icon down"
+                >
+                  ↓
+                </button>
+                <div />
+              </div>
             </div>
           )}
 
