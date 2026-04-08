@@ -297,8 +297,9 @@ export function fmtMinutes(totalMin: number): string {
 }
 
 export function fmtDuration(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = Math.round(minutes % 60);
+  let h = Math.floor(minutes / 60);
+  let m = Math.round(minutes % 60);
+  if (m === 60) { h += 1; m = 0; }
   if (h === 0) return `${m}m`;
   if (m === 0) return `${h}h`;
   return `${h}h ${m}m`;
