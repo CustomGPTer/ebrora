@@ -61,6 +61,7 @@ const TOOL_CATEGORIES = {
       "plant-pre-use-checksheet",
       "access-equipment-selector",
       "sling-swl-calculator",
+      "plant-hire-comparator",
     ]),
   },
   "Earthworks & Ground": {
@@ -143,6 +144,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "concrete-curing-estimator": { icon: "⏱️", accent: "#64748B", accentLight: "rgba(100,116,139,0.08)" },
   "working-days-calculator": { icon: "📅", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "daywork-rate-calculator": { icon: "💷", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
+  "plant-hire-comparator": { icon: "🚜", accent: "#EA580C", accentLight: "rgba(234,88,12,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -161,6 +163,7 @@ const PAID_TOOL_SLUGS = new Set([
   "concrete-curing-estimator",
   "working-days-calculator",
   "daywork-rate-calculator",
+  "plant-hire-comparator",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
