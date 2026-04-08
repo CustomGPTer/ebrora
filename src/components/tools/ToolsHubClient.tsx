@@ -59,6 +59,7 @@ const TOOL_CATEGORIES = {
       "fuel-usage-calculator",
       "plant-pre-use-checksheet",
       "access-equipment-selector",
+      "sling-swl-calculator",
     ]),
   },
   "Earthworks & Ground": {
@@ -128,6 +129,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "first-aid-needs-calculator": { icon: "🏥", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "scaffold-load-calculator": { icon: "🏗️", accent: "#64748B", accentLight: "rgba(100,116,139,0.08)" },
   "formwork-pressure-calculator": { icon: "🧱", accent: "#92400E", accentLight: "rgba(146,64,14,0.08)" },
+  "sling-swl-calculator": { icon: "🏗️", accent: "#EA580C", accentLight: "rgba(234,88,12,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
