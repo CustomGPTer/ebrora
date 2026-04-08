@@ -282,7 +282,7 @@ function MonthCalendar({ data, year, month }: { data: SolarTimes[]; year: number
                 <div className="font-bold text-gray-700 text-xs mb-0.5">{s.date.getDate()}</div>
                 <div className="text-amber-600 font-semibold">↑ {fmtTime(s.sunrise)}</div>
                 <div className="text-orange-600 font-semibold">↓ {fmtTime(s.sunset)}</div>
-                <div className="text-gray-500 mt-0.5">{fmtDuration(s.daylightMinutes)}</div>
+                <div className="text-gray-500 mt-0.5 whitespace-nowrap">{fmtDuration(s.daylightMinutes)}</div>
               </>
             )}
           </div>
