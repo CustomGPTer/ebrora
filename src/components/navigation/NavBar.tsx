@@ -75,7 +75,8 @@ export function NavBar() {
     isActive("/toolbox-talks") ||
     isActive("/tools") ||
     isActive("/free-templates") ||
-    isActive("/faq");
+    isActive("/faq") ||
+    isActive("/construction-sign-maker");
 
   const linkClass = (active: boolean) =>
     `relative text-sm font-medium transition-colors duration-200 ${
