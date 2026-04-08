@@ -115,6 +115,20 @@ export function calculateEv(
       if (sorted[i].stress <= targetStress) lower = sorted[i];
       if (sorted[i].stress >= targetStress && upper === null) upper = sorted[i];
     }
+    // If target is below all readings, extrapolate from first two points
+    if (lower === null && upper !== null && sorted.length >= 2) {
+      const a = sorted[0], b = sorted[1];
+      if (b.stress === a.stress) return a.settlement;
+      const fraction = (targetStress - a.stress) / (b.stress - a.stress);
+      return a.settlement + fraction * (b.settlement - a.settlement);
+    }
+    // If target is above all readings, extrapolate from last two points
+    if (upper === null && lower !== null && sorted.length >= 2) {
+      const a = sorted[sorted.length - 2], b = sorted[sorted.length - 1];
+      if (b.stress === a.stress) return b.settlement;
+      const fraction = (targetStress - a.stress) / (b.stress - a.stress);
+      return a.settlement + fraction * (b.settlement - a.settlement);
+    }
     if (lower === null || upper === null) return null;
     if (lower.stress === upper.stress) return lower.settlement;
     // Linear interpolation
