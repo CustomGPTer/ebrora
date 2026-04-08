@@ -78,6 +78,7 @@ const TOOL_CATEGORIES = {
     accentLight: "rgba(124,58,237,0.08)",
     slugs: new Set([
       "construction-productivity-calculator",
+      "sunrise-sunset-times",
     ]),
   },
   "Environmental & Ecology": {
@@ -132,6 +133,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "formwork-pressure-calculator": { icon: "🧱", accent: "#92400E", accentLight: "rgba(146,64,14,0.08)" },
   "sling-swl-calculator": { icon: "🏗️", accent: "#EA580C", accentLight: "rgba(234,88,12,0.08)" },
   "soil-compaction-calculator": { icon: "⛏️", accent: "#0891B2", accentLight: "rgba(8,145,178,0.08)" },
+  "sunrise-sunset-times": { icon: "🌅", accent: "#F59E0B", accentLight: "rgba(245,158,11,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
