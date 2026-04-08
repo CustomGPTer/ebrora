@@ -191,29 +191,16 @@ export default function SignMakerClient() {
 
     setExporting(true);
     try {
-      // load libs
-      const loadScript = (src: string) =>
-        new Promise<void>((res) => {
-          if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
-          const s = document.createElement("script");
-          s.src = src;
-          s.onload = () => res();
-          document.head.appendChild(s);
-        });
-
-      if (!(window as any).html2canvas)
-        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
-      if (!(window as any).jspdf)
-        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js");
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
 
       await document.fonts.ready;
 
-      const h2c = (window as any).html2canvas;
-      const JSPDF = (window as any).jspdf?.jsPDF;
-
-      const canvas = await h2c(el, { scale: 3, useCORS: true, backgroundColor: null });
+      const canvas = await html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null });
       const imgData = canvas.toDataURL("image/png");
-      const pdf = new JSPDF({
+      const pdf = new jsPDF({
         orientation: isLandscape ? "landscape" : "portrait",
         unit: "mm",
         format: paperSize,
@@ -234,23 +221,12 @@ export default function SignMakerClient() {
     if (batch.length === 0) return;
     setExporting(true);
     try {
-      const loadScript = (src: string) =>
-        new Promise<void>((res) => {
-          if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
-          const s = document.createElement("script");
-          s.src = src;
-          s.onload = () => res();
-          document.head.appendChild(s);
-        });
-
-      if (!(window as any).html2canvas)
-        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
-      if (!(window as any).jspdf)
-        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js");
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
 
       await document.fonts.ready;
-      const h2c = (window as any).html2canvas;
-      const JSPDF = (window as any).jspdf?.jsPDF;
 
       // Use the first item's size/orientation for the whole batch
       const b0 = batch[0];
@@ -259,7 +235,7 @@ export default function SignMakerClient() {
       const bW = bLand ? bSz.h : bSz.w;
       const bH = bLand ? bSz.w : bSz.h;
 
-      const pdf = new JSPDF({ orientation: bLand ? "landscape" : "portrait", unit: "mm", format: b0.paperSize });
+      const pdf = new jsPDF({ orientation: bLand ? "landscape" : "portrait", unit: "mm", format: b0.paperSize });
 
       // We need to render each sign offscreen
       const container = document.createElement("div");
@@ -326,7 +302,7 @@ export default function SignMakerClient() {
           )
         );
 
-        const canvas = await h2c(div, { scale: 3, useCORS: true, backgroundColor: null });
+        const canvas = await html2canvas(div, { scale: 3, useCORS: true, backgroundColor: null });
         const imgData = canvas.toDataURL("image/png");
         pdf.addImage(imgData, "PNG", 0, 0, bW, bH);
         container.removeChild(div);
