@@ -391,7 +391,7 @@ export default function SignMakerClient() {
               {(template === "panel" || template === "banner") && (
                 <div>
                   <div className="inline-grid grid-cols-3 gap-1" style={{ width: "calc(3 * 2.25rem + 2 * 0.25rem)" }}>
-                    <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1">Text Box</label><div />
+                    <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1 whitespace-nowrap">Text Box</label><div />
                     <div /><button onClick={() => setPanelOffsetY((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box up">↑</button><div />
                     <button onClick={() => setPanelOffsetX((v) => v - 4)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors" title="Move text box left">←</button>
                     <button onClick={() => { setPanelOffsetX(0); setPanelOffsetY(0); }} className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-[#1B5B50] font-bold text-[10px] transition-colors" title="Reset">↺</button>
