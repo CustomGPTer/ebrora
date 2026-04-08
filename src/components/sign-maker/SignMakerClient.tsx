@@ -356,7 +356,7 @@ export default function SignMakerClient() {
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{selectedIcons.length} Icon{selectedIcons.length !== 1 ? "s" : ""} Selected</span>
             <button onClick={() => setStep(1)} className="text-xs font-semibold text-[#1B5B50] hover:underline">Change</button>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 justify-center lg:justify-start">
             {selectedIcons.map((icon) => (
               <div key={icon.code} className="flex flex-col items-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -369,15 +369,15 @@ export default function SignMakerClient() {
       )}
       {isCustom && <div className="bg-white rounded-xl border border-gray-200 p-3"><div className="font-bold text-sm text-gray-900">Custom Text-Only Sign</div><div className="text-xs text-gray-500">No icon — pick your own colours</div></div>}
       <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6 items-start">
-        <div className="space-y-4">
+        <div className="flex flex-col items-center lg:items-start gap-4">
           {!isCustom && (
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Layout Template</label>
-              <div className="flex gap-2">{TEMPLATES.map((tpl) => renderTemplateThumbnail(tpl))}</div>
+            <div className="w-full">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 text-center lg:text-left">Layout Template</label>
+              <div className="flex gap-2 justify-center lg:justify-start">{TEMPLATES.map((tpl) => renderTemplateThumbnail(tpl))}</div>
             </div>
           )}
           {selectedIcons.length > 0 && (
-            <div className="flex gap-4">
+            <div className="flex gap-4 justify-center lg:justify-start">
               <div>
                 <div className="inline-grid grid-cols-3 gap-1" style={{ width: "calc(3 * 2.25rem + 2 * 0.25rem)" }}>
                   <div /><label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider text-center py-1">Icon</label><div />
@@ -402,8 +402,8 @@ export default function SignMakerClient() {
               )}
             </div>
           )}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Sign Text (up to 4 lines)</label>
+          <div className="w-full">
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 text-center lg:text-left">Sign Text (up to 4 lines)</label>
             {lines.map((line, i) => (
               <div key={i} className="flex gap-1.5 mb-1.5">
                 <input value={line} onChange={(e) => updateLine(i, e.target.value)} placeholder={`Line ${i + 1}`} maxLength={60} className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B5B50]/20 focus:border-[#1B5B50]" />
@@ -412,40 +412,40 @@ export default function SignMakerClient() {
             ))}
             {lines.length < 4 && <button onClick={addLine} className="text-xs font-semibold text-[#1B5B50] hover:underline mt-1">+ Add line</button>}
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Text Size</label>
+          <div className="w-full">
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 text-center lg:text-left">Text Size</label>
             <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">{TEXT_SIZES.map((t) => (<button key={t.id} onClick={() => setTextSize(t.id)} className={cx("flex-1 py-1.5 text-xs font-bold rounded-md transition-colors", textSize === t.id ? "bg-[#1B5B50] text-white" : "text-gray-600 hover:bg-gray-200")}>{t.label}</button>))}</div>
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Font</label>
+          <div className="w-full">
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 text-center lg:text-left">Font</label>
             <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">{FONTS.map((f) => (<button key={f.id} onClick={() => setFont(f.id)} className={cx("flex-1 py-1.5 text-xs font-bold rounded-md transition-colors", font === f.id ? "bg-[#1B5B50] text-white" : "text-gray-600 hover:bg-gray-200")} style={{ fontFamily: f.family }}>{f.label}</button>))}</div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 w-full">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Paper Size</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 text-center lg:text-left">Paper Size</label>
               <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">{PAPER_SIZES.map((s) => (<button key={s.id} onClick={() => setPaperSize(s.id)} className={cx("flex-1 py-1.5 text-xs font-bold rounded-md transition-colors", paperSize === s.id ? "bg-[#1B5B50] text-white" : "text-gray-600 hover:bg-gray-200")}>{s.label}</button>))}</div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Orientation</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 text-center lg:text-left">Orientation</label>
               <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">{(["portrait", "landscape"] as const).map((o) => (<button key={o} onClick={() => setOrientation(o)} className={cx("flex-1 py-1.5 text-xs font-bold rounded-md transition-colors capitalize", orientation === o ? "bg-[#1B5B50] text-white" : "text-gray-600 hover:bg-gray-200")}>{o}</button>))}</div>
             </div>
           </div>
-          <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={showBorder} onChange={(e) => setShowBorder(e.target.checked)} className="w-4 h-4 rounded accent-[#1B5B50]" /><span className="text-sm font-semibold text-gray-700">Show border</span></label>
+          <label className="flex items-center gap-2 cursor-pointer justify-center lg:justify-start"><input type="checkbox" checked={showBorder} onChange={(e) => setShowBorder(e.target.checked)} className="w-4 h-4 rounded accent-[#1B5B50]" /><span className="text-sm font-semibold text-gray-700">Show border</span></label>
           {isCustom && (
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 w-full">
               <div><label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Background</label><input type="color" value={customBg} onChange={(e) => setCustomBg(e.target.value)} className="w-full h-9 border-0 rounded-lg cursor-pointer" /></div>
               <div><label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Border</label><input type="color" value={customBorder} onChange={(e) => setCustomBorder(e.target.value)} className="w-full h-9 border-0 rounded-lg cursor-pointer" /></div>
               <div><label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Text</label><input type="color" value={customTextColour} onChange={(e) => setCustomTextColour(e.target.value)} className="w-full h-9 border-0 rounded-lg cursor-pointer" /></div>
             </div>
           )}
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full">
             <button onClick={exportPDF} disabled={exporting} className="flex-1 bg-[#1B5B50] text-white rounded-lg py-3 px-4 font-bold text-sm hover:bg-[#144840] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
               {exporting ? (<><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>Generating…</>) : !session ? "Sign in to download" : (<><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Download PDF</>)}
             </button>
             <button onClick={addToBatch} className="px-4 py-3 bg-gray-100 border border-gray-200 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors">+ Batch</button>
           </div>
           {batch.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+            <div className="bg-white rounded-xl border border-gray-200 p-3 space-y-2 w-full">
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Batch ({batch.length} sign{batch.length !== 1 ? "s" : ""})</div>
               {batch.map((b, i) => (
                 <div key={i} className="flex items-center justify-between text-xs">
