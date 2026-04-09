@@ -1,35 +1,51 @@
 // src/data/concrete-pour-planner.ts
 // Concrete Pour Planner — PAID, white-label, ready-mix only
-// Multi-wagon fleet with staggered arrivals, TACO breaks, cycling schedule
+// Multi-wagon fleet with staggered arrivals, multi-pump, workability tracking
+
+export interface PumpConfig {
+  rate: number | null;  // m³/hr — null = not active
+  label: string;        // e.g. "36m Boom", "Ground Line"
+}
 
 export interface PourInputs {
   pourVolume: number | null; // m³
-  pumpRate: number | null; // m³/hr
+  pumpCount: 1 | 2 | 3;
+  pumps: [PumpConfig, PumpConfig, PumpConfig]; // P1 required, P2/P3 optional
   truckCapacity: number; // m³ (default 6)
   fleetSize: number; // number of wagons available
   roundTripMinutes: number | null; // travel to plant + load + return (minutes)
-  dischargeMinutes: number | null; // override: time to discharge one load at pump
+  dischargeMinutes: number | null; // global override: time to discharge one load (null = auto per pump)
   staggerMinutes: number; // gap between first wagon arrivals (e.g. 15 min)
   tacoMinutes: number; // Workability guideline — default 120 min (rule of thumb)
   startTime: string; // HH:MM — first wagon arrival
   mixDesignation: string;
-  ambientTemp: "below10" | "10to25" | "25to30" | "above30"; // ambient temperature range
-  hasRetarder: boolean; // retarder admixture in the mix
+  ambientTemp: "below10" | "10to25" | "25to30" | "above30";
+  hasRetarder: boolean;
 }
 
 export interface TruckTrip {
   truckNumber: number;
   tripNumber: number;
+  pumpNumber: number; // 1-indexed
   arrivalTime: string;
   dischargeStart: string;
   dischargeEnd: string;
   departTime: string;
   loadM3: number;
   cumulativeM3: number;
-  tacoOk: boolean; // kept for backwards compat — true if within guideline
-  tacoStatus: "ok" | "caution" | "exceeds"; // ok = within guideline, caution = within 15 min, exceeds = over
+  tacoOk: boolean;
+  tacoStatus: "ok" | "caution" | "exceeds";
   tacoElapsedMin: number;
   waitMinutes: number;
+}
+
+export interface PumpStats {
+  pumpNumber: number;
+  label: string;
+  rate: number;
+  loads: number;
+  totalM3: number;
+  busyMinutes: number;
 }
 
 export interface PourResult {
@@ -39,11 +55,14 @@ export interface PourResult {
   lastDischargeEnd: string;
   schedule: TruckTrip[];
   fleetSize: number;
-  tacoBreaches: number; // kept for compat — count of "exceeds"
+  pumpCount: number;
+  pumpStats: PumpStats[];
+  tacoBreaches: number;
   tacoExceedances: number;
   tacoCautions: number;
-  effectiveTacoMinutes: number; // adjusted guideline after temp/retarder
+  effectiveTacoMinutes: number;
   peakWagonsOnSite: number;
+  combinedPumpRate: number; // total m³/hr across all active pumps
 }
 
 export const CONCRETE_MIXES = [
@@ -62,7 +81,12 @@ export const CONCRETE_MIXES = [
 
 export const DEFAULT_INPUTS: PourInputs = {
   pourVolume: null,
-  pumpRate: null,
+  pumpCount: 1,
+  pumps: [
+    { rate: null, label: "Pump 1" },
+    { rate: null, label: "Pump 2" },
+    { rate: null, label: "Pump 3" },
+  ],
   truckCapacity: 6,
   fleetSize: 3,
   roundTripMinutes: null,
@@ -75,22 +99,25 @@ export const DEFAULT_INPUTS: PourInputs = {
   hasRetarder: false,
 };
 
+// Backwards-compat helper: get primary pump rate for validation
+export function primaryPumpRate(inputs: PourInputs): number | null {
+  return inputs.pumps[0].rate;
+}
+
 // Temperature/retarder adjustment to workability guideline (rule of thumb)
-// BS 8500-2:2023 removed the prescriptive 2-hour limit — workability is now
-// the governing criterion. These adjustments reflect industry practice.
 const TEMP_ADJUSTMENTS: Record<PourInputs["ambientTemp"], number> = {
-  "below10": 30,   // cold weather — hydration slower, +30 min
-  "10to25": 0,     // baseline — no adjustment
-  "25to30": -15,   // warm weather — hydration faster, -15 min
-  "above30": -30,  // hot weather — hydration much faster, -30 min
+  "below10": 30,
+  "10to25": 0,
+  "25to30": -15,
+  "above30": -30,
 };
-const RETARDER_ADJUSTMENT = 60; // retarder typically adds ~60 min working life
+const RETARDER_ADJUSTMENT = 60;
 
 export function effectiveTaco(inputs: PourInputs): number {
   let effective = inputs.tacoMinutes;
   effective += TEMP_ADJUSTMENTS[inputs.ambientTemp] ?? 0;
   if (inputs.hasRetarder) effective += RETARDER_ADJUSTMENT;
-  return Math.max(30, effective); // floor at 30 min
+  return Math.max(30, effective);
 }
 
 function timeToMin(time: string): number {
@@ -106,15 +133,36 @@ function minToTime(min: number): string {
 }
 
 export function calculatePour(inputs: PourInputs): PourResult {
-  const empty: PourResult = { totalLoads: 0, totalPourDuration: 0, firstTruckArrival: "", lastDischargeEnd: "", schedule: [], fleetSize: 0, tacoBreaches: 0, tacoExceedances: 0, tacoCautions: 0, effectiveTacoMinutes: effectiveTaco(inputs), peakWagonsOnSite: 0 };
-
-  if (!inputs.pourVolume || !inputs.pumpRate || !inputs.roundTripMinutes || inputs.fleetSize < 1) return empty;
-
-  const { pourVolume, pumpRate, truckCapacity, fleetSize, roundTripMinutes, staggerMinutes, startTime } = inputs;
   const tacoLimit = effectiveTaco(inputs);
+  const emptyResult: PourResult = {
+    totalLoads: 0, totalPourDuration: 0, firstTruckArrival: "", lastDischargeEnd: "",
+    schedule: [], fleetSize: 0, pumpCount: inputs.pumpCount, pumpStats: [],
+    tacoBreaches: 0, tacoExceedances: 0, tacoCautions: 0,
+    effectiveTacoMinutes: tacoLimit, peakWagonsOnSite: 0, combinedPumpRate: 0,
+  };
 
-  // Discharge time per full load
-  const dischargeMins = inputs.dischargeMinutes ?? (truckCapacity / pumpRate) * 60;
+  // Validate: need at least P1 rate
+  if (!inputs.pourVolume || !inputs.pumps[0].rate || !inputs.roundTripMinutes || inputs.fleetSize < 1) return emptyResult;
+
+  const { pourVolume, truckCapacity, fleetSize, roundTripMinutes, staggerMinutes, startTime, pumpCount } = inputs;
+
+  // Build active pumps array
+  const activePumps: { index: number; rate: number; label: string }[] = [];
+  for (let p = 0; p < pumpCount; p++) {
+    const pump = inputs.pumps[p];
+    if (pump.rate && pump.rate > 0) {
+      activePumps.push({ index: p, rate: pump.rate, label: pump.label || `Pump ${p + 1}` });
+    }
+  }
+  if (activePumps.length === 0) return emptyResult;
+
+  const combinedPumpRate = activePumps.reduce((s, p) => s + p.rate, 0);
+
+  // Discharge time per pump (time to discharge one full truckload)
+  const pumpDischargeMins = activePumps.map(p =>
+    inputs.dischargeMinutes ?? (truckCapacity / p.rate) * 60
+  );
+
   const totalLoads = Math.ceil(pourVolume / truckCapacity);
   const startMin = timeToMin(startTime);
 
@@ -125,24 +173,27 @@ export function calculatePour(inputs: PourInputs): PourResult {
   }
 
   // Track when each wagon was loaded at the plant (for TACO)
-  // First trip: loaded at arrival - one-way travel (roundTrip/2 approx)
   const oneWayMin = roundTripMinutes / 2;
   const wagonLoadedAt: number[] = [];
   for (let w = 0; w < fleetSize; w++) {
     wagonLoadedAt.push(wagonNextArrival[w] - oneWayMin);
   }
 
-  let pumpFreeAt = startMin;
+  // Each pump has its own "free at" time
+  const pumpFreeAt: number[] = activePumps.map(() => startMin);
+
   const schedule: TruckTrip[] = [];
   let cumulativeM3 = 0;
   let tacoExceedances = 0;
   let tacoCautions = 0;
 
-  // On-site tracking for peak
   const onSiteEvents: { time: number; delta: number }[] = [];
-
-  // Trip counter per wagon
   const wagonTripCount: number[] = new Array(fleetSize).fill(0);
+
+  // Per-pump tracking
+  const pumpLoads: number[] = activePumps.map(() => 0);
+  const pumpM3: number[] = activePumps.map(() => 0);
+  const pumpBusy: number[] = activePumps.map(() => 0);
 
   for (let load = 0; load < totalLoads; load++) {
     // Find wagon that arrives earliest
@@ -155,13 +206,24 @@ export function calculatePour(inputs: PourInputs): PourResult {
     const loadedAtMin = wagonLoadedAt[bestW];
     wagonTripCount[bestW]++;
 
-    // Pump may not be free yet — wagon waits
-    const dischargeStartMin = Math.max(arrivalMin, pumpFreeAt);
+    // Find the pump that is free earliest (at or after wagon arrival)
+    // If multiple pumps are free, pick the one that has been free longest (earliest freeAt)
+    let bestPump = 0;
+    let bestPumpStart = Math.max(arrivalMin, pumpFreeAt[0]);
+    for (let p = 1; p < activePumps.length; p++) {
+      const thisStart = Math.max(arrivalMin, pumpFreeAt[p]);
+      if (thisStart < bestPumpStart) {
+        bestPump = p;
+        bestPumpStart = thisStart;
+      }
+    }
+
+    const dischargeStartMin = bestPumpStart;
     const waitMins = dischargeStartMin - arrivalMin;
 
     const remaining = pourVolume - cumulativeM3;
     const loadM3 = Math.min(truckCapacity, remaining);
-    const actualDischargeMins = (loadM3 / truckCapacity) * dischargeMins;
+    const actualDischargeMins = (loadM3 / truckCapacity) * pumpDischargeMins[bestPump];
     const dischargeEndMin = dischargeStartMin + actualDischargeMins;
     const departMin = dischargeEndMin;
 
@@ -175,9 +237,15 @@ export function calculatePour(inputs: PourInputs): PourResult {
 
     cumulativeM3 += loadM3;
 
+    // Track pump stats
+    pumpLoads[bestPump]++;
+    pumpM3[bestPump] += loadM3;
+    pumpBusy[bestPump] += actualDischargeMins;
+
     schedule.push({
       truckNumber: bestW + 1,
       tripNumber: wagonTripCount[bestW],
+      pumpNumber: bestPump + 1,
       arrivalTime: minToTime(arrivalMin),
       dischargeStart: minToTime(dischargeStartMin),
       dischargeEnd: minToTime(dischargeEndMin),
@@ -193,13 +261,12 @@ export function calculatePour(inputs: PourInputs): PourResult {
     onSiteEvents.push({ time: arrivalMin, delta: 1 });
     onSiteEvents.push({ time: departMin, delta: -1 });
 
-    pumpFreeAt = dischargeEndMin;
+    // Update pump free time
+    pumpFreeAt[bestPump] = dischargeEndMin;
 
-    // Wagon departs, does round trip (travel + load + travel), arrives again
+    // Wagon departs, does round trip, arrives again
     const nextArrival = departMin + roundTripMinutes;
     wagonNextArrival[bestW] = nextArrival;
-    // Wagon will be loaded at plant at: depart + one-way travel + loading
-    // Simplify: loaded at nextArrival - oneWayMin
     wagonLoadedAt[bestW] = nextArrival - oneWayMin;
   }
 
@@ -214,6 +281,15 @@ export function calculatePour(inputs: PourInputs): PourResult {
 
   const lastEndMin = schedule.length > 0 ? timeToMin(schedule[schedule.length - 1].dischargeEnd) : startMin;
 
+  const pumpStats: PumpStats[] = activePumps.map((p, i) => ({
+    pumpNumber: i + 1,
+    label: p.label,
+    rate: p.rate,
+    loads: pumpLoads[i],
+    totalM3: Math.round(pumpM3[i] * 10) / 10,
+    busyMinutes: Math.round(pumpBusy[i]),
+  }));
+
   return {
     totalLoads,
     totalPourDuration: lastEndMin >= startMin ? lastEndMin - startMin : (1440 - startMin) + lastEndMin,
@@ -221,10 +297,13 @@ export function calculatePour(inputs: PourInputs): PourResult {
     lastDischargeEnd: schedule.length > 0 ? schedule[schedule.length - 1].dischargeEnd : startTime,
     schedule,
     fleetSize,
-    tacoBreaches: tacoExceedances, // backwards compat
+    pumpCount: activePumps.length,
+    pumpStats,
+    tacoBreaches: tacoExceedances,
     tacoExceedances,
     tacoCautions,
     effectiveTacoMinutes: tacoLimit,
     peakWagonsOnSite: peak,
+    combinedPumpRate,
   };
 }
