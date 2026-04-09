@@ -5,16 +5,9 @@ import { useState, useMemo, useCallback } from "react";
 import {
   calculateOvertime,
   fmtGBP, fmtGBPFull, fmtPercent, generateId,
-  OVERTIME_PRESETS, TIER_COLOURS, TIER_COLOURS_LIGHT, REGULATIONS,
-  type OvertimeInputs, type OperativeGroup, type OvertimeTier, type EmployerOnCosts, type CalculationResult,
+  OVERTIME_PRESETS, TIER_COLOURS, REGULATIONS,
+  type OvertimeInputs, type OperativeGroup, type OvertimeTier, type EmployerOnCosts,
 } from "@/data/overtime-cost-calculator";
-
-// ─── Recharts ────────────────────────────────────────────────
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell,
-  CartesianGrid,
-} from "recharts";
 
 // ─── Helpers ─────────────────────────────────────────────────
 function todayISO() { return new Date().toISOString().slice(0, 10); }
@@ -153,19 +146,165 @@ function GroupPanel({ group, groupIndex, onUpdate, onRemove, canRemove }: {
   );
 }
 
-// ─── Custom tooltip ──────────────────────────────────────────
-function GBPTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) {
-  if (!active || !payload) return null;
+// ─── SVG Stacked Bar Chart ───────────────────────────────────
+function StackedBarChart({ data, keys, colours }: {
+  data: Record<string, unknown>[]; keys: string[]; colours: Record<string, string>;
+}) {
+  const W = 700, H = 280, PAD = { top: 20, right: 20, bottom: 40, left: 60 };
+  const cw = W - PAD.left - PAD.right;
+  const ch = H - PAD.top - PAD.bottom;
+  const n = data.length;
+  if (n === 0) return null;
+  const barW = Math.min(40, (cw / n) * 0.7);
+  const gap = (cw - barW * n) / (n + 1);
+
+  // Max stacked value
+  let maxVal = 0;
+  data.forEach(d => {
+    let sum = 0;
+    keys.forEach(k => { sum += (d[k] as number) || 0; });
+    if (sum > maxVal) maxVal = sum;
+  });
+  if (maxVal === 0) maxVal = 1;
+
+  const yScale = (v: number) => PAD.top + ch - (v / maxVal) * ch;
+
+  // Y grid
+  const yTicks: number[] = [];
+  const step = Math.pow(10, Math.floor(Math.log10(maxVal))) || 1;
+  const niceStep = maxVal / 4 > step ? Math.ceil(maxVal / 4 / step) * step : step;
+  for (let v = 0; v <= maxVal; v += niceStep) yTicks.push(v);
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2 text-xs">
-      <div className="font-bold text-gray-700 mb-1">Week {label}</div>
-      {payload.map((p, i) => (
-        <div key={i} className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
-          <span className="text-gray-600">{p.name}:</span>
-          <span className="font-bold">{fmtGBPFull(p.value)}</span>
-        </div>
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 300 }}>
+      {yTicks.map(v => (
+        <g key={v}>
+          <line x1={PAD.left} y1={yScale(v)} x2={W - PAD.right} y2={yScale(v)} stroke="#E5E7EB" strokeWidth={0.5} />
+          <text x={PAD.left - 6} y={yScale(v) + 3} textAnchor="end" fontSize={8} fill="#9CA3AF">{fmtGBP(v)}</text>
+        </g>
       ))}
+      {data.map((d, di) => {
+        const x = PAD.left + gap + di * (barW + gap);
+        let y0 = yScale(0);
+        return (
+          <g key={di}>
+            {keys.map(k => {
+              const val = (d[k] as number) || 0;
+              const barH = (val / maxVal) * ch;
+              const yTop = y0 - barH;
+              const el = <rect key={k} x={x} y={yTop} width={barW} height={barH} fill={colours[k] || "#9CA3AF"} rx={1} />;
+              y0 = yTop;
+              return el;
+            })}
+            {n <= 24 && <text x={x + barW / 2} y={H - PAD.bottom + 14} textAnchor="middle" fontSize={8} fill="#9CA3AF">{d.week as string}</text>}
+          </g>
+        );
+      })}
+      {/* Legend */}
+      {keys.map((k, i) => (
+        <g key={k} transform={`translate(${PAD.left + i * 120}, ${H - 10})`}>
+          <rect width={8} height={8} fill={colours[k] || "#9CA3AF"} rx={1} />
+          <text x={11} y={7} fontSize={8} fill="#6B7280">{k}</text>
+        </g>
+      ))}
+      <text x={W / 2} y={H - PAD.bottom + 28} textAnchor="middle" fontSize={10} fill="#6B7280">Week</text>
+    </svg>
+  );
+}
+
+// ─── SVG Cumulative Line Chart ───────────────────────────────
+function CumulativeLineChart({ data }: { data: { week: string; actual: number; baseOnly: number }[] }) {
+  const W = 700, H = 260, PAD = { top: 20, right: 20, bottom: 40, left: 60 };
+  const cw = W - PAD.left - PAD.right;
+  const ch = H - PAD.top - PAD.bottom;
+  const n = data.length;
+  if (n < 2) return null;
+
+  const maxVal = Math.max(...data.map(d => Math.max(d.actual, d.baseOnly)));
+  const xScale = (i: number) => PAD.left + (i / (n - 1)) * cw;
+  const yScale = (v: number) => PAD.top + ch - (v / (maxVal || 1)) * ch;
+
+  const actualPath = data.map((d, i) => `${i === 0 ? "M" : "L"}${xScale(i).toFixed(1)},${yScale(d.actual).toFixed(1)}`).join(" ");
+  const basePath = data.map((d, i) => `${i === 0 ? "M" : "L"}${xScale(i).toFixed(1)},${yScale(d.baseOnly).toFixed(1)}`).join(" ");
+
+  // Y grid
+  const yTicks: number[] = [];
+  const step = Math.pow(10, Math.floor(Math.log10(maxVal || 1)));
+  const niceStep = maxVal / 4 > step ? Math.ceil(maxVal / 4 / step) * step : step || 1;
+  for (let v = 0; v <= maxVal; v += niceStep) yTicks.push(v);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 280 }}>
+      {yTicks.map(v => (
+        <g key={v}>
+          <line x1={PAD.left} y1={yScale(v)} x2={W - PAD.right} y2={yScale(v)} stroke="#E5E7EB" strokeWidth={0.5} />
+          <text x={PAD.left - 6} y={yScale(v) + 3} textAnchor="end" fontSize={8} fill="#9CA3AF">{fmtGBP(v)}</text>
+        </g>
+      ))}
+      {/* X labels */}
+      {data.filter((_, i) => n <= 20 || i % Math.ceil(n / 10) === 0 || i === n - 1).map((d, _, arr) => {
+        const idx = data.indexOf(d);
+        return <text key={idx} x={xScale(idx)} y={H - PAD.bottom + 14} textAnchor="middle" fontSize={8} fill="#9CA3AF">{d.week}</text>;
+      })}
+      {/* Shaded premium area */}
+      <path d={`${actualPath} L${xScale(n - 1).toFixed(1)},${yScale(data[n - 1].baseOnly).toFixed(1)} ${data.slice().reverse().map((d, i) => `L${xScale(n - 1 - i).toFixed(1)},${yScale(d.baseOnly).toFixed(1)}`).join(" ")} Z`}
+        fill="rgba(27,87,69,0.08)" />
+      {/* Lines */}
+      <path d={actualPath} fill="none" stroke="#1B5745" strokeWidth={2.5} strokeLinejoin="round" />
+      <path d={basePath} fill="none" stroke="#9CA3AF" strokeWidth={1.5} strokeDasharray="5,3" strokeLinejoin="round" />
+      {/* End point */}
+      <circle cx={xScale(n - 1)} cy={yScale(data[n - 1].actual)} r={4} fill="#1B5745" stroke="white" strokeWidth={2} />
+      <text x={xScale(n - 1) - 8} y={yScale(data[n - 1].actual) - 8} textAnchor="end" fontSize={9} fontWeight={700} fill="#1B5745">{fmtGBP(data[n - 1].actual)}</text>
+      {/* Legend */}
+      <line x1={PAD.left} y1={H - 8} x2={PAD.left + 18} y2={H - 8} stroke="#1B5745" strokeWidth={2.5} />
+      <text x={PAD.left + 22} y={H - 5} fontSize={8} fill="#6B7280">Actual (with OT)</text>
+      <line x1={PAD.left + 130} y1={H - 8} x2={PAD.left + 148} y2={H - 8} stroke="#9CA3AF" strokeWidth={1.5} strokeDasharray="5,3" />
+      <text x={PAD.left + 152} y={H - 5} fontSize={8} fill="#6B7280">Base Rate Only</text>
+      <text x={W / 2} y={H - PAD.bottom + 28} textAnchor="middle" fontSize={10} fill="#6B7280">Week</text>
+    </svg>
+  );
+}
+
+// ─── SVG Pie/Donut Chart ─────────────────────────────────────
+function CostPieChart({ data }: { data: { label: string; value: number; colour: string }[] }) {
+  const size = 240, cx = size / 2, cy = size / 2, r = 90, ir = 50;
+  const total = data.reduce((s, d) => s + d.value, 0);
+  if (total === 0) return null;
+  let cumAngle = -Math.PI / 2;
+
+  const slices = data.map(d => {
+    const angle = (d.value / total) * Math.PI * 2;
+    const startAngle = cumAngle;
+    cumAngle += angle;
+    const endAngle = cumAngle;
+    const largeArc = angle > Math.PI ? 1 : 0;
+    const x1o = cx + r * Math.cos(startAngle), y1o = cy + r * Math.sin(startAngle);
+    const x2o = cx + r * Math.cos(endAngle), y2o = cy + r * Math.sin(endAngle);
+    const x1i = cx + ir * Math.cos(endAngle), y1i = cy + ir * Math.sin(endAngle);
+    const x2i = cx + ir * Math.cos(startAngle), y2i = cy + ir * Math.sin(startAngle);
+    const path = `M${x1o},${y1o} A${r},${r} 0 ${largeArc},1 ${x2o},${y2o} L${x1i},${y1i} A${ir},${ir} 0 ${largeArc},0 ${x2i},${y2i} Z`;
+    const midAngle = startAngle + angle / 2;
+    const pct = ((d.value / total) * 100).toFixed(0);
+    return { ...d, path, midAngle, pct };
+  });
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center gap-4">
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-48 h-48 flex-shrink-0">
+        {slices.map((s, i) => <path key={i} d={s.path} fill={s.colour} stroke="white" strokeWidth={1.5} />)}
+        <text x={cx} y={cy - 4} textAnchor="middle" fontSize={14} fontWeight={700} fill="#1B5745">{fmtGBP(total)}</text>
+        <text x={cx} y={cy + 10} textAnchor="middle" fontSize={8} fill="#9CA3AF">Total</text>
+      </svg>
+      <div className="space-y-1.5">
+        {slices.map((s, i) => (
+          <div key={i} className="flex items-center gap-2 text-xs">
+            <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: s.colour }} />
+            <span className="text-gray-600">{s.label}</span>
+            <span className="font-bold text-gray-800">{fmtGBPFull(s.value)}</span>
+            <span className="text-gray-400">({s.pct}%)</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -764,51 +903,21 @@ export default function OvertimeCostCalculatorClient() {
       <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
         <h3 className="text-sm font-bold text-gray-700">Weekly Cost Breakdown</h3>
         <p className="text-[11px] text-gray-400">Stacked bar showing base pay vs each overtime tier per week across all groups.</p>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={barData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis dataKey="week" tick={{ fontSize: 10 }} label={{ value: "Week", position: "insideBottom", offset: -2, fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 10 }} tickFormatter={v => fmtGBP(v as number)} />
-            <Tooltip content={<GBPTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 10 }} />
-            {barKeys.map(k => (
-              <Bar key={k} dataKey={k} stackId="a" fill={barColours[k] || "#9CA3AF"} />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
+        <StackedBarChart data={barData} keys={barKeys} colours={barColours} />
       </div>
 
       {/* ── Cumulative Line Chart */}
       <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
         <h3 className="text-sm font-bold text-gray-700">Cumulative Cost Over Time</h3>
-        <p className="text-[11px] text-gray-400">Solid line = actual cost with overtime premiums. Dashed line = what the same hours would cost at base rate. The gap is your total overtime premium.</p>
-        <ResponsiveContainer width="100%" height={260}>
-          <LineChart data={lineData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis dataKey="week" tick={{ fontSize: 10 }} label={{ value: "Week", position: "insideBottom", offset: -2, fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 10 }} tickFormatter={v => fmtGBP(v as number)} />
-            <Tooltip content={<GBPTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 10 }} />
-            <Line type="monotone" dataKey="actual" stroke="#1B5745" strokeWidth={2.5} dot={false} name="Actual (with OT)" />
-            <Line type="monotone" dataKey="baseOnly" stroke="#9CA3AF" strokeWidth={2} strokeDasharray="5 3" dot={false} name="Base Rate Only" />
-          </LineChart>
-        </ResponsiveContainer>
+        <p className="text-[11px] text-gray-400">Solid line = actual cost with overtime premiums. Dashed line = what the same hours would cost at base rate. The shaded area is your total overtime premium.</p>
+        <CumulativeLineChart data={lineData} />
       </div>
 
       {/* ── Pie Chart */}
       <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
         <h3 className="text-sm font-bold text-gray-700">Cost Split</h3>
         <p className="text-[11px] text-gray-400">Proportion of total cost between standard time, each overtime category, and employer on-costs.</p>
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={pieData} dataKey="value" nameKey="label" cx="50%" cy="50%" outerRadius={90} innerRadius={40} paddingAngle={2} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={{ stroke: "#9CA3AF", strokeWidth: 0.5 }} fontSize={9}>
-                {pieData.map((d, i) => <Cell key={i} fill={d.colour} />)}
-              </Pie>
-              <Tooltip formatter={(value: number) => fmtGBPFull(value)} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+        <CostPieChart data={pieData} />
       </div>
 
       {/* ── Hire vs Overtime Comparison */}
