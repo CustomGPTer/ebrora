@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import type { PourInputs } from "@/data/concrete-pour-planner";
+import type { PourInputs, PumpConfig } from "@/data/concrete-pour-planner";
 import { CONCRETE_MIXES, DEFAULT_INPUTS, calculatePour, effectiveTaco } from "@/data/concrete-pour-planner";
 import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 
@@ -59,8 +59,10 @@ async function exportPDF(
   doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Pour Summary", M, y); y += 5;
   doc.setFontSize(7.5);
   [
-    ["Pour Volume:", `${inputs.pourVolume} m³`], ["Mix:", inputs.mixDesignation],
-    ["Pump Rate:", `${inputs.pumpRate} m³/hr`], ["Truck Capacity:", `${inputs.truckCapacity} m³`],
+    ["Pour Volume:", `${inputs.pourVolume} m3`], ["Mix:", inputs.mixDesignation],
+    ["Pumps:", result.pumpStats.map(p => `P${p.pumpNumber}: ${p.rate} m3/hr (${p.label})`).join(" | ")],
+    ["Combined Pump Rate:", `${result.combinedPumpRate} m3/hr`],
+    ["Truck Capacity:", `${inputs.truckCapacity} m3`],
     ["Fleet Size:", `${inputs.fleetSize} wagons`], ["Stagger:", `${inputs.staggerMinutes} min between first arrivals`],
     ["Round-Trip:", `${inputs.roundTripMinutes} min`], ["Workability Guideline:", `${result.effectiveTacoMinutes} min (base ${inputs.tacoMinutes}, ${inputs.ambientTemp === "below10" ? "<10C +30" : inputs.ambientTemp === "25to30" ? "25-30C -15" : inputs.ambientTemp === "above30" ? ">30C -30" : "10-25C"}${inputs.hasRetarder ? ", retarder +60" : ""})`],
     ["Start:", inputs.startTime], ["Total Loads:", `${result.totalLoads}`],
@@ -89,10 +91,10 @@ async function exportPDF(
   // Schedule table — dark header + bordered cells
   checkPage(15);
   doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Dispatch Schedule", M, y); y += 5;
-  const dCols = [15, 20, 20, 25, 25, 20, 25, 25, 25, 25, 25, 23];
+  const dCols = [14, 18, 16, 16, 23, 23, 18, 23, 23, 23, 23, 23, 23];
   doc.setFontSize(5.5); doc.setFont("helvetica", "bold");
   let cx = M;
-  ["Load", "Wagon", "Trip", "Arrival", "Discharge", "End", "Depart", "Load m3", "Cumul. m3", "Wait", "TACO", "Status"].forEach((h, i) => {
+  ["Load", "Wagon", "Trip", "Pump", "Arrival", "Discharge", "End", "Depart", "Load m3", "Cumul. m3", "Wait", "TACO", "Status"].forEach((h, i) => {
     doc.setFillColor(30, 30, 30); doc.rect(cx, y, dCols[i], 6, "F");
     doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += dCols[i];
   });
@@ -102,7 +104,7 @@ async function exportPDF(
   result.schedule.forEach((t, i) => {
     checkPage(4.5);
     const vals = [
-      String(i + 1), `W${t.truckNumber}`, `T${t.tripNumber}`,
+      String(i + 1), `W${t.truckNumber}`, `T${t.tripNumber}`, `P${t.pumpNumber}`,
       t.arrivalTime, t.dischargeStart, t.dischargeEnd, t.departTime,
       fmtNum(t.loadM3, 1), fmtNum(t.cumulativeM3, 1),
       t.waitMinutes > 0 ? `${t.waitMinutes}m` : "-",
@@ -111,13 +113,13 @@ async function exportPDF(
     ];
     const rowH = 4.5; cx = M;
     vals.forEach((v, j) => {
-      if (j === 11 && t.tacoStatus === "exceeds") {
+      if (j === 12 && t.tacoStatus === "exceeds") {
         doc.setFillColor(254, 226, 226); doc.rect(cx, y, dCols[j], rowH, "FD");
         doc.setTextColor(220, 38, 38); doc.setFont("helvetica", "bold");
-      } else if (j === 11 && t.tacoStatus === "caution") {
+      } else if (j === 12 && t.tacoStatus === "caution") {
         doc.setFillColor(254, 243, 199); doc.rect(cx, y, dCols[j], rowH, "FD");
         doc.setTextColor(180, 83, 9); doc.setFont("helvetica", "bold");
-      } else if (j === 11 && t.tacoOk) {
+      } else if (j === 12 && t.tacoOk) {
         doc.setFillColor(236, 253, 245); doc.rect(cx, y, dCols[j], rowH, "FD");
         doc.setTextColor(22, 163, 74); doc.setFont("helvetica", "bold");
       } else {
@@ -239,15 +241,18 @@ export default function ConcretePourPlannerClient() {
       <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-4">
         <h3 className="text-sm font-bold text-gray-800">Pour Parameters</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Pour Volume (m³)</label>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Pour Volume (m3)</label>
             <input type="number" step={1} min={1} value={inputs.pourVolume ?? ""} placeholder="100"
               onChange={e => update({ pourVolume: e.target.value === "" ? null : parseFloat(e.target.value) })}
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Pump Rate (m³/hr)</label>
-            <input type="number" step={1} min={1} value={inputs.pumpRate ?? ""} placeholder="30"
-              onChange={e => update({ pumpRate: e.target.value === "" ? null : parseFloat(e.target.value) })}
-              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Truck Capacity (m³)</label>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Number of Pumps</label>
+            <div className="flex rounded-md overflow-hidden border border-gray-200">
+              {([1, 2, 3] as const).map(n => (
+                <button key={n} onClick={() => update({ pumpCount: n })}
+                  className={`flex-1 px-3 py-2 text-xs font-bold ${inputs.pumpCount === n ? "bg-ebrora text-white" : "bg-gray-50 text-gray-500"}`}>{n}</button>
+              ))}
+            </div></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Truck Capacity (m3)</label>
             <input type="number" step={0.5} min={1} max={12} value={inputs.truckCapacity}
               onChange={e => update({ truckCapacity: parseFloat(e.target.value) || 6 })}
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
@@ -259,6 +264,22 @@ export default function ConcretePourPlannerClient() {
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Start Time</label>
             <input type="time" value={inputs.startTime} onChange={e => update({ startTime: e.target.value })}
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
+        </div>
+
+        <h3 className="text-sm font-bold text-gray-800 pt-2">Pump Rates</h3>
+        <div className={`grid gap-3 ${inputs.pumpCount === 1 ? "grid-cols-1 sm:grid-cols-2" : inputs.pumpCount === 2 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3 sm:grid-cols-6"}`}>
+          {Array.from({ length: inputs.pumpCount }).map((_, pi) => (
+            <div key={pi} className="contents">
+              <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">P{pi + 1} Rate (m3/hr)</label>
+                <input type="number" step={1} min={1} value={inputs.pumps[pi].rate ?? ""} placeholder="30"
+                  onChange={e => { const newPumps = [...inputs.pumps] as [PumpConfig, PumpConfig, PumpConfig]; newPumps[pi] = { ...newPumps[pi], rate: e.target.value === "" ? null : parseFloat(e.target.value) }; update({ pumps: newPumps }); }}
+                  className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" /></div>
+              <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">P{pi + 1} Label</label>
+                <input type="text" value={inputs.pumps[pi].label} placeholder={`Pump ${pi + 1}`}
+                  onChange={e => { const newPumps = [...inputs.pumps] as [PumpConfig, PumpConfig, PumpConfig]; newPumps[pi] = { ...newPumps[pi], label: e.target.value }; update({ pumps: newPumps }); }}
+                  className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none" /></div>
+            </div>
+          ))}
         </div>
 
         <h3 className="text-sm font-bold text-gray-800 pt-2">Fleet & Logistics</h3>
@@ -284,7 +305,7 @@ export default function ConcretePourPlannerClient() {
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
             <p className="text-[10px] text-gray-400 mt-0.5">Rule of thumb: 120 min (BS 8500-2:2023 removed prescriptive limit)</p></div>
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Discharge Time (min)</label>
-            <input type="number" step={1} min={1} value={inputs.dischargeMinutes ?? ""} placeholder={inputs.pumpRate ? fmtNum((inputs.truckCapacity / inputs.pumpRate) * 60, 0) : "auto"}
+            <input type="number" step={1} min={1} value={inputs.dischargeMinutes ?? ""} placeholder={inputs.pumps[0].rate ? fmtNum((inputs.truckCapacity / inputs.pumps[0].rate) * 60, 0) : "auto"}
               onChange={e => update({ dischargeMinutes: e.target.value === "" ? null : parseFloat(e.target.value) })}
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
             <p className="text-[10px] text-gray-400 mt-0.5">Leave blank = auto from pump rate</p></div>
@@ -324,12 +345,12 @@ export default function ConcretePourPlannerClient() {
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
             <h3 className="text-sm font-bold text-gray-700">Truck Dispatch Schedule</h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">{result.totalLoads} loads across {inputs.fleetSize} wagons. Peak {result.peakWagonsOnSite} on-site simultaneously.</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">{result.totalLoads} loads across {inputs.fleetSize} wagons and {result.pumpCount} pump{result.pumpCount > 1 ? "s" : ""}. Peak {result.peakWagonsOnSite} on-site simultaneously.</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-gray-200">
-                {["#", "Wagon", "Trip", "Arrival", "Discharge", "End", "Depart", "Load", "Cumul.", "Wait", "TACO", "Progress"].map(h => (
+                {["#", "Wagon", "Trip", "Pump", "Arrival", "Discharge", "End", "Depart", "Load", "Cumul.", "Wait", "TACO", "Progress"].map(h => (
                   <th key={h} className="px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-wide text-gray-500">{h}</th>
                 ))}
               </tr></thead>
@@ -337,6 +358,8 @@ export default function ConcretePourPlannerClient() {
                 {result.schedule.map((t, i) => {
                   const pct = (t.cumulativeM3 / (inputs.pourVolume || 1)) * 100;
                   const wc = WAGON_COLOURS[(t.truckNumber - 1) % WAGON_COLOURS.length];
+                  const PUMP_COLOURS = ["text-blue-700 bg-blue-50 border-blue-200", "text-purple-700 bg-purple-50 border-purple-200", "text-cyan-700 bg-cyan-50 border-cyan-200"];
+                  const pc2 = PUMP_COLOURS[(t.pumpNumber - 1) % PUMP_COLOURS.length];
                   return (
                     <tr key={i} className={`hover:bg-blue-50/20 ${t.tacoStatus === "exceeds" ? "bg-red-50/30" : t.tacoStatus === "caution" ? "bg-amber-50/30" : ""}`}>
                       <td className="px-3 py-1.5 text-center text-gray-500 tabular-nums">{i + 1}</td>
@@ -344,6 +367,9 @@ export default function ConcretePourPlannerClient() {
                         <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full ${wc.bg} ${wc.text} border ${wc.border}`}>W{t.truckNumber}</span>
                       </td>
                       <td className="px-3 py-1.5 text-center text-gray-500 tabular-nums">T{t.tripNumber}</td>
+                      <td className="px-3 py-1.5 text-center">
+                        <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full border ${pc2}`}>P{t.pumpNumber}</span>
+                      </td>
                       <td className="px-3 py-1.5 text-center tabular-nums font-medium">{t.arrivalTime}</td>
                       <td className="px-3 py-1.5 text-center tabular-nums text-emerald-700 font-medium">{t.dischargeStart}</td>
                       <td className="px-3 py-1.5 text-center tabular-nums text-gray-500">{t.dischargeEnd}</td>
@@ -365,6 +391,27 @@ export default function ConcretePourPlannerClient() {
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Per-Pump Breakdown */}
+      {hasData && result.pumpStats.length > 1 && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+            <h3 className="text-sm font-bold text-gray-700">Per-Pump Breakdown</h3>
+            <p className="text-[11px] text-gray-400 mt-0.5">Combined rate: {result.combinedPumpRate} m3/hr across {result.pumpCount} pumps</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+            {result.pumpStats.map(p => (
+              <div key={p.pumpNumber} className="px-4 py-3 space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full border ${p.pumpNumber === 1 ? "text-blue-700 bg-blue-50 border-blue-200" : p.pumpNumber === 2 ? "text-purple-700 bg-purple-50 border-purple-200" : "text-cyan-700 bg-cyan-50 border-cyan-200"}`}>P{p.pumpNumber}</span>
+                  <span className="text-sm font-bold text-gray-800">{p.label}</span>
+                </div>
+                <div className="text-xs text-gray-500">{p.rate} m3/hr - {p.loads} loads - {fmtNum(p.totalM3, 1)} m3 - {p.busyMinutes} min busy</div>
+              </div>
+            ))}
           </div>
         </div>
       )}
