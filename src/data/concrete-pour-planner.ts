@@ -10,9 +10,11 @@ export interface PourInputs {
   roundTripMinutes: number | null; // travel to plant + load + return (minutes)
   dischargeMinutes: number | null; // override: time to discharge one load at pump
   staggerMinutes: number; // gap between first wagon arrivals (e.g. 15 min)
-  tacoMinutes: number; // Time Allowed for Completion of Operations (default 120)
+  tacoMinutes: number; // Workability guideline — default 120 min (rule of thumb)
   startTime: string; // HH:MM — first wagon arrival
   mixDesignation: string;
+  ambientTemp: "below10" | "10to25" | "25to30" | "above30"; // ambient temperature range
+  hasRetarder: boolean; // retarder admixture in the mix
 }
 
 export interface TruckTrip {
@@ -24,7 +26,8 @@ export interface TruckTrip {
   departTime: string;
   loadM3: number;
   cumulativeM3: number;
-  tacoOk: boolean;
+  tacoOk: boolean; // kept for backwards compat — true if within guideline
+  tacoStatus: "ok" | "caution" | "exceeds"; // ok = within guideline, caution = within 15 min, exceeds = over
   tacoElapsedMin: number;
   waitMinutes: number;
 }
@@ -36,7 +39,10 @@ export interface PourResult {
   lastDischargeEnd: string;
   schedule: TruckTrip[];
   fleetSize: number;
-  tacoBreaches: number;
+  tacoBreaches: number; // kept for compat — count of "exceeds"
+  tacoExceedances: number;
+  tacoCautions: number;
+  effectiveTacoMinutes: number; // adjusted guideline after temp/retarder
   peakWagonsOnSite: number;
 }
 
@@ -65,7 +71,27 @@ export const DEFAULT_INPUTS: PourInputs = {
   tacoMinutes: 120,
   startTime: "07:00",
   mixDesignation: "C25/30",
+  ambientTemp: "10to25",
+  hasRetarder: false,
 };
+
+// Temperature/retarder adjustment to workability guideline (rule of thumb)
+// BS 8500-2:2023 removed the prescriptive 2-hour limit — workability is now
+// the governing criterion. These adjustments reflect industry practice.
+const TEMP_ADJUSTMENTS: Record<PourInputs["ambientTemp"], number> = {
+  "below10": 30,   // cold weather — hydration slower, +30 min
+  "10to25": 0,     // baseline — no adjustment
+  "25to30": -15,   // warm weather — hydration faster, -15 min
+  "above30": -30,  // hot weather — hydration much faster, -30 min
+};
+const RETARDER_ADJUSTMENT = 60; // retarder typically adds ~60 min working life
+
+export function effectiveTaco(inputs: PourInputs): number {
+  let effective = inputs.tacoMinutes;
+  effective += TEMP_ADJUSTMENTS[inputs.ambientTemp] ?? 0;
+  if (inputs.hasRetarder) effective += RETARDER_ADJUSTMENT;
+  return Math.max(30, effective); // floor at 30 min
+}
 
 function timeToMin(time: string): number {
   const [h, m] = time.split(":").map(Number);
@@ -80,11 +106,12 @@ function minToTime(min: number): string {
 }
 
 export function calculatePour(inputs: PourInputs): PourResult {
-  const empty: PourResult = { totalLoads: 0, totalPourDuration: 0, firstTruckArrival: "", lastDischargeEnd: "", schedule: [], fleetSize: 0, tacoBreaches: 0, peakWagonsOnSite: 0 };
+  const empty: PourResult = { totalLoads: 0, totalPourDuration: 0, firstTruckArrival: "", lastDischargeEnd: "", schedule: [], fleetSize: 0, tacoBreaches: 0, tacoExceedances: 0, tacoCautions: 0, effectiveTacoMinutes: effectiveTaco(inputs), peakWagonsOnSite: 0 };
 
   if (!inputs.pourVolume || !inputs.pumpRate || !inputs.roundTripMinutes || inputs.fleetSize < 1) return empty;
 
-  const { pourVolume, pumpRate, truckCapacity, fleetSize, roundTripMinutes, staggerMinutes, tacoMinutes, startTime } = inputs;
+  const { pourVolume, pumpRate, truckCapacity, fleetSize, roundTripMinutes, staggerMinutes, startTime } = inputs;
+  const tacoLimit = effectiveTaco(inputs);
 
   // Discharge time per full load
   const dischargeMins = inputs.dischargeMinutes ?? (truckCapacity / pumpRate) * 60;
@@ -108,7 +135,8 @@ export function calculatePour(inputs: PourInputs): PourResult {
   let pumpFreeAt = startMin;
   const schedule: TruckTrip[] = [];
   let cumulativeM3 = 0;
-  let tacoBreaches = 0;
+  let tacoExceedances = 0;
+  let tacoCautions = 0;
 
   // On-site tracking for peak
   const onSiteEvents: { time: number; delta: number }[] = [];
@@ -139,8 +167,11 @@ export function calculatePour(inputs: PourInputs): PourResult {
 
     // TACO: time from loading at plant to start of discharge
     const tacoElapsedMin = Math.round(dischargeStartMin - loadedAtMin);
-    const tacoOk = tacoElapsedMin <= tacoMinutes;
-    if (!tacoOk) tacoBreaches++;
+    const tacoOk = tacoElapsedMin <= tacoLimit;
+    const tacoCaution = tacoOk && tacoElapsedMin > (tacoLimit - 15);
+    const tacoStatus: "ok" | "caution" | "exceeds" = !tacoOk ? "exceeds" : tacoCaution ? "caution" : "ok";
+    if (!tacoOk) tacoExceedances++;
+    else if (tacoCaution) tacoCautions++;
 
     cumulativeM3 += loadM3;
 
@@ -154,6 +185,7 @@ export function calculatePour(inputs: PourInputs): PourResult {
       loadM3,
       cumulativeM3,
       tacoOk,
+      tacoStatus,
       tacoElapsedMin,
       waitMinutes: Math.round(waitMins),
     });
@@ -189,7 +221,10 @@ export function calculatePour(inputs: PourInputs): PourResult {
     lastDischargeEnd: schedule.length > 0 ? schedule[schedule.length - 1].dischargeEnd : startTime,
     schedule,
     fleetSize,
-    tacoBreaches,
+    tacoBreaches: tacoExceedances, // backwards compat
+    tacoExceedances,
+    tacoCautions,
+    effectiveTacoMinutes: tacoLimit,
     peakWagonsOnSite: peak,
   };
 }
