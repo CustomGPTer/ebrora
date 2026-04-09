@@ -6,7 +6,7 @@ import {
   calculateOvertime,
   fmtGBP, fmtGBPFull, fmtPercent, generateId,
   OVERTIME_PRESETS, TIER_COLOURS, REGULATIONS,
-  type OvertimeInputs, type OperativeGroup, type OvertimeTier, type EmployerOnCosts,
+  type OvertimeInputs, type OperativeGroup, type OvertimeTier, type EmployerOnCosts, type CalculationResult,
 } from "@/data/overtime-cost-calculator";
 
 // ─── Helpers ─────────────────────────────────────────────────
