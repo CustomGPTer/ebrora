@@ -505,7 +505,7 @@ const INVASIVE_PLANTS: SpeciesProfile[] = [
       { label: "Active growing season", months: [4, 5, 6, 7, 8, 9, 10], severity: "moderate", description: "Knotweed actively grows April-October. Excavation can spread rhizome fragments. Treatment with herbicide is most effective August-October." },
     ],
     exclusionZoneM: 7, exclusionZoneNote: "Rhizomes can extend 7m from visible above-ground growth and 3m deep. All soil within 7m may be contaminated.",
-    yearRoundProtection: false, habitatFeatures: ["Riverbanks", "Disturbed ground", "Railway embankments", "Demolition sites"],
+    yearRoundProtection: true, habitatFeatures: ["Riverbanks", "Disturbed ground", "Railway embankments", "Demolition sites"],
     category: "plant", epsSpecies: false,
   },
   {
@@ -516,7 +516,7 @@ const INVASIVE_PLANTS: SpeciesProfile[] = [
       { label: "Active growth / seeding", months: [4, 5, 6, 7, 8, 9], severity: "high", description: "Sap causes severe burns under UV light. Full PPE required for any disturbance. Seeding June-September can spread the plant." },
     ],
     exclusionZoneM: 5, exclusionZoneNote: "5m from visible plants. Sap contact causes photodermatitis — serious burns under sunlight. Full PPE including face shield required.",
-    yearRoundProtection: false, habitatFeatures: ["Riverbanks", "Waste ground", "Road verges"],
+    yearRoundProtection: true, habitatFeatures: ["Riverbanks", "Waste ground", "Road verges"],
     category: "plant", epsSpecies: false,
   },
   {
