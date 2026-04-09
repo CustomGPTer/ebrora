@@ -875,7 +875,7 @@ export function assessConflicts(
   let overallTrafficLight: TrafficLight = "green";
   for (const c of conflicts) {
     if (c.trafficLight === "red") { overallTrafficLight = "red"; break; }
-    if (c.trafficLight === "amber" && overallTrafficLight !== "red") overallTrafficLight = "amber";
+    if (c.trafficLight === "amber") overallTrafficLight = "amber";
     if (c.trafficLight === "yellow" && overallTrafficLight === "green") overallTrafficLight = "yellow";
   }
 
