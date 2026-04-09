@@ -494,7 +494,7 @@ export default function HistoricalWeatherClient() {
     const s = firstRes.summary;
     const delta = s.tempDelta >= 0 ? `+${s.tempDelta.toFixed(1)}` : s.tempDelta.toFixed(1);
     return [
-      { label: "Temperature", value: `${s.avgTemp.toFixed(1)}\u00B0C`, sub: `${delta}\u00B0C vs baseline`, bgClass: s.tempDelta > 2 ? "bg-orange-50" : s.tempDelta < -2 ? "bg-cyan-50" : "bg-red-50", textClass: s.tempDelta > 2 ? "text-orange-800" : s.tempDelta < -2 ? "text-cyan-800" : "text-red-800", borderClass: s.tempDelta > 2 ? "border-orange-200" : s.tempDelta < -2 ? "border-cyan-200" : "border-red-200", dotClass: s.tempDelta > 2 ? "bg-orange-500" : s.tempDelta < -2 ? "bg-cyan-500" : "bg-red-500" },
+      { label: "Temperature", value: `${s.avgTemp.toFixed(1)}°C`, sub: `${delta}°C vs baseline`, bgClass: s.tempDelta > 2 ? "bg-orange-50" : s.tempDelta < -2 ? "bg-cyan-50" : "bg-red-50", textClass: s.tempDelta > 2 ? "text-orange-800" : s.tempDelta < -2 ? "text-cyan-800" : "text-red-800", borderClass: s.tempDelta > 2 ? "border-orange-200" : s.tempDelta < -2 ? "border-cyan-200" : "border-red-200", dotClass: s.tempDelta > 2 ? "bg-orange-500" : s.tempDelta < -2 ? "bg-cyan-500" : "bg-red-500" },
       { label: "Rainfall", value: `${s.totalRainMm.toFixed(1)} mm`, sub: `${s.rainDays} rain day${s.rainDays !== 1 ? "s" : ""} (>=${rainThreshold}mm)`, bgClass: "bg-blue-50", textClass: "text-blue-800", borderClass: "border-blue-200", dotClass: "bg-blue-500" },
       { label: "Wind Speed", value: fmtWind(s.avgWind, windUnit), sub: `Max: ${fmtWind(s.maxWind, windUnit)}`, bgClass: "bg-purple-50", textClass: "text-purple-800", borderClass: "border-purple-200", dotClass: "bg-purple-500" },
       { label: "Conditions", value: getWMO(s.dominantCode).description, sub: `Cloud: ${s.avgCloud.toFixed(0)}% | Humidity: ${s.avgHumidity.toFixed(0)}%`, bgClass: "bg-emerald-50", textClass: "text-emerald-800", borderClass: "border-emerald-200", dotClass: "bg-emerald-500" },
@@ -661,10 +661,10 @@ export default function HistoricalWeatherClient() {
                 <WeatherIcon code={res.days[0].weatherCode} size={64} />
               </div>
               <div className="text-2xl font-bold text-gray-900 mb-1">
-                {res.days[0].tempC !== null ? `${res.days[0].tempC.toFixed(1)}\u00B0C` : "--"}
+                {res.days[0].tempC !== null ? `${res.days[0].tempC.toFixed(1)}°C` : "--"}
                 {res.days[0].avgTempC !== null && (
                   <span className={`ml-2 text-sm font-medium ${(res.days[0].tempC ?? 0) > res.days[0].avgTempC ? "text-orange-600" : "text-cyan-600"}`}>
-                    ({((res.days[0].tempC ?? 0) - res.days[0].avgTempC) >= 0 ? "+" : ""}{((res.days[0].tempC ?? 0) - res.days[0].avgTempC).toFixed(1)}\u00B0 vs avg)
+                    ({((res.days[0].tempC ?? 0) - res.days[0].avgTempC) >= 0 ? "+" : ""}{((res.days[0].tempC ?? 0) - res.days[0].avgTempC).toFixed(1)}° vs avg)
                   </span>
                 )}
               </div>
@@ -672,7 +672,7 @@ export default function HistoricalWeatherClient() {
 
               {res.days[0].tempMinC !== null && (
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg mb-4 ${res.days[0].tempMinC <= 0 ? "bg-cyan-50 text-cyan-700 border border-cyan-200" : "bg-gray-50 text-gray-600 border border-gray-200"}`}>
-                  Overnight low: {res.days[0].tempMinC.toFixed(1)}\u00B0C
+                  Overnight low: {res.days[0].tempMinC.toFixed(1)}°C
                   {res.days[0].tempMinC <= 0 && <span className="text-cyan-600 font-bold ml-1">Frost</span>}
                 </div>
               )}
@@ -731,7 +731,7 @@ export default function HistoricalWeatherClient() {
                           <td className="px-1 py-1"><WeatherIcon code={day.weatherCode} size={22} /></td>
                           <td className="px-2 py-1.5 text-gray-600">{wmo.description}</td>
                           <td className="px-2 py-1.5 text-right font-mono font-semibold">
-                            {day.tempC !== null ? `${day.tempC.toFixed(1)}\u00B0` : "--"}
+                            {day.tempC !== null ? `${day.tempC.toFixed(1)}°` : "--"}
                             {day.avgTempC !== null && (
                               <span className={`ml-1 text-[10px] ${(day.tempC ?? 0) > day.avgTempC ? "text-orange-500" : "text-cyan-500"}`}>
                                 ({((day.tempC ?? 0) - day.avgTempC) >= 0 ? "+" : ""}{((day.tempC ?? 0) - day.avgTempC).toFixed(1)})
@@ -739,7 +739,7 @@ export default function HistoricalWeatherClient() {
                             )}
                           </td>
                           <td className={`px-2 py-1.5 text-right font-mono ${frost ? "text-cyan-600 font-bold" : ""}`}>
-                            {day.tempMinC !== null ? `${day.tempMinC.toFixed(1)}\u00B0` : "--"}
+                            {day.tempMinC !== null ? `${day.tempMinC.toFixed(1)}°` : "--"}
                             {frost && <span className="ml-0.5 text-[9px]">*</span>}
                           </td>
                           <td className="px-2 py-1.5 text-right font-mono">{day.windKmh !== null ? fmtWind(day.windKmh, windUnit).replace(/ (mph|km\/h)/, "") : "--"}</td>
@@ -753,7 +753,7 @@ export default function HistoricalWeatherClient() {
                 </table>
                 {view === "month" && (
                   <div className="mt-2 text-[10px] text-gray-400">
-                    * = frost (overnight low at or below 0{"\u00B0"}C) | Rain days ({">="}{rainThreshold}mm): {firstRes?.summary.rainDays ?? 0}
+                    * = frost (overnight low at or below 0{"°"}C) | Rain days ({">="}{rainThreshold}mm): {firstRes?.summary.rainDays ?? 0}
                   </div>
                 )}
               </div>
