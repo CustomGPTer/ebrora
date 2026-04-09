@@ -232,7 +232,6 @@ const BADGERS: SpeciesProfile = {
   id: "badgers", group: "badgers", name: "Eurasian Badger (Meles meles)",
   legislation: [
     "Protection of Badgers Act 1992",
-    "NERC Act 2006 (Section 41)",
   ],
   prohibitions: [
     "Wilfully kill, injure, or take a badger",
@@ -453,7 +452,7 @@ const PEARL_MUSSEL: SpeciesProfile = {
   id: "freshwater-pearl-mussel", group: "freshwater-pearl-mussel", name: "Freshwater Pearl Mussel (Margaritifera margaritifera)",
   legislation: [
     "Wildlife and Countryside Act 1981 (Schedule 5)",
-    "Conservation of Habitats and Species Regulations 2017 (Annex II / Annex IV)",
+    "Conservation of Habitats and Species Regulations 2017 (Annex II / Annex V)",
     "NERC Act 2006 (Section 41)",
   ],
   prohibitions: [
@@ -470,7 +469,7 @@ const PEARL_MUSSEL: SpeciesProfile = {
   exclusionZoneNote: "No fixed land-based exclusion zone. All in-channel and near-channel works in rivers with known populations require Environment Agency / Natural England consultation. Species is critically endangered.",
   yearRoundProtection: true,
   habitatFeatures: ["Clean, fast-flowing rivers", "Stable gravel/sand substrate", "Rivers with salmon/trout populations"],
-  category: "invertebrate", epsSpecies: true,
+  category: "invertebrate", epsSpecies: false,
 };
 
 // Lamprey species
@@ -667,11 +666,13 @@ function getActionsForConflict(
 
     case "great-crested-newts":
       surveyRequired = true;
-      if (hasGroundDisturbance) {
+      if (hasGroundDisturbance || hasWatercourseImpact) {
         actions.push("Commission eDNA survey of waterbodies within 250m (valid March-June) or traditional presence/absence surveys (4 visits, mid-March to mid-June).");
         actions.push("If GCN confirmed: apply for EPS licence or register under Natural England District Level Licensing (DLL) scheme.");
         actions.push("Install temporary amphibian fencing around 50m core zone before ground-breaking works commence.");
         eclerkRequired = true;
+      } else {
+        actions.push("Commission eDNA survey of waterbodies within 250m (valid March-June) as a precaution if ponds are present nearby.");
       }
       break;
 
