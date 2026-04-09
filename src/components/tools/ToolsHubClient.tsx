@@ -84,6 +84,7 @@ const TOOL_CATEGORIES = {
       "sunrise-sunset-times",
       "working-days-calculator",
       "daywork-rate-calculator",
+      "overtime-cost-calculator",
     ]),
   },
   "Environmental & Ecology": {
@@ -145,6 +146,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "working-days-calculator": { icon: "📅", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "daywork-rate-calculator": { icon: "💷", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "plant-hire-comparator": { icon: "🚜", accent: "#EA580C", accentLight: "rgba(234,88,12,0.08)" },
+  "overtime-cost-calculator": { icon: "💰", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
