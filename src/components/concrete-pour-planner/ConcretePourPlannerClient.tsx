@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import type { PourInputs } from "@/data/concrete-pour-planner";
-import { CONCRETE_MIXES, DEFAULT_INPUTS, calculatePour } from "@/data/concrete-pour-planner";
+import { CONCRETE_MIXES, DEFAULT_INPUTS, calculatePour, effectiveTaco } from "@/data/concrete-pour-planner";
 import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 
 function fmtNum(v: number, dp = 1): string { if (!Number.isFinite(v) || v === 0) return "—"; return v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
@@ -62,12 +62,12 @@ async function exportPDF(
     ["Pour Volume:", `${inputs.pourVolume} m³`], ["Mix:", inputs.mixDesignation],
     ["Pump Rate:", `${inputs.pumpRate} m³/hr`], ["Truck Capacity:", `${inputs.truckCapacity} m³`],
     ["Fleet Size:", `${inputs.fleetSize} wagons`], ["Stagger:", `${inputs.staggerMinutes} min between first arrivals`],
-    ["Round-Trip:", `${inputs.roundTripMinutes} min`], ["TACO Limit:", `${inputs.tacoMinutes} min`],
+    ["Round-Trip:", `${inputs.roundTripMinutes} min`], ["Workability Guideline:", `${result.effectiveTacoMinutes} min (base ${inputs.tacoMinutes}, ${inputs.ambientTemp === "below10" ? "<10C +30" : inputs.ambientTemp === "25to30" ? "25-30C -15" : inputs.ambientTemp === "above30" ? ">30C -30" : "10-25C"}${inputs.hasRetarder ? ", retarder +60" : ""})`],
     ["Start:", inputs.startTime], ["Total Loads:", `${result.totalLoads}`],
     ["Pour Duration:", `${result.totalPourDuration} min (${fmtNum(result.totalPourDuration / 60)} hrs)`],
     ["Pour Complete:", result.lastDischargeEnd],
     ["Peak Wagons On-Site:", `${result.peakWagonsOnSite}`],
-    ["TACO Breaches:", result.tacoBreaches > 0 ? `!! ${result.tacoBreaches}` : "None"],
+    ["Exceeds Guideline:", result.tacoExceedances > 0 ? `!! ${result.tacoExceedances} load(s)` : "None"],
   ].forEach(([l, v]) => {
     doc.setFont("helvetica", "bold"); doc.text(l, M, y);
     doc.setFont("helvetica", "normal"); doc.text(v, M + 45, y); y += 4;
@@ -107,13 +107,16 @@ async function exportPDF(
       fmtNum(t.loadM3, 1), fmtNum(t.cumulativeM3, 1),
       t.waitMinutes > 0 ? `${t.waitMinutes}m` : "-",
       `${t.tacoElapsedMin}m`,
-      t.tacoOk ? "OK" : "BREACH",
+      t.tacoStatus === "exceeds" ? "EXCEEDS" : t.tacoStatus === "caution" ? "CAUTION" : "OK",
     ];
     const rowH = 4.5; cx = M;
     vals.forEach((v, j) => {
-      if (j === 11 && !t.tacoOk) {
+      if (j === 11 && t.tacoStatus === "exceeds") {
         doc.setFillColor(254, 226, 226); doc.rect(cx, y, dCols[j], rowH, "FD");
         doc.setTextColor(220, 38, 38); doc.setFont("helvetica", "bold");
+      } else if (j === 11 && t.tacoStatus === "caution") {
+        doc.setFillColor(254, 243, 199); doc.rect(cx, y, dCols[j], rowH, "FD");
+        doc.setTextColor(180, 83, 9); doc.setFont("helvetica", "bold");
       } else if (j === 11 && t.tacoOk) {
         doc.setFillColor(236, 253, 245); doc.rect(cx, y, dCols[j], rowH, "FD");
         doc.setTextColor(22, 163, 74); doc.setFont("helvetica", "bold");
@@ -147,7 +150,7 @@ async function exportPDF(
 
   const pc = doc.getNumberOfPages();
   for (let p = 1; p <= pc; p++) { doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Ready-mix logistics plan. Confirm wagon availability with batch plant. TACO = Time Allowed for Completion of Operations (BS 8500).", M, 205);
+    doc.text("Ready-mix logistics plan. Confirm wagon availability with batch plant. Workability guideline per BS 8500-2:2023 (prescriptive 2-hour limit removed; workability for full compaction is the governing criterion). Adjust for temperature and retarder.", M, 205);
     doc.text(`Ref: ${docRef} | Page ${p} of ${pc}`, W - M - 50, 205); }
   doc.save(`concrete-pour-plan-${todayISO()}.pdf`);
 }
@@ -174,7 +177,7 @@ export default function ConcretePourPlannerClient() {
             { label: "Pour Duration", value: `${result.totalPourDuration} min`, sub: `${fmtNum(result.totalPourDuration / 60)} hrs`, bg: "bg-slate-50", border: "border-slate-200", text: "text-slate-800", dot: "bg-slate-500" },
             { label: "Peak On-Site", value: `${result.peakWagonsOnSite}`, sub: "Max wagons at once", bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-800", dot: "bg-emerald-500" },
             { label: "Pour Complete", value: result.lastDischargeEnd, sub: `Started ${result.firstTruckArrival}`, bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-800", dot: "bg-purple-500" },
-            { label: "TACO", value: result.tacoBreaches > 0 ? `⚠ ${result.tacoBreaches}` : "All OK", sub: `${inputs.tacoMinutes} min limit`, bg: result.tacoBreaches > 0 ? "bg-red-50" : "bg-green-50", border: result.tacoBreaches > 0 ? "border-red-200" : "border-green-200", text: result.tacoBreaches > 0 ? "text-red-800" : "text-green-800", dot: result.tacoBreaches > 0 ? "bg-red-500" : "bg-green-500" },
+            { label: "Workability", value: result.tacoExceedances > 0 ? `${result.tacoExceedances} exceed` : result.tacoCautions > 0 ? `${result.tacoCautions} caution` : "All OK", sub: `${result.effectiveTacoMinutes} min guideline`, bg: result.tacoExceedances > 0 ? "bg-red-50" : result.tacoCautions > 0 ? "bg-amber-50" : "bg-green-50", border: result.tacoExceedances > 0 ? "border-red-200" : result.tacoCautions > 0 ? "border-amber-200" : "border-green-200", text: result.tacoExceedances > 0 ? "text-red-800" : result.tacoCautions > 0 ? "text-amber-800" : "text-green-800", dot: result.tacoExceedances > 0 ? "bg-red-500" : result.tacoCautions > 0 ? "bg-amber-500" : "bg-green-500" },
           ].map(c => (
             <div key={c.label} className={`border rounded-xl p-4 ${c.bg} ${c.border}`}>
               <div className="flex items-center gap-2 mb-2"><span className={`w-2.5 h-2.5 rounded-full ${c.dot}`} /><span className={`text-[11px] font-bold uppercase tracking-wide ${c.text}`}>{c.label}</span></div>
@@ -185,15 +188,27 @@ export default function ConcretePourPlannerClient() {
         </div>
       )}
 
-      {/* TACO breach warning */}
-      {result.tacoBreaches > 0 && (
+      {/* Workability guideline warning */}
+      {result.tacoExceedances > 0 && (
         <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 flex gap-3 items-start">
-          <span className="text-2xl">⚠️</span>
+          <span className="text-lg font-bold text-red-600">!</span>
           <div>
-            <div className="text-sm font-bold text-red-800">TACO BREACH — {result.tacoBreaches} load{result.tacoBreaches > 1 ? "s" : ""} exceed{result.tacoBreaches === 1 ? "s" : ""} the {inputs.tacoMinutes}-minute limit</div>
+            <div className="text-sm font-bold text-red-800">EXCEEDS WORKABILITY GUIDELINE — {result.tacoExceedances} load{result.tacoExceedances > 1 ? "s" : ""} exceed{result.tacoExceedances === 1 ? "s" : ""} the {result.effectiveTacoMinutes}-minute guideline</div>
             <div className="text-xs text-red-700 mt-1">
-              Concrete in these wagons will exceed the Time Allowed for Completion of Operations before discharge starts.
-              Consider adding more wagons, reducing round-trip time, or accepting a slower pump rate.
+              Concrete in these wagons may not remain workable for full compaction by the time discharge starts.
+              Consider adding more wagons, reducing round-trip time, or using a retarder admixture.
+              BS 8500-2:2023 no longer prescribes a fixed time limit — workability for full compaction is the governing criterion.
+            </div>
+          </div>
+        </div>
+      )}
+      {result.tacoCautions > 0 && result.tacoExceedances === 0 && (
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 flex gap-3 items-start">
+          <span className="text-lg font-bold text-amber-600">!</span>
+          <div>
+            <div className="text-sm font-bold text-amber-800">APPROACHING GUIDELINE — {result.tacoCautions} load{result.tacoCautions > 1 ? "s are" : " is"} within 15 minutes of the {result.effectiveTacoMinutes}-minute workability guideline</div>
+            <div className="text-xs text-amber-700 mt-1">
+              These loads are close to the practical limit. Monitor slump on arrival and consider a slump test before discharge.
             </div>
           </div>
         </div>
@@ -263,16 +278,44 @@ export default function ConcretePourPlannerClient() {
               onChange={e => update({ roundTripMinutes: e.target.value === "" ? null : parseFloat(e.target.value) })}
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
             <p className="text-[10px] text-gray-400 mt-0.5">Site → plant → load → site</p></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">TACO Limit (min)</label>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Base Workability (min)</label>
             <input type="number" step={10} min={30} max={240} value={inputs.tacoMinutes}
               onChange={e => update({ tacoMinutes: parseInt(e.target.value) || 120 })}
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
-            <p className="text-[10px] text-gray-400 mt-0.5">BS 8500 — typically 120 min</p></div>
+            <p className="text-[10px] text-gray-400 mt-0.5">Rule of thumb: 120 min (BS 8500-2:2023 removed prescriptive limit)</p></div>
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Discharge Time (min)</label>
             <input type="number" step={1} min={1} value={inputs.dischargeMinutes ?? ""} placeholder={inputs.pumpRate ? fmtNum((inputs.truckCapacity / inputs.pumpRate) * 60, 0) : "auto"}
               onChange={e => update({ dischargeMinutes: e.target.value === "" ? null : parseFloat(e.target.value) })}
               className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none tabular-nums" />
             <p className="text-[10px] text-gray-400 mt-0.5">Leave blank = auto from pump rate</p></div>
+        </div>
+
+        <h3 className="text-sm font-bold text-gray-800 pt-2">Workability Conditions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Ambient Temperature</label>
+            <select value={inputs.ambientTemp} onChange={e => update({ ambientTemp: e.target.value as PourInputs["ambientTemp"] })}
+              className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none">
+              <option value="below10">Below 10C (+30 min)</option>
+              <option value="10to25">10 - 25C (baseline)</option>
+              <option value="25to30">25 - 30C (-15 min)</option>
+              <option value="above30">Above 30C (-30 min)</option>
+            </select>
+            <p className="text-[10px] text-gray-400 mt-0.5">Hot weather reduces working life</p></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Retarder Admixture</label>
+            <div className="flex rounded-md overflow-hidden border border-gray-200 mt-0.5">
+              <button onClick={() => update({ hasRetarder: false })}
+                className={`flex-1 px-3 py-2 text-xs font-bold ${!inputs.hasRetarder ? "bg-ebrora text-white" : "bg-gray-50 text-gray-500"}`}>No Retarder</button>
+              <button onClick={() => update({ hasRetarder: true })}
+                className={`flex-1 px-3 py-2 text-xs font-bold ${inputs.hasRetarder ? "bg-ebrora text-white" : "bg-gray-50 text-gray-500"}`}>Retarder (+60 min)</button>
+            </div>
+            <p className="text-[10px] text-gray-400 mt-0.5">Extends working life of the mix</p></div>
+          <div className="flex flex-col justify-end">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+              <div className="text-[10px] font-semibold text-gray-500 uppercase">Effective Guideline</div>
+              <div className="text-lg font-bold text-gray-800">{effectiveTaco(inputs)} min</div>
+              <div className="text-[10px] text-gray-400">Base {inputs.tacoMinutes}{inputs.ambientTemp !== "10to25" ? ` ${inputs.ambientTemp === "below10" ? "+30" : inputs.ambientTemp === "25to30" ? "-15" : "-30"}` : ""}{inputs.hasRetarder ? " +60 retarder" : ""}</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -295,7 +338,7 @@ export default function ConcretePourPlannerClient() {
                   const pct = (t.cumulativeM3 / (inputs.pourVolume || 1)) * 100;
                   const wc = WAGON_COLOURS[(t.truckNumber - 1) % WAGON_COLOURS.length];
                   return (
-                    <tr key={i} className={`hover:bg-blue-50/20 ${!t.tacoOk ? "bg-red-50/30" : ""}`}>
+                    <tr key={i} className={`hover:bg-blue-50/20 ${t.tacoStatus === "exceeds" ? "bg-red-50/30" : t.tacoStatus === "caution" ? "bg-amber-50/30" : ""}`}>
                       <td className="px-3 py-1.5 text-center text-gray-500 tabular-nums">{i + 1}</td>
                       <td className="px-3 py-1.5 text-center">
                         <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full ${wc.bg} ${wc.text} border ${wc.border}`}>W{t.truckNumber}</span>
@@ -308,7 +351,7 @@ export default function ConcretePourPlannerClient() {
                       <td className="px-3 py-1.5 text-center tabular-nums">{fmtNum(t.loadM3, 1)}</td>
                       <td className="px-3 py-1.5 text-center tabular-nums font-medium">{fmtNum(t.cumulativeM3, 1)}</td>
                       <td className="px-3 py-1.5 text-center tabular-nums text-gray-400">{t.waitMinutes > 0 ? `${t.waitMinutes}m` : "—"}</td>
-                      <td className={`px-3 py-1.5 text-center tabular-nums text-xs font-medium ${t.tacoOk ? "text-green-600" : "text-red-600"}`}>{t.tacoElapsedMin}m {!t.tacoOk && "⚠"}</td>
+                      <td className={`px-3 py-1.5 text-center tabular-nums text-xs font-medium ${t.tacoStatus === "exceeds" ? "text-red-600" : t.tacoStatus === "caution" ? "text-amber-600" : "text-green-600"}`}>{t.tacoElapsedMin}m {t.tacoStatus === "exceeds" && "!!"}{t.tacoStatus === "caution" && "!"}</td>
                       <td className="px-3 py-1.5">
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -327,7 +370,7 @@ export default function ConcretePourPlannerClient() {
       )}
 
       <div className="pt-4 border-t border-gray-100"><p className="text-[11px] text-gray-400 leading-relaxed max-w-xl">
-        Ready-mix logistics plan. Wagons cycle: arrive → discharge at pump → depart → round trip to plant → reload → return. Stagger controls the gap between first arrivals only — subsequent arrivals are determined by the cycling schedule. TACO (Time Allowed for Completion of Operations) per BS 8500, typically 120 minutes from batching to discharge. White-label PDF.</p></div>
+        Ready-mix logistics plan. Wagons cycle: arrive → discharge at pump → depart → round trip to plant → reload → return. Stagger controls the gap between first arrivals only — subsequent arrivals are determined by the cycling schedule. BS 8500-2:2023 removed the prescriptive 2-hour time limit — workability for full compaction is now the governing criterion. The 120-minute base guideline remains a practical rule of thumb, adjusted for temperature and retarder use. White-label PDF.</p></div>
     </div>
   );
 }
