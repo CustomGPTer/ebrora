@@ -85,6 +85,7 @@ const TOOL_CATEGORIES = {
       "working-days-calculator",
       "daywork-rate-calculator",
       "overtime-cost-calculator",
+      "historical-weather",
     ]),
   },
   "Environmental & Ecology": {
@@ -149,6 +150,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "overtime-cost-calculator": { icon: "💰", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "ecological-exclusion-zone-checker": { icon: "🦎", accent: "#16A34A", accentLight: "rgba(22,163,74,0.08)" },
   "coordinate-converter": { icon: "📍", accent: "#0284C7", accentLight: "rgba(2,132,199,0.08)" },
+  "historical-weather": { icon: "🌦️", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -168,6 +170,7 @@ const PAID_TOOL_SLUGS = new Set([
   "working-days-calculator",
   "daywork-rate-calculator",
   "plant-hire-comparator",
+  "historical-weather",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
