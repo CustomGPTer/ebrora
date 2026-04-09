@@ -97,7 +97,7 @@ const TOOL_CATEGORIES = {
     icon: "⚡",
     accent: "#0284C7",
     accentLight: "rgba(2,132,199,0.08)",
-    slugs: new Set<string>(["cable-trench-depth-checker"]),
+    slugs: new Set<string>(["cable-trench-depth-checker", "coordinate-converter"]),
   },
 } as const;
 
@@ -148,6 +148,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "plant-hire-comparator": { icon: "🚜", accent: "#EA580C", accentLight: "rgba(234,88,12,0.08)" },
   "overtime-cost-calculator": { icon: "💰", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "ecological-exclusion-zone-checker": { icon: "🦎", accent: "#16A34A", accentLight: "rgba(22,163,74,0.08)" },
+  "coordinate-converter": { icon: "📍", accent: "#0284C7", accentLight: "rgba(2,132,199,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
