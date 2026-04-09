@@ -315,8 +315,6 @@ export const UK_TOWNS: UKTown[] = [
 
 // ─── API Functions ───────────────────────────────────────────
 
-const API_BASE = "https://archive-api.open-meteo.com/v1/archive";
-
 interface OpenMeteoResponse {
   hourly?: {
     time?: string[];
@@ -329,20 +327,52 @@ interface OpenMeteoResponse {
   };
 }
 
-/** Fetch hourly weather for a date range from Open-Meteo Archive API */
+const ARCHIVE_API = "https://archive-api.open-meteo.com/v1/archive";
+const FORECAST_API = "https://api.open-meteo.com/v1/forecast";
+const HOURLY_PARAMS = "temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,cloud_cover";
+
+/** Fetch hourly weather — uses forecast API for recent dates, archive for older */
 export async function fetchWeather(
   lat: number, lon: number, startDate: string, endDate: string
 ): Promise<OpenMeteoResponse> {
+  const now = new Date();
+  const end = new Date(endDate + "T12:00:00");
+  const daysAgo = Math.floor((now.getTime() - end.getTime()) / 86400000);
+
+  // Use forecast API for dates within last 90 days (more reliable, includes today)
+  // Use archive API for older dates
+  const useArchive = daysAgo > 90;
+  const baseUrl = useArchive ? ARCHIVE_API : FORECAST_API;
+
   const params = new URLSearchParams({
     latitude: lat.toFixed(4),
     longitude: lon.toFixed(4),
     start_date: startDate,
     end_date: endDate,
-    hourly: "temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,cloud_cover",
+    hourly: HOURLY_PARAMS,
     timezone: "Europe/London",
   });
-  const res = await fetch(`${API_BASE}?${params}`);
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+  let res: Response;
+  try {
+    res = await fetch(`${baseUrl}?${params}`);
+  } catch {
+    throw new Error("Network error -- could not reach weather API. Check your connection.");
+  }
+
+  if (!res.ok) {
+    let detail = "";
+    try { const body = await res.json(); detail = body?.reason || body?.error || ""; } catch { /* ignore */ }
+    // If archive fails for this range, retry with forecast API
+    if (useArchive) {
+      try {
+        const fallbackRes = await fetch(`${FORECAST_API}?${params}`);
+        if (fallbackRes.ok) return fallbackRes.json();
+      } catch { /* ignore */ }
+    }
+    throw new Error(`Weather API error ${res.status}${detail ? ": " + detail : ""}. Try a different date range.`);
+  }
+
   return res.json();
 }
 
@@ -404,6 +434,7 @@ export async function fetchBaseline(
   for (const mmdd of mmddSet) accum[mmdd] = { temps: [], precips: [], winds: [] };
 
   const currentYear = new Date().getFullYear();
+  const today = new Date().toISOString().slice(0, 10);
   const endY = Math.min(avgEnd, currentYear);
 
   // Batch into 5-year chunks and fetch in parallel
@@ -412,7 +443,9 @@ export async function fetchBaseline(
   for (let yr = avgStart; yr <= endY; yr += CHUNK) {
     const chunkEnd = Math.min(yr + CHUNK - 1, endY);
     const lastDay = new Date(chunkEnd, endMM, 0).getDate();
-    chunks.push([`${yr}-${sd}-01`, `${chunkEnd}-${ed}-${lastDay}`]);
+    let endDate = `${chunkEnd}-${ed}-${lastDay}`;
+    if (endDate > today) endDate = today; // clamp to today — archive API has no future data
+    chunks.push([`${yr}-${sd}-01`, endDate]);
   }
 
   // Fetch all chunks in parallel
@@ -461,17 +494,19 @@ export function fmtWindVal(kmh: number | null, unit: WindUnit): number {
 
 export function getDateRange(date: string, view: ViewMode): [string, string] {
   const d = new Date(date + "T12:00:00");
-  if (view === "day") return [date, date];
+  const today = new Date().toISOString().slice(0, 10);
+  const clamp = (s: string) => s > today ? today : s;
+  if (view === "day") return [date > today ? today : date, date > today ? today : date];
   if (view === "week") {
     const start = new Date(d); start.setDate(d.getDate() - 3);
     const end = new Date(d); end.setDate(d.getDate() + 3);
-    return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+    return [start.toISOString().slice(0, 10), clamp(end.toISOString().slice(0, 10))];
   }
   // Month
   const yr = d.getFullYear(), mo = d.getMonth();
   const start = new Date(yr, mo, 1);
   const end = new Date(yr, mo + 1, 0);
-  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  return [start.toISOString().slice(0, 10), clamp(end.toISOString().slice(0, 10))];
 }
 
 export function computeSummary(days: DayWeather[]): WeatherResult["summary"] {
