@@ -327,6 +327,30 @@ async function exportPDF(
   doc.text(`${result.totalSpecies} species assessed | ${result.conflictCount} with constraints | ${result.licenceCount} licences required | ${result.surveyCount} surveys required`, M + 5, y + 9.5);
   doc.setTextColor(0, 0, 0); y += 17;
 
+  // ── Stat cards
+  {
+    const cardW = (CW - 6) / 4, cardH = 12;
+    const cards: { label: string; value: string; sub: string; rgb: number[] }[] = [
+      { label: "Species Assessed", value: String(result.totalSpecies), sub: `${result.conflictCount} with constraints`, rgb: [59, 130, 246] },
+      { label: "Licences Required", value: String(result.licenceCount), sub: result.licenceCount > 0 ? "Apply before works" : "None needed", rgb: result.licenceCount > 0 ? [220, 38, 38] : [22, 163, 74] },
+      { label: "Surveys Required", value: String(result.surveyCount), sub: result.surveyCount > 0 ? "Commission surveys" : "None needed", rgb: result.surveyCount > 0 ? [245, 158, 11] : [22, 163, 74] },
+      { label: "Optimal Months", value: result.optimalWindow ? String(result.optimalWindow.length) : "0", sub: "No high-severity conflicts", rgb: [22, 163, 74] },
+    ];
+    cards.forEach((c, ci) => {
+      const cx = M + ci * (cardW + 2);
+      doc.setFillColor(c.rgb[0], c.rgb[1], c.rgb[2]);
+      doc.roundedRect(cx, y, cardW, cardH, 1.5, 1.5, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(4); doc.setFont("helvetica", "bold");
+      doc.text(c.label.toUpperCase(), cx + 2, y + 3.5);
+      doc.setFontSize(8); doc.text(c.value, cx + 2, y + 8);
+      doc.setFontSize(3.5); doc.setFont("helvetica", "normal");
+      doc.text(c.sub, cx + 2, y + 10.5);
+    });
+    doc.setTextColor(0, 0, 0);
+    y += cardH + 4;
+  }
+
   // ── Calendar Gantt Chart
   checkPage(result.conflicts.length * 4.5 + 20);
   doc.setFontSize(8); doc.setFont("helvetica", "bold");
@@ -382,7 +406,7 @@ async function exportPDF(
         doc.setFontSize(3.5); doc.setFont("helvetica", "normal");
         doc.text(period.severity === "high" ? "h" : "m", gx + ganttCW / 2 - 1, y + ganttRH / 2 + 1);
       } else if (isWorks) {
-        doc.setFillColor(232, 240, 236); doc.rect(gx, y, ganttCW, ganttRH, "FD");
+        doc.setFillColor(200, 230, 210); doc.rect(gx, y, ganttCW, ganttRH, "FD");
       } else {
         if (ri % 2 === 0) { doc.setFillColor(255, 255, 255); } else { doc.setFillColor(250, 250, 250); }
         doc.rect(gx, y, ganttCW, ganttRH, "FD");
@@ -432,10 +456,13 @@ async function exportPDF(
     const periods = c.conflictingPeriods.map(p => `${p.label} (${p.months.map(m2 => MONTH_NAMES[m2]).join("-")})`).join("; ") || "None in works period";
     const zone = c.species.exclusionZoneM > 0 ? `${c.species.exclusionZoneM}m` : "N/A";
     const statusLabel = c.trafficLight === "green" ? "OK" : c.trafficLight === "yellow" ? "AWARE" : c.trafficLight === "amber" ? "MITIGATE" : "LICENCE";
-    const actionsShort = c.actions.slice(0, 2).map(a => a.slice(0, 80) + (a.length > 80 ? "..." : "")).join("; ") || "-";
+    const actionsText = c.actions.slice(0, 3).join("; ") || "-";
 
-    const rowData = [name, legShort, periods, zone, statusLabel, actionsShort].map(san);
-    const rowH = 5;
+    const rowData = [name, legShort, periods, zone, statusLabel, actionsText].map(san);
+    // Calculate dynamic row height based on longest wrapped cell
+    const cellLines = rowData.map((t, i) => doc.splitTextToSize(t, tCols[i] - 3));
+    const maxLines = Math.max(...cellLines.map(l => l.length));
+    const rowH = Math.max(5, maxLines * 3 + 2);
     checkPage(rowH + 1);
 
     tcx = M;
@@ -452,8 +479,10 @@ async function exportPDF(
         doc.setFont("helvetica", i === 0 ? "bold" : "normal");
       }
       doc.setFontSize(4.2);
-      const lines = doc.splitTextToSize(t, tCols[i] - 3);
-      doc.text(lines[0] || "-", tcx + 1.5, y + 3.5);
+      const lines = cellLines[i];
+      lines.forEach((line: string, li: number) => {
+        doc.text(line || "-", tcx + 1.5, y + 3.5 + li * 3);
+      });
       doc.setTextColor(0, 0, 0);
       tcx += tCols[i];
     });
@@ -501,7 +530,7 @@ async function exportPDF(
     doc.setFontSize(5); doc.setTextColor(130, 130, 130);
     doc.text(
       "Ecological constraints assessment based on current UK wildlife legislation and Natural England standing advice. This tool provides guidance only -- it does not replace a full ecological survey by a qualified ecologist.",
-      M, 205
+      M, 201
     );
     doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 60, 205);
   }
