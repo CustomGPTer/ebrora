@@ -208,7 +208,10 @@ export function mPaToKPa(mPa: number): number { return mPa * 1000; }
 
 export function stressDisplay(kPa: number, unit: StressUnit): string {
   if (unit === "MPa") return (kPa / 1000).toFixed(3);
-  return kPa.toFixed(0);
+  // Smart decimal display: show up to 2dp, strip trailing zeros
+  if (kPa === 0) return "0";
+  const s = kPa.toFixed(2);
+  return s.replace(/\.?0+$/, "");
 }
 
 export function stressToKPa(value: number, unit: StressUnit): number {
