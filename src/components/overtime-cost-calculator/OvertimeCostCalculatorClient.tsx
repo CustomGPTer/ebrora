@@ -381,6 +381,31 @@ async function exportPDF(
   doc.text(`OT Premium: ${fmtGBPFull(result.totalOvertimePremium)} | OT as % of total: ${fmtPercent(result.overallOvertimePercent)} | Effective rate: ${fmtGBPFull(result.overallEffectiveRate)}/hr`, M + 5, y + 11);
   doc.setTextColor(0, 0, 0); y += 20;
 
+  // ── Stat cards
+  {
+    const cardW = (CW - 6) / 4, cardH = 14;
+    const otPct = result.overallOvertimePercent;
+    const cards: { label: string; value: string; sub: string; rgb: number[] }[] = [
+      { label: "Total Cost", value: fmtGBP(result.grandTotal), sub: `${result.totalWeeks} wks, ${result.totalOperatives} ops`, rgb: [59, 130, 246] },
+      { label: "OT Premium", value: fmtGBP(result.totalOvertimePremium), sub: `${fmtPercent(otPct)} of total`, rgb: otPct > 40 ? [220, 38, 38] : otPct > 25 ? [234, 179, 8] : [22, 163, 74] },
+      { label: "Effective Rate", value: `${fmtGBP(result.overallEffectiveRate)}/hr`, sub: "vs base rate blended", rgb: [124, 58, 237] },
+      { label: "Annual Projection", value: fmtGBP(result.annualCost), sub: `Premium: ${fmtGBP(result.annualPremium)}/yr`, rgb: [14, 165, 233] },
+    ];
+    cards.forEach((c, ci) => {
+      const cx = M + ci * (cardW + 2);
+      doc.setFillColor(c.rgb[0], c.rgb[1], c.rgb[2]);
+      doc.roundedRect(cx, y, cardW, cardH, 1.5, 1.5, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "bold");
+      doc.text(c.label.toUpperCase(), cx + 3, y + 4);
+      doc.setFontSize(9); doc.text(c.value, cx + 3, y + 9);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "normal");
+      doc.text(c.sub, cx + 3, y + 12.5);
+    });
+    doc.setTextColor(0, 0, 0);
+    y += cardH + 6;
+  }
+
   // ── Summary panel
   checkPage(55);
   const summaryItems = [
@@ -466,13 +491,15 @@ async function exportPDF(
     y += 10;
   });
 
-  // ── Hire vs Overtime comparison
+  // ── Hire vs Overtime comparison (structured table)
   checkPage(35);
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Hire vs Overtime Comparison", M, y); y += 5;
-  doc.setFontSize(7); doc.setFont("helvetica", "normal");
+  doc.text("Hire vs Overtime Comparison", M, y); y += 2;
+  doc.setFontSize(5.5); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
+  doc.text("What if you hired one additional operative per group at base rate instead of paying overtime?", M, y + 2);
+  doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); y += 7;
   result.groups.forEach((gr) => {
-    checkPage(12);
+    checkPage(18);
     const scenA = gr.weeklyTotalPay * gr.operativeCount;
     const teamHrs = gr.totalHoursPerWeek * gr.operativeCount;
     const hrsEach = teamHrs / (gr.operativeCount + 1);
@@ -484,14 +511,27 @@ async function exportPDF(
       ? hrsEach * gr.baseRate * (gr.operativeCount + 1)
       : (gr.standardHoursPerWeek * gr.baseRate + remOT * gr.baseRate * avgMult) * (gr.operativeCount + 1);
     const saving = scenA - scenB;
-    const lines = doc.splitTextToSize(
-      `${gr.groupLabel}: Current OT cost = ${fmtGBPFull(scenA)}/wk vs hiring +1 (redistributed) = ${fmtGBPFull(scenB)}/wk. ` +
-      (remOT > 0 ? `Note: +1 hire still leaves ${remOT.toFixed(1)} OT hrs/person/wk. ` : "") +
-      (saving > 0 ? `Hiring saves ${fmtGBPFull(saving)}/wk (${fmtGBPFull(saving * inputs.weeks)} over ${inputs.weeks} weeks).` :
-        `Overtime is ${fmtGBPFull(Math.abs(saving))}/wk cheaper than hiring.`),
-      CW - 4
-    );
-    doc.text(lines, M + 2, y); y += lines.length * 3.5 + 2;
+    doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.text(gr.groupLabel, M + 2, y); y += 4;
+    const hCols = [45, 45, 45, 47];
+    const hHeaders = ["Current (with OT)", "Hire +1 (redistributed)", "Weekly Saving", `${inputs.weeks}wk Saving`];
+    let hx = M;
+    hHeaders.forEach((h, i) => {
+      doc.setFillColor(245, 245, 245); doc.setDrawColor(200, 200, 200); doc.rect(hx, y, hCols[i], 5, "FD");
+      doc.setFontSize(5); doc.setFont("helvetica", "bold"); doc.setTextColor(80, 80, 80);
+      doc.text(h, hx + 1.5, y + 3.5); hx += hCols[i];
+    });
+    y += 5; hx = M;
+    const hVals = [fmtGBPFull(scenA) + "/wk", fmtGBPFull(scenB) + "/wk",
+      (saving > 0 ? fmtGBPFull(saving) + " (hire)" : fmtGBPFull(Math.abs(saving)) + " (OT cheaper)"),
+      (saving > 0 ? fmtGBPFull(saving * inputs.weeks) : fmtGBPFull(Math.abs(saving) * inputs.weeks))];
+    hVals.forEach((v, i) => {
+      doc.rect(hx, y, hCols[i], 5, "D");
+      doc.setFontSize(5.5); doc.setFont("helvetica", i >= 2 ? "bold" : "normal");
+      doc.setTextColor(i >= 2 ? (saving > 0 ? 22 : 220) : 0, i >= 2 ? (saving > 0 ? 163 : 38) : 0, i >= 2 ? (saving > 0 ? 74 : 38) : 0);
+      doc.text(v, hx + 1.5, y + 3.5); hx += hCols[i];
+    });
+    doc.setTextColor(0, 0, 0); y += 7;
+    if (remOT > 0) { doc.setFontSize(5); doc.setTextColor(100, 100, 100); doc.text(`Note: +1 hire still leaves ${remOT.toFixed(1)} OT hrs/person/wk`, M + 2, y); y += 3; doc.setTextColor(0, 0, 0); }
   });
   y += 4;
 
@@ -500,7 +540,7 @@ async function exportPDF(
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
   doc.text("Cumulative Cost Over Time", M, y); y += 3;
   doc.setFontSize(6); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
-  doc.text("Solid line = actual cost with overtime. Dashed line = cost if all hours were at base rate.", M, y + 2);
+  doc.text("Green line = actual cost with overtime. Grey dashed line = cost if all hours were at base rate.", M, y + 2);
   doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); y += 6;
 
   // Use first group for chart (aggregated if multiple)
@@ -530,8 +570,17 @@ async function exportPDF(
       doc.text(fmtGBP(val), chartX - 10, yp + 1.5);
     }
 
-    // Actual line (solid green)
-    doc.setDrawColor(27, 87, 69); doc.setLineWidth(0.6);
+    // X grid + labels
+    const xStep = Math.max(1, Math.round(maxWeeks / 8));
+    for (let w = 0; w <= maxWeeks; w += xStep) {
+      const xp = chartX + (w / (maxWeeks - 1)) * chartW2;
+      doc.setDrawColor(220, 220, 220); doc.line(xp, chartY2, xp, chartY2 + chartH2);
+      doc.setFontSize(5); doc.setTextColor(130, 130, 130);
+      doc.text(`Wk ${w}`, xp - 3, chartY2 + chartH2 + 4);
+    }
+
+    // Actual line (solid dark green, thicker)
+    doc.setDrawColor(27, 87, 69); doc.setLineWidth(0.8);
     for (let i = 1; i < aggWeekly.length; i++) {
       const x1 = chartX + ((aggWeekly[i - 1].week - 1) / (maxWeeks - 1)) * chartW2;
       const y1 = chartY2 + chartH2 - (aggWeekly[i - 1].cumTotal / maxVal) * chartH2;
@@ -540,30 +589,55 @@ async function exportPDF(
       doc.line(x1, y1, x2, y2v);
     }
 
-    // Base-only line (lighter grey solid)
-    doc.setDrawColor(180, 180, 180); doc.setLineWidth(0.3);
+    // Base-only line (dashed grey, visible)
+    doc.setDrawColor(120, 120, 120); doc.setLineWidth(0.5);
     for (let i = 1; i < aggWeekly.length; i++) {
       const x1 = chartX + ((aggWeekly[i - 1].week - 1) / (maxWeeks - 1)) * chartW2;
       const y1 = chartY2 + chartH2 - (aggWeekly[i - 1].cumBase / maxVal) * chartH2;
       const x2 = chartX + ((aggWeekly[i].week - 1) / (maxWeeks - 1)) * chartW2;
       const y2v = chartY2 + chartH2 - (aggWeekly[i].cumBase / maxVal) * chartH2;
-      doc.line(x1, y1, x2, y2v);
+      // Draw dashed: only even-index segments
+      if (i % 2 === 0) doc.line(x1, y1, x2, y2v);
     }
     // Legend
-    doc.setFontSize(5); doc.setTextColor(27, 87, 69);
-    doc.text("-- Actual (with OT)", chartX + chartW2 - 50, chartY2 - 2);
-    doc.setTextColor(150, 150, 150);
-    doc.text("-- Base rate only", chartX + chartW2 - 22, chartY2 - 2);
+    doc.setFontSize(5);
+    doc.setDrawColor(27, 87, 69); doc.setLineWidth(0.8);
+    doc.line(chartX + chartW2 - 55, chartY2 - 3, chartX + chartW2 - 48, chartY2 - 3);
+    doc.setTextColor(27, 87, 69);
+    doc.text("Actual (with OT)", chartX + chartW2 - 46, chartY2 - 1.5);
+    doc.setDrawColor(120, 120, 120); doc.setLineWidth(0.5);
+    doc.line(chartX + chartW2 - 25, chartY2 - 3, chartX + chartW2 - 21, chartY2 - 3);
+    doc.line(chartX + chartW2 - 19, chartY2 - 3, chartX + chartW2 - 15, chartY2 - 3);
+    doc.setTextColor(120, 120, 120);
+    doc.text("Base rate only", chartX + chartW2 - 13, chartY2 - 1.5);
 
     doc.setLineWidth(0.2); doc.setDrawColor(220, 220, 220); doc.setTextColor(0, 0, 0);
     y = chartY2 + chartH2 + 8;
   }
 
-  // ── Pie chart (drawn as a simple legend — jsPDF can't easily do pies)
-  checkPage(25);
+  // ── Cost Breakdown (horizontal stacked bar + legend)
+  checkPage(30);
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
   doc.text("Cost Breakdown", M, y); y += 5;
   const total = result.pieData.reduce((s, d) => s + d.value, 0);
+  if (total > 0) {
+    // Draw horizontal stacked bar
+    const barX = M, barW = CW, barH2 = 6;
+    let bx = barX;
+    result.pieData.forEach((d) => {
+      const segW = (d.value / total) * barW;
+      if (segW > 0) {
+        const cr = parseInt(d.colour.slice(1, 3), 16);
+        const cg = parseInt(d.colour.slice(3, 5), 16);
+        const cb = parseInt(d.colour.slice(5, 7), 16);
+        doc.setFillColor(cr, cg, cb);
+        doc.rect(bx, y, segW, barH2, "F");
+        bx += segW;
+      }
+    });
+    y += barH2 + 3;
+  }
+  // Legend items
   result.pieData.forEach((d) => {
     checkPage(6);
     const pct = total > 0 ? (d.value / total) * 100 : 0;
@@ -619,9 +693,9 @@ async function exportPDF(
     doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
     doc.text(
       "Overtime cost analysis. Working Time Regulations 1998 limits apply. This is a planning tool -- verify rates with payroll/HR. Actual on-costs may vary.",
-      M, 290
+      M, 287
     );
-    doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, 290);
+    doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, 291);
   }
 
   doc.save(`overtime-cost-analysis-${todayISO()}.pdf`);
