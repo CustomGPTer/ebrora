@@ -194,7 +194,7 @@ export function calculateItem(item: PlantItem): ItemResult {
   }
 
   // Cumulative cost curves (weekly)
-  const maxWeeks = Math.min(Math.max(item.projectDurationWeeks * 2, 52), 260);
+  const maxWeeks = Math.max(item.projectDurationWeeks + Math.round(item.projectDurationWeeks * 0.3), 52);
   const cumulativeHire: number[] = [];
   const cumulativeOwn: number[] = [];
   for (let w = 0; w <= maxWeeks; w++) {
