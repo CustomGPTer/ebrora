@@ -33,7 +33,7 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
         setModalData({ used, limit, tier });
         setUsageOk(remaining > 0);
       })
-      .catch(() => setUsageOk(true));
+      .catch(() => setUsageOk(null));
   }, [sessionStatus]);
 
   const handleDownload = useCallback(async () => {
@@ -52,6 +52,32 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
     setStatus("loading");
 
     try {
+      // 0. Record download FIRST — server enforces tier limits
+      const usageRes = await fetch("/api/downloads/usage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentType: "TOOLBOX_TALK" }),
+      });
+
+      if (usageRes.status === 429) {
+        const data = await usageRes.json();
+        setModalData({ used: data.used, limit: data.limit, tier: data.tier });
+        setUsageOk(false);
+        setShowModal(true);
+        setStatus("idle");
+        return;
+      }
+
+      if (!usageRes.ok) {
+        throw new Error("Usage check failed");
+      }
+
+      const usageData = await usageRes.json();
+      if (usageData?.tbt) {
+        setModalData({ used: usageData.tbt.used, limit: usageData.tbt.limit, tier: usageData.tier });
+        setUsageOk(usageData.tbt.remaining > 0);
+      }
+
       // 1. Create hidden iframe — NO ?print param (that triggers window.print)
       const iframe = document.createElement("iframe");
       iframe.style.cssText = "position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;opacity:0;pointer-events:none;";
@@ -133,28 +159,6 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
       // 9. Clean up iframe
       document.body.removeChild(iframe);
 
-      // 10. Record download (fire-and-forget)
-      fetch("/api/downloads/usage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: "TOOLBOX_TALK" }),
-      })
-        .then((res) => {
-          if (res.status === 429) {
-            return res.json().then((data) => {
-              setModalData({ used: data.used, limit: data.limit, tier: data.tier });
-              setUsageOk(false);
-            });
-          }
-          return res.json().then((data) => {
-            if (data?.tbt) {
-              setModalData({ used: data.tbt.used, limit: data.tbt.limit, tier: data.tier });
-              setUsageOk(data.tbt.remaining > 0);
-            }
-          });
-        })
-        .catch(() => {});
-
       setStatus("idle");
     } catch (err) {
       console.error("TBT PDF generation error:", err);
@@ -162,6 +166,8 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
       const staleIframe = document.querySelector("iframe[style*='-9999px']");
       if (staleIframe) staleIframe.remove();
       setStatus("error");
+      // TODO: consider refunding the download credit if PDF generation fails
+      // e.g. POST /api/downloads/usage/undo { contentType: "TOOLBOX_TALK" }
       // Reset error state after 3 seconds so user can retry
       setTimeout(() => setStatus("idle"), 3000);
     }
