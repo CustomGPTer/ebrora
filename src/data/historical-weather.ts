@@ -5,6 +5,7 @@
 // ─── Types ───────────────────────────────────────────────────
 export type ViewMode = "day" | "week" | "month";
 export type WindUnit = "mph" | "kmh";
+export type ToolMode = "historical" | "planning";
 
 export interface UKTown {
   name: string;
@@ -558,4 +559,363 @@ export function computeSummary(days: DayWeather[]): WeatherResult["summary"] {
     tempDelta: actualAvgTemp - baseAvgTemp,
     rainDelta: actualTotalRain - baseAvgRain,
   };
+}
+
+// ─── Planning Mode Types & Functions ─────────────────────────
+
+export const WIND_THRESHOLDS_KMH = [
+  { kmh: 40.2, mph: 25, label: "Crane operations", colour: "#EAB308" },
+  { kmh: 56.3, mph: 35, label: "MEWP limit", colour: "#F97316" },
+  { kmh: 72.4, mph: 45, label: "Site closure", colour: "#EF4444" },
+];
+
+export interface PlanningDay {
+  date: string;           // target YYYY-MM-DD
+  mmdd: string;           // MM-DD
+  isWorkingDay: boolean;
+  // Temperature
+  avgHighC: number;
+  avgLowC: number;
+  rangeHighC: [number, number];   // [min high, max high] across years
+  rangeLowC: [number, number];    // [min low, max low] across years
+  // Precipitation
+  avgRainMm: number;
+  rainProbability: number;         // 0-100%
+  maxRainMm: number;
+  // Wind (stored in kmh)
+  avgWindKmh: number;
+  maxWindKmh: number;
+  windExceedance: { kmh: number; mph: number; label: string; percent: number }[];
+  // Other
+  avgHumidity: number;
+  avgCloudCover: number;
+  frostProbability: number;        // 0-100%
+  dominantWeatherCode: number;
+  yearsOfData: number;
+}
+
+export interface PlanningWeekSummary {
+  weekNum: number;
+  startDate: string;
+  endDate: string;
+  days: PlanningDay[];
+  avgHighC: number;
+  avgLowC: number;
+  avgRainMm: number;
+  rainDaysAvg: number;
+  rainProbability: number;
+  frostProbability: number;
+  avgWindKmh: number;
+  windExceedance: { kmh: number; mph: number; label: string; percent: number }[];
+}
+
+export interface BestWindow {
+  startDate: string;
+  endDate: string;
+  days: number;
+  score: number;         // lower is better
+  avgHighC: number;
+  rainProbability: number;
+  frostProbability: number;
+  avgWindKmh: number;
+}
+
+export interface PlanningResult {
+  location: UKTown;
+  view: ViewMode;
+  startDate: string;
+  endDate: string;
+  avgPeriod: [number, number];
+  days: PlanningDay[];
+  weekSummaries: PlanningWeekSummary[];
+  bestWindows: BestWindow[];
+  confidence: { level: "high" | "moderate" | "low"; years: number; label: string };
+  summary: {
+    avgHighC: number;
+    avgLowC: number;
+    avgRainMm: number;
+    rainProbability: number;
+    rainDaysAvg: number;
+    frostProbability: number;
+    avgWindKmh: number;
+    windExceedance: { kmh: number; mph: number; label: string; percent: number }[];
+    dominantWeatherCode: number;
+    avgHumidity: number;
+    avgCloudCover: number;
+  };
+}
+
+export function isWorkingDay(dateStr: string): boolean {
+  const d = new Date(dateStr + "T12:00:00");
+  const day = d.getDay();
+  return day >= 1 && day <= 5;
+}
+
+export function getDateRangePlanning(date: string, view: ViewMode): [string, string] {
+  const d = new Date(date + "T12:00:00");
+  if (view === "day") return [date, date];
+  if (view === "week") {
+    const start = new Date(d); start.setDate(d.getDate() - 3);
+    const end = new Date(d); end.setDate(d.getDate() + 3);
+    return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+  }
+  const yr = d.getFullYear(), mo = d.getMonth();
+  const start = new Date(yr, mo, 1);
+  const end = new Date(yr, mo + 1, 0);
+  return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
+}
+
+export function getConfidence(years: number): PlanningResult["confidence"] {
+  if (years >= 15) return { level: "high", years, label: `Based on ${years} years of data — high confidence` };
+  if (years >= 8) return { level: "moderate", years, label: `Based on ${years} years of data — moderate confidence` };
+  return { level: "low", years, label: `Based on ${years} years of data — low confidence` };
+}
+
+/** Fetch planning data: for each target date, gather the same MM-DD across baseline years */
+export async function fetchPlanningData(
+  lat: number, lon: number, targetDates: string[], avgStart: number, avgEnd: number, rainThreshold: number
+): Promise<Map<string, PlanningDay>> {
+  const result = new Map<string, PlanningDay>();
+  const mmddSet = new Set(targetDates.map(d => d.slice(5)));
+  const months = [...mmddSet].map(d => parseInt(d.slice(0, 2)));
+  const startMM = Math.min(...months);
+  const endMM = Math.max(...months);
+  const sd = String(startMM).padStart(2, "0");
+  const ed = String(endMM).padStart(2, "0");
+
+  const currentYear = new Date().getFullYear();
+  const today = new Date().toISOString().slice(0, 10);
+  const endY = Math.min(avgEnd, currentYear);
+
+  // Per MM-DD accumulator
+  type Accum = {
+    highs: number[]; lows: number[]; rains: number[];
+    winds: number[]; humids: number[]; clouds: number[];
+    codes: number[];
+  };
+  const accum: Record<string, Accum> = {};
+  for (const mmdd of mmddSet) {
+    accum[mmdd] = { highs: [], lows: [], rains: [], winds: [], humids: [], clouds: [], codes: [] };
+  }
+
+  // Fetch in 5-year parallel chunks
+  const CHUNK = 5;
+  const chunks: [string, string][] = [];
+  for (let yr = avgStart; yr <= endY; yr += CHUNK) {
+    const chunkEnd = Math.min(yr + CHUNK - 1, endY);
+    const lastDay = new Date(chunkEnd, endMM, 0).getDate();
+    let endDate = `${chunkEnd}-${ed}-${lastDay}`;
+    if (endDate > today) endDate = today;
+    chunks.push([`${yr}-${sd}-01`, endDate]);
+  }
+
+  const responses = await Promise.allSettled(
+    chunks.map(([s, e]) => fetchWeather(lat, lon, s, e))
+  );
+
+  for (const res of responses) {
+    if (res.status !== "fulfilled") continue;
+    const dayMap = extractDayData(res.value);
+    for (const [dateStr, entry] of dayMap) {
+      const mmdd = dateStr.slice(5);
+      if (!accum[mmdd]) continue;
+      const a = accum[mmdd];
+      if (entry.tempHighC !== null) a.highs.push(entry.tempHighC);
+      if (entry.tempLowC !== null) a.lows.push(entry.tempLowC);
+      a.rains.push(entry.totalPrecipMm);
+      const v = entry.values;
+      if (v.windKmh !== null && v.windKmh !== undefined) a.winds.push(v.windKmh as number);
+      if (v.humidity !== null && v.humidity !== undefined) a.humids.push(v.humidity as number);
+      if (v.cloudCover !== null && v.cloudCover !== undefined) a.clouds.push(v.cloudCover as number);
+      if (v.weatherCode !== null && v.weatherCode !== undefined) a.codes.push(v.weatherCode as number);
+    }
+  }
+
+  const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+  const pct = (arr: number[], test: (v: number) => boolean) => arr.length > 0 ? (arr.filter(test).length / arr.length) * 100 : 0;
+  const dominant = (arr: number[]) => {
+    const freq: Record<number, number> = {};
+    arr.forEach(c => { freq[c] = (freq[c] || 0) + 1; });
+    return parseInt(Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "3");
+  };
+
+  for (const td of targetDates) {
+    const mmdd = td.slice(5);
+    const a = accum[mmdd];
+    if (!a) continue;
+
+    const windExceedance = WIND_THRESHOLDS_KMH.map(t => ({
+      ...t,
+      percent: pct(a.winds, w => w >= t.kmh),
+    }));
+
+    result.set(td, {
+      date: td,
+      mmdd,
+      isWorkingDay: isWorkingDay(td),
+      avgHighC: avg(a.highs),
+      avgLowC: avg(a.lows),
+      rangeHighC: a.highs.length ? [Math.min(...a.highs), Math.max(...a.highs)] : [0, 0],
+      rangeLowC: a.lows.length ? [Math.min(...a.lows), Math.max(...a.lows)] : [0, 0],
+      avgRainMm: avg(a.rains),
+      rainProbability: pct(a.rains, r => r >= rainThreshold),
+      maxRainMm: a.rains.length ? Math.max(...a.rains) : 0,
+      avgWindKmh: avg(a.winds),
+      maxWindKmh: a.winds.length ? Math.max(...a.winds) : 0,
+      windExceedance,
+      avgHumidity: avg(a.humids),
+      avgCloudCover: avg(a.clouds),
+      frostProbability: pct(a.lows, t => t <= 0),
+      dominantWeatherCode: dominant(a.codes),
+      yearsOfData: a.highs.length,
+    });
+  }
+
+  return result;
+}
+
+/** Build weekly summaries from planning days */
+export function buildWeekSummaries(days: PlanningDay[]): PlanningWeekSummary[] {
+  const weeks: PlanningWeekSummary[] = [];
+  for (let i = 0; i < days.length; i += 7) {
+    const chunk = days.slice(i, i + 7);
+    if (chunk.length === 0) continue;
+    const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+    const allWindExc = WIND_THRESHOLDS_KMH.map(t => ({
+      ...t,
+      percent: avg(chunk.map(d => d.windExceedance.find(w => w.kmh === t.kmh)?.percent ?? 0)),
+    }));
+    weeks.push({
+      weekNum: weeks.length + 1,
+      startDate: chunk[0].date,
+      endDate: chunk[chunk.length - 1].date,
+      days: chunk,
+      avgHighC: avg(chunk.map(d => d.avgHighC)),
+      avgLowC: avg(chunk.map(d => d.avgLowC)),
+      avgRainMm: avg(chunk.map(d => d.avgRainMm)),
+      rainDaysAvg: avg(chunk.map(d => d.rainProbability)) / 100 * chunk.length,
+      rainProbability: avg(chunk.map(d => d.rainProbability)),
+      frostProbability: avg(chunk.map(d => d.frostProbability)),
+      avgWindKmh: avg(chunk.map(d => d.avgWindKmh)),
+      windExceedance: allWindExc,
+    });
+  }
+  return weeks;
+}
+
+/** Find best consecutive working-day windows */
+export function findBestWindows(days: PlanningDay[], windowSize: number, workingDaysOnly: boolean): BestWindow[] {
+  const filtered = workingDaysOnly ? days.filter(d => d.isWorkingDay) : days;
+  if (filtered.length < windowSize) return [];
+
+  const windows: BestWindow[] = [];
+  const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+
+  for (let i = 0; i <= filtered.length - windowSize; i++) {
+    const chunk = filtered.slice(i, i + windowSize);
+    const rainProb = avg(chunk.map(d => d.rainProbability));
+    const frostProb = avg(chunk.map(d => d.frostProbability));
+    const windAvg = avg(chunk.map(d => d.avgWindKmh));
+    // Score: lower = better. Heavily penalise rain and frost.
+    const score = rainProb * 2 + frostProb * 3 + windAvg * 0.5;
+    windows.push({
+      startDate: chunk[0].date,
+      endDate: chunk[chunk.length - 1].date,
+      days: windowSize,
+      score,
+      avgHighC: avg(chunk.map(d => d.avgHighC)),
+      rainProbability: rainProb,
+      frostProbability: frostProb,
+      avgWindKmh: windAvg,
+    });
+  }
+
+  return windows.sort((a, b) => a.score - b.score).slice(0, 3);
+}
+
+/** Compute planning summary across all days */
+export function computePlanningSummary(days: PlanningDay[]): PlanningResult["summary"] {
+  const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+  const allWindExc = WIND_THRESHOLDS_KMH.map(t => ({
+    ...t,
+    percent: avg(days.map(d => d.windExceedance.find(w => w.kmh === t.kmh)?.percent ?? 0)),
+  }));
+  const codes = days.map(d => d.dominantWeatherCode);
+  const freq: Record<number, number> = {};
+  codes.forEach(c => { freq[c] = (freq[c] || 0) + 1; });
+  const dominant = parseInt(Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "3");
+
+  return {
+    avgHighC: avg(days.map(d => d.avgHighC)),
+    avgLowC: avg(days.map(d => d.avgLowC)),
+    avgRainMm: avg(days.map(d => d.avgRainMm)),
+    rainProbability: avg(days.map(d => d.rainProbability)),
+    rainDaysAvg: days.filter(d => d.rainProbability >= 50).length,
+    frostProbability: avg(days.map(d => d.frostProbability)),
+    avgWindKmh: avg(days.map(d => d.avgWindKmh)),
+    windExceedance: allWindExc,
+    dominantWeatherCode: dominant,
+    avgHumidity: avg(days.map(d => d.avgHumidity)),
+    avgCloudCover: avg(days.map(d => d.avgCloudCover)),
+  };
+}
+
+/** Export planning data as CSV for programme integration */
+export function planningToCSV(days: PlanningDay[], windUnit: WindUnit): string {
+  const wu = windUnit === "mph" ? "mph" : "km/h";
+  const wv = (kmh: number) => windUnit === "mph" ? kmhToMph(kmh).toFixed(1) : kmh.toFixed(1);
+  const header = [
+    "Date", "Day", "Working Day", `Avg High (C)`, `Avg Low (C)`,
+    "High Range Min (C)", "High Range Max (C)", `Avg Rain (mm)`, "Rain Prob (%)",
+    `Avg Wind (${wu})`, `Max Wind (${wu})`,
+    "Crane Risk (%)", "MEWP Risk (%)", "Site Closure Risk (%)",
+    "Frost Prob (%)", "Humidity (%)", "Cloud (%)", "Conditions",
+  ].join(",");
+
+  const rows = days.map(d => {
+    const dayName = new Date(d.date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short" });
+    const crane = d.windExceedance.find(w => w.mph === 25)?.percent ?? 0;
+    const mewp = d.windExceedance.find(w => w.mph === 35)?.percent ?? 0;
+    const closure = d.windExceedance.find(w => w.mph === 45)?.percent ?? 0;
+    return [
+      d.date, dayName, d.isWorkingDay ? "Yes" : "No",
+      d.avgHighC.toFixed(1), d.avgLowC.toFixed(1),
+      d.rangeHighC[0].toFixed(1), d.rangeHighC[1].toFixed(1),
+      d.avgRainMm.toFixed(1), d.rainProbability.toFixed(0),
+      wv(d.avgWindKmh), wv(d.maxWindKmh),
+      crane.toFixed(0), mewp.toFixed(0), closure.toFixed(0),
+      d.frostProbability.toFixed(0), d.avgHumidity.toFixed(0), d.avgCloudCover.toFixed(0),
+      `"${getWMO(d.dominantWeatherCode).description}"`,
+    ].join(",");
+  });
+
+  return [header, ...rows].join("\n");
+}
+
+/** Export historical data as CSV */
+export function historicalToCSV(days: DayWeather[], windUnit: WindUnit): string {
+  const wu = windUnit === "mph" ? "mph" : "km/h";
+  const wv = (kmh: number | null) => kmh === null ? "" : (windUnit === "mph" ? kmhToMph(kmh).toFixed(1) : kmh.toFixed(1));
+  const header = [
+    "Date", "Day", `High (C)`, `Low (C)`, `Wind (${wu})`, "Rain (mm)",
+    "Humidity (%)", "Cloud (%)", "Conditions",
+    "Avg High (C)", "Avg Rain (mm)",
+  ].join(",");
+
+  const rows = days.map(d => {
+    const dayName = new Date(d.date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short" });
+    return [
+      d.date, dayName,
+      d.tempC !== null ? d.tempC.toFixed(1) : "",
+      d.tempMinC !== null ? d.tempMinC.toFixed(1) : "",
+      wv(d.windKmh), d.precipMm !== null ? d.precipMm.toFixed(1) : "",
+      d.humidity !== null ? Math.round(d.humidity) : "",
+      d.cloudCover !== null ? Math.round(d.cloudCover) : "",
+      `"${getWMO(d.weatherCode).description}"`,
+      d.avgTempC !== null ? d.avgTempC.toFixed(1) : "",
+      d.avgPrecipMm !== null ? d.avgPrecipMm.toFixed(1) : "",
+    ].join(",");
+  });
+
+  return [header, ...rows].join("\n");
 }
