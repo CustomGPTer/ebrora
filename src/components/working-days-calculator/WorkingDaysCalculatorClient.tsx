@@ -270,6 +270,30 @@ async function exportPDF(
   doc.text(`${result.totalCalendarDays} calendar days | ${result.weekendDays} weekends | ${result.bankHolidays} bank holidays | ${result.customExclusionDays} exclusions`, M + 5, y + 11);
   doc.setTextColor(0, 0, 0); y += 20;
 
+  // ── Stat cards
+  {
+    const cardW = (CW - 6) / 4, cardH = 14;
+    const cards: { label: string; value: string; sub: string; rgb: number[] }[] = [
+      { label: "Working Days", value: String(result.netWorkingDays), sub: `of ${result.totalCalendarDays} calendar days`, rgb: [22, 163, 74] },
+      { label: "Programme Weeks", value: String(result.programmeWeeks), sub: "Working days / 5", rgb: [59, 130, 246] },
+      { label: "Working %", value: `${result.workingDaysPct}%`, sub: `${result.weekendDays} wkds + ${result.bankHolidays} BH`, rgb: [124, 58, 237] },
+      { label: "Exclusions", value: String(result.bankHolidays + result.customExclusionDays), sub: `${result.bankHolidays} BH + ${result.customExclusionDays} custom`, rgb: [234, 179, 8] },
+    ];
+    cards.forEach((c, ci) => {
+      const cx = M + ci * (cardW + 2);
+      doc.setFillColor(c.rgb[0], c.rgb[1], c.rgb[2]);
+      doc.roundedRect(cx, y, cardW, cardH, 1.5, 1.5, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "bold");
+      doc.text(c.label.toUpperCase(), cx + 3, y + 4);
+      doc.setFontSize(9); doc.text(c.value, cx + 3, y + 9);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "normal");
+      doc.text(c.sub, cx + 3, y + 12.5);
+    });
+    doc.setTextColor(0, 0, 0);
+    y += cardH + 6;
+  }
+
   // Summary panel
   checkPage(45);
   doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
@@ -385,7 +409,14 @@ async function exportPDF(
     doc.text("Monthly Working Days Breakdown", M, y);
     doc.setFontSize(6); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
     doc.text("Stacked bar showing composition of each month's calendar days.", M, y + 4);
-    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); y += 8;
+    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); y += 7;
+    // Legend
+    doc.setFontSize(4.5);
+    doc.setFillColor(27, 87, 69); doc.rect(M, y, 4, 2.5, "F"); doc.setTextColor(27, 87, 69); doc.text("Working", M + 5, y + 2);
+    doc.setFillColor(203, 213, 225); doc.rect(M + 25, y, 4, 2.5, "F"); doc.setTextColor(120, 120, 120); doc.text("Weekends", M + 30, y + 2);
+    doc.setFillColor(147, 197, 253); doc.rect(M + 55, y, 4, 2.5, "F"); doc.setTextColor(59, 130, 246); doc.text("Bank Hols", M + 60, y + 2);
+    doc.setFillColor(252, 165, 165); doc.rect(M + 86, y, 4, 2.5, "F"); doc.setTextColor(239, 68, 68); doc.text("Exclusions", M + 91, y + 2);
+    doc.setTextColor(0, 0, 0); y += 5;
 
     const barH2 = 4.5, barGap = 1.5;
     const maxCal = Math.max(...result.monthSummaries.map(m => m.calendarDays));
@@ -495,8 +526,8 @@ async function exportPDF(
   const pageCount = doc.getNumberOfPages();
   for (let p = 1; p <= pageCount; p++) {
     doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Working days calculation based on published UK bank holiday dates. Verify exceptional holidays (coronations, state funerals). This is a planning tool -- programme durations should be confirmed.", M, 290);
-    doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 290);
+    doc.text("Working days calculation based on published UK bank holiday dates. Verify exceptional holidays (coronations, state funerals). This is a planning tool -- programme durations should be confirmed.", M, 287);
+    doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 291);
   }
   doc.save(`working-days-calculation-${todayISO()}.pdf`);
 }
