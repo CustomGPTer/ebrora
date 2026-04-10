@@ -25,6 +25,7 @@ const TOOL_CATEGORIES = {
       "lone-worker-risk-calculator",
       "fatigue-risk-calculator",
       "first-aid-needs-calculator",
+      "working-at-height-calculator",
     ]),
   },
   "Temporary Works": {
@@ -221,6 +222,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "ecological-exclusion-zone-checker": { icon: "🦎", accent: "#16A34A", accentLight: "rgba(22,163,74,0.08)" },
   "coordinate-converter": { icon: "📍", accent: "#0284C7", accentLight: "rgba(2,132,199,0.08)" },
   "historical-weather": { icon: "🌦️", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
+  "working-at-height-calculator": { icon: "🪜", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -241,6 +243,7 @@ const PAID_TOOL_SLUGS = new Set([
   "daywork-rate-calculator",
   "plant-hire-comparator",
   "historical-weather",
+  "working-at-height-calculator",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
