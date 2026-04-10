@@ -36,6 +36,18 @@ const TOOL_CATEGORIES = {
       "formwork-pressure-calculator",
     ]),
   },
+  "Concrete": {
+    icon: "🧱",
+    accent: "#78716C",
+    accentLight: "rgba(120,113,108,0.08)",
+    slugs: new Set([
+      "concrete-volume-calculator",
+      "concrete-pour-planner",
+      "concrete-curing-estimator",
+      "formwork-pressure-calculator",
+      "historical-weather",
+    ]),
+  },
   "Materials & Quantities": {
     icon: "🧱",
     accent: "#B45309",
@@ -73,9 +85,6 @@ const TOOL_CATEGORIES = {
       "drainage-pipe-flow-calculator",
       "soil-compaction-calculator",
       "plate-bearing-test-interpreter",
-      "excavation-spoil-calculator",
-      "trench-backfill-calculator",
-      "topsoil-calculator",
     ]),
   },
   "Programme & Commercial": {
@@ -89,7 +98,6 @@ const TOOL_CATEGORIES = {
       "daywork-rate-calculator",
       "overtime-cost-calculator",
       "historical-weather",
-      "plant-hire-comparator",
     ]),
   },
   "Environmental & Ecology": {
@@ -102,61 +110,7 @@ const TOOL_CATEGORIES = {
     icon: "⚡",
     accent: "#0284C7",
     accentLight: "rgba(2,132,199,0.08)",
-    slugs: new Set<string>([
-      "cable-trench-depth-checker",
-      "trench-backfill-calculator",
-      "drainage-pipe-flow-calculator",
-    ]),
-  },
-  "Surveying & Setting Out": {
-    icon: "📐",
-    accent: "#6D28D9",
-    accentLight: "rgba(109,40,217,0.08)",
-    slugs: new Set<string>(["coordinate-converter"]),
-  },
-  "Quality & Testing": {
-    icon: "🔬",
-    accent: "#0F766E",
-    accentLight: "rgba(15,118,110,0.08)",
-    slugs: new Set<string>([
-      "plate-bearing-test-interpreter",
-      "soil-compaction-calculator",
-      "cbr-modulus-converter",
-      "concrete-curing-estimator",
-      "concrete-pour-planner",
-    ]),
-  },
-  "Training & Competence": {
-    icon: "🎓",
-    accent: "#BE185D",
-    accentLight: "rgba(190,24,93,0.08)",
-    slugs: new Set<string>([
-      "first-aid-needs-calculator",
-      "plant-pre-use-checksheet",
-      "confined-space-calculator",
-    ]),
-  },
-  "Water & Wastewater": {
-    icon: "💧",
-    accent: "#1D4ED8",
-    accentLight: "rgba(29,78,216,0.08)",
-    slugs: new Set<string>([
-      "drainage-pipe-flow-calculator",
-      "confined-space-calculator",
-      "welfare-facilities-calculator",
-    ]),
-  },
-  "MEICA": {
-    icon: "🔧",
-    accent: "#475569",
-    accentLight: "rgba(71,85,105,0.08)",
-    slugs: new Set<string>([
-      "noise-exposure-calculator",
-      "hav-calculator",
-      "sling-swl-calculator",
-      "plant-pre-use-checksheet",
-      "confined-space-calculator",
-    ]),
+    slugs: new Set<string>(["cable-trench-depth-checker", "coordinate-converter"]),
   },
 } as const;
 
