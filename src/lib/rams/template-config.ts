@@ -190,6 +190,23 @@ export const TEMPLATE_CONFIGS: Record<TemplateSlug, TemplateConfig> = {
     ],
     keySections: ['Integrated Step-by-Step Table', 'Toolbox Talk Summary', 'Permit & Isolation Log', 'Supporting Information Only'],
   },
+  'risk-assessment-only': {
+    slug: 'risk-assessment-only',
+    displayName: 'Risk Assessment Only',
+    description: 'Standalone risk assessment without a method statement. Landscape 5×5 matrix with 15-column industry best practice layout including Consequence, Existing Controls, Additional Controls, Risk Owner, and Review Status. Minimum 20 risks per assessment.',
+    pageCount: 6,
+    scoringMethod: 'L_x_S',
+    thumbnailPath: '/rams-templates/thumb-risk-assessment-only.jpg',
+    previewPaths: [
+      '/rams-templates/preview-risk-assessment-only-p1.jpg',
+      '/rams-templates/preview-risk-assessment-only-p2.jpg',
+      '/rams-templates/preview-risk-assessment-only-p3.jpg',
+      '/rams-templates/preview-risk-assessment-only-p4.jpg',
+      '/rams-templates/preview-risk-assessment-only-p5.jpg',
+      '/rams-templates/preview-risk-assessment-only-p6.jpg',
+    ],
+    keySections: ['5×5 Risk Matrix with Descriptors', '15-Column Best Practice Hazard Table', 'Scope & Methodology', 'Risk Action Summary Dashboard', 'Legislative References'],
+  },
 };
 
 /** Ordered array for display in the template picker */
@@ -204,6 +221,7 @@ export const TEMPLATE_ORDER: TemplateSlug[] = [
   'rpn',
   'structured-checklist',
   'step-by-step',
+  'risk-assessment-only',
 ];
 
 /** Free tier: first 2 templates only — single source of truth */

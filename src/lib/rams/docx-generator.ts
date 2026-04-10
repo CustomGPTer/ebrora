@@ -13,6 +13,7 @@ import { buildTemplate07 } from './templates/template-07-compact';
 import { buildTemplate08 } from './templates/template-08-rpn';
 import { buildTemplate09 } from './templates/template-09-checklist';
 import { buildTemplate10 } from './templates/template-10-step-by-step';
+import { buildTemplate11 } from './templates/template-11-risk-assessment';
 
 const builders: Record<TemplateSlug, (content: any) => Promise<import('docx').Document>> = {
   'standard-5x5': buildTemplate01,
@@ -25,6 +26,7 @@ const builders: Record<TemplateSlug, (content: any) => Promise<import('docx').Do
   'rpn': buildTemplate08,
   'structured-checklist': buildTemplate09,
   'step-by-step': buildTemplate10,
+  'risk-assessment-only': buildTemplate11,
 };
 
 /**

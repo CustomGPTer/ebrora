@@ -305,11 +305,38 @@ export function getWordCountChecks(templateSlug: string, content: any): WordCoun
     'environmentalNarrative', 'wasteNarrative', 'pollutionPrevention',
     'emergencyNarrative', 'firstAid', 'welfareNarrative',
     'residualRiskManagement', 'hsfContributions', 'interfaces',
+    'scopeOfAssessment', 'legislativeReferences', 'assessmentMethodology',
   ];
 
   for (const field of hundredWordFields) {
     if (content[field] && typeof content[field] === 'string') {
       checks.push({ field, value: content[field], minimum: 100 });
+    }
+  }
+
+  // Template 11 (Risk Assessment Only) — per-row hazard field word counts
+  if (templateSlug === 'risk-assessment-only' && Array.isArray(content.hazards)) {
+    const rowMinimums: Array<{ key: string; label: string; min: number }> = [
+      { key: 'activity', label: 'Activity', min: 5 },
+      { key: 'hazard', label: 'Hazard', min: 15 },
+      { key: 'consequence', label: 'Consequence', min: 10 },
+      { key: 'whoAtRisk', label: 'Who at Risk', min: 8 },
+      { key: 'existingControls', label: 'Existing Controls', min: 40 },
+      { key: 'additionalControlMeasures', label: 'Additional Controls', min: 40 },
+    ];
+
+    for (const row of content.hazards) {
+      const ref = row.ref || '?';
+      for (const rm of rowMinimums) {
+        const val = row[rm.key];
+        if (typeof val === 'string') {
+          checks.push({
+            field: `Hazard ${ref} → ${rm.label}`,
+            value: val,
+            minimum: rm.min,
+          });
+        }
+      }
     }
   }
 

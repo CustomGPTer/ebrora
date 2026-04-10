@@ -2,7 +2,7 @@
 // RAMS Builder — Type Definitions
 // =============================================================================
 
-/** The 10 template slugs used internally */
+/** The 11 template slugs used internally */
 export type TemplateSlug =
   | 'standard-5x5'
   | 'simple-hml'
@@ -13,7 +13,8 @@ export type TemplateSlug =
   | 'compact'
   | 'rpn'
   | 'structured-checklist'
-  | 'step-by-step';
+  | 'step-by-step'
+  | 'risk-assessment-only';
 
 /** Risk scoring method used by a template */
 export type ScoringMethod = 'L_x_S' | 'HML' | 'L_x_S_x_D' | 'HML_INTEGRATED';
@@ -368,6 +369,40 @@ export interface Template10Content extends BaseDocumentContent {
   competencyRequirements: string;
 }
 
+/** Risk Assessment Only hazard row — industry best practice 14-column layout */
+export interface HazardRow_RA {
+  ref: string;
+  activity: string;
+  hazard: string;
+  consequence: string;
+  whoAtRisk: string;
+  existingControls: string;
+  likelihoodInitial: number;
+  severityInitial: number;
+  riskRatingInitial: number;
+  additionalControlMeasures: string;
+  likelihoodResidual: number;
+  severityResidual: number;
+  riskRatingResidual: number;
+  riskOwner: string;
+  reviewStatus: string;
+}
+
+export interface Template11Content extends BaseDocumentContent {
+  approvedBy: string;
+  reviewedBy: string;
+  workLocation: string;
+  principalContractor: string;
+  documentRef: string;
+  scopeOfAssessment: string;
+  legislativeReferences: string;
+  assessmentMethodology: string;
+  hazards: HazardRow_RA[];
+  riskActionSummary: Array<{ band: string; count: number; action: string }>;
+  monitoringArrangements: string;
+  competencyRequirements: string;
+}
+
 /** Union of all template content types */
 export type TemplateContent =
   | Template01Content
@@ -379,7 +414,8 @@ export type TemplateContent =
   | Template07Content
   | Template08Content
   | Template09Content
-  | Template10Content;
+  | Template10Content
+  | Template11Content;
 
 // =============================================================================
 // Generation record (maps to Prisma model)

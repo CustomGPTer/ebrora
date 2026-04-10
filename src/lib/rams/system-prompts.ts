@@ -80,6 +80,7 @@ TEMPLATE-SPECIFIC QUESTIONS TO INCLUDE:
 - rpn: Ask about detection methods for each hazard — how would you spot the hazard before it causes harm?
 - narrative: Ask for more descriptive detail about site conditions, access routes, and working environment.
 - compact: Keep questions focused on the 5 most critical hazards and their stop-work triggers.
+- risk-assessment-only: Focus entirely on hazard identification — dig deep into every activity. Ask about specific plant, substances, work-at-height scenarios, confined spaces, lifting operations, excavations, live services, hot works, manual handling, lone working, noise/vibration exposure, and environmental risks. Ask about existing controls already in place AND what additional controls are planned. Ask about who specifically is at risk for each activity. Ask for realistic worst-case consequences. This template has no method statement — every question must serve the risk assessment directly.
 
 3. NEVER repeat a question that has already been asked or answered.
 4. NEVER ask generic questions. Every question must be specific to the work described and the answers given.
@@ -198,6 +199,8 @@ export const TEMPLATE_SECTIONS: Record<TemplateSlug, string> = {
   'structured-checklist': 'Pre-Start Verification Checklist (10-row Y/N/NA checklist on front page). Risk assessment with Check Required and Verified columns. Hold Points & Inspection Schedule embedded between Sequence of Works and other MS sections. Task-Specific Safety Checklist (10-row daily checklist for supervisor). End-of-Shift Close-Down Checklist (6 rows). Standard L×S scoring. Method statement with 10 sections plus the three embedded checklists.',
 
   'step-by-step': 'No separate RA and MS. Single Integrated Step-by-Step Method & Risk Assessment table (9 columns: Step, Work Instruction, Hazards at Step, Who, Risk H/M/L, Controls, Residual H/M/L, Responsible, PPE for Step). 20 integrated rows. Toolbox Talk Step Summary (10-row condensed table: Step, What We Are Doing, Key Hazard, Critical Control). Permit & Isolation Log linked to step numbers. Supporting Information section (not full MS): Interfaces, Temporary Works, PPE Summary, Environmental, Waste, Emergency, Welfare, Competency.',
+
+  'risk-assessment-only': 'Standalone risk assessment — no method statement. Portrait cover page with project info, scope of assessment, legislative references, and assessment methodology. Landscape risk assessment section with enhanced 5×5 risk matrix including full descriptors for both Likelihood and Severity scales, colour-coded legend, and action band definitions. 15-column industry best practice hazard table: Ref, Activity/Task, Hazard Description, Potential Consequence, Persons at Risk, Existing Controls, Initial L, Initial S, Initial Risk Rating, Additional Control Measures Required, Residual L, Residual S, Residual Risk Rating, Risk Owner, Review Status. All risk score cells colour-coded. Risk Action Summary dashboard showing count of risks per band. Monitoring arrangements and competency requirements as supporting sections. Minimum 20 hazard rows.',
 };
 
 // ---------------------------------------------------------------------------
@@ -539,6 +542,98 @@ JSON SCHEMA:
 }
 
 Min 20 integrated steps. Toolbox talk: 10 rows covering the most critical steps. Permit log: minimum 3 rows (or more if permits are relevant). Each step's work instruction must be detailed enough for an operative to follow.`,
+
+  'risk-assessment-only': `${baseDocGenInstructions()}
+
+TEMPLATE: Risk Assessment Only (standalone — no method statement)
+SCORING: Likelihood (1-5) × Severity (1-5) = Risk Rating (1-25)
+
+This is a STANDALONE RISK ASSESSMENT. There is NO method statement section. Focus 100% of your expertise on producing the most comprehensive, detailed, industry-leading risk assessment possible.
+
+CRITICAL DIFFERENCES FROM OTHER TEMPLATES:
+- NO sequenceOfWorks field. Do NOT generate one.
+- NO ppeRequirements, environmentalConsiderations, wasteManagement, emergencyProcedures, welfareFacilities, communicationArrangements, or temporaryWorks fields.
+- Instead, generate: scopeOfAssessment, legislativeReferences, assessmentMethodology, monitoringArrangements, competencyRequirements.
+- The hazard table uses a 15-column INDUSTRY BEST PRACTICE layout with Consequence, Existing Controls, and Additional Control Measures as separate columns.
+
+HAZARD ROW QUALITY RULES:
+1. Minimum 20 hazard rows. More is better for complex tasks — generate up to 30 if the work warrants it.
+2. "existingControls" = controls ALREADY IN PLACE before any additional measures (e.g. "Site induction completed, operative holds CPCS card, machine fitted with ROPS/FOPS").
+3. "additionalControlMeasures" = NEW controls required to reduce the risk further (e.g. "Install edge protection to BS EN 13374 Class A, brief all operatives on fall rescue procedure").
+4. "consequence" = the realistic worst-case outcome (e.g. "Fatal crush injury", "Permanent hearing loss", "RIDDOR-reportable fracture", "Environmental prosecution under EPA 1990").
+5. "riskOwner" = specific role responsible (e.g. "Site Manager", "Lifting Supervisor", "COSHH Assessor") — NEVER "All" or "Everyone".
+6. "reviewStatus" = "Pending" for all rows (user fills in on site).
+7. Existing controls should bring the initial rating DOWN from what it would be with no controls at all. Additional controls should bring it down further to the residual rating.
+8. Every hazard row must have DETAILED, SPECIFIC control measures. Generic phrases like "Follow safe system of work" or "Use appropriate PPE" are NOT acceptable.
+
+═══════════════════════════════════════════════════════
+PER-FIELD MINIMUM WORD COUNTS — ENFORCED ON EVERY ROW:
+═══════════════════════════════════════════════════════
+These minimums are HARD REQUIREMENTS. Your response WILL BE REJECTED AND RETRIED if any row falls below these thresholds:
+
+- "activity": min 5 words — Clearly identify the specific work activity or task step. NOT just "Excavation" — write "Excavation of service trench using 8T excavator".
+- "hazard": min 15 words — Full hazard description. NOT just "Falls from height" — write "Unprotected leading edge at first floor level during steel erection, risk of fall to ground level (4.2m drop)".
+- "consequence": min 10 words — Realistic worst-case outcome with injury type and severity. NOT just "Injury" — write "Fatal head injury from fall to concrete slab at ground level, or multiple fractures requiring hospitalisation".
+- "whoAtRisk": min 8 words — Name specific persons and roles at risk. NOT just "Operatives" — write "Steel erectors on platform, banksman at ground level, adjacent trades within fall zone".
+- "existingControls": min 40 words — Comprehensive list of controls already in place BEFORE additional measures. Include training held, certifications, equipment features, existing procedures, site rules. Each control should be a specific, verifiable fact.
+- "additionalControlMeasures": min 40 words — Comprehensive list of NEW additional controls to be implemented. Reference specific standards (BS EN, HSG, INDG), equipment specifications, inspection regimes, frequencies, and responsible persons. Each control must be actionable and auditable.
+
+EXAMPLE OF A COMPLIANT ROW:
+- activity (7 words): "Excavation of 2.5m deep service trench"
+- hazard (22 words): "Collapse of unsupported trench walls due to unstable ground conditions (made ground over clay), burying operative working at trench base"
+- consequence (18 words): "Fatal crush asphyxiation from burial, or RIDDOR-reportable serious injury including multiple fractures, spinal compression, internal organ damage"
+- whoAtRisk (14 words): "Excavator operator, banksman directing operations, pipe layer working in trench, adjacent workforce within collapse zone"
+- existingControls (48 words): "Excavator operator holds CPCS A59 ticket with current CPC. Ground investigation report reviewed identifying made ground to 1.8m over stiff clay. CAT4 and Genny scan completed with service locations marked. Operatives inducted on site excavation procedures. Daily briefing covers excavation safety. Ladder access provided at 15m intervals."
+- additionalControlMeasures (52 words): "Trench box system rated to 3.0m depth installed before any operative enters excavation. Trench inspected by competent person before each shift and after rainfall in accordance with HSG185. Edge protection barriers positioned 1m from trench edge on both sides. No materials stored within 1.5m of excavation edge. Stop work if water ingress observed — dewater before re-entry."
+
+JSON SCHEMA:
+{
+  "projectName": "string",
+  "siteAddress": "string",
+  "clientName": "string",
+  "contractorName": "string",
+  "principalContractor": "string",
+  "workLocation": "string",
+  "documentRef": "string (format: RA-XXXX-001)",
+  "dateOfAssessment": "string (DD/MM/YYYY)",
+  "reviewDate": "string (DD/MM/YYYY, 6 months from assessment)",
+  "preparedBy": "string",
+  "reviewedBy": "string",
+  "approvedBy": "string",
+  "taskDescription": "string (min 100 words — detailed description of the work being assessed)",
+  "scopeOfAssessment": "string (min 150 words — define the boundaries of this assessment: what activities are included, what is excluded, physical boundaries, duration, interfaces with other work)",
+  "legislativeReferences": "string (min 100 words — list all applicable legislation, ACOPs, and standards. E.g. Health and Safety at Work etc. Act 1974, Management of Health and Safety at Work Regulations 1999, CDM Regulations 2015, Work at Height Regulations 2005, LOLER 1998, PUWER 1998, COSHH 2002, etc. Only include those RELEVANT to the specific work being assessed.)",
+  "assessmentMethodology": "string (min 100 words — describe the 5×5 L×S methodology, how scores are derived, what the action bands mean, and the hierarchy of controls applied)",
+  "hazards": [
+    {
+      "ref": "string (RA-01, RA-02...)",
+      "activity": "string (min 5 words — the specific work activity or task step)",
+      "hazard": "string (min 15 words — clear, specific hazard description with context)",
+      "consequence": "string (min 10 words — realistic worst-case outcome including injury type and severity)",
+      "whoAtRisk": "string (min 8 words — specific persons and roles, not generic groups)",
+      "existingControls": "string (min 40 words — controls already in place: training, certification, equipment features, site rules)",
+      "likelihoodInitial": "number (1-5, WITH existing controls in place)",
+      "severityInitial": "number (1-5)",
+      "riskRatingInitial": "number (L×S)",
+      "additionalControlMeasures": "string (min 40 words — NEW additional controls with standards references, specifications, and responsible persons)",
+      "likelihoodResidual": "number (1-5, AFTER additional controls implemented)",
+      "severityResidual": "number (1-5)",
+      "riskRatingResidual": "number (L×S)",
+      "riskOwner": "string (specific role responsible for ensuring controls are implemented)",
+      "reviewStatus": "string (use 'Pending' as default)"
+    }
+  ],
+  "riskActionSummary": [
+    { "band": "Critical (15-25)", "count": "number (count of hazards with initial rating in this band)", "action": "string (required action for this band)" },
+    { "band": "High (8-14)", "count": "number", "action": "string" },
+    { "band": "Medium (4-7)", "count": "number", "action": "string" },
+    { "band": "Low (1-3)", "count": "number", "action": "string" }
+  ],
+  "monitoringArrangements": "string (min 100 words — how will controls be monitored, inspection frequency, who reviews, escalation process)",
+  "competencyRequirements": "string (min 100 words — specific qualifications, tickets, experience, and induction requirements for all personnel)"
+}
+
+Min 20 hazard rows. Ensure riskRatingInitial = likelihoodInitial × severityInitial. Residual ratings must always be lower than initial. The riskActionSummary counts MUST match the actual hazard data. Generate the most comprehensive, detailed risk assessment possible — this is the ENTIRE document, not a section within a larger RAMS.`,
 };
 
 // ---------------------------------------------------------------------------
