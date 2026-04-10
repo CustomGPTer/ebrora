@@ -304,11 +304,11 @@ function exportPDF(
     // Data table
     checkPage(15);
     doc.setFontSize(9); doc.setFont("helvetica", "bold");
-    doc.text("Daily Weather Data (12PM readings)", M, y); y += 5;
+    doc.text("Daily Weather Data (high, low, and 24hr totals)", M, y); y += 5;
 
     const cols = [22, 20, 20, 22, 22, 22, 22, 22, 10];
     let cx = M;
-    ["Date", "Temp C", "Low C", "Wind", "Rain mm", "Humid %", "Cloud %", "Conditions", ""].forEach((h, i) => {
+    ["Date", "High C", "Low C", "Wind", "Rain mm", "Humid %", "Cloud %", "Conditions", ""].forEach((h, i) => {
       doc.setFillColor(30, 30, 30); doc.rect(cx, y, cols[i], 6, "F");
       doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(5.5);
       doc.text(h, cx + 1.5, y + 4);
@@ -369,7 +369,7 @@ function exportPDF(
   for (let p = 1; p <= pageCount; p++) {
     doc.setPage(p);
     doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Historical weather data from Open-Meteo Archive API. 12PM readings, Europe/London timezone. This is a weather evidence tool -- verify against Met Office records for contractual purposes.", M, 290);
+    doc.text("Historical weather data from Open-Meteo Archive API. Daily highs, lows, and 24hr precipitation totals. Europe/London timezone. This is a weather evidence tool -- verify against Met Office records for contractual purposes.", M, 290);
     doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 290);
   }
 
@@ -440,12 +440,12 @@ export default function HistoricalWeatherClient() {
           const baseline = baselineMap.get(dateStr);
           days.push({
             date: dateStr,
-            tempC: (entry?.values?.tempC as number) ?? null,
-            tempMinC: entry?.min3am ?? null,
+            tempC: entry?.tempHighC ?? null,
+            tempMinC: entry?.tempLowC ?? null,
             windKmh: (entry?.values?.windKmh as number) ?? null,
             windDir: null,
             humidity: (entry?.values?.humidity as number) ?? null,
-            precipMm: (entry?.values?.precipMm as number) ?? null,
+            precipMm: entry?.totalPrecipMm ?? null,
             cloudCover: (entry?.values?.cloudCover as number) ?? null,
             weatherCode: (entry?.values?.weatherCode as number) ?? null,
             avgTempC: baseline?.avgTempC ?? null,
@@ -486,7 +486,7 @@ export default function HistoricalWeatherClient() {
   const firstRes = results[0];
   const cards = useMemo(() => {
     if (!firstRes) return [
-      { label: "Temperature", value: "--", sub: "12PM reading", bgClass: "bg-red-50", textClass: "text-red-800", borderClass: "border-red-200", dotClass: "bg-red-500" },
+      { label: "Temperature", value: "--", sub: "Daily high", bgClass: "bg-red-50", textClass: "text-red-800", borderClass: "border-red-200", dotClass: "bg-red-500" },
       { label: "Rainfall", value: "--", sub: "Total precipitation", bgClass: "bg-blue-50", textClass: "text-blue-800", borderClass: "border-blue-200", dotClass: "bg-blue-500" },
       { label: "Wind Speed", value: "--", sub: windUnit === "mph" ? "miles per hour" : "km per hour", bgClass: "bg-purple-50", textClass: "text-purple-800", borderClass: "border-purple-200", dotClass: "bg-purple-500" },
       { label: "Conditions", value: "--", sub: "Dominant weather", bgClass: "bg-emerald-50", textClass: "text-emerald-800", borderClass: "border-emerald-200", dotClass: "bg-emerald-500" },
@@ -648,7 +648,7 @@ export default function HistoricalWeatherClient() {
         const fmtDate = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
         const fmtMonth = (d: Date) => d.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
         let period = "";
-        if (view === "day") period = `Weather at 12:00 PM, ${startD.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`;
+        if (view === "day") period = `Historical Weather, ${startD.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`;
         else if (view === "week") period = `7-Day Weather Summary, ${fmtDate(startD)} – ${fmtDate(endD)}`;
         else period = `Monthly Weather Summary, ${fmtMonth(startD)}`;
         return (
@@ -691,7 +691,7 @@ export default function HistoricalWeatherClient() {
 
               {res.days[0].tempMinC !== null && (
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg mb-4 ${res.days[0].tempMinC <= 0 ? "bg-cyan-50 text-cyan-700 border border-cyan-200" : "bg-gray-50 text-gray-600 border border-gray-200"}`}>
-                  Overnight low: {res.days[0].tempMinC.toFixed(1)}°C
+                  Daily low: {res.days[0].tempMinC.toFixed(1)}°C
                   {res.days[0].tempMinC <= 0 && <span className="text-cyan-600 font-bold ml-1">Frost</span>}
                 </div>
               )}
@@ -730,7 +730,7 @@ export default function HistoricalWeatherClient() {
                       <th className="px-2 py-1.5 text-left font-semibold rounded-tl-lg">Date</th>
                       <th className="px-2 py-1.5 text-center font-semibold"></th>
                       <th className="px-2 py-1.5 text-left font-semibold">Conditions</th>
-                      <th className="px-2 py-1.5 text-right font-semibold">Temp</th>
+                      <th className="px-2 py-1.5 text-right font-semibold">High</th>
                       <th className="px-2 py-1.5 text-right font-semibold">Low</th>
                       <th className="px-2 py-1.5 text-right font-semibold">Wind</th>
                       <th className="px-2 py-1.5 text-right font-semibold">Rain</th>
@@ -772,7 +772,7 @@ export default function HistoricalWeatherClient() {
                 </table>
                 {view === "month" && (
                   <div className="mt-2 text-[10px] text-gray-400">
-                    * = frost (overnight low at or below 0{"°"}C) | Rain days ({">="}{rainThreshold}mm): {firstRes?.summary.rainDays ?? 0}
+                    * = frost (daily low at or below 0{"°"}C) | Rain days ({">="}{rainThreshold}mm): {firstRes?.summary.rainDays ?? 0}
                   </div>
                 )}
               </div>
@@ -785,7 +785,7 @@ export default function HistoricalWeatherClient() {
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
         <div className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-2">Data Source</div>
         <div className="text-xs text-gray-600 space-y-1">
-          <p>Weather data from the <strong>Open-Meteo Archive API</strong> (ERA5 reanalysis, 1940-present). All readings are at <strong>12:00 PM Europe/London timezone</strong>. Overnight low is the 3:00 AM reading.</p>
+          <p>Weather data from the <strong>Open-Meteo Archive API</strong> (ERA5 reanalysis, 1940-present). Temperature shows daily high (max) and daily low (min) across all 24 hours. Rainfall is the 24-hour total. Wind, humidity, cloud cover, and conditions are <strong>12:00 PM snapshots</strong>.</p>
           <p>The baseline comparison averages the same calendar date(s) across your selected averaging period (default 2000-2025). This shows whether conditions were warmer/cooler or wetter/drier than the long-term average.</p>
         </div>
       </div>
