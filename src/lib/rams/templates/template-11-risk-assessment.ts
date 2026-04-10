@@ -361,27 +361,27 @@ function buildActionBandsLegend(totalWidth: number): Table {
 function buildHazardTable(content: Template11Content, totalWidth: number): Table {
   // Column width ratios for 15 columns on landscape A4
   const cols = {
-    ref:           380,
-    activity:      Math.round(totalWidth * 0.075),
-    hazard:        Math.round(totalWidth * 0.095),
-    consequence:   Math.round(totalWidth * 0.085),
-    who:           Math.round(totalWidth * 0.060),
-    existing:      Math.round(totalWidth * 0.115),
-    li:            420,
-    si:            420,
-    rri:           450,
-    additional:    Math.round(totalWidth * 0.130),
-    lr:            420,
-    sr:            420,
-    rrr:           450,
-    owner:         Math.round(totalWidth * 0.065),
+    ref:           400,
+    activity:      Math.round(totalWidth * 0.080),
+    hazard:        Math.round(totalWidth * 0.105),
+    consequence:   Math.round(totalWidth * 0.090),
+    who:           Math.round(totalWidth * 0.065),
+    existing:      Math.round(totalWidth * 0.135),
+    li:            380,
+    si:            380,
+    rri:           420,
+    additional:    Math.round(totalWidth * 0.145),
+    lr:            380,
+    sr:            380,
+    rrr:           420,
+    owner:         Math.round(totalWidth * 0.060),
     review:        0, // gets remainder
   };
   const used = Object.values(cols).reduce((a, b) => a + b, 0);
   cols.review = totalWidth - used;
   const colWidths = Object.values(cols);
 
-  const fs = 9; // Font size for the dense table
+  const fs = 18; // Font size in half-points (18 = 9pt)
 
   // Header row 1 — main headers
   const headerRow = new TableRow({
@@ -485,9 +485,9 @@ function buildRiskActionSummary(content: Template11Content, totalWidth: number):
 
   const headerRow = new TableRow({
     children: [
-      h.headerCell('Risk Band', col1, { fontSize: 13 }),
-      h.headerCell('Count', col2, { fontSize: 13, alignment: AlignmentType.CENTER }),
-      h.headerCell('Required Action', col3, { fontSize: 13 }),
+      h.headerCell('Risk Band', col1, { fontSize: 18 }),
+      h.headerCell('Count', col2, { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('Required Action', col3, { fontSize: 18 }),
     ],
   });
 
@@ -495,9 +495,9 @@ function buildRiskActionSummary(content: Template11Content, totalWidth: number):
     const bc = bandColors[item.band] || { fill: h.GREY_LIGHT, text: h.BLACK, bg: h.GREY_LIGHT };
     return new TableRow({
       children: [
-        h.dataCell(item.band, col1, { fontSize: 12, bold: true, fillColor: bc.fill, color: bc.text }),
-        h.dataCell(String(item.count ?? 0), col2, { fontSize: 14, bold: true, alignment: AlignmentType.CENTER, fillColor: bc.bg }),
-        h.dataCell(item.action || '', col3, { fontSize: 12, fillColor: bc.bg }),
+        h.dataCell(item.band, col1, { fontSize: 18, bold: true, fillColor: bc.fill, color: bc.text }),
+        h.dataCell(String(item.count ?? 0), col2, { fontSize: 20, bold: true, alignment: AlignmentType.CENTER, fillColor: bc.bg }),
+        h.dataCell(item.action || '', col3, { fontSize: 18, fillColor: bc.bg }),
       ],
     });
   });
