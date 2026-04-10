@@ -53,29 +53,32 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
 
     try {
       // 0. Record download FIRST — server enforces tier limits
-      const usageRes = await fetch("/api/downloads/usage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: "TOOLBOX_TALK" }),
-      });
+      try {
+        const usageRes = await fetch("/api/downloads/usage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contentType: "TOOLBOX_TALK" }),
+        });
 
-      if (usageRes.status === 429) {
-        const data = await usageRes.json();
-        setModalData({ used: data.used, limit: data.limit, tier: data.tier });
-        setUsageOk(false);
-        setShowModal(true);
-        setStatus("idle");
-        return;
-      }
+        if (usageRes.status === 429) {
+          const data = await usageRes.json();
+          setModalData({ used: data.used, limit: data.limit, tier: data.tier });
+          setUsageOk(false);
+          setShowModal(true);
+          setStatus("idle");
+          return;
+        }
 
-      if (!usageRes.ok) {
-        throw new Error("Usage check failed");
-      }
-
-      const usageData = await usageRes.json();
-      if (usageData?.tbt) {
-        setModalData({ used: usageData.tbt.used, limit: usageData.tbt.limit, tier: usageData.tier });
-        setUsageOk(usageData.tbt.remaining > 0);
+        if (usageRes.ok) {
+          const usageData = await usageRes.json();
+          if (usageData?.tbt) {
+            setModalData({ used: usageData.tbt.used, limit: usageData.tbt.limit, tier: usageData.tier });
+            setUsageOk(usageData.tbt.remaining > 0);
+          }
+        }
+      } catch {
+        // Network/fetch error — allow download rather than blocking the user
+        console.warn("TBT usage recording failed, allowing download");
       }
 
       // 1. Create hidden iframe — NO ?print param (that triggers window.print)
