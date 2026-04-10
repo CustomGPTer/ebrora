@@ -327,6 +327,55 @@ async function exportPDF(
   doc.text(`Labour: ${fmtGBP(result.labourTotal)} (${result.labourPct}%) | Plant: ${fmtGBP(result.plantTotal)} (${result.plantPct}%) | Materials: ${fmtGBP(result.materialsTotal)} (${result.materialsPct}%)`, M + 5, y + 11);
   doc.setTextColor(0, 0, 0); y += 20;
 
+  // ── Stat cards
+  {
+    const cardW = (CW - 6) / 4, cardH = 14;
+    const cards: { label: string; value: string; sub: string; rgb: number[] }[] = [
+      { label: "Grand Total", value: fmtGBP(result.grandTotal), sub: `Base + additions`, rgb: [22, 163, 74] },
+      { label: "Labour", value: fmtGBP(result.labourTotal), sub: `${result.labourPct}% of total`, rgb: [59, 130, 246] },
+      { label: "Plant", value: fmtGBP(result.plantTotal), sub: `${result.plantPct}% of total`, rgb: [234, 179, 8] },
+      { label: "Materials", value: fmtGBP(result.materialsTotal), sub: `${result.materialsPct}% of total`, rgb: [124, 58, 237] },
+    ];
+    cards.forEach((c, ci) => {
+      const cx = M + ci * (cardW + 2);
+      doc.setFillColor(c.rgb[0], c.rgb[1], c.rgb[2]);
+      doc.roundedRect(cx, y, cardW, cardH, 1.5, 1.5, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "bold");
+      doc.text(c.label.toUpperCase(), cx + 3, y + 4);
+      doc.setFontSize(9); doc.text(c.value, cx + 3, y + 9);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "normal");
+      doc.text(c.sub, cx + 3, y + 12.5);
+    });
+    doc.setTextColor(0, 0, 0);
+    y += cardH + 4;
+  }
+
+  // ── Cost breakdown stacked bar
+  {
+    const barW = CW, barH2 = 6, gt = result.grandTotal || 1;
+    let bx = M;
+    const segs: { w: number; rgb: number[]; label: string }[] = [
+      { w: (result.labourTotal / gt) * barW, rgb: [59, 130, 246], label: "Labour" },
+      { w: (result.plantTotal / gt) * barW, rgb: [234, 179, 8], label: "Plant" },
+      { w: (result.materialsTotal / gt) * barW, rgb: [124, 58, 237], label: "Materials" },
+    ];
+    segs.forEach(s => {
+      if (s.w > 0) { doc.setFillColor(s.rgb[0], s.rgb[1], s.rgb[2]); doc.rect(bx, y, s.w, barH2, "F"); bx += s.w; }
+    });
+    y += barH2 + 2;
+    // Legend
+    bx = M;
+    doc.setFontSize(4.5);
+    segs.forEach(s => {
+      doc.setFillColor(s.rgb[0], s.rgb[1], s.rgb[2]); doc.rect(bx, y, 3, 2.5, "F");
+      doc.setTextColor(s.rgb[0], s.rgb[1], s.rgb[2]); doc.text(s.label, bx + 4, y + 2);
+      bx += 30;
+    });
+    doc.setTextColor(0, 0, 0);
+    y += 6;
+  }
+
   // Helper to draw a section table
   const drawSectionTable = (title: string, headers: string[], colWidths: number[], rows: string[][], subtotal: [string, string, string]) => {
     checkPage(15 + rows.length * 6);
@@ -462,8 +511,8 @@ async function exportPDF(
   const pageCount = doc.getNumberOfPages();
   for (let p = 1; p <= pageCount; p++) {
     doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Daywork valuation per RICS Definition of Prime Cost of Daywork. Daywork must be authorised before execution. This is a valuation tool -- verify rates and additions against the contract.", M, 290);
-    doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 290);
+    doc.text("Daywork valuation per RICS Definition of Prime Cost of Daywork. Daywork must be authorised before execution. This is a valuation tool -- verify rates and additions against the contract.", M, 287);
+    doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 291);
   }
   doc.save(`daywork-valuation-${todayISO()}.pdf`);
 }
