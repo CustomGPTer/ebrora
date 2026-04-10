@@ -203,7 +203,6 @@ export const TEMPLATE_CONFIGS: Record<TemplateSlug, TemplateConfig> = {
       '/rams-templates/preview-risk-assessment-only-p3.jpg',
       '/rams-templates/preview-risk-assessment-only-p4.jpg',
       '/rams-templates/preview-risk-assessment-only-p5.jpg',
-      '/rams-templates/preview-risk-assessment-only-p6.jpg',
     ],
     keySections: ['5×5 Risk Matrix with Descriptors', '15-Column Best Practice Hazard Table', 'Scope & Methodology', 'Risk Action Summary Dashboard', 'Legislative References'],
   },
