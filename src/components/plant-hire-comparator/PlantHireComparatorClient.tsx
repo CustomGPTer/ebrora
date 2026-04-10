@@ -268,12 +268,60 @@ async function exportPDF(
   doc.text(`Total Hire: ${fmtGBP(summary.totalHireCost)} | Total Own: ${fmtGBP(summary.totalOwnershipCost)} | Saving: ${fmtGBP(summary.totalSaving)}`, M + 5, y + 11);
   doc.setTextColor(0, 0, 0); y += 20;
 
+  // ── Stat cards (coloured KPI row)
+  {
+    const cardW = (CW - 6) / 4;
+    const cardH = 14;
+    const cards: { label: string; value: string; sub: string; rgb: number[] }[] = [
+      { label: "Recommendation", value: summary.overallRecommendation === "hire" ? "HIRE" : summary.overallRecommendation === "buy" ? "BUY" : "MIXED", sub: results[0]?.breakevenWeeks != null ? `Breakeven ${fmtWeeks(results[0].breakevenWeeks)}` : "", rgb: summary.overallRecommendation === "buy" ? [22, 163, 74] : [234, 88, 12] },
+      { label: "Total Hire Cost", value: fmtGBP(summary.totalHireCost), sub: `${results.length} item(s)`, rgb: [59, 130, 246] },
+      { label: "Total Own Cost", value: fmtGBP(summary.totalOwnershipCost), sub: "All-in ownership", rgb: [124, 58, 237] },
+      { label: "Saving", value: fmtGBP(summary.totalSaving), sub: `by ${summary.overallRecommendation === "hire" ? "hiring" : "buying"}`, rgb: [234, 179, 8] },
+    ];
+    cards.forEach((c, ci) => {
+      const cx = M + ci * (cardW + 2);
+      doc.setFillColor(c.rgb[0], c.rgb[1], c.rgb[2]);
+      doc.roundedRect(cx, y, cardW, cardH, 1.5, 1.5, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "bold");
+      doc.text(c.label.toUpperCase(), cx + 3, y + 4);
+      doc.setFontSize(9); doc.text(c.value, cx + 3, y + 9);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "normal");
+      doc.text(c.sub, cx + 3, y + 12.5);
+    });
+    doc.setTextColor(0, 0, 0);
+    y += cardH + 6;
+  }
+
   // ── Per-item detail
   results.forEach((r, idx) => {
     checkPage(85);
     doc.setFontSize(10); doc.setFont("helvetica", "bold");
     doc.text(`Item ${idx + 1}: ${r.item.description || "Unnamed Plant Item"}`, M, y);
     y += 6;
+
+    // Comparison bar chart (hire vs buy)
+    {
+      const barH = 6, barMaxW = CW - 40;
+      const maxVal = Math.max(r.hireCost, r.ownershipCost) || 1;
+      const hW = (r.hireCost / maxVal) * barMaxW;
+      const oW = (r.ownershipCost / maxVal) * barMaxW;
+      doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+      doc.text("Hire", M, y + 4);
+      if (r.cheaperOption === "hire") { doc.setFillColor(22, 163, 74); } else { doc.setFillColor(239, 68, 68); }
+      doc.roundedRect(M + 18, y, hW, barH, 1, 1, "F");
+      doc.setTextColor(55, 65, 81); doc.setFontSize(6); doc.setFont("helvetica", "bold");
+      doc.text(fmtGBP(r.hireCost), M + 20 + hW, y + 4);
+      y += barH + 2;
+      doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+      doc.text("Buy", M, y + 4);
+      if (r.cheaperOption === "buy") { doc.setFillColor(22, 163, 74); } else { doc.setFillColor(59, 130, 246); }
+      doc.roundedRect(M + 18, y, oW, barH, 1, 1, "F");
+      doc.setTextColor(55, 65, 81); doc.setFontSize(6); doc.setFont("helvetica", "bold");
+      doc.text(fmtGBP(r.ownershipCost), M + 20 + oW, y + 4);
+      doc.setTextColor(0, 0, 0);
+      y += barH + 6;
+    }
 
     // Summary panel
     doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
@@ -496,9 +544,9 @@ async function exportPDF(
     doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
     doc.text(
       "Plant hire vs buy comparison. Analysis based on RICS Schedule of Basic Plant Charges methodology. This is a cost modelling tool -- actual costs may vary.",
-      M, 290
+      M, 287
     );
-    doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 290);
+    doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 291);
   }
 
   doc.save(`plant-hire-comparator-${docRef}.pdf`);
