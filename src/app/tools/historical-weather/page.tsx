@@ -4,14 +4,14 @@ import dynamic from "next/dynamic";
 import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
-  title: "Historical Weather Data Tool | Construction Weather Evidence | Ebrora",
+  title: "Historical Weather Data & Works Planning Tool | Construction Weather Evidence | Ebrora",
   description:
-    "Look up historical weather for any UK town or city. 12PM temperature, wind speed, rainfall, humidity, cloud cover with professional weather icons. Day, week, and month views. Compare to long-term average baseline. Multi-location comparison, frost warnings, rain day counter, and white-label PDF export.",
+    "Historical weather data and works planning for any UK town or city. Daily highs, lows, and 24-hour rainfall with professional weather icons. Day, week, and month views with baseline comparison. Works planning mode with rain probability, frost risk, wind threshold warnings, best working window finder, confidence ratings. Multi-location comparison, CSV export, and white-label PDF reports.",
   alternates: { canonical: "https://www.ebrora.com/tools/historical-weather" },
   openGraph: {
-    title: "Historical Weather Data Tool | Ebrora",
+    title: "Historical Weather Data & Works Planning Tool | Ebrora",
     description:
-      "UK historical weather lookup with day/week/month views, baseline comparison, professional icons, and PDF export for construction weather evidence.",
+      "UK historical weather and works planning tool. Daily highs/lows, rain probability, frost risk, wind thresholds (crane/MEWP/site closure), best working windows, multi-location comparison, CSV and PDF export.",
     url: "https://www.ebrora.com/tools/historical-weather",
     type: "website",
     images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
@@ -40,9 +40,9 @@ const HistoricalWeatherClient = dynamic(
 const pageSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Historical Weather Data Tool",
+  name: "Historical Weather Data & Works Planning Tool",
   description:
-    "Look up historical weather for any UK town or city. 12PM readings for temperature, wind speed, rainfall, humidity, and cloud cover. Day, week, and month views with professional weather icons, long-term baseline comparison, multi-location support, frost warnings, rain day counter, combined charts, and white-label PDF export for construction weather evidence.",
+    "Historical weather data and works planning for any UK town or city. Daily highs, lows, and 24-hour rainfall. Day, week, and month views with baseline comparison. Works planning mode with rain probability, frost risk, wind threshold warnings (crane, MEWP, site closure), best working window finder, confidence ratings. Multi-location comparison, CSV export for programmes, and white-label PDF reports.",
   url: "https://www.ebrora.com/tools/historical-weather",
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Web",
@@ -67,10 +67,10 @@ export default function HistoricalWeatherPage() {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-            Historical Weather Data Tool
+            Historical Weather Data &amp; Works Planning Tool
           </h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Look up historical weather for any UK town or city. 12PM readings with overnight lows, professional weather icons, day/week/month views, long-term baseline comparison, multi-location support, and white-label PDF export.
+            Historical weather data and works planning for any UK town or city. Daily highs, lows, and 24-hour rainfall with professional weather icons. Day, week, and month views with baseline comparison. Works planning mode with rain probability, frost risk, wind threshold warnings (crane, MEWP, site closure), best working window finder, and confidence ratings. Multi-location comparison, CSV export for programmes, and white-label PDF reports.
           </p>
         </div>
 
