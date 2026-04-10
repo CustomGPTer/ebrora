@@ -60,10 +60,10 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
           <p>Sign in to access templates and start building your RAMS documents</p>
         )}
         {isAuthenticated && !isPaid && (
-          <p>Free plan: 2 templates available &middot; <a href="/pricing" className="template-picker-upgrade-link">Upgrade for all 10</a></p>
+          <p>Free plan: 2 templates available &middot; <a href="/pricing" className="template-picker-upgrade-link">Upgrade for all 11</a></p>
         )}
         {isAuthenticated && isPaid && (
-          <p>All 10 templates available on your plan</p>
+          <p>All 11 templates available on your plan</p>
         )}
       </div>
 
