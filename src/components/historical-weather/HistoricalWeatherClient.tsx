@@ -640,6 +640,25 @@ export default function HistoricalWeatherClient() {
       </div>
 
       {/* Results */}
+      {results.length > 0 && (() => {
+        const r = results[0];
+        const locNames = results.map(r2 => r2.location.name).join(" vs ");
+        const startD = new Date(r.startDate + "T12:00:00");
+        const endD = new Date(r.endDate + "T12:00:00");
+        const fmtDate = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+        const fmtMonth = (d: Date) => d.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+        let period = "";
+        if (view === "day") period = `Weather at 12:00 PM, ${startD.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`;
+        else if (view === "week") period = `7-Day Weather Summary, ${fmtDate(startD)} – ${fmtDate(endD)}`;
+        else period = `Monthly Weather Summary, ${fmtMonth(startD)}`;
+        return (
+          <div className="border-b border-gray-200 pb-3">
+            <h2 className="text-base font-bold text-gray-900">{locNames}, UK</h2>
+            <p className="text-sm text-gray-500 mt-0.5">{period}</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">Compared against {r.avgPeriod[0]}–{r.avgPeriod[1]} historical average · Source: Open-Meteo ERA5</p>
+          </div>
+        );
+      })()}
       {results.map((res, ri) => (
         <div key={ri} className="space-y-4">
           {/* Location header */}
