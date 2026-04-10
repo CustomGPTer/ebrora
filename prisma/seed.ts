@@ -163,6 +163,19 @@ async function main() {
           order: 10,
         },
       }),
+      prisma.ramsFormat.upsert({
+        where: { slug: 'risk-assessment-only' },
+        update: {},
+        create: {
+          name: 'Risk Assessment Only',
+          slug: 'risk-assessment-only',
+          scoring_type: '5x5',
+          description: 'Standalone risk assessment with 15-column industry best practice layout. No method statement.',
+          is_free: false,
+          enabled: true,
+          order: 11,
+        },
+      }),
     ]);
 
     console.log(`Created ${formats.length} RAMS formats`);
