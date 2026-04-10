@@ -15,14 +15,14 @@ export interface UKTown {
 
 export interface DayWeather {
   date: string;         // YYYY-MM-DD
-  tempC: number | null;
-  tempMinC: number | null;   // overnight low (3AM)
-  windKmh: number | null;
+  tempC: number | null;        // daily high (max across all hours)
+  tempMinC: number | null;     // daily low (min across all hours)
+  windKmh: number | null;      // 12PM reading
   windDir: number | null;
-  humidity: number | null;
-  precipMm: number | null;
-  cloudCover: number | null;
-  weatherCode: number | null;
+  humidity: number | null;      // 12PM reading
+  precipMm: number | null;     // daily total (sum of all hours)
+  cloudCover: number | null;   // 12PM reading
+  weatherCode: number | null;  // 12PM reading
   // Comparison baseline
   avgTempC: number | null;
   avgPrecipMm: number | null;
@@ -377,12 +377,13 @@ export async function fetchWeather(
 }
 
 export interface DayDataEntry {
-  noon: number;
-  values: Record<string, number | null>;
-  min3am: number | null;
+  values: Record<string, number | null>;  // 12PM snapshot: wind, humidity, cloud, weatherCode
+  tempHighC: number | null;               // daily max temperature
+  tempLowC: number | null;                // daily min temperature
+  totalPrecipMm: number;                  // sum of all hourly precipitation
 }
 
-/** Extract 12PM and 3AM values from hourly API response */
+/** Extract daily high, daily low, daily total rain, and 12PM snapshot values */
 export function extractDayData(data: OpenMeteoResponse): Map<string, DayDataEntry> {
   const map = new Map<string, DayDataEntry>();
   const h = data.hourly;
@@ -392,24 +393,35 @@ export function extractDayData(data: OpenMeteoResponse): Map<string, DayDataEntr
     const dt = h.time[i]; // "YYYY-MM-DDTHH:00"
     const date = dt.slice(0, 10);
     const hour = parseInt(dt.slice(11, 13), 10);
+    const temp = h.temperature_2m?.[i] ?? null;
+    const precip = h.precipitation?.[i] ?? null;
 
+    if (!map.has(date)) {
+      map.set(date, { values: {}, tempHighC: null, tempLowC: null, totalPrecipMm: 0 });
+    }
+    const entry = map.get(date)!;
+
+    // Track daily high
+    if (temp !== null) {
+      if (entry.tempHighC === null || temp > entry.tempHighC) entry.tempHighC = temp;
+    }
+    // Track daily low
+    if (temp !== null) {
+      if (entry.tempLowC === null || temp < entry.tempLowC) entry.tempLowC = temp;
+    }
+    // Accumulate daily total precipitation
+    if (precip !== null) {
+      entry.totalPrecipMm += precip;
+    }
+    // 12PM snapshot for wind, humidity, cloud, weather code
     if (hour === 12) {
-      const entry = map.get(date) || { noon: i, values: {}, min3am: null };
-      entry.noon = i;
       entry.values = {
-        tempC: h.temperature_2m?.[i] ?? null,
+        tempC: temp,  // keep noon temp for baseline reference
         humidity: h.relative_humidity_2m?.[i] ?? null,
-        precipMm: h.precipitation?.[i] ?? null,
         weatherCode: h.weather_code?.[i] ?? null,
         windKmh: h.wind_speed_10m?.[i] ?? null,
         cloudCover: h.cloud_cover?.[i] ?? null,
       };
-      map.set(date, entry);
-    }
-    if (hour === 3) {
-      const entry = map.get(date) || { noon: -1, values: {}, min3am: null };
-      entry.min3am = h.temperature_2m?.[i] ?? null;
-      map.set(date, entry);
     }
   }
   return map;
@@ -460,8 +472,8 @@ export async function fetchBaseline(
       const mmdd = dateStr.slice(5);
       if (accum[mmdd]) {
         const v = entry.values;
-        if (v.tempC !== null && v.tempC !== undefined) accum[mmdd].temps.push(v.tempC as number);
-        if (v.precipMm !== null && v.precipMm !== undefined) accum[mmdd].precips.push(v.precipMm as number);
+        if (entry.tempHighC !== null) accum[mmdd].temps.push(entry.tempHighC);
+        if (entry.totalPrecipMm > 0 || entry.totalPrecipMm === 0) accum[mmdd].precips.push(entry.totalPrecipMm);
         if (v.windKmh !== null && v.windKmh !== undefined) accum[mmdd].winds.push(v.windKmh as number);
       }
     }
