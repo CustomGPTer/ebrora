@@ -93,7 +93,7 @@ function LoadSettlementChart({
         return (
           <g key={`xg-${i}`}>
             <line x1={xp} y1={padT} x2={xp} y2={padT + cH} stroke="#E5E7EB" strokeWidth={0.5} />
-            <text x={xp} y={H - 8} textAnchor="middle" fontSize={9} fill="#9CA3AF">{unit === "MPa" ? xv.toFixed(2) : xv.toFixed(0)}</text>
+            <text x={xp} y={H - 8} textAnchor="middle" fontSize={9} fill="#9CA3AF">{unit === "MPa" ? xv.toFixed(2) : (xv < 1 ? xv.toFixed(2) : xv < 10 ? xv.toFixed(1) : xv.toFixed(0))}</text>
           </g>
         );
       })}
@@ -322,16 +322,20 @@ async function exportPDF(
 
     // Status banner
     const pass = res.pass;
-    const brgb = pass === true ? [22, 163, 74] : pass === false ? [220, 38, 38] : [107, 114, 128];
+    const hasEv1Only = res.ev1 !== null && res.ev2 === null;
+    const hasNothing = res.ev1 === null && res.ev2 === null;
+    const brgb = pass === true ? [22, 163, 74] : pass === false ? [220, 38, 38] : hasEv1Only ? [59, 130, 246] : [107, 114, 128];
     doc.setFillColor(brgb[0], brgb[1], brgb[2]);
     doc.roundedRect(M, y, CW, 12, 2, 2, "F");
     doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-    const statusText = pass === true ? "PASS" : pass === false ? "FAIL" : "INSUFFICIENT DATA";
+    const statusText = pass === true ? "PASS" : pass === false ? "FAIL" : hasEv1Only ? "Ev1 ONLY — RELOAD DATA REQUIRED" : "INSUFFICIENT DATA";
     doc.text(statusText, M + 5, y + 5.5);
     doc.setFontSize(7); doc.setFont("helvetica", "normal");
     const summaryText = res.ratio !== null
       ? `Ev1: ${fmtMPa(res.ev1)} | Ev2: ${fmtMPa(res.ev2)} | Ratio: ${res.ratio.toFixed(2)} | Target: <= ${res.targetRatio.toFixed(1)} | CBR: ${res.cbrEquivalent?.toFixed(1) ?? "--"}%`
-      : "Insufficient data to calculate Ev values";
+      : hasEv1Only
+        ? `Ev1: ${fmtMPa(res.ev1)} | Ev2: -- (enter reload cycle data to calculate Ev2 and Ev2/Ev1 ratio)`
+        : "Insufficient data to calculate Ev values";
     doc.text(summaryText, M + 5, y + 9.5);
     doc.setTextColor(0, 0, 0); y += 17;
 
@@ -359,6 +363,156 @@ async function exportPDF(
         doc.setTextColor(0, 0, 0); y += 3.8;
       });
       y += 6;
+    }
+
+    // ── Load-Settlement Chart (PDF) ──────────────────────
+    const allReadings = [...test.firstLoad, ...test.unload, ...test.reload];
+    if (allReadings.length >= 2) {
+      const chartW = CW, chartH = 70, chartX = M, chartY = y;
+      checkPage(chartH + 14);
+      doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+      doc.text("Load-Settlement Curve", M, y); y += 4;
+
+      const padL2 = 18, padR2 = 8, padT2 = 4, padB2 = 10;
+      const cW2 = chartW - padL2 - padR2, cH2 = chartH - padT2 - padB2;
+      const ox = M + padL2, oy = y + padT2;
+
+      const maxStress = Math.max(...allReadings.map(r => stressFromKPa(r.stress, unit)), 0.001);
+      const maxSettle = Math.max(...allReadings.map(r => r.settlement), 0.5);
+
+      const px = (s: number) => ox + (stressFromKPa(s, unit) / maxStress) * cW2;
+      const py = (s: number) => oy + (s / maxSettle) * cH2;
+
+      // Grid + axes
+      doc.setDrawColor(230, 230, 230); doc.setLineWidth(0.15);
+      for (let i = 0; i <= 5; i++) {
+        const xp = ox + (i / 5) * cW2;
+        doc.line(xp, oy, xp, oy + cH2);
+        const yp = oy + (i / 5) * cH2;
+        doc.line(ox, yp, ox + cW2, yp);
+      }
+      doc.setDrawColor(60, 60, 60); doc.setLineWidth(0.3);
+      doc.line(ox, oy, ox, oy + cH2); doc.line(ox, oy + cH2, ox + cW2, oy + cH2);
+
+      // Axis labels
+      doc.setFontSize(5); doc.setFont("helvetica", "normal"); doc.setTextColor(120, 120, 120);
+      for (let i = 0; i <= 5; i++) {
+        const xv = (maxStress / 5) * i;
+        const xp = ox + (i / 5) * cW2;
+        const lbl = xv < 1 ? xv.toFixed(2) : xv < 10 ? xv.toFixed(1) : xv.toFixed(0);
+        doc.text(lbl, xp, oy + cH2 + 3, { align: "center" });
+        const yv = (maxSettle / 5) * i;
+        const yp = oy + (i / 5) * cH2;
+        doc.text(yv.toFixed(2), ox - 1, yp + 1, { align: "right" });
+      }
+      doc.setFontSize(5.5); doc.setFont("helvetica", "bold"); doc.setTextColor(60, 60, 60);
+      doc.text(`Stress (${stressLabel(unit)})`, ox + cW2 / 2, oy + cH2 + 7, { align: "center" });
+      doc.text("Settlement (mm)", ox - 14, oy + cH2 / 2, { align: "center", angle: 90 });
+
+      // Draw curves
+      const drawPdfCurve = (readings: Reading[], r: number, g: number, b: number, label: string) => {
+        if (readings.length === 0) return;
+        const sorted = [...readings].sort((a, b2) => a.stress - b2.stress);
+        doc.setDrawColor(r, g, b); doc.setLineWidth(0.5);
+        for (let i2 = 1; i2 < sorted.length; i2++) {
+          doc.line(px(sorted[i2 - 1].stress), py(sorted[i2 - 1].settlement), px(sorted[i2].stress), py(sorted[i2].settlement));
+        }
+        // Points
+        sorted.forEach(rd => {
+          doc.setFillColor(r, g, b);
+          doc.circle(px(rd.stress), py(rd.settlement), 0.7, "F");
+        });
+        // Label at end
+        const last = sorted[sorted.length - 1];
+        doc.setFontSize(4.5); doc.setFont("helvetica", "bold"); doc.setTextColor(r, g, b);
+        const lx = px(last.stress) + 1.5;
+        doc.text(label, Math.min(lx, M + chartW - padR2 - 10), py(last.settlement) + 1);
+      };
+
+      drawPdfCurve(test.firstLoad, 59, 130, 246, "1st Load");
+      drawPdfCurve(test.unload, 107, 114, 128, "Unload");
+      drawPdfCurve(test.reload, 245, 158, 11, "Reload");
+
+      // Ev gradient dashed lines
+      const drawGradient = (stressLow: number | null, stressHigh: number | null, readings: Reading[], r: number, g: number, b: number) => {
+        if (!stressLow || !stressHigh || readings.length < 2) return;
+        const sorted = [...readings].sort((a, b2) => a.stress - b2.stress);
+        const interp2 = (ts: number): number | null => {
+          let lo: Reading | null = null, hi: Reading | null = null;
+          for (const rd of sorted) { if (rd.stress <= ts) lo = rd; if (rd.stress >= ts && !hi) hi = rd; }
+          if (!lo || !hi) return null;
+          if (lo.stress === hi.stress) return lo.settlement;
+          return lo.settlement + ((ts - lo.stress) / (hi.stress - lo.stress)) * (hi.settlement - lo.settlement);
+        };
+        const sL = interp2(stressLow), sH = interp2(stressHigh);
+        if (sL === null || sH === null) return;
+        doc.setDrawColor(r, g, b); doc.setLineWidth(0.3);
+        doc.setLineDashPattern([1.5, 1], 0);
+        doc.line(px(stressLow), py(sL), px(stressHigh), py(sH));
+        doc.setLineDashPattern([], 0);
+      };
+      drawGradient(res.ev1StressLow, res.ev1StressHigh, test.firstLoad, 99, 102, 241);
+      drawGradient(res.ev2StressLow, res.ev2StressHigh, test.reload, 245, 158, 11);
+
+      doc.setTextColor(0, 0, 0); doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.1);
+      y += chartH + 4;
+    }
+
+    // ── Ev Bar Chart (PDF) ───────────────────────────────
+    if (res.ev1 !== null || res.ev2 !== null) {
+      const barChartH = 45;
+      checkPage(barChartH + 10);
+      doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+      doc.text("Deformation Modulus Comparison", M, y); y += 4;
+
+      const bcX = M + 20, bcW2 = 60, bcH = barChartH - 12;
+      const maxEv = Math.max(res.ev1 ?? 0, res.ev2 ?? 0, 10) * 1.2;
+      const barW2 = 16, gap2 = 10;
+      const bars2 = [
+        { label: "Ev1", value: res.ev1, r: 59, g: 130, b: 246 },
+        { label: "Ev2", value: res.ev2, r: 245, g: 158, b: 11 },
+      ];
+
+      // Y-axis
+      doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.15);
+      for (let i = 0; i <= 4; i++) {
+        const yp = y + bcH - (i / 4) * bcH;
+        doc.line(bcX, yp, bcX + 55, yp);
+        doc.setFontSize(4.5); doc.setFont("helvetica", "normal"); doc.setTextColor(150, 150, 150);
+        doc.text(((maxEv / 4) * i).toFixed(0), bcX - 1, yp + 1, { align: "right" });
+      }
+      doc.setFontSize(5); doc.setFont("helvetica", "bold"); doc.setTextColor(60, 60, 60);
+      doc.text("MPa", bcX - 8, y + bcH / 2 + 1);
+
+      bars2.forEach((b, i) => {
+        if (b.value === null) return;
+        const bx = bcX + 5 + i * (barW2 + gap2);
+        const bh = (b.value / maxEv) * bcH;
+        const by = y + bcH - bh;
+        doc.setFillColor(b.r, b.g, b.b);
+        doc.roundedRect(bx, by, barW2, bh, 1, 1, "F");
+        doc.setFontSize(6); doc.setFont("helvetica", "bold"); doc.setTextColor(b.r, b.g, b.b);
+        doc.text(b.value.toFixed(1), bx + barW2 / 2, by - 1.5, { align: "center" });
+        doc.setFontSize(5.5); doc.setTextColor(60, 60, 60);
+        doc.text(b.label, bx + barW2 / 2, y + bcH + 4, { align: "center" });
+      });
+
+      // Ratio annotation
+      if (res.ratio !== null) {
+        const ax = bcX + 60, ay = y + 2;
+        const isP = res.pass === true;
+        doc.setFillColor(isP ? 220 : 254, isP ? 252 : 226, isP ? 231 : 226);
+        doc.setDrawColor(isP ? 134 : 252, isP ? 239 : 165, isP ? 172 : 165);
+        doc.roundedRect(ax, ay, 38, 10, 1.5, 1.5, "FD");
+        doc.setFontSize(5.5); doc.setFont("helvetica", "bold");
+        doc.setTextColor(isP ? 22 : 153, isP ? 101 : 27, isP ? 52 : 27);
+        doc.text(`Ev2/Ev1 = ${res.ratio.toFixed(2)}`, ax + 19, ay + 4, { align: "center" });
+        doc.setFontSize(4.5);
+        doc.text(`${isP ? "PASS" : "FAIL"} (target <= ${res.targetRatio.toFixed(1)})`, ax + 19, ay + 8, { align: "center" });
+      }
+
+      doc.setTextColor(0, 0, 0); doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.1);
+      y += barChartH + 2;
     }
 
     // Data table
