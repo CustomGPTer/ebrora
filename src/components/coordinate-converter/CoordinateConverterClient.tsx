@@ -164,6 +164,58 @@ function exportPDF(
       doc.setTextColor(0, 0, 0); y += 3.8;
     });
     y += 6;
+
+    // ── UK Mini Map (drawn with jsPDF)
+    checkPage(70);
+    const mapW = 50, mapH = 70;
+    const mapX = M + CW - mapW - 2, mapY = y;
+    doc.setFillColor(239, 246, 255); doc.roundedRect(mapX, mapY, mapW, mapH, 2, 2, "F");
+    doc.setDrawColor(107, 114, 128); doc.setLineWidth(0.3);
+    doc.setFillColor(209, 250, 229);
+    const { minLat, maxLat, minLon, maxLon } = UK_BOUNDS;
+    const lonRange = maxLon - minLon, latRange = maxLat - minLat;
+    const proj = (lt: number, ln: number): [number, number] => [
+      mapX + ((ln - minLon) / lonRange) * mapW,
+      mapY + mapH - ((lt - minLat) / latRange) * mapH,
+    ];
+    // Draw coastline as connected line segments
+    for (let i = 1; i < UK_COAST_POINTS.length; i++) {
+      const [x1, y1] = proj(UK_COAST_POINTS[i - 1][0], UK_COAST_POINTS[i - 1][1]);
+      const [x2, y2] = proj(UK_COAST_POINTS[i][0], UK_COAST_POINTS[i][1]);
+      doc.line(x1, y1, x2, y2);
+    }
+    // Pin marker
+    const [px, py] = proj(result.latDec, result.lonDec);
+    if (px >= mapX && px <= mapX + mapW && py >= mapY && py <= mapY + mapH) {
+      doc.setFillColor(220, 38, 38); doc.circle(px, py, 1.5, "F");
+      doc.setDrawColor(220, 38, 38); doc.setLineWidth(0.3);
+      doc.line(px - 3, py, px + 3, py); doc.line(px, py - 3, px, py + 3);
+    }
+    doc.setLineWidth(0.2); doc.setDrawColor(200, 200, 200);
+
+    // ── Stat cards (left of map)
+    const scW = CW - mapW - 10;
+    const cardH2 = 14, cardW2 = (scW - 2) / 2;
+    const statCards = [
+      { label: "Grid Reference", value: result.gridLetters || "--", sub: result.gridRef, rgb: [59, 130, 246] },
+      { label: "Latitude", value: result.latDec.toFixed(6), sub: "WGS84 decimal", rgb: [22, 163, 74] },
+      { label: "Easting", value: String(Math.round(result.easting)), sub: "OSGB36 metres", rgb: [124, 58, 237] },
+      { label: "Method", value: "Helmert", sub: "~5m accuracy", rgb: [234, 179, 8] },
+    ];
+    statCards.forEach((c, ci) => {
+      const row = Math.floor(ci / 2), col = ci % 2;
+      const cx = M + col * (cardW2 + 2), cy2 = y + row * (cardH2 + 2);
+      doc.setFillColor(c.rgb[0], c.rgb[1], c.rgb[2]);
+      doc.roundedRect(cx, cy2, cardW2, cardH2, 1.5, 1.5, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(4.5); doc.setFont("helvetica", "bold");
+      doc.text(c.label.toUpperCase(), cx + 3, cy2 + 4);
+      doc.setFontSize(8); doc.text(c.value, cx + 3, cy2 + 9);
+      doc.setFontSize(4); doc.setFont("helvetica", "normal");
+      doc.text(c.sub, cx + 3, cy2 + 12);
+    });
+    doc.setTextColor(0, 0, 0);
+    y += Math.max(mapH, 2 * (cardH2 + 2)) + 6;
   }
 
   // ── Batch results table
@@ -230,9 +282,9 @@ function exportPDF(
     doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
     doc.text(
       "Coordinate conversion using the Helmert 7-parameter datum transformation (OSGB36 to WGS84). Accuracy ~5m. This is a conversion tool -- always verify coordinates on site.",
-      M, 290
+      M, 287
     );
-    doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, 290);
+    doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, 291);
   }
 
   doc.save(`coordinate-conversion-${todayISO()}.pdf`);
