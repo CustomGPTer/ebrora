@@ -27,9 +27,24 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 // getRamsLimitByTier handles FREE/STARTER/STANDARD/PROFESSIONAL/UNLIMITED
 
 // Question limits: AI judges readiness between MIN and MAX
-const MIN_TOTAL_QUESTIONS = 8;
-const MAX_TOTAL_QUESTIONS = 15;
-const MAX_ROUNDS = 5;
+const DEFAULT_MIN_QUESTIONS = 8;
+const DEFAULT_MAX_QUESTIONS = 15;
+const DEFAULT_MAX_ROUNDS = 5;
+
+// Per-template overrides (only templates that differ from defaults need entries)
+const TEMPLATE_LIMITS: Record<string, { min: number; max: number; rounds: number }> = {
+  // Add per-template overrides here when needed, e.g.:
+  // 'compact': { min: 6, max: 10, rounds: 3 },
+};
+
+function getTemplateLimits(slug: string) {
+  const override = TEMPLATE_LIMITS[slug];
+  return {
+    MIN_TOTAL_QUESTIONS: override?.min ?? DEFAULT_MIN_QUESTIONS,
+    MAX_TOTAL_QUESTIONS: override?.max ?? DEFAULT_MAX_QUESTIONS,
+    MAX_ROUNDS: override?.rounds ?? DEFAULT_MAX_ROUNDS,
+  };
+}
 
 // Answer validation limits
 const MAX_ANSWER_WORDS = 100;
@@ -113,6 +128,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Per-template question/round limits
+    const { MIN_TOTAL_QUESTIONS, MAX_TOTAL_QUESTIONS, MAX_ROUNDS } = getTemplateLimits(templateSlug);
 
     // Validate description word count
     const descWords = description.trim().split(/\s+/).length;
