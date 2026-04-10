@@ -218,7 +218,7 @@ function buildEnhancedRiskMatrix(totalWidth: number): Table {
   const titleRow = new TableRow({
     children: [
       h.headerCell('LIKELIHOOD ↓ / SEVERITY →', labelColW, {
-        fontSize: 13, fillColor: ACCENT,
+        fontSize: 16, fillColor: ACCENT,
       }),
       ...severityHeaders.map((s, i) =>
         new TableCell({
@@ -230,16 +230,16 @@ function buildEnhancedRiskMatrix(totalWidth: number): Table {
           children: [
             new Paragraph({
               alignment: AlignmentType.CENTER,
-              spacing: { after: 20 },
+              spacing: { before: 0, after: 0 },
               children: [
-                new TextRun({ text: `${s.score} — ${s.label}`, bold: true, size: 14, font: 'Arial', color: h.WHITE }),
+                new TextRun({ text: `${s.score} — ${s.label}`, bold: true, size: 20, font: 'Arial', color: h.WHITE }),
               ],
             }),
             new Paragraph({
               alignment: AlignmentType.CENTER,
-              spacing: { after: 0 },
+              spacing: { before: 0, after: 0 },
               children: [
-                new TextRun({ text: s.desc, size: 11, font: 'Arial', color: ACCENT_MID, italics: true }),
+                new TextRun({ text: s.desc, size: 16, font: 'Arial', color: ACCENT_MID, italics: true }),
               ],
             }),
           ],
@@ -262,15 +262,15 @@ function buildEnhancedRiskMatrix(totalWidth: number): Table {
           verticalAlign: VerticalAlign.CENTER,
           children: [
             new Paragraph({
-              spacing: { after: 10 },
+              spacing: { before: 0, after: 0 },
               children: [
-                new TextRun({ text: `${ld.score} — ${ld.label}`, bold: true, size: 14, font: 'Arial', color: ACCENT }),
+                new TextRun({ text: `${ld.score} — ${ld.label}`, bold: true, size: 20, font: 'Arial', color: ACCENT }),
               ],
             }),
             new Paragraph({
-              spacing: { after: 0 },
+              spacing: { before: 0, after: 0 },
               children: [
-                new TextRun({ text: ld.desc, size: 11, font: 'Arial', color: h.GREY_DARK, italics: true }),
+                new TextRun({ text: ld.desc, size: 16, font: 'Arial', color: h.GREY_DARK, italics: true }),
               ],
             }),
           ],
@@ -288,9 +288,9 @@ function buildEnhancedRiskMatrix(totalWidth: number): Table {
             children: [
               new Paragraph({
                 alignment: AlignmentType.CENTER,
-                spacing: { after: 0 },
+                spacing: { before: 0, after: 0 },
                 children: [
-                  new TextRun({ text: String(val), bold: true, size: 22, font: 'Arial', color: textColor }),
+                  new TextRun({ text: String(val), bold: true, size: 28, font: 'Arial', color: textColor }),
                 ],
               }),
             ],
@@ -336,15 +336,15 @@ function buildActionBandsLegend(totalWidth: number): Table {
             verticalAlign: VerticalAlign.TOP,
             children: [
               new Paragraph({
-                spacing: { after: 30 },
+                spacing: { before: 0, after: 0 },
                 children: [
-                  new TextRun({ text: `${band.label} (${band.range})`, bold: true, size: 14, font: 'Arial', color: band.color }),
+                  new TextRun({ text: `${band.label} (${band.range})`, bold: true, size: 18, font: 'Arial', color: band.color }),
                 ],
               }),
               new Paragraph({
-                spacing: { after: 0 },
+                spacing: { before: 0, after: 0 },
                 children: [
-                  new TextRun({ text: band.text, size: 11, font: 'Arial', color: h.BLACK }),
+                  new TextRun({ text: band.text, size: 16, font: 'Arial', color: h.BLACK }),
                 ],
               }),
             ],
