@@ -103,14 +103,42 @@ function exportPDF(mode:ToolMode,results:WeatherResult[],planResults:PlanningRes
       doc.setFontSize(9);doc.setFont("helvetica","bold");doc.text("Planning Summary",M+4,y+2);y+=6;
       items.forEach(([l,v])=>{doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(55,65,81);doc.text(l+":",M+4,y);doc.setTextColor(17,24,39);doc.setFont("helvetica","normal");doc.text(v,M+60,y);doc.setTextColor(0,0,0);y+=3.8});y+=6;
       if(pr.bestWindows.length>0){checkPage(20);doc.setFontSize(9);doc.setFont("helvetica","bold");doc.text("Best Working Windows",M,y);y+=5;
-        pr.bestWindows.forEach((bw,i)=>{checkPage(6);doc.setFontSize(7);doc.setFont("helvetica","normal");doc.text(`${i+1}. ${bw.startDate} to ${bw.endDate} -- High: ${bw.avgHighC.toFixed(1)}C, Rain: ${bw.rainProbability.toFixed(0)}%, Frost: ${bw.frostProbability.toFixed(0)}%, Wind: ${wv(bw.avgWindKmh)}`,M+2,y);y+=4});y+=4}
+        pr.bestWindows.forEach((bw,i)=>{checkPage(6);doc.setFontSize(7);doc.setFont("helvetica","normal");doc.text(`${i+1}. ${bw.startDate} to ${bw.endDate} -- High: ${bw.avgHighC.toFixed(1)}°C, Rain: ${bw.rainProbability.toFixed(0)}%, Frost: ${bw.frostProbability.toFixed(0)}%, Wind: ${wv(bw.avgWindKmh)}`,M+2,y);y+=4});y+=4}
       checkPage(15);doc.setFontSize(9);doc.setFont("helvetica","bold");doc.text("Daily Planning Data",M,y);y+=5;
       const cols=[22,18,18,20,20,18,18,18,18,12];let cx=M;
-      ["Date","High C","Low C","Rain mm","Rain %","Wind","Crane%","Frost%","Cloud%",""].forEach((h,i)=>{doc.setFillColor(30,30,30);doc.rect(cx,y,cols[i],6,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(5);doc.text(h,cx+1,y+4);cx+=cols[i]});
+      ["Date","High °C","Low °C","Rain mm","Rain %","Wind","Crane% (>25mph)","Frost%","Cloud%",""].forEach((h,i)=>{doc.setFillColor(30,30,30);doc.rect(cx,y,cols[i],6,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(5);doc.text(h,cx+1,y+4);cx+=cols[i]});
       doc.setTextColor(0,0,0);y+=6;doc.setDrawColor(200,200,200);
       pr.days.forEach((day,ri)=>{checkPage(5.5);cx=M;const crane=day.windExceedance.find(w=>w.mph===25)?.percent??0;
         const cells=[day.date.slice(5),day.avgHighC.toFixed(1),day.avgLowC.toFixed(1),day.avgRainMm.toFixed(1),day.rainProbability.toFixed(0),fmtWind(day.avgWindKmh,windUnit).replace(/ (mph|km\/h)/,""),crane.toFixed(0),day.frostProbability.toFixed(0),day.avgCloudCover.toFixed(0),""];
-        cells.forEach((t,i)=>{if(ri%2===0){doc.setFillColor(250,250,250);doc.rect(cx,y,cols[i],5.5,"FD")}else{doc.rect(cx,y,cols[i],5.5,"D")}doc.setTextColor(0,0,0);doc.setFont("helvetica",i===0?"bold":"normal");doc.setFontSize(5);doc.text(t,cx+1,y+3.8);cx+=cols[i]});y+=5.5});y+=8}
+        cells.forEach((t,i)=>{if(ri%2===0){doc.setFillColor(250,250,250);doc.rect(cx,y,cols[i],5.5,"FD")}else{doc.rect(cx,y,cols[i],5.5,"D")}doc.setTextColor(0,0,0);doc.setFont("helvetica",i===0?"bold":"normal");doc.setFontSize(5);doc.text(t,cx+1,y+3.8);cx+=cols[i]});y+=5.5});
+      // ── Temperature & Rain Chart
+      y+=3;checkPage(40);doc.setFontSize(8);doc.setFont("helvetica","bold");doc.text("Temperature & Rain Overview",M,y);y+=5;
+      {const cX=M+8,cW2=CW-16,cH=30,cY=y;
+      doc.setFillColor(248,250,252);doc.rect(cX,cY,cW2,cH,"F");
+      const days=pr.days;const n=days.length;if(n>1){
+        const tMin=Math.min(...days.map(d=>d.avgLowC));const tMax=Math.max(...days.map(d=>d.avgHighC));const tRange=Math.max(tMax-tMin,1);
+        const rMax=Math.max(...days.map(d=>d.avgRainMm),1);
+        const barW2=cW2/n;
+        days.forEach((d,di)=>{const bx=cX+di*barW2;
+          // Rain bar (blue, from bottom)
+          const rH=(d.avgRainMm/rMax)*cH*0.4;
+          if(rH>0.5){doc.setFillColor(147,197,253);doc.rect(bx+barW2*0.2,cY+cH-rH,barW2*0.6,rH,"F")}
+          // Temperature band (red line for high, blue line for low)
+          if(di>0){const px=(di-1)*barW2+barW2/2;const nx=di*barW2+barW2/2;
+            const ph=cY+cH*0.55-((days[di-1].avgHighC-tMin)/tRange)*cH*0.5;
+            const nh=cY+cH*0.55-((d.avgHighC-tMin)/tRange)*cH*0.5;
+            doc.setDrawColor(239,68,68);doc.setLineWidth(0.6);doc.line(cX+px,ph,cX+nx,nh);
+            const pl=cY+cH*0.55-((days[di-1].avgLowC-tMin)/tRange)*cH*0.5;
+            const nl=cY+cH*0.55-((d.avgLowC-tMin)/tRange)*cH*0.5;
+            doc.setDrawColor(59,130,246);doc.setLineWidth(0.4);doc.line(cX+px,pl,cX+nx,nl)}
+        });
+        // Legend
+        doc.setFontSize(4.5);doc.setDrawColor(239,68,68);doc.setLineWidth(0.6);doc.line(cX+2,cY-1.5,cX+8,cY-1.5);doc.setTextColor(239,68,68);doc.text("High °C",cX+10,cY-0.5);
+        doc.setDrawColor(59,130,246);doc.setLineWidth(0.4);doc.line(cX+30,cY-1.5,cX+36,cY-1.5);doc.setTextColor(59,130,246);doc.text("Low °C",cX+38,cY-0.5);
+        doc.setFillColor(147,197,253);doc.rect(cX+56,cY-2.5,4,2,"F");doc.setTextColor(147,197,253);doc.text("Rain mm",cX+62,cY-0.5);
+        doc.setTextColor(0,0,0);doc.setLineWidth(0.2);doc.setDrawColor(220,220,220);
+      }y=cY+cH+5}
+      y+=5}
   }else{
     for(const res of results){
       checkPage(50);doc.setFillColor(30,30,30);doc.roundedRect(M,y,CW,12,2,2,"F");doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont("helvetica","bold");
@@ -123,7 +151,7 @@ function exportPDF(mode:ToolMode,results:WeatherResult[],planResults:PlanningRes
       items.forEach(([l,v])=>{doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(55,65,81);doc.text(l+":",M+4,y);doc.setTextColor(17,24,39);doc.setFont("helvetica","normal");doc.text(v,M+60,y);doc.setTextColor(0,0,0);y+=3.8});y+=6;
       checkPage(15);doc.setFontSize(9);doc.setFont("helvetica","bold");doc.text("Daily Weather Data",M,y);y+=5;
       const cols=[22,20,20,22,22,22,22,22,10];let cx=M;
-      ["Date","High C","Low C","Wind","Rain mm","Humid %","Cloud %","Conditions",""].forEach((h,i)=>{doc.setFillColor(30,30,30);doc.rect(cx,y,cols[i],6,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(5.5);doc.text(h,cx+1.5,y+4);cx+=cols[i]});
+      ["Date","High °C","Low °C","Wind","Rain mm","Humid %","Cloud %","Conditions",""].forEach((h,i)=>{doc.setFillColor(30,30,30);doc.rect(cx,y,cols[i],6,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(5.5);doc.text(h,cx+1.5,y+4);cx+=cols[i]});
       doc.setTextColor(0,0,0);y+=6;doc.setDrawColor(200,200,200);
       res.days.forEach((day,ri)=>{checkPage(5.5);cx=M;const wmo2=getWMO(day.weatherCode);
         const cells=[day.date.slice(5),day.tempC!==null?day.tempC.toFixed(1):"--",day.tempMinC!==null?day.tempMinC.toFixed(1):"--",day.windKmh!==null?fmtWind(day.windKmh,windUnit).replace(/ (mph|km\/h)/,""):"--",day.precipMm!==null?day.precipMm.toFixed(1):"--",day.humidity!==null?String(Math.round(day.humidity)):"--",day.cloudCover!==null?String(Math.round(day.cloudCover)):"--",wmo2.description.slice(0,14),""];
@@ -134,8 +162,8 @@ function exportPDF(mode:ToolMode,results:WeatherResult[],planResults:PlanningRes
   doc.rect(M,y,soW,soH,"FD");doc.rect(M+soW+4,y,soW,soH,"FD");doc.setFont("helvetica","bold");doc.text("Prepared By",M+3,y+5.5);doc.text("Site Manager",M+soW+7,y+5.5);y+=soH;
   (["Name:","Position:","Signature:","Date:"] as const).forEach(l=>{doc.rect(M,y,soW,soH,"D");doc.rect(M+soW+4,y,soW,soH,"D");doc.setFont("helvetica","bold");doc.setFontSize(6.5);doc.text(l,M+3,y+5.5);doc.text(l,M+soW+7,y+5.5);doc.setFont("helvetica","normal");y+=soH});
   const pc=doc.getNumberOfPages();for(let p=1;p<=pc;p++){doc.setPage(p);doc.setFontSize(5.5);doc.setTextColor(130,130,130);
-    doc.text(mode==="planning"?"Planning estimates based on historical averages from Open-Meteo Archive API. NOT a weather forecast. Verify with Met Office for contractual purposes.":"Historical weather data from Open-Meteo Archive API. Daily highs, lows, and 24hr totals. Europe/London timezone.",M,290);
-    doc.text(`Ref: ${docRef} | Page ${p} of ${pc}`,W2-M-50,290)}
+    doc.text(mode==="planning"?"Planning estimates based on historical averages from Open-Meteo Archive API. NOT a weather forecast. Verify with Met Office for contractual purposes.":"Historical weather data from Open-Meteo Archive API. Daily highs, lows, and 24hr totals. Europe/London timezone.",M,287);
+    doc.text(`Ref: ${docRef} | Page ${p} of ${pc}`,W2-M-50,291)}
   doc.save(`${mode==="planning"?"weather-planning":"weather-report"}-${todayISO()}.pdf`);
 }
 
