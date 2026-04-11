@@ -112,7 +112,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = (await request.json()) as { contentType?: string };
+    let body: { contentType?: string };
+    try {
+      body = (await request.json()) as { contentType?: string };
+    } catch (parseErr) {
+      console.error('POST /api/downloads/usage — body parse failed:', parseErr);
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
     const contentType = body.contentType as 'TOOLBOX_TALK' | 'FREE_TEMPLATE';
 
     if (!contentType || !['TOOLBOX_TALK', 'FREE_TEMPLATE'].includes(contentType)) {
@@ -160,14 +167,19 @@ export async function POST(request: NextRequest) {
     // Record the download
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 
-    await prisma.contentDownload.create({
-      data: {
-        contentType,
-        userId: session.user.id,
-        email: user.email,
-        ipAddress: ip,
-      },
-    });
+    try {
+      await prisma.contentDownload.create({
+        data: {
+          contentType,
+          userId: session.user.id,
+          email: user.email,
+          ipAddress: ip,
+        },
+      });
+    } catch (dbErr) {
+      console.error('POST /api/downloads/usage — prisma.create failed:', dbErr);
+      return NextResponse.json({ error: 'Failed to record download', detail: String(dbErr) }, { status: 500 });
+    }
 
     // Return updated usage
     const usage = await getUsageCounts(session.user.id, tier);
@@ -177,7 +189,7 @@ export async function POST(request: NextRequest) {
       ...usage,
     });
   } catch (error) {
-    console.error('Record download error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('POST /api/downloads/usage — unhandled error:', error);
+    return NextResponse.json({ error: 'Internal server error', detail: String(error) }, { status: 500 });
   }
 }
