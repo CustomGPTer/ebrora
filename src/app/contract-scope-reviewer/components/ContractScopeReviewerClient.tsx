@@ -17,12 +17,14 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import { CONTRACT_SCOPE_TEMPLATE_CONFIGS } from '@/lib/contract-scope-reviewer/template-config';
 import { CONTRACT_SCOPE_TEMPLATE_ORDER, CONTRACT_SCOPE_FREE_TEMPLATES } from '@/lib/contract-scope-reviewer/types';
 import type { ContractScopeTemplateSlug, ContractScopeWizardState, ContractFamily, DynamicQuestion } from '@/lib/contract-scope-reviewer/types';
 import { NEC_CONTRACT_TYPES, NEC_MAIN_OPTIONS, JCT_CONTRACT_TYPES, JCT_VARIANT_LABELS, REVIEW_CONTEXTS, USER_ROLES, SECTORS } from '@/lib/contract-scope-reviewer/contract-data';
 import type { NecContractType, JctContractType, JctVariant, NecMainOption } from '@/lib/contract-scope-reviewer/types';
+import ContractScopePreviewModal from './ContractScopePreviewModal';
 
 type WizardStep = 'template' | 'contract' | 'context' | 'upload' | 'questions' | 'processing' | 'download' | 'error';
 
@@ -155,6 +157,9 @@ export default function ContractScopeReviewerClient() {
   // Error
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Preview modal
+  const [previewSlug, setPreviewSlug] = useState<ContractScopeTemplateSlug | null>(null);
+
   // Auth
   const isAuthenticated = status === 'authenticated';
   const userPlan = (session?.user as { subscriptionTier?: string })?.subscriptionTier || 'FREE';
@@ -165,7 +170,7 @@ export default function ContractScopeReviewerClient() {
     if (step === 'processing') {
       processingTimerRef.current = setInterval(() => {
         setProcessingStep(prev => prev < PROCESSING_STEPS.length - 1 ? prev + 1 : prev);
-      }, 3500);
+      }, 10500);
     }
     return () => { if (processingTimerRef.current) clearInterval(processingTimerRef.current); };
   }, [step]);
@@ -370,21 +375,19 @@ export default function ContractScopeReviewerClient() {
               Upload your scope of works and get an AI-powered risk review tailored to your contract type, role, and sector.
             </p>
             {!isAuthenticated && <p style={{ color: '#9CA3AF', fontSize: '0.8rem', marginTop: '0.5rem' }}>Sign in to access templates</p>}
-            {isAuthenticated && !isPaid && <p style={{ color: '#9CA3AF', fontSize: '0.8rem', marginTop: '0.5rem' }}>1 free template · <a href="/pricing" style={{ color: ACCENT, fontWeight: 600 }}>Upgrade for all 3</a></p>}
+            {isAuthenticated && !isPaid && <p style={{ color: '#9CA3AF', fontSize: '0.8rem', marginTop: '0.5rem' }}>Upgrade for all 3 templates · <a href="/pricing" style={{ color: ACCENT, fontWeight: 600 }}>View plans</a></p>}
           </div>
 
           <div className="template-grid-5">
             {CONTRACT_SCOPE_TEMPLATE_ORDER.map(slug => {
               const tpl = CONTRACT_SCOPE_TEMPLATE_CONFIGS[slug];
               const accessible = canAccessTemplate(slug);
-              const isFree = CONTRACT_SCOPE_FREE_TEMPLATES.includes(slug);
               const locked = !accessible && isAuthenticated;
               return (
                 <button key={slug} type="button" className={`tpl-card ${locked ? 'tpl-card--locked' : ''}`} onClick={() => handleTemplateSelect(slug)}>
-                  <div className="tpl-card-thumb" style={{ background: '#F3F4F6', minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                    <DocumentIcon className="w-12 h-12 text-gray-300" />
-                    <span className="tpl-card-preview-pill">{tpl.pageCount} pages</span>
-                    {isFree && <span className="tpl-card-badge tpl-card-badge--free">Free</span>}
+                  <div className="tpl-card-thumb">
+                    <Image src={tpl.thumbnailPath} alt={`${tpl.displayName} preview`} fill sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw" style={{ objectFit: 'cover', objectPosition: 'top' }} />
+                    <span className="tpl-card-preview-pill" role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); setPreviewSlug(slug); }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setPreviewSlug(slug); } }} title={`Preview all ${tpl.pageCount} pages`}><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>{tpl.pageCount} pages</span>
                     {locked && (
                       <div className="tpl-card-lock-overlay">
                         <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" className="tpl-card-lock-icon"><path d="M12 1C8.676 1 6 3.676 6 7v1H4v15h16V8h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 0 1 2 2c0 .738-.405 1.376-1 1.723V17h-2v-2.277A1.993 1.993 0 0 10 13a2 2 0 0 1 2-2z" /></svg>
@@ -400,6 +403,7 @@ export default function ContractScopeReviewerClient() {
               );
             })}
           </div>
+          {previewSlug && <ContractScopePreviewModal template={CONTRACT_SCOPE_TEMPLATE_CONFIGS[previewSlug]} onClose={() => setPreviewSlug(null)} />}
         </div>
       </div>
     );
