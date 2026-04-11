@@ -190,6 +190,12 @@ export function NavBar() {
                 <span className={underlineClass(isActive("/blog"))} />
               </Link>
 
+              {/* Printable Paper */}
+              <Link href="/tools/printable-paper" className={`group ${linkClass(isActive("/tools/printable-paper"))}`}>
+                Paper
+                <span className={underlineClass(isActive("/tools/printable-paper"))} />
+              </Link>
+
               {/* Pricing */}
               <Link href="/pricing" className={`group ${linkClass(isActive("/pricing"))}`}>
                 Pricing
