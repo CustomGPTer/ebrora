@@ -1378,11 +1378,50 @@ export const AI_TOOL_CONFIGS: Record<AiToolSlug, AiToolConfig> = {
     textareaRows: 6,
     warningText: 'Please provide at least {min} words to describe the invasive species and site.',
   },
-};
 
-// ─────────────────────────────────────────────────────────────
-// Ordered arrays — existing 16 first, then new 13
-// ─────────────────────────────────────────────────────────────
+  // ── Batch 3 — Commercial Upload Tools ──────────────────────────────────
+  'contract-scope-reviewer': {
+    slug: 'contract-scope-reviewer',
+    name: 'Contract Scope Risk Reviewer',
+    shortName: 'Scope Risk Review',
+    category: 'Commercial',
+    description:
+      'Upload a scope of works (PDF or DOCX) and get an AI-powered risk review tailored to your contract type, role, and sector. Identifies missing scope gaps, ambiguous clauses, uncapped liability, onerous payment terms, unfair termination clauses, impossible programme constraints, missing prelim allowances, and unclear interfaces. Supports all NEC3/NEC4 and JCT contract forms.',
+    route: '/contract-scope-reviewer',
+    pageTitle: 'Contract Scope Risk Reviewer | Ebrora',
+    metaDescription:
+      'AI-powered scope of works risk reviewer for NEC and JCT contracts. Upload your scope, answer tailored questions, get a professional risk review with clause references and severity ratings.',
+    documentLabel: 'Contract Scope Risk Review',
+    descriptionPlaceholder: '',
+    descriptionHeading: '',
+    descriptionHint: '',
+    descriptionExample: '',
+    keySections: [
+      'Executive Risk Summary',
+      'Scope Coverage Assessment',
+      'Clause-by-Clause Risk Flags',
+      'Risk Register (Severity-Rated)',
+      'Missing Items Checklist',
+      'Ambiguity & Contradiction Log',
+      'Commercial Risk Observations',
+      'Payment Mechanism Review',
+      'Programme Feasibility Assessment',
+      'Interface Gap Analysis',
+      'Suggested Clarification RFIs',
+      'Pre-Contract Action Checklist',
+    ],
+    accentColor: '7C3AED',
+    iconType: 'shield',
+    maxWords: 0,
+    minWords: 0,
+    textareaRows: 0,
+    warningText: '',
+    uploadInstructions: 'Upload your scope of works document for AI-powered risk analysis. The reviewer will identify risks, gaps, and issues specific to your contract type, role, and sector.',
+    uploadFormats: ['PDF', 'DOCX'],
+    requiresUpload: true,
+    premiumTemplate: true,
+  },
+};
 
 /** Ordered array of all 35 tool slugs for display */
 export const AI_TOOL_ORDER: AiToolSlug[] = [
@@ -1400,6 +1439,8 @@ export const AI_TOOL_ORDER: AiToolSlug[] = [
   'wah-assessment', 'wbv-assessment', 'riddor-report',
   // Batch 2 — Environmental & Transport
   'traffic-management', 'waste-management', 'invasive-species',
+  // Batch 3 — Commercial Upload Tools
+  'contract-scope-reviewer',
 ];
 
 /** Tools grouped by category — for homepage grid and account dashboard */
@@ -1417,7 +1458,7 @@ export const AI_TOOLS_BY_CATEGORY: Record<string, AiToolSlug[]> = {
   'Commercial': [
     'scope-of-works', 'early-warning', 'ce-notification', 'quote-generator',
     'delay-notification', 'variation-confirmation', 'rfi-generator',
-    'payment-application', 'daywork-sheet',
+    'payment-application', 'daywork-sheet', 'contract-scope-reviewer',
   ],
   'Programme': [
     'programme-checker', 'carbon-footprint', 'carbon-reduction-plan',

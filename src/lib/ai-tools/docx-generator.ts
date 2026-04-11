@@ -626,6 +626,12 @@ export async function generateAiToolDocument(
     return Buffer.from(await Packer.toBuffer(doc));
   }
 
+  if (toolSlug === 'contract-scope-reviewer') {
+    const templateSlug = (content as any)._contractScopeTemplateSlug || 'quick-risk-summary';
+    const { buildContractScopeDocument } = await import('./templates/contract-scope-reviewer-templates');
+    return await buildContractScopeDocument(templateSlug, content);
+  }
+
   if (toolSlug === 'delay-notification') {
     const slug = (content as any)._delayTemplateSlug;
     if (slug) {

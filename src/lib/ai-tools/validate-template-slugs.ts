@@ -105,6 +105,9 @@ const VALID_TEMPLATE_SLUGS: Partial<Record<AiToolSlug, Set<string>>> = {
   'invasive-species': new Set([
     'ecological-report', 'site-management', 'briefing-note',
   ]),
+  'contract-scope-reviewer': new Set([
+    'quick-risk-summary', 'detailed-risk-review', 'comprehensive-risk-action',
+  ]),
 };
 
 /**
@@ -163,6 +166,7 @@ export function findInvalidTemplateSlug(
     trafficTemplateSlug: 'traffic-management',
     wasteTemplateSlug: 'waste-management',
     invasiveTemplateSlug: 'invasive-species',
+    contractScopeTemplateSlug: 'contract-scope-reviewer',
   };
 
   for (const [prop, value] of Object.entries(templateSlugs)) {
