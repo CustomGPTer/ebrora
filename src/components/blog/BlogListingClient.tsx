@@ -43,7 +43,7 @@ export default function BlogListingClient({ posts, categories }: BlogListingClie
       {/* Page Header */}
       <div className="page-header">
         <h1>Ebrora Blog</h1>
-        <p>Excel tips, construction guides, and template tutorials</p>
+        <p>Practical guides, safety insights, and tools for construction professionals</p>
       </div>
 
       {/* Blog Filter */}
@@ -132,7 +132,7 @@ export default function BlogListingClient({ posts, categories }: BlogListingClie
       <section className="newsletter-section">
         <div className="newsletter-container">
           <h2>Get Construction Tips in Your Inbox</h2>
-          <p>Subscribe to our monthly newsletter for Excel tips, guides, and best practices for construction teams.</p>
+          <p>Subscribe to our monthly newsletter for site management tips, safety guides, and tools for construction teams.</p>
           <form className="newsletter-form">
             <input
               type="email"
