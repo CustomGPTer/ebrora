@@ -101,6 +101,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         category={category}
         relatedProducts={relatedProducts}
         relatedPosts={relatedPosts}
+        relatedLinks={post.relatedLinks || []}
       />
     </>
   );
