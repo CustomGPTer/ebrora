@@ -832,6 +832,10 @@ RULES:
 4. MAXIMUM 3 rounds — after round 3, ALWAYS respond with status "ready".
 
 Respond with JSON: { "status": "more_questions" | "ready", "questions": [...], "message": "..." }`,
+
+  'contract-scope-reviewer': `This tool uses a dedicated upload route with a two-phase flow (questions then generation). It does not use the standard conversation system. Respond immediately with status "ready".
+
+Respond with JSON: { "status": "ready", "message": "Upload your scope of works document to begin the review." }`,
 };
 
 // ---------------------------------------------------------------------------
@@ -3862,6 +3866,8 @@ CRITICAL RULES:
 - monitoringSchedule must have minimum 5 entries with visit, date, and purpose.
 - Names for preparedBy, ecologist: leave blank if not provided by the user. Never invent names.
 - Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
+
+  'contract-scope-reviewer': `This tool uses a dedicated two-phase API route with template-specific generation prompts defined in src/lib/contract-scope-reviewer/system-prompts.ts. It does not use the standard generation schema pipeline.`,
 };
 
 // ---------------------------------------------------------------------------
