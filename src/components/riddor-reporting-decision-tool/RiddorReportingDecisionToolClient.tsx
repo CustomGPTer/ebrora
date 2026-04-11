@@ -210,7 +210,7 @@ function LiveFlowchart({
 async function exportPDF(
   header: { company: string; site: string; manager: string; assessedBy: string; date: string },
   category: IncidentCategory,
-  path: DecisionPathStep[],
+  pathSteps: DecisionPathStep[],
   terminal: TerminalResult,
   incidentDate: string,
 ) {
@@ -230,6 +230,15 @@ async function exportPDF(
       doc.text("ebrora.com", W - M - 18, 7);
       doc.setTextColor(0, 0, 0); y = 14;
     }
+  }
+
+  // Helper: draw a section heading with accent bar
+  function sectionHead(title: string) {
+    checkPage(12);
+    doc.setFillColor(27, 87, 69); doc.rect(M, y, 3, 6, "F");
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(27, 87, 69);
+    doc.text(title, M + 6, y + 4.5);
+    doc.setTextColor(0, 0, 0); y += 9;
   }
 
   // ── Header bar (green, free)
@@ -268,9 +277,38 @@ async function exportPDF(
   doc.text(scopeLines, M, y); y += scopeLines.length * 3 + 3;
   doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
 
-  // ── Determination banner
+  // ── URGENCY PANEL (colour-coded)
   const isReport = terminal.reportable;
-  const rgb = isReport ? [220, 38, 38] : [22, 163, 74];
+  if (isReport) {
+    checkPage(26);
+    const isImmediate = !!terminal.deadlineImmediate;
+    const urgRGB: [number, number, number] = isImmediate ? [185, 28, 28] : terminal.deadlineDays && terminal.deadlineDays <= 10 ? [194, 65, 12] : [161, 98, 7];
+    const urgBgRGB: [number, number, number] = isImmediate ? [254, 226, 226] : terminal.deadlineDays && terminal.deadlineDays <= 10 ? [255, 237, 213] : [254, 249, 195];
+    const urgLabel = isImmediate ? "IMMEDIATE ACTION REQUIRED" : `ACTION WITHIN ${terminal.deadlineDays} DAYS`;
+    const urgDesc = isImmediate
+      ? "This incident requires IMMEDIATE telephone notification to HSE followed by an online report within 10 days."
+      : `This incident must be reported online within ${terminal.deadlineDays} days of the incident date.`;
+    doc.setFillColor(urgBgRGB[0], urgBgRGB[1], urgBgRGB[2]);
+    doc.setDrawColor(urgRGB[0], urgRGB[1], urgRGB[2]);
+    doc.setLineWidth(0.8);
+    doc.roundedRect(M, y, CW, 22, 2, 2, "FD");
+    doc.setLineWidth(0.2);
+    doc.setFillColor(urgRGB[0], urgRGB[1], urgRGB[2]);
+    doc.roundedRect(M + 3, y + 3, 16, 16, 2, 2, "F");
+    doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.setFont("helvetica", "bold");
+    doc.text("!", M + 9, y + 13);
+    doc.setTextColor(urgRGB[0], urgRGB[1], urgRGB[2]); doc.setFontSize(10); doc.setFont("helvetica", "bold");
+    doc.text(urgLabel, M + 23, y + 8);
+    doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 40, 20);
+    const urgLines = doc.splitTextToSize(urgDesc, CW - 28);
+    doc.text(urgLines, M + 23, y + 13);
+    doc.setTextColor(0, 0, 0); doc.setDrawColor(220, 220, 220);
+    y += 27;
+  }
+
+  // ── Determination banner
+  const rgb: [number, number, number] = isReport ? [220, 38, 38] : [22, 163, 74];
+  checkPage(20);
   doc.setFillColor(rgb[0], rgb[1], rgb[2]);
   doc.roundedRect(M, y, CW, 16, 2, 2, "F");
   doc.setTextColor(255, 255, 255); doc.setFontSize(13); doc.setFont("helvetica", "bold");
@@ -281,7 +319,7 @@ async function exportPDF(
   doc.setTextColor(0, 0, 0); y += 22;
 
   // ── Summary panel
-  checkPage(40);
+  checkPage(45);
   const summaryItems: [string, string][] = [
     ["Incident Category:", catLabel],
     ["Reportable:", isReport ? "YES" : "NO"],
@@ -291,12 +329,10 @@ async function exportPDF(
   ];
   if (terminal.phoneRequired && terminal.phoneNumber) summaryItems.push(["Phone:", terminal.phoneNumber]);
   if (terminal.onlineUrl) summaryItems.push(["Online:", terminal.onlineUrl]);
-  if (incidentDate && terminal.deadlineDays) {
-    const dl = calculateDeadline(incidentDate, terminal);
-    if (dl) {
-      summaryItems.push(["Deadline Date:", dl.deadlineDate]);
-      summaryItems.push(["Days Remaining:", dl.isOverdue ? `OVERDUE by ${Math.abs(dl.daysRemaining)} days` : `${dl.daysRemaining} days`]);
-    }
+  const dl = (incidentDate && terminal.deadlineDays) ? calculateDeadline(incidentDate, terminal) : null;
+  if (dl) {
+    summaryItems.push(["Deadline Date:", dl.deadlineDate]);
+    summaryItems.push(["Days Remaining:", dl.isOverdue ? `OVERDUE by ${Math.abs(dl.daysRemaining)} days` : `${dl.daysRemaining} days`]);
   }
   const panelH = summaryItems.length * 4 + 8;
   doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
@@ -313,12 +349,135 @@ async function exportPDF(
   });
   y += 4;
 
-  // ── Decision Pathway
+  // ── TIMELINE GRAPHIC
+  if (dl && incidentDate && terminal.deadlineDays) {
+    checkPage(30);
+    sectionHead("Reporting Timeline");
+    const tlX = M + 8, tlW = CW - 16, tlY = y;
+    const incDate = new Date(incidentDate);
+    const deadDate = new Date(dl.deadlineDate);
+    const todayDate = new Date(); todayDate.setHours(0, 0, 0, 0);
+    const totalSpanDays = terminal.deadlineDays + 2;
+    const dayToX = (d: Date) => {
+      const diff = Math.ceil((d.getTime() - incDate.getTime()) / (1000 * 60 * 60 * 24));
+      const ratio = Math.max(0, Math.min(1, diff / totalSpanDays));
+      return tlX + ratio * tlW;
+    };
+    doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.8);
+    doc.line(tlX, tlY + 8, tlX + tlW, tlY + 8);
+    doc.setLineWidth(0.2);
+    const todayX = dayToX(todayDate);
+    const deadX = dayToX(deadDate);
+    const fillColor: [number, number, number] = dl.isOverdue ? [220, 38, 38] : [22, 163, 74];
+    doc.setFillColor(fillColor[0], fillColor[1], fillColor[2]);
+    doc.rect(tlX, tlY + 6.5, Math.min(todayX - tlX, tlW), 3, "F");
+    doc.setFillColor(27, 87, 69); doc.circle(tlX, tlY + 8, 2.5, "F");
+    doc.setFontSize(5.5); doc.setFont("helvetica", "bold"); doc.setTextColor(27, 87, 69);
+    doc.text("INCIDENT", tlX, tlY + 2);
+    doc.setFontSize(5); doc.setFont("helvetica", "normal"); doc.setTextColor(100, 100, 100);
+    doc.text(incidentDate, tlX, tlY + 14);
+    doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.circle(deadX, tlY + 8, 2.5, "F");
+    doc.setFontSize(5.5); doc.setFont("helvetica", "bold"); doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+    doc.text("DEADLINE", deadX - 5, tlY + 2);
+    doc.setFontSize(5); doc.setFont("helvetica", "normal"); doc.setTextColor(100, 100, 100);
+    doc.text(dl.deadlineDate, deadX - 5, tlY + 14);
+    if (todayX > tlX + 5 && todayX < tlX + tlW - 5) {
+      doc.setDrawColor(100, 100, 100); doc.setLineDashPattern([1, 1], 0);
+      doc.line(todayX, tlY + 3, todayX, tlY + 13);
+      doc.setLineDashPattern([], 0);
+      doc.setFontSize(5); doc.setFont("helvetica", "bold"); doc.setTextColor(80, 80, 80);
+      doc.text("TODAY", todayX - 4, tlY + 18);
+    }
+    doc.setFontSize(7); doc.setFont("helvetica", "bold");
+    if (dl.isOverdue) {
+      doc.setTextColor(220, 38, 38);
+      doc.text(`OVERDUE by ${Math.abs(dl.daysRemaining)} days`, M + CW / 2 - 15, tlY + 22);
+    } else {
+      doc.setTextColor(22, 163, 74);
+      doc.text(`${dl.daysRemaining} days remaining`, M + CW / 2 - 12, tlY + 22);
+    }
+    doc.setTextColor(0, 0, 0); doc.setDrawColor(220, 220, 220);
+    y = tlY + 26;
+  }
+
+  // ── DECISION FLOWCHART (visual, drawn in jsPDF)
+  checkPage(30);
+  sectionHead("Decision Pathway Flowchart");
+  {
+    const fcX = M + 10, fcNodeW = 70, fcNodeH = 11, fcGapY = 8;
+    const fcAnsW = 70;
+    const fcCX = fcX + fcNodeW / 2;
+    interface FcNode { label: string; type: "start" | "question" | "yes" | "no"; answer?: string }
+    const fcNodes: FcNode[] = [];
+    fcNodes.push({ label: "Incident Reported", type: "start" });
+    fcNodes.push({ label: `Category: ${catLabel}`, type: "start", answer: catLabel });
+    pathSteps.forEach(step => {
+      const shortQ = step.question.length > 45 ? step.question.slice(0, 42) + "..." : step.question;
+      const shortA = step.selectedOption.length > 40 ? step.selectedOption.slice(0, 37) + "..." : step.selectedOption;
+      fcNodes.push({ label: shortQ, type: "question", answer: shortA });
+    });
+    fcNodes.push({ label: terminal.reportable ? "REPORTABLE" : "NOT REPORTABLE", type: terminal.reportable ? "yes" : "no" });
+
+    fcNodes.forEach((node, ni) => {
+      const neededH = fcNodeH + (ni < fcNodes.length - 1 ? fcGapY : 0) + 2;
+      checkPage(neededH + 4);
+      const ny = y;
+
+      let fillR = 248, fillG = 250, fillB = 252;
+      let strokeR = 200, strokeG = 200, strokeB = 200;
+      let txtR = 55, txtG = 65, txtB = 81;
+      let rr = 2;
+      if (node.type === "start") { fillR = 27; fillG = 87; fillB = 69; txtR = 255; txtG = 255; txtB = 255; strokeR = 27; strokeG = 87; strokeB = 69; rr = 3; }
+      else if (node.type === "yes") { fillR = 220; fillG = 38; fillB = 38; txtR = 255; txtG = 255; txtB = 255; strokeR = 185; strokeG = 28; strokeB = 28; rr = 5; }
+      else if (node.type === "no") { fillR = 22; fillG = 163; fillB = 74; txtR = 255; txtG = 255; txtB = 255; strokeR = 21; strokeG = 128; strokeB = 61; rr = 5; }
+      else { fillR = 239; fillG = 246; fillB = 255; strokeR = 147; strokeG = 197; strokeB = 253; }
+
+      doc.setFillColor(fillR, fillG, fillB); doc.setDrawColor(strokeR, strokeG, strokeB);
+      doc.roundedRect(fcX, ny, fcNodeW, fcNodeH, rr, rr, "FD");
+      doc.setTextColor(txtR, txtG, txtB); doc.setFontSize(node.type === "start" || node.type === "yes" || node.type === "no" ? 7 : 5.5);
+      doc.setFont("helvetica", node.type === "question" ? "normal" : "bold");
+      const nodeLines = doc.splitTextToSize(node.label, fcNodeW - 6);
+      const textStartY = ny + (fcNodeH / 2) - ((nodeLines.length - 1) * 2.5 / 2) + 1;
+      nodeLines.forEach((line: string, li: number) => {
+        doc.text(line, fcCX, textStartY + li * 2.5, { align: "center" });
+      });
+
+      if (node.answer && node.type === "question") {
+        const badgeX = fcX + fcNodeW + 4;
+        const badgeW = Math.min(doc.getTextWidth(node.answer) + 8, fcAnsW);
+        doc.setFillColor(240, 253, 244); doc.setDrawColor(187, 247, 208);
+        doc.roundedRect(badgeX, ny + 1.5, badgeW, fcNodeH - 3, 2, 2, "FD");
+        doc.setTextColor(22, 101, 52); doc.setFontSize(5); doc.setFont("helvetica", "bold");
+        const ansLines = doc.splitTextToSize(node.answer, badgeW - 4);
+        doc.text(ansLines[0], badgeX + 2, ny + fcNodeH / 2 + 0.5);
+        doc.setDrawColor(187, 247, 208); doc.setLineWidth(0.4);
+        doc.line(fcX + fcNodeW, ny + fcNodeH / 2, badgeX, ny + fcNodeH / 2);
+        doc.setLineWidth(0.2);
+      }
+
+      y = ny + fcNodeH;
+
+      if (ni < fcNodes.length - 1) {
+        const arrowX = fcCX;
+        const isCompleted = node.type === "start" || node.type === "question";
+        doc.setDrawColor(isCompleted ? 27 : 200, isCompleted ? 87 : 200, isCompleted ? 69 : 200);
+        doc.setLineWidth(isCompleted ? 0.6 : 0.3);
+        doc.line(arrowX, y, arrowX, y + fcGapY - 2);
+        doc.setFillColor(isCompleted ? 27 : 200, isCompleted ? 87 : 200, isCompleted ? 69 : 200);
+        const tipY = y + fcGapY - 1;
+        doc.triangle(arrowX, tipY, arrowX - 1.5, tipY - 2.5, arrowX + 1.5, tipY - 2.5, "F");
+        doc.setLineWidth(0.2);
+        y += fcGapY;
+      }
+      doc.setDrawColor(220, 220, 220);
+    });
+    y += 6;
+  }
+
+  // ── Decision Pathway Table (colour-coded)
   checkPage(20);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Decision Pathway", M, y); y += 5;
-  const cols = [12, CW - 12 - 65, 65];
-  // Header
+  sectionHead("Decision Pathway Detail");
+  const cols = [10, CW - 10 - 60, 60];
   let cx = M;
   ["#", "Question", "Answer Selected"].forEach((h, i) => {
     doc.setFillColor(30, 30, 30); doc.rect(cx, y, cols[i], 6, "F");
@@ -329,46 +488,102 @@ async function exportPDF(
   doc.setTextColor(0, 0, 0); y += 6;
   doc.setDrawColor(200, 200, 200);
 
-  // Category row first
   cx = M;
   ["1", "Incident Category", catLabel].forEach((t, i) => {
-    doc.setFillColor(232, 240, 236); doc.rect(cx, y, cols[i], 6, "FD");
-    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", i === 0 ? "bold" : "normal"); doc.setFontSize(6);
+    doc.setFillColor(232, 240, 236); doc.setDrawColor(200, 220, 210);
+    doc.rect(cx, y, cols[i], 6, "FD");
+    doc.setTextColor(27, 87, 69); doc.setFont("helvetica", i === 0 ? "bold" : "normal"); doc.setFontSize(6);
     const tLines = doc.splitTextToSize(t, cols[i] - 4);
     doc.text(tLines[0], cx + 2, y + 4);
     cx += cols[i];
   });
+  doc.setTextColor(0, 0, 0); doc.setDrawColor(200, 200, 200);
   y += 6;
 
-  // Path steps
-  path.forEach((step, si) => {
+  pathSteps.forEach((step, si) => {
     const rowH = 8;
     checkPage(rowH);
     cx = M;
-    const shortQ = step.question.length > 80 ? step.question.slice(0, 77) + "..." : step.question;
-    const shortA = step.selectedOption.length > 40 ? step.selectedOption.slice(0, 37) + "..." : step.selectedOption;
+    const shortQ = step.question.length > 75 ? step.question.slice(0, 72) + "..." : step.question;
+    const shortA = step.selectedOption.length > 38 ? step.selectedOption.slice(0, 35) + "..." : step.selectedOption;
+    const isTerminalStep = si === pathSteps.length - 1;
+    const rowBgR = isTerminalStep ? (isReport ? 254 : 240) : (si % 2 === 0 ? 250 : 255);
+    const rowBgG = isTerminalStep ? (isReport ? 226 : 253) : (si % 2 === 0 ? 250 : 255);
+    const rowBgB = isTerminalStep ? (isReport ? 226 : 244) : (si % 2 === 0 ? 250 : 255);
+    const rowBorderR = isTerminalStep ? (isReport ? 252 : 187) : 200;
+    const rowBorderG = isTerminalStep ? (isReport ? 165 : 247) : 200;
+    const rowBorderB = isTerminalStep ? (isReport ? 165 : 208) : 200;
+    if (isTerminalStep) {
+      doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+      doc.rect(M, y, 1.5, rowH, "F");
+    }
     [`${si + 2}`, shortQ, shortA].forEach((t, i) => {
-      if (si % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], rowH, "FD"); }
-      else { doc.rect(cx, y, cols[i], rowH, "D"); }
+      doc.setFillColor(rowBgR, rowBgG, rowBgB);
+      doc.setDrawColor(rowBorderR, rowBorderG, rowBorderB);
+      doc.rect(cx, y, cols[i], rowH, "FD");
       doc.setTextColor(0, 0, 0); doc.setFont("helvetica", i === 0 ? "bold" : "normal"); doc.setFontSize(5.5);
       const lines = doc.splitTextToSize(t, cols[i] - 4);
       doc.text(lines[0], cx + 2, y + 3.5);
       if (lines.length > 1) doc.text(lines[1], cx + 2, y + 6.5);
       cx += cols[i];
     });
+    doc.setDrawColor(200, 200, 200);
     y += rowH;
   });
   y += 6;
 
+  // ── ACTIONS CHECKLIST
+  checkPage(30);
+  sectionHead("Actions To Take Now");
+  {
+    const actions: string[] = [];
+    if (isReport) {
+      if (terminal.phoneRequired) actions.push(`Telephone HSE immediately on ${terminal.phoneNumber || HSE_CONTACTS.riddorPhone}`);
+      actions.push("Preserve the scene -- do not disturb evidence unless necessary for safety");
+      actions.push(`Complete online report via ${terminal.onlineUrl || HSE_CONTACTS.riddorOnline}`);
+      if (dl) actions.push(`Ensure report submitted by ${dl.deadlineDate}`);
+      if (category === "death") actions.push("Notify the police on 999");
+      if (category === "gas-incident") actions.push(`Notify Gas Safe Register on ${HSE_CONTACTS.gasSafePhone}`);
+      actions.push("Record full details in the accident book (BI 510)");
+      actions.push("Identify and preserve any witnesses and their statements");
+      actions.push("Notify your company health and safety department");
+      actions.push("Initiate an internal investigation to establish root cause");
+      actions.push("Review risk assessments and method statements for the activity");
+      actions.push("Consider whether work can continue safely or must be suspended");
+    } else {
+      actions.push("Record the incident in the accident book (BI 510)");
+      actions.push("Investigate the root cause and identify corrective actions");
+      actions.push("Review risk assessments for the activity");
+      actions.push("Monitor the injured person's condition -- reassess if incapacitated >7 days");
+      actions.push("Brief affected personnel on lessons learned");
+      actions.push("Update site induction to include lessons from this incident");
+    }
+    const cbSize = 3.5;
+    actions.forEach((action, ai) => {
+      checkPage(7);
+      const rowY = y;
+      doc.setDrawColor(180, 180, 180); doc.setFillColor(255, 255, 255);
+      doc.rect(M + 2, rowY, cbSize, cbSize, "FD");
+      doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(6.5);
+      const aLines = doc.splitTextToSize(action, CW - 12);
+      doc.text(aLines, M + 8, rowY + 2.8);
+      y += Math.max(aLines.length * 3.2, 5) + 1;
+      if (ai < actions.length - 1) {
+        doc.setDrawColor(240, 240, 240);
+        doc.line(M + 2, y - 0.5, M + CW - 2, y - 0.5);
+        doc.setDrawColor(220, 220, 220);
+      }
+    });
+    y += 4;
+  }
+
   // ── Responsible Person
   checkPage(30);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Responsible Person", M, y); y += 5;
+  sectionHead("Responsible Person");
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
   const rpLines = doc.splitTextToSize(terminal.responsiblePerson, CW - 4);
   doc.text(rpLines, M + 2, y); y += rpLines.length * 3.5 + 3;
 
-  // RP guidance table
   const rpCols = [55, CW - 55];
   cx = M;
   ["Scenario", "Responsible Person"].forEach((h, i) => {
@@ -395,8 +610,7 @@ async function exportPDF(
 
   // ── Record Keeping
   checkPage(20);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Record Keeping Requirements", M, y); y += 5;
+  sectionHead("Record Keeping Requirements");
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
   const rkLines = doc.splitTextToSize(terminal.recordKeeping, CW - 4);
   doc.text(rkLines, M + 2, y); y += rkLines.length * 3.5 + 4;
@@ -404,8 +618,7 @@ async function exportPDF(
   // ── Additional Notes
   if (terminal.additionalNotes && terminal.additionalNotes.length > 0) {
     checkPage(20);
-    doc.setFontSize(9); doc.setFont("helvetica", "bold");
-    doc.text("Important Notes", M, y); y += 5;
+    sectionHead("Important Notes");
     doc.setFontSize(7); doc.setFont("helvetica", "normal");
     terminal.additionalNotes.forEach(note => {
       checkPage(8);
@@ -417,20 +630,29 @@ async function exportPDF(
 
   // ── Regulatory References
   checkPage(20);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Regulatory References", M, y); y += 5;
-  doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  terminal.regulations.forEach(reg => {
-    checkPage(5);
-    doc.text(`- ${reg}`, M + 2, y); y += 3.5;
+  sectionHead("Regulatory References");
+  cx = M;
+  ["Regulation / Standard"].forEach((h, i) => {
+    doc.setFillColor(30, 30, 30); doc.rect(cx, y, CW, 6, "F");
+    doc.setTextColor(255, 255, 255); doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
+    doc.text(h, cx + 2, y + 4);
   });
-  y += 4;
+  doc.setTextColor(0, 0, 0); y += 6;
+  doc.setDrawColor(200, 200, 200);
+  terminal.regulations.forEach((reg, ri) => {
+    checkPage(6);
+    if (ri % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(M, y, CW, 5.5, "FD"); }
+    else { doc.rect(M, y, CW, 5.5, "D"); }
+    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(6);
+    doc.text(reg, M + 2, y + 3.8);
+    y += 5.5;
+  });
+  y += 6;
 
   // ── HSE Contact Details
-  checkPage(35);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("HSE Contact Details", M, y); y += 5;
-  const contacts: [string, string][] = [
+  checkPage(40);
+  sectionHead("HSE Contact Details");
+  const contactItems: [string, string][] = [
     ["RIDDOR Reporting Line:", HSE_CONTACTS.riddorPhone],
     ["Hours:", HSE_CONTACTS.riddorPhoneHours],
     ["Out of Hours:", HSE_CONTACTS.riddorOutOfHours],
@@ -439,24 +661,29 @@ async function exportPDF(
     ["Post:", HSE_CONTACTS.hseAddress],
   ];
   if (category === "gas-incident") {
-    contacts.push(["Gas Safe Register:", HSE_CONTACTS.gasSafePhone]);
-    contacts.push(["Gas Safe Web:", HSE_CONTACTS.gasSafeWeb]);
+    contactItems.push(["Gas Safe Register:", HSE_CONTACTS.gasSafePhone]);
+    contactItems.push(["Gas Safe Web:", HSE_CONTACTS.gasSafeWeb]);
   }
-  contacts.forEach(([label, val]) => {
-    checkPage(5);
-    doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.text(label, M + 2, y);
-    doc.setFont("helvetica", "normal");
-    const valLines = doc.splitTextToSize(val, CW - 50);
-    doc.text(valLines[0], M + 45, y);
-    if (valLines.length > 1) { y += 3; doc.text(valLines[1], M + 45, y); }
-    y += 3.8;
+  const contactPanelH = contactItems.length * 4.5 + 6;
+  checkPage(contactPanelH + 4);
+  doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
+  doc.roundedRect(M, y - 2, CW, contactPanelH, 1.5, 1.5, "FD");
+  contactItems.forEach(([label, val]) => {
+    doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+    doc.text(label, M + 4, y + 1);
+    doc.setFont("helvetica", "normal"); doc.setTextColor(17, 24, 39);
+    const valLines = doc.splitTextToSize(val, CW - 55);
+    doc.text(valLines[0], M + 48, y + 1);
+    if (valLines.length > 1) { y += 3.5; doc.text(valLines[1], M + 48, y + 1); }
+    y += 4.5;
   });
-  y += 4;
+  doc.setTextColor(0, 0, 0); doc.setDrawColor(220, 220, 220);
+  y += 6;
 
   // ── Sign-off
   checkPage(50);
   y += 2;
-  doc.setDrawColor(27, 87, 69); doc.line(M, y, W - M, y); y += 6;
+  doc.setDrawColor(27, 87, 69); doc.setLineWidth(0.6); doc.line(M, y, W - M, y); doc.setLineWidth(0.2); y += 6;
   doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("SIGN-OFF", M, y); y += 6;
   const soW = CW / 2 - 2, soH = 8;
   doc.setDrawColor(200, 200, 200); doc.setFontSize(7.5);
