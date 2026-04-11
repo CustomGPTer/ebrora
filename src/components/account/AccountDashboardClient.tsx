@@ -147,6 +147,7 @@ const AI_TOOL_CATEGORIES: Record<DashToolCategory, DashToolEntry[]> = {
     { slug: 'rfi-generator',           label: 'RFI',                 href: '/rfi-generator-builder' },
     { slug: 'payment-application',     label: 'Payment Application', href: '/payment-application-builder' },
     { slug: 'daywork-sheet',           label: 'Daywork Sheet',       href: '/daywork-sheet-builder' },
+    { slug: 'contract-scope-reviewer', label: 'Scope Risk Review',   href: '/contract-scope-reviewer' },
   ],
   'Programme': [
     { slug: 'programme-checker',       label: 'Programme Checker',   href: '/programme-checker-builder' },
