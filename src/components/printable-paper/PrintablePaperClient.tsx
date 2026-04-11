@@ -5,7 +5,7 @@ import { useState, useMemo, useCallback } from "react";
 import {
   PAPER_CATEGORIES, PAGE_DIMS, MARGINS, GRID_COLOR_PRESETS,
   PAPER_TINT_COLORS, PAPER_TINT_LABELS, PAGE_COUNT_OPTIONS,
-  FAQ_ITEMS, defaultConfig, getTypeById, totalVariationCount,
+  FAQ_ITEMS, SCALE_RULER_SCALES, defaultConfig, getTypeById, totalVariationCount,
 } from "@/data/printable-paper";
 import type {
   PaperCategoryId, PaperConfig, PageSize, Orientation,
@@ -249,10 +249,31 @@ function svgSurveyTable(area: DrawArea, headers: string[], color: string, rowH: 
 }
 
 // ─── Master SVG renderer ─────────────────────────────────────────
+// ─── Scale helper ────────────────────────────────────────────────
+function parseScale(s: string): number {
+  const parts = s.split(":");
+  return parts.length === 2 ? parseInt(parts[1]) || 1 : 1;
+}
+function formatRulerLabel(mmOnPaper: number, scaleFactor: number): string {
+  const realMm = mmOnPaper * scaleFactor;
+  if (scaleFactor === 1) return `${mmOnPaper}`;
+  if (realMm >= 1000) return `${(realMm / 1000).toFixed(realMm % 1000 === 0 ? 0 : 1)}m`;
+  return `${realMm}mm`;
+}
+
 function renderPreviewSVG(config: PaperConfig): string {
   const dims = PAGE_DIMS[config.pageSize][config.orientation];
   const margin = MARGINS[config.marginSize];
-  const area: DrawArea = { x: margin, y: margin, w: dims.w - margin * 2, h: dims.h - margin * 2 };
+  const hasRuler = config.scaleRuler !== "none";
+  const rulerPad = hasRuler ? 3 : 0;
+  const hasLeft = config.scaleRuler === "left" || config.scaleRuler === "l-shape";
+  const hasBottom = config.scaleRuler === "bottom" || config.scaleRuler === "l-shape";
+  const area: DrawArea = {
+    x: margin + (hasLeft ? rulerPad : 0),
+    y: margin,
+    w: dims.w - margin * 2 - (hasLeft ? rulerPad : 0),
+    h: dims.h - margin * 2 - (hasBottom ? rulerPad : 0),
+  };
   const tintBg = PAPER_TINT_COLORS[config.paperTint];
   const c = config.gridColor;
 
@@ -406,16 +427,17 @@ function renderPreviewSVG(config: PaperConfig): string {
   }
 
   // Scale rulers
+  const scaleFactor = parseScale(config.scaleRulerScale);
   if (config.scaleRuler === "left" || config.scaleRuler === "l-shape") {
     for (let i = 0; i <= area.h; i += 10) {
       content += `<line x1="${area.x - 2}" y1="${area.y + i}" x2="${area.x}" y2="${area.y + i}" stroke="#999" stroke-width="0.15"/>`;
-      if (i % 50 === 0) content += `<text x="${area.x - 3}" y="${area.y + i + 0.5}" text-anchor="end" font-size="1.2" fill="#999" font-family="Helvetica">${i}</text>`;
+      if (i % 50 === 0) content += `<text x="${area.x - 3}" y="${area.y + i + 0.5}" text-anchor="end" font-size="1.7" fill="#666" font-family="Helvetica">${formatRulerLabel(i, scaleFactor)}</text>`;
     }
   }
   if (config.scaleRuler === "bottom" || config.scaleRuler === "l-shape") {
     for (let i = 0; i <= area.w; i += 10) {
       content += `<line x1="${area.x + i}" y1="${area.y + area.h}" x2="${area.x + i}" y2="${area.y + area.h + 2}" stroke="#999" stroke-width="0.15"/>`;
-      if (i % 50 === 0) content += `<text x="${area.x + i}" y="${area.y + area.h + 4}" text-anchor="middle" font-size="1.2" fill="#999" font-family="Helvetica">${i}</text>`;
+      if (i % 50 === 0) content += `<text x="${area.x + i}" y="${area.y + area.h + 4.5}" text-anchor="middle" font-size="1.7" fill="#666" font-family="Helvetica">${formatRulerLabel(i, scaleFactor)}</text>`;
     }
   }
 
@@ -436,7 +458,13 @@ async function generatePDF(config: PaperConfig) {
   const format = config.pageSize === "a4" ? "a4" : "a3";
   const doc = new jsPDF(orient, "mm", format);
   const margin = MARGINS[config.marginSize];
-  const ax = margin, ay = margin, aw = dims.w - margin * 2, ah = dims.h - margin * 2;
+  const pdfHasLeft = config.scaleRuler === "left" || config.scaleRuler === "l-shape";
+  const pdfHasBottom = config.scaleRuler === "bottom" || config.scaleRuler === "l-shape";
+  const pdfRulerPad = (pdfHasLeft || pdfHasBottom) ? 3 : 0;
+  const ax = margin + (pdfHasLeft ? pdfRulerPad : 0), ay = margin;
+  const aw = dims.w - margin * 2 - (pdfHasLeft ? pdfRulerPad : 0);
+  const ah = dims.h - margin * 2 - (pdfHasBottom ? pdfRulerPad : 0);
+  const pdfScaleFactor = parseScale(config.scaleRulerScale);
   const c = config.gridColor;
   // Parse hex color
   const cr = parseInt(c.slice(1, 3), 16), cg = parseInt(c.slice(3, 5), 16), cb = parseInt(c.slice(5, 7), 16);
@@ -891,13 +919,13 @@ async function generatePDF(config: PaperConfig) {
 
     // Scale rulers
     doc.setDrawColor(150, 150, 150); doc.setLineWidth(0.1);
-    doc.setFontSize(3); doc.setTextColor(150, 150, 150);
+    doc.setFontSize(3.5); doc.setTextColor(100, 100, 100);
     if (config.scaleRuler === "left" || config.scaleRuler === "l-shape") {
       for (let i = 0; i <= ah; i += 10) {
         const isMajor = i % 50 === 0;
         doc.setLineWidth(isMajor ? 0.15 : 0.08);
         doc.line(ax - (isMajor ? 2.5 : 1.5), ay + i, ax, ay + i);
-        if (isMajor) doc.text(String(i), ax - 3, ay + i + 0.8, { align: "right" });
+        if (isMajor) doc.text(formatRulerLabel(i, pdfScaleFactor), ax - 3, ay + i + 0.8, { align: "right" });
       }
     }
     if (config.scaleRuler === "bottom" || config.scaleRuler === "l-shape") {
@@ -905,7 +933,7 @@ async function generatePDF(config: PaperConfig) {
         const isMajor = i % 50 === 0;
         doc.setLineWidth(isMajor ? 0.15 : 0.08);
         doc.line(ax + i, ay + ah, ax + i, ay + ah + (isMajor ? 2.5 : 1.5));
-        if (isMajor) doc.text(String(i), ax + i, ay + ah + 4, { align: "center" });
+        if (isMajor) doc.text(formatRulerLabel(i, pdfScaleFactor), ax + i, ay + ah + 4.5, { align: "center" });
       }
     }
     doc.setTextColor(0, 0, 0);
@@ -1136,6 +1164,20 @@ export default function PrintablePaperClient() {
                 </select>
               </div>
             </div>
+            {config.scaleRuler !== "none" && (
+              <div>
+                <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Ruler Scale</label>
+                <select value={config.scaleRulerScale} onChange={e => updateConfig({ scaleRulerScale: e.target.value })}
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none">
+                  {SCALE_RULER_SCALES.map(s => <option key={s} value={s}>{s}{s === "1:1" ? " (actual size)" : ""}</option>)}
+                </select>
+                <p className="text-[10px] text-gray-400 mt-1">
+                  {parseScale(config.scaleRulerScale) === 1
+                    ? "Labels show millimetres (actual size on paper)"
+                    : `1mm on paper = ${parseScale(config.scaleRulerScale)}mm real world. Labels show real-world distances.`}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Download button */}
