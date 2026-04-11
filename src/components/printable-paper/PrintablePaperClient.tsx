@@ -1219,19 +1219,6 @@ export default function PrintablePaperClient() {
         </div>
       </div>
 
-      {/* ── FAQ ────────────────────────────────────────────── */}
-      <div className="border-t border-gray-100 pt-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {FAQ_ITEMS.map((faq, i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
-              <h3 className="text-sm font-bold text-gray-800 mb-2">{faq.q}</h3>
-              <p className="text-xs text-gray-600 leading-relaxed">{faq.a}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── COSHH Upsell ─────────────────────────────────── */}
       <div className="mt-12 bg-[#faf9f7] border border-[#e0ddd7] rounded-2xl p-8 sm:p-10 text-center">
         <div className="flex flex-col items-center gap-4">
@@ -1252,6 +1239,19 @@ export default function PrintablePaperClient() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
           </a>
+        </div>
+      </div>
+
+      {/* ── FAQ ────────────────────────────────────────────── */}
+      <div className="border-t border-gray-100 pt-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {FAQ_ITEMS.map((faq, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
+              <h3 className="text-sm font-bold text-gray-800 mb-2">{faq.q}</h3>
+              <p className="text-xs text-gray-600 leading-relaxed">{faq.a}</p>
+            </div>
+          ))}
         </div>
       </div>
 
