@@ -75,10 +75,12 @@ export function TbtDownloadButton({ htmlFile, title }: TbtDownloadButtonProps) {
             setModalData({ used: usageData.tbt.used, limit: usageData.tbt.limit, tier: usageData.tier });
             setUsageOk(usageData.tbt.remaining > 0);
           }
+        } else {
+          console.warn("TBT usage POST failed:", usageRes.status, await usageRes.text().catch(() => ""));
         }
-      } catch {
+      } catch (usageErr) {
         // Network/fetch error — allow download rather than blocking the user
-        console.warn("TBT usage recording failed, allowing download");
+        console.warn("TBT usage recording failed, allowing download:", usageErr);
       }
 
       // 1. Create hidden iframe — NO ?print param (that triggers window.print)
