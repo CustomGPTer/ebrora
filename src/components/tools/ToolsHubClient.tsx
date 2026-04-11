@@ -27,6 +27,7 @@ const TOOL_CATEGORIES = {
       "first-aid-needs-calculator",
       "working-at-height-calculator",
       "riddor-reporting-decision-tool",
+      "asbestos-notification-decision-tool",
     ]),
   },
   "Temporary Works": {
@@ -110,7 +111,7 @@ const TOOL_CATEGORIES = {
     icon: "🌿",
     accent: "#16A34A",
     accentLight: "rgba(22,163,74,0.08)",
-    slugs: new Set<string>(["ecological-exclusion-zone-checker"]),
+    slugs: new Set<string>(["ecological-exclusion-zone-checker", "asbestos-notification-decision-tool"]),
   },
   "Utilities & Services": {
     icon: "⚡",
@@ -225,6 +226,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "historical-weather": { icon: "🌦️", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "working-at-height-calculator": { icon: "🪜", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "riddor-reporting-decision-tool": { icon: "🚨", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
+  "asbestos-notification-decision-tool": { icon: "⚠️", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
