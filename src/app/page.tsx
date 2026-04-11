@@ -144,6 +144,7 @@ export default function HomePage() {
     { label: 'Payment Application', href: '/payment-application-builder' },
     { label: 'Daywork Sheet', href: '/daywork-sheet-builder' },
     { label: 'Programme Checker', href: '/programme-checker-builder' },
+    { label: 'Contract Scope Risk Reviewer', href: '/contract-scope-reviewer' },
     { label: 'Carbon Footprint', href: '/carbon-footprint-builder' },
     { label: 'Carbon Reduction Plan', href: '/carbon-reduction-plan-builder' },
   ];
