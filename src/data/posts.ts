@@ -5,9 +5,18 @@
  * All post content preserved exactly as-is for backward compatibility.
  */
 
+import { NEW_POSTS } from './new-posts';
+
 export interface BlogCategory {
   label: string;
   icon: string;
+}
+
+export interface RelatedLink {
+  title: string;
+  description: string;
+  href: string;
+  type: 'tool' | 'ai-tool' | 'resource';
 }
 
 export interface BlogPost {
@@ -20,6 +29,7 @@ export interface BlogPost {
   featuredImage: string;
   content: string;
   relatedProducts: string[];
+  relatedLinks?: RelatedLink[];
   tags: string[];
 }
 
@@ -30,9 +40,15 @@ export const BLOG_CATEGORIES: Record<string, BlogCategory> = {
   safety: { label: "Health & Safety", icon: "🦺" },
   management: { label: "Site Management", icon: "📋" },
   infrastructure: { label: "Infrastructure", icon: "🏗️" },
+  "ai-tools": { label: "AI Tools", icon: "🤖" },
+  "plant-equipment": { label: "Plant & Equipment", icon: "🚜" },
+  environmental: { label: "Environmental & Ecology", icon: "🌿" },
+  commercial: { label: "Commercial & Contracts", icon: "📑" },
+  earthworks: { label: "Earthworks & Ground", icon: "⛏️" },
+  "temporary-works": { label: "Temporary Works", icon: "🏗️" },
 };
 
-export const POSTS: BlogPost[] = [
+const _EXISTING_POSTS: BlogPost[] = [
   {
     id: "10-excel-tips-site-managers",
     title: "10 Excel Tips Every Construction Site Manager Should Know",
@@ -596,3 +612,5 @@ export const POSTS: BlogPost[] = [
     ],
   },
 ];
+
+export const POSTS: BlogPost[] = [..._EXISTING_POSTS, ...NEW_POSTS];
