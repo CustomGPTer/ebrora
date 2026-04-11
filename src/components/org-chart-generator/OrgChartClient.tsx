@@ -508,8 +508,9 @@ function isLightColor(hex: string): boolean {
 
 // ─── MAIN COMPONENT ────────────────────────────────────────────────────────
 export default function OrgChartClient() {
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const isLoggedIn = !!session?.user;
+  const sessionLoading = sessionStatus === "loading";
 
   // State
   const [people, setPeople] = useState<Person[]>([]);
@@ -593,10 +594,15 @@ export default function OrgChartClient() {
 
   // ─── LOAD CHART ON MOUNT ─────────────────────────────────────────────────
   useEffect(() => {
+    // Don't do anything while session is still loading
+    if (sessionLoading) return;
+
     if (!isLoggedIn) { setLoading(false); return; }
+
     (async () => {
       try {
         const res = await fetch("/api/org-chart/load");
+        if (!res.ok) { console.error("Load failed:", res.status); setLoading(false); return; }
         const data = await res.json();
         if (data.chartData) {
           setPeople(data.chartData.people || []);
@@ -605,12 +611,16 @@ export default function OrgChartClient() {
             ...DEFAULT_SETTINGS,
             ...saved,
             visibleFields: { ...DEFAULT_SETTINGS.visibleFields, ...(saved.visibleFields || {}) },
+            colorOverrides: saved.colorOverrides || {},
+            chartTitle: saved.chartTitle || "",
           };
           setSettings(merged);
           setShareId(data.shareId || null);
           pushHistory(data.chartData.people || [], merged);
         }
-      } catch {}
+      } catch (err) {
+        console.error("Failed to load org chart:", err);
+      }
       setLoading(false);
     })();
 
@@ -623,7 +633,7 @@ export default function OrgChartClient() {
       } catch {}
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]);
+  }, [isLoggedIn, sessionLoading]);
 
   // ─── SAVE ─────────────────────────────────────────────────────────────────
   const save = useCallback(async () => {
