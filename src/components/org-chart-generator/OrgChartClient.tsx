@@ -36,6 +36,8 @@ interface ChartSettings {
   borderColor: string;
   colorMode: "job-family" | "management-level" | "manual";
   palette: number;
+  colorOverrides: Record<string, string>; // personId or jobFamily → hex colour
+  chartTitle: string;
   font: string;
   fontBold: boolean;
   fontItalic: boolean;
@@ -102,6 +104,8 @@ const DEFAULT_SETTINGS: ChartSettings = {
   borderColor: "#333333",
   colorMode: "job-family",
   palette: 0,
+  colorOverrides: {},
+  chartTitle: "",
   font: "Arial",
   fontBold: false,
   fontItalic: false,
@@ -143,6 +147,12 @@ function getColorForPerson(
   people: Person[],
   settings: ChartSettings
 ): string {
+  // Check person-level override first, then job-family override
+  if (settings.colorOverrides[person.id]) return settings.colorOverrides[person.id];
+  if (person.jobFamily && settings.colorOverrides[`jf:${person.jobFamily}`]) {
+    return settings.colorOverrides[`jf:${person.jobFamily}`];
+  }
+
   const pal = PALETTES[settings.palette]?.colors || PALETTES[0].colors;
 
   if (settings.colorMode === "job-family") {
@@ -174,6 +184,7 @@ const H_GAP = 30;
 const V_GAP = 50;
 const PHOTO_SIZE = 36;
 
+// A3 landscape proportions (mm) — used for WYSIWYG canvas
 function fieldCount(s: ChartSettings): number {
   let c = 0;
   if (s.visibleFields.name) c++;
@@ -512,6 +523,8 @@ export default function OrgChartClient() {
   const [loading, setLoading] = useState(true);
   const [showClearWarn, setShowClearWarn] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [dragOverPos, setDragOverPos] = useState<"before" | "child" | "after" | null>(null);
   const [showSettingsPanel, setShowSettingsPanel] = useState(true);
   const [paidUser, setPaidUser] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -892,47 +905,79 @@ export default function OrgChartClient() {
     isPanning.current = false;
   }, []);
 
-  // ─── RENDER CHART SVG ────────────────────────────────────────────────────
+  // ─── RENDER CHART SVG (A3 WYSIWYG) ─────────────────────────────────────
+  // A3 landscape viewBox: 3px per mm = 1260 x 891
+  const A3_VW = 1260;
+  const A3_VH = 891;
+
   const { svgContent, svgWidth, svgHeight } = useMemo(() => {
-    if (people.length === 0) {
-      return { svgContent: "", svgWidth: 400, svgHeight: 200 };
-    }
+    const emptyReturn = { svgContent: "", svgWidth: A3_VW, svgHeight: A3_VH };
+
+    if (people.length === 0) return emptyReturn;
 
     const roots = buildTree(null, people, settings, people.length);
-    if (roots.length === 0) {
-      return { svgContent: "", svgWidth: 400, svgHeight: 200 };
-    }
+    if (roots.length === 0) return emptyReturn;
+
     const padding = 40;
-    const layout = settings.layout === "bottom-up" ? "top-down" : settings.layout;
+    const layoutDir = settings.layout === "bottom-up" ? "top-down" : settings.layout;
 
     let dims: { width: number; height: number };
-    if (layout === "left-right") {
+    if (layoutDir === "left-right") {
       dims = layoutLeftRight(roots, padding, padding, settings, people.length);
     } else {
       dims = layoutTopDown(roots, padding, padding, settings, people.length);
     }
 
-    const totalW = dims.width + padding * 2;
-    const totalH = dims.height + padding * 2;
+    const naturalW = dims.width + padding * 2;
+    const naturalH = dims.height + padding * 2;
 
-    // If bottom-up, flip Y positions of all nodes so root is at bottom
+    // Bottom-up: flip Y positions
     if (settings.layout === "bottom-up") {
       function flipNodes(nodes: LayoutNode[]) {
         for (const node of nodes) {
-          node.y = totalH - node.y - node.h;
+          node.y = naturalH - node.y - node.h;
           flipNodes(node.children);
         }
       }
       flipNodes(roots);
     }
 
+    // Calculate title space
+    const titleH = settings.chartTitle ? 40 : 0;
+
+    // Calculate scale to fit A3 with margins
+    const margin = 30;
+    const availW = A3_VW - margin * 2;
+    const availH = A3_VH - margin * 2 - titleH;
+    const scale = Math.min(availW / naturalW, availH / naturalH);
+
+    // Centre offset
+    const scaledW = naturalW * scale;
+    const scaledH = naturalH * scale;
+    const offsetX = margin + (availW - scaledW) / 2;
+    const offsetY = margin + titleH + (availH - scaledH) / 2;
+
     let svg = "";
+
+    // A3 border (subtle dashed)
+    svg += `<rect x="0" y="0" width="${A3_VW}" height="${A3_VH}" fill="white" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,4" rx="4" />`;
+
+    // Title
+    if (settings.chartTitle) {
+      const titleFontSize = Math.min(24, Math.max(14, 24 * (people.length > 20 ? 0.7 : 1)));
+      const titleWeight = settings.titleBold ? "bold" : "normal";
+      const titleStyle = settings.fontItalic ? "italic" : "normal";
+      svg += `<text x="${A3_VW / 2}" y="${margin + titleFontSize + 4}" text-anchor="middle" font-family="'${settings.font}'" font-size="${titleFontSize}" font-weight="${titleWeight}" font-style="${titleStyle}" fill="#1a1a1a">${escSvg(settings.chartTitle)}</text>`;
+    }
+
+    // Wrap chart content in a scaled/translated group
+    svg += `<g transform="translate(${offsetX},${offsetY}) scale(${scale})">`;
 
     // Draw arrows
     function drawArrows(nodes: LayoutNode[]) {
       for (const node of nodes) {
         for (const child of node.children) {
-          svg += drawArrow(node, child, settings, layout);
+          svg += drawArrow(node, child, settings, layoutDir);
         }
         drawArrows(node.children);
       }
@@ -949,7 +994,9 @@ export default function OrgChartClient() {
     }
     drawNodes(roots);
 
-    return { svgContent: svg, svgWidth: totalW, svgHeight: totalH };
+    svg += `</g>`;
+
+    return { svgContent: svg, svgWidth: A3_VW, svgHeight: A3_VH };
   }, [people, settings, selectedId]);
 
   // ─── SETTINGS UPDATE ─────────────────────────────────────────────────────
@@ -1177,9 +1224,53 @@ export default function OrgChartClient() {
               </select>
               <div className="flex gap-0.5 mt-1">
                 {PALETTES[settings.palette].colors.map((c, i) => (
-                  <div key={i} className="flex-1 h-4 rounded-sm" style={{ backgroundColor: c }} />
+                  <div
+                    key={i}
+                    className="flex-1 h-6 rounded-sm cursor-pointer hover:scale-110 hover:ring-2 hover:ring-blue-400 transition-transform"
+                    style={{ backgroundColor: c }}
+                    title={selectedId ? `Assign to selected person` : `Click a person first, then click a swatch`}
+                    onClick={() => {
+                      if (selectedId) {
+                        const person = people.find(p => p.id === selectedId);
+                        if (person) {
+                          updateSettings({
+                            colorOverrides: {
+                              ...settings.colorOverrides,
+                              [selectedId]: c,
+                              ...(person.jobFamily ? { [`jf:${person.jobFamily}`]: c } : {}),
+                            },
+                          });
+                        }
+                      }
+                    }}
+                  />
                 ))}
               </div>
+              {selectedId && (
+                <p className="text-[10px] text-blue-600 mt-1">Click a swatch to assign it to the selected person &amp; their job family</p>
+              )}
+              {!selectedId && people.length > 0 && (
+                <p className="text-[10px] text-gray-400 mt-1">Select a person on the chart, then click a swatch</p>
+              )}
+              {Object.keys(settings.colorOverrides).length > 0 && (
+                <button
+                  onClick={() => updateSettings({ colorOverrides: {} })}
+                  className="text-[10px] text-red-500 hover:underline mt-1"
+                >
+                  Reset all colour overrides
+                </button>
+              )}
+            </div>
+
+            {/* Chart Title */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Chart Title</label>
+              <input
+                value={settings.chartTitle}
+                onChange={(e) => updateSettings({ chartTitle: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                placeholder="e.g. Salford WwTW — Site Organisation"
+              />
             </div>
 
             {/* Font */}
@@ -1222,41 +1313,41 @@ export default function OrgChartClient() {
           </div>
         )}
 
-        {/* CHART CANVAS */}
+        {/* CHART CANVAS — A3 WYSIWYG */}
         <div
           ref={containerRef}
-          className="flex-1 bg-white border border-gray-200 rounded-xl overflow-hidden relative"
-          style={{ minHeight: 500, cursor: isPanning.current ? "grabbing" : "default" }}
+          className="flex-1 bg-gray-100 border border-gray-200 rounded-xl overflow-auto relative"
+          style={{ cursor: isPanning.current ? "grabbing" : "default" }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          {people.length === 0 ? (
-            <div className="flex items-center justify-center h-[500px] text-gray-400 text-sm">
-              <div className="text-center space-y-2">
-                <p className="text-lg">No people added yet</p>
-                <p>Click <strong>+ Add Person</strong> to start building your org chart</p>
-              </div>
-            </div>
-          ) : (
+          <div style={{ transform: `scale(${zoom})`, transformOrigin: "0 0", display: "inline-block" }}>
             <svg
               ref={svgRef}
               viewBox={`0 0 ${svgWidth} ${svgHeight}`}
               width={svgWidth}
               height={svgHeight}
               xmlns="http://www.w3.org/2000/svg"
-              style={{
-                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-                transformOrigin: "0 0",
-              }}
+              className="block shadow-sm"
+              style={{ margin: `${pan.y}px ${pan.x}px` }}
               onClick={handleSvgClick}
               dangerouslySetInnerHTML={{ __html: svgContent }}
             />
+          </div>
+
+          {people.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm pointer-events-none">
+              <div className="text-center space-y-2">
+                <p className="text-lg">No people added yet</p>
+                <p>Click <strong>+ Add Person</strong> to start building your org chart</p>
+              </div>
+            </div>
           )}
 
           {/* Zoom hint */}
-          <div className="absolute bottom-2 right-2 text-[10px] text-gray-400">
+          <div className="absolute bottom-2 right-2 text-[10px] text-gray-400 bg-white/80 px-1.5 py-0.5 rounded">
             Scroll to zoom · Alt+drag to pan · Click node to edit
           </div>
         </div>
@@ -1265,8 +1356,8 @@ export default function OrgChartClient() {
       {/* PEOPLE LIST (drag-and-drop) */}
       {people.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">People — drag to reorder or re-parent</h3>
-          <div className="space-y-1 max-h-64 overflow-y-auto">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">People — drag to reorder or re-parent (top third = before, middle = make child, bottom third = after)</h3>
+          <div className="space-y-0.5 max-h-72 overflow-y-auto">
             {renderPeopleList(null, 0)}
           </div>
         </div>
@@ -1321,43 +1412,70 @@ export default function OrgChartClient() {
   // ─── RECURSIVE PEOPLE LIST RENDERER ──────────────────────────────────────
   function renderPeopleList(parentId: string | null, depth: number): React.ReactNode {
     const items = getChildren(parentId, people);
-    return items.map((p) => (
-      <div key={p.id}>
-        <div
-          draggable
-          onDragStart={() => handleDragStart(p.id)}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // Determine position based on mouse position
-            const rect = (e.target as HTMLElement).getBoundingClientRect();
-            const y = e.clientY - rect.top;
-            const third = rect.height / 3;
-            if (y < third) handleDrop(p.id, "before");
-            else if (y > third * 2) handleDrop(p.id, "after");
-            else handleDrop(p.id, "child");
-          }}
-          onClick={() => {
-            setSelectedId(p.id);
-            setEditPerson({ ...p });
-          }}
-          className={`flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-grab hover:bg-blue-50 transition-colors text-sm ${
-            selectedId === p.id ? "bg-blue-100 ring-1 ring-blue-300" : ""
-          } ${dragId === p.id ? "opacity-40" : ""}`}
-          style={{ paddingLeft: `${depth * 20 + 8}px` }}
-        >
-          {p.photo && (
-            <img src={p.photo} alt="" className="w-6 h-6 rounded-full object-cover" />
+    return items.map((p) => {
+      const isDropTarget = dragOverId === p.id;
+      return (
+        <div key={p.id}>
+          {/* Drop zone: before */}
+          {isDropTarget && dragOverPos === "before" && (
+            <div className="h-0.5 bg-blue-500 rounded-full mx-2" style={{ marginLeft: `${depth * 20 + 8}px` }} />
           )}
-          <span className="font-medium text-gray-800">{p.name || "Unnamed"}</span>
-          {p.title && <span className="text-gray-500">— {p.title}</span>}
-          {p.jobFamily && <span className="text-gray-400 text-xs">({p.jobFamily})</span>}
-          <span className="ml-auto text-gray-300 text-xs">⠿</span>
+          <div
+            draggable
+            onDragStart={() => handleDragStart(p.id)}
+            onDragEnd={() => { setDragId(null); setDragOverId(null); setDragOverPos(null); }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              const rect = e.currentTarget.getBoundingClientRect();
+              const y = e.clientY - rect.top;
+              const third = rect.height / 3;
+              setDragOverId(p.id);
+              if (y < third) setDragOverPos("before");
+              else if (y > third * 2) setDragOverPos("after");
+              else setDragOverPos("child");
+            }}
+            onDragLeave={() => { if (dragOverId === p.id) { setDragOverId(null); setDragOverPos(null); } }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const rect = e.currentTarget.getBoundingClientRect();
+              const y = e.clientY - rect.top;
+              const third = rect.height / 3;
+              if (y < third) handleDrop(p.id, "before");
+              else if (y > third * 2) handleDrop(p.id, "after");
+              else handleDrop(p.id, "child");
+              setDragOverId(null);
+              setDragOverPos(null);
+            }}
+            onClick={() => {
+              setSelectedId(p.id);
+              setEditPerson({ ...p });
+            }}
+            className={`flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-grab transition-all text-sm border ${
+              selectedId === p.id
+                ? "bg-blue-100 border-blue-300 ring-1 ring-blue-300"
+                : isDropTarget && dragOverPos === "child"
+                ? "bg-green-50 border-green-400 border-dashed"
+                : "bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-200"
+            } ${dragId === p.id ? "opacity-30 scale-95" : ""}`}
+            style={{ paddingLeft: `${depth * 20 + 8}px`, marginBottom: "2px" }}
+          >
+            {p.photo && (
+              <img src={p.photo} alt="" className="w-6 h-6 rounded-full object-cover" />
+            )}
+            <span className="font-medium text-gray-800">{p.name || "Unnamed"}</span>
+            {p.title && <span className="text-gray-500 truncate">— {p.title}</span>}
+            {p.jobFamily && <span className="text-gray-400 text-xs truncate">({p.jobFamily})</span>}
+            <span className="ml-auto text-gray-300 text-xs flex-shrink-0">⠿ drag</span>
+          </div>
+          {/* Drop zone: after */}
+          {isDropTarget && dragOverPos === "after" && (
+            <div className="h-0.5 bg-blue-500 rounded-full mx-2" style={{ marginLeft: `${depth * 20 + 8}px` }} />
+          )}
+          {renderPeopleList(p.id, depth + 1)}
         </div>
-        {renderPeopleList(p.id, depth + 1)}
-      </div>
-    ));
+      );
+    });
   }
 }
 

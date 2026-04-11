@@ -27,6 +27,8 @@ export interface ChartSettings {
   borderColor: string;
   colorMode: "job-family" | "management-level" | "manual";
   palette: number;
+  colorOverrides: Record<string, string>;
+  chartTitle: string;
   font: string;
   fontBold: boolean;
   fontItalic: boolean;
@@ -100,6 +102,8 @@ export const DEFAULT_SETTINGS: ChartSettings = {
   borderColor: "#333333",
   colorMode: "job-family",
   palette: 0,
+  colorOverrides: {},
+  chartTitle: "",
   font: "Arial",
   fontBold: false,
   fontItalic: false,
@@ -160,6 +164,10 @@ function getColorForPerson(
   people: Person[],
   settings: ChartSettings
 ): string {
+  if (settings.colorOverrides?.[person.id]) return settings.colorOverrides[person.id];
+  if (person.jobFamily && settings.colorOverrides?.[`jf:${person.jobFamily}`]) {
+    return settings.colorOverrides[`jf:${person.jobFamily}`];
+  }
   const pal = PALETTES[settings.palette]?.colors || PALETTES[0].colors;
   if (settings.colorMode === "job-family") {
     const families = [...new Set(people.map((p) => p.jobFamily).filter(Boolean))];
