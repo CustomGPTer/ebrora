@@ -17,16 +17,18 @@ export default function BlogListingClient({ posts, categories }: BlogListingClie
 
   // Filter posts based on selected category and search query
   const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
-      const matchesCategory = !selectedCategory || post.category === selectedCategory;
-      const matchesSearch =
-        !searchQuery ||
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    return posts
+      .filter((post) => {
+        const matchesCategory = !selectedCategory || post.category === selectedCategory;
+        const matchesSearch =
+          !searchQuery ||
+          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      return matchesCategory && matchesSearch;
-    });
+        return matchesCategory && matchesSearch;
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [posts, selectedCategory, searchQuery]);
 
   // Format date to "1 March 2026" format
