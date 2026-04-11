@@ -706,9 +706,9 @@ async function exportPDF(
     doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
     doc.text(
       "RIDDOR reporting assessment using the Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013. This tool provides guidance only -- it does not constitute legal advice.",
-      M, 290
+      M, 288
     );
-    doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, 290);
+    doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, 292);
   }
 
   doc.save(`riddor-assessment-${todayISO()}.pdf`);
