@@ -78,6 +78,7 @@
    ============================================================================ */
 .hp-hero {
   position: relative;
+  z-index: 50;
   overflow: clip;
   background: linear-gradient(160deg, #0f2d22 0%, #1B5B50 45%, #1a6b5c 100%);
   padding: 4rem 1.5rem 3.5rem;
