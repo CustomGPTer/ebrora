@@ -246,7 +246,7 @@ export default function ContractScopeReviewerClient() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
-      const res = await fetch('/api/ai-tools/scope-review', { method: 'POST', body: formData, signal: controller.signal });
+      const res = await fetch('/api/ai-tools/contract-scope-reviewer', { method: 'POST', body: formData, signal: controller.signal });
       clearTimeout(timeoutId);
 
       const ct = res.headers.get('content-type') || '';
@@ -302,7 +302,7 @@ export default function ContractScopeReviewerClient() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
-      const res = await fetch('/api/ai-tools/scope-review', { method: 'POST', body: formData, signal: controller.signal });
+      const res = await fetch('/api/ai-tools/contract-scope-reviewer', { method: 'POST', body: formData, signal: controller.signal });
       clearTimeout(timeoutId);
 
       const ct = res.headers.get('content-type') || '';
