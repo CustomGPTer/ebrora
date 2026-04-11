@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BlogPost, BlogCategory } from '@/data/posts';
+import { BlogPost, BlogCategory, RelatedLink } from '@/data/posts';
 import { Product } from '@/lib/types';
 
 interface BlogPostClientProps {
@@ -12,6 +12,7 @@ interface BlogPostClientProps {
   category: BlogCategory;
   relatedProducts: (Product | undefined)[];
   relatedPosts: BlogPost[];
+  relatedLinks: RelatedLink[];
 }
 
 export default function BlogPostClient({
@@ -19,6 +20,7 @@ export default function BlogPostClient({
   category,
   relatedProducts,
   relatedPosts,
+  relatedLinks,
 }: BlogPostClientProps) {
   const [copyLinkSuccess, setCopyLinkSuccess] = useState(false);
 
@@ -151,6 +153,28 @@ export default function BlogPostClient({
 
         {/* Sidebar */}
         <aside className="blog-post__sidebar">
+          {/* Related Tools & Resources */}
+          {relatedLinks.length > 0 && (
+            <section className="blog-post__related-tools">
+              <h3>Try These Tools</h3>
+              <div className="blog-post__related-tools-list">
+                {relatedLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="blog-post__related-tool-card"
+                  >
+                    <span className={`blog-post__related-tool-badge blog-post__related-tool-badge--${link.type}`}>
+                      {link.type === 'tool' ? '🧮 Calculator' : link.type === 'ai-tool' ? '🤖 AI Tool' : '📄 Resource'}
+                    </span>
+                    <h4 className="blog-post__related-tool-name">{link.title}</h4>
+                    <p className="blog-post__related-tool-desc">{link.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Related Products */}
           {relatedProducts.length > 0 && (
             <section className="blog-post__related-products">
