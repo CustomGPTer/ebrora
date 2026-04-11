@@ -9,14 +9,16 @@ import { useSession } from "next-auth/react";
 import { MobileMenu } from "./MobileMenu";
 import { ProductsDropdown } from "./ProductsDropdown";
 import { ResourcesDropdown } from "./ResourcesDropdown";
+import { ToolsDropdown } from "./ToolsDropdown";
 
 export function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<"products" | "resources" | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<"products" | "resources" | "tools" | null>(null);
   const pathname = usePathname();
   const productsRef = useRef<HTMLDivElement>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const { data: session, status } = useSession();
 
@@ -37,7 +39,7 @@ export function NavBar() {
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       const t = e.target as Node;
-      if (!productsRef.current?.contains(t) && !resourcesRef.current?.contains(t)) {
+      if (!productsRef.current?.contains(t) && !resourcesRef.current?.contains(t) && !toolsRef.current?.contains(t)) {
         setOpenDropdown(null);
       }
     }
@@ -52,7 +54,7 @@ export function NavBar() {
   }, [isMobileOpen]);
 
   // Hover helpers
-  const handleEnter = (which: "products" | "resources") => {
+  const handleEnter = (which: "products" | "resources" | "tools") => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
     setOpenDropdown(which);
   };
@@ -71,9 +73,10 @@ export function NavBar() {
     isActive("/products") ||
     pathname.includes("-builder");
 
+  const isToolsActive = isActive("/tools");
+
   const isResourcesActive =
     isActive("/toolbox-talks") ||
-    isActive("/tools") ||
     isActive("/free-templates") ||
     isActive("/faq") ||
     isActive("/construction-sign-maker");
@@ -184,16 +187,37 @@ export function NavBar() {
                 />
               </div>
 
+              {/* Calculators and Tools dropdown */}
+              <div
+                ref={toolsRef}
+                className="relative"
+                onMouseEnter={() => handleEnter("tools")}
+                onMouseLeave={handleLeave}
+              >
+                <button
+                  onClick={() => setOpenDropdown(openDropdown === "tools" ? null : "tools")}
+                  className={`group flex items-center gap-1 text-sm font-medium transition-colors duration-200 ${
+                    isToolsActive ? "text-[#1B5B50]" : "text-gray-700 hover:text-[#1B5B50]"
+                  }`}
+                  aria-expanded={openDropdown === "tools"}
+                  aria-haspopup="true"
+                >
+                  Calculators and Tools
+                  {chevronIcon(openDropdown === "tools")}
+                </button>
+                {openDropdown === "tools" && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-[640px] h-2" />
+                )}
+                <ToolsDropdown
+                  isOpen={openDropdown === "tools"}
+                  onClose={() => setOpenDropdown(null)}
+                />
+              </div>
+
               {/* Blog */}
               <Link href="/blog" className={`group ${linkClass(isActive("/blog"))}`}>
                 Blog
                 <span className={underlineClass(isActive("/blog"))} />
-              </Link>
-
-              {/* Printable Paper */}
-              <Link href="/tools/printable-paper" className={`group ${linkClass(isActive("/tools/printable-paper"))}`}>
-                Paper
-                <span className={underlineClass(isActive("/tools/printable-paper"))} />
               </Link>
 
               {/* Pricing */}
