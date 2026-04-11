@@ -10,12 +10,13 @@ export const CONTRACT_SCOPE_TEMPLATE_CONFIGS: Record<ContractScopeTemplateSlug, 
     displayName: 'Quick Risk Summary',
     description:
       'A concise 1–2 page executive overview highlighting the top risks, missing items, and red flags in your scope of works. Ideal for a fast gut-check before meetings or for flagging showstoppers to senior management without overwhelming detail.',
-    pageCount: 2,
+    pageCount: 3,
     layout: 'quick',
     thumbnailPath: '/product-images/contract-scope-reviewer/thumb-quick-risk-summary.jpg',
     previewPaths: [
       '/product-images/contract-scope-reviewer/preview-quick-risk-summary-p1.jpg',
       '/product-images/contract-scope-reviewer/preview-quick-risk-summary-p2.jpg',
+      '/product-images/contract-scope-reviewer/preview-quick-risk-summary-p3.jpg',
     ],
     keySections: [
       'Executive Risk Summary',
@@ -61,7 +62,7 @@ export const CONTRACT_SCOPE_TEMPLATE_CONFIGS: Record<ContractScopeTemplateSlug, 
     displayName: 'Comprehensive Risk & Action Report',
     description:
       'The full-depth analysis: everything in the Detailed Risk Review plus a complete risk register with likelihood × impact scoring, printable pre-contract checklist, prioritised RFI schedule, interface gap analysis, programme feasibility assessment, payment mechanism review, and a structured action plan with owners and deadlines. The definitive pre-contract review document.',
-    pageCount: 10,
+    pageCount: 13,
     layout: 'comprehensive',
     thumbnailPath: '/product-images/contract-scope-reviewer/thumb-comprehensive-risk-action.jpg',
     previewPaths: [
@@ -75,6 +76,9 @@ export const CONTRACT_SCOPE_TEMPLATE_CONFIGS: Record<ContractScopeTemplateSlug, 
       '/product-images/contract-scope-reviewer/preview-comprehensive-risk-action-p8.jpg',
       '/product-images/contract-scope-reviewer/preview-comprehensive-risk-action-p9.jpg',
       '/product-images/contract-scope-reviewer/preview-comprehensive-risk-action-p10.jpg',
+      '/product-images/contract-scope-reviewer/preview-comprehensive-risk-action-p11.jpg',
+      '/product-images/contract-scope-reviewer/preview-comprehensive-risk-action-p12.jpg',
+      '/product-images/contract-scope-reviewer/preview-comprehensive-risk-action-p13.jpg',
     ],
     keySections: [
       'Executive Summary (500+ Words)',
