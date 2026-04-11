@@ -123,6 +123,7 @@ model User {
   usage_records       UsageRecord[]
   ai_tool_generations AiToolGeneration[]
   ai_tool_usage       AiToolUsage[]
+  orgChart            OrgChart?
 
   @@index([email])
   @@index([google_id])
@@ -439,6 +440,23 @@ model FreeTemplate {
 enum ToolStatus {
   COMING_SOON
   LIVE
+}
+
+model OrgChart {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blobUrl     String?  // Vercel Blob URL for the chart JSON data
+  photoBlobUrls Json?  // JSON array of photo blob URLs for cleanup
+  shareId     String?  @unique @default(cuid())
+  lastSavedAt DateTime @default(now())
+  expiresAt   DateTime // 3 months from last save
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([expiresAt])
+  @@index([shareId])
+  @@map("org_charts")
 }
 
 model FreeTool {
