@@ -105,6 +105,7 @@ const TOOL_CATEGORIES = {
       "overtime-cost-calculator",
       "historical-weather",
       "plant-hire-comparator",
+      "org-chart-generator",
     ]),
   },
   "Environmental & Ecology": {
@@ -227,6 +228,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "working-at-height-calculator": { icon: "🪜", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "riddor-reporting-decision-tool": { icon: "🚨", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "asbestos-notification-decision-tool": { icon: "⚠️", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
+  "org-chart-generator": { icon: "📋", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
