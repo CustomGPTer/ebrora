@@ -530,6 +530,8 @@ export default function OrgChartClient() {
   const [paidUser, setPaidUser] = useState(false);
   const [copied, setCopied] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [paintMode, setPaintMode] = useState(false);
+  const [paintColor, setPaintColor] = useState<string | null>(null);
 
   // Undo/redo
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -1025,6 +1027,20 @@ export default function OrgChartClient() {
       const target = (e.target as SVGElement).closest("[data-person-id]");
       if (target) {
         const id = target.getAttribute("data-person-id")!;
+
+        // Paint mode: assign colour without opening modal
+        if (paintMode && paintColor) {
+          const person = people.find((pp) => pp.id === id);
+          updateSettings({
+            colorOverrides: {
+              ...settings.colorOverrides,
+              [id]: paintColor,
+              ...(person?.jobFamily ? { [`jf:${person.jobFamily}`]: paintColor } : {}),
+            },
+          });
+          return;
+        }
+
         setSelectedId(id);
         const p = people.find((pp) => pp.id === id);
         if (p) setEditPerson({ ...p });
@@ -1033,7 +1049,7 @@ export default function OrgChartClient() {
         setEditPerson(null);
       }
     },
-    [people]
+    [people, paintMode, paintColor, settings.colorOverrides, updateSettings]
   );
 
   // ─── RENDER ──────────────────────────────────────────────────────────────
@@ -1088,6 +1104,38 @@ export default function OrgChartClient() {
         <button onClick={() => setShowSettingsPanel((s) => !s)} className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
           ⚙ {showSettingsPanel ? "Hide" : "Show"} Settings
         </button>
+
+        <button
+          onClick={() => { setPaintMode((m) => !m); if (paintMode) setPaintColor(null); }}
+          className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+            paintMode
+              ? "bg-purple-600 text-white hover:bg-purple-700"
+              : "bg-white border border-gray-300 hover:bg-gray-50"
+          }`}
+        >
+          🎨 {paintMode ? "Exit Paint" : "Paint Mode"}
+        </button>
+
+        {/* Paint mode swatch bar */}
+        {paintMode && (
+          <div className="flex items-center gap-1">
+            {PALETTES[settings.palette].colors.map((c, i) => (
+              <div
+                key={i}
+                onClick={() => setPaintColor(c)}
+                className={`w-6 h-6 rounded cursor-pointer transition-transform hover:scale-125 ${paintColor === c ? "ring-2 ring-offset-1 ring-purple-500 scale-110" : ""}`}
+                style={{ backgroundColor: c }}
+                title={`Select ${c}`}
+              />
+            ))}
+            {paintColor && (
+              <span className="text-[10px] text-purple-600 font-medium ml-1">Click a person to paint</span>
+            )}
+            {!paintColor && (
+              <span className="text-[10px] text-gray-400 ml-1">Pick a colour</span>
+            )}
+          </div>
+        )}
 
         {isLoggedIn && shareId && (
           <button onClick={copyShareLink} className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
@@ -1315,7 +1363,7 @@ export default function OrgChartClient() {
         <div
           ref={containerRef}
           className="flex-1 bg-gray-100 border border-gray-200 rounded-xl overflow-auto relative p-2"
-          style={{ cursor: isPanning.current ? "grabbing" : "default", maxHeight: `${svgHeight * zoom + 20}px` }}
+          style={{ cursor: isPanning.current ? "grabbing" : paintMode && paintColor ? "crosshair" : "default", maxHeight: `${svgHeight * zoom + 20}px` }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
