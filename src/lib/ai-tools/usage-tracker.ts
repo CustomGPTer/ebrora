@@ -142,6 +142,8 @@ export const ALL_AI_TOOL_SLUGS: AiToolSlug[] = [
   'traffic-management',
   'waste-management',
   'invasive-species',
+  // Batch 3 — Commercial Upload Tools
+  'contract-scope-reviewer',
 ];
 
 export async function getAllAiToolUsage(
