@@ -525,6 +525,7 @@ export default function OrgChartClient() {
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [dragOverPos, setDragOverPos] = useState<"before" | "child" | "after" | null>(null);
+  const [dragTooltip, setDragTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
   const [showSettingsPanel, setShowSettingsPanel] = useState(true);
   const [paidUser, setPaidUser] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -536,8 +537,7 @@ export default function OrgChartClient() {
   const skipHistoryRef = useRef(false);
 
   // Zoom/pan
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(0.6);
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isPanning = useRef(false);
@@ -893,11 +893,9 @@ export default function OrgChartClient() {
   }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isPanning.current) return;
-    setPan((p) => ({
-      x: p.x + e.clientX - lastMouse.current.x,
-      y: p.y + e.clientY - lastMouse.current.y,
-    }));
+    if (!isPanning.current || !containerRef.current) return;
+    containerRef.current.scrollLeft -= e.clientX - lastMouse.current.x;
+    containerRef.current.scrollTop -= e.clientY - lastMouse.current.y;
     lastMouse.current = { x: e.clientX, y: e.clientY };
   }, []);
 
@@ -1083,7 +1081,7 @@ export default function OrgChartClient() {
         <button onClick={() => setZoom((z) => Math.min(3, z + 0.2))} className="px-2 py-1.5 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">+</button>
         <span className="text-xs text-gray-500 w-10 text-center">{Math.round(zoom * 100)}%</span>
         <button onClick={() => setZoom((z) => Math.max(0.2, z - 0.2))} className="px-2 py-1.5 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">−</button>
-        <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} className="px-2 py-1.5 text-xs bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Reset</button>
+        <button onClick={() => { setZoom(0.6); if (containerRef.current) { containerRef.current.scrollLeft = 0; containerRef.current.scrollTop = 0; } }} className="px-2 py-1.5 text-xs bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Reset</button>
 
         <div className="flex-1" />
 
@@ -1316,22 +1314,21 @@ export default function OrgChartClient() {
         {/* CHART CANVAS — A3 WYSIWYG */}
         <div
           ref={containerRef}
-          className="flex-1 bg-gray-100 border border-gray-200 rounded-xl overflow-auto relative"
-          style={{ cursor: isPanning.current ? "grabbing" : "default" }}
+          className="flex-1 bg-gray-100 border border-gray-200 rounded-xl overflow-auto relative p-2"
+          style={{ cursor: isPanning.current ? "grabbing" : "default", maxHeight: `${svgHeight * zoom + 20}px` }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          <div style={{ transform: `scale(${zoom})`, transformOrigin: "0 0", display: "inline-block" }}>
+          <div style={{ width: `${svgWidth * zoom}px`, height: `${svgHeight * zoom}px` }}>
             <svg
               ref={svgRef}
               viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-              width={svgWidth}
-              height={svgHeight}
+              width={svgWidth * zoom}
+              height={svgHeight * zoom}
               xmlns="http://www.w3.org/2000/svg"
               className="block shadow-sm"
-              style={{ margin: `${pan.y}px ${pan.x}px` }}
               onClick={handleSvgClick}
               dangerouslySetInnerHTML={{ __html: svgContent }}
             />
@@ -1390,6 +1387,16 @@ export default function OrgChartClient() {
         />
       )}
 
+      {/* DRAG TOOLTIP */}
+      {dragTooltip && (
+        <div
+          className="fixed z-50 pointer-events-none px-2.5 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg shadow-lg whitespace-nowrap"
+          style={{ left: dragTooltip.x + 12, top: dragTooltip.y - 10 }}
+        >
+          {dragTooltip.text}
+        </div>
+      )}
+
       {/* CLEAR WARNING */}
       {showClearWarn && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowClearWarn(false)}>
@@ -1423,18 +1430,26 @@ export default function OrgChartClient() {
           <div
             draggable
             onDragStart={() => handleDragStart(p.id)}
-            onDragEnd={() => { setDragId(null); setDragOverId(null); setDragOverPos(null); }}
+            onDragEnd={() => { setDragId(null); setDragOverId(null); setDragOverPos(null); setDragTooltip(null); }}
             onDragOver={(e) => {
               e.preventDefault();
               const rect = e.currentTarget.getBoundingClientRect();
               const y = e.clientY - rect.top;
               const third = rect.height / 3;
               setDragOverId(p.id);
-              if (y < third) setDragOverPos("before");
-              else if (y > third * 2) setDragOverPos("after");
-              else setDragOverPos("child");
+              const name = p.name || "Unnamed";
+              if (y < third) {
+                setDragOverPos("before");
+                setDragTooltip({ text: `↑ Move before ${name}`, x: e.clientX, y: e.clientY });
+              } else if (y > third * 2) {
+                setDragOverPos("after");
+                setDragTooltip({ text: `↓ Move after ${name}`, x: e.clientX, y: e.clientY });
+              } else {
+                setDragOverPos("child");
+                setDragTooltip({ text: `→ Make child of ${name}`, x: e.clientX, y: e.clientY });
+              }
             }}
-            onDragLeave={() => { if (dragOverId === p.id) { setDragOverId(null); setDragOverPos(null); } }}
+            onDragLeave={() => { if (dragOverId === p.id) { setDragOverId(null); setDragOverPos(null); setDragTooltip(null); } }}
             onDrop={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -1446,6 +1461,7 @@ export default function OrgChartClient() {
               else handleDrop(p.id, "child");
               setDragOverId(null);
               setDragOverPos(null);
+              setDragTooltip(null);
             }}
             onClick={() => {
               setSelectedId(p.id);
