@@ -54,6 +54,7 @@ export interface PaperConfig {
   paperTint: PaperTint;
   titleBlock: TitleBlockStyle;
   scaleRuler: ScaleRulerPosition;
+  scaleRulerScale: string;
   pageCount: number;
   titleBlockFields: {
     project: string;
@@ -289,6 +290,7 @@ export function defaultConfig(): PaperConfig {
     paperTint: "white",
     titleBlock: "none",
     scaleRuler: "none",
+    scaleRulerScale: "1:1",
     pageCount: 1,
     titleBlockFields: {
       project: "", title: "", drawnBy: "", checkedBy: "",
