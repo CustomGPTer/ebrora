@@ -177,7 +177,7 @@ function buildCategorisedTools(): Record<ToolCategory, HomepageToolCard[]> {
   const result: Record<ToolCategory, HomepageToolCard[]> = {
     'Health & Safety': [
       /* RAMS Builder is separate from AI tools — always first */
-      { title: 'RAMS Builder', desc: '10 industry formats. AI-generated risk assessments and method statements, CDM 2015 compliant.', href: '/rams-builder', icon: '🛡️', isUpload: false, isPopular: true, slug: 'rams' },
+      { title: 'RAMS Builder', desc: '11 industry formats. AI-generated risk assessments and method statements, CDM 2015 compliant.', href: '/rams-builder', icon: '🛡️', isUpload: false, isPopular: true, slug: 'rams' },
     ],
     'Quality': [],
     'Commercial': [],
@@ -252,6 +252,20 @@ const HUB_CARDS = [
     badge: 'Free',
   },
   {
+    title: 'Calculators & Tools',
+    desc: 'Free construction calculators across 14 categories — earthworks, concrete, lifting, temporary works, MEICA, and more.',
+    href: '/tools',
+    icon: (
+      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007v-.008zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" />
+      </svg>
+    ),
+    stat: '40+',
+    statLabel: 'calculators',
+    accent: 'hp-card--free',
+    badge: 'Free',
+  },
+  {
     title: 'Blog & Guides',
     desc: 'Expert articles on construction safety, RAMS, productivity tracking, Excel tips, and site management.',
     href: '/blog',
@@ -294,8 +308,8 @@ export default function HomepageClient({
   const counter1 = useCounter(templateCount);
   const counter2 = useCounter(1500);
   const counter3 = useCounter(categoryCount);
-  const counter4 = useCounter(30);
-  const counter5 = useCounter(500);
+  const counter4 = useCounter(35);
+  const counter5 = useCounter(1000);
 
   /* ── Grouped search: max MAX_PER_GROUP results per type, ordered by type priority ── */
   const getGroupedResults = useCallback(
@@ -582,7 +596,7 @@ export default function HomepageClient({
         <div className="hp-container">
           <div className="hp-section-header">
             <span className="hp-section-badge">AI Document Generators</span>
-            <h2 className="hp-section-title">30 AI Tools Across 4 Categories</h2>
+            <h2 className="hp-section-title">35+ AI Tools Across 4 Categories</h2>
             <p className="hp-section-sub">Every tool is built specifically for UK construction. Regulation-compliant outputs, ready to use on site.</p>
           </div>
 
@@ -693,7 +707,7 @@ export default function HomepageClient({
                 Every output is regulation-compliant and ready to use.
               </p>
               <ul className="hp-rams__features">
-                <li>30 AI document generators across 4 categories</li>
+                <li>35+ AI document generators across 4 categories</li>
                 <li>H&amp;S, Quality, Commercial, and Programme tools</li>
                 <li>CDM 2015, COSHH Regs, NEC, JCT &amp; BS compliant outputs</li>
                 <li>Download as professional Word and Excel documents</li>
