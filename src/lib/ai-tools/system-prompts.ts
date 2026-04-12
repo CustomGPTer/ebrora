@@ -854,7 +854,12 @@ RULES:
 - MINIMUM CONTENT QUALITY: Every prose field must contain specific, site-relevant detail — not generic boilerplate. Reference applicable UK regulations, British Standards, and HSE guidance by name and number. Use professional UK construction terminology throughout.
 - LEGAL COMPLIANCE: Every document must reference the specific regulations that mandate it. Include regulation names, section/clause numbers, and year of enactment.
 - NO THIN SECTIONS: If a minimum word count is specified, treat it as an absolute minimum — exceed it where the content warrants it. A section with fewer words than specified is a failure.
-- PARAGRAPH BREAKS: In all long text fields (100+ words), use double newlines (\\n\\n) to separate distinct paragraphs. Never write one continuous block of text — break content into readable paragraphs of 3-5 sentences each.`;
+- PARAGRAPH BREAKS: In all long text fields (100+ words), use double newlines (\\n\\n) to separate distinct paragraphs. Never write one continuous block of text — break content into readable paragraphs of 3-5 sentences each.
+- NEVER OUTPUT PLACEHOLDERS: Never include "[No content provided]", "Not specified", "N/A", or "—" as field values. If you lack data for a field, either generate reasonable content from context, or omit the field entirely. A placeholder in a professional document is a failure.
+- TABLE DATA IS MANDATORY: When the schema defines an array of objects (e.g. hazards, equipment checks, controls), you MUST populate it with a minimum of 3 data rows containing realistic, site-specific content. An array with zero items, or items with all-empty values, is never acceptable. Generate content from the task description and your knowledge of UK construction practice.
+- STRUCTURED FIELDS MUST MATCH NARRATIVE: If you write detailed information in a narrative/description field (e.g. incidentDescription), you MUST also populate the corresponding structured fields (e.g. incidentDetails.date, injuredPerson.occupation) with the same data. Never leave structured fields empty when the narrative contains the information.
+- ARITHMETIC MUST BE CORRECT: In commercial documents, Amount = Quantity × Rate. Retention = stated percentage × stated base. Variation totals must sum correctly. Do not output placeholder dashes in amount/total columns — calculate the values. Cross-check all numbers before outputting.
+- INTERNAL CONSISTENCY: All data within a single document must be internally consistent. If a table shows status "Agreed" for a variation, the narrative must not say "not yet formally valued". If the key message says "0 stands of invasive species", the body must not describe active hazards with exclusion zones. Review your output for contradictions before finalising.`;
 
 // ---------------------------------------------------------------------------
 // Tool-specific generation JSON schemas
@@ -1194,6 +1199,7 @@ CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays.
 - TILE analysis must have all four components (Task, Individual, Load, Environment) with specific justifications.
 - MAC/RAPP scores must be numerically calculated and internally consistent.
+- The keyRules and correctLiftingTechnique sections (if present in the template) must ALWAYS contain substantive content — minimum 4 numbered rules and a full TILE-based technique description. These are the core educational content of the training brief and must NEVER be empty or contain "[No content provided]".
 - Names for assessedBy: leave blank if not provided by the user. Never invent names.
 - Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
@@ -2577,8 +2583,9 @@ Minimum 11 BoQ line items with realistic quantities. Minimum 12 inclusions. Mini
 
 CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays.
-- All BoQ line items must have rate AND quantity with a calculated amount (rate × quantity).
-- priceSummary totals must sum correctly from the BoQ items.
+- All BoQ line items must have rate AND quantity with a calculated amount (rate × quantity). NEVER output "—" or empty values in amount columns.
+- priceSummary totals must sum correctly from the BoQ items. The budget total MUST be present and correct.
+- The fields validUntil, from, to, estimatedDuration, paymentTerms, and retention must ALL be populated — use reasonable defaults if the user did not specify (e.g. "30 days" for validity, "Monthly valuations, 28 days net" for payment, "5%" for retention, "8 weeks" for duration).
 - Names for preparedBy: leave blank if not provided by the user. Never invent names.
 - Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
@@ -2645,7 +2652,8 @@ Minimum 3 immediate causes. Minimum 2 underlying factors. Minimum 3 lessons lear
 
 CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays.
-- actions array must have specific, actionable items — not generic safety platitudes.
+- The fields alertDate, alertClassification, severity, site/siteAddress, and investigationLead must ALL be populated with specific values — never empty.
+- actions array must have specific, actionable items — not generic safety platitudes. Every action MUST have an owner (responsible person/role) and a target date.
 - incidentDescription must contain paragraph breaks (use \\n\\n) for readability.
 - Names: leave blank if not provided by the user. Never invent names.
 - Write in plain English accessible to operatives — this is a site-distributed bulletin.`,
@@ -3651,7 +3659,9 @@ JSON structure:
   "scenePreservation": "string (was the scene preserved? Photos taken? Evidence secured?)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 5 immediate actions. Minimum 3 immediate causes. Minimum 3 underlying causes. Minimum 5 corrective actions. The incident description must be a detailed factual narrative — not bullet points. Root cause analysis must go beyond surface-level causes.`,
+Minimum 5 immediate actions. Minimum 3 immediate causes. Minimum 3 underlying causes. Minimum 5 corrective actions. The incident description must be a detailed factual narrative — not bullet points. Root cause analysis must go beyond surface-level causes.
+
+CRITICAL: The incidentDetails object (date, time, exactLocation, activityUnderway, weatherConditions, lightingConditions) and injuredPerson object (occupation, natureOfInjury, bodyPartAffected, gender, hospitalName, daysAbsent, lengthOfService) must ALL be populated with specific values extracted from the incident narrative you generate. Do NOT leave any of these fields as empty strings — every field must contain a concrete value.`,
 
   // ── Batch 2 — Environmental & Transport ──────────────────────────────────
 
@@ -3736,7 +3746,9 @@ JSON structure:
   "monitoringArrangements": "string (min 150 words — inspection frequency, NRSWA supervisor details, daily checklists, queue monitoring, cone/sign replacement timescales, plan review trigger points)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 8 signs in schedule (with TSRGD 2016 diagram numbers). Minimum 5 risk assessment entries. Minimum 3 operative roles with names. Minimum 6 TM controls for quick brief. Reference Chapter 8 and TSRGD numbers for all signs.`,
+Minimum 8 signs in schedule (with TSRGD 2016 diagram numbers). Minimum 5 risk assessment entries. Minimum 3 operative roles with names. Minimum 6 TM controls for quick brief. Reference Chapter 8 and TSRGD numbers for all signs.
+
+CRITICAL: The date, duration, tmControls array (min 6 rows with specific control details), and operativeRoles array (all name, role, and responsibility fields populated) must NEVER be empty or contain "—". Generate realistic content from the works description.`,
 
   'waste-management': `Generate a Site Waste Management Plan compliant with EPA 1990 s.34, the Waste (England and Wales) Regulations 2011, and the waste hierarchy.
 
@@ -3804,7 +3816,9 @@ JSON structure:
   "monitoringSchedule": "string (min 150 words — weekly skip audits, monthly reporting, quarterly management reviews, annual plan review, reporting format)",
   "additionalNotes": "string (min 100 words — additional safety references, relevant legislation, further reading, and how this topic links to the site-specific RAMS)"
 }
-Minimum 7 waste streams with EWC codes (include at least 1 hazardous with * code). Minimum 5 skip/container entries. Minimum 3 carriers/facilities with EA licence numbers. Minimum 6 segregation checklist items. Minimum 4 hierarchy steps. Minimum 4 KPI targets. EWC codes must be realistic 6-digit codes for UK construction waste.`,
+Minimum 7 waste streams with EWC codes (include at least 1 hazardous with * code). Minimum 5 skip/container entries. Minimum 3 carriers/facilities with EA licence numbers. Minimum 6 segregation checklist items. Minimum 4 hierarchy steps. Minimum 4 KPI targets. EWC codes must be realistic 6-digit codes for UK construction waste.
+
+CRITICAL: Every waste stream row MUST have populated estimatedQty, classification (Hazardous/Non-hazardous/Inert), container (e.g. "8yd skip", "IBC", "205L drum"), and disposalRoute (e.g. "Licensed recycling facility", "Landfill", "Specialist treatment"). Never output "—" or empty values in these columns — generate realistic estimates from the project type and scale.`,
 
   'invasive-species': `Generate an Invasive Species Management Plan compliant with the Wildlife & Countryside Act 1981 (Section 14) and the Environmental Protection Act 1990.
 
@@ -3862,8 +3876,10 @@ Legal framework must reference specific Acts and Sections. Treatment methodology
 
 CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays.
-- speciesIdentification must have commonName, latinName, schedule, and identificationFeatures all populated.
+- speciesIdentification must have commonName, latinName, schedule, and identificationFeatures all populated. The "How to Identify It" or identificationFeatures section must ALWAYS contain species-specific visual characteristics — never "[No content provided]".
+- The keyMessage standsCount must accurately reflect the body content. If the document describes active invasive species with exclusion zones, the stands count MUST be > 0. If there are genuinely 0 stands, do not generate exclusion zone or biosecurity content.
 - monitoringSchedule must have minimum 5 entries with visit, date, and purpose.
+- The date field must be populated with the current date — never "—".
 - Names for preparedBy, ecologist: leave blank if not provided by the user. Never invent names.
 - Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
@@ -6733,9 +6749,9 @@ Round 1: "What WAH task is being checked? What height? What equipment is in use?
 After Round 1, respond with status "ready" — Quick Checks are rapid pre-task documents.
 COVER: Slate gradient banner "WAH QUICK CHECK". 5-row info table.
 BODY: Slate header bar "WAH QUICK CHECK | ref | date". Left-border sections:
-  TASK SUMMARY — 3-row info table (Task, Height, Equipment)
-  KEY HAZARDS & CONTROLS — 3-col table (Hazard/Control/OK? with green ticks, min 5 rows)
-  EQUIPMENT CHECK — 3-col table (Item/Checked green/Notes, min 6 rows)
+  TASK SUMMARY — 3-row info table (Task, Height, Equipment) — Task field must contain the FULL task description, never truncated
+  KEY HAZARDS & CONTROLS — 3-col table (Hazard/Control/OK? with green ticks, MINIMUM 5 rows — you MUST generate hazards specific to the WAH task described, e.g. falls from height, scaffold collapse, dropped objects, weather exposure, access/egress failures, contact with overhead services. Never output a header-only table.)
+  EQUIPMENT CHECK — 3-col table (Item/Checked green/Notes, MINIMUM 6 rows — you MUST generate checks for the specific equipment mentioned, e.g. scaffold tag date, harness inspection cert, MEWP LOLER certificate, guardrail integrity, toe board condition, ladder tie-off, rescue kit availability. Never output a header-only table.)
   Red warning banner "DO NOT ACCESS IF ANY CHECK FAILS"
 Sig grid (Checked By + Operatives Briefed). Valid for single shift only.`,
 
@@ -6772,9 +6788,9 @@ Round 1: "Who are the operators? Names (or 'Agency Driver 1' etc.) and their equ
 Round 2: "What controls are in place? Seat condition, haul road maintenance, speed limits, task rotation, health surveillance status?"
 COVER: Lime gradient banner "WHOLE BODY VIBRATION ASSESSMENT", subtitle with equipment list. 5-row info table.
 SECTIONS (lime bars 01–03):
-  01 EQUIPMENT & EXPOSURE SUMMARY — 7-col table (Equipment bold/Vibration/Daily Use/A(8) bold/vs EAV RAG/vs ELV RAG/Action, min 3 rows) + amber callout explaining EAV 0.5 and ELV 1.15
+  01 EQUIPMENT & EXPOSURE SUMMARY — 7-col table (Equipment bold/Vibration/Daily Use/A(8) bold/vs EAV RAG/vs ELV RAG/Action, min 3 rows) + amber callout explaining EAV 0.5 and ELV 1.15. CRITICAL: Equipment rows must contain real equipment names (not "—"), actual vibration magnitudes in m/s² (not 0), and realistic daily hours (not 0). Use your knowledge of typical WBV data for common construction plant if the user did not specify exact values (e.g. CAT 320 excavator ~0.5 m/s², JCB 3CX ~0.7 m/s², Bomag BW120 roller ~0.8 m/s²). Zero values defeat the purpose of the assessment and are never acceptable.
   02 CONTROLS — bullet list (min 6 controls with bold titles: Seat condition, Haul road, Speed limits, Task rotation, Training, Health surveillance)
-  03 OPERATIVE ACKNOWLEDGEMENT — 5-col table (Name bold/Equipment/Max Daily Hrs/Briefed green tick/Signature blank, min 3 rows) + blue review callout
+  03 OPERATIVE ACKNOWLEDGEMENT — 5-col table (Name bold/Equipment/Max Daily Hrs/Briefed green tick/Signature blank, min 3 rows — use operative names from the interview or realistic placeholders like "Operator 1") + blue review callout
 End mark.`,
 
   'compliance': `TEMPLATE: Compliance (navy #1E3A5F, Arial, 5 sections, regulatory, clause-numbered)

@@ -120,10 +120,45 @@ function cell(
 }
 
 /** Build a table from an array of objects */
-function buildTable(data: Record<string, any>[]): Table {
-  if (data.length === 0) return new Table({ rows: [] });
+function buildTable(data: Record<string, any>[]): Table | Paragraph {
+  if (data.length === 0) {
+    return new Paragraph({
+      spacing: { after: 120 },
+      children: [
+        new TextRun({
+          text: 'No data recorded.',
+          font: 'Arial',
+          size: 18,
+          italics: true,
+          color: '999999',
+        }),
+      ],
+    });
+  }
 
-  const keys = Object.keys(data[0]);
+  // Filter out rows where every value is empty or placeholder
+  const filteredData = data.filter(item =>
+    !Object.values(item).every(v =>
+      v === '' || v === '—' || v === '-' || v === 0 || v === null || v === undefined
+    )
+  );
+
+  if (filteredData.length === 0) {
+    return new Paragraph({
+      spacing: { after: 120 },
+      children: [
+        new TextRun({
+          text: 'No data recorded.',
+          font: 'Arial',
+          size: 18,
+          italics: true,
+          color: '999999',
+        }),
+      ],
+    });
+  }
+
+  const keys = Object.keys(filteredData[0]);
 
   // Header row
   const headerRow = new TableRow({
@@ -134,7 +169,7 @@ function buildTable(data: Record<string, any>[]): Table {
   });
 
   // Data rows
-  const dataRows = data.map((item, idx) =>
+  const dataRows = filteredData.map((item, idx) =>
     new TableRow({
       children: keys.map((k) =>
         cell(
@@ -753,6 +788,17 @@ export async function generateAiToolDocument(
   const bodyElements: (Paragraph | Table)[] = [];
   processContent(content, bodyElements, 0);
 
+  // Strip consecutive empty paragraphs (max 1 allowed between sections)
+  const cleanedElements: (Paragraph | Table)[] = [];
+  let prevWasEmpty = false;
+  for (const el of bodyElements) {
+    const isEmpty = el instanceof Paragraph &&
+      (el as any).root?.length === 0;
+    if (isEmpty && prevWasEmpty) continue;
+    cleanedElements.push(el);
+    prevWasEmpty = isEmpty;
+  }
+
   const doc = new Document({
     styles: {
       default: {
@@ -836,7 +882,7 @@ export async function generateAiToolDocument(
             ],
           }),
         },
-        children: [...coverPage, ...bodyElements],
+        children: [...coverPage, ...cleanedElements],
       },
     ],
   });
