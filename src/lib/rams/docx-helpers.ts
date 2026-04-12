@@ -81,6 +81,19 @@ export const NO_BORDERS = {
   right: { style: BorderStyle.NONE, size: 0, color: WHITE },
 };
 
+/**
+ * Suppress default table-level borders (auto-colored black lines).
+ * Cell-level borders from headerCell/dataCell are unaffected.
+ */
+export const NO_TABLE_BORDERS = {
+  top: { style: BorderStyle.NONE, size: 0, color: WHITE },
+  bottom: { style: BorderStyle.NONE, size: 0, color: WHITE },
+  left: { style: BorderStyle.NONE, size: 0, color: WHITE },
+  right: { style: BorderStyle.NONE, size: 0, color: WHITE },
+  insideHorizontal: { style: BorderStyle.NONE, size: 0, color: WHITE },
+  insideVertical: { style: BorderStyle.NONE, size: 0, color: WHITE },
+};
+
 // ---------------------------------------------------------------------------
 // Standard cell margins
 // ---------------------------------------------------------------------------
@@ -265,6 +278,7 @@ export function infoTable(
   const lw = labelWidth ?? Math.round(totalWidth * 0.35);
   const vw = totalWidth - lw;
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [lw, vw],
     rows: rows.map(r => new TableRow({
@@ -283,6 +297,7 @@ export function gridInfoTable(
   totalWidth: number
 ): Table {
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths,
     rows: rows.map(row => new TableRow({
@@ -306,6 +321,7 @@ export function approvalTable(
   const col4 = totalWidth - col1 - col2 - col3;
 
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [col1, col2, col3, col4],
     rows: [
@@ -364,6 +380,7 @@ export function briefingRecordTable(
   );
 
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: widths,
     rows: [headerRow, ...dataRows],
@@ -417,9 +434,9 @@ export function riskMatrix5x5(totalWidth: number): Table {
 
   const headerRow = new TableRow({
     children: [
-      headerCell('Likelihood ↓ / Severity →', labelW, { fontSize: 12 }),
+      headerCell('Likelihood ↓ / Severity →', labelW, { fontSize: 16 }),
       ...[1, 2, 3, 4, 5].map(s =>
-        headerCell(String(s), cellW, { fontSize: 14, alignment: AlignmentType.CENTER })
+        headerCell(String(s), cellW, { fontSize: 18, alignment: AlignmentType.CENTER })
       ),
     ],
   });
@@ -427,10 +444,10 @@ export function riskMatrix5x5(totalWidth: number): Table {
   const dataRows = matrixData.map((row, rIdx) =>
     new TableRow({
       children: [
-        dataCell(likelihoodLabels[rIdx], labelW, { fontSize: 12, bold: true, fillColor: EBRORA_GREEN_LIGHT }),
+        dataCell(likelihoodLabels[rIdx], labelW, { fontSize: 16, bold: true, fillColor: EBRORA_GREEN_LIGHT }),
         ...row.map(val =>
           dataCell(String(val), cellW, {
-            fontSize: 14,
+            fontSize: 18,
             bold: true,
             alignment: AlignmentType.CENTER,
             fillColor: lxsColor(val),
@@ -442,6 +459,7 @@ export function riskMatrix5x5(totalWidth: number): Table {
   );
 
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [labelW, ...Array(5).fill(cellW)],
     rows: [headerRow, ...dataRows],
@@ -456,6 +474,7 @@ export function hmlRiskKey(totalWidth: number): Table {
   const col2 = totalWidth - col1;
 
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [col1, col2],
     rows: [
@@ -743,6 +762,7 @@ export function accentFooter(docRef: string, templateName: string, accent: strin
 // ---------------------------------------------------------------------------
 export function fullWidthSectionBar(num: string, title: string, accent: string): Table {
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
     columnWidths: [A4_CONTENT_WIDTH],
     rows: [
@@ -785,6 +805,7 @@ export function coverBlock(
   subtitleColor: string
 ): Table {
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
     columnWidths: [A4_CONTENT_WIDTH],
     rows: [
@@ -834,6 +855,7 @@ export function coverBlock(
 // ---------------------------------------------------------------------------
 export function projectNameBar(text: string, accent: string): Table {
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
     columnWidths: [A4_CONTENT_WIDTH],
     rows: [
@@ -880,6 +902,7 @@ export function coverInfoTable(
   const border = { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' };
   const borders = { top: border, bottom: border, left: border, right: border };
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [lw, vw],
     rows: rows.map(r =>
@@ -970,6 +993,7 @@ export function signatureGrid(roles: string[], accent: string, totalWidth: numbe
   }
 
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [cellW, cellW],
     rows,
@@ -990,6 +1014,7 @@ export function calloutBox(
   const border = { style: BorderStyle.NONE, size: 0, color: WHITE };
   const leftBorder = { style: BorderStyle.SINGLE, size: 24, color: borderColor };
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [totalWidth],
     rows: [
@@ -1031,6 +1056,7 @@ export function kpiDashboard(
   const borders = { top: border, bottom: border, left: border, right: border };
 
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: items.map(() => cellW),
     rows: [
@@ -1075,6 +1101,7 @@ export function kpiDashboard(
 // ---------------------------------------------------------------------------
 export function warningBanner(text: string, bg: string, colour: string, totalWidth: number): Table {
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [totalWidth],
     rows: [
@@ -1157,6 +1184,7 @@ export function coverFooterLine(): Paragraph {
 // ---------------------------------------------------------------------------
 export function phaseBand(text: string, accent: string): Table {
   return new Table({
+    borders: NO_TABLE_BORDERS,
     width: { size: A4_CONTENT_WIDTH, type: WidthType.DXA },
     columnWidths: [A4_CONTENT_WIDTH],
     rows: [
