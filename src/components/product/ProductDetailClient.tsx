@@ -206,30 +206,6 @@ export default function ProductDetailClient({
               </tbody>
             </table>
 
-            {/* Description */}
-            <div className="product-description">
-              <h2>Description</h2>
-              {product.longDesc ? (
-                <div dangerouslySetInnerHTML={{ __html: product.longDesc }} />
-              ) : (
-                <p>{product.desc}</p>
-              )}
-            </div>
-
-            {/* Key Features */}
-            {product.features && product.features.length > 0 && (
-              <div className="product-features">
-                <h2>Key Features</h2>
-                <div className="product-features__grid">
-                  {product.features.map((feature, i) => (
-                    <div key={i} className="product-features__item">
-                      ✓ {feature}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Bundle Section */}
             {product.isBundle &&
               product.bundleProducts &&
@@ -267,6 +243,30 @@ export default function ProductDetailClient({
               )}
           </div>
         </div>
+
+        {/* Full-width Description */}
+        <div className="product-description product-description--full">
+          <h2>Description</h2>
+          {product.longDesc ? (
+            <div dangerouslySetInnerHTML={{ __html: product.longDesc }} />
+          ) : (
+            <p>{product.desc}</p>
+          )}
+        </div>
+
+        {/* Full-width Key Features */}
+        {product.features && product.features.length > 0 && (
+          <div className="product-features product-features--full">
+            <h2>Key Features</h2>
+            <div className="product-features__grid">
+              {product.features.map((feature, i) => (
+                <div key={i} className="product-features__item">
+                  ✓ {feature}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* CTA Bar */}
