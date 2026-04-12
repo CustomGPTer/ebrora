@@ -159,14 +159,6 @@ export default function ProductDetailClient({
                 >
                   🛒 Buy Now — {product.price}
                 </a>
-                <a
-                  href={product.pdfLink}
-                  target="_blank"
-                  rel="noopener"
-                  className="btn btn--outline btn--large"
-                >
-                  📄 Download Free PDF
-                </a>
               </div>
 
               {/* Gumroad Notice */}
