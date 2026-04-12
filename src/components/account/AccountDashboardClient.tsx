@@ -104,7 +104,7 @@ const TABS: { key: TabType; label: string; icon: React.ReactNode }[] = [
   },
 ];
 
-/** All 35 AI tools grouped by category — drives account dashboard usage grid */
+/** All 35+ AI tools grouped by category — drives account dashboard usage grid */
 type DashToolCategory = 'Health & Safety' | 'Quality' | 'Commercial' | 'Programme';
 
 interface DashToolEntry { slug: string; label: string; href: string; }

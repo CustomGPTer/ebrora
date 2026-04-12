@@ -118,7 +118,7 @@ export default function DocumentHistory({ generations }: DocumentHistoryProps) {
           </Link>{' '}
           or try one of our{' '}
           <Link href="/pricing" className="text-[#1B5745] font-medium hover:text-[#143f33]">
-            35 AI document tools
+            35+ AI document tools
           </Link>.
         </p>
       </div>
