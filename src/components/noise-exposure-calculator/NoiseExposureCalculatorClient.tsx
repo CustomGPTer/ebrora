@@ -651,9 +651,9 @@ export default function NoiseExposureCalculatorClient() {
                   const exceeds = r.maxMinsUpperEAV < r.durationMinutes;
                   return (
                     <tr key={r.id} className="border-b border-gray-100">
-                      <td className="py-2 font-medium text-gray-800">{r.name}</td>
-                      <td className="py-2 text-right">{fmtNum(r.levelDBA, 0)} dB(A)</td>
-                      <td className="py-2 text-right">{r.durationMinutes} min</td>
+                      <td className="px-2 py-2 font-medium text-gray-800">{r.name}</td>
+                      <td className="px-2 py-2 text-right">{fmtNum(r.levelDBA, 0)} dB(A)</td>
+                      <td className="px-2 py-2 text-right">{r.durationMinutes} min</td>
                       <td className={`py-2 text-right font-semibold ${exceeds ? "text-red-600" : "text-green-600"}`}>{fmtTime(r.maxMinsUpperEAV)}</td>
                       <td className={`py-2 text-right font-bold ${exceeds ? "text-red-600" : "text-green-600"}`}>{exceeds ? "EXCEEDS" : "OK"}</td>
                     </tr>
