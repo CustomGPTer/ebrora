@@ -153,7 +153,7 @@ export const PRODUCTS: Product[] = [
       "Competent person and temporary works status tracking per excavation"
     ],
         images: ["product-images/Excavation-Inspection-Register-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/excavation-inspection-register",
+        buyLink: "https://ebrora.gumroad.com/l/jgrop",
         youtubeId: "",
         new: false,
         featured: true,
@@ -198,7 +198,7 @@ export const PRODUCTS: Product[] = [
       "Filter and show/hide completed tasks toggles"
     ],
         images: ["product-images/Programme-Gantt-Chart-Template-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/gantt-chart-project-planner",
+        buyLink: "https://ebrora.gumroad.com/l/cxgnxx",
         youtubeId: "",
         new: false,
         featured: true,
@@ -248,7 +248,7 @@ export const PRODUCTS: Product[] = [
       "Designed for civil engineering and construction — excludes MEICA"
     ],
         images: ["product-images/Carbon-Calculator-Construction-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/carbon-calculator-construction",
+        buyLink: "https://ebrora.gumroad.com/l/cvyui",
         youtubeId: "",
         new: false,
         featured: false,
@@ -290,7 +290,7 @@ export const PRODUCTS: Product[] = [
       "Designed for contractual records, delay claims and daywork substantiation"
     ],
         images: ["product-images/Daily-Diary-Template-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/daily-diary-template",
+        buyLink: "https://ebrora.gumroad.com/l/gdmqgu",
         youtubeId: "",
         new: false,
         featured: false,
@@ -332,7 +332,7 @@ export const PRODUCTS: Product[] = [
       "Suitable for maintenance supervisors, process engineers and asset managers"
     ],
         images: ["product-images/Pump-Maintenance-Tracker-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/pump-maintenance-tracker",
+        buyLink: "https://ebrora.gumroad.com/l/qobkz",
         youtubeId: "",
         new: false,
         featured: false,
@@ -373,7 +373,7 @@ export const PRODUCTS: Product[] = [
       "Designed for site engineers and concrete supervisors on civil engineering projects"
     ],
         images: ["product-images/Concrete-Pour-Register-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/concrete-pour-register",
+        buyLink: "https://ebrora.gumroad.com/l/nkaku",
         youtubeId: "",
         new: false,
         featured: false,
@@ -420,7 +420,7 @@ export const PRODUCTS: Product[] = [
       "Suitable for major infrastructure and capital delivery projects"
     ],
         images: ["product-images/Persons-In-Charge-Assessment-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/pic-competence-assessment",
+        buyLink: "https://ebrora.gumroad.com/l/yojna",
         youtubeId: "",
         new: false,
         featured: false,
@@ -675,7 +675,7 @@ export const PRODUCTS: Product[] = [
       "Designed for plant coordinators and site supervisors"
     ],
     images: ["product-images/Plant-Pre-Use-Check-Sheet-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/plant-pre-use-check-sheets",
+    buyLink: "https://ebrora.gumroad.com/l/veyab",
     youtubeId: "",
     new: true,
     featured: false,
@@ -1590,7 +1590,7 @@ export const PRODUCTS: Product[] = [
       "Suitable for civil engineering, building and wastewater treatment projects"
     ],
         images: ["product-images/OWL-Register-Observation-Checklist-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/owl-list",
+        buyLink: "https://ebrora.gumroad.com/l/lenqf",
         youtubeId: "",
         new: true,
         featured: true,
@@ -1909,7 +1909,7 @@ export const PRODUCTS: Product[] = [
       "Designed for general foremen, section supervisors and construction managers"
     ],
         images: ["product-images/Supervisors-RACI-Chart-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/supervisors-raci-chart",
+        buyLink: "https://ebrora.gumroad.com/l/xxwldb",
         youtubeId: "",
         new: true,
         featured: true,
