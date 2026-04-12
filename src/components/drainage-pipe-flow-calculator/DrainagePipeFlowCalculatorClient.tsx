@@ -410,10 +410,10 @@ export default function DrainagePipeFlowCalculatorClient() {
                   const pctQ = fullQ > 0 ? (p.flowLPS / fullQ * 100) : 0;
                   return (
                     <tr key={p.depthRatio} className="border-b border-gray-100 cursor-pointer hover:bg-blue-50/50" onClick={() => setViewDepth(p.depthRatio)}>
-                      <td className="py-1.5 font-medium">{p.depthLabel} ({p.depthMM}mm)</td>
-                      <td className="py-1.5 text-right">{fmtNum(p.velocity, 3)}</td>
-                      <td className="py-1.5 text-right font-semibold">{fmtNum(p.flowLPS, 2)}</td>
-                      <td className="py-1.5 text-right">{pctQ.toFixed(1)}%</td>
+                      <td className="px-2 py-1.5 font-medium">{p.depthLabel} ({p.depthMM}mm)</td>
+                      <td className="px-2 py-1.5 text-right">{fmtNum(p.velocity, 3)}</td>
+                      <td className="px-2 py-1.5 text-right font-semibold">{fmtNum(p.flowLPS, 2)}</td>
+                      <td className="px-2 py-1.5 text-right">{pctQ.toFixed(1)}%</td>
                     </tr>
                   );
                 })}
