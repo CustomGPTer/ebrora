@@ -185,7 +185,7 @@ export default function BlogPostClient({
                     product && (
                       <Link
                         key={product.id}
-                        href={`/products/${product.id}`}
+                        href={`/${product.id}`}
                         className="blog-post__related-product-card"
                       >
                         {product.images[0] && (
