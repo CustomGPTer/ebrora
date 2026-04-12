@@ -439,9 +439,9 @@ export default function TopsoilCalculatorClient() {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-2 text-[10px] font-semibold text-gray-500 uppercase">Application</th>
-                <th className="text-right py-2 text-[10px] font-semibold text-gray-500 uppercase">Depth (mm)</th>
-                <th className="text-left py-2 text-[10px] font-semibold text-gray-500 uppercase">Notes</th>
+                <th className="text-left px-2 py-2 text-[10px] font-semibold text-gray-500 uppercase">Application</th>
+                <th className="text-right px-2 py-2 text-[10px] font-semibold text-gray-500 uppercase">Depth (mm)</th>
+                <th className="text-left px-2 py-2 text-[10px] font-semibold text-gray-500 uppercase">Notes</th>
               </tr>
             </thead>
             <tbody>
@@ -449,9 +449,9 @@ export default function TopsoilCalculatorClient() {
                 <tr key={i} className="border-b border-gray-100 cursor-pointer hover:bg-ebrora-light/30" onClick={() => {
                   if (areas.length === 1 && !areas[0].depthMM) updateArea(areas[0].id, { depthMM: d.depthMM });
                 }}>
-                  <td className="py-1.5 font-medium text-gray-800">{d.application}</td>
-                  <td className="py-1.5 text-right font-bold text-ebrora">{d.depthMM}</td>
-                  <td className="py-1.5 text-gray-500">{d.notes}</td>
+                  <td className="px-2 py-1.5 font-medium text-gray-800">{d.application}</td>
+                  <td className="px-2 py-1.5 text-right font-bold text-ebrora">{d.depthMM}</td>
+                  <td className="px-2 py-1.5 text-gray-500">{d.notes}</td>
                 </tr>
               ))}
             </tbody>
