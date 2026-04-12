@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `${tool.name} | Ebrora`,
       description: tool.description || undefined,
-      url: `https://ebrora.com/tools/${slug}`,
+      url: `https://www.ebrora.com/tools/${slug}`,
       type: "website",
     },
   };
@@ -185,11 +185,11 @@ export default async function ToolPage({ params }: PageProps) {
             "@type": "SoftwareApplication",
             name: tool.name,
             description: tool.description,
-            url: `https://ebrora.com/tools/${slug}`,
+            url: `https://www.ebrora.com/tools/${slug}`,
             applicationCategory: "UtilitiesApplication",
             operatingSystem: "Web",
             offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
-            publisher: { "@type": "Organization", name: "Ebrora", url: "https://ebrora.com" },
+            publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" },
           }),
         }}
       />
