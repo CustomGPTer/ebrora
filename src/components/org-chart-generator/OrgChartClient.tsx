@@ -38,6 +38,7 @@ interface ChartSettings {
   palette: number;
   colorOverrides: Record<string, string>; // personId or jobFamily → hex colour
   chartTitle: string;
+  chartTitleSize: number;
   font: string;
   fontBold: boolean;
   fontItalic: boolean;
@@ -106,6 +107,7 @@ const DEFAULT_SETTINGS: ChartSettings = {
   palette: 0,
   colorOverrides: {},
   chartTitle: "",
+  chartTitleSize: 24,
   font: "Arial",
   fontBold: false,
   fontItalic: false,
@@ -953,7 +955,7 @@ export default function OrgChartClient() {
     }
 
     // Calculate title space
-    const titleH = settings.chartTitle ? 40 : 0;
+    const titleH = settings.chartTitle ? (settings.chartTitleSize || 24) + 16 : 0;
 
     // Calculate scale to fit A3 with margins
     const margin = 30;
@@ -974,7 +976,7 @@ export default function OrgChartClient() {
 
     // Title
     if (settings.chartTitle) {
-      const titleFontSize = Math.min(24, Math.max(14, 24 * (people.length > 20 ? 0.7 : 1)));
+      const titleFontSize = settings.chartTitleSize || 24;
       const titleWeight = settings.titleBold ? "bold" : "normal";
       const titleStyle = settings.fontItalic ? "italic" : "normal";
       svg += `<text x="${A3_VW / 2}" y="${margin + titleFontSize + 4}" text-anchor="middle" font-family="'${settings.font}'" font-size="${titleFontSize}" font-weight="${titleWeight}" font-style="${titleStyle}" fill="#1a1a1a">${escSvg(settings.chartTitle)}</text>`;
@@ -1321,12 +1323,25 @@ export default function OrgChartClient() {
             {/* Chart Title */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Chart Title</label>
-              <input
-                value={settings.chartTitle}
-                onChange={(e) => updateSettings({ chartTitle: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
-                placeholder="e.g. Salford WwTW — Site Organisation"
-              />
+              <div className="flex gap-2">
+                <input
+                  value={settings.chartTitle}
+                  onChange={(e) => updateSettings({ chartTitle: e.target.value })}
+                  className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+                  placeholder="e.g. Salford WwTW — Site Organisation"
+                />
+                <div className="w-16">
+                  <input
+                    type="number"
+                    min={10}
+                    max={48}
+                    value={settings.chartTitleSize}
+                    onChange={(e) => updateSettings({ chartTitleSize: Math.max(10, Math.min(48, +e.target.value)) })}
+                    className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm text-center"
+                    title="Title font size (10–48)"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Font */}

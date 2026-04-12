@@ -29,6 +29,7 @@ export interface ChartSettings {
   palette: number;
   colorOverrides: Record<string, string>;
   chartTitle: string;
+  chartTitleSize: number;
   font: string;
   fontBold: boolean;
   fontItalic: boolean;
@@ -104,6 +105,7 @@ export const DEFAULT_SETTINGS: ChartSettings = {
   palette: 0,
   colorOverrides: {},
   chartTitle: "",
+  chartTitleSize: 24,
   font: "Arial",
   fontBold: false,
   fontItalic: false,
