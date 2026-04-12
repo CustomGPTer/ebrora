@@ -35,19 +35,37 @@ export const metadata: Metadata = {
 };
 
 export default function FuelUsageCalculatorPage() {
+  const toolSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Fuel Usage Calculator",
+    description: "Calculate fuel usage, cost, and carbon emissions for construction plant. 370+ machines from Caterpillar, Komatsu, Hitachi, Volvo, JCB, and more.",
+    url: "https://www.ebrora.com/tools/fuel-usage-calculator",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Web",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
+    publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" },
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <BreadcrumbNav items={[{ label: "Free Tools", href: "/tools" }, { label: "Fuel Usage Calculator" }]} />
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Fuel Usage Calculator</h1>
-        <p className="text-base text-gray-500 mt-2 leading-relaxed max-w-2xl">
-          Plan fuel usage, cost, and carbon emissions for your site plant.
-          Search 370+ machines by make, model, or type — add multiple items,
-          set duty cycles and hours, and get instant daily and weekly breakdowns
-          with a professional PDF export.
-        </p>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <BreadcrumbNav items={[{ label: "Free Tools", href: "/tools" }, { label: "Fuel Usage Calculator" }]} />
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Fuel Usage Calculator</h1>
+          <p className="text-base text-gray-500 mt-2 leading-relaxed max-w-2xl">
+            Plan fuel usage, cost, and carbon emissions for your site plant.
+            Search 370+ machines by make, model, or type — add multiple items,
+            set duty cycles and hours, and get instant daily and weekly breakdowns
+            with a professional PDF export.
+          </p>
+        </div>
+        <FuelUsageCalculatorClient />
       </div>
-      <FuelUsageCalculatorClient />
-    </div>
+    </>
   );
 }
