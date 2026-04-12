@@ -41,8 +41,25 @@ export const metadata: Metadata = {
 };
 
 export default function AccessEquipmentSelectorPage() {
+  const toolSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Access Equipment Selector",
+    description: "HSE hierarchy-compliant access equipment selector for UK construction. Enter your site conditions and get ranked recommendations for the safest reasonably practicable access equipment.",
+    url: "https://www.ebrora.com/tools/access-equipment-selector",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Web",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
+    publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" },
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <BreadcrumbNav
         items={[
           { label: "Free Tools", href: "/tools" },
@@ -64,5 +81,6 @@ export default function AccessEquipmentSelectorPage() {
 
       <AccessEquipmentClient />
     </div>
+    </>
   );
 }
