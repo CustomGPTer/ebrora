@@ -40,28 +40,46 @@ export const metadata: Metadata = {
 };
 
 export default function ManualHandlingCalculatorPage() {
+  const toolSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Manual Handling Risk Score Calculator",
+    description: "Score manual handling tasks using HSE MAC and RAPP methodologies. 120+ civil engineering task library, automatic risk banding with HSE colour-coded output.",
+    url: "https://www.ebrora.com/tools/manual-handling-calculator",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Web",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
+    publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" },
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <BreadcrumbNav
-        items={[
-          { label: "Free Tools", href: "/tools" },
-          { label: "Manual Handling Calculator" },
-        ]}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }}
       />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <BreadcrumbNav
+          items={[
+            { label: "Free Tools", href: "/tools" },
+            { label: "Manual Handling Calculator" },
+          ]}
+        />
 
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-          Manual Handling Risk Score Calculator
-        </h1>
-        <p className="text-base text-gray-500 mt-2 leading-relaxed max-w-2xl">
-          Quick supervisor assessment combining HSE MAC (lift, carry, team
-          handling) and RAPP (push and pull) methodologies. Select your task,
-          score the risk factors, apply controls, and download a professional
-          PDF assessment.
-        </p>
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+            Manual Handling Risk Score Calculator
+          </h1>
+          <p className="text-base text-gray-500 mt-2 leading-relaxed max-w-2xl">
+            Quick supervisor assessment combining HSE MAC (lift, carry, team
+            handling) and RAPP (push and pull) methodologies. Select your task,
+            score the risk factors, apply controls, and download a professional
+            PDF assessment.
+          </p>
+        </div>
+
+        <ManualHandlingCalculatorClient />
       </div>
-
-      <ManualHandlingCalculatorClient />
-    </div>
+    </>
   );
 }
