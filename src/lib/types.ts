@@ -11,7 +11,6 @@ export interface Product {
   longDesc: string;
   features: string[];
   images: string[];
-  pdfLink: string;
   buyLink: string;
   youtubeId: string;
   new: boolean;
