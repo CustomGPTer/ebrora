@@ -73,14 +73,12 @@ function stripNoContentPlaceholders(content: Record<string, any>, warnings: stri
 // ── Rule 2: Strip duplicate word sequences ("working days working days") ────
 
 function stripDuplicateWords(content: Record<string, any>, warnings: string[]): void {
-  const pattern = /\b(\w+(?:\s+\w+)?)\s+\1\b/gi;
   walkStrings(content, '', (path, value, parent, key) => {
-    if (pattern.test(value)) {
-      const fixed = value.replace(pattern, '$1');
-      if (fixed !== value) {
-        warnings.push(`DUPLICATE: "${path}" had repeated words — fixed`);
-        parent[key] = fixed;
-      }
+    const pattern = /\b(\w+(?:\s+\w+)?)\s+\1\b/gi;
+    const fixed = value.replace(pattern, '$1');
+    if (fixed !== value) {
+      warnings.push(`DUPLICATE: "${path}" had repeated words — fixed`);
+      parent[key] = fixed;
     }
   });
 }
