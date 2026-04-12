@@ -308,6 +308,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── Validate and patch AI output before docx generation ──
+    const { validateDocumentContent } = await import('@/lib/ai-tools/validate-content');
+    const validation = validateDocumentContent(toolSlug, documentContent);
+    if (validation.warnings.length > 0) {
+      console.warn(
+        `[AI Tools Validate] ${toolSlug}: ${validation.warnings.length} warnings:`,
+        validation.warnings.slice(0, 10),
+      );
+    }
+    documentContent = validation.content;
+
     // Generate the document buffer (xlsx for ITP, docx for others)
     const toolOutputFormat = toolConfig.outputFormat || 'docx';
     let docBuffer: Buffer;
@@ -470,13 +481,16 @@ export async function POST(req: NextRequest) {
       fileExtension = 'docx';
     }
 
-    // Generate filename
-    const projectName = (documentContent.projectName || documentContent.topic || toolConfig.shortName)
+    // Generate filename — avoid duplicating shortName when projectName is empty
+    const rawProjectName = (documentContent.projectName || documentContent.topic || '')
       .replace(/[^a-zA-Z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .substring(0, 50);
     const dateStr = new Date().toISOString().split('T')[0];
-    const filename = `${toolConfig.shortName.replace(/\s+/g, '-')}-${projectName}-${dateStr}.${fileExtension}`;
+    const toolPrefix = toolConfig.shortName.replace(/\s+/g, '-');
+    const filename = rawProjectName
+      ? `${toolPrefix}-${rawProjectName}-${dateStr}.${fileExtension}`
+      : `${toolPrefix}-${dateStr}.${fileExtension}`;
 
     // Upload to Vercel Blob
     const blob = await put(filename, docBuffer, {
