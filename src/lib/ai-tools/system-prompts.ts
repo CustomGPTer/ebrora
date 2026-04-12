@@ -1395,6 +1395,8 @@ Minimum 4 atmospheric hazards (always include O₂ depletion, H₂S, CO, and LEL
 CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays or blank structured fields.
 - Names for assessedBy: leave blank if not provided by the user. Never invent names.
+- The contractor field must be populated from the interview data — if not provided, use "To be confirmed" rather than "—".
+- The extractionProcedure / rescueProcedure section must ALWAYS contain substantive content — never "[No content provided]". Generate a step-by-step rescue procedure specific to the space type and access method described.
 - All risk ratings must be numerically calculated (L × S) and internally consistent.
 - Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
@@ -2042,8 +2044,10 @@ MANDATORY MINIMUMS:
 
 CRITICAL RULES:
 - You MUST populate EVERY field and EVERY array. Never return empty arrays or blank structured fields.
-- nonConformanceDescription must be a detailed factual narrative with paragraph breaks (use \\n\\n).
-- Root cause analysis must be specific to the NCR described, not generic quality boilerplate.
+- nonConformanceDescription must be a detailed factual narrative with paragraph breaks (use \\n\\n). It must NEVER be "[No content provided]" or empty — this is the core of the NCR.
+- rootCauseAnalysis must be specific to the NCR described, not generic quality boilerplate. It must NEVER be "[No content provided]" or empty.
+- dateRaised must be populated with the current date. closeOutDueDate must be populated (typically 14–28 days from dateRaised). element and nonConformanceSummary must be populated from the interview data.
+- Every correctiveAction must have a named owner (role if name not provided) and a target date — never "—".
 - Names for raisedBy, discoveredBy: leave blank if not provided by the user. Never invent names.
 - correctiveActions and preventiveActions arrays must never be empty.
 - NCR category (Major/Minor/Observation) must match the severity of the non-conformance described.`,
@@ -2770,8 +2774,10 @@ JSON structure:
 CRITICAL RULES:
 - You MUST populate EVERY array with real data. Never return empty arrays.
 - Every field in the JSON must be populated. Do not leave structured fields blank while putting data only in prose.
+- The contractRef, principalContractor, and contractor fields must be populated from the interview data — if not provided, use "To be confirmed" rather than "—" or empty strings.
+- No section or field may contain "[No content provided]" — generate content from the project description or omit the field.
 - All tco2e values must be numerically calculated and internally consistent.
-- Names for assessedBy, client, principalContractor: leave blank if not provided by the user. Never invent names.
+- Names for assessedBy, client: leave blank if not provided by the user. Never invent names.
 Minimum 10 materials. Minimum 5 plant items. Minimum 5 transport entries. Minimum 5 waste entries. Minimum 3 hotspots. Minimum 5 carbon reduction opportunities. Minimum 5 assumptions (audit-ready only). Minimum 3 sensitivity analyses (audit-ready only). Minimum 6 ISO compliance items (audit-ready only). Minimum 6 regulatory references.
 
 ADDITIONAL FIELDS FOR PAS 2080 (T2) AND AUDIT-READY (T4) — populate these for ALL templates; T2/T4 will use them most:
@@ -3311,7 +3317,9 @@ JSON structure:
 }
 
 CRITICAL RULES:
-- You MUST populate the labour, plant, and materials arrays with real entries based on the activity described. Never return empty arrays — a daywork sheet with no recorded resources is commercially useless.
+- You MUST populate the labour, plant, and materials arrays with real entries based on the activity described. Never return empty arrays — a daywork sheet with no recorded resources is commercially useless. Generate at least 2 labour entries, 1 plant entry, and 1 material entry as worked examples based on the activity described.
+- The date field must be populated with the current date. The contractRef and contractor fields must be populated from the interview data — if not provided, use "To be confirmed" rather than "—".
+- The activityDescription and compensationEventDescription fields must ALWAYS contain substantive content — never "[No content provided]" or empty strings.
 - Every labour entry must have name (leave blank if not provided), trade, hours, and rate with a calculated total.
 - Every plant entry must have description, hours, rate, and calculated total.
 - Every material entry must have description, quantity, unit, unitCost, and calculated total.
@@ -3467,7 +3475,15 @@ Scope 3 categories[].methodology: "string (e.g. Hybrid, Activity-based, Spend-ba
 Scope 1 sources[].activity: "string (activity data description)"
 Scope 1 sources[].quantity: "string (e.g. 724,000 litres diesel)"
 Minimum 7 decarbonisation pathway milestones (baseline, current, 2028, 2030, 2035, 2040, net zero year).
-Minimum 8 GHG source identifications (ISO 14064 template). Minimum 11 quantification table rows.`,
+Minimum 8 GHG source identifications (ISO 14064 template). Minimum 11 quantification table rows.
+
+CRITICAL RULES:
+- You MUST populate EVERY field and EVERY array. Never return empty arrays.
+- No section or field may contain "[No content provided]" — generate content from the organisation description or omit the field.
+- The currentProject and framework fields must be populated from the interview data — if not provided, use "To be confirmed" rather than "—".
+- Emissions data must be numerically consistent — Scope 1 + Scope 2 + Scope 3 = Total.
+- Names: leave blank if not provided by the user. Never invent names for signatories.
+- Prose sections must contain paragraph breaks (use \\n\\n) for readability.`,
 
   // ── Batch 1 — Mandated tools ─────────────────────────────────────────────
 

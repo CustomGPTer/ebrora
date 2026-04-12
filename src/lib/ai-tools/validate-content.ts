@@ -107,6 +107,25 @@ const SAFETY_ALERT_REQUIRED = [
   'investigationLead',
 ];
 
+const NCR_REQUIRED = [
+  'dateRaised',
+  'closeOutDueDate',
+  'nonConformanceDescription',
+  'rootCauseAnalysis',
+];
+
+const DAYWORK_REQUIRED = [
+  'date',
+  'contractRef',
+  'contractor',
+];
+
+const CARBON_FOOTPRINT_REQUIRED = [
+  'contractRef',
+  'principalContractor',
+  'contractor',
+];
+
 function getNestedValue(obj: Record<string, any>, dotPath: string): any {
   return dotPath.split('.').reduce((o, k) => o?.[k], obj);
 }
@@ -120,6 +139,9 @@ function checkRequiredFields(
 
   if (toolSlug === 'riddor-report') fields = RIDDOR_REQUIRED_FIELDS;
   else if (toolSlug === 'safety-alert') fields = SAFETY_ALERT_REQUIRED;
+  else if (toolSlug === 'ncr') fields = NCR_REQUIRED;
+  else if (toolSlug === 'daywork-sheet') fields = DAYWORK_REQUIRED;
+  else if (toolSlug === 'carbon-footprint') fields = CARBON_FOOTPRINT_REQUIRED;
 
   for (const field of fields) {
     const val = getNestedValue(content, field);
@@ -287,6 +309,36 @@ function backPopulateFromNarrative(content: Record<string, any>, toolSlug: strin
   }
 }
 
+// ── Rule 8: Auto-fill dates and replace placeholder dashes ─────────────────
+
+function autoFillMetadata(content: Record<string, any>, toolSlug: string, warnings: string[]): void {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const yyyy = today.getFullYear();
+  const todayStr = `${dd}/${mm}/${yyyy}`;
+
+  // Auto-fill date fields that are empty or '—'
+  const dateFields = ['date', 'dateRaised', 'assessmentDate', 'planDate', 'reportDate', 'alertDate'];
+  for (const field of dateFields) {
+    if (content[field] === '—' || content[field] === '' || content[field] === undefined) {
+      if (content[field] !== undefined || ['daywork-sheet', 'ncr', 'carbon-footprint'].includes(toolSlug)) {
+        content[field] = todayStr;
+        warnings.push(`AUTOFILL: Set "${field}" to today's date ${todayStr}`);
+      }
+    }
+  }
+
+  // Replace '—' with 'To be confirmed' for key metadata fields
+  const tbcFields = ['contractRef', 'contract', 'contractor', 'principalContractor', 'instructionRef'];
+  for (const field of tbcFields) {
+    if (content[field] === '—' || content[field] === '') {
+      content[field] = 'To be confirmed';
+      warnings.push(`AUTOFILL: Set "${field}" to "To be confirmed"`);
+    }
+  }
+}
+
 // ── Main Validator ──────────────────────────────────────────────────────────
 
 export function validateDocumentContent(
@@ -307,6 +359,7 @@ export function validateDocumentContent(
   validateArithmetic(patched, toolSlug, warnings);
   checkContradictions(patched, toolSlug, warnings);
   backPopulateFromNarrative(patched, toolSlug, warnings);
+  autoFillMetadata(patched, toolSlug, warnings);
 
   return {
     valid: errors.length === 0,
