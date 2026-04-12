@@ -173,30 +173,31 @@ function buildNarrativeHazardTable(c: Template05Content): Table {
   cols[7] = tw - cols.slice(0, 7).reduce((a, b) => a + b, 0);
 
   return new Table({
+    borders: h.NO_TABLE_BORDERS,
     width: { size: tw, type: WidthType.DXA }, columnWidths: cols,
     rows: [
       new TableRow({
         children: [
-          h.headerCell('Ref', cols[0], { fontSize: 11 }),
-          h.headerCell('Hazard & Description', cols[1], { fontSize: 11 }),
-          h.headerCell('Who at Risk', cols[2], { fontSize: 11 }),
-          h.headerCell('Initial Risk', cols[3], { fontSize: 11, alignment: AlignmentType.CENTER }),
-          h.headerCell('Control Measures & Arrangements', cols[4], { fontSize: 11 }),
-          h.headerCell('Residual Risk', cols[5], { fontSize: 11, alignment: AlignmentType.CENTER }),
-          h.headerCell('Action By', cols[6], { fontSize: 11 }),
-          h.headerCell('Review / Notes', cols[7], { fontSize: 11 }),
+          h.headerCell('Ref', cols[0], { fontSize: 18 }),
+          h.headerCell('Hazard & Description', cols[1], { fontSize: 18 }),
+          h.headerCell('Who at Risk', cols[2], { fontSize: 18 }),
+          h.headerCell('Initial Risk', cols[3], { fontSize: 18, alignment: AlignmentType.CENTER }),
+          h.headerCell('Control Measures & Arrangements', cols[4], { fontSize: 18 }),
+          h.headerCell('Residual Risk', cols[5], { fontSize: 18, alignment: AlignmentType.CENTER }),
+          h.headerCell('Action By', cols[6], { fontSize: 18 }),
+          h.headerCell('Review / Notes', cols[7], { fontSize: 18 }),
         ],
       }),
       ...c.hazards.map((hz, idx) => new TableRow({
         children: [
-          h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 11, alignment: AlignmentType.CENTER }),
-          h.dataCell(hz.hazard, cols[1], { fontSize: 11 }),
-          h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 11 }),
-          h.dataCell(hz.initialRisk, cols[3], { fontSize: 11, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.initialRisk), color: h.WHITE }),
-          h.dataCell(hz.controlMeasures, cols[4], { fontSize: 11 }),
-          h.dataCell(hz.residualRisk, cols[5], { fontSize: 11, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.residualRisk), color: h.WHITE }),
-          h.dataCell(hz.responsiblePerson, cols[6], { fontSize: 11 }),
-          h.dataCell(hz.reviewNotes, cols[7], { fontSize: 11 }),
+          h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 18, alignment: AlignmentType.CENTER }),
+          h.dataCell(hz.hazard, cols[1], { fontSize: 18 }),
+          h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 18 }),
+          h.dataCell(hz.initialRisk, cols[3], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.initialRisk), color: h.WHITE }),
+          h.dataCell(hz.controlMeasures, cols[4], { fontSize: 18 }),
+          h.dataCell(hz.residualRisk, cols[5], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.residualRisk), color: h.WHITE }),
+          h.dataCell(hz.responsiblePerson, cols[6], { fontSize: 18 }),
+          h.dataCell(hz.reviewNotes, cols[7], { fontSize: 18 }),
         ],
       })),
     ],
@@ -207,6 +208,7 @@ function buildKeyContactsTable(c: Template05Content): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [2500, 3500, 0]; cols[2] = tw - cols[0] - cols[1];
   return new Table({
+    borders: h.NO_TABLE_BORDERS,
     width: { size: tw, type: WidthType.DXA }, columnWidths: cols,
     rows: [
       new TableRow({ children: [h.headerCell('Role', cols[0], { fontSize: 14 }), h.headerCell('Name', cols[1], { fontSize: 14 }), h.headerCell('Phone', cols[2], { fontSize: 14 })] }),

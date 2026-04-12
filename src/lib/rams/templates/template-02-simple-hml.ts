@@ -96,6 +96,7 @@ function buildCompactInfoTable(content: Template02Content): Table {
     ['Training/Tickets', content.trainingTickets, '', ''],
   ];
   return new Table({
+    borders: h.NO_TABLE_BORDERS,
     width: { size: tw, type: WidthType.DXA },
     columnWidths: [c1, c2, c3, c4],
     rows: rows.map(r => new TableRow({
@@ -115,31 +116,32 @@ function buildHMLHazardTable(content: Template02Content): Table {
   cols[7] = tw - cols.slice(0, 7).reduce((a, b) => a + b, 0);
 
   return new Table({
+    borders: h.NO_TABLE_BORDERS,
     width: { size: tw, type: WidthType.DXA },
     columnWidths: cols,
     rows: [
       new TableRow({
         children: [
-          h.headerCell('Ref', cols[0], { fontSize: 12 }),
-          h.headerCell('Hazard Description', cols[1], { fontSize: 12 }),
-          h.headerCell('Who is at Risk', cols[2], { fontSize: 12 }),
-          h.headerCell('Initial Risk', cols[3], { fontSize: 12, alignment: AlignmentType.CENTER }),
-          h.headerCell('Control Measures', cols[4], { fontSize: 12 }),
-          h.headerCell('Residual Risk', cols[5], { fontSize: 12, alignment: AlignmentType.CENTER }),
-          h.headerCell('Responsible', cols[6], { fontSize: 12 }),
-          h.headerCell('Monitoring', cols[7], { fontSize: 12 }),
+          h.headerCell('Ref', cols[0], { fontSize: 18 }),
+          h.headerCell('Hazard Description', cols[1], { fontSize: 18 }),
+          h.headerCell('Who is at Risk', cols[2], { fontSize: 18 }),
+          h.headerCell('Initial Risk', cols[3], { fontSize: 18, alignment: AlignmentType.CENTER }),
+          h.headerCell('Control Measures', cols[4], { fontSize: 18 }),
+          h.headerCell('Residual Risk', cols[5], { fontSize: 18, alignment: AlignmentType.CENTER }),
+          h.headerCell('Responsible', cols[6], { fontSize: 18 }),
+          h.headerCell('Monitoring', cols[7], { fontSize: 18 }),
         ],
       }),
       ...content.hazards.map((hz, idx) => new TableRow({
         children: [
-          h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 12, alignment: AlignmentType.CENTER }),
-          h.dataCell(hz.hazard, cols[1], { fontSize: 12 }),
-          h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 12 }),
-          h.dataCell(hz.initialRisk, cols[3], { fontSize: 12, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.initialRisk), color: h.WHITE }),
-          h.dataCell(hz.controlMeasures, cols[4], { fontSize: 12 }),
-          h.dataCell(hz.residualRisk, cols[5], { fontSize: 12, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.residualRisk), color: h.WHITE }),
-          h.dataCell(hz.responsiblePerson, cols[6], { fontSize: 12 }),
-          h.dataCell(hz.monitoring, cols[7], { fontSize: 12 }),
+          h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 18, alignment: AlignmentType.CENTER }),
+          h.dataCell(hz.hazard, cols[1], { fontSize: 18 }),
+          h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 18 }),
+          h.dataCell(hz.initialRisk, cols[3], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.initialRisk), color: h.WHITE }),
+          h.dataCell(hz.controlMeasures, cols[4], { fontSize: 18 }),
+          h.dataCell(hz.residualRisk, cols[5], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.residualRisk), color: h.WHITE }),
+          h.dataCell(hz.responsiblePerson, cols[6], { fontSize: 18 }),
+          h.dataCell(hz.monitoring, cols[7], { fontSize: 18 }),
         ],
       })),
     ],

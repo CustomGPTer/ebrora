@@ -111,28 +111,28 @@ function buildIntegratedTable(c: Template10Content): Table {
   ];
   cols[8] = tw - cols.slice(0, 8).reduce((a, b) => a + b, 0);
 
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [
-      h.headerCell('Step', cols[0], { fontSize: 10 }),
-      h.headerCell('▶ Work Instruction', cols[1], { fontSize: 10, fillColor: h.STEP_BLUE }),
-      h.headerCell('Hazards at this Step', cols[2], { fontSize: 10 }),
-      h.headerCell('Who at Risk', cols[3], { fontSize: 10 }),
-      h.headerCell('Risk', cols[4], { fontSize: 10, alignment: AlignmentType.CENTER }),
-      h.headerCell('Control Measures & Precautions', cols[5], { fontSize: 10 }),
-      h.headerCell('Residual', cols[6], { fontSize: 10, alignment: AlignmentType.CENTER }),
-      h.headerCell('Responsible', cols[7], { fontSize: 10 }),
-      h.headerCell('▶ PPE for Step', cols[8], { fontSize: 10, fillColor: h.STEP_BLUE }),
+      h.headerCell('Step', cols[0], { fontSize: 18 }),
+      h.headerCell('▶ Work Instruction', cols[1], { fontSize: 18, fillColor: h.STEP_BLUE }),
+      h.headerCell('Hazards at this Step', cols[2], { fontSize: 18 }),
+      h.headerCell('Who at Risk', cols[3], { fontSize: 18 }),
+      h.headerCell('Risk', cols[4], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('Control Measures & Precautions', cols[5], { fontSize: 18 }),
+      h.headerCell('Residual', cols[6], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('Responsible', cols[7], { fontSize: 18 }),
+      h.headerCell('▶ PPE for Step', cols[8], { fontSize: 18, fillColor: h.STEP_BLUE }),
     ] }),
     ...c.steps.map(step => new TableRow({ children: [
-      h.dataCell(String(step.stepNumber), cols[0], { fontSize: 10, bold: true, alignment: AlignmentType.CENTER }),
-      h.dataCell(step.workInstruction, cols[1], { fontSize: 10, fillColor: h.STEP_BLUE_LIGHT }),
-      h.dataCell(step.hazards, cols[2], { fontSize: 10 }),
-      h.dataCell(step.whoAtRisk, cols[3], { fontSize: 10 }),
-      h.dataCell(step.initialRisk, cols[4], { fontSize: 10, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(step.initialRisk), color: h.WHITE }),
-      h.dataCell(step.controlMeasures, cols[5], { fontSize: 10 }),
-      h.dataCell(step.residualRisk, cols[6], { fontSize: 10, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(step.residualRisk), color: h.WHITE }),
-      h.dataCell(step.responsiblePerson, cols[7], { fontSize: 10 }),
-      h.dataCell(step.ppeForStep, cols[8], { fontSize: 10, fillColor: h.STEP_BLUE_LIGHT }),
+      h.dataCell(String(step.stepNumber), cols[0], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER }),
+      h.dataCell(step.workInstruction, cols[1], { fontSize: 18, fillColor: h.STEP_BLUE_LIGHT }),
+      h.dataCell(step.hazards, cols[2], { fontSize: 18 }),
+      h.dataCell(step.whoAtRisk, cols[3], { fontSize: 18 }),
+      h.dataCell(step.initialRisk, cols[4], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(step.initialRisk), color: h.WHITE }),
+      h.dataCell(step.controlMeasures, cols[5], { fontSize: 18 }),
+      h.dataCell(step.residualRisk, cols[6], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(step.residualRisk), color: h.WHITE }),
+      h.dataCell(step.responsiblePerson, cols[7], { fontSize: 18 }),
+      h.dataCell(step.ppeForStep, cols[8], { fontSize: 18, fillColor: h.STEP_BLUE_LIGHT }),
     ] })),
   ] });
 }
@@ -140,7 +140,7 @@ function buildIntegratedTable(c: Template10Content): Table {
 function buildToolboxSummaryTable(c: Template10Content): Table {
   const tw = h.A4_LANDSCAPE_CONTENT_WIDTH;
   const cols = [600, Math.round(tw * 0.25), Math.round(tw * 0.3), 0]; cols[3] = tw - cols.slice(0, 3).reduce((a, b) => a + b, 0);
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Step', cols[0], { fillColor: h.STEP_BLUE, fontSize: 12, alignment: AlignmentType.CENTER }), h.headerCell('What We Are Doing', cols[1], { fillColor: h.STEP_BLUE, fontSize: 12 }), h.headerCell('Key Hazard', cols[2], { fillColor: h.STEP_BLUE, fontSize: 12 }), h.headerCell('Critical Control / Watch Point', cols[3], { fillColor: h.STEP_BLUE, fontSize: 12 })] }),
     ...c.toolboxTalkSummary.map(t => new TableRow({ children: [h.dataCell(String(t.step), cols[0], { fontSize: 12, bold: true, alignment: AlignmentType.CENTER }), h.dataCell(t.whatWeAreDoing, cols[1], { fontSize: 12 }), h.dataCell(t.keyHazard, cols[2], { fontSize: 12, bold: true }), h.dataCell(t.criticalControl, cols[3], { fontSize: 12 })] })),
   ] });
@@ -149,7 +149,7 @@ function buildToolboxSummaryTable(c: Template10Content): Table {
 function buildPermitLogTable(c: Template10Content): Table {
   const tw = h.A4_LANDSCAPE_CONTENT_WIDTH;
   const cols = [600, 2500, 2500, 0]; cols[3] = tw - cols.slice(0, 3).reduce((a, b) => a + b, 0);
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Step', cols[0], { fillColor: h.STEP_BLUE, fontSize: 14, alignment: AlignmentType.CENTER }), h.headerCell('Permit Type', cols[1], { fillColor: h.STEP_BLUE, fontSize: 14 }), h.headerCell('Issued By', cols[2], { fillColor: h.STEP_BLUE, fontSize: 14 }), h.headerCell('Validity Period', cols[3], { fillColor: h.STEP_BLUE, fontSize: 14 })] }),
     ...c.permitIsolationLog.map(p => new TableRow({ children: [h.dataCell(String(p.step), cols[0], { fontSize: 14, bold: true, alignment: AlignmentType.CENTER }), h.dataCell(p.permitType, cols[1], { fontSize: 14 }), h.dataCell(p.issuedBy, cols[2], { fontSize: 14 }), h.dataCell(p.validityPeriod, cols[3], { fontSize: 14 })] })),
   ] });

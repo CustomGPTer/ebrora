@@ -124,7 +124,7 @@ export async function buildTemplate06(content: Template06Content): Promise<Docum
 function buildPCOrgTable(c: Template06Content): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [1800, 1800, 1500, 0]; cols[3] = tw - cols[0] - cols[1] - cols[2];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('PC Role', cols[0], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Name', cols[1], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Contact', cols[2], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Responsibility', cols[3], { fillColor: h.PC_NAVY, fontSize: 14 })] }),
     ...c.pcOrganisation.map(p => new TableRow({ children: [h.dataCell(p.role, cols[0], { fontSize: 14, bold: true }), h.dataCell(p.name, cols[1], { fontSize: 14 }), h.dataCell(p.contact, cols[2], { fontSize: 14 }), h.dataCell(p.responsibility, cols[3], { fontSize: 14 })] })),
   ] });
@@ -133,7 +133,7 @@ function buildPCOrgTable(c: Template06Content): Table {
 function buildCompetencyTable(c: Template06Content): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [2500, 2500, 2000, 0]; cols[3] = tw - cols[0] - cols[1] - cols[2];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Competency Item', cols[0], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Reference/Expiry', cols[1], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Verified By', cols[2], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Status', cols[3], { fillColor: h.PC_NAVY, fontSize: 14 })] }),
     ...c.competencyVerification.map(cv => new TableRow({ children: [h.dataCell(cv.item, cols[0], { fontSize: 14 }), h.dataCell(cv.reference, cols[1], { fontSize: 14 }), h.dataCell(cv.verifiedBy, cols[2], { fontSize: 14 }), h.dataCell(cv.status, cols[3], { fontSize: 14 })] })),
   ] });
@@ -142,7 +142,7 @@ function buildCompetencyTable(c: Template06Content): Table {
 function buildInsuranceTable(c: Template06Content): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [2500, 2000, 1500, 0]; cols[3] = tw - cols[0] - cols[1] - cols[2];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Type', cols[0], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Policy No.', cols[1], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Expiry', cols[2], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Cover Level', cols[3], { fillColor: h.PC_NAVY, fontSize: 14 })] }),
     ...c.insuranceAccreditation.map(ia => new TableRow({ children: [h.dataCell(ia.type, cols[0], { fontSize: 14 }), h.dataCell(ia.policyNo, cols[1], { fontSize: 14 }), h.dataCell(ia.expiry, cols[2], { fontSize: 14 }), h.dataCell(ia.coverLevel, cols[3], { fontSize: 14 })] })),
   ] });
@@ -151,7 +151,7 @@ function buildInsuranceTable(c: Template06Content): Table {
 function buildApprovalChainTable(c: Template06Content): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [2500, 2000, 1500, 0]; cols[3] = tw - cols[0] - cols[1] - cols[2];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Stage', cols[0], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Name', cols[1], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Date', cols[2], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Accepted?', cols[3], { fillColor: h.PC_NAVY, fontSize: 14 })] }),
     ...c.approvalChain.map(a => new TableRow({ children: [h.dataCell(a.stage, cols[0], { fontSize: 14, bold: true }), h.dataCell(a.name, cols[1], { fontSize: 14 }), h.dataCell(a.date, cols[2], { fontSize: 14 }), h.dataCell(a.accepted, cols[3], { fontSize: 14 })] })),
   ] });
@@ -160,7 +160,7 @@ function buildApprovalChainTable(c: Template06Content): Table {
 function buildAmendmentsTable(c: Template06Content): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [3500, 1500, 1200, 0]; cols[3] = tw - cols[0] - cols[1] - cols[2];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Amendment/Condition', cols[0], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Raised By', cols[1], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Date', cols[2], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Status', cols[3], { fillColor: h.PC_NAVY, fontSize: 14 })] }),
     ...c.pcAmendments.map(am => new TableRow({ children: [h.dataCell(am.amendment, cols[0], { fontSize: 14 }), h.dataCell(am.raisedBy, cols[1], { fontSize: 14 }), h.dataCell(am.date, cols[2], { fontSize: 14 }), h.dataCell(am.status, cols[3], { fontSize: 14 })] })),
   ] });
@@ -169,7 +169,7 @@ function buildAmendmentsTable(c: Template06Content): Table {
 function buildMonitoringTable(c: Template06Content): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [2000, 1200, 1500, 1800, 0]; cols[4] = tw - cols.slice(0, 4).reduce((a, b) => a + b, 0);
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Check', cols[0], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Frequency', cols[1], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Carried Out By', cols[2], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Record Location', cols[3], { fillColor: h.PC_NAVY, fontSize: 14 }), h.headerCell('Escalation', cols[4], { fillColor: h.PC_NAVY, fontSize: 14 })] }),
     ...c.monitoringInspectionRegime.map(m => new TableRow({ children: [h.dataCell(m.check, cols[0], { fontSize: 14 }), h.dataCell(m.frequency, cols[1], { fontSize: 14 }), h.dataCell(m.carriedOutBy, cols[2], { fontSize: 14 }), h.dataCell(m.recordLocation, cols[3], { fontSize: 14 }), h.dataCell(m.escalation, cols[4], { fontSize: 14 })] })),
   ] });
@@ -181,39 +181,39 @@ function buildHazardTable(c: Template06Content): Table {
   const cols = [400, Math.round(tw * 0.1), Math.round(tw * 0.1), Math.round(tw * 0.05), 450, 450, 500, Math.round(tw * 0.2), 450, 450, 500, Math.round(tw * 0.08), 0];
   cols[12] = tw - cols.slice(0, 12).reduce((a, b) => a + b, 0);
 
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [
-      h.headerCell('Ref', cols[0], { fontSize: 9 }),
-      h.headerCell('Activity', cols[1], { fontSize: 9 }),
-      h.headerCell('Hazard', cols[2], { fontSize: 9 }),
-      h.headerCell('Who', cols[3], { fontSize: 9 }),
-      h.headerCell('L', cols[4], { fontSize: 9, alignment: AlignmentType.CENTER }),
-      h.headerCell('S', cols[5], { fontSize: 9, alignment: AlignmentType.CENTER }),
-      h.headerCell('Risk', cols[6], { fontSize: 9, alignment: AlignmentType.CENTER }),
-      h.headerCell('Control Measures', cols[7], { fontSize: 9 }),
-      h.headerCell('Res L', cols[8], { fontSize: 9, alignment: AlignmentType.CENTER }),
-      h.headerCell('Res S', cols[9], { fontSize: 9, alignment: AlignmentType.CENTER }),
-      h.headerCell('Res R', cols[10], { fontSize: 9, alignment: AlignmentType.CENTER }),
-      h.headerCell('Responsible', cols[11], { fontSize: 9 }),
-      h.headerCell('■ PC Comment', cols[12], { fontSize: 9, fillColor: h.PC_NAVY }),
+      h.headerCell('Ref', cols[0], { fontSize: 18 }),
+      h.headerCell('Activity', cols[1], { fontSize: 18 }),
+      h.headerCell('Hazard', cols[2], { fontSize: 18 }),
+      h.headerCell('Who', cols[3], { fontSize: 18 }),
+      h.headerCell('L', cols[4], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('S', cols[5], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('Risk', cols[6], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('Control Measures', cols[7], { fontSize: 18 }),
+      h.headerCell('Res L', cols[8], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('Res S', cols[9], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('Res R', cols[10], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.headerCell('Responsible', cols[11], { fontSize: 18 }),
+      h.headerCell('■ PC Comment', cols[12], { fontSize: 18, fillColor: h.PC_NAVY }),
     ] }),
     ...c.hazards.map((hz, idx) => {
       const is = hz.likelihoodInitial * hz.severityInitial;
       const rs = hz.likelihoodResidual * hz.severityResidual;
       return new TableRow({ children: [
-        h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(hz.activity || '', cols[1], { fontSize: 9 }),
-        h.dataCell(hz.hazard, cols[2], { fontSize: 9 }),
-        h.dataCell(hz.whoAtRisk, cols[3], { fontSize: 9 }),
-        h.dataCell(String(hz.likelihoodInitial), cols[4], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(String(hz.severityInitial), cols[5], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(String(is), cols[6], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(is), color: is >= 8 ? h.WHITE : h.BLACK }),
-        h.dataCell(hz.controlMeasures, cols[7], { fontSize: 9 }),
-        h.dataCell(String(hz.likelihoodResidual), cols[8], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(String(hz.severityResidual), cols[9], { fontSize: 9, alignment: AlignmentType.CENTER }),
-        h.dataCell(String(rs), cols[10], { fontSize: 9, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(rs), color: rs >= 8 ? h.WHITE : h.BLACK }),
-        h.dataCell(hz.responsible || '', cols[11], { fontSize: 9 }),
-        h.dataCell(hz.pcComment, cols[12], { fontSize: 9, fillColor: h.PC_NAVY_LIGHT }),
+        h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 18, alignment: AlignmentType.CENTER }),
+        h.dataCell(hz.activity || '', cols[1], { fontSize: 18 }),
+        h.dataCell(hz.hazard, cols[2], { fontSize: 18 }),
+        h.dataCell(hz.whoAtRisk, cols[3], { fontSize: 18 }),
+        h.dataCell(String(hz.likelihoodInitial), cols[4], { fontSize: 18, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(hz.severityInitial), cols[5], { fontSize: 18, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(is), cols[6], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(is), color: is >= 8 ? h.WHITE : h.BLACK }),
+        h.dataCell(hz.controlMeasures, cols[7], { fontSize: 18 }),
+        h.dataCell(String(hz.likelihoodResidual), cols[8], { fontSize: 18, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(hz.severityResidual), cols[9], { fontSize: 18, alignment: AlignmentType.CENTER }),
+        h.dataCell(String(rs), cols[10], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.lxsColor(rs), color: rs >= 8 ? h.WHITE : h.BLACK }),
+        h.dataCell(hz.responsible || '', cols[11], { fontSize: 18 }),
+        h.dataCell(hz.pcComment, cols[12], { fontSize: 18, fillColor: h.PC_NAVY_LIGHT }),
       ] });
     }),
   ] });

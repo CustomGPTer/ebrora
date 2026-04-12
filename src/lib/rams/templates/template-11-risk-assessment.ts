@@ -301,6 +301,7 @@ function buildEnhancedRiskMatrix(totalWidth: number): Table {
   });
 
   return new Table({
+    borders: h.NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: [labelColW, ...severityCols],
     rows: [titleRow, ...matrixRows],
@@ -323,6 +324,7 @@ function buildActionBandsLegend(totalWidth: number): Table {
   const widths = [colW, colW, colW, lastColW];
 
   return new Table({
+    borders: h.NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: widths,
     rows: [
@@ -461,6 +463,7 @@ function buildHazardTable(content: Template11Content, totalWidth: number): Table
   });
 
   return new Table({
+    borders: h.NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: colWidths,
     rows: [subHeaderRow, headerRow, ...dataRows],
@@ -503,6 +506,7 @@ function buildRiskActionSummary(content: Template11Content, totalWidth: number):
   });
 
   return new Table({
+    borders: h.NO_TABLE_BORDERS,
     width: { size: totalWidth, type: WidthType.DXA },
     columnWidths: colWidths,
     rows: [headerRow, ...actionRows],

@@ -109,7 +109,7 @@ function buildCompactInfoGrid(c: Template07Content): Table {
     ['Contractor', c.contractorName, 'Area', c.workArea],
     ['Hours', c.workingHours, 'Workforce', c.workforceSize],
   ];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: [c1, c2, c3, c4], rows: rows.map(r => new TableRow({ children: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: [c1, c2, c3, c4], rows: rows.map(r => new TableRow({ children: [
     h.headerCell(r[0], c1, { fontSize: 13 }), h.dataCell(r[1], c2, { fontSize: 13 }),
     h.headerCell(r[2], c3, { fontSize: 13 }), h.dataCell(r[3], c4, { fontSize: 13 }),
   ] })) });
@@ -119,15 +119,15 @@ function buildCompactHazardTable(c: Template07Content): Table {
   const tw = h.A4_LANDSCAPE_CONTENT_WIDTH;
   const cols = [400, Math.round(tw * 0.15), Math.round(tw * 0.08), Math.round(tw * 0.07), Math.round(tw * 0.3), Math.round(tw * 0.07), Math.round(tw * 0.1), 0];
   cols[7] = tw - cols.slice(0, 7).reduce((a, b) => a + b, 0);
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
-    new TableRow({ children: [h.headerCell('Ref', cols[0], { fontSize: 11 }), h.headerCell('Hazard', cols[1], { fontSize: 11 }), h.headerCell('Who at Risk', cols[2], { fontSize: 11 }), h.headerCell('Risk', cols[3], { fontSize: 11, alignment: AlignmentType.CENTER }), h.headerCell('Control Measures', cols[4], { fontSize: 11 }), h.headerCell('Residual', cols[5], { fontSize: 11, alignment: AlignmentType.CENTER }), h.headerCell('Action By', cols[6], { fontSize: 11 }), h.headerCell('Notes', cols[7], { fontSize: 11 })] }),
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+    new TableRow({ children: [h.headerCell('Ref', cols[0], { fontSize: 18 }), h.headerCell('Hazard', cols[1], { fontSize: 18 }), h.headerCell('Who at Risk', cols[2], { fontSize: 18 }), h.headerCell('Risk', cols[3], { fontSize: 18, alignment: AlignmentType.CENTER }), h.headerCell('Control Measures', cols[4], { fontSize: 18 }), h.headerCell('Residual', cols[5], { fontSize: 18, alignment: AlignmentType.CENTER }), h.headerCell('Action By', cols[6], { fontSize: 18 }), h.headerCell('Notes', cols[7], { fontSize: 18 })] }),
     ...c.hazards.map((hz, idx) => new TableRow({ children: [
-      h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 11, alignment: AlignmentType.CENTER }),
-      h.dataCell(hz.hazard, cols[1], { fontSize: 11 }), h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 11 }),
-      h.dataCell(hz.initialRisk, cols[3], { fontSize: 11, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.initialRisk), color: h.WHITE }),
-      h.dataCell(hz.controlMeasures, cols[4], { fontSize: 11 }),
-      h.dataCell(hz.residualRisk, cols[5], { fontSize: 11, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.residualRisk), color: h.WHITE }),
-      h.dataCell(hz.responsiblePerson, cols[6], { fontSize: 11 }), h.dataCell(hz.monitoring, cols[7], { fontSize: 11 }),
+      h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.dataCell(hz.hazard, cols[1], { fontSize: 18 }), h.dataCell(hz.whoAtRisk, cols[2], { fontSize: 18 }),
+      h.dataCell(hz.initialRisk, cols[3], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.initialRisk), color: h.WHITE }),
+      h.dataCell(hz.controlMeasures, cols[4], { fontSize: 18 }),
+      h.dataCell(hz.residualRisk, cols[5], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.hmlColor(hz.residualRisk), color: h.WHITE }),
+      h.dataCell(hz.responsiblePerson, cols[6], { fontSize: 18 }), h.dataCell(hz.monitoring, cols[7], { fontSize: 18 }),
     ] })),
   ] });
 }
@@ -135,7 +135,7 @@ function buildCompactHazardTable(c: Template07Content): Table {
 function buildKeyHazardTable(c: Template07Content): Table {
   const tw = h.A4_LANDSCAPE_CONTENT_WIDTH;
   const cols = [Math.round(tw * 0.25), Math.round(tw * 0.35), 0]; cols[2] = tw - cols[0] - cols[1];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Key Hazard', cols[0], { fontSize: 14 }), h.headerCell('Critical Control', cols[1], { fontSize: 14 }), h.headerCell('Stop Work If...', cols[2], { fontSize: 14, fillColor: h.HML_HIGH })] }),
     ...c.keyHazardSummary.map(kh => new TableRow({ children: [h.dataCell(kh.hazard, cols[0], { fontSize: 14, bold: true }), h.dataCell(kh.criticalControl, cols[1], { fontSize: 14 }), h.dataCell(kh.stopWorkIf, cols[2], { fontSize: 14 })] })),
   ] });

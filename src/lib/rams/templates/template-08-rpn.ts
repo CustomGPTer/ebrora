@@ -102,7 +102,7 @@ export async function buildTemplate08(content: Template08Content): Promise<Docum
 function buildScaleTable(title: string, rows: string[][]): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [2500, 0]; cols[1] = tw - cols[0];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell(title, tw, { fillColor: h.RPN_PURPLE, fontSize: 14, columnSpan: 2 })] }),
     ...rows.map(r => new TableRow({ children: [h.dataCell(r[0], cols[0], { fontSize: 14, bold: true, fillColor: h.RPN_PURPLE_LIGHT }), h.dataCell(r[1], cols[1], { fontSize: 14 })] })),
   ] });
@@ -111,7 +111,7 @@ function buildScaleTable(title: string, rows: string[][]): Table {
 function buildActionBandsTable(): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [1500, 1500, 0]; cols[2] = tw - cols[0] - cols[1];
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('RPN Range', cols[0], { fillColor: h.RPN_PURPLE, fontSize: 14 }), h.headerCell('Band', cols[1], { fillColor: h.RPN_PURPLE, fontSize: 14 }), h.headerCell('Required Action', cols[2], { fillColor: h.RPN_PURPLE, fontSize: 14 })] }),
     new TableRow({ children: [h.dataCell('76–125', cols[0], { fontSize: 14, bold: true, fillColor: h.RPN_RED, color: h.WHITE }), h.dataCell('Critical', cols[1], { fontSize: 14, bold: true, fillColor: h.RPN_RED, color: h.WHITE }), h.dataCell('Stop work. Senior management review required before proceeding.', cols[2], { fontSize: 14 })] }),
     new TableRow({ children: [h.dataCell('36–75', cols[0], { fontSize: 14, bold: true, fillColor: h.RPN_AMBER, color: h.WHITE }), h.dataCell('High', cols[1], { fontSize: 14, bold: true, fillColor: h.RPN_AMBER, color: h.WHITE }), h.dataCell('Additional controls required. Supervisor authorisation needed.', cols[2], { fontSize: 14 })] }),
@@ -133,39 +133,39 @@ function buildRPNHazardTable(c: Template08Content): Table {
   const remainW = tw - fixed;
   const cols = [refW, actW, hazW, whoW, numW, numW, numW, numW, ctrlW, numW, numW, numW, numW, detW, remainW];
 
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [
-      h.headerCell('Ref', cols[0], { fontSize: 8 }),
-      h.headerCell('Activity', cols[1], { fontSize: 8 }),
-      h.headerCell('Hazard', cols[2], { fontSize: 8 }),
-      h.headerCell('Who', cols[3], { fontSize: 8 }),
-      h.headerCell('◆L', cols[4], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆S', cols[5], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆D', cols[6], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆RPN', cols[7], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('Control Measures', cols[8], { fontSize: 8 }),
-      h.headerCell('◆rL', cols[9], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆rS', cols[10], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆rD', cols[11], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆rRPN', cols[12], { fontSize: 8, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
-      h.headerCell('◆Detection Method', cols[13], { fontSize: 8, fillColor: h.RPN_PURPLE }),
-      h.headerCell('Review', cols[14], { fontSize: 8 }),
+      h.headerCell('Ref', cols[0], { fontSize: 18 }),
+      h.headerCell('Activity', cols[1], { fontSize: 18 }),
+      h.headerCell('Hazard', cols[2], { fontSize: 18 }),
+      h.headerCell('Who', cols[3], { fontSize: 18 }),
+      h.headerCell('◆L', cols[4], { fontSize: 18, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆S', cols[5], { fontSize: 18, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆D', cols[6], { fontSize: 18, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆RPN', cols[7], { fontSize: 18, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('Control Measures', cols[8], { fontSize: 18 }),
+      h.headerCell('◆rL', cols[9], { fontSize: 18, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆rS', cols[10], { fontSize: 18, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆rD', cols[11], { fontSize: 18, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆rRPN', cols[12], { fontSize: 18, fillColor: h.RPN_PURPLE, alignment: AlignmentType.CENTER }),
+      h.headerCell('◆Detection Method', cols[13], { fontSize: 18, fillColor: h.RPN_PURPLE }),
+      h.headerCell('Review', cols[14], { fontSize: 18 }),
     ] }),
     ...c.hazards.map((hz, idx) => new TableRow({ children: [
-      h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 8, alignment: AlignmentType.CENTER }),
-      h.dataCell(hz.activity || '', cols[1], { fontSize: 8 }),
-      h.dataCell(hz.hazard, cols[2], { fontSize: 8 }),
-      h.dataCell(hz.whoAtRisk, cols[3], { fontSize: 8 }),
-      h.dataCell(String(hz.likelihoodInitial), cols[4], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.severityInitial), cols[5], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.detectabilityInitial), cols[6], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.rpnInitial), cols[7], { fontSize: 8, bold: true, alignment: AlignmentType.CENTER, fillColor: h.rpnColor(hz.rpnInitial), color: hz.rpnInitial >= 36 ? h.WHITE : h.BLACK }),
-      h.dataCell(hz.controlMeasures, cols[8], { fontSize: 8 }),
-      h.dataCell(String(hz.likelihoodResidual), cols[9], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.severityResidual), cols[10], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.detectabilityResidual), cols[11], { fontSize: 8, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
-      h.dataCell(String(hz.rpnResidual), cols[12], { fontSize: 8, bold: true, alignment: AlignmentType.CENTER, fillColor: h.rpnColor(hz.rpnResidual), color: hz.rpnResidual >= 36 ? h.WHITE : h.BLACK }),
-      h.dataCell(hz.detectionMethod, cols[13], { fontSize: 8, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(hz.ref || String(idx + 1), cols[0], { fontSize: 18, alignment: AlignmentType.CENTER }),
+      h.dataCell(hz.activity || '', cols[1], { fontSize: 18 }),
+      h.dataCell(hz.hazard, cols[2], { fontSize: 18 }),
+      h.dataCell(hz.whoAtRisk, cols[3], { fontSize: 18 }),
+      h.dataCell(String(hz.likelihoodInitial), cols[4], { fontSize: 18, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.severityInitial), cols[5], { fontSize: 18, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.detectabilityInitial), cols[6], { fontSize: 18, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.rpnInitial), cols[7], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.rpnColor(hz.rpnInitial), color: hz.rpnInitial >= 36 ? h.WHITE : h.BLACK }),
+      h.dataCell(hz.controlMeasures, cols[8], { fontSize: 18 }),
+      h.dataCell(String(hz.likelihoodResidual), cols[9], { fontSize: 18, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.severityResidual), cols[10], { fontSize: 18, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.detectabilityResidual), cols[11], { fontSize: 18, alignment: AlignmentType.CENTER, fillColor: h.RPN_PURPLE_LIGHT }),
+      h.dataCell(String(hz.rpnResidual), cols[12], { fontSize: 18, bold: true, alignment: AlignmentType.CENTER, fillColor: h.rpnColor(hz.rpnResidual), color: hz.rpnResidual >= 36 ? h.WHITE : h.BLACK }),
+      h.dataCell(hz.detectionMethod, cols[13], { fontSize: 18, fillColor: h.RPN_PURPLE_LIGHT }),
       h.emptyCell(cols[14]),
     ] })),
   ] });
@@ -174,7 +174,7 @@ function buildRPNHazardTable(c: Template08Content): Table {
 function buildControlsReviewTable(c: Template08Content): Table {
   const tw = h.A4_CONTENT_WIDTH;
   const cols = [2500, 1000, 1000, 1800, 0]; cols[4] = tw - cols.slice(0, 4).reduce((a, b) => a + b, 0);
-  return new Table({ width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
+  return new Table({ borders: h.NO_TABLE_BORDERS, width: { size: tw, type: WidthType.DXA }, columnWidths: cols, rows: [
     new TableRow({ children: [h.headerCell('Control Measure', cols[0], { fillColor: h.RPN_PURPLE, fontSize: 14 }), h.headerCell('Target RPN', cols[1], { fillColor: h.RPN_PURPLE, fontSize: 14, alignment: AlignmentType.CENTER }), h.headerCell('Actual RPN', cols[2], { fillColor: h.RPN_PURPLE, fontSize: 14, alignment: AlignmentType.CENTER }), h.headerCell('Reviewed By', cols[3], { fillColor: h.RPN_PURPLE, fontSize: 14 }), h.headerCell('Action/Notes', cols[4], { fillColor: h.RPN_PURPLE, fontSize: 14 })] }),
     ...c.controlsEffectivenessReview.map(ce => new TableRow({ children: [h.dataCell(ce.control, cols[0], { fontSize: 14 }), h.dataCell(String(ce.targetRPN), cols[1], { fontSize: 14, alignment: AlignmentType.CENTER }), h.dataCell(String(ce.actualRPN), cols[2], { fontSize: 14, alignment: AlignmentType.CENTER }), h.dataCell(ce.reviewedBy, cols[3], { fontSize: 14 }), h.dataCell(ce.actionNotes, cols[4], { fontSize: 14 })] })),
   ] });
