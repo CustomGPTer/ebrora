@@ -123,7 +123,7 @@ export default function RamsLandingClient() {
       <section className="format-selection">
         <div className="container">
           <h2 className="section-title">Choose Your Format</h2>
-          <p className="section-subtitle">10 industry-standard formats covering every type of construction activity</p>
+          <p className="section-subtitle">11 industry-standard formats covering every type of construction activity</p>
 
           <div className="format-grid">
             {RAMS_FORMATS.map((format) => (
@@ -274,7 +274,7 @@ export default function RamsLandingClient() {
               <ul className="features-list">
                 <li>5 RAMS per month</li>
                 <li>30 AI documents per month</li>
-                <li>All 10 formats</li>
+                <li>All 11 formats</li>
                 <li>Company logo on documents</li>
                 <li>14-day money-back guarantee</li>
               </ul>
@@ -305,7 +305,7 @@ export default function RamsLandingClient() {
               <ul className="features-list">
                 <li>15 RAMS per month</li>
                 <li>150 AI documents per month</li>
-                <li>All 10 formats</li>
+                <li>All 11 formats</li>
                 <li>Company logo on documents</li>
                 <li>Priority email & chat support</li>
               </ul>
@@ -336,7 +336,7 @@ export default function RamsLandingClient() {
               <ul className="features-list">
                 <li>Unlimited RAMS</li>
                 <li>Unlimited AI documents</li>
-                <li>All 10 formats</li>
+                <li>All 11 formats</li>
                 <li>Company logo on documents</li>
                 <li>Dedicated priority queue</li>
               </ul>
@@ -388,7 +388,7 @@ export default function RamsLandingClient() {
                 </svg>
               </div>
               <h3 className="step-title">Choose Your Format</h3>
-              <p className="step-description">Select from 10 industry-standard RAMS formats</p>
+              <p className="step-description">Select from 11 industry-standard RAMS formats</p>
             </div>
 
             {/* Step 2 */}

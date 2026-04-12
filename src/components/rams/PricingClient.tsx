@@ -36,7 +36,7 @@ const TIERS: TierData[] = [
     ramsPerMonth: '1 RAMS / month',
     aiUses: '1 AI document / month',
     features: [
-      'Access to all 35 AI tools',
+      'Access to all 35+ AI tools',
       '1 AI document per month',
       '1 RAMS document per month',
       '1 toolbox talk download / month',
@@ -56,7 +56,7 @@ const TIERS: TierData[] = [
     aiUses: '30 AI documents / month',
     badge: 'Most Popular',
     features: [
-      'All 35 AI construction tools',
+      'All 35+ AI construction tools',
       '30 AI documents per month',
       '5 RAMS documents per month',
       'All 10 RAMS formats',
@@ -130,7 +130,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'What AI tools are included?',
-    a: 'All plans — including Free — have access to every AI tool: COSHH assessments, safety alerts, RFIs, incident reports, toolbox talk generator, permit to dig, lift plans, and 28 more. The difference is how many documents you can generate per month.',
+    a: 'All plans — including Free — have access to every AI tool: COSHH assessments, safety alerts, RFIs, incident reports, toolbox talk generator, permit to dig, lift plans, and many more. The difference is how many documents you can generate per month.',
   },
   {
     q: 'Can I upload my company logo?',
@@ -154,9 +154,9 @@ const COMPARISON_ROWS: {
   unlimited: string | boolean;
 }[] = [
   { label: 'AI documents / month', free: '1', starter: '30', professional: '150', unlimited: 'Unlimited' },
-  { label: 'AI tools available', free: '35', starter: '35', professional: '35', unlimited: '35' },
+  { label: 'AI tools available', free: '35+', starter: '35+', professional: '35+', unlimited: '35+' },
   { label: 'RAMS documents / month', free: '1', starter: '5', professional: '15', unlimited: 'Unlimited' },
-  { label: 'RAMS formats', free: '2', starter: '10', professional: '10', unlimited: '10' },
+  { label: 'RAMS formats', free: '2', starter: '11', professional: '11', unlimited: '11' },
   { label: 'Toolbox talk downloads / month', free: '1', starter: '10', professional: '20', unlimited: 'Unlimited' },
   { label: 'Free template downloads / month', free: '1', starter: '10', professional: '30', unlimited: 'Unlimited' },
   { label: 'AI-generated content', free: true, starter: true, professional: true, unlimited: true },
@@ -587,7 +587,7 @@ export default function PricingClient() {
             className="text-[0.95rem] sm:text-[1.05rem] leading-relaxed max-w-xl mx-auto mb-10"
             style={{ color: 'var(--color-text-light)' }}
           >
-            35 AI construction tools, RAMS Builder, free templates, and toolbox talks.
+            35+ AI construction tools, RAMS Builder, free templates, and toolbox talks.
             Start free — upgrade when you need more.
           </p>
 

@@ -364,7 +364,7 @@ export default function QuestionnaireClient({
             <p>
               This format is available on the Starter plan and above.{' '}
               <a href="/rams-builder#pricing" className="polite-message__link">
-                Upgrade to access all 10 formats
+                Upgrade to access all 11 formats
               </a>
             </p>
           </div>
