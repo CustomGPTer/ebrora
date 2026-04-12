@@ -309,31 +309,67 @@ export async function POST(req: NextRequest) {
           : 'Based on my answers so far, ask your next batch of follow-up questions — or tell me you have enough information.',
     });
 
-    // AI Call
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4.1',
-      messages,
-      temperature: 0.7,
-      max_tokens: 3000,
-      response_format: { type: 'json_object' },
-    });
+    // AI Call — retry if round 1 wrongly returns "ready" (AI should always ask questions first)
+    const MAX_CHAT_RETRIES = 2;
+    let parsed: any = null;
 
-    const responseText = completion.choices[0]?.message?.content;
-    if (!responseText) throw new Error('No response from AI');
+    for (let attempt = 0; attempt <= MAX_CHAT_RETRIES; attempt++) {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4.1',
+        messages,
+        temperature: 0.7 + (attempt * 0.1), // slightly increase temp on retry
+        max_tokens: 3000,
+        response_format: { type: 'json_object' },
+      });
 
-    const parsed = JSON.parse(responseText);
+      const responseText = completion.choices[0]?.message?.content;
+      if (!responseText) throw new Error('No response from AI');
+
+      parsed = JSON.parse(responseText);
+
+      // Round 1 returning "ready" is always wrong — the AI must ask questions first.
+      // Retry with a correction message appended to the conversation.
+      if (parsed.status === 'ready' && roundNumber === 1 && totalQuestionsAsked === 0 && attempt < MAX_CHAT_RETRIES) {
+        messages.push({ role: 'assistant', content: responseText });
+        messages.push({
+          role: 'user',
+          content: 'You must ask your interview questions FIRST before signalling ready. I have not answered any questions yet. Please ask your first batch of questions now.',
+        });
+        continue;
+      }
+
+      break; // valid response
+    }
 
     // Record cooldown
     lastRoundTimestamps.set(userId, Date.now());
 
-    // AI signals ready
+    // AI signals ready (legitimate on round 2+ or as last-resort fallback on round 1)
     if (parsed.status === 'ready') {
+      // If round 1 returned ready after retries, still create the generation record
+      // so the user can proceed (generate route will use description only)
+      let readyGenerationId: string | undefined;
+      if (roundNumber === 1) {
+        const generation = await prisma.aiToolGeneration.create({
+          data: {
+            user_id: userId,
+            tool_slug: toolSlug,
+            description,
+            questions: JSON.stringify([]),
+            status: 'QUEUED',
+          },
+        });
+        readyGenerationId = generation.id;
+        await incrementAiToolUsage(userId, toolSlug);
+      }
+
       return NextResponse.json({
         status: 'ready',
         roundNumber,
         totalQuestionsAsked,
         message: parsed.message || `I have enough information to generate your ${toolConfig.documentLabel}.`,
-      } as AiToolChatResponse);
+        ...(readyGenerationId ? { generationId: readyGenerationId } : {}),
+      } as AiToolChatResponse & { generationId?: string });
     }
 
     // Validate questions
