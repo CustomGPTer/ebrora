@@ -12,13 +12,13 @@ export const metadata: Metadata = {
     absolute: "Free Construction Calculators & Safety Tools | Ebrora",
   },
   description:
-    "Free interactive tools for construction site teams. Materials converter, manual handling calculator, fire risk assessment, and confined space category calculator.",
+    "48+ free interactive construction calculators across 14 categories. Health & safety, earthworks, materials, plant & equipment, programme & commercial, environmental, utilities, surveying, quality & testing, water & wastewater, MEICA and more. Based on UK regulations and HSE methodologies.",
   alternates: {
     canonical: "https://www.ebrora.com/tools",
   },
   openGraph: {
     title: "Free Construction Calculators & Safety Tools | Ebrora",
-    description: "Free interactive calculators for construction health and safety.",
+    description: "48+ free interactive calculators for UK construction site teams across 14 categories. Health & safety, earthworks, materials, commercial, environmental, MEICA and more.",
     url: "https://www.ebrora.com/tools",
     type: "website",
     images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Free Construction Calculators & Safety Tools | Ebrora",
     description:
-      "Free interactive construction calculators and safety tools for UK site teams.",
+      "48+ free interactive construction calculators and safety tools for UK site teams across 14 categories.",
     images: ["https://www.ebrora.com/og-image.jpg"],
   },
 };
