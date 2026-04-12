@@ -4,26 +4,26 @@ import BlogListingClient from '@/components/blog/BlogListingClient';
 
 export const metadata: Metadata = {
     title: {
-          absolute: 'Construction Safety & RAMS Guides | Ebrora Blog',
+          absolute: 'Construction Industry Blog | Safety, AI Tools, Site Management & More | Ebrora',
     },
     description:
-          'Expert guides on construction safety, RAMS templates, risk assessments and method statements. Practical tips for UK site managers and civil engineers.',
+          'Expert guides on construction safety, AI document tools, site management, plant & equipment, earthworks, temporary works, commercial contracts, and environmental compliance. Practical tips for UK site managers and civil engineers.',
     alternates: {
           canonical: 'https://www.ebrora.com/blog',
     },
     openGraph: {
-          title: 'Construction Safety & RAMS Guides | Ebrora Blog',
+          title: 'Construction Industry Blog | Safety, AI Tools & Site Management | Ebrora',
           description:
-                  'Expert guides on construction safety, RAMS templates, risk assessments and method statements for UK site teams.',
+                  'Expert guides on construction safety, AI tools, site management, plant & equipment, earthworks, commercial contracts, and more for UK site teams.',
           url: 'https://www.ebrora.com/blog',
           type: 'website',
           images: [{ url: 'https://www.ebrora.com/og-image.jpg', width: 1200, height: 630 }],
     },
     twitter: {
           card: 'summary_large_image',
-          title: 'Construction Safety & RAMS Guides | Ebrora Blog',
+          title: 'Construction Industry Blog | Safety, AI Tools & Site Management | Ebrora',
           description:
-                  'Expert guides on construction safety, RAMS templates, risk assessments and method statements for UK site teams.',
+                  'Expert guides on construction safety, AI tools, site management, plant & equipment, earthworks, commercial contracts, and more for UK site teams.',
           images: ['https://www.ebrora.com/og-image.jpg'],
     },
 };
