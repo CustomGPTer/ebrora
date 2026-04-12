@@ -506,10 +506,10 @@ export default function CBRModulusConverterClient() {
                 const srClass = getSubgradeClass(sr.typicalCBRMid);
                 return (
                   <tr key={i} className="border-b border-gray-100">
-                    <td className="py-1.5 font-medium text-gray-800">{sr.name}</td>
-                    <td className="py-1.5 text-center">{sr.typicalCBRLow}-{sr.typicalCBRHigh}%</td>
-                    <td className="py-1.5 text-center font-semibold">{srClass.className}</td>
-                    <td className="py-1.5 text-gray-500">{sr.notes}</td>
+                    <td className="px-2 py-1.5 font-medium text-gray-800">{sr.name}</td>
+                    <td className="px-2 py-1.5 text-center">{sr.typicalCBRLow}-{sr.typicalCBRHigh}%</td>
+                    <td className="px-2 py-1.5 text-center font-semibold">{srClass.className}</td>
+                    <td className="px-2 py-1.5 text-gray-500">{sr.notes}</td>
                   </tr>
                 );
               })}
