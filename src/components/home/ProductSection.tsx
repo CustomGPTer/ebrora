@@ -270,12 +270,6 @@ function ProductCard({ product, categories }: ProductCardProps) {
   const mainImage = hasImages ? product.images[0] : '';
   const hoverImage = hasImages && product.images.length > 1 ? product.images[1] : mainImage;
 
-  const handlePdfClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    window.open(product.pdfLink, '_blank');
-  };
-
   const handleBuyClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -312,9 +306,7 @@ function ProductCard({ product, categories }: ProductCardProps) {
           </span>
         </div>
         <div className="product-card__btn-row">
-          <span className="btn btn--outline" onClick={handlePdfClick}>
-            Free PDF
-          </span>
+          <span className="btn btn--outline">View Details</span>
           <span className="btn btn--primary" onClick={handleBuyClick}>
             Buy Now
           </span>
