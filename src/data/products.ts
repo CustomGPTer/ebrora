@@ -32,7 +32,6 @@ import type { Product, Category, Review } from '@/lib/types';
  *                      detailed paragraphs.
  *    - features      £ An array of feature strings. Include at least 8.
  *    - images        £ An array of image paths/URLs. Leave as [] if none yet.
- *    - pdfLink       £ URL to the free PDF preview. Use "#" as placeholder.
  *    - buyLink       £ Full Gumroad purchase URL.
  *                      Format: "https://ebrora.gumroad.com/l/your-slug"
  *    - youtubeId     £ YouTube video ID for demo. Leave as "" if none yet.
@@ -154,7 +153,6 @@ export const PRODUCTS: Product[] = [
       "Competent person and temporary works status tracking per excavation"
     ],
         images: ["product-images/Excavation-Inspection-Register-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/excavation-inspection-register",
         youtubeId: "",
         new: false,
@@ -200,7 +198,6 @@ export const PRODUCTS: Product[] = [
       "Filter and show/hide completed tasks toggles"
     ],
         images: ["product-images/Programme-Gantt-Chart-Template-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/gantt-chart-project-planner",
         youtubeId: "",
         new: false,
@@ -217,45 +214,7 @@ export const PRODUCTS: Product[] = [
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // 3. COSHH Assessment Tool
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-    {
-        id: "coshh-assessment-tool",
-        title: "COSHH Assessment Tool",
-    altText: "COSHH Assessment Tool Excel template for hazardous substance risk assessments",
-        category: ["hse", "inspection"],
-        price: "£19.99",
-        oldPrice: "",
-        badge: "HSE & Safety",
-        icon: "£ ï¸",
-        desc: "Comprehensive COSHH risk assessment with a pre-built substance database, automated risk matrix, PPE mapping, printable assessment forms, and full compliance with UK COSHH Regulations 2002.",
-        longDesc: `<p>The COSHH Assessment Tool is a purpose-built Excel template that enables construction and industrial teams to carry out thorough assessments under the Control of Substances Hazardous to Health Regulations 2002. It ships with a pre-built database of over 120 commonly encountered construction substances £ from cement dust and resin hardeners to diesel fuel and silica-bearing materials £ each pre-populated with hazard classifications, exposure limits, and recommended control measures. Simply select a substance and the template auto-fills the key hazard information, dramatically reducing the time it takes to produce a compliant assessment.</p><p>The automated risk matrix calculates residual risk scores based on your selected likelihood and severity ratings, both before and after control measures are applied. Colour-coded cells instantly communicate whether the residual risk is acceptable, tolerable, or unacceptable, guiding you toward appropriate additional controls. A dedicated PPE mapping section links each substance to the specific personal protective equipment required, and an emergency procedures tab provides structured response plans for spills, skin contact, inhalation, and ingestion scenarios for every substance in the register.</p><p>Completed assessments can be printed to a professional, single-page format that is ready for site display, toolbox talk briefings, or client audit submissions. The substance register dashboard gives a bird's-eye view of all assessed substances across your project, their risk ratings, review dates, and responsible persons. With built-in review reminders and version tracking, this tool ensures your COSHH programme stays current and legally defensible throughout the life of your project.</p>`,
-        features: [
-            "Pre-built database of 120+ construction substances with hazard data",
-            "Automated risk matrix with before/after control measure scoring",
-            "Colour-coded residual risk output: acceptable, tolerable, unacceptable",
-            "PPE mapping linked to each substance and task combination",
-            "Emergency procedures tab for spills, contact, inhalation, and ingestion",
-            "Printable single-page assessment forms for site display and audits",
-            "Substance register dashboard with risk ratings and review dates",
-            "Fully compliant with UK COSHH Regulations 2002 requirements",
-            "Built-in review date reminders and version history tracking",
-            "Dropdown-driven data entry for speed and consistency"
-        ],
-        images: ["product-images/OWL-Register-Observation-Checklist-excel-ebrora.jpg"],
-        pdfLink: "#",
-        buyLink: "https://ebrora.gumroad.com/l/coshh-assessment-tool",
-        youtubeId: "",
-        new: false,
-        featured: true,
-        compatible: "Windows & Mac",
-        version: "1.0",
-        fileSize: "1.3 MB",
-        lastUpdate: "March 2026",
-        popularity: 14,
-        isBundle: false,
-        bundleProducts: [],
-    },
-
-    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // 4. ITR Asset Tracker
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
 
@@ -289,7 +248,6 @@ export const PRODUCTS: Product[] = [
       "Designed for civil engineering and construction — excludes MEICA"
     ],
         images: ["product-images/Carbon-Calculator-Construction-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/carbon-calculator-construction",
         youtubeId: "",
         new: false,
@@ -332,7 +290,6 @@ export const PRODUCTS: Product[] = [
       "Designed for contractual records, delay claims and daywork substantiation"
     ],
         images: ["product-images/Daily-Diary-Template-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/daily-diary-template",
         youtubeId: "",
         new: false,
@@ -349,45 +306,7 @@ export const PRODUCTS: Product[] = [
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // 7. ART Assessment Tool
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-    {
-        id: "art-assessment-tool",
-        title: "ART Assessment Tool",
-    altText: "ART Assessment Tool Excel template for upper limb repetitive task risk assessment",
-        category: ["hse", "competence"],
-        price: "£16.99",
-        oldPrice: "",
-        badge: "HSE & Safety",
-        icon: "ð¦º",
-        desc: "HSE Assessment of Repetitive Tasks tool with guided workflows, automated risk scoring, colour-coded risk levels, control measure recommendations, and printable assessment reports.",
-        longDesc: `<p>The ART Assessment Tool is an Excel-based implementation of the HSE's Assessment of Repetitive Tasks methodology, designed for occupational health and safety professionals working in construction, manufacturing, and industrial environments. It provides a guided, step-by-step workflow that walks assessors through the evaluation of repetitive manual tasks £ from identifying the task and workforce involved, through scoring frequency, force, posture, and additional risk factors, to calculating an overall exposure level and recommending proportionate control measures.</p><p>Automated risk scoring eliminates manual calculation errors and ensures consistency across assessments. As you enter scores for each body region and risk factor, the template instantly computes the task-level exposure score and assigns a colour-coded risk level: green for low risk, amber for medium risk requiring further investigation, and red for high risk demanding immediate action. Each risk level is linked to a library of pre-written control measure recommendations tailored to construction activities, so assessors are not left wondering what to do with the results £ practical guidance is provided automatically.</p><p>Completed assessments can be printed to a professional report format suitable for inclusion in project health and safety files, toolbox talk packs, or regulatory submissions. The assessment history sheet maintains a chronological record of all assessments carried out, enabling trend analysis over time. If a task is reassessed after control measures are implemented, the before-and-after comparison clearly demonstrates risk reduction. The template supports multiple task assessments within a single workbook, making it ideal for teams managing diverse construction activities across one or several project sites.</p>`,
-        features: [
-            "Guided step-by-step ART assessment workflow aligned with HSE methodology",
-            "Automated risk scoring for frequency, force, posture, and additional factors",
-            "Colour-coded risk levels: green (low), amber (medium), red (high)",
-            "Pre-written control measure recommendations for construction activities",
-            "Printable professional report format for safety files and audits",
-            "Assessment history sheet with chronological record and trend analysis",
-            "Before-and-after comparison to demonstrate risk reduction effectiveness",
-            "Multiple task support within a single workbook for diverse activities",
-            "Body-region-specific scoring for upper limbs, back, and neck",
-            "Dropdown-driven inputs for speed, consistency, and ease of use"
-        ],
-        images: ["product-images/Root-Cause-Analysis-Fishbone-excel-ebrora.jpg"],
-        pdfLink: "#",
-        buyLink: "https://ebrora.gumroad.com/l/art-assessment-tool",
-        youtubeId: "",
-        new: false,
-        featured: false,
-        compatible: "Windows & Mac",
-        version: "1.0",
-        fileSize: "1.1 MB",
-        lastUpdate: "March 2026",
-        popularity: 8,
-        isBundle: false,
-        bundleProducts: [],
-    },
-
-    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // 8. Pump Maintenance Tracker
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     {
@@ -413,7 +332,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for maintenance supervisors, process engineers and asset managers"
     ],
         images: ["product-images/Pump-Maintenance-Tracker-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/pump-maintenance-tracker",
         youtubeId: "",
         new: false,
@@ -455,7 +373,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site engineers and concrete supervisors on civil engineering projects"
     ],
         images: ["product-images/Concrete-Pour-Register-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/concrete-pour-register",
         youtubeId: "",
         new: false,
@@ -476,45 +393,7 @@ export const PRODUCTS: Product[] = [
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // 11. Delivery Booking System
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-    {
-        id: "delivery-booking-system",
-        title: "Delivery Booking System",
-    altText: "Delivery Booking System Excel spreadsheet for managing site material deliveries",
-        category: ["planning", "daily", "registers"],
-        price: "£23.99",
-        oldPrice: "",
-        badge: "Planning",
-        icon: "ð",
-        desc: "Time-slot booking calendar for construction deliveries with vehicle tracking, storage allocation, supplier database, conflict detection, unloading requirements, and weekly logistics summaries.",
-        longDesc: `<p>The Delivery Booking System is an Excel-based logistics management tool designed to bring order to the often chaotic process of managing material deliveries on busy construction sites. At its core is a visual time-slot booking calendar that divides each working day into configurable intervals £ typically 30-minute or one-hour slots £ and allows logistics managers to book, view, and manage all incoming deliveries in a single, colour-coded overview. Each booking captures the supplier, material type, estimated number of vehicles, vehicle size category, required unloading equipment (crane, telehandler, forklift, manual), and designated storage or laydown area.</p><p>Conflict detection logic automatically checks for overbooking against your site's defined constraints £ maximum vehicles per hour, unloading bay capacity, crane availability, and gate access limitations. When a proposed booking would exceed any constraint, the template highlights the conflict in red and suggests alternative available slots. The supplier database stores contact details, lead times, and delivery performance ratings for all your regular suppliers, making it quick to set up repeat bookings and track which suppliers consistently deliver on time, early, or late.</p><p>A daily overview sheet provides the site team with a printable one-page summary of all expected deliveries for the day, including arrival times, vehicle details, unloading requirements, and storage destinations £ perfect for briefing gatemen, banksmen, and forklift operators at the morning coordination meeting. Weekly logistics summaries aggregate delivery volumes, vehicle movements, and supplier performance into management-level reports. For congested urban sites or projects with restricted delivery windows, this template is an indispensable planning tool that reduces site congestion, waiting times, and health and safety risks associated with uncontrolled vehicle movements.</p>`,
-        features: [
-            "Visual time-slot booking calendar with configurable intervals",
-            "Conflict detection for overbooking against site capacity constraints",
-            "Supplier database with contact details and delivery performance ratings",
-            "Vehicle tracking with size category and unloading equipment requirements",
-            "Storage and laydown area allocation linked to each delivery booking",
-            "Printable daily delivery overview for site team morning briefings",
-            "Weekly logistics summary reports with volume and performance metrics",
-            "Colour-coded calendar view for instant visual status assessment",
-            "Gate access and crane availability scheduling integration",
-            "Repeat booking functionality for regular supplier deliveries"
-        ],
-        images: ["product-images/Action-Calendar-Template-excel-ebrora.jpg"],
-        pdfLink: "#",
-        buyLink: "https://ebrora.gumroad.com/l/delivery-booking-system",
-        youtubeId: "",
-        new: false,
-        featured: false,
-        compatible: "Windows & Mac",
-        version: "1.0",
-        fileSize: "1.3 MB",
-        lastUpdate: "March 2026",
-        popularity: 10,
-        isBundle: false,
-        bundleProducts: [],
-    },
-
-    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // 12. PIC Competence Assessment
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     {
@@ -541,7 +420,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for major infrastructure and capital delivery projects"
     ],
         images: ["product-images/Persons-In-Charge-Assessment-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/pic-competence-assessment",
         youtubeId: "",
         new: false,
@@ -558,45 +436,7 @@ export const PRODUCTS: Product[] = [
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // 13. Temporary Works Register
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-    {
-        id: "temporary-works-register",
-        title: "Temporary Works Register",
-    altText: "Temporary Works Register Excel template for managing temporary works on site",
-        category: ["temporary", "registers", "hse"],
-        price: "£26.99",
-        oldPrice: "",
-        badge: "Temporary Works",
-        icon: "ð§",
-        desc: "BS 5975 compliant temporary works register with design check certificates, permit to load management, inspection scheduling, TWC/TWS assignment, RAG dashboards, and printable reports.",
-        longDesc: `<p>The Temporary Works Register is a comprehensive Excel template that provides full compliance with BS 5975:2019 £ the code of practice for temporary works procedures and the permissible stress design of falsework. Managing temporary works is one of the most safety-critical responsibilities on any construction project, and this register ensures that every temporary works item £ from scaffolding and propping to cofferdams, excavation support, and temporary bridges £ is formally registered, designed, checked, approved, inspected, loaded, and eventually dismantled through a controlled, auditable process.</p><p>Each register entry captures the temporary works item description, location, designer, design checker, Temporary Works Coordinator (TWC) assignment, Temporary Works Supervisor (TWS) assignment, design check certificate reference, permit to load status, inspection schedule, and current lifecycle stage. The permit to load management module ensures that no temporary works item is loaded until the design has been checked, the TWC has approved the installation, and all pre-loading inspections have been completed and signed off. Design check certificates can be generated directly from the template in a format that satisfies BS 5975 requirements, recording the checker's confirmation that the design is adequate for the intended loading and conditions.</p><p>The RAG-rated dashboard provides an instant overview of every temporary works item on the project, colour-coded by lifecycle stage and compliance status. Items awaiting design checks, overdue inspections, or pending permits to load are highlighted so the TWC can prioritise their attention where it matters most. Inspection scheduling tracks recurring inspection requirements against each item, with automated reminders for upcoming and overdue inspections. Dismantling procedures ensure that temporary works are not removed prematurely, with a formal sign-off process confirming that the permanent works have achieved sufficient strength to carry the loads. All data is printable in professional report formats suitable for project safety files and external audits.</p>`,
-        features: [
-            "Full BS 5975:2019 compliance for temporary works management procedures",
-            "Design check certificate generation within the template",
-            "Permit to load management with pre-loading inspection verification",
-            "TWC and TWS assignment and tracking for every temporary works item",
-            "RAG-rated dashboard with lifecycle stage and compliance status overview",
-            "Automated inspection scheduling with upcoming and overdue reminders",
-            "Dismantling sign-off process to prevent premature removal",
-            "Comprehensive register covering scaffolding, propping, cofferdams, and more",
-            "Printable reports for project safety files and external audits",
-            "Structured lifecycle tracking from design through to removal"
-        ],
-        images: ["product-images/Temporary-Works-Class-Matrix-excel-ebrora.jpg"],
-        pdfLink: "#",
-        buyLink: "https://ebrora.gumroad.com/l/temporary-works-register",
-        youtubeId: "",
-        new: true,
-        featured: true,
-        compatible: "Windows & Mac",
-        version: "1.0",
-        fileSize: "1.5 MB",
-        lastUpdate: "March 2026",
-        popularity: 14,
-        isBundle: false,
-        bundleProducts: [],
-    },
-
-    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // 14. Plant & Equipment Register
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
 
@@ -638,7 +478,6 @@ export const PRODUCTS: Product[] = [
       "Compatible with Windows and Mac versions of Excel"
     ],
     images: ["product-images/HAVS-Vibration-Monitoring-Register-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/havs-monitoring",
     youtubeId: "",
     new: true,
@@ -678,7 +517,6 @@ export const PRODUCTS: Product[] = [
       "Print-ready assessment output for filing and distribution"
     ],
     images: ["product-images/Manual-Handling-Risk-Calculator-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/manual-handling-risk-score-calculator",
     youtubeId: "",
     new: true,
@@ -719,7 +557,6 @@ export const PRODUCTS: Product[] = [
       "Print-ready output for permit packs and method statements"
     ],
     images: ["product-images/Confined-Space-Assessment-Calculator-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/confined-space-assessment-calculator",
     youtubeId: "",
     new: true,
@@ -759,7 +596,6 @@ export const PRODUCTS: Product[] = [
       "Aligned with Regulatory Reform (Fire Safety) Order 2005"
     ],
     images: ["product-images/Office-Fire-Risk-Assessment-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/office-fire-risk-assessment",
     youtubeId: "",
     new: true,
@@ -799,7 +635,6 @@ export const PRODUCTS: Product[] = [
       "Compatible with both Windows and Mac versions of Excel"
     ],
     images: ["product-images/Drug-Alcohol-Test-Register-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/da-test-register",
     youtubeId: "",
     new: true,
@@ -818,28 +653,28 @@ export const PRODUCTS: Product[] = [
   {
     id: "plant-pre-use-check-sheets",
     title: "Plant Pre-Use Check Sheets",
-    altText: "Plant Pre-Use Check Sheets Excel template for daily plant inspection records",
+    altText: "Plant Pre-Use Check Sheets Excel template with 28 equipment types and type-specific daily inspection items",
     category: ["plant", "daily", "hse"],
     price: "£15.99",
     oldPrice: "",
     badge: "Plant & Equipment",
     icon: "£ï¸",
-    desc: "Printable pre-use inspection checklists for excavators, telehandlers, dumpers, cranes, and more with defect categorisation, operator sign-off, and supervisor review tracking.",
-    longDesc: `<p>The Plant Pre-Use Check Sheets is a professionally designed Excel template built specifically for construction and civil engineering teams who need structured, reliable tools for managing plant pre-use check s processes. Printable pre-use inspection checklists for excavators, telehandlers, dumpers, cranes, and more with defect categorisation, operator sign-off, and supervisor review tracking.</p><p>Built with practical site experience in mind, this template features automated calculations, conditional formatting for instant visual status indicators, and dropdown-driven data entry that ensures consistency across all users. Whether you are a site manager, engineer, or project coordinator, the intuitive layout means you can start using it immediately without extensive training or setup.</p><p>All outputs are formatted for professional presentation, suitable for client submissions, audit evidence packs, and project filing. The template includes built-in data validation, protected formulas, and a user guide sheet to help your team get the most from every feature. Designed for UK construction standards and best practices, it scales from single-site operations to multi-project programmes.</p>`,
+    desc: "Printable weekly plant pre-use inspection check sheets covering 28 equipment types — from tracked and wheeled excavators, dumpers, telehandlers and MEWPs to piling rigs, mobile cranes, concrete pumps, vacuum excavators and harnesses — each with 15–25 type-specific daily check items drawn from a built-in question bank, a 7-day Monday-to-Sunday check grid (✓/✗/N/A), defect reporting section, operator declaration and signature block.",
+    longDesc: `<p>The Plant Pre-Use Check Sheets template is an Excel workbook providing printable weekly inspection forms for 28 types of construction plant and equipment. Each sheet is pre-populated with 15 to 25 type-specific daily check items drawn from a built-in question bank on the Data sheet, covering the checks an operator must complete before starting work each day — from fluid levels and tyre condition to safety devices, braking systems and attachment security.</p><p>Equipment types covered include crawler and wheeled 360 excavators, mini excavators, tracked and wheeled dozers, forward tipping and rear tipping dumpers, tracked dumpers, articulated dump trucks, wheeled loading shovels, backhoe loaders, skid steer loaders, telescopic handlers, MEWPs, ride-on rollers, compactors, graders, road planers, piling rigs, mobile cranes, concrete pumps, vacuum excavators, site vehicles, tower lights, mobile scaffold towers, harnesses and sweepers.</p><p>Each check sheet has a 7-day Monday-to-Sunday grid for recording ✓ (pass), ✗ (fail) or N/A against each item, a defect details section for recording any issues identified, and an operator declaration with name, signature and date fields. The sheets are formatted for A4 portrait printing and designed to be issued weekly to operators as part of the site plant management system. Check items are editable on the Data sheet so new equipment types or site-specific checks can be added.</p>`,
     features: [
-      "Structured plant pre-use check sheets with comprehensive data capture fields",
-      "Automated calculations and conditional formatting for instant visual feedback",
-      "Dropdown-driven data entry for speed and consistency across all users",
-      "Professional print-ready layouts for client and audit submissions",
-      "Built-in data validation to ensure complete and accurate records",
-      "Dashboard overview with summary charts and KPI tracking",
-      "Searchable and filterable views by date, status, and category",
-      "One-click PDF export for distribution and filing",
-      "User guide sheet with setup instructions and field descriptions",
-      "Compatible with both Windows and Mac versions of Excel"
+      "28 equipment types with type-specific daily check items",
+      "15-25 check items per equipment type from built-in question bank",
+      "Excavators, dumpers, telehandlers, MEWPs, cranes, piling rigs and more",
+      "Harnesses, scaffold towers, site vehicles and tower lights included",
+      "7-day Monday-to-Sunday check grid per sheet",
+      "Pass, fail and N/A recording for each check item per day",
+      "Defect details section for recording identified issues",
+      "Operator declaration with name, signature and date fields",
+      "A4 portrait print-ready format for weekly issue to operators",
+      "Editable question bank on Data sheet for site-specific customisation",
+      "Designed for plant coordinators and site supervisors"
     ],
     images: ["product-images/Plant-Pre-Use-Check-Sheet-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/plant-pre-use-check-sheets",
     youtubeId: "",
     new: true,
@@ -880,7 +715,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site managers, plant coordinators and commercial teams"
     ],
     images: ["product-images/Plant-Issues-Tracker-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/plant-issues-tracker",
     youtubeId: "",
     new: true,
@@ -920,7 +754,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site managers, supervisors and temporary works coordinators"
     ],
     images: ["product-images/Access-Equipment-Selector-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/access-equipment-selector",
     youtubeId: "",
     new: true,
@@ -959,7 +792,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site managers, plant coordinators and environmental managers"
     ],
     images: ["product-images/Fuel-Usage-Calculator-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/fuel-usage-calculator",
     youtubeId: "",
     new: true,
@@ -999,7 +831,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for multi-trade construction projects"
     ],
     images: ["product-images/Subcontractor-Performance-Scorecard-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/subcontractor-performance-scorecard",
     youtubeId: "",
     new: true,
@@ -1039,7 +870,6 @@ export const PRODUCTS: Product[] = [
       "Consistent assessment framework across different reviewers"
     ],
     images: ["product-images/Site-Operative-Scorecard-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/site-operative-scorecard",
     youtubeId: "",
     new: true,
@@ -1079,7 +909,6 @@ export const PRODUCTS: Product[] = [
       "VBA-powered automation requiring macro-enabled Excel (.xlsm)"
     ],
     images: ["product-images/Allocation-Sheet-Template-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/allocation-sheet",
     youtubeId: "",
     new: true,
@@ -1120,7 +949,6 @@ export const PRODUCTS: Product[] = [
       "Supports teams of up to 50 people across multiple job families"
     ],
     images: ["product-images/Leave-Calendar-Template-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/leave-calendar",
     youtubeId: "",
     new: true,
@@ -1160,7 +988,6 @@ export const PRODUCTS: Product[] = [
       "Quick-reference tool for BS 5975 compliance on construction projects"
     ],
     images: ["product-images/Temporary-Works-Class-Matrix-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/temporary-works-class-matrix",
     youtubeId: "",
     new: true,
@@ -1200,7 +1027,6 @@ export const PRODUCTS: Product[] = [
       "Complete audit trail with name, signature, date and time at each stage"
     ],
     images: ["product-images/Ladder-Stepladder-Permit-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/ladder-stepladder-permit",
     youtubeId: "",
     new: true,
@@ -1240,7 +1066,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site engineers, materials managers and environmental coordinators"
     ],
     images: ["product-images/Aggregate-Import-Tracker-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/aggregate-import-tracker",
     youtubeId: "",
     new: true,
@@ -1256,44 +1081,7 @@ export const PRODUCTS: Product[] = [
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 33. Aggregate Price Comparison
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-  {
-    id: "aggregate-price-comparison",
-    title: "Aggregate Price Comparison",
-    altText: "Aggregate Price Comparison Excel template for comparing construction material costs",
-    category: ["cost", "concrete"],
-    price: "£14.99",
-    oldPrice: "",
-    badge: "Cost & Carbon",
-    icon: "ð°",
-    desc: "Side-by-side cost comparison tool for aggregate suppliers with delivered price analysis, haulage cost modelling, quality scoring, carbon footprint comparison, and procurement recommendation output.",
-    longDesc: `<p>The Aggregate Price Comparison is a professionally designed Excel template built specifically for construction and civil engineering teams who need structured, reliable tools for managing aggregate price comparison processes. Side-by-side cost comparison tool for aggregate suppliers with delivered price analysis, haulage cost modelling, quality scoring, carbon footprint comparison, and procurement recommendation output.</p><p>Built with practical site experience in mind, this template features automated calculations, conditional formatting for instant visual status indicators, and dropdown-driven data entry that ensures consistency across all users. Whether you are a site manager, engineer, or project coordinator, the intuitive layout means you can start using it immediately without extensive training or setup.</p><p>All outputs are formatted for professional presentation, suitable for client submissions, audit evidence packs, and project filing. The template includes built-in data validation, protected formulas, and a user guide sheet to help your team get the most from every feature. Designed for UK construction standards and best practices, it scales from single-site operations to multi-project programmes.</p>`,
-    features: [
-      "Structured aggregate price comparison with comprehensive data capture fields",
-      "Automated calculations and conditional formatting for instant visual feedback",
-      "Dropdown-driven data entry for speed and consistency across all users",
-      "Professional print-ready layouts for client and audit submissions",
-      "Built-in data validation to ensure complete and accurate records",
-      "Dashboard overview with summary charts and KPI tracking",
-      "Searchable and filterable views by date, status, and category",
-      "One-click PDF export for distribution and filing",
-      "User guide sheet with setup instructions and field descriptions",
-      "Compatible with both Windows and Mac versions of Excel"
-    ],
-    images: ["product-images/Aggregate-Price-Comparison-excel-ebrora.jpg"],
-    pdfLink: "#",
-    buyLink: "https://ebrora.gumroad.com/l/aggregate-price-comparison",
-    youtubeId: "",
-    new: true,
-    featured: false,
-    compatible: "Windows & Mac",
-    version: "1.0",
-    fileSize: "1.2 MB",
-    lastUpdate: "June 2026",
-    popularity: 5,
-    isBundle: false,
-    bundleProducts: [],
-  },
-  // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 34. Civil Engineering Materials Converter
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   {
@@ -1320,7 +1108,6 @@ export const PRODUCTS: Product[] = [
       "Single-sheet layout for fast data entry and review"
     ],
     images: ["product-images/Civil-Engineering-Materials-Converter-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/civil-engineering-materials-converter",
     youtubeId: "",
     new: true,
@@ -1360,7 +1147,6 @@ export const PRODUCTS: Product[] = [
       "Designed for environmental managers and waste coordinators"
     ],
     images: ["product-images/Waste-Export-Tracker-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/waste-export-tracker",
     youtubeId: "",
     new: true,
@@ -1400,7 +1186,6 @@ export const PRODUCTS: Product[] = [
       "Designed for AMP-framework and capital delivery wastewater projects"
     ],
     images: ["product-images/Long-Lead-Item-Tracker-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/wwtw-long-lead-item-tracker",
     youtubeId: "",
     new: true,
@@ -1440,7 +1225,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for pipeline and civil engineering infrastructure projects"
     ],
     images: ["product-images/Pipe-Laying-Productivity-Log-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/pipe-laying-productivity-log",
     youtubeId: "",
     new: true,
@@ -1480,7 +1264,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site agents, planners and quantity surveyors"
     ],
     images: ["product-images/Construction-Productivity-Calculator-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/productivity-calculator",
     youtubeId: "",
     new: true,
@@ -1519,7 +1302,6 @@ export const PRODUCTS: Product[] = [
       "Designed for weekly or fortnightly focused planning sessions"
     ],
     images: ["product-images/Planning-Meeting-Template-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/focused-planning-meeting-template",
     youtubeId: "",
     new: true,
@@ -1535,71 +1317,34 @@ export const PRODUCTS: Product[] = [
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 40. Recovery Plan Tracker
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-  {
-    id: "recovery-plan-tracker",
-    title: "Recovery Plan Tracker",
-    altText: "Recovery Plan Tracker Excel template for managing project recovery schedules",
-    category: ["project", "planning"],
-    price: "£19.99",
-    oldPrice: "",
-    badge: "Project Management",
-    icon: "ð",
-    desc: "Programme recovery planning tool with delay analysis, acceleration options, resource levelling, milestone recovery tracking, and executive summary dashboards for reporting progress against recovery targets.",
-    longDesc: `<p>The Recovery Plan Tracker is a professionally designed Excel template built specifically for construction and civil engineering teams who need structured, reliable tools for managing recovery plan processes. Programme recovery planning tool with delay analysis, acceleration options, resource levelling, milestone recovery tracking, and executive summary dashboards for reporting progress against recovery targets.</p><p>Built with practical site experience in mind, this template features automated calculations, conditional formatting for instant visual status indicators, and dropdown-driven data entry that ensures consistency across all users. Whether you are a site manager, engineer, or project coordinator, the intuitive layout means you can start using it immediately without extensive training or setup.</p><p>All outputs are formatted for professional presentation, suitable for client submissions, audit evidence packs, and project filing. The template includes built-in data validation, protected formulas, and a user guide sheet to help your team get the most from every feature. Designed for UK construction standards and best practices, it scales from single-site operations to multi-project programmes.</p>`,
-    features: [
-      "Structured recovery plan tracker with comprehensive data capture fields",
-      "Automated calculations and conditional formatting for instant visual feedback",
-      "Dropdown-driven data entry for speed and consistency across all users",
-      "Professional print-ready layouts for client and audit submissions",
-      "Built-in data validation to ensure complete and accurate records",
-      "Dashboard overview with summary charts and KPI tracking",
-      "Searchable and filterable views by date, status, and category",
-      "One-click PDF export for distribution and filing",
-      "User guide sheet with setup instructions and field descriptions",
-      "Compatible with both Windows and Mac versions of Excel"
-    ],
-    images: ["product-images/Recovery-Plan-Tracker-excel-ebrora.jpg"],
-    pdfLink: "#",
-    buyLink: "https://ebrora.gumroad.com/l/recovery-plan-tracker",
-    youtubeId: "",
-    new: true,
-    featured: false,
-    compatible: "Windows & Mac",
-    version: "1.0",
-    fileSize: "1.2 MB",
-    lastUpdate: "June 2026",
-    popularity: 6,
-    isBundle: false,
-    bundleProducts: [],
-  },
-  // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 41. WWTW Valve Schedule
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   {
     id: "wwtw-valve-schedule",
     title: "WWTW Valve Schedule",
-    altText: "WWTW Valve Schedule Excel template for wastewater treatment valve management",
+    altText: "WwTW Valve Schedule Excel template with valve register P&ID summary and commissioning status dashboard",
     category: ["wastewater", "asset", "registers"],
     price: "£18.99",
     oldPrice: "",
     badge: "Wastewater",
     icon: "ð§",
-    desc: "Complete valve schedule for wastewater treatment works with tag numbers, types, sizes, actuator details, isolation references, maintenance history, and operational status tracking.",
-    longDesc: `<p>The WWTW Valve Schedule is a professionally designed Excel template built specifically for construction and civil engineering teams who need structured, reliable tools for managing wwtw valve processes. Complete valve schedule for wastewater treatment works with tag numbers, types, sizes, actuator details, isolation references, maintenance history, and operational status tracking.</p><p>Built with practical site experience in mind, this template features automated calculations, conditional formatting for instant visual status indicators, and dropdown-driven data entry that ensures consistency across all users. Whether you are a site manager, engineer, or project coordinator, the intuitive layout means you can start using it immediately without extensive training or setup.</p><p>All outputs are formatted for professional presentation, suitable for client submissions, audit evidence packs, and project filing. The template includes built-in data validation, protected formulas, and a user guide sheet to help your team get the most from every feature. Designed for UK construction standards and best practices, it scales from single-site operations to multi-project programmes.</p>`,
+    desc: "Wastewater treatment works valve schedule with a structured valve register (area, system, auto-generated Valve ID, P&ID reference, service, valve type, function, actuation, fail position, DN, rating, materials, status tracking from Design through to Operational), configurable dropdown lists for areas, systems, valve types and actuation methods, an auto-generated Drawing Summary sheet aggregating valve counts by P&ID reference, and a live dashboard showing total, installed, commissioned, operational and defect counts with actuation type breakdowns.",
+    longDesc: `<p>The WwTW Valve Schedule is an Excel-based valve management tool designed for wastewater treatment works construction and commissioning projects. The valve register records each valve with area, system, auto-generated Valve ID (format VLV-[AreaCode]-[SystemCode]-[TagSequence]), P&amp;ID reference, service description, valve type (gate, knife gate, butterfly, ball, check, plug, diaphragm, pinch, globe, control valve and more), function (isolation, control, non-return, throttling, pressure reducing, sampling, bypass, scour), actuation method, fail position, DN, pressure rating, body and trim materials, and status.</p><p>Valve status tracks the full delivery lifecycle — Design, Procured, Delivered, Installed, Tested, Commissioned, Operational, Defect, Isolated and Decommissioned — giving the commissioning team visibility of every valve's progress from design through to handover. Dropdown lists for areas, systems, valve types, actuation methods, ratings and materials are fully configurable on a dedicated Lists sheet, and new values can be added without breaking existing data.</p><p>An auto-generated Drawing Summary sheet aggregates valve counts by P&amp;ID reference, showing installed, commissioned, operational and defect counts per drawing. The live dashboard presents headline KPIs including total valves, installed percentage, commissioned percentage, operational percentage, open defects, high-criticality counts and actuation type breakdowns. The template is designed for MEICA engineers, commissioning managers and operations teams on wastewater treatment works projects.</p>`,
     features: [
-      "Structured wwtw valve schedule with comprehensive data capture fields",
-      "Automated calculations and conditional formatting for instant visual feedback",
-      "Dropdown-driven data entry for speed and consistency across all users",
-      "Professional print-ready layouts for client and audit submissions",
-      "Built-in data validation to ensure complete and accurate records",
-      "Dashboard overview with summary charts and KPI tracking",
-      "Searchable and filterable views by date, status, and category",
-      "One-click PDF export for distribution and filing",
-      "User guide sheet with setup instructions and field descriptions",
-      "Compatible with both Windows and Mac versions of Excel"
+      "Structured valve register with auto-generated Valve ID (VLV-Area-System-Sequence)",
+      "Full technical fields: valve type, function, actuation, fail position, DN, rating, materials",
+      "Status tracking from Design through Procured, Delivered, Installed, Tested, Commissioned to Operational",
+      "Defect, Isolated and Decommissioned status options for lifecycle management",
+      "Configurable dropdown lists for areas, systems, valve types and actuation methods",
+      "P&ID reference linking for drawing-based tracking",
+      "Auto-generated Drawing Summary aggregating counts by P&ID reference",
+      "Live dashboard with total, installed, commissioned, operational and defect KPIs",
+      "Actuation type breakdown: manual, electric, pneumatic, hydraulic, gearbox, solenoid",
+      "Criticality rating (1-5) for operational risk prioritisation",
+      "Designed for MEICA engineers, commissioning managers and operations teams"
     ],
     images: ["product-images/Valve-Schedule-Register-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/wwtw-valve-schedule",
     youtubeId: "",
     new: true,
@@ -1639,7 +1384,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for works managers, process scientists and commissioning engineers"
     ],
     images: ["product-images/Wastewater-Sampler-Log-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/wwtw-sampler-log",
     youtubeId: "",
     new: true,
@@ -1679,7 +1423,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for site engineers, survey teams and commissioning engineers"
     ],
     images: ["product-images/Instrument-Calibration-Log-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/engineers-instrument-calibration-log",
     youtubeId: "",
     new: true,
@@ -1719,7 +1462,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for site managers and commercial teams on temporary supplies"
     ],
     images: ["product-images/Meter-Readings-Log-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/meter-readings",
     youtubeId: "",
     new: true,
@@ -1735,84 +1477,10 @@ export const PRODUCTS: Product[] = [
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 45. Testing & Commissioning Log
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-  {
-    id: "testing-commissioning-log",
-    title: "Testing & Commissioning Log",
-    altText: "Testing and Commissioning Log Excel template for system handover records",
-    category: ["commissioning", "inspection", "registers"],
-    price: "£24.99",
-    oldPrice: "",
-    badge: "Commissioning",
-    icon: "£",
-    desc: "Comprehensive test and commissioning log tracking every test activity from pre-commissioning through performance testing with results recording, witness management, and handover pack generation.",
-    longDesc: `<p>The Testing &amp; Commissioning Log is a professionally designed Excel template built specifically for construction and civil engineering teams who need structured, reliable tools for managing testing &amp; commissioning processes. Comprehensive test and commissioning log tracking every test activity from pre-commissioning through performance testing with results recording, witness management, and handover pack generation.</p><p>Built with practical site experience in mind, this template features automated calculations, conditional formatting for instant visual status indicators, and dropdown-driven data entry that ensures consistency across all users. Whether you are a site manager, engineer, or project coordinator, the intuitive layout means you can start using it immediately without extensive training or setup.</p><p>All outputs are formatted for professional presentation, suitable for client submissions, audit evidence packs, and project filing. The template includes built-in data validation, protected formulas, and a user guide sheet to help your team get the most from every feature. Designed for UK construction standards and best practices, it scales from single-site operations to multi-project programmes.</p>`,
-    features: [
-      "Structured testing & commissioning log with comprehensive data capture fields",
-      "Automated calculations and conditional formatting for instant visual feedback",
-      "Dropdown-driven data entry for speed and consistency across all users",
-      "Professional print-ready layouts for client and audit submissions",
-      "Built-in data validation to ensure complete and accurate records",
-      "Dashboard overview with summary charts and KPI tracking",
-      "Searchable and filterable views by date, status, and category",
-      "One-click PDF export for distribution and filing",
-      "User guide sheet with setup instructions and field descriptions",
-      "Compatible with both Windows and Mac versions of Excel"
-    ],
-    images: ["product-images/Testing-Commissioning-Log-excel-ebrora.jpg"],
-    pdfLink: "#",
-    buyLink: "https://ebrora.gumroad.com/l/testing-commissioning-log",
-    youtubeId: "",
-    new: true,
-    featured: false,
-    compatible: "Windows & Mac",
-    version: "1.0",
-    fileSize: "1.2 MB",
-    lastUpdate: "June 2026",
-    popularity: 8,
-    isBundle: false,
-    bundleProducts: [],
-  },
-  // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 46. NCR Schedule
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-  {
-    id: "ncr-schedule",
-    title: "NCR Schedule",
-    altText: "NCR Schedule Excel template for tracking non-conformance reports on construction projects",
-    category: ["inspection", "registers"],
-    price: "£17.99",
-    oldPrice: "",
-    badge: "Inspection",
-    icon: "ð",
-    desc: "Non-conformance report register with structured NCR numbering, root cause classification, corrective action tracking, close-out verification, and trend analysis dashboards for quality management reviews.",
-    longDesc: `<p>The NCR Schedule is a professionally designed Excel template built specifically for construction and civil engineering teams who need structured, reliable tools for managing ncr processes. Non-conformance report register with structured NCR numbering, root cause classification, corrective action tracking, close-out verification, and trend analysis dashboards for quality management reviews.</p><p>Built with practical site experience in mind, this template features automated calculations, conditional formatting for instant visual status indicators, and dropdown-driven data entry that ensures consistency across all users. Whether you are a site manager, engineer, or project coordinator, the intuitive layout means you can start using it immediately without extensive training or setup.</p><p>All outputs are formatted for professional presentation, suitable for client submissions, audit evidence packs, and project filing. The template includes built-in data validation, protected formulas, and a user guide sheet to help your team get the most from every feature. Designed for UK construction standards and best practices, it scales from single-site operations to multi-project programmes.</p>`,
-    features: [
-      "Structured ncr schedule with comprehensive data capture fields",
-      "Automated calculations and conditional formatting for instant visual feedback",
-      "Dropdown-driven data entry for speed and consistency across all users",
-      "Professional print-ready layouts for client and audit submissions",
-      "Built-in data validation to ensure complete and accurate records",
-      "Dashboard overview with summary charts and KPI tracking",
-      "Searchable and filterable views by date, status, and category",
-      "One-click PDF export for distribution and filing",
-      "User guide sheet with setup instructions and field descriptions",
-      "Compatible with both Windows and Mac versions of Excel"
-    ],
-    images: ["product-images/NCR-Non-Conformance-Schedule-excel-ebrora.jpg"],
-    pdfLink: "#",
-    buyLink: "https://ebrora.gumroad.com/l/ncr-schedule",
-    youtubeId: "",
-    new: true,
-    featured: false,
-    compatible: "Windows & Mac",
-    version: "1.0",
-    fileSize: "1.2 MB",
-    lastUpdate: "June 2026",
-    popularity: 7,
-    isBundle: false,
-    bundleProducts: [],
-  },
-  // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 47. Root Cause Analysis Template
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   {
@@ -1839,7 +1507,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for site managers, H&S advisors and quality managers"
     ],
     images: ["product-images/Root-Cause-Analysis-Fishbone-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/root-cause-analysis",
     youtubeId: "",
     new: true,
@@ -1878,7 +1545,6 @@ export const PRODUCTS: Product[] = [
       "Documented rationale for stakeholder and audit presentations"
     ],
     images: ["product-images/Decision-Matrix-Template-excel-ebrora.jpg"],
-    pdfLink: "#",
     buyLink: "https://ebrora.gumroad.com/l/decision-matrix",
     youtubeId: "",
     new: true,
@@ -1894,84 +1560,10 @@ export const PRODUCTS: Product[] = [
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 49. RAM Matrix
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-  {
-    id: "ram-matrix",
-    title: "RAM Matrix",
-    altText: "RAM Matrix Excel template for responsibility assignment on construction projects",
-    category: ["hse", "project"],
-    price: "£14.99",
-    oldPrice: "",
-    badge: "HSE & Safety",
-    icon: "£ ï¸",
-    desc: "Responsibility Assignment Matrix (RACI) template for construction projects with role mapping, accountability tracking, gap analysis, and printable responsibility charts for project governance.",
-    longDesc: `<p>The RAM Matrix is a professionally designed Excel template built specifically for construction and civil engineering teams who need structured, reliable tools for managing ram processes. Responsibility Assignment Matrix (RACI) template for construction projects with role mapping, accountability tracking, gap analysis, and printable responsibility charts for project governance.</p><p>Built with practical site experience in mind, this template features automated calculations, conditional formatting for instant visual status indicators, and dropdown-driven data entry that ensures consistency across all users. Whether you are a site manager, engineer, or project coordinator, the intuitive layout means you can start using it immediately without extensive training or setup.</p><p>All outputs are formatted for professional presentation, suitable for client submissions, audit evidence packs, and project filing. The template includes built-in data validation, protected formulas, and a user guide sheet to help your team get the most from every feature. Designed for UK construction standards and best practices, it scales from single-site operations to multi-project programmes.</p>`,
-    features: [
-      "Structured ram matrix with comprehensive data capture fields",
-      "Automated calculations and conditional formatting for instant visual feedback",
-      "Dropdown-driven data entry for speed and consistency across all users",
-      "Professional print-ready layouts for client and audit submissions",
-      "Built-in data validation to ensure complete and accurate records",
-      "Dashboard overview with summary charts and KPI tracking",
-      "Searchable and filterable views by date, status, and category",
-      "One-click PDF export for distribution and filing",
-      "User guide sheet with setup instructions and field descriptions",
-      "Compatible with both Windows and Mac versions of Excel"
-    ],
-    images: ["product-images/Risk-Assessment-Matrix-RAM-excel-ebrora.jpg"],
-    pdfLink: "#",
-    buyLink: "https://ebrora.gumroad.com/l/ram-matrix",
-    youtubeId: "",
-    new: true,
-    featured: false,
-    compatible: "Windows & Mac",
-    version: "1.0",
-    fileSize: "1.2 MB",
-    lastUpdate: "June 2026",
-    popularity: 5,
-    isBundle: false,
-    bundleProducts: [],
-  },
-  // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
   // 50. Lessons Learned Register
   // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-  {
-    id: "lessons-learned-register",
-    title: "Lessons Learned Register",
-    altText: "Lessons Learned Register Excel template for capturing construction project insights",
-    category: ["project", "registers"],
-    price: "£14.99",
-    oldPrice: "",
-    badge: "Project Management",
-    icon: "ð",
-    desc: "Project lessons learned register with structured capture forms, categorisation by phase and discipline, action tracking, knowledge sharing outputs, and searchable archive for organisational learning.",
-    longDesc: `<p>The Lessons Learned Register is a professionally designed Excel template built specifically for construction and civil engineering teams who need structured, reliable tools for managing lessons learned processes. Project lessons learned register with structured capture forms, categorisation by phase and discipline, action tracking, knowledge sharing outputs, and searchable archive for organisational learning.</p><p>Built with practical site experience in mind, this template features automated calculations, conditional formatting for instant visual status indicators, and dropdown-driven data entry that ensures consistency across all users. Whether you are a site manager, engineer, or project coordinator, the intuitive layout means you can start using it immediately without extensive training or setup.</p><p>All outputs are formatted for professional presentation, suitable for client submissions, audit evidence packs, and project filing. The template includes built-in data validation, protected formulas, and a user guide sheet to help your team get the most from every feature. Designed for UK construction standards and best practices, it scales from single-site operations to multi-project programmes.</p>`,
-    features: [
-      "Structured lessons learned register with comprehensive data capture fields",
-      "Automated calculations and conditional formatting for instant visual feedback",
-      "Dropdown-driven data entry for speed and consistency across all users",
-      "Professional print-ready layouts for client and audit submissions",
-      "Built-in data validation to ensure complete and accurate records",
-      "Dashboard overview with summary charts and KPI tracking",
-      "Searchable and filterable views by date, status, and category",
-      "One-click PDF export for distribution and filing",
-      "User guide sheet with setup instructions and field descriptions",
-      "Compatible with both Windows and Mac versions of Excel"
-    ],
-    images: ["product-images/Lessons-Learned-Register-excel-ebrora.jpg"],
-    pdfLink: "#",
-    buyLink: "https://ebrora.gumroad.com/l/lessons-learned-register",
-    youtubeId: "",
-    new: true,
-    featured: false,
-    compatible: "Windows & Mac",
-    version: "1.0",
-    fileSize: "1.2 MB",
-    lastUpdate: "June 2026",
-    popularity: 6,
-    isBundle: false,
-    bundleProducts: [],
-  },
-    // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+// ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // OWL List
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     {
@@ -1998,7 +1590,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for civil engineering, building and wastewater treatment projects"
     ],
         images: ["product-images/OWL-Register-Observation-Checklist-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/owl-list",
         youtubeId: "",
         new: true,
@@ -2040,7 +1631,6 @@ export const PRODUCTS: Product[] = [
       "Designed for survey engineers and setting-out teams on infrastructure projects"
     ],
         images: ["product-images/Survey-Control-Register-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/survey-control-register",
         youtubeId: "",
         new: true,
@@ -2081,7 +1671,6 @@ export const PRODUCTS: Product[] = [
       "Designed for AMP-framework commissioning and handover documentation"
     ],
         images: ["product-images/Process-Client-Training-Log-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/process-client-training-log",
         youtubeId: "",
         new: true,
@@ -2122,7 +1711,6 @@ export const PRODUCTS: Product[] = [
       "Scalable for single-site or multi-area compliance programmes"
     ],
         images: ["product-images/Action-Calendar-Template-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/action-calendar",
         youtubeId: "",
         new: false,
@@ -2163,7 +1751,6 @@ export const PRODUCTS: Product[] = [
       "Suitable for site managers, commercial teams and procurement coordinators"
     ],
         images: ["product-images/PPE-Budget-Calculator-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/ppe-budget-calculator",
         youtubeId: "",
         new: true,
@@ -2203,7 +1790,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site managers, engineers, QS and subcontractors"
     ],
         images: ["product-images/Construction-Mileage-Tracker-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/construction-mileage-tracker",
         youtubeId: "",
         new: true,
@@ -2243,7 +1829,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site managers and H&S coordinators"
     ],
         images: ["product-images/Weekly-Inspection-Rota-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/weekly-inspection-rota",
         youtubeId: "",
         new: true,
@@ -2284,7 +1869,6 @@ export const PRODUCTS: Product[] = [
       "Designed for construction site wellness and engagement initiatives"
     ],
         images: ["product-images/Weight-Loss-Challenge-Tracker-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/weight-loss-challenge-tracker",
         youtubeId: "",
         new: true,
@@ -2325,7 +1909,6 @@ export const PRODUCTS: Product[] = [
       "Designed for general foremen, section supervisors and construction managers"
     ],
         images: ["product-images/Supervisors-RACI-Chart-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/supervisors-raci-chart",
         youtubeId: "",
         new: true,
@@ -2366,7 +1949,6 @@ export const PRODUCTS: Product[] = [
       "Designed for site engineers, utility coordinators and commercial teams"
     ],
         images: ["product-images/Uncharted-Services-Log-excel-ebrora.jpg"],
-        pdfLink: "#",
         buyLink: "https://ebrora.gumroad.com/l/uncharted-services-log",
         youtubeId: "",
         new: true,
