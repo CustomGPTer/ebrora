@@ -1837,6 +1837,12 @@ p {
     margin-bottom: 2rem;
 }
 
+.product-description--full {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+}
+
 .product-description h2 {
     font-size: 1.2rem;
     margin-bottom: 0.75rem;
@@ -1850,6 +1856,10 @@ p {
 /* Features List */
 .product-features {
     margin-bottom: 2rem;
+}
+
+.product-features--full {
+    margin-top: 2rem;
 }
 
 .product-features h2 {
