@@ -268,15 +268,25 @@ export default function AiToolBuilderClient({ toolConfig, tbtTemplateSlug, coshh
 
       const data = await res.json();
       if (data.generationId) setGenerationId(data.generationId);
-      setCurrentQuestions(data.questions || []);
-      setTotalAsked(data.totalQuestionsAsked || 0);
-      setCurrentRoundNumber(1);
-      setStep('conversation');
+
+      // Handle AI signalling ready on round 1 (e.g. 1-round templates)
+      if (data.status === 'ready') {
+        setReadyMessage(data.message || `I have enough information to generate your ${toolConfig.documentLabel}.`);
+        setCurrentQuestions([]);
+        setTotalAsked(data.totalQuestionsAsked || 0);
+        setCurrentRoundNumber(1);
+        setStep('conversation');
+      } else {
+        setCurrentQuestions(data.questions || []);
+        setTotalAsked(data.totalQuestionsAsked || 0);
+        setCurrentRoundNumber(1);
+        setStep('conversation');
+      }
     } catch (err: any) {
       setError(err.message);
       setStep('describe-work');
     }
-  }, [description, toolConfig.slug, MIN_WORDS, MAX_WORDS]);
+  }, [description, toolConfig.slug, toolConfig.documentLabel, MIN_WORDS, MAX_WORDS]);
 
   /* ── Step 2: Submit round ── */
   const currentAnswersValid = currentQuestions.every((q) => {
