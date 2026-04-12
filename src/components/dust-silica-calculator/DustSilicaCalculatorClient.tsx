@@ -714,7 +714,7 @@ export default function DustSilicaCalculatorClient() {
                   };
                   return (
                     <tr key={r.id} className="border-b border-gray-100">
-                      <td className="py-2 font-medium text-gray-800">{r.name}</td>
+                      <td className="px-2 py-2 font-medium text-gray-800">{r.name}</td>
                       <td className={`py-2 text-right font-semibold ${tRCS !== null && tRCS < 480 ? "text-red-600" : "text-green-600"}`}>{fmtTime(tRCS)}</td>
                       <td className={`py-2 text-right font-semibold ${tResp !== null && tResp < 480 ? "text-red-600" : "text-green-600"}`}>{fmtTime(tResp)}</td>
                       <td className={`py-2 text-right font-semibold ${tInhal !== null && tInhal < 480 ? "text-red-600" : "text-green-600"}`}>{fmtTime(tInhal)}</td>
