@@ -114,7 +114,7 @@ export function RamsBuilderBanner() {
               </span>
               <span className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-                10 formats
+                11 formats
               </span>
               <span className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
@@ -164,7 +164,7 @@ export function AIToolsSidebarCard() {
       <div className="prem-sidebar-body p-5 bg-white border border-gray-200 border-t-0 rounded-b-xl">
         <h4 className="text-sm font-bold text-gray-900">AI Construction Tools</h4>
         <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-          30+ AI-powered tools for UK construction. RAMS, safety alerts, COSHH assessments, RFIs and more — professional output in minutes.
+          35+ AI-powered tools for UK construction. RAMS, safety alerts, COSHH assessments, RFIs and more — professional output in minutes.
         </p>
         <Link
           href="/tools"
