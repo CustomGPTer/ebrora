@@ -101,6 +101,8 @@ const CATEGORIES: Category[] = [
       { name: "Working Days Calculator", slug: "working-days-calculator" },
       { name: "Daywork Rate Calculator", slug: "daywork-rate-calculator" },
       { name: "Overtime Cost Calculator", slug: "overtime-cost-calculator" },
+      { name: "Historical Weather Data", slug: "historical-weather" },
+      { name: "Org Chart Generator", slug: "org-chart-generator" },
     ],
   },
   {
