@@ -26,6 +26,26 @@ function discoverBuilderPages(): string[] {
   }
 }
 
+// Auto-discover all individual tool pages under src/app/tools/
+function discoverToolPages(): string[] {
+  try {
+    const toolsDir = path.join(process.cwd(), 'src', 'app', 'tools');
+    const entries = fs.readdirSync(toolsDir, { withFileTypes: true });
+    return entries
+      .filter(
+        (e) =>
+          e.isDirectory() &&
+          e.name !== '[slug]' &&
+          fs.existsSync(path.join(toolsDir, e.name, 'page.tsx'))
+      )
+      .map((e) => e.name)
+      .sort();
+  } catch {
+    console.warn('Sitemap: could not auto-discover tool pages');
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const baseUrl = 'https://www.ebrora.com';
 
@@ -36,6 +56,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date('2025-06-01'),
     changeFrequency: 'monthly' as const,
     priority: 0.9,
+  }));
+
+  // Auto-discovered individual tool pages
+  const toolSlugs = discoverToolPages();
+  const toolPages: MetadataRoute.Sitemap = toolSlugs.map((slug) => ({
+    url: `${baseUrl}/tools/${slug}`,
+    lastModified: new Date('2025-06-01'),
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
   }));
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -215,6 +244,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
           ...staticPages,
           ...builderPages,
+          ...toolPages,
           ...productPages,
           ...blogPages,
           ...freeTemplateCategoryPages,
