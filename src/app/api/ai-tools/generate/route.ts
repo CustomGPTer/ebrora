@@ -78,9 +78,9 @@ export async function POST(req: NextRequest) {
     };
     bodyGenerationId = generationId;
 
-    if (!generationId || !answers || answers.length === 0) {
+    if (!generationId || !answers) {
       return NextResponse.json(
-        { error: 'Generation ID and at least one answered question are required.' },
+        { error: 'Generation ID and answers array are required.' },
         { status: 400 }
       );
     }
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Generation not found.' }, { status: 404 });
     }
 
-    if (generation.status !== 'PROCESSING' && generation.status !== 'QUEUED') {
+    if (generation.status !== 'PROCESSING' && generation.status !== 'QUEUED' && generation.status !== 'EXPIRED') {
       return NextResponse.json({ error: 'Invalid generation state.' }, { status: 400 });
     }
 
