@@ -23,6 +23,7 @@ import {
   incrementAiToolUsage,
 } from '@/lib/ai-tools';
 import { getConversationPrompt } from '@/lib/ai-tools/system-prompts';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 import { getCrpTemplateConversationPrompt } from '@/lib/carbon-reduction/crp-prompts';
 import { getCarbonFootprintTemplateConversationPrompt } from '@/lib/carbon-footprint/cf-prompts';
 import { getDayworkSheetTemplateConversationPrompt } from '@/lib/daywork-sheet/dw-prompts';
@@ -171,16 +172,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 });
     }
 
-    const tier = user.subscription?.tier ?? 'FREE';
-    const subscriptionStatus = user.subscription?.status ?? 'ACTIVE';
-
-    // Paid tier: require active subscription
-    if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
-      return NextResponse.json(
-        { error: 'Your subscription is not active. Please update your billing details.' },
-        { status: 403 }
-      );
-    }
+    const tier = resolveEffectiveTier(user.subscription);
 
     // Usage limit check (only on first round — GLOBAL cap across all tools)
     if (!rounds || rounds.length === 0) {
