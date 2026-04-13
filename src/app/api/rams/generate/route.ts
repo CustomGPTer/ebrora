@@ -19,6 +19,7 @@ import {
   buildRetryPrompt,
 } from '@/lib/rams/rich-body-text';
 import { wrapGenerateInput, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -93,19 +94,7 @@ export async function POST(req: NextRequest) {
       where: { id: session.user.id },
       include: { subscription: true },
     });
-    const tier = user?.subscription?.tier ?? 'FREE';
-    const subscriptionStatus = user?.subscription?.status ?? 'ACTIVE';
-
-    if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
-      await prisma.generation.update({
-        where: { id: generationId },
-        data: { status: 'FAILED' },
-      });
-      return NextResponse.json(
-        { error: 'Your subscription is not active. Please update your billing details.' },
-        { status: 403 }
-      );
-    }
+    const tier = resolveEffectiveTier(user?.subscription);
 
     const templateSlug = generation.rams_format.slug as TemplateSlug;
     const workDescription = description || '';
