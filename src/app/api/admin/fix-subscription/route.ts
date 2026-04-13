@@ -3,7 +3,8 @@ import { requireAdmin } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { getSubscriptionDetails } from '@/lib/payments/paypal-client';
 import { getStripeSubscriptionDetails } from '@/lib/payments/stripe-client';
-import { resolveTierFromPlanId, resolveTierFromStripePriceId, getRamsLimitByTier } from '@/lib/payments/plan-config';
+import { resolveTierFromPlanId, resolveTierFromStripePriceId } from '@/lib/payments/plan-config';
+import { upsertUsageRecord } from '@/lib/payments/usage-tracker';
 import type { SubscriptionTier } from '@prisma/client';
 
 /**
@@ -129,31 +130,7 @@ async function fixSubscription(email: string) {
   });
 
   // Also fix usage record
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const ramsLimit = getRamsLimitByTier(tier);
-
-  const existingUsage = await prisma.usageRecord.findFirst({
-    where: { user_id: user.id, billing_period_start: monthStart },
-  });
-
-  if (existingUsage) {
-    await prisma.usageRecord.update({
-      where: { id: existingUsage.id },
-      data: { rams_limit: ramsLimit },
-    });
-  } else {
-    await prisma.usageRecord.create({
-      data: {
-        user_id: user.id,
-        billing_period_start: monthStart,
-        billing_period_end: monthEnd,
-        rams_generated: 0,
-        rams_limit: ramsLimit,
-      },
-    });
-  }
+  await upsertUsageRecord(user.id, tier);
 
   return NextResponse.json({
     success: true,
