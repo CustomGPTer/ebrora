@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { validateWebhookSignature, getSubscriptionDetails } from '@/lib/payments/paypal-client';
-import { resolveTierFromPlanId, getRamsLimitByTier } from '@/lib/payments/plan-config';
+import { resolveTierFromPlanId } from '@/lib/payments/plan-config';
+import { upsertUsageRecord } from '@/lib/payments/usage-tracker';
 import { sendSubscriptionConfirmationEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
@@ -192,6 +193,9 @@ async function handleSubscriptionActivated(resource: any): Promise<void> {
         paypal_subscription_id: subscriptionId,
         current_period_start: new Date(),
         ...(periodEnd ? { current_period_end: periodEnd } : {}),
+        // Clear Stripe fields if switching provider
+        stripe_subscription_id: null,
+        stripe_customer_id: null,
       },
       create: {
         user_id: customId,
@@ -211,34 +215,7 @@ async function handleSubscriptionActivated(resource: any): Promise<void> {
     });
 
     // Create or update usage record for this month
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const ramsLimit = getRamsLimitByTier(tier);
-
-    const existingUsage = await prisma.usageRecord.findFirst({
-      where: {
-        user_id: customId,
-        billing_period_start: monthStart,
-      },
-    });
-
-    if (existingUsage) {
-      await prisma.usageRecord.update({
-        where: { id: existingUsage.id },
-        data: { rams_limit: ramsLimit },
-      });
-    } else {
-      await prisma.usageRecord.create({
-        data: {
-          user_id: customId,
-          billing_period_start: monthStart,
-          billing_period_end: monthEnd,
-          rams_generated: 0,
-          rams_limit: ramsLimit,
-        },
-      });
-    }
+    await upsertUsageRecord(customId, tier);
 
     // Send confirmation email
     if (user) {
