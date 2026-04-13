@@ -10,6 +10,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt, getEarlyWarningTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { getCrpTemplateGenerationPrompt } from '@/lib/carbon-reduction/crp-prompts';
 import { getCarbonFootprintTemplateGenerationPrompt } from '@/lib/carbon-footprint/cf-prompts';
@@ -146,20 +147,7 @@ export async function POST(req: NextRequest) {
       where: { id: session.user.id },
       include: { subscription: true },
     });
-    const tier = user?.subscription?.tier ?? 'FREE';
-    const subscriptionStatus = user?.subscription?.status ?? 'ACTIVE';
-
-    // Paid tier: require active subscription
-    if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
-      await prisma.aiToolGeneration.update({
-        where: { id: generationId },
-        data: { status: 'FAILED', error_message: 'Subscription not active' },
-      });
-      return NextResponse.json(
-        { error: 'Your subscription is not active. Please update your billing details.' },
-        { status: 403 }
-      );
-    }
+    const tier = resolveEffectiveTier(user?.subscription);
 
     const monthLimit = getAiToolLimitByTier(tier, toolSlug);
     const nowDate = new Date();
