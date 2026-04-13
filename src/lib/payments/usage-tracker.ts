@@ -83,24 +83,37 @@ export async function incrementUsage(userId: string): Promise<boolean> {
   }
 }
 
-export async function resetMonthlyUsage(): Promise<number> {
-  const now = new Date();
-  const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+// ── Upsert usage record for a given tier ──
+// Shared helper used by webhook handlers and verify-subscription.
 
-  try {
-    const result = await prisma.usageRecord.updateMany({
-      where: {
-        billing_period_start: previousMonthStart,
-      },
+export async function upsertUsageRecord(
+  userId: string,
+  tier: string
+): Promise<void> {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const ramsLimit = getRamsLimitByTier(tier);
+
+  const existingUsage = await prisma.usageRecord.findFirst({
+    where: { user_id: userId, billing_period_start: monthStart },
+  });
+
+  if (existingUsage) {
+    await prisma.usageRecord.update({
+      where: { id: existingUsage.id },
+      data: { rams_limit: ramsLimit },
+    });
+  } else {
+    await prisma.usageRecord.create({
       data: {
+        user_id: userId,
+        billing_period_start: monthStart,
+        billing_period_end: monthEnd,
         rams_generated: 0,
+        rams_limit: ramsLimit,
       },
     });
-
-    return result.count;
-  } catch (error) {
-    console.error('Failed to reset monthly usage:', error);
-    return 0;
   }
 }
 
