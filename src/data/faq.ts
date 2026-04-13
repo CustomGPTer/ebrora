@@ -172,7 +172,7 @@ export const FAQ_DATA: FAQSection[] = [
       {
         id: 'account-3',
         question: 'What payment methods do you accept?',
-        answer: 'Subscriptions are processed through PayPal, which accepts all major credit and debit cards as well as PayPal balance. Premium template purchases through Gumroad accept cards, PayPal, Apple Pay, and Google Pay.'
+        answer: 'Subscriptions can be paid by card (via Stripe) or PayPal. You choose your preferred method at checkout. Both accept all major credit and debit cards. Premium template purchases through Gumroad accept cards, PayPal, Apple Pay, and Google Pay.'
       },
       {
         id: 'account-4',
