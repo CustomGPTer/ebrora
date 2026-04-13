@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { getSubscriptionDetails } from '@/lib/payments/paypal-client';
-import { resolveTierFromPlanId, getRamsLimitByTier } from '@/lib/payments/plan-config';
+import { getStripeSubscriptionDetails } from '@/lib/payments/stripe-client';
+import { resolveTierFromPlanId, resolveTierFromStripePriceId, getRamsLimitByTier } from '@/lib/payments/plan-config';
+import type { SubscriptionTier } from '@prisma/client';
 
 /**
  * POST /api/admin/fix-subscription  { email: string }
  *
- * Syncs a user's subscription record with the actual PayPal state.
+ * Syncs a user's subscription record with the actual provider (PayPal or Stripe) state.
  * Requires ADMIN role. POST-only — state-changing operations must not be GET.
  */
 
@@ -25,48 +27,104 @@ async function fixSubscription(email: string) {
 
   const sub = user.subscription;
 
-  if (!sub || !sub.paypal_subscription_id) {
+  if (!sub) {
     return NextResponse.json({
-      error: 'No PayPal subscription ID on record for this user',
-      currentRecord: sub
-        ? { tier: sub.tier, status: sub.status, paypalId: sub.paypal_subscription_id }
-        : null,
+      error: 'No subscription record for this user',
+      currentRecord: null,
     }, { status: 404 });
   }
 
-  // Query PayPal for the real subscription state
-  const paypalDetails = await getSubscriptionDetails(sub.paypal_subscription_id);
+  let tier: SubscriptionTier;
+  let dbStatus: 'ACTIVE' | 'CANCELLED' | 'PAST_DUE' | 'EXPIRED';
+  let periodStart: Date | undefined;
+  let periodEnd: Date | undefined;
+  let providerInfo: Record<string, unknown>;
 
-  const paypalStatus = paypalDetails.status;
-  const planId = paypalDetails.plan_id;
+  // ── Stripe path ──
+  if (sub.payment_provider === 'STRIPE' && sub.stripe_subscription_id) {
+    const stripeDetails = await getStripeSubscriptionDetails(sub.stripe_subscription_id);
 
-  const resolvedTier = resolveTierFromPlanId(planId);
-  const tier = resolvedTier || 'STARTER';
+    const resolvedTier = resolveTierFromStripePriceId(stripeDetails.priceId);
+    tier = resolvedTier || 'STARTER';
 
-  // Map PayPal status to our DB status
-  let dbStatus: 'ACTIVE' | 'CANCELLED' | 'PAST_DUE' | 'EXPIRED' = 'ACTIVE';
-  if (paypalStatus === 'ACTIVE' || paypalStatus === 'APPROVED') {
-    dbStatus = 'ACTIVE';
-  } else if (paypalStatus === 'CANCELLED') {
-    dbStatus = 'CANCELLED';
-  } else if (paypalStatus === 'SUSPENDED') {
-    dbStatus = 'PAST_DUE';
+    // Map Stripe status to our DB status
+    if (stripeDetails.status === 'active') {
+      dbStatus = stripeDetails.cancelAtPeriodEnd ? 'CANCELLED' : 'ACTIVE';
+    } else if (stripeDetails.status === 'past_due') {
+      dbStatus = 'PAST_DUE';
+    } else if (stripeDetails.status === 'canceled' || stripeDetails.status === 'unpaid') {
+      dbStatus = 'EXPIRED';
+    } else {
+      dbStatus = 'ACTIVE';
+    }
+
+    periodStart = stripeDetails.currentPeriodStart;
+    periodEnd = stripeDetails.currentPeriodEnd;
+
+    providerInfo = {
+      provider: 'STRIPE',
+      status: stripeDetails.status,
+      priceId: stripeDetails.priceId,
+      resolvedTier: resolvedTier || 'UNKNOWN (defaulted to STARTER)',
+      currentPeriodEnd: stripeDetails.currentPeriodEnd.toISOString(),
+      cancelAtPeriodEnd: stripeDetails.cancelAtPeriodEnd,
+    };
+
+  // ── PayPal path (existing) ──
+  } else if (sub.paypal_subscription_id) {
+    const paypalDetails = await getSubscriptionDetails(sub.paypal_subscription_id);
+
+    const paypalStatus = paypalDetails.status;
+    const planId = paypalDetails.plan_id;
+    const resolvedTier = resolveTierFromPlanId(planId);
+    tier = resolvedTier || 'STARTER';
+
+    if (paypalStatus === 'ACTIVE' || paypalStatus === 'APPROVED') {
+      dbStatus = 'ACTIVE';
+    } else if (paypalStatus === 'CANCELLED') {
+      dbStatus = 'CANCELLED';
+    } else if (paypalStatus === 'SUSPENDED') {
+      dbStatus = 'PAST_DUE';
+    } else {
+      dbStatus = 'EXPIRED';
+    }
+
+    periodStart = paypalDetails.billing_info?.last_payment?.time
+      ? new Date(paypalDetails.billing_info.last_payment.time)
+      : undefined;
+    periodEnd = paypalDetails.billing_info?.next_billing_time
+      ? new Date(paypalDetails.billing_info.next_billing_time)
+      : undefined;
+
+    providerInfo = {
+      provider: 'PAYPAL',
+      status: paypalStatus,
+      planId,
+      resolvedTier: resolvedTier || 'UNKNOWN (defaulted to STARTER)',
+      nextBillingTime: paypalDetails.billing_info?.next_billing_time,
+    };
+
   } else {
-    dbStatus = 'EXPIRED';
+    return NextResponse.json({
+      error: 'No provider subscription ID on record for this user',
+      currentRecord: {
+        tier: sub.tier,
+        status: sub.status,
+        provider: sub.payment_provider,
+        paypalId: sub.paypal_subscription_id,
+        stripeId: sub.stripe_subscription_id,
+      },
+    }, { status: 404 });
   }
 
-  // Update the DB record to match PayPal's truth
+  // Update the DB record to match provider's truth
   const updated = await prisma.subscription.update({
     where: { user_id: user.id },
     data: {
       tier: dbStatus === 'ACTIVE' ? tier : sub.tier,
       status: dbStatus,
-      current_period_start: paypalDetails.billing_info?.last_payment?.time
-        ? new Date(paypalDetails.billing_info.last_payment.time)
-        : sub.current_period_start,
-      current_period_end: paypalDetails.billing_info?.next_billing_time
-        ? new Date(paypalDetails.billing_info.next_billing_time)
-        : sub.current_period_end,
+      ...(periodStart ? { current_period_start: periodStart } : {}),
+      ...(periodEnd ? { current_period_end: periodEnd } : {}),
     },
   });
 
@@ -108,12 +166,7 @@ async function fixSubscription(email: string) {
       status: updated.status,
       currentPeriodEnd: updated.current_period_end,
     },
-    paypal: {
-      status: paypalStatus,
-      planId,
-      resolvedTier: resolvedTier || 'UNKNOWN (defaulted to STARTER)',
-      nextBillingTime: paypalDetails.billing_info?.next_billing_time,
-    },
+    provider: providerInfo,
   });
 }
 
