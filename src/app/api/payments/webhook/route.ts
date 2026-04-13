@@ -188,6 +188,7 @@ async function handleSubscriptionActivated(resource: any): Promise<void> {
       update: {
         tier,
         status: 'ACTIVE',
+        payment_provider: 'PAYPAL',
         paypal_subscription_id: subscriptionId,
         current_period_start: new Date(),
         ...(periodEnd ? { current_period_end: periodEnd } : {}),
@@ -196,6 +197,7 @@ async function handleSubscriptionActivated(resource: any): Promise<void> {
         user_id: customId,
         tier,
         status: 'ACTIVE',
+        payment_provider: 'PAYPAL',
         paypal_subscription_id: subscriptionId,
         current_period_start: new Date(),
         ...(periodEnd ? { current_period_end: periodEnd } : {}),
