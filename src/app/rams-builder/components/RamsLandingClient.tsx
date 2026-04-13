@@ -45,15 +45,23 @@ export default function RamsLandingClient() {
 
   const searchParams = useSearchParams();
 
-  // Verify subscription on return from PayPal
+  // Verify subscription on return from payment provider
   useEffect(() => {
     const subscriptionId = searchParams.get('subscription_id');
-    if (!subscriptionId) return;
+    const stripeSessionId = searchParams.get('stripe_session_id');
+
+    const verifyBody = stripeSessionId
+      ? { stripeSessionId }
+      : subscriptionId
+      ? { subscriptionId }
+      : null;
+
+    if (!verifyBody) return;
 
     fetch('/api/payments/verify-subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subscriptionId }),
+      body: JSON.stringify(verifyBody),
     })
       .then((res) => res.json())
       .then((data) => {
