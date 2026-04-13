@@ -39,7 +39,7 @@ export default async function UsersPage({ searchParams }: PageProps) {
     prisma.user.findMany({
       where: filter,
       include: {
-        subscription: { select: { tier: true, status: true, paypal_subscription_id: true } },
+        subscription: { select: { tier: true, status: true, paypal_subscription_id: true, stripe_subscription_id: true, payment_provider: true } },
         _count: { select: { generations: true, ai_tool_generations: true } },
         accounts: { select: { provider: true } },
       },
@@ -60,6 +60,8 @@ export default async function UsersPage({ searchParams }: PageProps) {
     tier: user.subscription?.tier || 'FREE',
     status: user.subscription?.status || 'ACTIVE',
     paypalId: user.subscription?.paypal_subscription_id || null,
+    stripeId: user.subscription?.stripe_subscription_id || null,
+    paymentProvider: user.subscription?.payment_provider || 'PAYPAL',
     ramsCount: user._count.generations,
     aiToolCount: user._count.ai_tool_generations,
     authMethod: user.google_id ? 'Google' : user.accounts.length > 0 ? user.accounts[0].provider : 'Email',
