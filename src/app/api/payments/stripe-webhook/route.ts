@@ -3,8 +3,8 @@ import prisma from '@/lib/prisma';
 import { constructWebhookEvent } from '@/lib/payments/stripe-client';
 import {
   resolveTierFromStripePriceId,
-  getRamsLimitByTier,
 } from '@/lib/payments/plan-config';
+import { upsertUsageRecord } from '@/lib/payments/usage-tracker';
 import { sendSubscriptionConfirmationEmail } from '@/lib/email';
 import type Stripe from 'stripe';
 
@@ -116,37 +116,6 @@ function getPeriodFromSubscription(subscription: Stripe.Subscription): {
     start: new Date((item?.current_period_start || 0) * 1000),
     end: new Date((item?.current_period_end || 0) * 1000),
   };
-}
-
-async function upsertUsageRecord(
-  userId: string,
-  tier: string
-): Promise<void> {
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const ramsLimit = getRamsLimitByTier(tier);
-
-  const existingUsage = await prisma.usageRecord.findFirst({
-    where: { user_id: userId, billing_period_start: monthStart },
-  });
-
-  if (existingUsage) {
-    await prisma.usageRecord.update({
-      where: { id: existingUsage.id },
-      data: { rams_limit: ramsLimit },
-    });
-  } else {
-    await prisma.usageRecord.create({
-      data: {
-        user_id: userId,
-        billing_period_start: monthStart,
-        billing_period_end: monthEnd,
-        rams_generated: 0,
-        rams_limit: ramsLimit,
-      },
-    });
-  }
 }
 
 // ── Checkout completed — new subscription activated ──
