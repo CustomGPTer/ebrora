@@ -14,15 +14,17 @@ export default function AboutSection({ templateCount, categoryCount }: AboutSect
           <div className="about__content">
             <h2>About Ebrora</h2>
             <p>
-              Ebrora was created by construction professionals who were tired of spending evenings
-              building spreadsheets from scratch for every new project. We build the tools we wish we
-              had when we started out — professional, reliable, and ready to use on day one.
+              Ebrora was built by construction professionals who were tired of spending evenings
+              writing RAMS from scratch, chasing compliance paperwork, and rebuilding spreadsheets
+              for every new project. We built the platform we wish we had when we started out —
+              AI document generators, ready-to-use templates, free toolbox talks, and site
+              calculators, all in one place.
             </p>
             <p>
-              Every template is designed with real site workflows in mind, tested by practising
-              engineers and site managers, and refined based on customer feedback. Whether you manage
-              earthworks, M&amp;E installations, or full project programmes, our templates help you
-              work smarter.
+              Every tool on the platform is designed around real UK site workflows and tested by
+              practising engineers and site managers. From AI-powered RAMS and COSHH assessments to
+              premium Excel templates, 1,500+ free toolbox talks, and 40+ construction calculators —
+              Ebrora helps site teams spend less time on paperwork and more time delivering projects.
             </p>
             <div className="about__stats">
               <div className="about__stat">

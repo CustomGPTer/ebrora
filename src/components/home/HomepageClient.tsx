@@ -219,7 +219,7 @@ const HUB_CARDS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 0v.375" />
       </svg>
     ),
-    stat: '750+',
+    stat: '45+',
     statLabel: 'templates',
     accent: 'hp-card--templates',
   },
@@ -798,16 +798,23 @@ export default function HomepageClient({
             <h2 className="hp-section-title">What Construction Teams Say</h2>
           </div>
           <div className="hp-reviews-grid">
-            {reviews.map((review, idx) => (
-              <div key={idx} className="hp-review-card">
-                <div className="hp-review-card__stars">{'★'.repeat(review.stars)}</div>
-                <p className="hp-review-card__text">&ldquo;{review.text}&rdquo;</p>
-                <div className="hp-review-card__author">
-                  <span className="hp-review-card__name">{review.author}</span>
-                  <span className="hp-review-card__role">{review.role}</span>
+            {reviews.map((review, idx) => {
+              const commaIdx = review.role.lastIndexOf(',');
+              const jobTitle = commaIdx >= 0 ? review.role.slice(0, commaIdx) : review.role;
+              const company = commaIdx >= 0 ? review.role.slice(commaIdx + 1).trim() : '';
+              return (
+                <div key={idx} className="hp-review-card">
+                  <div className="hp-review-card__stars">{'★'.repeat(review.stars)}</div>
+                  <p className="hp-review-card__text">&ldquo;{review.text}&rdquo;</p>
+                  <div className="hp-review-card__author">
+                    <span className="hp-review-card__name">{review.author}</span>
+                    <span className="hp-review-card__role">
+                      {jobTitle}{company && <>{', '}<span style={{ filter: 'blur(5px)', WebkitFilter: 'blur(5px)', userSelect: 'none', display: 'inline-block' }}>{company}</span></>}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
