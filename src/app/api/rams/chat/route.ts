@@ -18,6 +18,7 @@ import {
 } from '@/lib/rams/types';
 import { wrapDescription, wrapAnswers, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import { getRamsLimitByTier } from '@/lib/payments/plan-config';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 import { FREE_TEMPLATES } from '@/lib/rams/template-config';
 import { getRamsUsageThisMonth } from '@/lib/rams/usage';
 
@@ -177,16 +178,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const tier = user.subscription?.tier ?? 'FREE';
-    const subscriptionStatus = user.subscription?.status ?? 'ACTIVE';
-
-    // Paid tier: require active subscription
-    if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
-      return NextResponse.json(
-        { error: 'Your subscription is not active. Please update your billing details.' },
-        { status: 403 }
-      );
-    }
+    const tier = resolveEffectiveTier(user.subscription);
 
     // Template access check
     if (tier === 'FREE' && !FREE_TEMPLATES.includes(templateSlug)) {
