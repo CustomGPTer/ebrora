@@ -4,6 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 
 export const authOptions: NextAuthOptions = {
           adapter: PrismaAdapter(prisma) as any,
@@ -163,14 +164,7 @@ export const authOptions: NextAuthOptions = {
                                                                               where: { user_id: token.id as string },
                                                                               select: { tier: true, status: true, current_period_end: true },
                                                           });
-                                                          // Grant paid tier if ACTIVE, or if CANCELLED but still within billing period
-                                                          const isActive = subscription?.status === 'ACTIVE';
-                                                          const isCancelledButValid =
-                                                                        subscription?.status === 'CANCELLED' &&
-                                                                        subscription?.tier !== 'FREE' &&
-                                                                        subscription?.current_period_end &&
-                                                                        new Date() < subscription.current_period_end;
-                                                          token.subscriptionTier = (isActive || isCancelledButValid) ? (subscription?.tier || 'FREE') : 'FREE';
+                                                          token.subscriptionTier = resolveEffectiveTier(subscription);
                                         } catch {
                                                           token.subscriptionTier = 'FREE';
                                         }
