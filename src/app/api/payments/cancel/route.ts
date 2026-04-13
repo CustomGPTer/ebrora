@@ -24,10 +24,12 @@ export async function POST(request: NextRequest) {
         paypal_subscription_id: true,
         stripe_subscription_id: true,
         payment_provider: true,
+        status: true,
+        tier: true,
       },
     });
 
-    if (!subscription) {
+    if (!subscription || subscription.status === 'EXPIRED' || subscription.tier === 'FREE') {
       return NextResponse.json(
         { error: 'No active subscription found' },
         { status: 404 }
