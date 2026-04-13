@@ -478,7 +478,7 @@ export const PRODUCTS: Product[] = [
       "Compatible with Windows and Mac versions of Excel"
     ],
     images: ["product-images/HAVS-Vibration-Monitoring-Register-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/havs-monitoring",
+    buyLink: "https://ebrora.gumroad.com/l/ebszps",
     youtubeId: "",
     new: true,
     featured: false,
@@ -557,7 +557,7 @@ export const PRODUCTS: Product[] = [
       "Print-ready output for permit packs and method statements"
     ],
     images: ["product-images/Confined-Space-Assessment-Calculator-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/confined-space-assessment-calculator",
+    buyLink: "https://ebrora.gumroad.com/l/rulkbj",
     youtubeId: "",
     new: true,
     featured: false,
@@ -715,7 +715,7 @@ export const PRODUCTS: Product[] = [
       "Designed for site managers, plant coordinators and commercial teams"
     ],
     images: ["product-images/Plant-Issues-Tracker-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/plant-issues-tracker",
+    buyLink: "https://ebrora.gumroad.com/l/zceao",
     youtubeId: "",
     new: true,
     featured: false,
@@ -831,7 +831,7 @@ export const PRODUCTS: Product[] = [
       "Suitable for multi-trade construction projects"
     ],
     images: ["product-images/Subcontractor-Performance-Scorecard-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/subcontractor-performance-scorecard",
+    buyLink: "https://ebrora.gumroad.com/l/xyscvl",
     youtubeId: "",
     new: true,
     featured: false,
@@ -909,7 +909,7 @@ export const PRODUCTS: Product[] = [
       "VBA-powered automation requiring macro-enabled Excel (.xlsm)"
     ],
     images: ["product-images/Allocation-Sheet-Template-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/allocation-sheet",
+    buyLink: "https://ebrora.gumroad.com/l/tdmhwg",
     youtubeId: "",
     new: true,
     featured: false,
@@ -1147,7 +1147,7 @@ export const PRODUCTS: Product[] = [
       "Designed for environmental managers and waste coordinators"
     ],
     images: ["product-images/Waste-Export-Tracker-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/waste-export-tracker",
+    buyLink: "https://ebrora.gumroad.com/l/ocjulyi",
     youtubeId: "",
     new: true,
     featured: false,
@@ -1225,7 +1225,7 @@ export const PRODUCTS: Product[] = [
       "Suitable for pipeline and civil engineering infrastructure projects"
     ],
     images: ["product-images/Pipe-Laying-Productivity-Log-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/pipe-laying-productivity-log",
+    buyLink: "https://ebrora.gumroad.com/l/iwebrw",
     youtubeId: "",
     new: true,
     featured: false,
@@ -1264,7 +1264,7 @@ export const PRODUCTS: Product[] = [
       "Designed for site agents, planners and quantity surveyors"
     ],
     images: ["product-images/Construction-Productivity-Calculator-excel-ebrora.jpg"],
-    buyLink: "https://ebrora.gumroad.com/l/productivity-calculator",
+    buyLink: "https://ebrora.gumroad.com/l/jxpoxw",
     youtubeId: "",
     new: true,
     featured: false,
@@ -1711,7 +1711,7 @@ export const PRODUCTS: Product[] = [
       "Scalable for single-site or multi-area compliance programmes"
     ],
         images: ["product-images/Action-Calendar-Template-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/action-calendar",
+        buyLink: "https://ebrora.gumroad.com/l/ycanul",
         youtubeId: "",
         new: false,
         featured: false,
@@ -1949,7 +1949,7 @@ export const PRODUCTS: Product[] = [
       "Designed for site engineers, utility coordinators and commercial teams"
     ],
         images: ["product-images/Uncharted-Services-Log-excel-ebrora.jpg"],
-        buyLink: "https://ebrora.gumroad.com/l/uncharted-services-log",
+        buyLink: "https://ebrora.gumroad.com/l/vbbmzu",
         youtubeId: "",
         new: true,
         featured: false,
