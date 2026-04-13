@@ -16,6 +16,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolLimitByTier } from '@/lib/ai-tools/constants';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
@@ -42,12 +43,7 @@ async function authCheck() {
     where: { id: userId },
     include: { subscription: true },
   });
-  const tier = user?.subscription?.tier ?? 'FREE';
-  const subscriptionStatus = user?.subscription?.status ?? 'ACTIVE';
-
-  if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
-    return { error: 'Your subscription is not active.', status: 403 };
-  }
+  const tier = resolveEffectiveTier(user?.subscription);
 
   const monthLimit = getAiToolLimitByTier(tier, TOOL_SLUG);
   if (monthLimit === 0) {
