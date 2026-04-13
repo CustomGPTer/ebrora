@@ -50,10 +50,37 @@ export async function POST(request: NextRequest) {
       where: { user_id: session.user.id },
       select: {
         paypal_subscription_id: true,
+        stripe_subscription_id: true,
+        payment_provider: true,
         status: true,
         tier: true,
+        current_period_end: true,
       },
     });
+
+    // Block cross-provider: if user has active Stripe sub, don't allow PayPal
+    if (
+      existingSub &&
+      existingSub.status === 'ACTIVE' &&
+      existingSub.tier !== 'FREE' &&
+      existingSub.payment_provider === 'STRIPE' &&
+      existingSub.stripe_subscription_id
+    ) {
+      const endDate = existingSub.current_period_end
+        ? existingSub.current_period_end.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          })
+        : 'the end of your billing period';
+
+      return NextResponse.json(
+        {
+          error: `You have an active card subscription. Cancel it first from your account page. You'll keep access until ${endDate}, then you can resubscribe with PayPal.`,
+        },
+        { status: 409 }
+      );
+    }
 
     // If user has an active subscription with a PayPal ID, revise it
     // instead of creating a new one (prevents "pre-approved payments" error)
