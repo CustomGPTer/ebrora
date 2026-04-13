@@ -18,17 +18,19 @@ export async function GET(req: NextRequest) {
 
   try {
     const now = new Date();
+    const safetyWindow = new Date(now.getTime() - 48 * 60 * 60 * 1000); // 48 hours ago
 
     // Downgrade non-ACTIVE subscriptions to FREE, but ONLY if:
-    // - current_period_end is null (never set), OR
+    // - current_period_end is null AND created > 48h ago (gives webhooks time to arrive), OR
     // - current_period_end has passed (grace period expired)
-    // This prevents nuking CANCELLED users who still have paid time remaining.
+    // This prevents nuking CANCELLED users who still have paid time remaining,
+    // and avoids racing with delayed activation/payment webhooks.
     const result = await prisma.subscription.updateMany({
       where: {
         status: { not: 'ACTIVE' },
         tier: { not: 'FREE' },
         OR: [
-          { current_period_end: null },
+          { current_period_end: null, created_at: { lt: safetyWindow } },
           { current_period_end: { lt: now } },
         ],
       },
