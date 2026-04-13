@@ -12,6 +12,7 @@ export const PLAN_CONFIG = {
     price: '9.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_STARTER_MONTHLY || '',
+    stripePriceId: process.env.STRIPE_PRICE_STARTER_MONTHLY || '',
     ramsLimit: 5,
     formatsAccess: 'ALL' as const,
   },
@@ -21,6 +22,7 @@ export const PLAN_CONFIG = {
     price: '99.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_STARTER_YEARLY || '',
+    stripePriceId: process.env.STRIPE_PRICE_STARTER_YEARLY || '',
     ramsLimit: 5,
     formatsAccess: 'ALL' as const,
   },
@@ -32,6 +34,7 @@ export const PLAN_CONFIG = {
     price: '9.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_STARTER_MONTHLY || process.env.PAYPAL_PLAN_STANDARD_MONTHLY || '',
+    stripePriceId: process.env.STRIPE_PRICE_STARTER_MONTHLY || '',
     ramsLimit: 5,
     formatsAccess: 'ALL' as const,
   },
@@ -41,6 +44,7 @@ export const PLAN_CONFIG = {
     price: '99.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_STARTER_YEARLY || process.env.PAYPAL_PLAN_STANDARD_YEARLY || '',
+    stripePriceId: process.env.STRIPE_PRICE_STARTER_YEARLY || '',
     ramsLimit: 5,
     formatsAccess: 'ALL' as const,
   },
@@ -51,6 +55,7 @@ export const PLAN_CONFIG = {
     price: '24.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_PROFESSIONAL_MONTHLY || process.env.PAYPAL_PLAN_PREMIUM_MONTHLY || '',
+    stripePriceId: process.env.STRIPE_PRICE_PROFESSIONAL_MONTHLY || '',
     ramsLimit: 15,
     formatsAccess: 'ALL' as const,
   },
@@ -60,6 +65,7 @@ export const PLAN_CONFIG = {
     price: '249.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_PROFESSIONAL_YEARLY || process.env.PAYPAL_PLAN_PREMIUM_YEARLY || '',
+    stripePriceId: process.env.STRIPE_PRICE_PROFESSIONAL_YEARLY || '',
     ramsLimit: 15,
     formatsAccess: 'ALL' as const,
   },
@@ -70,6 +76,7 @@ export const PLAN_CONFIG = {
     price: '49.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_UNLIMITED_MONTHLY || '',
+    stripePriceId: process.env.STRIPE_PRICE_UNLIMITED_MONTHLY || '',
     ramsLimit: 9999,
     formatsAccess: 'ALL' as const,
   },
@@ -79,6 +86,7 @@ export const PLAN_CONFIG = {
     price: '499.99',
     currency: 'GBP',
     paypalPlanId: process.env.PAYPAL_PLAN_UNLIMITED_YEARLY || '',
+    stripePriceId: process.env.STRIPE_PRICE_UNLIMITED_YEARLY || '',
     ramsLimit: 9999,
     formatsAccess: 'ALL' as const,
   },
@@ -185,4 +193,55 @@ export function resolveBillingFromPlanId(
     return 'YEARLY';
   }
   return 'MONTHLY';
+}
+
+// ── Resolve tier from Stripe price ID ──
+
+export function resolveTierFromStripePriceId(
+  priceId: string
+): 'STARTER' | 'PROFESSIONAL' | 'UNLIMITED' | null {
+  const unlimitedMonthly = process.env.STRIPE_PRICE_UNLIMITED_MONTHLY || '';
+  const unlimitedYearly = process.env.STRIPE_PRICE_UNLIMITED_YEARLY || '';
+  if (priceId === unlimitedMonthly || priceId === unlimitedYearly) {
+    return 'UNLIMITED';
+  }
+
+  const proMonthly = process.env.STRIPE_PRICE_PROFESSIONAL_MONTHLY || '';
+  const proYearly = process.env.STRIPE_PRICE_PROFESSIONAL_YEARLY || '';
+  if (priceId === proMonthly || priceId === proYearly) {
+    return 'PROFESSIONAL';
+  }
+
+  const starterMonthly = process.env.STRIPE_PRICE_STARTER_MONTHLY || '';
+  const starterYearly = process.env.STRIPE_PRICE_STARTER_YEARLY || '';
+  if (priceId === starterMonthly || priceId === starterYearly) {
+    return 'STARTER';
+  }
+
+  console.warn(`Unknown Stripe price ID: ${priceId}`);
+  return null;
+}
+
+// ── Resolve billing cycle from Stripe price ID ──
+
+export function resolveBillingFromStripePriceId(
+  priceId: string
+): 'MONTHLY' | 'YEARLY' {
+  const yearlyIds = [
+    process.env.STRIPE_PRICE_STARTER_YEARLY || '',
+    process.env.STRIPE_PRICE_PROFESSIONAL_YEARLY || '',
+    process.env.STRIPE_PRICE_UNLIMITED_YEARLY || '',
+  ].filter(Boolean);
+
+  if (yearlyIds.includes(priceId)) {
+    return 'YEARLY';
+  }
+  return 'MONTHLY';
+}
+
+// ── Get Stripe price ID from plan key ──
+
+export function getStripePriceId(planKey: string): string | null {
+  const config = PLAN_CONFIG[planKey as PlanKey];
+  return config?.stripePriceId || null;
 }
