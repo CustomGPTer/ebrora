@@ -48,6 +48,7 @@ export default async function AccountPage({ searchParams }: PageProps) {
         status: user.subscription.status,
         currentPeriodStart: user.subscription.current_period_start,
         currentPeriodEnd: user.subscription.current_period_end,
+        paymentProvider: user.subscription.payment_provider || 'PAYPAL',
       }
     : null;
 
