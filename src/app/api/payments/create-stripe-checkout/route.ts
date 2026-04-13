@@ -100,8 +100,11 @@ export async function POST(request: NextRequest) {
       );
 
       // Update DB immediately (webhook will also fire, idempotent)
-      const { resolveTierFromStripePriceId, getRamsLimitByTier } = await import(
+      const { resolveTierFromStripePriceId } = await import(
         '@/lib/payments/plan-config'
+      );
+      const { upsertUsageRecord } = await import(
+        '@/lib/payments/usage-tracker'
       );
       const newTier = resolveTierFromStripePriceId(updated.priceId);
 
@@ -115,32 +118,7 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        // Update usage record
-        const now = new Date();
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const ramsLimit = getRamsLimitByTier(newTier);
-
-        const existingUsage = await prisma.usageRecord.findFirst({
-          where: { user_id: session.user.id, billing_period_start: monthStart },
-        });
-
-        if (existingUsage) {
-          await prisma.usageRecord.update({
-            where: { id: existingUsage.id },
-            data: { rams_limit: ramsLimit },
-          });
-        } else {
-          await prisma.usageRecord.create({
-            data: {
-              user_id: session.user.id,
-              billing_period_start: monthStart,
-              billing_period_end: monthEnd,
-              rams_generated: 0,
-              rams_limit: ramsLimit,
-            },
-          });
-        }
+        await upsertUsageRecord(session.user.id, newTier);
       }
 
       return NextResponse.json({ updated: true, tier: newTier });
