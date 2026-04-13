@@ -104,6 +104,9 @@ export const PAYMENT_CONFIG = {
   paypal: {
     mode: process.env.NEXT_PUBLIC_PAYPAL_MODE || 'sandbox',
   },
+  stripe: {
+    publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+  },
 };
 
 /**
