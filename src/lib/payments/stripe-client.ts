@@ -4,11 +4,23 @@ import Stripe from 'stripe';
 // Stripe Client — mirrors paypal-client.ts structure
 // Uses Stripe Checkout (redirect) for new subscriptions and
 // Stripe Customer Portal for billing management.
+// Lazy-initialized to avoid build-time crash when env vars are missing.
 // =============================================================================
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-03-25.dahlia',
-});
+let _stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error('STRIPE_SECRET_KEY is not set');
+    }
+    _stripe = new Stripe(key, {
+      apiVersion: '2026-03-25.dahlia',
+    });
+  }
+  return _stripe;
+}
 
 // ── Types ──
 
@@ -34,7 +46,7 @@ export async function createCheckoutSession(
 
   // Check if user already has a Stripe customer ID
   // If so, reuse it to keep subscription history together
-  const existingCustomers = await stripe.customers.list({
+  const existingCustomers = await getStripe().customers.list({
     email: customerEmail,
     limit: 1,
   });
@@ -44,7 +56,7 @@ export async function createCheckoutSession(
     customerId = existingCustomers.data[0].id;
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
     line_items: [
@@ -86,7 +98,7 @@ export async function createCheckoutSession(
 export async function getCheckoutSession(
   sessionId: string
 ): Promise<Stripe.Checkout.Session> {
-  return stripe.checkout.sessions.retrieve(sessionId, {
+  return getStripe().checkout.sessions.retrieve(sessionId, {
     expand: ['subscription'],
   });
 }
@@ -96,7 +108,7 @@ export async function getCheckoutSession(
 export async function getStripeSubscriptionDetails(
   subscriptionId: string
 ): Promise<StripeSubscriptionDetails> {
-  const sub = await stripe.subscriptions.retrieve(subscriptionId);
+  const sub = await getStripe().subscriptions.retrieve(subscriptionId);
 
   const item = sub.items.data[0];
   if (!item) {
@@ -120,14 +132,14 @@ export async function updateStripeSubscription(
   subscriptionId: string,
   newPriceId: string
 ): Promise<StripeSubscriptionDetails> {
-  const sub = await stripe.subscriptions.retrieve(subscriptionId);
+  const sub = await getStripe().subscriptions.retrieve(subscriptionId);
   const item = sub.items.data[0];
 
   if (!item) {
     throw new Error('No subscription items to update');
   }
 
-  const updated = await stripe.subscriptions.update(subscriptionId, {
+  const updated = await getStripe().subscriptions.update(subscriptionId, {
     items: [
       {
         id: item.id,
@@ -156,7 +168,7 @@ export async function cancelStripeSubscription(
   subscriptionId: string
 ): Promise<boolean> {
   try {
-    await stripe.subscriptions.update(subscriptionId, {
+    await getStripe().subscriptions.update(subscriptionId, {
       cancel_at_period_end: true,
     });
     return true;
@@ -172,7 +184,7 @@ export async function cancelStripeSubscriptionImmediately(
   subscriptionId: string
 ): Promise<boolean> {
   try {
-    await stripe.subscriptions.cancel(subscriptionId);
+    await getStripe().subscriptions.cancel(subscriptionId);
     return true;
   } catch (error) {
     console.error('Stripe immediate cancel error:', error);
@@ -188,7 +200,7 @@ export async function createPortalSession(
 ): Promise<{ portalUrl: string }> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-  const session = await stripe.billingPortal.sessions.create({
+  const session = await getStripe().billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl || `${baseUrl}/account`,
   });
@@ -203,9 +215,9 @@ export function constructWebhookEvent(
   signature: string
 ): Stripe.Event {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
-  return stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  return getStripe().webhooks.constructEvent(body, signature, webhookSecret);
 }
 
-// ── Export raw Stripe instance for edge cases ──
+// ── Export getter for edge cases ──
 
-export { stripe };
+export { getStripe as stripe };
