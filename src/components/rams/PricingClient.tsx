@@ -10,6 +10,7 @@ import Link from 'next/link';
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type BillingPeriod = 'monthly' | 'yearly';
+type PaymentMethod = 'paypal' | 'stripe';
 type Tier = 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'UNLIMITED';
 
 interface TierData {
@@ -263,10 +264,12 @@ function PricingCard({
   data,
   billingPeriod,
   isCurrentPlan,
+  paymentMethod,
 }: {
   data: TierData;
   billingPeriod: BillingPeriod;
   isCurrentPlan: boolean;
+  paymentMethod: PaymentMethod;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -283,19 +286,45 @@ function PricingCard({
     if (data.tier === 'FREE' || isCurrentPlan || !planKey) return;
     setIsLoading(true);
     try {
-      const res = await fetch('/api/payments/create-subscription', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planKey }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        alert(`Error: ${err.error || 'Failed to create subscription'}`);
-        setIsLoading(false);
-        return;
+      if (paymentMethod === 'stripe') {
+        // Stripe Checkout flow
+        const res = await fetch('/api/payments/create-stripe-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planKey }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          alert(`Error: ${err.error || 'Failed to create checkout session'}`);
+          setIsLoading(false);
+          return;
+        }
+        const data = (await res.json()) as { checkoutUrl?: string; updated?: boolean; tier?: string };
+        if (data.updated) {
+          // In-place upgrade — no redirect needed
+          alert(`Plan updated to ${data.tier || 'new plan'}!`);
+          window.location.reload();
+          return;
+        }
+        if (data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+        }
+      } else {
+        // PayPal flow (existing)
+        const res = await fetch('/api/payments/create-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planKey }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          alert(`Error: ${err.error || 'Failed to create subscription'}`);
+          setIsLoading(false);
+          return;
+        }
+        const { approvalUrl } = (await res.json()) as { approvalUrl: string };
+        window.location.href = approvalUrl;
       }
-      const { approvalUrl } = (await res.json()) as { approvalUrl: string };
-      window.location.href = approvalUrl;
     } catch {
       alert('Failed to create subscription. Please try again.');
       setIsLoading(false);
@@ -479,6 +508,7 @@ function PricingCard({
 
 export default function PricingClient() {
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('stripe');
   const { data: session } = useSession();
   const searchParams = useSearchParams();
 
@@ -504,38 +534,66 @@ export default function PricingClient() {
     fetchSubscriptionStatus();
   }, [fetchSubscriptionStatus]);
 
-  // Handle PayPal return: auto-verify subscription when user returns with ?subscribed=true or ?upgraded=true
+  // Handle return from payment provider: auto-verify subscription
   useEffect(() => {
     const subscribed = searchParams.get('subscribed');
     const upgraded = searchParams.get('upgraded');
     const subId = searchParams.get('subscription_id');
+    const stripeSessionId = searchParams.get('stripe_session_id');
 
-    if ((subscribed === 'true' || upgraded === 'true') && subId && session?.user) {
-      setVerifyMessage('Verifying your subscription…');
+    if ((subscribed === 'true' || upgraded === 'true') && session?.user) {
+      // Determine which provider returned the user
+      if (stripeSessionId) {
+        // Stripe return
+        setVerifyMessage('Verifying your subscription…');
 
-      fetch('/api/payments/verify-subscription', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscriptionId: subId }),
-      })
-        .then(async (res) => {
-          if (res.ok) {
-            const data = (await res.json()) as { tier?: string };
-            setVerifyMessage(`Subscription confirmed — you're on ${data.tier || 'a paid'} plan!`);
-            if (data.tier) setCurrentPlan(data.tier as Tier);
-          } else {
+        fetch('/api/payments/verify-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stripeSessionId }),
+        })
+          .then(async (res) => {
+            if (res.ok) {
+              const data = (await res.json()) as { tier?: string };
+              setVerifyMessage(`Subscription confirmed — you're on ${data.tier || 'a paid'} plan!`);
+              if (data.tier) setCurrentPlan(data.tier as Tier);
+            } else {
+              setVerifyMessage('Subscription is being processed. It may take a minute to activate.');
+            }
+          })
+          .catch(() => {
             setVerifyMessage('Subscription is being processed. It may take a minute to activate.');
-          }
+          })
+          .finally(() => {
+            window.history.replaceState({}, '', '/pricing');
+            setTimeout(() => setVerifyMessage(null), 6000);
+          });
+      } else if (subId) {
+        // PayPal return (existing flow)
+        setVerifyMessage('Verifying your subscription…');
+
+        fetch('/api/payments/verify-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscriptionId: subId }),
         })
-        .catch(() => {
-          setVerifyMessage('Subscription is being processed. It may take a minute to activate.');
-        })
-        .finally(() => {
-          // Clear URL params without navigation
-          window.history.replaceState({}, '', '/pricing');
-          // Clear message after a few seconds
-          setTimeout(() => setVerifyMessage(null), 6000);
-        });
+          .then(async (res) => {
+            if (res.ok) {
+              const data = (await res.json()) as { tier?: string };
+              setVerifyMessage(`Subscription confirmed — you're on ${data.tier || 'a paid'} plan!`);
+              if (data.tier) setCurrentPlan(data.tier as Tier);
+            } else {
+              setVerifyMessage('Subscription is being processed. It may take a minute to activate.');
+            }
+          })
+          .catch(() => {
+            setVerifyMessage('Subscription is being processed. It may take a minute to activate.');
+          })
+          .finally(() => {
+            window.history.replaceState({}, '', '/pricing');
+            setTimeout(() => setVerifyMessage(null), 6000);
+          });
+      }
     }
   }, [searchParams, session?.user]);
 
@@ -630,6 +688,40 @@ export default function PricingClient() {
               </span>
             </button>
           </div>
+
+          {/* Payment method toggle */}
+          <div className="mt-4">
+            <div
+              className="inline-flex items-center p-1 rounded-full"
+              style={{
+                background: 'var(--color-white)',
+                border: '1px solid var(--color-border)',
+                boxShadow: 'var(--shadow-sm)',
+              }}
+            >
+              <button
+                onClick={() => setPaymentMethod('stripe')}
+                className="flex items-center gap-1.5 px-5 py-2 rounded-full text-[0.8rem] font-semibold transition-all duration-300"
+                style={{
+                  background: paymentMethod === 'stripe' ? 'var(--color-primary)' : 'transparent',
+                  color: paymentMethod === 'stripe' ? '#FFFFFF' : 'var(--color-text-light)',
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Card
+              </button>
+              <button
+                onClick={() => setPaymentMethod('paypal')}
+                className="flex items-center gap-1.5 px-5 py-2 rounded-full text-[0.8rem] font-semibold transition-all duration-300"
+                style={{
+                  background: paymentMethod === 'paypal' ? 'var(--color-primary)' : 'transparent',
+                  color: paymentMethod === 'paypal' ? '#FFFFFF' : 'var(--color-text-light)',
+                }}
+              >
+                PayPal
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -642,6 +734,7 @@ export default function PricingClient() {
               data={tier}
               billingPeriod={billingPeriod}
               isCurrentPlan={currentPlan === tier.tier}
+              paymentMethod={paymentMethod}
             />
           ))}
         </div>
@@ -771,7 +864,7 @@ export default function PricingClient() {
                     <circle cx="7" cy="14" r="1" fill="currentColor" />
                   </svg>
                 ),
-                title: 'Secure payments via PayPal',
+                title: 'Secure payments via card or PayPal',
                 desc: 'Your payment details are encrypted and never stored on our servers.',
               },
               {
