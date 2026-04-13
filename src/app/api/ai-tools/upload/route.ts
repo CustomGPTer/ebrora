@@ -34,6 +34,7 @@ import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
 import { wrapUploadContent, detectInjectionPatterns, logInjectionAttempt } from '@/lib/ai-tools/sanitise-input';
 import { isValidTemplateSlug } from '@/lib/ai-tools/validate-template-slugs';
 import type { AiToolSlug } from '@/lib/ai-tools/types';
+import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 
 export const maxDuration = 300; // Vercel Pro allows up to 300s
 
@@ -119,16 +120,7 @@ export async function POST(req: NextRequest) {
       where: { id: userId },
       include: { subscription: true },
     });
-    const tier = user?.subscription?.tier ?? 'FREE';
-    const subscriptionStatus = user?.subscription?.status ?? 'ACTIVE';
-
-    // Paid tier: require active subscription
-    if (tier !== 'FREE' && subscriptionStatus !== 'ACTIVE') {
-      return NextResponse.json(
-        { error: 'Your subscription is not active. Please update your billing details.' },
-        { status: 403 }
-      );
-    }
+    const tier = resolveEffectiveTier(user?.subscription);
 
     const monthLimit = getAiToolLimitByTier(tier, toolSlug);
 
