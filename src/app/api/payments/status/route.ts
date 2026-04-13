@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     const tier = subscription?.tier || 'FREE';
     const status = subscription?.status || 'ACTIVE';
-    const paymentProvider = subscription?.payment_provider || 'PAYPAL';
+    const paymentProvider = subscription?.payment_provider || null;
 
     // Get usage information
     const usage = await getUserUsage(session.user.id);
