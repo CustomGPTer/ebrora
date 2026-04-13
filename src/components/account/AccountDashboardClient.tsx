@@ -18,6 +18,7 @@ interface Subscription {
   status: string;
   currentPeriodStart: Date;
   currentPeriodEnd: Date;
+  paymentProvider: string;
 }
 
 interface Generation {
@@ -200,6 +201,27 @@ export default function AccountDashboardClient({
       setCancelError(err.message || 'Something went wrong');
     } finally {
       setCancelLoading(false);
+    }
+  };
+
+  const [portalLoading, setPortalLoading] = useState(false);
+  const handleManageBilling = async () => {
+    setPortalLoading(true);
+    try {
+      const res = await fetch('/api/payments/stripe-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (res.ok && data.portalUrl) {
+        window.location.href = data.portalUrl;
+      } else {
+        alert(data.error || 'Failed to open billing portal');
+      }
+    } catch {
+      alert('Failed to open billing portal. Please try again.');
+    } finally {
+      setPortalLoading(false);
     }
   };
 
@@ -634,6 +656,15 @@ export default function AccountDashboardClient({
                 >
                   Upgrade Plan
                 </Link>
+                {subscription && subscription.paymentProvider === 'STRIPE' && subscription.plan !== 'FREE' && (
+                  <button
+                    onClick={handleManageBilling}
+                    disabled={portalLoading}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                  >
+                    {portalLoading ? 'Opening…' : 'Manage Billing'}
+                  </button>
+                )}
                 {subscription && subscription.plan !== 'FREE' && subscription.plan !== 'STARTER' && subscription.plan !== 'STANDARD' && (
                   <Link
                     href="/pricing"
