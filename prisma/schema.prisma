@@ -132,21 +132,25 @@ model User {
 
 // Subscription Model
 model Subscription {
-  id                     String             @id @default(cuid())
-  user_id                String             @unique
-  tier                   SubscriptionTier   @default(FREE)
-  status                 SubscriptionStatus @default(ACTIVE)
-  paypal_subscription_id String?            @unique
-  current_period_start   DateTime?
-  current_period_end     DateTime?
-  created_at             DateTime           @default(now())
-  updated_at             DateTime           @updatedAt
+  id                      String             @id @default(cuid())
+  user_id                 String             @unique
+  tier                    SubscriptionTier   @default(FREE)
+  status                  SubscriptionStatus @default(ACTIVE)
+  payment_provider        String             @default("PAYPAL")
+  paypal_subscription_id  String?            @unique
+  stripe_customer_id      String?            @unique
+  stripe_subscription_id  String?            @unique
+  current_period_start    DateTime?
+  current_period_end      DateTime?
+  created_at              DateTime           @default(now())
+  updated_at              DateTime           @updatedAt
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
   @@index([tier])
   @@index([status])
+  @@index([payment_provider])
   @@map("subscriptions")
 }
 
@@ -319,6 +323,7 @@ model WebhookEvent {
   id              String   @id @default(cuid())
   transmission_id String   @unique
   event_type      String
+  source          String   @default("PAYPAL")
   processed_at    DateTime @default(now())
 
   @@index([transmission_id])
