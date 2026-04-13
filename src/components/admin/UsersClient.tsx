@@ -12,6 +12,8 @@ interface User {
   tier: string;
   status: string;
   paypalId: string | null;
+  stripeId: string | null;
+  paymentProvider: string;
   ramsCount: number;
   aiToolCount: number;
   authMethod: string;
@@ -382,10 +384,28 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
                   <option value="UNLIMITED">Unlimited</option>
                 </select>
               </div>
+              {editingUser.paymentProvider && editingUser.paymentProvider !== 'PAYPAL' && (
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <label className="admin-label">Payment Provider</label>
+                  <div className="admin-table__mono" style={{ padding: '0.5rem 0' }}>{editingUser.paymentProvider}</div>
+                </div>
+              )}
               {editingUser.paypalId && (
-                <div style={{ marginBottom: '1rem' }}>
+                <div style={{ marginBottom: '0.5rem' }}>
                   <label className="admin-label">PayPal Subscription ID</label>
                   <div className="admin-table__mono" style={{ padding: '0.5rem 0' }}>{editingUser.paypalId}</div>
+                </div>
+              )}
+              {editingUser.stripeId && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label className="admin-label">Stripe Subscription ID</label>
+                  <div className="admin-table__mono" style={{ padding: '0.5rem 0' }}>{editingUser.stripeId}</div>
+                </div>
+              )}
+              {!editingUser.paypalId && !editingUser.stripeId && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label className="admin-label">Subscription ID</label>
+                  <div style={{ padding: '0.5rem 0', color: 'var(--admin-text-muted)' }}>None (admin-granted or free)</div>
                 </div>
               )}
               {/* Email Verification Status */}
