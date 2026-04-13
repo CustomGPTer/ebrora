@@ -3,7 +3,8 @@ import { getSession } from '@/lib/auth-utils';
 import prisma from '@/lib/prisma';
 import { getUserUsage } from '@/lib/payments/usage-tracker';
 import { getSubscriptionDetails } from '@/lib/payments/paypal-client';
-import { resolveBillingFromPlanId } from '@/lib/payments/plan-config';
+import { getStripeSubscriptionDetails } from '@/lib/payments/stripe-client';
+import { resolveBillingFromPlanId, resolveBillingFromStripePriceId } from '@/lib/payments/plan-config';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
 
     const tier = subscription?.tier || 'FREE';
     const status = subscription?.status || 'ACTIVE';
+    const paymentProvider = subscription?.payment_provider || 'PAYPAL';
 
     // Get usage information
     const usage = await getUserUsage(session.user.id);
@@ -29,14 +31,23 @@ export async function GET(request: NextRequest) {
       renewalDate = subscription.current_period_end.toISOString();
     }
 
-    // Determine billing cycle from PayPal subscription
+    // Determine billing cycle from provider
     let billing = 'MONTHLY';
-    if (subscription?.paypal_subscription_id && status === 'ACTIVE') {
-      try {
-        const details = await getSubscriptionDetails(subscription.paypal_subscription_id);
-        billing = resolveBillingFromPlanId(details.plan_id);
-      } catch {
-        // If we can't reach PayPal, default to MONTHLY — non-critical
+    if (status === 'ACTIVE') {
+      if (paymentProvider === 'STRIPE' && subscription?.stripe_subscription_id) {
+        try {
+          const details = await getStripeSubscriptionDetails(subscription.stripe_subscription_id);
+          billing = resolveBillingFromStripePriceId(details.priceId);
+        } catch {
+          // If we can't reach Stripe, default to MONTHLY — non-critical
+        }
+      } else if (subscription?.paypal_subscription_id) {
+        try {
+          const details = await getSubscriptionDetails(subscription.paypal_subscription_id);
+          billing = resolveBillingFromPlanId(details.plan_id);
+        } catch {
+          // If we can't reach PayPal, default to MONTHLY — non-critical
+        }
       }
     }
 
@@ -44,10 +55,11 @@ export async function GET(request: NextRequest) {
       tier,
       status,
       billing,
+      paymentProvider,
       ramsUsed: usage.used,
       ramsLimit: usage.limit,
       renewalDate,
-      subscriptionId: subscription?.paypal_subscription_id || null,
+      subscriptionId: subscription?.paypal_subscription_id || subscription?.stripe_subscription_id || null,
     });
   } catch (error) {
     console.error('Status check error:', error);
