@@ -3738,6 +3738,41 @@ p {
         box-shadow: none;
         border: 1px solid #ccc;
     }
+
+    /* Guide print styles */
+    .guide-sidebar,
+    .guide-toolbar,
+    .guide-download-btn,
+    .guide-progress-bar,
+    .guide-search,
+    [data-guide-no-print] {
+        display: none !important;
+    }
+
+    .guide-content {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .guide-section {
+        break-before: page;
+    }
+
+    .guide-section:first-child {
+        break-before: auto;
+    }
+
+    .guide-subsystem {
+        break-inside: avoid;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+        margin-bottom: 1rem;
+    }
+
+    .guide-subsection {
+        break-inside: avoid;
+    }
 }
 
 /* ============================================================================
