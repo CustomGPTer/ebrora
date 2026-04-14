@@ -28,6 +28,7 @@ const TOOL_CATEGORIES = {
       "working-at-height-calculator",
       "riddor-reporting-decision-tool",
       "asbestos-notification-decision-tool",
+      "site-induction-duration-calculator",
     ]),
   },
   "Temporary Works": {
@@ -150,6 +151,7 @@ const TOOL_CATEGORIES = {
       "first-aid-needs-calculator",
       "plant-pre-use-checksheet",
       "confined-space-calculator",
+      "site-induction-duration-calculator",
     ]),
   },
   "Water & Wastewater": {
@@ -229,6 +231,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "riddor-reporting-decision-tool": { icon: "🚨", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "asbestos-notification-decision-tool": { icon: "⚠️", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "org-chart-generator": { icon: "📋", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
+  "site-induction-duration-calculator": { icon: "🎓", accent: "#BE185D", accentLight: "rgba(190,24,93,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
