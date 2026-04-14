@@ -402,7 +402,7 @@ function SectionBlock({ section }: { section: GuideSection }) {
 
       {/* Section intro content (skip glossary — GlossarySearch parses it) */}
       {section.content && section.id !== "acronyms-and-glossary" && (
-        <div className="mb-6">{renderContent(section.content)}</div>
+        <div className="mb-6 pl-16">{renderContent(section.content)}</div>
       )}
 
       {/* ─── Interactive components by section ─── */}
