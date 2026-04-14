@@ -478,7 +478,7 @@ function GuideSidebar({
 }: {
   sections: GuideSection[];
   activeSection: string;
-  onNavigate: (id: string) => void;
+  onNavigate: (sectionId: string, subsystemId?: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }) {
