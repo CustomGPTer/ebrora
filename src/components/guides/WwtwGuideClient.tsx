@@ -400,8 +400,8 @@ function SectionBlock({ section }: { section: GuideSection }) {
         </div>
       </div>
 
-      {/* Section intro content */}
-      {section.content && (
+      {/* Section intro content (skip glossary — GlossarySearch parses it) */}
+      {section.content && section.id !== "acronyms-and-glossary" && (
         <div className="mb-6">{renderContent(section.content)}</div>
       )}
 
