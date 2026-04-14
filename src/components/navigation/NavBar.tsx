@@ -79,6 +79,7 @@ export function NavBar() {
     isActive("/toolbox-talks") ||
     isActive("/free-templates") ||
     isActive("/faq") ||
+    isActive("/guides") ||
     isActive("/construction-sign-maker");
 
   const linkClass = (active: boolean) =>
