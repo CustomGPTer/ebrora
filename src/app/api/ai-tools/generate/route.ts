@@ -11,6 +11,7 @@ import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolConfig, isValidAiToolSlug, getAiToolLimitByTier } from '@/lib/ai-tools';
 import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
+import { checkDailyFairUsage } from '@/lib/fair-usage';
 import { getGenerationPrompt, getTbtTemplateGenerationPrompt, getCoshhTemplateGenerationPrompt, getCdmCheckerTemplateGenerationPrompt, getConfinedSpacesTemplateGenerationPrompt, getErpTemplateGenerationPrompt, getIncidentReportTemplateGenerationPrompt, getLiftPlanTemplateGenerationPrompt, getManualHandlingTemplateGenerationPrompt, getNoiseAssessmentTemplateGenerationPrompt, getPermitToDigTemplateGenerationPrompt, getPowraTemplateGenerationPrompt, getEarlyWarningTemplateGenerationPrompt } from '@/lib/ai-tools/system-prompts';
 import { getCrpTemplateGenerationPrompt } from '@/lib/carbon-reduction/crp-prompts';
 import { getCarbonFootprintTemplateGenerationPrompt } from '@/lib/carbon-footprint/cf-prompts';
@@ -176,6 +177,23 @@ export async function POST(req: NextRequest) {
             ? `The ${toolConfig.shortName} requires a paid plan.`
             : `You've reached your monthly AI document limit.`,
           limitReached: true,
+        },
+        { status: 429 }
+      );
+    }
+
+    // Daily fair-usage check (Unlimited plan only — defense-in-depth)
+    const fairUsage = await checkDailyFairUsage(session.user.id, tier, 'aiTools');
+    if (!fairUsage.allowed) {
+      await prisma.aiToolGeneration.update({
+        where: { id: generationId },
+        data: { status: 'FAILED', error_message: 'Daily fair-usage limit exceeded' },
+      });
+      return NextResponse.json(
+        {
+          error: fairUsage.message,
+          limitReached: true,
+          isFairUsage: true,
         },
         { status: 429 }
       );
