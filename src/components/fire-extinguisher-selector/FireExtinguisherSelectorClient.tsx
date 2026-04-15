@@ -95,65 +95,162 @@ function ExtinguisherBandDiagram() {
 
 // ─── SVG: Siting Coverage Diagram ────────────────────────────────
 function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }: { floorArea: number; extinguisherCount: number; travelDistance: number }) {
-  const W = 600, H = 300;
-  // Represent floor as a rectangle
-  const aspect = Math.min(2, Math.max(0.5, Math.sqrt(floorArea) / 10));
-  const floorW = Math.min(400, Math.sqrt(floorArea * aspect));
-  const floorH = floorW / aspect;
-  const scale = Math.min(1, 380 / floorW, 220 / floorH);
-  const sw = floorW * scale, sh = floorH * scale;
-  const ox = (W - sw) / 2, oy = (H - sh) / 2 + 15;
+  const W = 700, H = 440;
+  const PAD = { top: 55, right: 40, bottom: 65, left: 55 };
+  const planW = W - PAD.left - PAD.right;
+  const planH = H - PAD.top - PAD.bottom;
 
-  // Place extinguishers evenly
-  const positions: { x: number; y: number }[] = [];
-  const cols = Math.ceil(Math.sqrt(extinguisherCount * aspect));
-  const rows = Math.ceil(extinguisherCount / cols);
+  // Floor dimensions
+  const aspect = Math.min(2.5, Math.max(1, Math.sqrt(floorArea) / 8));
+  const realW = Math.round(Math.sqrt(floorArea * aspect));
+  const realH = Math.round(floorArea / realW);
+  const mPerPx = Math.max(realW / planW, realH / planH);
+  const drawW = realW / mPerPx;
+  const drawH = realH / mPerPx;
+  const ox = PAD.left + (planW - drawW) / 2;
+  const oy = PAD.top + (planH - drawH) / 2;
+
+  // Grid spacing (5m grid)
+  const gridSpacing = 5;
+  const gridPxX = gridSpacing / mPerPx;
+  const gridPxY = gridSpacing / mPerPx;
+
+  // Place extinguishers in optimal positions
+  const positions: { x: number; y: number; id: string }[] = [];
+  const cols = Math.max(1, Math.ceil(Math.sqrt(extinguisherCount * (realW / realH))));
+  const rows = Math.max(1, Math.ceil(extinguisherCount / cols));
   let idx = 0;
   for (let r = 0; r < rows && idx < extinguisherCount; r++) {
     for (let c = 0; c < cols && idx < extinguisherCount; c++) {
       positions.push({
-        x: ox + (sw / (cols + 1)) * (c + 1),
-        y: oy + (sh / (rows + 1)) * (r + 1),
+        x: ox + (drawW / (cols + 1)) * (c + 1),
+        y: oy + (drawH / (rows + 1)) * (r + 1),
+        id: `FP${idx + 1}`,
       });
       idx++;
     }
   }
 
-  const maxR = Math.min(travelDistance, 30) * scale * (sw / floorW);
+  // Coverage radius in px
+  const coverR = Math.min(travelDistance, 30) / mPerPx;
+
+  // Exit positions (2 exits on opposite walls)
+  const exits = [
+    { x: ox, y: oy + drawH * 0.6, label: "EXIT", rotation: 0 },
+    { x: ox + drawW, y: oy + drawH * 0.2, label: "EXIT", rotation: 0 },
+  ];
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 300 }}>
-      <text x={W / 2} y={16} textAnchor="middle" fontSize={11} fontWeight={700} fill="#1F2937">Extinguisher Siting Coverage</text>
-      <text x={W / 2} y={28} textAnchor="middle" fontSize={8} fill="#6B7280">{Math.round(floorArea)}m2 floor area -- max {travelDistance}m travel distance</text>
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 480 }}>
+      {/* Background */}
+      <rect x={0} y={0} width={W} height={H} fill="#FAFBFC" rx={4} />
+
+      {/* Title block */}
+      <text x={W / 2} y={20} textAnchor="middle" fontSize={13} fontWeight={700} fill="#1F2937">FIRE EXTINGUISHER SITING PLAN</text>
+      <text x={W / 2} y={35} textAnchor="middle" fontSize={9} fill="#6B7280">
+        {Math.round(floorArea)}m2 floor area | {extinguisherCount} fire point{extinguisherCount !== 1 ? "s" : ""} | Max {travelDistance}m travel distance | BS 5306-8:2012
+      </text>
+      <line x1={PAD.left} y1={44} x2={W - PAD.right} y2={44} stroke="#D1D5DB" strokeWidth={0.5} />
+
+      {/* Grid lines */}
+      {Array.from({ length: Math.ceil(drawW / gridPxX) + 1 }).map((_, i) => {
+        const gx = ox + i * gridPxX;
+        if (gx > ox + drawW + 0.5) return null;
+        return <line key={`gx-${i}`} x1={gx} y1={oy} x2={gx} y2={oy + drawH} stroke="#E5E7EB" strokeWidth={0.3} />;
+      })}
+      {Array.from({ length: Math.ceil(drawH / gridPxY) + 1 }).map((_, i) => {
+        const gy = oy + i * gridPxY;
+        if (gy > oy + drawH + 0.5) return null;
+        return <line key={`gy-${i}`} x1={ox} y1={gy} x2={ox + drawW} y2={gy} stroke="#E5E7EB" strokeWidth={0.3} />;
+      })}
 
       {/* Floor outline */}
-      <rect x={ox} y={oy} width={sw} height={sh} rx={4} fill="#F8FAFC" stroke="#CBD5E1" strokeWidth={1.5} />
+      <rect x={ox} y={oy} width={drawW} height={drawH} rx={2} fill="none" stroke="#374151" strokeWidth={2.5} />
+
+      {/* Wall hatching effect (thick border inside) */}
+      <rect x={ox + 2} y={oy + 2} width={drawW - 4} height={drawH - 4} rx={1} fill="none" stroke="#9CA3AF" strokeWidth={0.5} strokeDasharray="2,2" />
 
       {/* Coverage circles */}
       {positions.map((p, i) => (
-        <circle key={`c-${i}`} cx={p.x} cy={p.y} r={maxR} fill="#1B5745" opacity={0.06} stroke="#1B5745" strokeWidth={0.5} strokeDasharray="3,2" />
+        <circle key={`cov-${i}`} cx={p.x} cy={p.y} r={coverR} fill="#1B5745" opacity={0.06} stroke="#1B5745" strokeWidth={1} strokeDasharray="6,3" />
       ))}
 
-      {/* Extinguisher icons */}
+      {/* Distance annotations between adjacent fire points */}
+      {positions.length >= 2 && positions.slice(0, -1).map((p, i) => {
+        const next = positions[i + 1];
+        if (!next) return null;
+        const dist = Math.round(Math.sqrt(Math.pow((p.x - next.x) * mPerPx, 2) + Math.pow((p.y - next.y) * mPerPx, 2)));
+        const mx = (p.x + next.x) / 2;
+        const my = (p.y + next.y) / 2;
+        return (
+          <g key={`dist-${i}`}>
+            <line x1={p.x} y1={p.y} x2={next.x} y2={next.y} stroke="#94A3B8" strokeWidth={0.8} strokeDasharray="3,3" />
+            <rect x={mx - 14} y={my - 7} width={28} height={12} rx={2} fill="white" stroke="#CBD5E1" strokeWidth={0.5} />
+            <text x={mx} y={my + 2} textAnchor="middle" fontSize={7} fontWeight={600} fill="#64748B">{dist}m</text>
+          </g>
+        );
+      })}
+
+      {/* Fire point markers */}
       {positions.map((p, i) => (
-        <g key={`e-${i}`}>
-          <rect x={p.x - 5} y={p.y - 10} width={10} height={16} rx={2} fill="#EF4444" stroke="#B91C1C" strokeWidth={0.8} />
-          <rect x={p.x - 3} y={p.y - 12} width={6} height={3} rx={1} fill="#374151" />
-          <text x={p.x} y={p.y + 14} textAnchor="middle" fontSize={7} fontWeight={600} fill="#374151">#{i + 1}</text>
+        <g key={`fp-${i}`}>
+          {/* Outer ring */}
+          <circle cx={p.x} cy={p.y} r={14} fill="white" stroke="#DC2626" strokeWidth={2} />
+          {/* Inner fill */}
+          <circle cx={p.x} cy={p.y} r={10} fill="#FEE2E2" />
+          {/* Extinguisher icon */}
+          <rect x={p.x - 3} y={p.y - 6} width={6} height={10} rx={1.5} fill="#DC2626" />
+          <rect x={p.x - 2} y={p.y - 8} width={4} height={2.5} rx={0.8} fill="#7F1D1D" />
+          {/* Label */}
+          <rect x={p.x - 12} y={p.y + 16} width={24} height={12} rx={2} fill="#1E293B" />
+          <text x={p.x} y={p.y + 24} textAnchor="middle" fontSize={7} fontWeight={700} fill="white">{p.id}</text>
         </g>
       ))}
 
-      {/* Dimensions */}
-      <text x={ox + sw / 2} y={oy + sh + 16} textAnchor="middle" fontSize={8} fill="#6B7280">{Math.round(Math.sqrt(floorArea * aspect))}m</text>
-      <text x={ox - 12} y={oy + sh / 2} textAnchor="middle" fontSize={8} fill="#6B7280" transform={`rotate(-90, ${ox - 12}, ${oy + sh / 2})`}>{Math.round(Math.sqrt(floorArea / aspect))}m</text>
+      {/* Exit markers */}
+      {exits.map((ex, i) => (
+        <g key={`exit-${i}`}>
+          <rect x={ex.x - (i === 0 ? 3 : -3)} y={ex.y - 12} width={6} height={24} rx={1} fill="white" stroke="#374151" strokeWidth={1.5} />
+          <rect x={ex.x - (i === 0 ? 28 : -28)} y={ex.y - 8} width={25} height={16} rx={3} fill="#16A34A" />
+          <text x={ex.x - (i === 0 ? 16 : -16)} y={ex.y + 2} textAnchor="middle" fontSize={7} fontWeight={700} fill="white">EXIT</text>
+        </g>
+      ))}
 
-      {/* Legend */}
-      <g>
-        <rect x={ox} y={H - 20} width={8} height={8} rx={1} fill="#EF4444" stroke="#B91C1C" strokeWidth={0.5} />
-        <text x={ox + 12} y={H - 13} fontSize={8} fill="#6B7280">Extinguisher position</text>
-        <circle cx={ox + 140} cy={H - 16} r={6} fill="#1B5745" opacity={0.1} stroke="#1B5745" strokeWidth={0.5} strokeDasharray="2,1" />
-        <text x={ox + 150} y={H - 13} fontSize={8} fill="#6B7280">{travelDistance}m coverage radius</text>
-      </g>
+      {/* Dimension lines - bottom */}
+      <line x1={ox} y1={oy + drawH + 14} x2={ox + drawW} y2={oy + drawH + 14} stroke="#374151" strokeWidth={1} />
+      <line x1={ox} y1={oy + drawH + 8} x2={ox} y2={oy + drawH + 20} stroke="#374151" strokeWidth={1} />
+      <line x1={ox + drawW} y1={oy + drawH + 8} x2={ox + drawW} y2={oy + drawH + 20} stroke="#374151" strokeWidth={1} />
+      <text x={ox + drawW / 2} y={oy + drawH + 28} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151">{realW}m</text>
+
+      {/* Dimension lines - left */}
+      <line x1={ox - 14} y1={oy} x2={ox - 14} y2={oy + drawH} stroke="#374151" strokeWidth={1} />
+      <line x1={ox - 20} y1={oy} x2={ox - 8} y2={oy} stroke="#374151" strokeWidth={1} />
+      <line x1={ox - 20} y1={oy + drawH} x2={ox - 8} y2={oy + drawH} stroke="#374151" strokeWidth={1} />
+      <text x={ox - 24} y={oy + drawH / 2} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151" transform={`rotate(-90, ${ox - 24}, ${oy + drawH / 2})`}>{realH}m</text>
+
+      {/* Legend bar */}
+      <rect x={PAD.left} y={H - 48} width={W - PAD.left - PAD.right} height={38} rx={4} fill="#F1F5F9" stroke="#E2E8F0" strokeWidth={0.5} />
+
+      {/* Legend items */}
+      <circle cx={PAD.left + 20} cy={H - 29} r={7} fill="#FEE2E2" stroke="#DC2626" strokeWidth={1.5} />
+      <rect x={PAD.left + 17} y={H - 33} width={6} height={7} rx={1} fill="#DC2626" />
+      <text x={PAD.left + 34} y={H - 26} fontSize={9} fill="#374151" fontWeight={600}>Fire Point</text>
+
+      <circle cx={PAD.left + 130} cy={H - 29} r={8} fill="#1B5745" opacity={0.08} stroke="#1B5745" strokeWidth={1} strokeDasharray="3,2" />
+      <text x={PAD.left + 146} y={H - 26} fontSize={9} fill="#374151" fontWeight={600}>{travelDistance}m Coverage</text>
+
+      <rect x={PAD.left + 268} y={H - 35} width={16} height={12} rx={2} fill="#16A34A" />
+      <text x={PAD.left + 272} y={H - 27} fontSize={6} fontWeight={700} fill="white">EXIT</text>
+      <text x={PAD.left + 292} y={H - 26} fontSize={9} fill="#374151" fontWeight={600}>Emergency Exit</text>
+
+      <line x1={PAD.left + 400} y1={H - 29} x2={PAD.left + 420} y2={H - 29} stroke="#94A3B8" strokeWidth={0.8} strokeDasharray="3,2" />
+      <text x={PAD.left + 428} y={H - 26} fontSize={9} fill="#374151" fontWeight={600}>Distance</text>
+
+      <line x1={PAD.left + 500} y1={H - 35} x2={PAD.left + 500} y2={H - 23} stroke="#E5E7EB" strokeWidth={0.5} />
+      <text x={PAD.left + 510} y={H - 26} fontSize={8} fill="#9CA3AF">Grid: {gridSpacing}m</text>
+
+      {/* Scale bar */}
+      <text x={W - PAD.right} y={H - 8} textAnchor="end" fontSize={8} fill="#9CA3AF">NTS -- indicative layout only</text>
     </svg>
   );
 }
@@ -171,13 +268,15 @@ function TypeDistributionChart({ result }: { result: SelectorResult }) {
   if (counts.length === 0) return null;
 
   const total = counts.reduce((s, c) => s + c.qty, 0);
-  const W = 300, H = 240, cx = 120, cy = 120, r = 80, ir = 45;
+  const W = 700, H = 320;
+  const cx = 170, cy = 160, r = 120, ir = 68;
   let startAngle = -Math.PI / 2;
 
-  const COLORS = ["#EF4444", "#FDE68A", "#374151", "#3B82F6", "#EAB308", "#6366F1", "#F1F5F9"];
+  const COLORS = ["#EF4444", "#374151", "#3B82F6", "#EAB308", "#6366F1", "#F1F5F9", "#F97316"];
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 260 }}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 380 }}>
+      {/* Donut segments */}
       {counts.map((c, i) => {
         const angle = (c.qty / total) * Math.PI * 2;
         const endAngle = startAngle + angle;
@@ -189,19 +288,36 @@ function TypeDistributionChart({ result }: { result: SelectorResult }) {
         const color = COLORS[i % COLORS.length];
         const path = `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${largeArc} 0 ${ix1} ${iy1} Z`;
         startAngle = endAngle;
-        return <path key={i} d={path} fill={color} stroke="#fff" strokeWidth={2} opacity={0.85} />;
+        return <path key={i} d={path} fill={color} stroke="#fff" strokeWidth={3} opacity={0.9} />;
       })}
-      <text x={cx} y={cy - 4} textAnchor="middle" fontSize={18} fontWeight={700} fill="#1F2937">{total}</text>
-      <text x={cx} y={cy + 10} textAnchor="middle" fontSize={8} fill="#6B7280">Total Units</text>
 
-      {/* Legend */}
-      {counts.map((c, i) => (
-        <g key={i}>
-          <rect x={W - 140} y={30 + i * 22} width={12} height={12} rx={2} fill={COLORS[i % COLORS.length]} opacity={0.85} />
-          <text x={W - 124} y={40 + i * 22} fontSize={9} fill="#374151" fontWeight={600}>{c.type}</text>
-          <text x={W - 124} y={50 + i * 22} fontSize={8} fill="#6B7280">{c.qty} unit{c.qty > 1 ? "s" : ""} ({Math.round(c.qty / total * 100)}%)</text>
-        </g>
-      ))}
+      {/* Centre label */}
+      <circle cx={cx} cy={cy} r={ir - 6} fill="#F9FAFB" />
+      <text x={cx} y={cy - 8} textAnchor="middle" fontSize={32} fontWeight={800} fill="#1F2937">{total}</text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fontSize={11} fontWeight={500} fill="#6B7280">Total Units</text>
+
+      {/* Right-side legend */}
+      <line x1={340} y1={30} x2={340} y2={H - 30} stroke="#E5E7EB" strokeWidth={1} />
+      <text x={370} y={40} fontSize={11} fontWeight={700} fill="#374151" letterSpacing={1}>EXTINGUISHER TYPES</text>
+
+      {counts.map((c, i) => {
+        const ly = 70 + i * 50;
+        const pct = Math.round(c.qty / total * 100);
+        const color = COLORS[i % COLORS.length];
+        return (
+          <g key={i}>
+            {/* Colour swatch */}
+            <rect x={370} y={ly - 2} width={18} height={18} rx={4} fill={color} opacity={0.9} />
+            {/* Type name + qty */}
+            <text x={398} y={ly + 5} fontSize={13} fontWeight={700} fill="#1F2937">{c.type}</text>
+            <text x={398} y={ly + 18} fontSize={10} fill="#6B7280">{c.qty} unit{c.qty > 1 ? "s" : ""}</text>
+            {/* Percentage bar */}
+            <rect x={540} y={ly} width={120} height={14} rx={3} fill="#F3F4F6" />
+            <rect x={540} y={ly} width={Math.max(4, 120 * pct / 100)} height={14} rx={3} fill={color} opacity={0.7} />
+            <text x={545 + Math.max(4, 120 * pct / 100) + 4} y={ly + 10} fontSize={10} fontWeight={600} fill="#6B7280">{pct}%</text>
+          </g>
+        );
+      })}
     </svg>
   );
 }
@@ -829,20 +945,20 @@ export default function FireExtinguisherSelectorClient() {
             ))}
           </div>
 
-          {/* Distribution Chart + Siting Diagram */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="border border-gray-200 rounded-xl p-4">
-              <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-3">Type Distribution</div>
-              <TypeDistributionChart result={result} />
-            </div>
-            <div className="border border-gray-200 rounded-xl p-4">
-              <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-3">Siting Coverage</div>
-              <SitingCoverageDiagram
-                floorArea={totalArea}
-                extinguisherCount={result.totalExtinguishers}
-                travelDistance={areas[0]?.travelDistance || 30}
-              />
-            </div>
+          {/* Distribution Chart */}
+          <div className="border border-gray-200 rounded-xl p-5">
+            <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-4">Type Distribution</div>
+            <TypeDistributionChart result={result} />
+          </div>
+
+          {/* Siting Plan */}
+          <div className="border border-gray-200 rounded-xl p-5">
+            <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-4">Siting Coverage Plan</div>
+            <SitingCoverageDiagram
+              floorArea={totalArea}
+              extinguisherCount={result.totalExtinguishers}
+              travelDistance={areas[0]?.travelDistance || 30}
+            />
           </div>
 
           {/* Suitability Matrix SVG */}
