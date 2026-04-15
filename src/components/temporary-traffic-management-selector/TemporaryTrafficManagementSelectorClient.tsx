@@ -1,17 +1,18 @@
 // src/components/temporary-traffic-management-selector/TemporaryTrafficManagementSelectorClient.tsx
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 import {
-  ROAD_TYPES, WORKS_LOCATIONS, WORKS_DURATIONS, SIGNING_DISTANCES,
+  ROAD_TYPES, WORKS_LOCATIONS, WORKS_DURATIONS,
   TM_LAYOUTS, SCORING_FACTORS, RISK_BANDS, NHSS_REQUIREMENTS,
-  DEPLOYMENT_CHECKLIST,
+  DEPLOYMENT_CHECKLIST, REGULATORY_REFERENCES,
   getSigningForSpeed, getNHSSRequirement, selectLayout, getNeighbourLayouts,
   calculateComplexityScore, getOperativesRequired, getSigningSchedule,
   generateWarnings, generateRecommendations, generateCrossReferences,
+  autoSyncSelections, getNRSWANote,
 } from "@/data/temporary-traffic-management-selector";
-import type { RoadType, TMLayout, RiskBand, SigningDistance, TMResult } from "@/data/temporary-traffic-management-selector";
+import type { RoadType, TMLayout, SigningDistance, TMResult } from "@/data/temporary-traffic-management-selector";
 
 function todayISO() { return new Date().toISOString().slice(0, 10); }
 
@@ -249,7 +250,7 @@ async function exportPDF(
       doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
       doc.text("TTM ASSESSMENT (continued)", M, 7);
       doc.setFontSize(6); doc.setFont("helvetica", "normal");
-      doc.text(`${docRef} | ${header.site || ""}`, W - M - 55, 7);
+      doc.text(header.site ? `${docRef} | ${header.site}` : docRef, W - M - 55, 7);
       doc.setTextColor(0, 0, 0); y = 14;
     }
   }
@@ -289,24 +290,65 @@ async function exportPDF(
     ["Night Works", nightWorks ? "Yes" : "No"],
     ["Pedestrian Diversion", pedestrianDiversion ? "Yes" : "No"],
   ];
-  summaryItems.forEach(([label, value]) => {
+  summaryItems.forEach(([label, value], si) => {
     doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
     doc.text(label + ":", M + 4, y);
-    doc.setTextColor(17, 24, 39); doc.setFont("helvetica", "normal");
+    if (si === 8) { doc.setTextColor(rgb[0], rgb[1], rgb[2]); }
+    else { doc.setTextColor(17, 24, 39); }
+    doc.setFont("helvetica", "normal");
     const valLines = doc.splitTextToSize(value, CW - 68);
     doc.text(valLines[0], M + 60, y);
     doc.setTextColor(0, 0, 0); y += 3.8;
   });
   y += 6;
 
+  // ── Layout Schematic (drawn in jsPDF)
+  checkPage(50);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+  doc.text("Layout Schematic (not to scale)", M, y); y += 4;
+  const s = result.signing;
+  const schScale = Math.min(1, (CW - 10) / (s.totalLeadInM + 60 + s.exitTaperM));
+  const schX0 = M + 5;
+  const roadTop = y + 4;
+  const rdH = 14, lnH = 7;
+  doc.setFillColor(230, 230, 230); doc.rect(M, roadTop, CW, rdH, "F");
+  doc.setDrawColor(180, 180, 180); doc.line(M, roadTop + lnH, M + CW, roadTop + lnH);
+  // Taper
+  const tS = schX0 + s.advanceSignM * schScale;
+  const tE = tS + s.leadInTaperM * schScale;
+  doc.setFillColor(249, 115, 22); doc.setDrawColor(249, 115, 22);
+  doc.triangle(tS, roadTop, tE, roadTop + lnH, tE, roadTop, "F");
+  // Safety zone
+  if (s.safetyZoneM > 0) {
+    const szE = tE + s.safetyZoneM * schScale;
+    doc.setFillColor(191, 219, 254); doc.rect(tE, roadTop, szE - tE, lnH, "F");
+    doc.setFontSize(4); doc.setTextColor(59, 130, 246);
+    doc.text(`Safety ${s.safetyZoneM}m`, (tE + szE) / 2, roadTop + lnH / 2 + 1.5, { align: "center" });
+  }
+  const szEnd = tE + s.safetyZoneM * schScale;
+  const wEnd = szEnd + 30 * schScale;
+  doc.setFillColor(254, 202, 202); doc.rect(szEnd, roadTop, wEnd - szEnd, lnH, "F");
+  doc.setFontSize(5); doc.setTextColor(239, 68, 68); doc.setFont("helvetica", "bold");
+  doc.text("WORKS", (szEnd + wEnd) / 2, roadTop + lnH / 2 + 1.5, { align: "center" });
+  const exEnd = wEnd + s.exitTaperM * schScale;
+  doc.setFillColor(187, 247, 208); doc.triangle(wEnd, roadTop + lnH, exEnd, roadTop, exEnd, roadTop + lnH, "F");
+  doc.setTextColor(0, 0, 0); doc.setFontSize(5); doc.setFont("helvetica", "normal");
+  if (s.advanceSignM > 0) doc.text(`Sign ${s.advanceSignM}m`, schX0, roadTop + rdH + 4);
+  doc.text(`Taper ${s.leadInTaperM}m`, tS, roadTop + rdH + 4);
+  doc.text(`Exit ${s.exitTaperM}m`, wEnd, roadTop + rdH + 4);
+  doc.setFont("helvetica", "bold"); doc.setFontSize(5.5);
+  doc.text(`Total: ${s.totalLeadInM + 60 + s.exitTaperM}m | Cones: ${s.coneSpacingM}m spacing | ${speedMph >= 50 ? "750mm" : "450mm"} min height`, M, roadTop + rdH + 9);
+  doc.setFont("helvetica", "normal"); doc.setDrawColor(200, 200, 200);
+  y = roadTop + rdH + 14;
+
   // ── Signing Dimensions Table
   checkPage(35);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("Signing Dimensions (per Safety at Street Works CoP Table A1)", M, y); y += 5;
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+  doc.text("Signing Dimensions (Safety at Street Works CoP Table A1)", M, y); y += 5;
 
-  const dimCols = [46, 36, 36, 36, 28];
+  const dimCols = [48, 28, 28, 28, CW - 132];
   let cx = M;
-  ["Dimension", "Distance (m)", "Cone Spacing", "Cone Height", "Notes"].forEach((h, i) => {
+  ["Dimension", "Dist. (m)", "Cone Gap", "Cone Ht", "Notes"].forEach((h, i) => {
     doc.setFillColor(30, 30, 30); doc.rect(cx, y, dimCols[i], 6, "F");
     doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(6);
     doc.text(h, cx + 2, y + 4); cx += dimCols[i];
@@ -314,14 +356,13 @@ async function exportPDF(
   doc.setTextColor(0, 0, 0); y += 6;
   doc.setDrawColor(200, 200, 200);
 
-  const s = result.signing;
   const coneHt = speedMph >= 50 ? "750mm min" : "450mm min";
   const dimRows = [
-    ["Advance signing distance", `${s.advanceSignM}`, `${s.coneSpacingM}m`, coneHt, "Both directions"],
-    ["Lead-in taper length", `${s.leadInTaperM}`, `${s.coneSpacingM}m`, coneHt, "Diagonal"],
+    ["Advance signing distance", `${s.advanceSignM}`, `${s.coneSpacingM}m`, coneHt, "Both approaches"],
+    ["Lead-in taper length", `${s.leadInTaperM}`, `${s.coneSpacingM}m`, coneHt, "Diagonal taper"],
     ["Longitudinal safety zone", `${s.safetyZoneM}`, "-", "-", "No works in zone"],
     ["Exit taper length", `${s.exitTaperM}`, `${s.coneSpacingM}m`, coneHt, ""],
-    ["Total lead-in distance", `${s.totalLeadInM}`, "-", "-", "Sign to works"],
+    ["Total lead-in distance", `${s.totalLeadInM}`, "-", "-", "Sign to works start"],
   ];
   dimRows.forEach((row, ri) => {
     checkPage(6);
@@ -336,42 +377,30 @@ async function exportPDF(
   });
   y += 6;
 
-  // ── Complexity Scoring Breakdown
-  checkPage(50);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  // ── Complexity Bar Chart (drawn in jsPDF)
+  checkPage(65);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
   doc.text("Complexity Scoring Breakdown", M, y); y += 5;
 
-  const scoreCols = [42, 50, 24, 24, 42];
-  cx = M;
-  ["Factor", "Selection", "Weight", "Score", "Max"].forEach((h, i) => {
-    doc.setFillColor(30, 30, 30); doc.rect(cx, y, scoreCols[i], 6, "F");
-    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(6);
-    doc.text(h, cx + 2, y + 4); cx += scoreCols[i];
+  const barX = M + 42, barMaxW = CW - 60;
+  result.factorScores.forEach((f) => {
+    checkPage(8);
+    doc.setFontSize(5.5); doc.setFont("helvetica", "bold"); doc.setTextColor(55, 65, 81);
+    doc.text(f.label, M + 2, y + 3.5);
+    doc.setFillColor(243, 244, 246); doc.rect(barX, y, barMaxW, 5, "F");
+    const ratio = f.maxScore > 0 ? f.score / f.maxScore : 0;
+    const hex = f.color;
+    const rr = parseInt(hex.slice(1, 3), 16), gg = parseInt(hex.slice(3, 5), 16), bb = parseInt(hex.slice(5, 7), 16);
+    doc.setFillColor(rr, gg, bb); doc.rect(barX, y, Math.max(ratio * barMaxW, 1), 5, "F");
+    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(5);
+    doc.text(`${f.score.toFixed(1)} / ${f.maxScore.toFixed(1)} (${f.selectedLabel})`, barX + ratio * barMaxW + 2, y + 3.5);
+    y += 7;
   });
-  doc.setTextColor(0, 0, 0); y += 6;
-  doc.setDrawColor(200, 200, 200);
-
-  result.factorScores.forEach((f, ri) => {
-    checkPage(6);
-    cx = M;
-    const cells = [f.label, f.selectedLabel, `x${f.weight}`, f.score.toFixed(1), f.maxScore.toFixed(1)];
-    cells.forEach((t, i) => {
-      if (ri % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, scoreCols[i], 5.5, "FD"); }
-      else { doc.rect(cx, y, scoreCols[i], 5.5, "D"); }
-      doc.setTextColor(0, 0, 0); doc.setFont("helvetica", i === 0 ? "bold" : "normal"); doc.setFontSize(5.5);
-      const truncT = t.length > (scoreCols[i] / 2.5) ? t.slice(0, Math.floor(scoreCols[i] / 2.5)) + ".." : t;
-      doc.text(truncT, cx + 2, y + 3.8); cx += scoreCols[i];
-    });
-    y += 5.5;
-  });
-  // Total row
-  cx = M;
-  ["TOTAL", "", "", String(result.complexityScore), String(result.maxComplexity)].forEach((t, i) => {
-    doc.setFillColor(245, 245, 245); doc.setDrawColor(200, 200, 200);
-    doc.rect(cx, y, scoreCols[i], 6, "FD");
-    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold"); doc.setFontSize(6);
-    doc.text(t, cx + 2, y + 4); cx += scoreCols[i];
-  });
+  // Total bar
+  doc.setFillColor(245, 245, 245); doc.setDrawColor(200, 200, 200);
+  doc.rect(M, y, CW, 6, "FD");
+  doc.setFontSize(6); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+  doc.text(`TOTAL: ${result.complexityScore} / ${result.maxComplexity} -- ${result.riskBand.label}`, M + 4, y + 4);
   y += 10;
 
   // ── Signing Schedule
@@ -379,7 +408,7 @@ async function exportPDF(
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
   doc.text("Signing Schedule", M, y); y += 5;
 
-  const ssCols = [48, 38, 34, CW - 120];
+  const ssCols = [52, 34, 34, CW - 120];
   cx = M;
   ["Sign / Element", "Position", "Distance", "Notes"].forEach((h, i) => {
     doc.setFillColor(30, 30, 30); doc.rect(cx, y, ssCols[i], 6, "F");
@@ -390,17 +419,18 @@ async function exportPDF(
   doc.setDrawColor(200, 200, 200);
 
   result.signingSchedule.forEach((entry, ri) => {
-    checkPage(6);
+    checkPage(9);
     cx = M;
     [entry.sign, entry.position, entry.distance, entry.notes].forEach((t, i) => {
-      if (ri % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, ssCols[i], 5.5, "FD"); }
-      else { doc.rect(cx, y, ssCols[i], 5.5, "D"); }
+      if (ri % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, ssCols[i], 7, "FD"); }
+      else { doc.rect(cx, y, ssCols[i], 7, "D"); }
       doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); doc.setFontSize(5);
-      const maxChars = Math.floor(ssCols[i] / 2);
-      const trunc = t.length > maxChars ? t.slice(0, maxChars - 2) + ".." : t;
-      doc.text(trunc, cx + 1.5, y + 3.8); cx += ssCols[i];
+      const lines = doc.splitTextToSize(t, ssCols[i] - 3);
+      doc.text(lines[0], cx + 1.5, y + 3.5);
+      if (lines[1]) doc.text(lines[1], cx + 1.5, y + 6);
+      cx += ssCols[i];
     });
-    y += 5.5;
+    y += 7;
   });
   y += 6;
 
@@ -494,9 +524,11 @@ async function exportPDF(
     doc.setDrawColor(200, 200, 200);
 
     const compRows = [
-      ["Name", ...allLayouts.map(l => l.name.slice(0, 30))],
+      ["Name", ...allLayouts.map(l => l.name.length > 28 ? l.name.slice(0, 26) + ".." : l.name)],
       ["Min Operatives", ...allLayouts.map(l => String(l.operativeMin))],
       ["Speed Range", ...allLayouts.map(l => `${l.minSpeed}-${l.maxSpeed} mph`)],
+      ["Key Features", ...allLayouts.map(l => l.keyFeatures.slice(0, 2).join("; "))],
+      ["NHSS", ...allLayouts.map(l => { const nh = getNHSSRequirement(roadType, speedMph, l); return nh.level === "none" ? "None" : nh.level === "12a" ? "12D" : "12A/B"; })],
     ];
     compRows.forEach((row, ri) => {
       checkPage(6);
@@ -517,42 +549,30 @@ async function exportPDF(
     y += 6;
   }
 
-  // ── Risk Band Key
-  checkPage(25);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  // ── Risk Band Key (wide colour blocks)
+  checkPage(30);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
   doc.text("Complexity Risk Bands", M, y); y += 5;
   RISK_BANDS.forEach(band => {
-    checkPage(6);
+    checkPage(10);
     const bRGB = bandColorMap[band.label] || [100, 100, 100];
     doc.setFillColor(bRGB[0], bRGB[1], bRGB[2]);
-    doc.rect(M + 2, y - 2, 4, 4, "F");
-    doc.setFontSize(6); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-    doc.text(`${band.label} (${band.min}-${band.max})`, M + 9, y);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(5.5);
-    const descLines = doc.splitTextToSize(band.description, CW - 60);
-    doc.text(descLines[0], M + 60, y);
-    y += 5;
+    doc.roundedRect(M + 2, y - 2, CW - 4, 8, 1, 1, "F");
+    doc.setTextColor(255, 255, 255); doc.setFontSize(6); doc.setFont("helvetica", "bold");
+    doc.text(`${band.label} (${band.min}-${band.max})`, M + 5, y + 2);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(5);
+    const descLines = doc.splitTextToSize(band.description, CW - 55);
+    doc.text(descLines[0], M + 55, y + 2);
+    doc.setTextColor(0, 0, 0); y += 10;
   });
-  y += 4;
+  y += 2;
 
   // ── Regulatory References
-  checkPage(20);
-  doc.setFontSize(9); doc.setFont("helvetica", "bold");
+  checkPage(30);
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
   doc.text("Regulatory References", M, y); y += 5;
   doc.setFontSize(6); doc.setFont("helvetica", "normal");
-  const regs = [
-    "Traffic Signs Manual Chapter 8 Part 1 (Design) and Part 2 (Operations) - 2009 Edition",
-    "Safety at Street Works and Road Works - A Code of Practice (2013)",
-    "New Roads and Street Works Act 1991 (NRSWA) - s.54, s.55, s.74",
-    "Traffic Management Act 2004 - Part 3 (Permit Schemes)",
-    "Traffic Signs Regulations and General Directions (TSRGD) 2016",
-    "GG 104 - Requirements for safety at roadworks on motorways and high speed dual carriageways",
-    "CD 122 - Geometric design of roundabouts (was IAN 115/08)",
-    "NHSS Sector Scheme 12A/12B - National Highway Sector Schemes",
-    "MHSWR 1999 - Management of Health and Safety at Work Regulations",
-    "Highways Act 1980 - s.148 (penalty for depositing things on highway)",
-  ];
-  regs.forEach(r => {
+  REGULATORY_REFERENCES.forEach(r => {
     checkPage(4);
     doc.text(`- ${r}`, M + 2, y); y += 3.2;
   });
@@ -604,6 +624,7 @@ export default function TemporaryTrafficManagementSelectorClient() {
   const [assessDate, setAssessDate] = useState(todayISO());
   const [showSettings, setShowSettings] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [showChecklist, setShowChecklist] = useState(false);
 
   // Inputs
   const [roadTypeId, setRoadTypeId] = useState("single-a");
@@ -613,15 +634,17 @@ export default function TemporaryTrafficManagementSelectorClient() {
   const [nightWorks, setNightWorks] = useState(false);
   const [pedestrianDiversion, setPedestrianDiversion] = useState(false);
 
-  // Scoring selections (index-based)
-  const [selections, setSelections] = useState<Record<string, number>>({
-    "road-speed": 2, "road-type": 4, "works-location": 3,
-    "duration": 2, "lane-closures": 2, "pedestrian": 1, "night-works": 0,
-  });
+  // Scoring selections (index-based) — initialised from auto-sync
+  const [selections, setSelections] = useState<Record<string, number>>(() =>
+    autoSyncSelections("single-a", 30, "nearside-lane", "minor", false, false)
+  );
+
+  // FIX: Auto-sync scoring factors when inputs change
+  useEffect(() => {
+    setSelections(autoSyncSelections(roadTypeId, speedMph, worksLocationId, durationId, nightWorks, pedestrianDiversion));
+  }, [roadTypeId, speedMph, worksLocationId, durationId, nightWorks, pedestrianDiversion]);
 
   const roadType = useMemo(() => ROAD_TYPES.find(r => r.id === roadTypeId) || ROAD_TYPES[4], [roadTypeId]);
-
-  // Auto-update speed when road type changes
   const availableSpeeds = roadType.availableSpeeds;
 
   const signing = useMemo(() => getSigningForSpeed(speedMph), [speedMph]);
@@ -629,12 +652,14 @@ export default function TemporaryTrafficManagementSelectorClient() {
   const neighbours = useMemo(() => getNeighbourLayouts(layout), [layout]);
   const nhss = useMemo(() => getNHSSRequirement(roadType, speedMph, layout), [roadType, speedMph, layout]);
   const nrswa = useMemo(() => WORKS_DURATIONS.find(d => d.id === durationId) || WORKS_DURATIONS[3], [durationId]);
+  const nrswaNote = useMemo(() => getNRSWANote(roadType), [roadType]);
   const operatives = useMemo(() => getOperativesRequired(layout, nightWorks, pedestrianDiversion), [layout, nightWorks, pedestrianDiversion]);
   const complexity = useMemo(() => calculateComplexityScore(selections), [selections]);
   const signingSchedule = useMemo(() => getSigningSchedule(speedMph, layout, signing, pedestrianDiversion, nightWorks), [speedMph, layout, signing, pedestrianDiversion, nightWorks]);
   const warnings = useMemo(() => generateWarnings(roadType, speedMph, layout, nightWorks, pedestrianDiversion), [roadType, speedMph, layout, nightWorks, pedestrianDiversion]);
   const recommendations = useMemo(() => generateRecommendations(roadType, speedMph, layout, nhss, complexity.band), [roadType, speedMph, layout, nhss, complexity.band]);
   const crossRefs = useMemo(() => generateCrossReferences(layout, pedestrianDiversion), [layout, pedestrianDiversion]);
+  const totalSigningLength = signing.totalLeadInM + 60 + signing.exitTaperM;
 
   const result: TMResult = useMemo(() => ({
     layout, neighbourLayouts: neighbours, signing, nrswaNotice: nrswa,
@@ -653,19 +678,20 @@ export default function TemporaryTrafficManagementSelectorClient() {
   const clearAll = useCallback(() => {
     setRoadTypeId("single-a"); setSpeedMph(30); setWorksLocationId("nearside-lane");
     setDurationId("minor"); setNightWorks(false); setPedestrianDiversion(false);
-    setSelections({ "road-speed": 2, "road-type": 4, "works-location": 3, "duration": 2, "lane-closures": 2, "pedestrian": 1, "night-works": 0 });
+    setSelections(autoSyncSelections("single-a", 30, "nearside-lane", "minor", false, false));
     setCompany(""); setSite(""); setManager(""); setAssessedBy(""); setAssessDate(todayISO());
   }, []);
 
   return (
     <div className="space-y-5">
       {/* ── Summary Cards ─────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {[
-          { label: "Layout", value: layout.ref, sub: layout.name.length > 40 ? layout.name.slice(0, 38) + ".." : layout.name, bgClass: "bg-blue-50", textClass: "text-blue-800", borderClass: "border-blue-200", dotClass: "bg-blue-500" },
+          { label: "Layout", value: layout.ref, sub: layout.name.length > 35 ? layout.name.slice(0, 33) + ".." : layout.name, bgClass: "bg-blue-50", textClass: "text-blue-800", borderClass: "border-blue-200", dotClass: "bg-blue-500" },
           { label: "Complexity", value: `${complexity.score}/${complexity.max}`, sub: complexity.band.label, ...complexity.band },
           { label: "NHSS Level", value: nhss.level === "none" ? "N/A" : nhss.level === "12a" ? "12D" : "12A/B", sub: nhss.label, bgClass: nhss.level === "none" ? "bg-emerald-50" : nhss.level === "both" ? "bg-red-50" : "bg-amber-50", textClass: nhss.level === "none" ? "text-emerald-800" : nhss.level === "both" ? "text-red-800" : "text-amber-800", borderClass: nhss.level === "none" ? "border-emerald-200" : nhss.level === "both" ? "border-red-200" : "border-amber-200", dotClass: nhss.level === "none" ? "bg-emerald-500" : nhss.level === "both" ? "bg-red-500" : "bg-amber-500" },
           { label: "Operatives", value: String(operatives), sub: `Min. ${layout.operativeMin} for this layout`, bgClass: "bg-purple-50", textClass: "text-purple-800", borderClass: "border-purple-200", dotClass: "bg-purple-500" },
+          { label: "Total Length", value: `${totalSigningLength}m`, sub: "Sign + taper + safety + works + exit", bgClass: "bg-cyan-50", textClass: "text-cyan-800", borderClass: "border-cyan-200", dotClass: "bg-cyan-500" },
         ].map(c => (
           <div key={c.label} className={`border rounded-xl p-4 ${c.bgClass} ${c.borderClass}`}>
             <div className="flex items-center gap-2 mb-2">
@@ -852,6 +878,7 @@ export default function TemporaryTrafficManagementSelectorClient() {
           <div className="bg-blue-50 rounded-lg p-3"><span className="font-bold text-blue-700 uppercase tracking-wide block text-[10px]">Max Duration</span><span className="text-sm font-bold text-blue-900">{nrswa.maxDays === 999 ? "No limit" : `${nrswa.maxDays} days`}</span></div>
         </div>
         <p className="text-xs text-gray-600">{nrswa.description}</p>
+        {nrswaNote && <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">{nrswaNote}</div>}
       </div>
 
       {/* ── NHSS Requirements ─────────────────────────────── */}
@@ -906,6 +933,31 @@ export default function TemporaryTrafficManagementSelectorClient() {
         </div>
       )}
 
+      {/* ── Deployment Checklist (collapsible) ────────────── */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <button onClick={() => setShowChecklist(!showChecklist)} className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors">
+          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">TM Deployment Checklist ({DEPLOYMENT_CHECKLIST.length} items)</h3>
+          <svg className={`w-5 h-5 text-gray-400 transition-transform ${showChecklist ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        </button>
+        {showChecklist && (
+          <div className="px-5 pb-5 space-y-4">
+            {[...new Set(DEPLOYMENT_CHECKLIST.map(c => c.category))].map(cat => (
+              <div key={cat}>
+                <div className="text-xs font-bold text-ebrora uppercase tracking-wide mb-2">{cat}</div>
+                <div className="space-y-1.5">
+                  {DEPLOYMENT_CHECKLIST.filter(c => c.category === cat).map(item => (
+                    <div key={item.id} className="flex items-start gap-2 text-xs">
+                      <input type="checkbox" className="w-3.5 h-3.5 rounded border-gray-300 text-ebrora mt-0.5" />
+                      <div className="flex-1"><span className="text-gray-800">{item.item}</span><span className="text-gray-400 ml-2 text-[10px]">{item.regulation}</span></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* ── Recommendations ───────────────────────────────── */}
       <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-2">
         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-2">Recommendations</h3>
@@ -943,7 +995,7 @@ export default function TemporaryTrafficManagementSelectorClient() {
       {/* ── Regulatory References ─────────────────────────── */}
       <div className="text-[10px] text-gray-400 space-y-0.5 px-1">
         <div>Chapter 8 Traffic Signs Manual (2009) | Safety at Street Works and Road Works Code of Practice (2013)</div>
-        <div>NRSWA 1991 | TMA 2004 | TSRGD 2016 | GG 104 | CD 122 | NHSS 12A/12B | MHSWR 1999</div>
+        <div>NRSWA 1991 | TMA 2004 | TSRGD 2016 | GG 104 | NHSS 12A/B &amp; 12D | MHSWR 1999</div>
       </div>
     </div>
   );
