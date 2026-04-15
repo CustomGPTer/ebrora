@@ -24,6 +24,7 @@ import {
 } from '@/lib/ai-tools';
 import { getConversationPrompt } from '@/lib/ai-tools/system-prompts';
 import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
+import { checkDailyFairUsage } from '@/lib/fair-usage';
 import { getCrpTemplateConversationPrompt } from '@/lib/carbon-reduction/crp-prompts';
 import { getCarbonFootprintTemplateConversationPrompt } from '@/lib/carbon-footprint/cf-prompts';
 import { getDayworkSheetTemplateConversationPrompt } from '@/lib/daywork-sheet/dw-prompts';
@@ -208,6 +209,23 @@ export async function POST(req: NextRequest) {
               : tier === 'FREE'
                 ? 'Sign up for a paid plan to generate more documents each month.'
                 : 'Your monthly limit resets at the start of next month, or upgrade your plan for a higher limit.',
+          },
+          { status: 429 }
+        );
+      }
+
+      // Daily fair-usage check (Unlimited plan only)
+      const fairUsage = await checkDailyFairUsage(user.id, tier, 'aiTools');
+      if (!fairUsage.allowed) {
+        return NextResponse.json(
+          {
+            error: 'Daily fair-usage limit reached',
+            limitReached: true,
+            used: fairUsage.used,
+            limit: fairUsage.limit,
+            tier,
+            isFairUsage: true,
+            message: fairUsage.message,
           },
           { status: 429 }
         );
