@@ -9,6 +9,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TIER_LIMITS } from "@/lib/constants";
 import { resolveEffectiveTier } from "@/lib/payments/resolve-tier";
+import { checkDailyFairUsage } from "@/lib/fair-usage";
 
 // ─── In-memory IP rate limiter (abuse prevention, not primary limit) ─────────
 const IP_DAILY_LIMIT = 10; // generous daily cap per IP as abuse prevention
@@ -108,6 +109,23 @@ export async function POST(request: NextRequest) {
           { status: 429 }
         );
       }
+    }
+
+    // Daily fair-usage check (Unlimited plan only)
+    const fairUsage = await checkDailyFairUsage(session.user.id, tier, 'tbtDownloads');
+    if (!fairUsage.allowed) {
+      return NextResponse.json(
+        {
+          error: "Daily fair-usage limit reached",
+          code: "FAIR_USAGE_LIMIT",
+          used: fairUsage.used,
+          limit: fairUsage.limit,
+          tier,
+          isFairUsage: true,
+          message: fairUsage.message,
+        },
+        { status: 429 }
+      );
     }
 
     // IP abuse prevention (secondary)
