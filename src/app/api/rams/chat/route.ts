@@ -21,6 +21,7 @@ import { getRamsLimitByTier } from '@/lib/payments/plan-config';
 import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
 import { FREE_TEMPLATES } from '@/lib/rams/template-config';
 import { getRamsUsageThisMonth } from '@/lib/rams/usage';
+import { checkDailyFairUsage } from '@/lib/fair-usage';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -209,6 +210,23 @@ export async function POST(req: NextRequest) {
               tier === 'FREE'
                 ? 'Sign up for a paid plan to generate more RAMS each month.'
                 : 'Your monthly limit resets at the start of next month, or upgrade your plan for a higher limit.',
+          },
+          { status: 429 }
+        );
+      }
+
+      // Daily fair-usage check (Unlimited plan only)
+      const fairUsage = await checkDailyFairUsage(user.id, tier, 'rams');
+      if (!fairUsage.allowed) {
+        return NextResponse.json(
+          {
+            error: 'Daily fair-usage limit reached',
+            limitReached: true,
+            used: fairUsage.used,
+            limit: fairUsage.limit,
+            tier,
+            isFairUsage: true,
+            message: fairUsage.message,
           },
           { status: 429 }
         );
