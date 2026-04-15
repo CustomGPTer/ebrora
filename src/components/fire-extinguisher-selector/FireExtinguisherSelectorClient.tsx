@@ -96,52 +96,78 @@ function ExtinguisherBandDiagram() {
 // ─── SVG: Siting Coverage Diagram ────────────────────────────────
 function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }: { floorArea: number; extinguisherCount: number; travelDistance: number }) {
   const W = 700, H = 440;
-  const PAD = { top: 55, right: 40, bottom: 65, left: 55 };
+  const PAD = { top: 55, right: 50, bottom: 65, left: 60 };
   const planW = W - PAD.left - PAD.right;
   const planH = H - PAD.top - PAD.bottom;
 
-  // Floor dimensions
-  const aspect = Math.min(2.5, Math.max(1, Math.sqrt(floorArea) / 8));
-  const realW = Math.round(Math.sqrt(floorArea * aspect));
-  const realH = Math.round(floorArea / realW);
-  const mPerPx = Math.max(realW / planW, realH / planH);
-  const drawW = realW / mPerPx;
-  const drawH = realH / mPerPx;
+  // Floor dimensions — sensible aspect ratio
+  const rawAspect = Math.min(2.2, Math.max(1.2, 1 + floorArea / 800));
+  const realW = Math.round(Math.sqrt(floorArea * rawAspect));
+  const realH = Math.max(4, Math.round(floorArea / realW));
+
+  // Scale to fit plan area with margin
+  const scaleX = planW / realW;
+  const scaleY = planH / realH;
+  const scale = Math.min(scaleX, scaleY) * 0.92;
+  const drawW = realW * scale;
+  const drawH = realH * scale;
   const ox = PAD.left + (planW - drawW) / 2;
   const oy = PAD.top + (planH - drawH) / 2;
 
-  // Grid spacing (5m grid)
-  const gridSpacing = 5;
-  const gridPxX = gridSpacing / mPerPx;
-  const gridPxY = gridSpacing / mPerPx;
+  // Metres to pixels
+  const m2px = (m: number) => m * scale;
 
-  // Place extinguishers in optimal positions
-  const positions: { x: number; y: number; id: string }[] = [];
-  const cols = Math.max(1, Math.ceil(Math.sqrt(extinguisherCount * (realW / realH))));
-  const rows = Math.max(1, Math.ceil(extinguisherCount / cols));
-  let idx = 0;
-  for (let r = 0; r < rows && idx < extinguisherCount; r++) {
-    for (let c = 0; c < cols && idx < extinguisherCount; c++) {
-      positions.push({
-        x: ox + (drawW / (cols + 1)) * (c + 1),
-        y: oy + (drawH / (rows + 1)) * (r + 1),
-        id: `FP${idx + 1}`,
-      });
-      idx++;
+  // Grid spacing — adaptive: 2m for small, 5m for medium, 10m for large
+  const gridM = realW <= 15 ? 2 : realW <= 40 ? 5 : 10;
+  const gridPx = m2px(gridM);
+
+  // Place fire points in a 2D staggered grid filling the space
+  const positions: { x: number; y: number; id: string; realX: number; realY: number }[] = [];
+  const n = Math.max(1, extinguisherCount);
+
+  if (n === 1) {
+    positions.push({ x: ox + drawW / 2, y: oy + drawH / 2, id: "FP1", realX: realW / 2, realY: realH / 2 });
+  } else if (n === 2) {
+    const inset = 0.25;
+    positions.push({ x: ox + drawW * inset, y: oy + drawH * 0.5, id: "FP1", realX: realW * inset, realY: realH * 0.5 });
+    positions.push({ x: ox + drawW * (1 - inset), y: oy + drawH * 0.5, id: "FP2", realX: realW * (1 - inset), realY: realH * 0.5 });
+  } else {
+    // Distribute in a grid that respects the floor aspect ratio
+    const cols = Math.max(2, Math.ceil(Math.sqrt(n * (realW / realH))));
+    const rows = Math.max(1, Math.ceil(n / cols));
+    const insetX = drawW * 0.12;
+    const insetY = drawH * 0.15;
+    const spaceX = cols > 1 ? (drawW - 2 * insetX) / (cols - 1) : 0;
+    const spaceY = rows > 1 ? (drawH - 2 * insetY) / (rows - 1) : 0;
+    let idx = 0;
+    for (let r = 0; r < rows && idx < n; r++) {
+      const colsInRow = r === rows - 1 && n % cols !== 0 ? n % cols : Math.min(cols, n - idx);
+      const rowInsetX = cols > 1 && colsInRow < cols ? insetX + (cols - colsInRow) * spaceX / 2 : insetX;
+      const rowSpaceX = colsInRow > 1 ? (drawW - 2 * rowInsetX) / (colsInRow - 1) : 0;
+      for (let c = 0; c < colsInRow && idx < n; c++) {
+        const px = colsInRow === 1 ? ox + drawW / 2 : ox + rowInsetX + c * rowSpaceX;
+        const py = rows === 1 ? oy + drawH / 2 : oy + insetY + r * spaceY;
+        const rx = (px - ox) / scale;
+        const ry = (py - oy) / scale;
+        positions.push({ x: px, y: py, id: `FP${idx + 1}`, realX: rx, realY: ry });
+        idx++;
+      }
     }
   }
 
-  // Coverage radius in px
-  const coverR = Math.min(travelDistance, 30) / mPerPx;
+  // Coverage radius — clamp visual size so circles are visible but don't dwarf the plan
+  const rawCoverPx = m2px(Math.min(travelDistance, 30));
+  const maxVisualR = Math.min(rawCoverPx, Math.max(drawW, drawH) * 0.45);
 
-  // Exit positions (2 exits on opposite walls)
+  // Exits integrated into walls
+  const exitW = m2px(Math.max(1.2, realW * 0.06));
   const exits = [
-    { x: ox, y: oy + drawH * 0.6, label: "EXIT", rotation: 0 },
-    { x: ox + drawW, y: oy + drawH * 0.2, label: "EXIT", rotation: 0 },
+    { x: ox, y: oy + drawH * 0.7, side: "left" as const },
+    { x: ox + drawW, y: oy + drawH * 0.15, side: "right" as const },
   ];
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 480 }}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 500 }}>
       {/* Background */}
       <rect x={0} y={0} width={W} height={H} fill="#FAFBFC" rx={4} />
 
@@ -152,105 +178,130 @@ function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }:
       </text>
       <line x1={PAD.left} y1={44} x2={W - PAD.right} y2={44} stroke="#D1D5DB" strokeWidth={0.5} />
 
+      {/* Clip region for coverage circles */}
+      <defs>
+        <clipPath id="floorClip"><rect x={ox} y={oy} width={drawW} height={drawH} /></clipPath>
+      </defs>
+
       {/* Grid lines */}
-      {Array.from({ length: Math.ceil(drawW / gridPxX) + 1 }).map((_, i) => {
-        const gx = ox + i * gridPxX;
+      {Array.from({ length: Math.floor(realW / gridM) + 1 }).map((_, i) => {
+        const gx = ox + i * gridPx;
         if (gx > ox + drawW + 0.5) return null;
-        return <line key={`gx-${i}`} x1={gx} y1={oy} x2={gx} y2={oy + drawH} stroke="#E5E7EB" strokeWidth={0.3} />;
+        return <line key={`gx-${i}`} x1={gx} y1={oy} x2={gx} y2={oy + drawH} stroke="#CBD5E1" strokeWidth={0.5} />;
       })}
-      {Array.from({ length: Math.ceil(drawH / gridPxY) + 1 }).map((_, i) => {
-        const gy = oy + i * gridPxY;
+      {Array.from({ length: Math.floor(realH / gridM) + 1 }).map((_, i) => {
+        const gy = oy + i * gridPx;
         if (gy > oy + drawH + 0.5) return null;
-        return <line key={`gy-${i}`} x1={ox} y1={gy} x2={ox + drawW} y2={gy} stroke="#E5E7EB" strokeWidth={0.3} />;
+        return <line key={`gy-${i}`} x1={ox} y1={gy} x2={ox + drawW} y2={gy} stroke="#CBD5E1" strokeWidth={0.5} />;
       })}
 
-      {/* Floor outline */}
-      <rect x={ox} y={oy} width={drawW} height={drawH} rx={2} fill="none" stroke="#374151" strokeWidth={2.5} />
+      {/* Floor outline — thick wall */}
+      <rect x={ox} y={oy} width={drawW} height={drawH} rx={1} fill="#F8FAFC" stroke="#374151" strokeWidth={3} />
+      {/* Inner wall line */}
+      <rect x={ox + 3.5} y={oy + 3.5} width={drawW - 7} height={drawH - 7} rx={0} fill="none" stroke="#94A3B8" strokeWidth={0.5} />
 
-      {/* Wall hatching effect (thick border inside) */}
-      <rect x={ox + 2} y={oy + 2} width={drawW - 4} height={drawH - 4} rx={1} fill="none" stroke="#9CA3AF" strokeWidth={0.5} strokeDasharray="2,2" />
+      {/* Coverage circles — clipped to floor */}
+      <g clipPath="url(#floorClip)">
+        {positions.map((p, i) => (
+          <circle key={`cov-${i}`} cx={p.x} cy={p.y} r={maxVisualR} fill="#1B5745" opacity={0.08} stroke="#1B5745" strokeWidth={1.2} strokeDasharray="8,4" />
+        ))}
+      </g>
 
-      {/* Coverage circles */}
-      {positions.map((p, i) => (
-        <circle key={`cov-${i}`} cx={p.x} cy={p.y} r={coverR} fill="#1B5745" opacity={0.06} stroke="#1B5745" strokeWidth={1} strokeDasharray="6,3" />
-      ))}
-
-      {/* Distance annotations between adjacent fire points */}
-      {positions.length >= 2 && positions.slice(0, -1).map((p, i) => {
+      {/* Distance annotations between fire points */}
+      {positions.length >= 2 && positions.map((p, i) => {
+        // Connect to nearest neighbour not already connected
         const next = positions[i + 1];
         if (!next) return null;
-        const dist = Math.round(Math.sqrt(Math.pow((p.x - next.x) * mPerPx, 2) + Math.pow((p.y - next.y) * mPerPx, 2)));
+        const distM = Math.round(Math.sqrt(Math.pow(p.realX - next.realX, 2) + Math.pow(p.realY - next.realY, 2)));
         const mx = (p.x + next.x) / 2;
-        const my = (p.y + next.y) / 2;
+        const my = (p.y + next.y) / 2 - 10;
         return (
           <g key={`dist-${i}`}>
-            <line x1={p.x} y1={p.y} x2={next.x} y2={next.y} stroke="#94A3B8" strokeWidth={0.8} strokeDasharray="3,3" />
-            <rect x={mx - 14} y={my - 7} width={28} height={12} rx={2} fill="white" stroke="#CBD5E1" strokeWidth={0.5} />
-            <text x={mx} y={my + 2} textAnchor="middle" fontSize={7} fontWeight={600} fill="#64748B">{dist}m</text>
+            <line x1={p.x} y1={p.y - 18} x2={next.x} y2={next.y - 18} stroke="#64748B" strokeWidth={0.8} strokeDasharray="4,3" markerStart="url(#dimTick)" markerEnd="url(#dimTick)" />
+            <rect x={mx - 16} y={my - 18} width={32} height={14} rx={3} fill="white" stroke="#94A3B8" strokeWidth={0.6} />
+            <text x={mx} y={my - 9} textAnchor="middle" fontSize={8} fontWeight={700} fill="#374151">{distM}m</text>
           </g>
         );
       })}
 
+      {/* Dimension tick marker */}
+      <defs>
+        <marker id="dimTick" markerWidth="1" markerHeight="6" refX="0.5" refY="3" orient="auto"><line x1="0.5" y1="0" x2="0.5" y2="6" stroke="#64748B" strokeWidth="1" /></marker>
+      </defs>
+
       {/* Fire point markers */}
-      {positions.map((p, i) => (
-        <g key={`fp-${i}`}>
+      {positions.map((p) => (
+        <g key={p.id}>
+          {/* Shadow */}
+          <circle cx={p.x + 1} cy={p.y + 1} r={16} fill="#00000010" />
           {/* Outer ring */}
-          <circle cx={p.x} cy={p.y} r={14} fill="white" stroke="#DC2626" strokeWidth={2} />
+          <circle cx={p.x} cy={p.y} r={15} fill="white" stroke="#DC2626" strokeWidth={2.5} />
           {/* Inner fill */}
-          <circle cx={p.x} cy={p.y} r={10} fill="#FEE2E2" />
-          {/* Extinguisher icon */}
-          <rect x={p.x - 3} y={p.y - 6} width={6} height={10} rx={1.5} fill="#DC2626" />
-          <rect x={p.x - 2} y={p.y - 8} width={4} height={2.5} rx={0.8} fill="#7F1D1D" />
-          {/* Label */}
-          <rect x={p.x - 12} y={p.y + 16} width={24} height={12} rx={2} fill="#1E293B" />
-          <text x={p.x} y={p.y + 24} textAnchor="middle" fontSize={7} fontWeight={700} fill="white">{p.id}</text>
+          <circle cx={p.x} cy={p.y} r={11} fill="#FEF2F2" />
+          {/* Extinguisher body */}
+          <rect x={p.x - 3.5} y={p.y - 6} width={7} height={10} rx={1.5} fill="#DC2626" />
+          {/* Extinguisher head */}
+          <rect x={p.x - 2.5} y={p.y - 8.5} width={5} height={3} rx={1} fill="#7F1D1D" />
+          {/* Nozzle */}
+          <line x1={p.x + 2.5} y1={p.y - 7} x2={p.x + 5} y2={p.y - 4} stroke="#7F1D1D" strokeWidth={1} strokeLinecap="round" />
+          {/* Label badge */}
+          <rect x={p.x - 14} y={p.y + 18} width={28} height={13} rx={3} fill="#1E293B" />
+          <text x={p.x} y={p.y + 27} textAnchor="middle" fontSize={8} fontWeight={700} fill="white">{p.id}</text>
         </g>
       ))}
 
-      {/* Exit markers */}
-      {exits.map((ex, i) => (
-        <g key={`exit-${i}`}>
-          <rect x={ex.x - (i === 0 ? 3 : -3)} y={ex.y - 12} width={6} height={24} rx={1} fill="white" stroke="#374151" strokeWidth={1.5} />
-          <rect x={ex.x - (i === 0 ? 28 : -28)} y={ex.y - 8} width={25} height={16} rx={3} fill="#16A34A" />
-          <text x={ex.x - (i === 0 ? 16 : -16)} y={ex.y + 2} textAnchor="middle" fontSize={7} fontWeight={700} fill="white">EXIT</text>
-        </g>
-      ))}
+      {/* Exit markers — integrated into walls */}
+      {exits.map((ex, i) => {
+        const isLeft = ex.side === "left";
+        const doorX = isLeft ? ox - 1.5 : ox + drawW - 1.5;
+        return (
+          <g key={`exit-${i}`}>
+            {/* Door opening (gap in wall) */}
+            <rect x={doorX} y={ex.y - exitW / 2} width={6} height={exitW} fill="#FAFBFC" stroke="none" />
+            {/* Door swing arc */}
+            <path d={isLeft
+              ? `M ${ox} ${ex.y - exitW / 2} A ${exitW} ${exitW} 0 0 0 ${ox - exitW * 0.7} ${ex.y}`
+              : `M ${ox + drawW} ${ex.y - exitW / 2} A ${exitW} ${exitW} 0 0 1 ${ox + drawW + exitW * 0.7} ${ex.y}`
+            } fill="none" stroke="#16A34A" strokeWidth={1} strokeDasharray="3,2" />
+            {/* Door leaf */}
+            <line x1={isLeft ? ox : ox + drawW} y1={ex.y - exitW / 2} x2={isLeft ? ox - exitW * 0.65 : ox + drawW + exitW * 0.65} y2={ex.y - 1} stroke="#16A34A" strokeWidth={1.5} />
+            {/* EXIT label */}
+            <rect x={isLeft ? ox - 38 : ox + drawW + 8} y={ex.y - 7} width={28} height={14} rx={2} fill="#16A34A" />
+            <text x={isLeft ? ox - 24 : ox + drawW + 22} y={ex.y + 3} textAnchor="middle" fontSize={7} fontWeight={700} fill="white">EXIT</text>
+          </g>
+        );
+      })}
 
-      {/* Dimension lines - bottom */}
-      <line x1={ox} y1={oy + drawH + 14} x2={ox + drawW} y2={oy + drawH + 14} stroke="#374151" strokeWidth={1} />
-      <line x1={ox} y1={oy + drawH + 8} x2={ox} y2={oy + drawH + 20} stroke="#374151" strokeWidth={1} />
-      <line x1={ox + drawW} y1={oy + drawH + 8} x2={ox + drawW} y2={oy + drawH + 20} stroke="#374151" strokeWidth={1} />
-      <text x={ox + drawW / 2} y={oy + drawH + 28} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151">{realW}m</text>
+      {/* Dimension lines — bottom */}
+      <line x1={ox} y1={oy + drawH + 16} x2={ox + drawW} y2={oy + drawH + 16} stroke="#374151" strokeWidth={1} markerStart="url(#dimTick)" markerEnd="url(#dimTick)" />
+      <text x={ox + drawW / 2} y={oy + drawH + 30} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151">{realW}m</text>
 
-      {/* Dimension lines - left */}
-      <line x1={ox - 14} y1={oy} x2={ox - 14} y2={oy + drawH} stroke="#374151" strokeWidth={1} />
-      <line x1={ox - 20} y1={oy} x2={ox - 8} y2={oy} stroke="#374151" strokeWidth={1} />
-      <line x1={ox - 20} y1={oy + drawH} x2={ox - 8} y2={oy + drawH} stroke="#374151" strokeWidth={1} />
-      <text x={ox - 24} y={oy + drawH / 2} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151" transform={`rotate(-90, ${ox - 24}, ${oy + drawH / 2})`}>{realH}m</text>
+      {/* Dimension lines — left */}
+      <line x1={ox - 16} y1={oy} x2={ox - 16} y2={oy + drawH} stroke="#374151" strokeWidth={1} markerStart="url(#dimTick)" markerEnd="url(#dimTick)" />
+      <text x={ox - 28} y={oy + drawH / 2} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151" transform={`rotate(-90, ${ox - 28}, ${oy + drawH / 2})`}>{realH}m</text>
 
       {/* Legend bar */}
-      <rect x={PAD.left} y={H - 48} width={W - PAD.left - PAD.right} height={38} rx={4} fill="#F1F5F9" stroke="#E2E8F0" strokeWidth={0.5} />
+      <rect x={PAD.left - 5} y={H - 50} width={W - PAD.left - PAD.right + 10} height={40} rx={5} fill="#F1F5F9" stroke="#E2E8F0" strokeWidth={0.5} />
 
-      {/* Legend items */}
-      <circle cx={PAD.left + 20} cy={H - 29} r={7} fill="#FEE2E2" stroke="#DC2626" strokeWidth={1.5} />
-      <rect x={PAD.left + 17} y={H - 33} width={6} height={7} rx={1} fill="#DC2626" />
-      <text x={PAD.left + 34} y={H - 26} fontSize={9} fill="#374151" fontWeight={600}>Fire Point</text>
+      <circle cx={PAD.left + 18} cy={H - 30} r={8} fill="#FEF2F2" stroke="#DC2626" strokeWidth={1.5} />
+      <rect x={PAD.left + 15} y={H - 34} width={6} height={7} rx={1} fill="#DC2626" />
+      <text x={PAD.left + 34} y={H - 27} fontSize={9} fill="#374151" fontWeight={600}>Fire Point</text>
 
-      <circle cx={PAD.left + 130} cy={H - 29} r={8} fill="#1B5745" opacity={0.08} stroke="#1B5745" strokeWidth={1} strokeDasharray="3,2" />
-      <text x={PAD.left + 146} y={H - 26} fontSize={9} fill="#374151" fontWeight={600}>{travelDistance}m Coverage</text>
+      <circle cx={PAD.left + 128} cy={H - 30} r={10} fill="#1B5745" opacity={0.1} stroke="#1B5745" strokeWidth={1.2} strokeDasharray="4,2" />
+      <text x={PAD.left + 146} y={H - 27} fontSize={9} fill="#374151" fontWeight={600}>{travelDistance}m Coverage</text>
 
-      <rect x={PAD.left + 268} y={H - 35} width={16} height={12} rx={2} fill="#16A34A" />
-      <text x={PAD.left + 272} y={H - 27} fontSize={6} fontWeight={700} fill="white">EXIT</text>
-      <text x={PAD.left + 292} y={H - 26} fontSize={9} fill="#374151" fontWeight={600}>Emergency Exit</text>
+      <line x1={PAD.left + 268} y1={H - 33} x2={PAD.left + 278} y2={H - 28} stroke="#16A34A" strokeWidth={1.5} />
+      <rect x={PAD.left + 280} y={H - 37} width={18} height={13} rx={2} fill="#16A34A" />
+      <text x={PAD.left + 285} y={H - 28} fontSize={6} fontWeight={700} fill="white">EXIT</text>
+      <text x={PAD.left + 306} y={H - 27} fontSize={9} fill="#374151" fontWeight={600}>Emergency Exit</text>
 
-      <line x1={PAD.left + 400} y1={H - 29} x2={PAD.left + 420} y2={H - 29} stroke="#94A3B8" strokeWidth={0.8} strokeDasharray="3,2" />
-      <text x={PAD.left + 428} y={H - 26} fontSize={9} fill="#374151" fontWeight={600}>Distance</text>
+      <line x1={PAD.left + 418} y1={H - 30} x2={PAD.left + 440} y2={H - 30} stroke="#64748B" strokeWidth={0.8} strokeDasharray="4,3" />
+      <text x={PAD.left + 448} y={H - 27} fontSize={9} fill="#374151" fontWeight={600}>Distance</text>
 
-      <line x1={PAD.left + 500} y1={H - 35} x2={PAD.left + 500} y2={H - 23} stroke="#E5E7EB" strokeWidth={0.5} />
-      <text x={PAD.left + 510} y={H - 26} fontSize={8} fill="#9CA3AF">Grid: {gridSpacing}m</text>
+      <rect x={PAD.left + 518} y={H - 36} width={12} height={12} fill="none" stroke="#CBD5E1" strokeWidth={0.5} />
+      <text x={PAD.left + 538} y={H - 27} fontSize={8} fill="#9CA3AF">Grid: {gridM}m</text>
 
-      {/* Scale bar */}
-      <text x={W - PAD.right} y={H - 8} textAnchor="end" fontSize={8} fill="#9CA3AF">NTS -- indicative layout only</text>
+      <text x={W - PAD.right + 5} y={H - 8} textAnchor="end" fontSize={8} fill="#9CA3AF">NTS -- indicative layout only</text>
     </svg>
   );
 }
