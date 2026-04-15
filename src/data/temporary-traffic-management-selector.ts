@@ -783,7 +783,7 @@ export function generateRecommendations(
   const recs: string[] = [];
   recs.push(`Use the ${layout.ref} layout as the basis for your TM drawing. Adapt dimensions to match site conditions.`);
   if (nhss.level !== "none") {
-    recs.push(`Ensure all TM operatives hold current ${nhss.level === "12a" ? "NHSS 12A" : nhss.level === "12b" ? "NHSS 12B" : "NHSS 12A and 12B"} certification before deployment.`);
+    recs.push(`Ensure all TM operatives hold current ${nhss.level === "12a" ? "NHSS 12D" : nhss.level === "12b" ? "NHSS 12A/B and 12D M7" : "NHSS 12A and 12B"} certification before deployment.`);
   }
   if (speedMph >= 50) {
     recs.push("Use 750mm or 1000mm cones with reflective sleeves on roads 50 mph and above.");
@@ -812,3 +812,106 @@ export function generateCrossReferences(layout: TMLayout, pedestrianDiversion: b
   refs.push("Use the WBGT Heat Stress Calculator for operatives working in PPE on exposed roads in warm weather.");
   return refs;
 }
+
+// ─── Auto-Sync: Map inputs to scoring factor indices ────────────
+
+export function autoSyncSelections(
+  roadTypeId: string, speedMph: number, worksLocationId: string, durationId: string,
+  nightWorks: boolean, pedestrianDiversion: boolean,
+): Record<string, number> {
+  // Road speed factor
+  let roadSpeedIdx = 2; // default 30 mph
+  if (speedMph <= 15) roadSpeedIdx = 0;
+  else if (speedMph <= 20) roadSpeedIdx = 1;
+  else if (speedMph <= 30) roadSpeedIdx = 2;
+  else if (speedMph <= 40) roadSpeedIdx = 3;
+  else if (speedMph <= 50) roadSpeedIdx = 4;
+  else if (speedMph <= 60) roadSpeedIdx = 5;
+  else roadSpeedIdx = 6;
+
+  // Road classification factor
+  const roadClassMap: Record<string, number> = {
+    "private": 0, "unclassified": 1, "minor-c": 2, "single-b": 3,
+    "single-a": 4, "dual-a": 5, "single-trunk": 5, "dual-trunk": 6, "motorway": 6,
+  };
+  const roadTypeIdx = roadClassMap[roadTypeId] ?? 4;
+
+  // Works location factor
+  const locMap: Record<string, number> = {
+    "footway-only": 0, "hard-shoulder": 1, "nearside-lane": 3, "shuttle-manual": 3,
+    "shuttle-signals": 3, "offside-lane": 4, "centre-lane": 4, "central-reserve": 4,
+    "full-closure": 5, "contraflow": 5, "roundabout": 6, "multi-phase": 6,
+    "footway-carriageway": 2, "crossing": 3,
+  };
+  const locIdx = locMap[worksLocationId] ?? 3;
+
+  // Duration factor
+  const durMap: Record<string, number> = {
+    "emergency": 0, "urgent": 0, "immediate-minor": 1, "minor": 2,
+    "standard": 3, "major-short": 4, "major-long": 5, "permit": 5,
+  };
+  const durIdx = durMap[durationId] ?? 2;
+
+  // Lane closures factor
+  const laneMap: Record<string, number> = {
+    "footway-only": 0, "hard-shoulder": 0, "footway-carriageway": 1,
+    "nearside-lane": 2, "shuttle-manual": 2, "shuttle-signals": 2,
+    "crossing": 1, "offside-lane": 2, "centre-lane": 3,
+    "central-reserve": 2, "full-closure": 4, "contraflow": 4,
+    "roundabout": 3, "multi-phase": 3,
+  };
+  const laneIdx = laneMap[worksLocationId] ?? 2;
+
+  // Pedestrian factor
+  let pedIdx = 1; // default low
+  if (!pedestrianDiversion) {
+    const pedLocations = ["footway-only", "footway-carriageway", "crossing", "full-closure"];
+    pedIdx = pedLocations.includes(worksLocationId) ? 2 : 1;
+  } else {
+    const highPedLocations = ["crossing", "full-closure"];
+    pedIdx = highPedLocations.includes(worksLocationId) ? 4 : 3;
+  }
+
+  // Night works factor
+  let nightIdx = 0;
+  if (nightWorks) {
+    nightIdx = speedMph >= 40 ? 3 : 2;
+  }
+
+  return {
+    "road-speed": roadSpeedIdx,
+    "road-type": roadTypeIdx,
+    "works-location": locIdx,
+    "duration": durIdx,
+    "lane-closures": laneIdx,
+    "pedestrian": pedIdx,
+    "night-works": nightIdx,
+  };
+}
+
+// ─── NRSWA Applicability Note ───────────────────────────────────
+
+export function getNRSWANote(roadType: RoadType): string {
+  if (roadType.category === "motorway" || roadType.category === "trunk") {
+    return "Note: NRSWA notices apply to statutory undertakers carrying out street works. Works by National Highways on their own network follow separate procedures (NOMS/Street Manager). The notice periods shown apply if you are a utility company or contractor working under NRSWA powers.";
+  }
+  if (roadType.category === "private") {
+    return "Note: NRSWA does not apply to private roads. No statutory notice is required, but the landowner's permission and any site-specific permit-to-dig procedures must be followed.";
+  }
+  return "";
+}
+
+// ─── PDF Regulatory References ──────────────────────────────────
+
+export const REGULATORY_REFERENCES = [
+  "Traffic Signs Manual Chapter 8 Part 1 (Design) and Part 2 (Operations) - 2009 Edition",
+  "Safety at Street Works and Road Works - A Code of Practice (2013)",
+  "New Roads and Street Works Act 1991 (NRSWA) - s.54, s.55, s.74",
+  "Traffic Management Act 2004 - Part 3 (Permit Schemes)",
+  "Traffic Signs Regulations and General Directions (TSRGD) 2016",
+  "GG 104 - Requirements for safety at roadworks on motorways and high speed dual carriageways",
+  "NHSS Sector Schemes 12A/B (motorways/high-speed duals) and 12D (urban/rural roads)",
+  "MHSWR 1999 - Management of Health and Safety at Work Regulations",
+  "Highways Act 1980 - s.148 (penalty for depositing things on highway)",
+  "Equality Act 2010 - accessibility requirements for pedestrian diversions",
+];
