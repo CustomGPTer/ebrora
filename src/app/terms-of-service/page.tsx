@@ -246,14 +246,35 @@ export default function TermsOfServicePage() {
               courts of England and Wales.
             </p>
 
-            <h2>16. Severability</h2>
+            <h2>16. Fair Usage Policy</h2>
+            <p>
+              The Unlimited subscription plan is subject to a fair usage policy
+              designed to ensure a consistently high-quality experience for all
+              users. Daily usage allowances apply to the Unlimited plan as
+              follows:
+            </p>
+            <ul>
+              <li>RAMS documents: 5 per day</li>
+              <li>AI-generated documents: 30 per day</li>
+              <li>Toolbox talk downloads: 10 per day</li>
+              <li>Free template downloads: 10 per day</li>
+            </ul>
+            <p>
+              Daily allowances reset at midnight UK time (Europe/London timezone)
+              each day. Unused daily allowances do not carry over to the
+              following day. Ebrora reserves the right to adjust these daily
+              limits at any time, and will notify affected subscribers of any
+              material changes by email.
+            </p>
+
+            <h2>17. Severability</h2>
             <p>
               If any provision of these Terms is found to be invalid or
               unenforceable, the remaining provisions shall continue in full force
               and effect.
             </p>
 
-            <h2>17. Contact Us</h2>
+            <h2>18. Contact Us</h2>
             <p>
               If you have any questions about these Terms of Service, please
               contact us:
