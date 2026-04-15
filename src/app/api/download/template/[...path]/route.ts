@@ -17,6 +17,7 @@ import { prisma } from "@/lib/prisma";
 import { getTemplateBySlug } from "@/lib/free-templates";
 import { TIER_LIMITS } from "@/lib/constants";
 import { resolveEffectiveTier } from "@/lib/payments/resolve-tier";
+import { checkDailyFairUsage } from "@/lib/fair-usage";
 import type { SubscriptionTier } from "@prisma/client";
 import fs from "fs";
 import nodePath from "path";
@@ -105,6 +106,23 @@ export async function GET(request: NextRequest, context: RouteContext) {
           limit: monthlyLimit,
           tier,
           message: `You've used all ${monthlyLimit} of your free template downloads. Upgrade for more.`,
+        },
+        { status: 429 }
+      );
+    }
+ 
+    // Daily fair-usage check (Unlimited plan only)
+    const fairUsage = await checkDailyFairUsage(userId, tier, 'templateDownloads');
+    if (!fairUsage.allowed) {
+      return NextResponse.json(
+        {
+          error: "Daily fair-usage limit reached",
+          code: "FAIR_USAGE_LIMIT",
+          used: fairUsage.used,
+          limit: fairUsage.limit,
+          tier,
+          isFairUsage: true,
+          message: fairUsage.message,
         },
         { status: 429 }
       );
