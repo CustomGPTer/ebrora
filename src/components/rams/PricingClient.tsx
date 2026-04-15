@@ -99,17 +99,18 @@ const TIERS: TierData[] = [
     tagline: 'For H&S managers and consultancies',
     monthlyPrice: 49.99,
     yearlyPrice: 499.99,
-    ramsPerMonth: 'Unlimited RAMS',
-    aiUses: 'Unlimited AI documents',
+    ramsPerMonth: 'Unlimited RAMS*',
+    aiUses: 'Unlimited AI documents*',
     features: [
       'Everything in Professional',
-      'Unlimited AI documents',
-      'Unlimited RAMS documents',
-      'Unlimited toolbox talk downloads',
-      'Unlimited template downloads',
+      'Unlimited AI documents*',
+      'Unlimited RAMS documents*',
+      'Unlimited toolbox talk downloads*',
+      'Unlimited template downloads*',
       'Dedicated priority queue',
       'Priority email & chat support',
       '14-day money-back guarantee',
+      '* Subject to fair usage policy — generous daily limits apply',
     ],
     highlighted: false,
     cta: 'Start Unlimited Plan',
@@ -145,6 +146,10 @@ const FAQ_ITEMS = [
     q: 'What counts as an "AI document"?',
     a: 'Each time you complete the AI interview and generate a downloadable document (COSHH, lift plan, incident report, etc.), that counts as one AI document use. Chat rounds during the interview do not count — only the final generation.',
   },
+  {
+    q: 'What is the Unlimited plan fair usage policy?',
+    a: 'The Unlimited plan includes generous daily limits to ensure a great experience for all users. Each day resets at midnight UK time. Daily allowances are: 5 RAMS documents, 30 AI documents, 10 toolbox talk downloads, and 10 template downloads. These daily limits match more than a full month of our Starter plan — every single day.',
+  },
 ];
 
 const COMPARISON_ROWS: {
@@ -154,12 +159,12 @@ const COMPARISON_ROWS: {
   professional: string | boolean;
   unlimited: string | boolean;
 }[] = [
-  { label: 'AI documents / month', free: '1', starter: '30', professional: '150', unlimited: 'Unlimited' },
+  { label: 'AI documents / month', free: '1', starter: '30', professional: '150', unlimited: 'Unlimited*' },
   { label: 'AI tools available', free: '35+', starter: '35+', professional: '35+', unlimited: '35+' },
-  { label: 'RAMS documents / month', free: '1', starter: '5', professional: '15', unlimited: 'Unlimited' },
+  { label: 'RAMS documents / month', free: '1', starter: '5', professional: '15', unlimited: 'Unlimited*' },
   { label: 'RAMS formats', free: '2', starter: '11', professional: '11', unlimited: '11' },
-  { label: 'Toolbox talk downloads / month', free: '1', starter: '10', professional: '20', unlimited: 'Unlimited' },
-  { label: 'Free template downloads / month', free: '1', starter: '10', professional: '30', unlimited: 'Unlimited' },
+  { label: 'Toolbox talk downloads / month', free: '1', starter: '10', professional: '20', unlimited: 'Unlimited*' },
+  { label: 'Free template downloads / month', free: '1', starter: '10', professional: '30', unlimited: 'Unlimited*' },
   { label: 'AI-generated content', free: true, starter: true, professional: true, unlimited: true },
   { label: 'DOCX download', free: true, starter: true, professional: true, unlimited: true },
   { label: 'Company logo on docs', free: false, starter: true, professional: true, unlimited: true },
@@ -837,6 +842,9 @@ export default function PricingClient() {
                 ))}
               </tbody>
             </table>
+            <p className="mt-3 text-xs" style={{ color: 'var(--color-text-lighter, #999)' }}>
+              * Unlimited plan subject to fair usage policy — generous daily limits apply. See FAQ below for details.
+            </p>
           </div>
         </div>
       </section>
