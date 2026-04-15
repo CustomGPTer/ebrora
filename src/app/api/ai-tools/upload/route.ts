@@ -35,6 +35,7 @@ import { wrapUploadContent, detectInjectionPatterns, logInjectionAttempt } from 
 import { isValidTemplateSlug } from '@/lib/ai-tools/validate-template-slugs';
 import type { AiToolSlug } from '@/lib/ai-tools/types';
 import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
+import { checkDailyFairUsage } from '@/lib/fair-usage';
 
 export const maxDuration = 300; // Vercel Pro allows up to 300s
 
@@ -148,6 +149,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         error: `You have reached your monthly limit of ${monthLimit} AI document generation${monthLimit === 1 ? '' : 's'}. Resets on the 1st of next month.`,
         limitReached: true,
+      }, { status: 429 });
+    }
+
+    // Daily fair-usage check (Unlimited plan only)
+    const fairUsage = await checkDailyFairUsage(userId, tier, 'aiTools');
+    if (!fairUsage.allowed) {
+      return NextResponse.json({
+        error: fairUsage.message,
+        limitReached: true,
+        isFairUsage: true,
       }, { status: 429 });
     }
 
