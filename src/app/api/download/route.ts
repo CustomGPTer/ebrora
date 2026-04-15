@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 import { ContentType } from "@prisma/client";
 import { TIER_LIMITS } from "@/lib/constants";
 import { resolveEffectiveTier } from "@/lib/payments/resolve-tier";
+import { checkDailyFairUsage } from "@/lib/fair-usage";
+import type { FairUsageFeature } from "@/lib/constants";
 import { validateOrigin } from "@/lib/csrf";
 
 export async function POST(request: NextRequest) {
@@ -106,6 +108,24 @@ export async function POST(request: NextRequest) {
           );
         }
       }
+    }
+
+    // Daily fair-usage check (Unlimited plan only)
+    const fairFeature: FairUsageFeature = contentType === 'TOOLBOX_TALK' ? 'tbtDownloads' : 'templateDownloads';
+    const fairUsage = await checkDailyFairUsage(session.user.id, tier, fairFeature);
+    if (!fairUsage.allowed) {
+      return NextResponse.json(
+        {
+          error: "Daily fair-usage limit reached",
+          code: "FAIR_USAGE_LIMIT",
+          used: fairUsage.used,
+          limit: fairUsage.limit,
+          tier,
+          isFairUsage: true,
+          message: fairUsage.message,
+        },
+        { status: 429 }
+      );
     }
 
     // Get client IP for tracking
