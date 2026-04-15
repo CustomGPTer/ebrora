@@ -30,6 +30,7 @@ const TOOL_CATEGORIES = {
       "asbestos-notification-decision-tool",
       "site-induction-duration-calculator",
       "fire-extinguisher-selector",
+      "temporary-traffic-management-selector",
     ]),
   },
   "Temporary Works": {
@@ -108,6 +109,7 @@ const TOOL_CATEGORIES = {
       "historical-weather",
       "plant-hire-comparator",
       "org-chart-generator",
+      "temporary-traffic-management-selector",
     ]),
   },
   "Environmental & Ecology": {
@@ -188,6 +190,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "manual-handling-calculator": { icon: "🏋️", accent: "#2563EB", accentLight: "rgba(37,99,235,0.08)" },
   "fire-risk-score-calculator": { icon: "🔥", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "fire-extinguisher-selector": { icon: "🧯", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
+  "temporary-traffic-management-selector": { icon: "🚧", accent: "#F97316", accentLight: "rgba(249,115,22,0.08)" },
   "materials-converter": { icon: "⚖️", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" },
   "confined-space-calculator": { icon: "🕳️", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "hav-calculator": { icon: "📳", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
@@ -255,6 +258,7 @@ const PAID_TOOL_SLUGS = new Set([
   "plant-hire-comparator",
   "historical-weather",
   "working-at-height-calculator",
+  "temporary-traffic-management-selector",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
