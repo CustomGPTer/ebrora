@@ -31,6 +31,7 @@ const TOOL_CATEGORIES = {
       "site-induction-duration-calculator",
       "fire-extinguisher-selector",
       "temporary-traffic-management-selector",
+      "working-time-regulations-calculator",
     ]),
   },
   "Temporary Works": {
@@ -110,6 +111,7 @@ const TOOL_CATEGORIES = {
       "plant-hire-comparator",
       "org-chart-generator",
       "temporary-traffic-management-selector",
+      "working-time-regulations-calculator",
     ]),
   },
   "Environmental & Ecology": {
@@ -237,6 +239,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "asbestos-notification-decision-tool": { icon: "⚠️", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "org-chart-generator": { icon: "📋", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "site-induction-duration-calculator": { icon: "🎓", accent: "#BE185D", accentLight: "rgba(190,24,93,0.08)" },
+  "working-time-regulations-calculator": { icon: "⏱️", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
