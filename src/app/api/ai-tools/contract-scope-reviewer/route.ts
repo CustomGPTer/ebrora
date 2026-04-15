@@ -17,6 +17,7 @@ import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { getAiToolLimitByTier } from '@/lib/ai-tools/constants';
 import { resolveEffectiveTier } from '@/lib/payments/resolve-tier';
+import { checkDailyFairUsage } from '@/lib/fair-usage';
 import { incrementAiToolUsage } from '@/lib/ai-tools/usage-tracker';
 import { generateAiToolDocument } from '@/lib/ai-tools/docx-generator';
 import { parseUploadedFile } from '@/lib/ai-tools/upload-parser';
@@ -63,6 +64,12 @@ async function authCheck() {
 
   if (usage >= monthLimit) {
     return { error: `Monthly limit of ${monthLimit} reached. Resets on the 1st.`, status: 429, limitReached: true };
+  }
+
+  // Daily fair-usage check (Unlimited plan only)
+  const fairUsage = await checkDailyFairUsage(userId, tier, 'aiTools');
+  if (!fairUsage.allowed) {
+    return { error: fairUsage.message, status: 429, limitReached: true, isFairUsage: true };
   }
 
   return { userId, tier };
