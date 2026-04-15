@@ -97,6 +97,21 @@ export const TIER_LIMITS = {
 } as const;
 
 /**
+ * Fair Usage Policy — Daily Limits for Unlimited Plan
+ * Daily caps match the Starter plan's MONTHLY allowances.
+ * Only enforced on the UNLIMITED tier; other tiers use their monthly limits.
+ * Resets at midnight UK time (Europe/London).
+ */
+export const DAILY_FAIR_USE_LIMITS = {
+  ramsPerDay: 5,
+  aiToolUsesPerDay: 30,
+  templateDownloadsPerDay: 10,
+  tbtDownloadsPerDay: 10,
+} as const;
+
+export type FairUsageFeature = 'rams' | 'aiTools' | 'templateDownloads' | 'tbtDownloads';
+
+/**
  * Payment Configuration
  */
 export const PAYMENT_CONFIG = {
