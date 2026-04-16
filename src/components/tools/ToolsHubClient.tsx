@@ -3,190 +3,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-
-// ─── Category definitions ────────────────────────────────────
-const TOOL_CATEGORIES = {
-  "Health & Safety": {
-    icon: "🛡️",
-    accent: "#DC2626",
-    accentLight: "rgba(220,38,38,0.08)",
-    slugs: new Set([
-      "manual-handling-calculator",
-      "fire-risk-score-calculator",
-      "wbgt-heat-stress-calculator",
-      "hav-calculator",
-      "confined-space-calculator",
-      "welfare-facilities-calculator",
-      "dust-silica-calculator",
-      "noise-exposure-calculator",
-      "slip-risk-calculator",
-      "uv-index-exposure-checker",
-      "cold-stress-wind-chill-calculator",
-      "lone-worker-risk-calculator",
-      "fatigue-risk-calculator",
-      "first-aid-needs-calculator",
-      "working-at-height-calculator",
-      "riddor-reporting-decision-tool",
-      "asbestos-notification-decision-tool",
-      "site-induction-duration-calculator",
-      "fire-extinguisher-selector",
-      "temporary-traffic-management-selector",
-      "working-time-regulations-calculator",
-      "ladder-stepladder-justification-tool",
-      "f10-notification-checker",
-    ]),
-  },
-  "Temporary Works": {
-    icon: "🏗️",
-    accent: "#64748B",
-    accentLight: "rgba(100,116,139,0.08)",
-    slugs: new Set([
-      "scaffold-load-calculator",
-      "formwork-pressure-calculator",
-      "excavation-batter-angle-calculator",
-    ]),
-  },
-  "Concrete": {
-    icon: "🧱",
-    accent: "#78716C",
-    accentLight: "rgba(120,113,108,0.08)",
-    slugs: new Set([
-      "concrete-volume-calculator",
-      "concrete-pour-planner",
-      "concrete-curing-estimator",
-      "formwork-pressure-calculator",
-      "historical-weather",
-    ]),
-  },
-  "Materials & Quantities": {
-    icon: "🧱",
-    accent: "#B45309",
-    accentLight: "rgba(180,83,9,0.08)",
-    slugs: new Set([
-      "materials-converter",
-      "concrete-volume-calculator",
-      "aggregate-calculator",
-      "excavation-spoil-calculator",
-      "trench-backfill-calculator",
-      "brick-block-calculator",
-      "concrete-pour-planner",
-      "topsoil-calculator",
-      "concrete-curing-estimator",
-    ]),
-  },
-  "Plant & Equipment": {
-    icon: "🚜",
-    accent: "#EA580C",
-    accentLight: "rgba(234,88,12,0.08)",
-    slugs: new Set([
-      "fuel-usage-calculator",
-      "plant-pre-use-checksheet",
-      "access-equipment-selector",
-      "sling-swl-calculator",
-      "plant-hire-comparator",
-    ]),
-  },
-  "Earthworks & Ground": {
-    icon: "⛏️",
-    accent: "#0891B2",
-    accentLight: "rgba(8,145,178,0.08)",
-    slugs: new Set([
-      "cbr-modulus-converter",
-      "drainage-pipe-flow-calculator",
-      "soil-compaction-calculator",
-      "plate-bearing-test-interpreter",
-      "excavation-spoil-calculator",
-      "trench-backfill-calculator",
-      "topsoil-calculator",
-      "excavation-batter-angle-calculator",
-    ]),
-  },
-  "Programme & Commercial": {
-    icon: "📊",
-    accent: "#7C3AED",
-    accentLight: "rgba(124,58,237,0.08)",
-    slugs: new Set([
-      "construction-productivity-calculator",
-      "sunrise-sunset-times",
-      "working-days-calculator",
-      "daywork-rate-calculator",
-      "overtime-cost-calculator",
-      "historical-weather",
-      "plant-hire-comparator",
-      "org-chart-generator",
-      "temporary-traffic-management-selector",
-      "working-time-regulations-calculator",
-      "f10-notification-checker",
-    ]),
-  },
-  "Environmental & Ecology": {
-    icon: "🌿",
-    accent: "#16A34A",
-    accentLight: "rgba(22,163,74,0.08)",
-    slugs: new Set<string>(["ecological-exclusion-zone-checker", "asbestos-notification-decision-tool"]),
-  },
-  "Utilities & Services": {
-    icon: "⚡",
-    accent: "#0284C7",
-    accentLight: "rgba(2,132,199,0.08)",
-    slugs: new Set<string>([
-      "cable-trench-depth-checker",
-      "trench-backfill-calculator",
-      "drainage-pipe-flow-calculator",
-    ]),
-  },
-  "Surveying & Setting Out": {
-    icon: "📐",
-    accent: "#6D28D9",
-    accentLight: "rgba(109,40,217,0.08)",
-    slugs: new Set<string>(["coordinate-converter"]),
-  },
-  "Quality & Testing": {
-    icon: "🔬",
-    accent: "#0F766E",
-    accentLight: "rgba(15,118,110,0.08)",
-    slugs: new Set<string>([
-      "plate-bearing-test-interpreter",
-      "soil-compaction-calculator",
-      "cbr-modulus-converter",
-      "concrete-curing-estimator",
-      "concrete-pour-planner",
-    ]),
-  },
-  "Training & Competence": {
-    icon: "🎓",
-    accent: "#BE185D",
-    accentLight: "rgba(190,24,93,0.08)",
-    slugs: new Set<string>([
-      "first-aid-needs-calculator",
-      "plant-pre-use-checksheet",
-      "confined-space-calculator",
-      "site-induction-duration-calculator",
-    ]),
-  },
-  "Water & Wastewater": {
-    icon: "💧",
-    accent: "#1D4ED8",
-    accentLight: "rgba(29,78,216,0.08)",
-    slugs: new Set<string>([
-      "drainage-pipe-flow-calculator",
-      "confined-space-calculator",
-      "welfare-facilities-calculator",
-    ]),
-  },
-  "MEICA": {
-    icon: "🔧",
-    accent: "#475569",
-    accentLight: "rgba(71,85,105,0.08)",
-    slugs: new Set<string>([
-      "noise-exposure-calculator",
-      "hav-calculator",
-      "sling-swl-calculator",
-      "plant-pre-use-checksheet",
-      "confined-space-calculator",
-    ]),
-  },
-} as const;
+import { TOOL_CATEGORIES } from "@/data/tool-catalogue";
 
 type CategoryName = keyof typeof TOOL_CATEGORIES;
 const CATEGORY_NAMES = Object.keys(TOOL_CATEGORIES) as CategoryName[];
@@ -288,7 +105,7 @@ export interface ToolData {
 
 function getCategoryForSlug(slug: string): CategoryName | null {
   for (const [name, cat] of Object.entries(TOOL_CATEGORIES)) {
-    if (cat.slugs.has(slug)) return name as CategoryName;
+    if (cat.slugs.includes(slug)) return name as CategoryName;
   }
   return null;
 }
@@ -299,7 +116,7 @@ export default function ToolsHubClient({ tools }: { tools: ToolData[] }) {
 
   const filteredTools = activeTab === "all"
     ? tools
-    : tools.filter(t => TOOL_CATEGORIES[activeTab].slugs.has(t.slug));
+    : tools.filter(t => TOOL_CATEGORIES[activeTab].slugs.includes(t.slug));
 
   const activeCatAccent = activeTab !== "all" ? TOOL_CATEGORIES[activeTab].accent : "#1B5745";
 
@@ -324,7 +141,7 @@ export default function ToolsHubClient({ tools }: { tools: ToolData[] }) {
 
         {CATEGORY_NAMES.map(cat => {
           const catDef = TOOL_CATEGORIES[cat];
-          const count = tools.filter(t => catDef.slugs.has(t.slug)).length;
+          const count = tools.filter(t => catDef.slugs.includes(t.slug)).length;
           const isActive = activeTab === cat;
           return (
             <button
