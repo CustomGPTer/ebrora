@@ -3,159 +3,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { TOOL_CATEGORIES, getToolName } from "@/data/tool-catalogue";
 
 interface ToolsDropdownProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-interface ToolEntry {
-  name: string;
-  slug: string;
-}
-
-interface Category {
-  name: string;
-  icon: string;
-  tools: ToolEntry[];
-}
-
-const CATEGORIES: Category[] = [
-  {
-    name: "Health & Safety",
-    icon: "🛡️",
-    tools: [
-      { name: "Manual Handling Calculator", slug: "manual-handling-calculator" },
-      { name: "Working at Height Calculator", slug: "working-at-height-calculator" },
-      { name: "WBGT Heat Stress Calculator", slug: "wbgt-heat-stress-calculator" },
-      { name: "Fire Risk Score Calculator", slug: "fire-risk-score-calculator" },
-      { name: "HAV Calculator", slug: "hav-calculator" },
-      { name: "Confined Space Calculator", slug: "confined-space-calculator" },
-      { name: "Welfare Facilities Calculator", slug: "welfare-facilities-calculator" },
-      { name: "Dust & Silica Calculator", slug: "dust-silica-calculator" },
-      { name: "Noise Exposure Calculator", slug: "noise-exposure-calculator" },
-      { name: "Slip Risk Calculator", slug: "slip-risk-calculator" },
-      { name: "UV Index Exposure Checker", slug: "uv-index-exposure-checker" },
-      { name: "Cold Stress Wind Chill Calculator", slug: "cold-stress-wind-chill-calculator" },
-      { name: "Lone Worker Risk Calculator", slug: "lone-worker-risk-calculator" },
-      { name: "Fatigue Risk Calculator", slug: "fatigue-risk-calculator" },
-      { name: "First Aid Needs Calculator", slug: "first-aid-needs-calculator" },
-      { name: "RIDDOR Reporting Decision Tool", slug: "riddor-reporting-decision-tool" },
-      { name: "Asbestos Notification Decision Tool", slug: "asbestos-notification-decision-tool" },
-    ],
-  },
-  {
-    name: "Temporary Works",
-    icon: "🏗️",
-    tools: [
-      { name: "Scaffold Load Calculator", slug: "scaffold-load-calculator" },
-      { name: "Formwork Pressure Calculator", slug: "formwork-pressure-calculator" },
-    ],
-  },
-  {
-    name: "Concrete",
-    icon: "🧱",
-    tools: [
-      { name: "Concrete Volume Calculator", slug: "concrete-volume-calculator" },
-      { name: "Concrete Pour Planner", slug: "concrete-pour-planner" },
-      { name: "Concrete Curing Estimator", slug: "concrete-curing-estimator" },
-    ],
-  },
-  {
-    name: "Materials & Quantities",
-    icon: "🧱",
-    tools: [
-      { name: "Materials Converter", slug: "materials-converter" },
-      { name: "Aggregate Calculator", slug: "aggregate-calculator" },
-      { name: "Brick & Block Calculator", slug: "brick-block-calculator" },
-      { name: "Sling SWL Calculator", slug: "sling-swl-calculator" },
-    ],
-  },
-  {
-    name: "Plant & Equipment",
-    icon: "🚜",
-    tools: [
-      { name: "Access Equipment Selector", slug: "access-equipment-selector" },
-      { name: "Fuel Usage Calculator", slug: "fuel-usage-calculator" },
-      { name: "Plant Pre-Use Checksheet", slug: "plant-pre-use-checksheet" },
-      { name: "Plant Hire Comparator", slug: "plant-hire-comparator" },
-    ],
-  },
-  {
-    name: "Earthworks & Ground",
-    icon: "⛏️",
-    tools: [
-      { name: "Excavation Spoil Calculator", slug: "excavation-spoil-calculator" },
-      { name: "Trench Backfill Calculator", slug: "trench-backfill-calculator" },
-      { name: "CBR Modulus Converter", slug: "cbr-modulus-converter" },
-      { name: "Topsoil Calculator", slug: "topsoil-calculator" },
-      { name: "Soil Compaction Calculator", slug: "soil-compaction-calculator" },
-      { name: "Plate Bearing Test Interpreter", slug: "plate-bearing-test-interpreter" },
-    ],
-  },
-  {
-    name: "Programme & Commercial",
-    icon: "📊",
-    tools: [
-      { name: "Construction Productivity Calculator", slug: "construction-productivity-calculator" },
-      { name: "Working Days Calculator", slug: "working-days-calculator" },
-      { name: "Daywork Rate Calculator", slug: "daywork-rate-calculator" },
-      { name: "Overtime Cost Calculator", slug: "overtime-cost-calculator" },
-      { name: "Historical Weather Data", slug: "historical-weather" },
-      { name: "Org Chart Generator", slug: "org-chart-generator" },
-    ],
-  },
-  {
-    name: "Environmental & Ecology",
-    icon: "🌿",
-    tools: [
-      { name: "Ecological Exclusion Zone Checker", slug: "ecological-exclusion-zone-checker" },
-      { name: "Asbestos Notification Decision Tool", slug: "asbestos-notification-decision-tool" },
-    ],
-  },
-  {
-    name: "Utilities & Services",
-    icon: "⚡",
-    tools: [
-      { name: "Cable Trench Depth Checker", slug: "cable-trench-depth-checker" },
-      { name: "Trench Backfill Calculator", slug: "trench-backfill-calculator" },
-      { name: "Drainage Pipe Flow Calculator", slug: "drainage-pipe-flow-calculator" },
-    ],
-  },
-  {
-    name: "Surveying & Setting Out",
-    icon: "📐",
-    tools: [
-      { name: "Coordinate Converter", slug: "coordinate-converter" },
-      { name: "Sunrise & Sunset Times", slug: "sunrise-sunset-times" },
-    ],
-  },
-  {
-    name: "Quality & Testing",
-    icon: "🔬",
-    tools: [
-      { name: "Plate Bearing Test Interpreter", slug: "plate-bearing-test-interpreter" },
-      { name: "Concrete Curing Estimator", slug: "concrete-curing-estimator" },
-    ],
-  },
-  {
-    name: "Training & Competence",
-    icon: "🎓",
-    tools: [],
-  },
-  {
-    name: "Water & Wastewater",
-    icon: "💧",
-    tools: [
-      { name: "Drainage Pipe Flow Calculator", slug: "drainage-pipe-flow-calculator" },
-    ],
-  },
-  {
-    name: "MEICA",
-    icon: "🔧",
-    tools: [],
-  },
-];
+// Materialise the catalogue into the dropdown's format once at module load.
+// No hand-maintained list -- any new tool added to tool-catalogue.ts shows
+// up here automatically.
+const CATEGORIES = Object.entries(TOOL_CATEGORIES).map(([name, spec]) => ({
+  name,
+  icon: spec.icon,
+  tools: spec.slugs.map((slug) => ({ slug, name: getToolName(slug) })),
+}));
 
 export function ToolsDropdown({ isOpen, onClose }: ToolsDropdownProps) {
   const [hoveredCat, setHoveredCat] = useState<number>(0);
