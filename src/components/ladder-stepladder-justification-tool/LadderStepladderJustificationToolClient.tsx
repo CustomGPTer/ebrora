@@ -97,30 +97,27 @@ function AuditTrailFlowchart({ result }: { result: JustificationResult }) {
               {connector}
               <rect x={padX} y={y2} width={nodeW} height={nodeH} rx={8} fill={fill} stroke={stroke} strokeWidth={1.5} />
               {isSelected ? (
-                // Selected — single centred title
                 <text x={cx} y={y2 + nodeH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={12} fontWeight={700} fill={textFill}>
                   {opt.rank}. {label} -- {statusLabel}
                 </text>
               ) : hasReason ? (
-                // Rejected with reason — 3 stacked lines, vertically centred as a block
                 <>
-                  <text x={padX + 12} y={y2 + nodeH / 2 - 10} fontSize={11} fontWeight={700} fill={textFill}>
+                  <text x={cx} y={y2 + nodeH / 2 - 10} textAnchor="middle" fontSize={11} fontWeight={700} fill={textFill}>
                     {opt.rank}. {label}
                   </text>
-                  <text x={padX + 12} y={y2 + nodeH / 2 + 3} fontSize={8} fontWeight={600} fill={textFill}>
+                  <text x={cx} y={y2 + nodeH / 2 + 3} textAnchor="middle" fontSize={8} fontWeight={600} fill={textFill}>
                     {statusLabel}
                   </text>
-                  <text x={padX + 12} y={y2 + nodeH / 2 + 15} fontSize={7.5} fill={textFill}>
+                  <text x={cx} y={y2 + nodeH / 2 + 15} textAnchor="middle" fontSize={7.5} fill={textFill}>
                     {reasonText}
                   </text>
                 </>
               ) : (
-                // Pending or no reason — 2 lines centred
                 <>
-                  <text x={padX + 12} y={y2 + nodeH / 2 - 5} fontSize={11} fontWeight={700} fill={textFill}>
+                  <text x={cx} y={y2 + nodeH / 2 - 5} textAnchor="middle" fontSize={11} fontWeight={700} fill={textFill}>
                     {opt.rank}. {label}
                   </text>
-                  <text x={padX + 12} y={y2 + nodeH / 2 + 9} fontSize={8} fontWeight={600} fill={textFill}>
+                  <text x={cx} y={y2 + nodeH / 2 + 9} textAnchor="middle" fontSize={8} fontWeight={600} fill={textFill}>
                     {statusLabel}
                   </text>
                 </>
