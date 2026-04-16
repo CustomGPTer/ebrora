@@ -33,6 +33,7 @@ const TOOL_CATEGORIES = {
       "temporary-traffic-management-selector",
       "working-time-regulations-calculator",
       "ladder-stepladder-justification-tool",
+      "f10-notification-checker",
     ]),
   },
   "Temporary Works": {
@@ -113,6 +114,7 @@ const TOOL_CATEGORIES = {
       "org-chart-generator",
       "temporary-traffic-management-selector",
       "working-time-regulations-calculator",
+      "f10-notification-checker",
     ]),
   },
   "Environmental & Ecology": {
@@ -242,6 +244,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "site-induction-duration-calculator": { icon: "🎓", accent: "#BE185D", accentLight: "rgba(190,24,93,0.08)" },
   "working-time-regulations-calculator": { icon: "⏱️", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "ladder-stepladder-justification-tool": { icon: "🪜", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
+  "f10-notification-checker": { icon: "📋", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -264,6 +267,7 @@ const PAID_TOOL_SLUGS = new Set([
   "historical-weather",
   "working-at-height-calculator",
   "temporary-traffic-management-selector",
+  "f10-notification-checker",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
