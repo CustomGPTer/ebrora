@@ -57,7 +57,7 @@ export default function ExcavationBatterAngleCalculatorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <BreadcrumbNav
-          items={[{ label: "Free Tools", href: "/tools" }, { label: "Excavation Batter Angle Calculator" }]}
+          items={[{ label: "Calculators & Tools", href: "/tools" }, { label: "Excavation Batter Angle Calculator" }]}
         />
 
         <div className="mb-6 text-center">
