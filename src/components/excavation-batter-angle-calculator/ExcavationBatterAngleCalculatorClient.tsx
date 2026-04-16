@@ -78,7 +78,7 @@ function CrossSectionDiagram({
 
   // Dimension annotations
   const angleLabel = result.viable ? `${result.finalAngleDeg.toFixed(0)}°` : "N/A";
-  const ratioLabel = result.viable ? `1 V : ${result.finalRatioH.toFixed(2)} H` : "support";
+  const ratioLabel = result.viable ? `${result.finalRatioH.toFixed(2)} H : 1 V` : "support";
 
   // RAG fill colour
   const ragFill =
@@ -365,13 +365,14 @@ async function exportPDF(
   // ── Scope paragraph ────────────────────────────────────────────
   doc.setFontSize(7); doc.setFont("helvetica", "italic"); doc.setTextColor(80, 80, 80);
   const shapeLabel = inputs.shape === "linear-trench" ? "linear trench" : "rectangular pit";
-  const scopeText = `Open-cut batter angle assessment for a ${shapeLabel} on ${header.site || "the above site"}. Excavation depth ${inputs.depth.toFixed(2)} m, soil category "${soil?.label || "not set"}", water condition "${water?.label || ""}", surcharge "${surcharge?.label || ""}", duration "${duration?.label || ""}". Geometry and batter angle derived from BS 6031:2009 and BS EN 1997-1 with modifiers applied per HSE HSG150.`;
+  const surchargeClause = inputs.surcharge === "none" ? "no surcharge" : (surcharge?.label || "").toLowerCase();
+  const scopeText = `Open-cut batter angle assessment for a ${shapeLabel} on ${header.site || "the above site"}. Depth ${inputs.depth.toFixed(2)} m in ${(soil?.label || "(soil not set)").toLowerCase()}, ${(water?.label || "").toLowerCase()}, with ${surchargeClause}, duration ${(duration?.label || "").toLowerCase()}. Geometry and batter angle derived from BS 6031:2009 and BS EN 1997-1 with modifiers applied per HSE HSG150.`;
   const scopeLines = doc.splitTextToSize(scopeText, CW);
   doc.text(scopeLines, M, y); y += scopeLines.length * 3 + 3;
   doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
 
   // ── RAG banner ────────────────────────────────────────────────
-  checkPage(20);
+  checkPage(24);
   const ragColour: [number, number, number] =
     result.rag === "green" ? [22, 163, 74] :
     result.rag === "amber" ? [217, 119, 6] :
@@ -380,18 +381,36 @@ async function exportPDF(
     result.rag === "green" ? "VIABLE -- Open-Cut Batter Acceptable" :
     result.rag === "amber" ? "CAUTION -- Designer Review Recommended" :
     "NOT VIABLE -- Support Required";
+  // Margin-to-red: how many more degrees of reduction before crossing the 5° floor (Fault 10)
+  const marginToRed = result.viable ? Math.max(0, result.finalAngleDeg - 5) : 0;
   doc.setFillColor(ragColour[0], ragColour[1], ragColour[2]);
-  doc.roundedRect(M, y, CW, 16, 2, 2, "F");
+  doc.roundedRect(M, y, CW, 20, 2, 2, "F");
   doc.setTextColor(255, 255, 255); doc.setFontSize(13); doc.setFont("helvetica", "bold");
   doc.text(ragLabel, M + 5, y + 7);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
   const bannerSub = result.viable
     ? `Batter ${result.finalAngleDeg.toFixed(1)}° (${result.finalRatio}) -- toe-to-crest offset ${result.toeToCrestPlanDistance.toFixed(2)} m per side`
     : result.supportReason || "Batter not viable -- design an engineered support system.";
-  doc.text(bannerSub, M + 5, y + 13);
-  doc.setTextColor(0, 0, 0); y += 22;
+  doc.text(bannerSub, M + 5, y + 12);
+  // Reduction journey (Fault 9)
+  if (result.viable && result.totalReductionDeg > 0) {
+    doc.setFontSize(6.5);
+    doc.text(
+      `Base ${result.baseAngleDeg.toFixed(0)}° -- reductions ${result.totalReductionDeg.toFixed(0)}° = final ${result.finalAngleDeg.toFixed(1)}°.  Margin to red band: ${marginToRed.toFixed(1)}° before support becomes mandatory.`,
+      M + 5, y + 17,
+    );
+  } else if (result.viable) {
+    doc.setFontSize(6.5);
+    doc.text(
+      `No reductions applied (dry, no surcharge, short-term).  Margin to red band: ${marginToRed.toFixed(1)}°.`,
+      M + 5, y + 17,
+    );
+  }
+  doc.setTextColor(0, 0, 0); y += 26;
 
   // ── Key results summary panel ─────────────────────────────────
+  // Fault 2: explicit support-advised logic -- YES / REQUIRED / NO are distinct states.
+  const supportAdvisedText = !result.viable ? "REQUIRED" : result.supportAdvised ? "YES" : "NO";
   const summaryItems: [string, string][] = [
     ["Soil category:", soil?.label || "(not set)"],
     ["BS 5930 descriptor:", soil?.bs5930 || ""],
@@ -399,14 +418,15 @@ async function exportPDF(
     ["Base batter angle (dry, short-term):", result.baseAngleDeg > 0 ? `${result.baseAngleDeg.toFixed(0)}°` : "N/A"],
     ["Total reduction applied:", `${result.totalReductionDeg.toFixed(0)}° (surcharge ${surcharge?.angleReductionDeg ?? 0}°, water ${water?.angleReductionDeg ?? 0}°, duration ${duration?.angleReductionDeg ?? 0}°)`],
     ["Final batter angle:", result.viable ? `${result.finalAngleDeg.toFixed(1)}°` : "N/A"],
-    ["Final H:V ratio:", result.finalRatio],
+    ["Final ratio (H:V):", result.finalRatio],
     ["Toe-to-crest offset:", result.viable ? `${result.toeToCrestPlanDistance.toFixed(2)} m per side` : "N/A"],
-    ["Base width:", inputs.baseWidth > 0 ? `${inputs.baseWidth.toFixed(2)} m` : "(not entered)"],
+    ["Base width:", inputs.baseWidth > 0 ? `${inputs.baseWidth.toFixed(2)} m` : "(optional - enter to see top width, volume)"],
     ...(inputs.shape === "rectangular-pit" ? [["Base length:", inputs.baseLength > 0 ? `${inputs.baseLength.toFixed(2)} m` : "(not entered)"] as [string, string]] : []),
-    ["Top width:", result.topWidth !== null ? `${result.topWidth.toFixed(2)} m` : "(enter base width)"],
+    ["Top width:", result.topWidth !== null ? `${result.topWidth.toFixed(2)} m` : "-- (enter base width)"],
     ...(inputs.shape === "rectangular-pit" && result.topLength !== null ? [["Top length:", `${result.topLength.toFixed(2)} m`] as [string, string]] : []),
-    ["Volume vs vertical cut:", result.volumeFactorVsVertical > 1 ? `${result.volumeFactorVsVertical.toFixed(2)}x (+${result.volumeIncreasePercent.toFixed(1)}%)` : "(enter base width)"],
-    ["Support advised?:", result.supportAdvised || !result.viable ? "YES" : "NO"],
+    ["Volume vs vertical cut:", inputs.baseWidth > 0 && inputs.depth > 0 ? `${result.volumeFactorVsVertical.toFixed(2)}x (+${result.volumeIncreasePercent.toFixed(1)}%)` : "-- (enter base width)"],
+    ["Margin to red band:", result.viable ? `${marginToRed.toFixed(1)}°` : "N/A"],
+    ["Support advised?:", supportAdvisedText],
     ["Designer review required?:", result.designerReviewRequired ? "YES" : "NO"],
   ];
   const panelH = summaryItems.length * 4 + 8;
@@ -429,16 +449,19 @@ async function exportPDF(
   checkPage(60);
   sectionHead("Inputs & Applied Modifiers");
   const inputRows: [string, string, string][] = [
-    ["Excavation shape:", inputs.shape === "linear-trench" ? "Linear trench (2 sloped sides)" : "Rectangular pit (4 sloped sides)", ""],
-    ["Excavation depth:", `${inputs.depth.toFixed(2)} m`, ""],
-    ["Soil category:", soil?.label || "(not set)", soil?.bs5930 || ""],
+    ["Excavation shape:", inputs.shape === "linear-trench" ? "Linear trench (2 sloped sides)" : "Rectangular pit (4 sloped sides)", "-"],
+    ["Excavation depth:", `${inputs.depth.toFixed(2)} m`, "-"],
+    ["Soil category:", `${soil?.label || "(not set)"}${soil?.bs5930 ? ` - ${soil.bs5930}` : ""}`, "-"],
     ["Surcharge:", surcharge?.label || "", `-${surcharge?.angleReductionDeg ?? 0}°`],
     ["Water condition:", water?.label || "", water?.angleReductionDeg !== null && water?.angleReductionDeg !== undefined ? `-${water.angleReductionDeg}°` : "dewater first"],
     ["Duration:", duration?.label || "", `-${duration?.angleReductionDeg ?? 0}°`],
-    ["Surcharge standoff:", inputs.standoffMetres > 0 ? `${inputs.standoffMetres.toFixed(2)} m` : "(not entered)", ""],
+    // Only show standoff row if there is actually a surcharge (Fault 5)
+    ...(inputs.surcharge !== "none"
+      ? [["Surcharge standoff:", inputs.standoffMetres > 0 ? `${inputs.standoffMetres.toFixed(2)} m` : "(not entered, 1.5 m default assumed)", "-"] as [string, string, string]]
+      : []),
   ];
-  // Header
-  const cols = [55, 85, 42];
+  // Header -- wider value column so BS5930 descriptors don't truncate (Fault 3)
+  const cols = [45, 108, 29];
   let cx = M;
   ["Parameter", "Value", "Modifier"].forEach((h, i) => {
     doc.setFillColor(30, 30, 30); doc.rect(cx, y, cols[i], 6, "F");
@@ -449,108 +472,196 @@ async function exportPDF(
   doc.setTextColor(0, 0, 0); y += 6;
   doc.setDrawColor(200, 200, 200);
   inputRows.forEach((row, ri) => {
-    checkPage(6);
+    // Calculate row height from the longest wrapped cell
+    doc.setFontSize(5.8);
+    const wrappedCells = row.map((t, i) => doc.splitTextToSize(t, cols[i] - 3) as string[]);
+    const rowLines = Math.max(1, ...wrappedCells.map(w => w.length));
+    const rowH = Math.max(5.5, rowLines * 2.6 + 1.5);
+    checkPage(rowH + 2);
     cx = M;
-    row.forEach((t, i) => {
-      if (ri % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], 5.5, "FD"); }
-      else { doc.setDrawColor(200, 200, 200); doc.rect(cx, y, cols[i], 5.5, "D"); }
+    row.forEach((_t, i) => {
+      if (ri % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(cx, y, cols[i], rowH, "FD"); }
+      else { doc.setDrawColor(200, 200, 200); doc.rect(cx, y, cols[i], rowH, "D"); }
       doc.setTextColor(0, 0, 0); doc.setFont("helvetica", i === 0 ? "bold" : "normal"); doc.setFontSize(5.8);
-      const lines = doc.splitTextToSize(t, cols[i] - 3);
-      doc.text(lines[0], cx + 2, y + 3.8);
+      doc.text(wrappedCells[i], cx + 2, y + 3.5);
       cx += cols[i];
     });
-    y += 5.5;
+    y += rowH;
   });
   y += 6;
 
-  // ── Cross-section diagram (simplified in PDF) ─────────────────
+  // ── Cross-section diagram (scaled, fully rendered) ────────────
   if (result.viable && inputs.depth > 0) {
-    checkPage(85);
-    sectionHead("Cross-Section (Indicative)");
-    const diagW = CW, diagH = 65;
+    checkPage(90);
+    sectionHead("Cross-Section (Indicative, Scaled)");
+    const diagW = CW, diagH = 72;
     const diagX = M, diagY = y;
-    // Background
-    doc.setFillColor(232, 240, 255); doc.rect(diagX, diagY, diagW, diagH * 0.35, "F");
-    doc.setFillColor(212, 163, 115); doc.rect(diagX, diagY + diagH * 0.35, diagW, diagH * 0.65, "F");
-    // Compute scale
+
+    // ─── Compute scale (world metres -> PDF mm) ────────────────
     const baseW = Math.max(0.5, inputs.baseWidth || 1.5);
     const offset = result.toeToCrestPlanDistance;
-    const totalWorld = baseW + 2 * offset + 2;
-    const depthWorld = Math.max(0.5, inputs.depth);
-    const skyRatio = 0.35;
-    const scaleX = diagW / totalWorld;
-    const scaleY = (diagH * (1 - skyRatio)) / depthWorld;
+    // Horizontal world span: margin(1) + offset + base + offset + margin(1)
+    const totalWorld = 2 + baseW + 2 * offset;
+    // Vertical world span: sky(~40% of depth, min 0.6m) + depth + base-margin(0.3m)
+    const skyWorld = Math.max(0.6, inputs.depth * 0.4);
+    const baseMarginWorld = 0.3;
+    const vertWorld = skyWorld + inputs.depth + baseMarginWorld;
+
+    const diagInnerH = diagH - 8; // reserve 8mm for top/bottom dimension labels
+    const diagInnerW = diagW - 24; // reserve 24mm for depth dimension on right
+    const scaleX = diagInnerW / totalWorld;
+    const scaleY = diagInnerH / vertWorld;
     const scale = Math.min(scaleX, scaleY);
-    const actualDrawW = totalWorld * scale;
-    const originX = diagX + (diagW - actualDrawW) / 2;
-    const originY = diagY + diagH * skyRatio;
+    const actualW = totalWorld * scale;
+    const actualH = vertWorld * scale;
+    const originX = diagX + (diagInnerW - actualW) / 2 + 2;
+    const originY = diagY + (diagInnerH - actualH) / 2 + 4;
+
     const wx = (m: number) => originX + (m + 1) * scale;
-    const wy = (m: number) => originY + m * scale;
+    const wy = (m: number) => originY + (skyWorld + m) * scale;
     const leftCrestX = wx(0);
     const rightCrestX = wx(baseW + 2 * offset);
     const leftToeX = wx(offset);
     const rightToeX = wx(offset + baseW);
     const groundY = wy(0);
-    const baseY = wy(depthWorld);
+    const baseYd = wy(inputs.depth);
+    const diagBottomY = wy(inputs.depth + baseMarginWorld);
 
-    // Draw excavation (white polygon cuts out soil)
-    doc.setFillColor(255, 255, 255); doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.3);
+    // ─── Sky (light blue) ──────────────────────────────────────
+    doc.setFillColor(235, 245, 255);
+    doc.rect(diagX, diagY, diagW - 18, groundY - diagY, "F");
+
+    // ─── Soil mass (tan) filling ground beyond the excavation ──
+    doc.setFillColor(212, 163, 115);
+    // Left of crest
+    doc.rect(diagX, groundY, leftCrestX - diagX, diagBottomY - groundY, "F");
+    // Right of crest
+    doc.rect(rightCrestX, groundY, (diagX + diagW - 18) - rightCrestX, diagBottomY - groundY, "F");
+    // Under the trench (base of excavation down to diagram bottom)
+    doc.rect(leftToeX, baseYd, rightToeX - leftToeX, diagBottomY - baseYd, "F");
+    // Triangular wedges under each batter slope
+    // Left wedge: from (leftCrestX, groundY) to (leftToeX, baseYd) to (leftToeX, groundY)
     doc.lines(
       [
-        [leftToeX - leftCrestX, baseY - groundY],
-        [rightToeX - leftToeX, 0],
-        [rightCrestX - rightToeX, -(baseY - groundY)],
-        [-(rightCrestX - leftCrestX), 0],
+        [leftToeX - leftCrestX, baseYd - groundY],
+        [0, groundY - baseYd],
+        [leftCrestX - leftToeX, 0],
       ],
-      leftCrestX, groundY, [1, 1], "FD", true,
+      leftCrestX, groundY, [1, 1], "F", true,
     );
-    doc.setLineWidth(0.2);
+    // Right wedge: (rightToeX, groundY) -> (rightCrestX, groundY) -> (rightToeX, baseYd)
+    doc.lines(
+      [
+        [rightCrestX - rightToeX, 0],
+        [rightToeX - rightCrestX, baseYd - groundY],
+        [0, groundY - baseYd],
+      ],
+      rightToeX, groundY, [1, 1], "F", true,
+    );
 
-    // RAG tint
+    // ─── Ground line ──────────────────────────────────────────
+    doc.setDrawColor(90, 65, 45); doc.setLineWidth(0.5);
+    doc.line(diagX, groundY, leftCrestX, groundY);
+    doc.line(rightCrestX, groundY, diagX + diagW - 18, groundY);
+
+    // ─── Excavation outline (the batter slopes and base) ──────
     const ragRGB: [number, number, number] =
-      result.rag === "green" ? [34, 197, 94] :
+      result.rag === "green" ? [22, 163, 74] :
       result.rag === "amber" ? [217, 119, 6] :
       [220, 38, 38];
-    doc.setFillColor(ragRGB[0], ragRGB[1], ragRGB[2]);
-    // Approximate via light trapezium (jspdf lacks alpha; use thin outline instead)
-    doc.setDrawColor(ragRGB[0], ragRGB[1], ragRGB[2]); doc.setLineWidth(0.8);
-    doc.lines(
-      [
-        [leftToeX - leftCrestX, baseY - groundY],
-        [rightToeX - leftToeX, 0],
-        [rightCrestX - rightToeX, -(baseY - groundY)],
-        [-(rightCrestX - leftCrestX), 0],
-      ],
-      leftCrestX, groundY, [1, 1], "D", true,
-    );
-    doc.setLineWidth(0.2); doc.setDrawColor(200, 200, 200);
+    doc.setDrawColor(ragRGB[0], ragRGB[1], ragRGB[2]); doc.setLineWidth(0.7);
+    doc.line(leftCrestX, groundY, leftToeX, baseYd);        // left slope
+    doc.line(leftToeX, baseYd, rightToeX, baseYd);          // trench base
+    doc.line(rightToeX, baseYd, rightCrestX, groundY);      // right slope
+    doc.setLineWidth(0.2);
 
-    // Depth label (right side)
-    doc.setDrawColor(100, 100, 100); doc.setLineWidth(0.3);
-    doc.line(rightCrestX + 3, groundY, rightCrestX + 3, baseY);
-    doc.setFontSize(6); doc.setFont("helvetica", "bold"); doc.setTextColor(30, 30, 30);
-    doc.text(`${inputs.depth.toFixed(2)} m`, rightCrestX + 5, (groundY + baseY) / 2 + 1);
+    // ─── Surcharge silhouette (if applicable) ─────────────────
+    if (inputs.surcharge !== "none") {
+      const standoff = inputs.standoffMetres > 0 ? inputs.standoffMetres : 1.5;
+      const surchargeX = wx(-standoff);
+      if (surchargeX > diagX + 2) {
+        if (inputs.surcharge === "heavy-plant" || inputs.surcharge === "traffic") {
+          doc.setFillColor(234, 88, 12);
+          doc.rect(surchargeX - 6, groundY - 4, 12, 3.5, "F");
+          doc.setFillColor(60, 60, 60);
+          doc.circle(surchargeX - 4, groundY - 0.3, 0.8, "F");
+          doc.circle(surchargeX + 4, groundY - 0.3, 0.8, "F");
+        } else if (inputs.surcharge === "light-plant") {
+          doc.setFillColor(251, 191, 36);
+          doc.rect(surchargeX - 4, groundY - 3, 8, 2.5, "F");
+        } else if (inputs.surcharge === "stockpile") {
+          doc.setFillColor(161, 98, 7);
+          doc.lines(
+            [[6, -4], [6, 4], [-12, 0]],
+            surchargeX - 6, groundY, [1, 1], "F", true,
+          );
+        } else {
+          // pedestrian stick
+          doc.setDrawColor(17, 24, 39); doc.setLineWidth(0.4);
+          doc.circle(surchargeX, groundY - 5, 0.7, "D");
+          doc.line(surchargeX, groundY - 4.3, surchargeX, groundY - 2);
+          doc.line(surchargeX, groundY - 2, surchargeX - 1, groundY - 0.2);
+          doc.line(surchargeX, groundY - 2, surchargeX + 1, groundY - 0.2);
+          doc.setLineWidth(0.2);
+        }
+        // Standoff dim
+        doc.setDrawColor(185, 28, 28); doc.setLineWidth(0.3);
+        doc.line(surchargeX, groundY + 1.5, leftCrestX, groundY + 1.5);
+        doc.line(surchargeX, groundY + 0.5, surchargeX, groundY + 2.5);
+        doc.line(leftCrestX, groundY + 0.5, leftCrestX, groundY + 2.5);
+        doc.setFontSize(5.5); doc.setFont("helvetica", "bold"); doc.setTextColor(153, 27, 27);
+        doc.text(`${standoff.toFixed(2)} m standoff`, (surchargeX + leftCrestX) / 2, groundY + 5, { align: "center" });
+        doc.setTextColor(0, 0, 0); doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.2);
+      }
+    }
 
-    // Top width label
+    // ─── Depth dimension (right side, outside soil mass) ──────
+    const depthDimX = diagX + diagW - 14;
+    doc.setDrawColor(55, 65, 81); doc.setLineWidth(0.3);
+    doc.line(depthDimX, groundY, depthDimX, baseYd);
+    doc.line(depthDimX - 1, groundY, depthDimX + 1, groundY);
+    doc.line(depthDimX - 1, baseYd, depthDimX + 1, baseYd);
+    doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); doc.setTextColor(17, 24, 39);
+    doc.text(`${inputs.depth.toFixed(2)} m`, depthDimX + 1.5, (groundY + baseYd) / 2 + 1);
+
+    // ─── Top width dimension (above ground) if available ──────
     if (inputs.baseWidth > 0 && result.topWidth !== null) {
-      doc.line(leftCrestX, groundY - 3, rightCrestX, groundY - 3);
-      doc.setFontSize(6); doc.setFont("helvetica", "bold"); doc.setTextColor(22, 101, 52);
-      doc.text(`Top ${result.topWidth.toFixed(2)} m`, (leftCrestX + rightCrestX) / 2 - 10, groundY - 4.5);
+      const topDimY = groundY - 5;
+      doc.setDrawColor(5, 150, 105); doc.setLineWidth(0.3);
+      doc.line(leftCrestX, topDimY, rightCrestX, topDimY);
+      doc.line(leftCrestX, topDimY - 1, leftCrestX, topDimY + 1);
+      doc.line(rightCrestX, topDimY - 1, rightCrestX, topDimY + 1);
+      doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); doc.setTextColor(6, 78, 59);
+      doc.text(`Top ${result.topWidth.toFixed(2)} m`, (leftCrestX + rightCrestX) / 2, topDimY - 1.5, { align: "center" });
     }
 
-    // Base width label
+    // ─── Base width dimension (below base) ────────────────────
     if (inputs.baseWidth > 0) {
-      doc.line(leftToeX, baseY + 3, rightToeX, baseY + 3);
-      doc.setFontSize(6); doc.setFont("helvetica", "bold"); doc.setTextColor(30, 30, 30);
-      doc.text(`Base ${inputs.baseWidth.toFixed(2)} m`, (leftToeX + rightToeX) / 2 - 10, baseY + 6);
+      const baseDimY = baseYd + 4;
+      doc.setDrawColor(55, 65, 81); doc.setLineWidth(0.3);
+      doc.line(leftToeX, baseDimY, rightToeX, baseDimY);
+      doc.line(leftToeX, baseDimY - 1, leftToeX, baseDimY + 1);
+      doc.line(rightToeX, baseDimY - 1, rightToeX, baseDimY + 1);
+      doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); doc.setTextColor(17, 24, 39);
+      doc.text(`Base ${inputs.baseWidth.toFixed(2)} m`, (leftToeX + rightToeX) / 2, baseDimY + 3, { align: "center" });
     }
 
-    // Angle at left toe
-    doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(ragRGB[0], ragRGB[1], ragRGB[2]);
-    doc.text(`${result.finalAngleDeg.toFixed(0)}°`, leftToeX + 4, baseY - 2);
-    doc.setTextColor(0, 0, 0); doc.setLineWidth(0.2);
+    // ─── Angle label at left toe ──────────────────────────────
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(ragRGB[0], ragRGB[1], ragRGB[2]);
+    doc.text(`${result.finalAngleDeg.toFixed(0)}°`, leftToeX + 2.5, baseYd - 1.5);
 
-    y = diagY + diagH + 4;
+    // ─── Scale bar (1 m) ──────────────────────────────────────
+    const scaleBarX = diagX + 3;
+    const scaleBarY = diagBottomY + 3;
+    doc.setDrawColor(17, 24, 39); doc.setLineWidth(0.5);
+    doc.line(scaleBarX, scaleBarY, scaleBarX + scale, scaleBarY);
+    doc.line(scaleBarX, scaleBarY - 1, scaleBarX, scaleBarY + 1);
+    doc.line(scaleBarX + scale, scaleBarY - 1, scaleBarX + scale, scaleBarY + 1);
+    doc.setFontSize(5.5); doc.setFont("helvetica", "normal"); doc.setTextColor(55, 65, 81);
+    doc.text(`1.00 m scale`, scaleBarX + scale + 1.5, scaleBarY + 1);
+
+    doc.setTextColor(0, 0, 0); doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.2);
+    y = Math.max(diagBottomY, scaleBarY) + 6;
   }
 
   // ── Warnings (if any) ─────────────────────────────────────────
@@ -624,22 +735,26 @@ async function exportPDF(
   });
   y += 4;
 
-  // ── Sign-off ─────────────────────────────────────────────────
-  checkPage(55);
+  // ── Sign-off (compact, 38mm tall) ─────────────────────────────
+  // Keep together so we don't orphan. Uses compact cells.
+  checkPage(42);
   y += 2;
-  doc.setDrawColor(30, 30, 30); doc.setLineWidth(0.6); doc.line(M, y, W - M, y); doc.setLineWidth(0.2); y += 6;
-  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("SIGN-OFF", M, y); y += 6;
-  const soW = CW / 2 - 2, soH = 8;
-  doc.setDrawColor(200, 200, 200); doc.setFontSize(7.5);
+  doc.setDrawColor(30, 30, 30); doc.setLineWidth(0.6); doc.line(M, y, W - M, y); doc.setLineWidth(0.2); y += 5;
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("SIGN-OFF", M, y);
+  doc.setFontSize(6); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
+  doc.text("Each signatory confirms the excavation has been assessed against the conditions recorded above.", M + 22, y);
+  doc.setTextColor(0, 0, 0); y += 4;
+  const soW = CW / 2 - 2, soH = 6;
+  doc.setDrawColor(200, 200, 200); doc.setFontSize(7);
   doc.setFillColor(245, 245, 245);
   doc.rect(M, y, soW, soH, "FD"); doc.rect(M + soW + 4, y, soW, soH, "FD");
   doc.setFont("helvetica", "bold");
-  doc.text("Competent Person", M + 3, y + 5.5); doc.text("Temporary Works Designer (>4.5 m)", M + soW + 7, y + 5.5);
+  doc.text("Competent Person", M + 3, y + 4); doc.text("Temporary Works Designer (required > 4.5 m)", M + soW + 7, y + 4);
   y += soH;
   (["Name:", "Position:", "Signature:", "Date:"] as const).forEach(label => {
     doc.rect(M, y, soW, soH, "D"); doc.rect(M + soW + 4, y, soW, soH, "D");
-    doc.setFont("helvetica", "bold"); doc.setFontSize(6.5);
-    doc.text(label, M + 3, y + 5.5); doc.text(label, M + soW + 7, y + 5.5);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(6);
+    doc.text(label, M + 3, y + 4); doc.text(label, M + soW + 7, y + 4);
     doc.setFont("helvetica", "normal"); y += soH;
   });
 
