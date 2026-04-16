@@ -32,6 +32,7 @@ const TOOL_CATEGORIES = {
       "fire-extinguisher-selector",
       "temporary-traffic-management-selector",
       "working-time-regulations-calculator",
+      "ladder-stepladder-justification-tool",
     ]),
   },
   "Temporary Works": {
@@ -240,6 +241,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "org-chart-generator": { icon: "📋", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "site-induction-duration-calculator": { icon: "🎓", accent: "#BE185D", accentLight: "rgba(190,24,93,0.08)" },
   "working-time-regulations-calculator": { icon: "⏱️", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
+  "ladder-stepladder-justification-tool": { icon: "🪜", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
