@@ -47,8 +47,8 @@ function AuditTrailFlowchart({ result }: { result: JustificationResult }) {
   const steps = result.auditTrail;
   if (steps.length === 0) return null;
 
-  const nodeW = 260, nodeH = 44, gapY = 22, padX = 20, padY = 20;
-  const totalH = (steps.length + 1) * (nodeH + gapY) - gapY + padY * 2;
+  const nodeW = 300, nodeH = 56, gapY = 22, padX = 20, padY = 20;
+  const totalH = (steps.length + 1) * (nodeH + gapY) - gapY + padY * 2 + (result.status === "no-viable-option" ? (nodeH + gapY) : 0);
   const totalW = nodeW + padX * 2;
   const cx = padX + nodeW / 2;
 
@@ -62,7 +62,7 @@ function AuditTrailFlowchart({ result }: { result: JustificationResult }) {
 
         {/* Start node */}
         <rect x={padX} y={padY} width={nodeW} height={nodeH} rx={12} fill="#1B5745" />
-        <text x={cx} y={padY + nodeH / 2 + 3} textAnchor="middle" fontSize={11} fontWeight={700} fill="#FFFFFF">
+        <text x={cx} y={padY + nodeH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={12} fontWeight={700} fill="#FFFFFF">
           Work at Height Justification
         </text>
         <line x1={cx} y1={padY + nodeH} x2={cx} y2={padY + nodeH + gapY} stroke="#1B5745" strokeWidth={2.5} markerEnd="url(#lsj-ar-g)" />
@@ -87,21 +87,43 @@ function AuditTrailFlowchart({ result }: { result: JustificationResult }) {
 
           const label = opt.shortName;
           const statusLabel = isSelected ? "SELECTED" : isRejected ? "REJECTED" : "PENDING";
+          const hasReason = Boolean(step.reasonText);
+          const reasonText = step.reasonText
+            ? (step.reasonText.length > 58 ? step.reasonText.slice(0, 56) + "..." : step.reasonText)
+            : "";
 
           return (
             <g key={step.optionId + "-" + i}>
               {connector}
               <rect x={padX} y={y2} width={nodeW} height={nodeH} rx={8} fill={fill} stroke={stroke} strokeWidth={1.5} />
-              <text x={padX + 10} y={y2 + 16} fontSize={10} fontWeight={700} fill={textFill}>
-                {opt.rank}. {label}
-              </text>
-              <text x={padX + 10} y={y2 + 30} fontSize={8} fill={textFill}>
-                {statusLabel}
-              </text>
-              {step.reasonText && (
-                <text x={padX + 10} y={y2 + 40} fontSize={7} fill={textFill}>
-                  {step.reasonText.length > 48 ? step.reasonText.slice(0, 46) + "..." : step.reasonText}
+              {isSelected ? (
+                // Selected — single centred title
+                <text x={cx} y={y2 + nodeH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={12} fontWeight={700} fill={textFill}>
+                  {opt.rank}. {label} -- {statusLabel}
                 </text>
+              ) : hasReason ? (
+                // Rejected with reason — 3 stacked lines, vertically centred as a block
+                <>
+                  <text x={padX + 12} y={y2 + nodeH / 2 - 10} fontSize={11} fontWeight={700} fill={textFill}>
+                    {opt.rank}. {label}
+                  </text>
+                  <text x={padX + 12} y={y2 + nodeH / 2 + 3} fontSize={8} fontWeight={600} fill={textFill}>
+                    {statusLabel}
+                  </text>
+                  <text x={padX + 12} y={y2 + nodeH / 2 + 15} fontSize={7.5} fill={textFill}>
+                    {reasonText}
+                  </text>
+                </>
+              ) : (
+                // Pending or no reason — 2 lines centred
+                <>
+                  <text x={padX + 12} y={y2 + nodeH / 2 - 5} fontSize={11} fontWeight={700} fill={textFill}>
+                    {opt.rank}. {label}
+                  </text>
+                  <text x={padX + 12} y={y2 + nodeH / 2 + 9} fontSize={8} fontWeight={600} fill={textFill}>
+                    {statusLabel}
+                  </text>
+                </>
               )}
             </g>
           );
@@ -110,8 +132,8 @@ function AuditTrailFlowchart({ result }: { result: JustificationResult }) {
         {/* Terminal — no viable option */}
         {result.status === "no-viable-option" && (
           <g>
-            <rect x={padX} y={padY + (steps.length + 1) * (nodeH + gapY)} width={nodeW} height={nodeH} rx={22} fill="#DC2626" />
-            <text x={cx} y={padY + (steps.length + 1) * (nodeH + gapY) + nodeH / 2 + 3} textAnchor="middle" fontSize={10} fontWeight={700} fill="#FFFFFF">
+            <rect x={padX} y={padY + (steps.length + 1) * (nodeH + gapY)} width={nodeW} height={nodeH} rx={12} fill="#DC2626" />
+            <text x={cx} y={padY + (steps.length + 1) * (nodeH + gapY) + nodeH / 2} textAnchor="middle" dominantBaseline="middle" fontSize={11} fontWeight={700} fill="#FFFFFF">
               NO VIABLE OPTION -- RE-DESIGN REQUIRED
             </text>
           </g>
@@ -188,7 +210,8 @@ async function exportPDF(
       doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
       doc.text("LADDER / STEPLADDER JUSTIFICATION (continued)", M, 7);
       doc.setFontSize(6); doc.setFont("helvetica", "normal");
-      doc.text(`${docRef} | ${header.site || ""}`, W - M - 55, 7);
+      const headerRef = header.site ? `${docRef} | ${header.site}` : docRef;
+      doc.text(headerRef, W - M - 55, 7);
       doc.setTextColor(0, 0, 0); y = 14;
     }
   }
@@ -312,18 +335,21 @@ async function exportPDF(
   if (result.justifiedOption) {
     const opt = getOption(result.justifiedOption);
 
-    // Spec Requirements
-    checkPage(20);
+    // Spec Requirements — keep heading + regulation + first item together
+    checkPage(18);
     doc.setFontSize(9); doc.setFont("helvetica", "bold");
     doc.text(`Requirements for ${opt.name}`, M, y); y += 5;
     doc.setFontSize(7); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
-    doc.text(`Regulation: ${opt.regulation}`, M, y);
-    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal"); y += 4;
+    const regLines = doc.splitTextToSize(`Regulation: ${opt.regulation}`, CW);
+    doc.text(regLines, M, y);
+    y += regLines.length * 3.5 + 1;
+    doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
 
     opt.specRequirements.forEach(spec => {
-      checkPage(6);
       doc.setFontSize(7);
       const lines = doc.splitTextToSize(`- ${spec}`, CW - 4);
+      const itemH = lines.length * 3.5;
+      checkPage(itemH);
       lines.forEach((ln: string) => { doc.text(ln, M + 2, y); y += 3.5; });
     });
     y += 3;
@@ -341,20 +367,22 @@ async function exportPDF(
     }
     y += 5;
 
-    // Pre-Use Checklist
-    checkPage(30);
+    // Pre-Use Checklist — keep heading + first item together to avoid orphaned heading
+    checkPage(14);
     doc.setFontSize(9); doc.setFont("helvetica", "bold");
     doc.text("Pre-Use Checklist", M, y); y += 5;
 
     opt.preUseChecklist.forEach(item => {
-      checkPage(6);
-      // Checkbox
-      doc.setDrawColor(100, 100, 100); doc.setFillColor(255, 255, 255);
-      doc.rect(M + 2, y - 3, 3, 3, "FD");
       doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.setTextColor(0, 0, 0);
       const lines = doc.splitTextToSize(item, CW - 10);
+      const itemH = Math.max(4.5, lines.length * 3.5 + 1);
+      checkPage(itemH);
+      // Checkbox aligned with first line baseline
+      doc.setDrawColor(100, 100, 100); doc.setFillColor(255, 255, 255);
+      doc.rect(M + 2, y - 2.5, 3, 3, "FD");
+      doc.setDrawColor(200, 200, 200);
       doc.text(lines, M + 7, y);
-      y += Math.max(3.5, lines.length * 3.5);
+      y += itemH;
     });
     y += 4;
 
