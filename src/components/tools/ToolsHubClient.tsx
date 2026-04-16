@@ -43,6 +43,7 @@ const TOOL_CATEGORIES = {
     slugs: new Set([
       "scaffold-load-calculator",
       "formwork-pressure-calculator",
+      "excavation-batter-angle-calculator",
     ]),
   },
   "Concrete": {
@@ -97,6 +98,7 @@ const TOOL_CATEGORIES = {
       "excavation-spoil-calculator",
       "trench-backfill-calculator",
       "topsoil-calculator",
+      "excavation-batter-angle-calculator",
     ]),
   },
   "Programme & Commercial": {
@@ -245,6 +247,7 @@ const TOOL_META: Record<string, { icon: string; accent: string; accentLight: str
   "working-time-regulations-calculator": { icon: "⏱️", accent: "#7C3AED", accentLight: "rgba(124,58,237,0.08)" },
   "ladder-stepladder-justification-tool": { icon: "🪜", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
   "f10-notification-checker": { icon: "📋", accent: "#DC2626", accentLight: "rgba(220,38,38,0.08)" },
+  "excavation-batter-angle-calculator": { icon: "⛰️", accent: "#64748B", accentLight: "rgba(100,116,139,0.08)" },
 };
 
 const DEFAULT_META = { icon: "🔧", accent: "#1B5745", accentLight: "rgba(27,87,69,0.08)" };
@@ -268,6 +271,7 @@ const PAID_TOOL_SLUGS = new Set([
   "working-at-height-calculator",
   "temporary-traffic-management-selector",
   "f10-notification-checker",
+  "excavation-batter-angle-calculator",
 ]);
 
 // ─── Props ───────────────────────────────────────────────────
