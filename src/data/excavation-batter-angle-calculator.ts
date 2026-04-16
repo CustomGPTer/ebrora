@@ -516,7 +516,9 @@ export function computeBatter(inputs: ProjectInputs): BatterResult {
   // Horizontal offset per 1 m vertical = cot(angle) = 1 / tan(angle)
   const angleRad = (finalAngleDeg * Math.PI) / 180;
   const finalRatioH = finalAngleDeg > 0 ? 1 / Math.tan(angleRad) : 0;
-  const finalRatio = finalAngleDeg > 0 ? `1 : ${finalRatioH.toFixed(2)} (V:H)` : "N/A";
+  // UK civil convention: batter expressed as horizontal:vertical (H:V).
+  // e.g. "1.60 H : 1 V" means 1.60 m horizontal offset per 1 m vertical rise.
+  const finalRatio = finalAngleDeg > 0 ? `${finalRatioH.toFixed(2)} H : 1 V` : "N/A";
   const toeToCrestPlanDistance = Math.max(0, inputs.depth * finalRatioH);
 
   // Top-of-excavation dimensions
