@@ -21,14 +21,14 @@ export const metadata: Metadata = {
     description: "48+ free interactive calculators for UK construction site teams across 14 categories. Health & safety, earthworks, materials, commercial, environmental, MEICA and more.",
     url: "https://www.ebrora.com/tools",
     type: "website",
-    images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://www.ebrora.com/og-image-tools.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Free Construction Calculators & Safety Tools | Ebrora",
     description:
       "48+ free interactive construction calculators and safety tools for UK site teams across 14 categories.",
-    images: ["https://www.ebrora.com/og-image.jpg"],
+    images: ["https://www.ebrora.com/og-image-tools.jpg"],
   },
 };
 
