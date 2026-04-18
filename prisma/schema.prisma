@@ -124,6 +124,7 @@ model User {
   ai_tool_generations AiToolGeneration[]
   ai_tool_usage       AiToolUsage[]
   orgChart            OrgChart?
+  visualise_documents VisualiseDocument[]
 
   @@index([email])
   @@index([google_id])
@@ -462,6 +463,32 @@ model OrgChart {
   @@index([expiresAt])
   @@index([shareId])
   @@map("org_charts")
+}
+
+// ============================================================
+// VISUALISE — User-saved visual documents (drafts).
+// Up to 3 drafts per user, 3-month rolling expiry from last save.
+// Usage/quota is tracked in AiToolGeneration with tool_slug='visualise'.
+// ============================================================
+
+model VisualiseDocument {
+  id            String   @id @default(cuid())
+  user_id       String
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  title         String?  @db.Text
+  blob_url      String?
+  blob_pathname String?
+  visual_count  Int      @default(0)
+
+  last_saved_at DateTime @default(now())
+  expires_at    DateTime
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([user_id, last_saved_at])
+  @@index([expires_at])
+  @@map("visualise_documents")
 }
 
 model FreeTool {
