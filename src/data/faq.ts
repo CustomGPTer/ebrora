@@ -38,7 +38,7 @@ export const FAQ_DATA: FAQSection[] = [
       {
         id: 'ai-5',
         question: 'Which AI tools are available on the Free plan?',
-        answer: 'All users — including Free — have access to every AI tool: COSHH assessments, manual handling, DSE, toolbox talk generator, confined spaces, incident reports, lift plans, and 28 more. The difference between plans is how many documents you can generate per month.'
+        answer: 'Free users have access to most AI tools — COSHH assessments, manual handling, DSE, toolbox talk generator, confined spaces, incident reports, lift plans, and 28 more. The Visualise AI visual document creator is the exception: it requires Starter or higher. Across the paid tiers, the main difference is how many documents you can generate per month.'
       },
       {
         id: 'ai-6',
