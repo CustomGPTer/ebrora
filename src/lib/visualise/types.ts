@@ -215,6 +215,15 @@ export interface GenerateRequest {
    * suppresses the "regenerate warning" modal. Requires visualId + forcePresetId.
    */
   silent?: boolean;
+  /**
+   * Batch CQ: answers from the clarifying-questions flow, if the user went
+   * through it. Each answer is {topic, value}. The server converts these
+   * into authoritative hints in the system prompt — the AI must honour them
+   * when choosing preset, count, palette, etc. Empty or absent means the
+   * user either skipped clarification or had nothing to clarify.
+   * Session-scoped client-side; never persisted.
+   */
+  clarifyAnswers?: Array<{ topic: string; value: string }>;
 }
 
 /** Response from GET /api/visualise/access. */
