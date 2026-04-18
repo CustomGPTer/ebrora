@@ -38,6 +38,11 @@ export default function DocumentView({
   const [titleEditing, setTitleEditing] = useState(false);
   const [titleDraft, setTitleDraft] = useState(document.title);
   const [resetOpen, setResetOpen] = useState(false);
+  // Batch 1: dismissible AI-reasoning banner. Persists dismissed state per
+  // draft (keyed by document title + updatedAt so it re-shows after a fresh
+  // generate). In-memory only — refreshing the page brings it back, which is
+  // intentional: the reasoning is valuable feedback and shouldn't be buried.
+  const [reasoningDismissed, setReasoningDismissed] = useState(false);
 
   const commitTitle = () => {
     setTitleEditing(false);
@@ -91,6 +96,32 @@ export default function DocumentView({
           <p className="text-xs text-gray-500 mt-1">{document.visuals.length} visual{document.visuals.length === 1 ? '' : 's'}</p>
         )}
       </div>
+
+      {/* Batch 1: AI reasoning banner — shows the chain-of-thought the model
+          used to pick concepts + presets. Dismissible. Hidden entirely when
+          the blob has no reasoning (pre-Batch-1 drafts or when AI returned
+          an empty field). */}
+      {document.reasoning && !reasoningDismissed ? (
+        <div className="mb-5 bg-[#F6FAF8] border border-[#1B5B50]/20 rounded-xl px-4 py-3 flex items-start gap-3">
+          <div className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-[#1B5B50] text-white flex items-center justify-center text-xs font-bold" aria-hidden="true">
+            i
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-[#1B5B50] mb-0.5">
+              How I read your text
+            </p>
+            <p className="text-sm text-gray-700 leading-snug">{document.reasoning}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setReasoningDismissed(true)}
+            className="flex-shrink-0 text-gray-400 hover:text-gray-600 text-sm leading-none p-1 -mr-1 -mt-1"
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
 
       {/* Visual cards */}
       {document.visuals.length === 0 ? (
