@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const itemSchema = z.array(z.string().max(60)).min(0).max(5);
 
@@ -28,16 +28,11 @@ const defaultData: Data = {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
-  const gridStroke = paletteColor(p, 3);
-  const textDark = paletteColor(p, 0);
+  const palette = getPalette(p);
+  const fills = gradientSequence(palette, 4);
+  const gridStroke = palette.nodeStroke;
+  const textDark = palette.nodeFill;
   const font = settings.font ?? 'Inter, sans-serif';
-
-  const fills: [string, string, string, string] = [
-    paletteColor(p, 1),
-    paletteColor(p, 2),
-    paletteColor(p, 3),
-    paletteColor(p, 4),
-  ];
 
   const halfW = width / 2;
   const halfH = height / 2;

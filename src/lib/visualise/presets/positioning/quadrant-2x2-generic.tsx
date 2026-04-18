@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const quadrantSchema = z.object({
   label: z.string().min(1).max(22),
@@ -52,9 +52,13 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const gridStroke = paletteColor(paletteId, 3);
-  const axisText = paletteColor(paletteId, 0);
-  const quadrantText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  // Pattern G: 4 fills via gradient — no quadrant is semantically special in a
+  // generic 2×2, so a gradient gives distinction without implying hierarchy.
+  const fills = gradientSequence(palette, 4) as [string, string, string, string];
+  const gridStroke = palette.nodeStroke;
+  const axisText = palette.nodeFill;
+  const quadrantText = palette.nodeFill;
 
   const padLeft = 52;
   const padBottom = 44;
@@ -65,13 +69,6 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
   const innerH = height - padTop - padBottom;
   const halfW = innerW / 2;
   const halfH = innerH / 2;
-
-  const fills: [string, string, string, string] = [
-    paletteColor(paletteId, 1),
-    paletteColor(paletteId, 2),
-    paletteColor(paletteId, 3),
-    paletteColor(paletteId, 4),
-  ];
 
   const positions = [
     { id: 'q-tl', x: padLeft, y: padTop, fill: fills[0] },

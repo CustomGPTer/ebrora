@@ -14,7 +14,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const itemSchema = z.object({
   label: z.string().min(1).max(20),
@@ -57,11 +57,22 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const gridStroke = paletteColor(paletteId, 3);
-  const midGridStroke = paletteColor(paletteId, 4);
-  const axisText = paletteColor(paletteId, 0);
-  const bubbleStroke = paletteColor(paletteId, 5);
-  const labelText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  const gridStroke = palette.nodeStroke;
+  const midGridStroke = palette.nodeStroke;
+  const axisText = palette.nodeFill;
+  const bubbleStroke = palette.bg;
+  const labelText = palette.nodeFill;
+  const plotBg = palette.bg;
+  // Per handover: points use gradient (by x-axis position); axes use nodeStroke.
+  // Sort the gradient across the x-ordering so leftmost item gets from-colour,
+  // rightmost gets to-colour — reads as a continuous ramp across the plot.
+  const sortedIndexByX = data.items
+    .map((it, i) => ({ i, x: it.x }))
+    .sort((a, b) => a.x - b.x)
+    .map((o) => o.i);
+  const gradientFills = gradientSequence(palette, data.items.length);
+  const bubbleFillFor = (i: number): string => gradientFills[sortedIndexByX.indexOf(i)];
 
   const padLeft = 60;
   const padBottom = 44;
@@ -89,7 +100,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         y={padTop}
         width={innerW}
         height={innerH}
-        fill={paletteColor(paletteId, 5)}
+        fill={plotBg}
         fillOpacity={0.4}
       />
 
@@ -130,7 +141,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const cx = padLeft + clamp(item.x) * innerW;
         // y is inverted: higher data y → lower screen y
         const cy = padTop + (1 - clamp(item.y)) * innerH;
-        const bubbleFill = customColors[nodeId] ?? paletteColor(paletteId, i % 5);
+        const bubbleFill = customColors[nodeId] ?? bubbleFillFor(i);
 
         // Label placement: right of bubble if it fits, left otherwise
         const labelRight = cx + bubbleR + 6 + item.label.length * 3 < padLeft + innerW;

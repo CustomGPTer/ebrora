@@ -12,7 +12,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, darken, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   quickWins: z.array(z.string().min(1).max(32)).min(0).max(5),
@@ -37,9 +37,15 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const gridStroke = paletteColor(paletteId, 3);
-  const axisText = paletteColor(paletteId, 0);
-  const quadrantText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  const gridStroke = palette.nodeStroke;
+  const axisText = palette.nodeFill;
+  const quadrantText = palette.nodeFill;
+  // Per handover: Quick Wins = accent (the "winner" quadrant); others gradient.
+  const quickWinsFill = palette.accent;
+  const majorProjectsFill = palette.nodeFill;
+  const fillInsFill = lighten(palette.nodeFill, 0.3);
+  const thanklessFill = darken(palette.nodeFill, 0.2);
 
   const padLeft = 60;
   const padBottom = 44;
@@ -70,7 +76,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       items: data.quickWins,
       x: padLeft,
       y: padTop,
-      fill: paletteColor(paletteId, 0),
+      fill: quickWinsFill,
     },
     {
       id: 'major-projects',
@@ -78,7 +84,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       items: data.majorProjects,
       x: padLeft + halfW,
       y: padTop,
-      fill: paletteColor(paletteId, 1),
+      fill: majorProjectsFill,
     },
     {
       id: 'fill-ins',
@@ -86,7 +92,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       items: data.fillIns,
       x: padLeft,
       y: padTop + halfH,
-      fill: paletteColor(paletteId, 2),
+      fill: fillInsFill,
     },
     {
       id: 'thankless-tasks',
@@ -94,7 +100,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       items: data.thanklessTasks,
       x: padLeft + halfW,
       y: padTop + halfH,
-      fill: paletteColor(paletteId, 4),
+      fill: thanklessFill,
     },
   ];
 

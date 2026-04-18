@@ -14,7 +14,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, darken, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   stars: z.array(z.string().min(1).max(32)).min(0).max(5),
@@ -39,9 +39,18 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const gridStroke = paletteColor(paletteId, 3);
-  const axisText = paletteColor(paletteId, 0);
-  const quadrantText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  const gridStroke = palette.nodeStroke;
+  const axisText = palette.nodeFill;
+  const quadrantText = palette.nodeFill;
+  // Per handover: BCG quadrants have semantic meaning — Stars are the "winner"
+  // (high growth + high share), so they get `accent`. Dogs are the "loser" so
+  // they get a darker tint. Question Marks and Cash Cows sit between as
+  // nodeFill and a lightened nodeFill.
+  const starsFill = palette.accent;
+  const questionMarksFill = palette.nodeFill;
+  const cashCowsFill = lighten(palette.nodeFill, 0.3);
+  const dogsFill = darken(palette.nodeFill, 0.2);
 
   const padLeft = 60;
   const padBottom = 44;
@@ -73,7 +82,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       items: data.questionMarks,
       x: padLeft,
       y: padTop,
-      fill: paletteColor(paletteId, 2),
+      fill: questionMarksFill,
     },
     {
       id: 'stars',
@@ -81,7 +90,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       items: data.stars,
       x: padLeft + halfW,
       y: padTop,
-      fill: paletteColor(paletteId, 0),
+      fill: starsFill,
     },
     {
       id: 'dogs',
@@ -89,7 +98,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       items: data.dogs,
       x: padLeft,
       y: padTop + halfH,
-      fill: paletteColor(paletteId, 4),
+      fill: dogsFill,
     },
     {
       id: 'cash-cows',
@@ -97,7 +106,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       items: data.cashCows,
       x: padLeft + halfW,
       y: padTop + halfH,
-      fill: paletteColor(paletteId, 1),
+      fill: cashCowsFill,
     },
   ];
 
