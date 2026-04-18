@@ -39,8 +39,15 @@ import {
   getVisualiseLimit,
 } from '@/lib/visualise/constants';
 import { buildSystemPrompt } from '@/lib/visualise/ai/systemPrompt';
-import { parseAiResponse } from '@/lib/visualise/ai/validateResponse';
-import { dropInvalidVisuals, toVisualInstance } from '@/lib/visualise/ai/dropInvalidVisuals';
+import {
+  parseAiResponse,
+  parseVariantAiResponse,
+} from '@/lib/visualise/ai/validateResponse';
+import {
+  dropInvalidVisuals,
+  dropInvalidVariants,
+  toVisualInstance,
+} from '@/lib/visualise/ai/dropInvalidVisuals';
 import { getPresetById } from '@/lib/visualise/presets';
 import type {
   VisualiseDocumentBlob,
@@ -74,7 +81,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    const { text, forcePresetId, visualCountPreference, documentId, visualId } = body;
+    const {
+      text,
+      forcePresetId,
+      visualCountPreference,
+      documentId,
+      visualId,
+      variantMode,
+      silent,
+    } = body;
 
     // visualId requires documentId
     if (visualId && !documentId) {
@@ -84,7 +99,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // silent requires visualId + forcePresetId (it's the auto-remap path)
+    if (silent && (!visualId || !forcePresetId)) {
+      return NextResponse.json(
+        { error: 'silent requests require visualId and forcePresetId' },
+        { status: 400 },
+      );
+    }
+
     const isRegenerate = Boolean(visualId);
+    // Variant mode is ONLY valid for fresh generations. Regenerate path stays
+    // on the legacy single-visual shape so it continues to swap a single
+    // VisualInstance cleanly.
+    const useVariantMode = Boolean(variantMode) && !isRegenerate;
 
     // ── Tier check ──────────────────────────────────────────────────────────
     const subscription = await prisma.subscription.findUnique({
@@ -243,6 +270,7 @@ export async function POST(req: NextRequest) {
       forcePresetId,
       visualCount: resolveCount(visualCountPreference, isRegenerate),
       regenerateFrom: regeneratingFromPresetId ?? undefined,
+      variantMode: useVariantMode,
     });
 
     // ── Call OpenAI with JSON retry loop ────────────────────────────────────
@@ -283,17 +311,35 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Validate top-level shape ────────────────────────────────────────────
-    const parsed = parseAiResponse(documentContent);
-    if (!parsed.success) {
-      await markFailed(generationId, `Top-level AI response invalid: ${parsed.error.message}`);
-      return NextResponse.json(
-        { error: 'AI response failed top-level validation' },
-        { status: 500 },
-      );
+    // Branch on mode: variant shape has a `variants` array per concept,
+    // legacy shape has flat preset_id/title/data per visual.
+    let dropResult;
+    let aiDocumentTitle: string;
+    if (useVariantMode) {
+      const parsedVariant = parseVariantAiResponse(documentContent);
+      if (!parsedVariant.success) {
+        await markFailed(generationId, `Variant AI response invalid: ${parsedVariant.error.message}`);
+        return NextResponse.json(
+          { error: 'AI response failed top-level validation (variant mode)' },
+          { status: 500 },
+        );
+      }
+      dropResult = dropInvalidVariants(parsedVariant.data);
+      aiDocumentTitle = parsedVariant.data.document_title;
+    } else {
+      const parsed = parseAiResponse(documentContent);
+      if (!parsed.success) {
+        await markFailed(generationId, `Top-level AI response invalid: ${parsed.error.message}`);
+        return NextResponse.json(
+          { error: 'AI response failed top-level validation' },
+          { status: 500 },
+        );
+      }
+      dropResult = dropInvalidVisuals(parsed.data);
+      aiDocumentTitle = parsed.data.document_title;
     }
 
     // ── Per-visual validation with graceful degradation ─────────────────────
-    const dropResult = dropInvalidVisuals(parsed.data);
     if (dropResult.valid.length === 0) {
       await markFailed(
         generationId,
@@ -312,7 +358,7 @@ export async function POST(req: NextRequest) {
 
     // ── Assemble blob ───────────────────────────────────────────────────────
     const nowIso = new Date().toISOString();
-    const documentTitle = parsed.data.document_title || fallbackTitle();
+    const documentTitle = aiDocumentTitle || fallbackTitle();
 
     let blobPayload: VisualiseDocumentBlob;
 
@@ -327,10 +373,22 @@ export async function POST(req: NextRequest) {
       }
       const existingVisual = existingBlob.visuals[targetIndex];
       const mergedVisuals = [...existingBlob.visuals];
+      // Batch 10: for silent auto-remap, preserve concept-level fields
+      // (caption, nodeDescriptions, variants) from the existing visual —
+      // they describe the concept, not the preset. The user picked a new
+      // preset from the gallery, but the narrative stays the same.
+      // Full Regenerate (silent=false) gets fresh caption/descriptions from
+      // the AI; legacy regenerate visuals never had them.
+      const preserveConceptFields = Boolean(silent);
       mergedVisuals[targetIndex] = {
         ...newVisual,
         id: existingVisual.id,
         order: existingVisual.order,
+        caption: preserveConceptFields ? existingVisual.caption : newVisual.caption,
+        nodeDescriptions: preserveConceptFields
+          ? existingVisual.nodeDescriptions
+          : newVisual.nodeDescriptions,
+        variants: preserveConceptFields ? existingVisual.variants : newVisual.variants,
       };
       blobPayload = {
         ...existingBlob,
