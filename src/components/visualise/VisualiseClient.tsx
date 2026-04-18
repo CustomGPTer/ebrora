@@ -33,6 +33,7 @@ import type {
   AccessResponse,
   VisualCountPreference,
 } from '@/lib/visualise/types';
+import type { ClarifyAnswer } from '@/lib/visualise/ai/clarify/types';
 
 import GenerateScreen from './GenerateScreen';
 import DocumentView from './DocumentView';
@@ -193,7 +194,12 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
 
   // ── Generate ─────────────────────────────────────────────────────────────
   const handleGenerate = useCallback(
-    async (text: string, forcePresetId?: string, visualCountPreference?: VisualCountPreference) => {
+    async (
+      text: string,
+      forcePresetId?: string,
+      visualCountPreference?: VisualCountPreference,
+      clarifyAnswers?: ClarifyAnswer[],
+    ) => {
       setIsGenerating(true);
       setError(null);
       try {
@@ -210,6 +216,12 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
             // advanced options will still get that preset as variant #1, with
             // 2 complementary alternates for the same concept.
             variantMode: true,
+            // Batch CQ: clarifying answers from the pre-generate questions
+            // flow. Session-scoped client-side — once this call returns (or
+            // fails) the answers are gone unless the user hits Continue
+            // again. Sent as an array of {topic, value}; absent when the
+            // clarify loop concluded with zero answers.
+            clarifyAnswers,
           }),
         });
 
