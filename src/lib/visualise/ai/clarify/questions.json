@@ -1,0 +1,162 @@
+{
+  "family": {
+    "topic": "family",
+    "prompt": "What shape fits your content best?",
+    "chips": [
+      { "value": "flow",          "label": "Flow / steps" },
+      { "value": "timeline",      "label": "Timeline / dates" },
+      { "value": "hierarchy",     "label": "Hierarchy / structure" },
+      { "value": "comparison",    "label": "Comparison / matrix" },
+      { "value": "charts",        "label": "Data / chart" },
+      { "value": "cycle",         "label": "Cycle / loop" },
+      { "value": "relationships", "label": "Relationships / links" },
+      { "value": "positioning",   "label": "Positioning / quadrant" },
+      { "value": "unknown",       "label": "Not sure — let AI choose" }
+    ]
+  },
+  "presetByFamily": {
+    "flow": {
+      "topic": "preset",
+      "prompt": "Which kind of flow?",
+      "chips": [
+        { "value": "flow-linear-3step",      "label": "Linear — 3 steps" },
+        { "value": "flow-linear-4step",      "label": "Linear — 4 steps" },
+        { "value": "flow-linear-5step",      "label": "Linear — 5 steps" },
+        { "value": "flow-decision-yesno",    "label": "Yes/no decision" },
+        { "value": "flow-multi-gateway",     "label": "Multi-way decision" },
+        { "value": "flow-branching-1to2",    "label": "Parallel branches" },
+        { "value": "flow-swimlane-2lane",    "label": "2 swimlanes" },
+        { "value": "flow-swimlane-3lane",    "label": "3 swimlanes" },
+        { "value": "flow-sipoc",             "label": "SIPOC" },
+        { "value": "unknown",                "label": "Not sure" }
+      ]
+    },
+    "timeline": {
+      "topic": "preset",
+      "prompt": "Which kind of timeline?",
+      "chips": [
+        { "value": "timeline-horizontal-5event",  "label": "Horizontal — 5 events" },
+        { "value": "timeline-horizontal-8event",  "label": "Horizontal — 8 events" },
+        { "value": "timeline-vertical-5event",    "label": "Vertical — 5 events" },
+        { "value": "timeline-milestones",         "label": "Milestones" },
+        { "value": "timeline-roadmap-quarters",   "label": "Roadmap by quarters" },
+        { "value": "timeline-gantt-lite",         "label": "Gantt chart" },
+        { "value": "unknown",                     "label": "Not sure" }
+      ]
+    },
+    "hierarchy": {
+      "topic": "preset",
+      "prompt": "What kind of hierarchy?",
+      "chips": [
+        { "value": "hierarchy-org-simple",      "label": "Org chart — simple" },
+        { "value": "hierarchy-org-3level",      "label": "Org chart — 3 levels" },
+        { "value": "hierarchy-pyramid-4tier",   "label": "Pyramid — 4 tiers" },
+        { "value": "hierarchy-pyramid-5tier",   "label": "Pyramid — 5 tiers" },
+        { "value": "hierarchy-tree-generic",    "label": "Tree" },
+        { "value": "hierarchy-mindmap-centre",  "label": "Mind map" },
+        { "value": "unknown",                   "label": "Not sure" }
+      ]
+    },
+    "comparison": {
+      "topic": "preset",
+      "prompt": "Which comparison style?",
+      "chips": [
+        { "value": "side-by-side-2col", "label": "Side-by-side (2 cols)" },
+        { "value": "pros-cons",         "label": "Pros vs cons" },
+        { "value": "vs-card",           "label": "Head-to-head (VS)" },
+        { "value": "matrix-3col",       "label": "Matrix — 3 cols" },
+        { "value": "matrix-4col",       "label": "Matrix — 4 cols" },
+        { "value": "table-clean",       "label": "Clean table" },
+        { "value": "unknown",           "label": "Not sure" }
+      ]
+    },
+    "charts": {
+      "topic": "preset",
+      "prompt": "Which chart?",
+      "chips": [
+        { "value": "chart-bar-vertical", "label": "Bar chart" },
+        { "value": "chart-pie",          "label": "Pie chart" },
+        { "value": "kpi-card-grid-3",    "label": "KPI cards" },
+        { "value": "unknown",            "label": "Not sure" }
+      ]
+    },
+    "cycle": {
+      "topic": "preset",
+      "prompt": "Which cycle?",
+      "chips": [
+        { "value": "cycle-4step",             "label": "4-step cycle" },
+        { "value": "cycle-6step",             "label": "6-step cycle" },
+        { "value": "cycle-feedback-loop",     "label": "Feedback loop" },
+        { "value": "process-circular-4step",  "label": "Circular — 4" },
+        { "value": "process-circular-6step",  "label": "Circular — 6" },
+        { "value": "process-pdca",            "label": "PDCA" },
+        { "value": "unknown",                 "label": "Not sure" }
+      ]
+    },
+    "relationships": {
+      "topic": "preset",
+      "prompt": "Which relationship view?",
+      "chips": [
+        { "value": "venn-2circle",              "label": "Venn — 2 circles" },
+        { "value": "venn-3circle",              "label": "Venn — 3 circles" },
+        { "value": "euler-nested",              "label": "Nested sets" },
+        { "value": "concept-map",               "label": "Concept map" },
+        { "value": "network-hub-spoke-6",       "label": "Hub + spokes" },
+        { "value": "fishbone-ishikawa-6bone",   "label": "Fishbone / Ishikawa" },
+        { "value": "unknown",                   "label": "Not sure" }
+      ]
+    },
+    "positioning": {
+      "topic": "preset",
+      "prompt": "Which quadrant / map?",
+      "chips": [
+        { "value": "quadrant-2x2-generic",    "label": "Generic 2×2" },
+        { "value": "quadrant-bcg",            "label": "BCG matrix" },
+        { "value": "quadrant-impact-effort",  "label": "Impact vs effort" },
+        { "value": "quadrant-swot",           "label": "SWOT" },
+        { "value": "perceptual-map",          "label": "Perceptual map" },
+        { "value": "unknown",                 "label": "Not sure" }
+      ]
+    },
+    "process": {
+      "topic": "preset",
+      "prompt": "Which process view?",
+      "chips": [
+        { "value": "process-stages-4phase",   "label": "4-phase stages" },
+        { "value": "process-dmaic",           "label": "DMAIC" },
+        { "value": "process-pdca",            "label": "PDCA" },
+        { "value": "process-numbered-6step",  "label": "6 numbered steps" },
+        { "value": "process-circular-4step",  "label": "Circular — 4" },
+        { "value": "process-circular-6step",  "label": "Circular — 6" },
+        { "value": "unknown",                 "label": "Not sure" }
+      ]
+    }
+  },
+  "count": {
+    "topic": "count",
+    "prompt": "How many main items?",
+    "chips": [
+      { "value": "2",  "label": "2" },
+      { "value": "3",  "label": "3" },
+      { "value": "4",  "label": "4" },
+      { "value": "5",  "label": "5" },
+      { "value": "6",  "label": "6" },
+      { "value": "7",  "label": "7" },
+      { "value": "8",  "label": "8+" },
+      { "value": "unknown", "label": "Not sure" }
+    ]
+  },
+  "palette": {
+    "topic": "palette",
+    "prompt": "What vibe?",
+    "chips": [
+      { "value": "ebrora-primary", "label": "Brand (teal)" },
+      { "value": "ebrora-gold",    "label": "Gold" },
+      { "value": "hi-vis",         "label": "High-vis / safety" },
+      { "value": "slate",          "label": "Corporate slate" },
+      { "value": "mono",           "label": "Monochrome" },
+      { "value": "earth",          "label": "Earth / ecology" },
+      { "value": "unknown",        "label": "Not sure" }
+    ]
+  }
+}
