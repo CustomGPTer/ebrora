@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   events: z
@@ -49,12 +49,13 @@ function Render({
 }: PresetRenderProps<TimelineHorizontal8EventData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const lineColor = paletteColor(paletteId, 2);
-  const dotFill = paletteColor(paletteId, 0);
-  const textColor = paletteColor(paletteId, 0);
-  const subTextColor = paletteColor(paletteId, 2);
-  const dateColor = paletteColor(paletteId, 1);
-  const dotStroke = paletteColor(paletteId, 5);
+  const palette = getPalette(paletteId);
+  const dotFills = gradientSequence(palette, data.events.length);
+  const lineColor = palette.nodeStroke;
+  const textColor = palette.nodeFill;
+  const subTextColor = palette.nodeStroke;
+  const dateColor = palette.nodeStroke;
+  const dotStroke = palette.bg;
 
   const padding = 30;
   const lineY = height / 2;
@@ -75,7 +76,7 @@ function Render({
         const detailY = above ? lineY - 28 : lineY + 40;
         const dateY = above ? lineY - 42 : lineY + 54;
         const nodeId = `event-${i}`;
-        const fill = customColors[nodeId] ?? dotFill;
+        const fill = customColors[nodeId] ?? dotFills[i];
 
         return (
           <g key={nodeId} data-id={nodeId}>

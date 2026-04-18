@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const milestoneSchema = z.object({
   title: z.string().min(1).max(24),
@@ -45,11 +45,12 @@ function Render({
 }: PresetRenderProps<TimelineMilestonesData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const axisColor = paletteColor(paletteId, 2);
-  const flagFill = paletteColor(paletteId, 0);
-  const flagText = paletteColor(paletteId, 5);
-  const subtitleText = paletteColor(paletteId, 0);
-  const whenText = paletteColor(paletteId, 1);
+  const palette = getPalette(paletteId);
+  const flagFills = gradientSequence(palette, data.milestones.length);
+  const axisColor = palette.nodeStroke;
+  const flagText = palette.text;
+  const subtitleText = palette.nodeFill;
+  const whenText = palette.nodeStroke;
 
   const pad = 30;
   const axisY = height * 0.55;
@@ -70,7 +71,7 @@ function Render({
         const flagH = 28;
         const flagY = axisY - 54;
         const nodeId = `milestone-${i}`;
-        const fill = customColors[nodeId] ?? flagFill;
+        const fill = customColors[nodeId] ?? flagFills[i];
 
         return (
           <g key={nodeId} data-id={nodeId}>
@@ -95,7 +96,7 @@ function Render({
             </text>
 
             {/* Axis dot */}
-            <circle cx={x} cy={axisY} r={5} fill={flagFill} stroke={paletteColor(paletteId, 5)} strokeWidth={1.5} />
+            <circle cx={x} cy={axisY} r={5} fill={flagFills[i]} stroke={palette.bg} strokeWidth={1.5} />
 
             {/* When (below axis) */}
             {m.when ? (

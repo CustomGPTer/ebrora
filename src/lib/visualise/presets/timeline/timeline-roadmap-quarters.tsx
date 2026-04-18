@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence, lighten } from '../../palettes';
 
 const itemSchema = z.object({
   label: z.string().min(1).max(32),
@@ -47,13 +47,18 @@ function Render({
 }: PresetRenderProps<TimelineRoadmapQuartersData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const headerFill = paletteColor(paletteId, 0);
-  const headerText = paletteColor(paletteId, 5);
-  const columnBg = paletteColor(paletteId, 4);
-  const itemFill = paletteColor(paletteId, 5);
-  const itemLabel = paletteColor(paletteId, 0);
-  const tagFill = paletteColor(paletteId, 2);
-  const tagText = paletteColor(paletteId, 5);
+  const palette = getPalette(paletteId);
+  // Per handover recipe: Pattern A for the 4 quarter headers; items sit on a
+  // very light tint of nodeFill so their labels read clearly.
+  const headerFills = gradientSequence(palette, data.quarters.length);
+  const headerText = palette.text;
+  const columnBg = lighten(palette.nodeFill, 0.85);
+  const itemFill = palette.bg;
+  const itemLabel = palette.nodeFill;
+  // Tags are a mid-tint of nodeFill with text tuned for the dark-on-light read.
+  const tagFill = lighten(palette.nodeFill, 0.2);
+  const tagText = palette.text;
+  const itemStroke = lighten(palette.nodeFill, 0.5);
 
   const pad = 12;
   const colGap = 8;
@@ -70,7 +75,7 @@ function Render({
       {data.quarters.map((q, ci) => {
         const x = pad + ci * (colW + colGap);
         const nodeId = `quarter-${ci}`;
-        const headerFillResolved = customColors[`${nodeId}-header`] ?? headerFill;
+        const headerFillResolved = customColors[`${nodeId}-header`] ?? headerFills[ci];
 
         return (
           <g key={nodeId}>
@@ -110,7 +115,7 @@ function Render({
                     rx={4}
                     ry={4}
                     fill={fill}
-                    stroke={paletteColor(paletteId, 2)}
+                    stroke={itemStroke}
                     strokeWidth={0.5}
                     opacity={0.95}
                   />

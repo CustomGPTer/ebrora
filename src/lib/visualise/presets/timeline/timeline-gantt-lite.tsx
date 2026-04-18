@@ -11,7 +11,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence, lighten } from '../../palettes';
 
 const taskSchema = z.object({
   label: z.string().min(1).max(28),
@@ -57,13 +57,14 @@ function Render({
 }: PresetRenderProps<TimelineGanttLiteData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const labelColor = paletteColor(paletteId, 0);
-  const axisColor = paletteColor(paletteId, 2);
-  const gridColor = paletteColor(paletteId, 4);
-  const barFillBase = paletteColor(paletteId, 0);
-  const barAlt = paletteColor(paletteId, 2);
-  const tickColor = paletteColor(paletteId, 0);
-  const axisLabelColor = paletteColor(paletteId, 1);
+  const palette = getPalette(paletteId);
+  // Pattern A: per-task gradient fills so stacked bars are visually distinguishable.
+  const barFills = gradientSequence(palette, data.tasks.length);
+  const labelColor = palette.nodeFill;
+  const axisColor = palette.nodeStroke;
+  const gridColor = lighten(palette.nodeFill, 0.75);
+  const tickColor = palette.nodeFill;
+  const axisLabelColor = palette.nodeStroke;
 
   const pad = 14;
   const labelColW = Math.max(90, width * 0.22);
@@ -147,7 +148,7 @@ function Render({
         const barH = Math.max(8, rowH * 0.52);
         const barY = y + (rowH - barH) / 2;
         const nodeId = `task-${i}`;
-        const barFill = customColors[nodeId] ?? (i % 2 === 0 ? barFillBase : barAlt);
+        const barFill = customColors[nodeId] ?? barFills[i];
 
         return (
           <g key={nodeId} data-id={nodeId}>

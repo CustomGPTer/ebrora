@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   events: z
@@ -48,14 +48,17 @@ function Render({
 }: PresetRenderProps<TimelineVertical5EventData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const axisColor = paletteColor(paletteId, 2);
-  const markerFill = paletteColor(paletteId, 0);
-  const markerStroke = paletteColor(paletteId, 5);
-  const cardFill = paletteColor(paletteId, 4);
-  const labelText = paletteColor(paletteId, 0);
-  const detailText = paletteColor(paletteId, 0);
-  const dateBadge = paletteColor(paletteId, 1);
-  const dateText = paletteColor(paletteId, 5);
+  const palette = getPalette(paletteId);
+  const markerFills = gradientSequence(palette, data.events.length);
+  const axisColor = palette.nodeStroke;
+  const markerStroke = palette.bg;
+  // Cards are a very light tint of nodeFill so the nodeFill text reads on them.
+  const cardFill = lighten(palette.nodeFill, 0.85);
+  const labelText = palette.nodeFill;
+  const detailText = palette.nodeFill;
+  // Date pill is nodeStroke-filled so its label uses `text` (reads on dark fills).
+  const dateBadge = palette.nodeStroke;
+  const dateText = palette.text;
 
   const axisX = Math.max(70, width * 0.13);
   const pad = 14;
@@ -85,7 +88,7 @@ function Render({
         const cardH = rowH - 8;
         const cardY = cy - cardH / 2;
         const nodeId = `event-${i}`;
-        const markerFillResolved = customColors[nodeId] ?? markerFill;
+        const markerFillResolved = customColors[nodeId] ?? markerFills[i];
 
         return (
           <g key={nodeId} data-id={nodeId}>
@@ -164,7 +167,7 @@ function Render({
             x={axisX - 16}
             y={cy + 4}
             textAnchor="end"
-            fill={paletteColor(paletteId, 0)}
+            fill={palette.nodeFill}
             fontFamily={font}
             fontSize={10}
             fontWeight={500}

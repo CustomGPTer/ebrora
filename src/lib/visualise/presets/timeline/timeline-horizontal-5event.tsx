@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   events: z.array(z.object({
@@ -30,10 +30,11 @@ const defaultData: Data = {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
-  const lineColor = paletteColor(p, 2);
-  const dotFill = paletteColor(p, 0);
-  const textColor = paletteColor(p, 0);
-  const subTextColor = paletteColor(p, 2);
+  const palette = getPalette(p);
+  const dotFills = gradientSequence(palette, data.events.length);
+  const lineColor = palette.nodeStroke;
+  const textColor = palette.nodeFill;
+  const subTextColor = palette.nodeStroke;
   const font = settings.font ?? 'Inter, sans-serif';
 
   const padding = 40;
@@ -52,7 +53,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const nodeId = `event-${i}`;
         return (
           <g key={nodeId} data-id={nodeId}>
-            <circle cx={x} cy={lineY} r={7} fill={dotFill} stroke={paletteColor(p, 5)} strokeWidth={2} />
+            <circle cx={x} cy={lineY} r={7} fill={dotFills[i]} stroke={palette.bg} strokeWidth={2} />
             <text x={x} y={labelY} textAnchor="middle" fontFamily={font} fontSize={12} fontWeight={600} fill={textColor}>
               {truncate(ev.label, 16)}
             </text>
@@ -62,7 +63,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
               </text>
             ) : null}
             {ev.date ? (
-              <text x={x} y={dateY} textAnchor="middle" fontFamily={font} fontSize={10} fontWeight={500} fill={paletteColor(p, 1)}>
+              <text x={x} y={dateY} textAnchor="middle" fontFamily={font} fontSize={10} fontWeight={500} fill={palette.nodeStroke}>
                 {truncate(ev.date, 16)}
               </text>
             ) : null}
