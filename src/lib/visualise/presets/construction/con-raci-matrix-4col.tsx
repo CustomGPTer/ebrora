@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const raciCell = z.enum(['R', 'A', 'C', 'I', '-']);
 
@@ -42,19 +42,24 @@ const RACI_LABEL: Record<string, string> = {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
   const font = settings.font ?? 'Inter, sans-serif';
-  const textDark = paletteColor(p, 0);
-  const headerFill = paletteColor(p, 0);
-  const headerText = paletteColor(p, 5);
-  const rowAlt = paletteColor(p, 5);
-  const borderColor = paletteColor(p, 4);
+  const palette = getPalette(p);
+  const textDark = palette.nodeFill;
+  const headerFill = palette.accent;
+  // Header is accent-filled — text on it needs accentText contrast.
+  const headerText = palette.accentText;
+  const rowAlt = palette.bg;
+  const borderColor = palette.nodeStroke;
 
   const colors: Record<string, string> = {
-    R: paletteColor(p, 0),
-    A: paletteColor(p, 1),
-    C: paletteColor(p, 2),
-    I: paletteColor(p, 3),
-    '-': paletteColor(p, 4),
+    R: palette.nodeFill,
+    A: palette.accent,
+    C: lighten(palette.nodeFill, 0.35),
+    I: lighten(palette.nodeFill, 0.55),
+    '-': palette.bg,
   };
+  // The 'A' badge fills with accent, so its letter needs accentText contrast
+  // rather than `text` (which is tuned for nodeFill — the R badge).
+  const badgeTextFor = (cell: string): string => (cell === 'A' ? palette.accentText : palette.text);
 
   const taskColW = Math.min(180, width * 0.35);
   const roleColW = (width - taskColW) / data.roles.length;
@@ -87,7 +92,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
               return (
                 <g key={`cell-${r}-${c}`}>
                   <circle cx={cx} cy={cy} r={10} fill={bg} />
-                  <text x={cx} y={cy + 4} textAnchor="middle" fontFamily={font} fontSize={11} fontWeight={700} fill={paletteColor(p, 5)}>
+                  <text x={cx} y={cy + 4} textAnchor="middle" fontFamily={font} fontSize={11} fontWeight={700} fill={badgeTextFor(cell)}>
                     {cell}
                   </text>
                 </g>

@@ -7,7 +7,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette } from '../../palettes';
 
 const dataSchema = z.object({
   likelihoodLabels: z.array(z.string().max(20)).length(5).default([
@@ -47,9 +47,15 @@ function scoreColor(score: number): string {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const font = settings.font ?? 'Inter, sans-serif';
-  const p = settings.paletteId;
-  const textDark = paletteColor(p, 0);
+  const palette = getPalette(settings.paletteId);
+  // Special case per handover: the cell fills use a traffic-light colour ramp
+  // based on risk score (not the palette) to preserve the universal
+  // green/amber/red reading. The palette is used for borders, axis labels,
+  // and the plotted-risk marker so that the chrome remains brand-coherent.
+  const textDark = palette.nodeFill;
   const textLight = '#ffffff';
+  const cellBorder = palette.bg;
+  const riskMarkerFill = palette.nodeFill;
 
   const padLeft = 92;
   const padTop = 40;
@@ -81,7 +87,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
           const y = padTop + row * cellH;
           return (
             <g key={`cell-${row}-${col}`}>
-              <rect x={x} y={y} width={cellW} height={cellH} fill={scoreColor(score)} fillOpacity={0.75} stroke={paletteColor(p, 5)} strokeWidth={1.5} />
+              <rect x={x} y={y} width={cellW} height={cellH} fill={scoreColor(score)} fillOpacity={0.75} stroke={cellBorder} strokeWidth={1.5} />
               <text x={x + cellW - 6} y={y + 12} textAnchor="end" fontFamily={font} fontSize={9} fontWeight={600} fill={textLight} fillOpacity={0.9}>
                 {score}
               </text>
@@ -113,7 +119,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const nodeId = `risk-${i}`;
         return (
           <g key={nodeId} data-id={nodeId}>
-            <circle cx={cx} cy={cy} r={11} fill={paletteColor(p, 0)} stroke="#ffffff" strokeWidth={2} />
+            <circle cx={cx} cy={cy} r={11} fill={riskMarkerFill} stroke="#ffffff" strokeWidth={2} />
             <text x={cx} y={cy + 4} textAnchor="middle" fontFamily={font} fontSize={10} fontWeight={700} fill="#ffffff">
               {i + 1}
             </text>

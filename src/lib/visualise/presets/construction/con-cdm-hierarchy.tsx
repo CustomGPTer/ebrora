@@ -7,7 +7,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten, darken } from '../../palettes';
 
 const dataSchema = z.object({
   client: z.string().min(1).max(40).default('Client'),
@@ -31,9 +31,20 @@ const defaultData: Data = {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
+  const palette = getPalette(p);
   const font = settings.font ?? 'Inter, sans-serif';
-  const lineColor = paletteColor(p, 2);
-  const textLight = paletteColor(p, 5);
+  // Pattern D per handover: Client accent (top); rest gradient by hierarchy level.
+  // 4 depth levels — client, principals, designers/contractors, workers.
+  const lineColor = palette.nodeStroke;
+  const clientFill = palette.accent;
+  const clientText = palette.accentText;
+  const principalFill = palette.nodeFill;
+  const designerFill = darken(palette.nodeFill, 0.08);
+  const workerFill = lighten(palette.nodeFill, 0.3);
+  const nodeText = palette.text;
+  // Workers sit on a lightened fill — dark text reads better than `text` (which
+  // is tuned for full nodeFill).
+  const workerText = palette.nodeFill;
 
   const boxW = Math.min(180, (width - 40) / 2 - 16);
   const boxH = 36;
@@ -52,10 +63,10 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
   const desX = cx - boxW - 12;
   const conX = cx + 12;
 
-  const box = (id: string, x: number, y: number, label: string, fill: string, bold = false) => (
+  const box = (id: string, x: number, y: number, label: string, fill: string, textFill: string, bold = false) => (
     <g key={id} data-id={id}>
       <rect x={x} y={y} width={boxW} height={boxH} rx={6} fill={fill} />
-      <text x={x + boxW / 2} y={y + boxH / 2 + 4} textAnchor="middle" fontFamily={font} fontSize={12} fontWeight={bold ? 700 : 600} fill={textLight}>
+      <text x={x + boxW / 2} y={y + boxH / 2 + 4} textAnchor="middle" fontFamily={font} fontSize={12} fontWeight={bold ? 700 : 600} fill={textFill}>
         {truncate(label, 26)}
       </text>
     </g>
@@ -75,12 +86,12 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       <line x1={desX + boxW / 2} y1={row3Y + boxH} x2={cx} y2={workersY} stroke={lineColor} strokeWidth={2} />
       <line x1={conX + boxW / 2} y1={row3Y + boxH} x2={cx} y2={workersY} stroke={lineColor} strokeWidth={2} />
 
-      {box('client', cx - boxW / 2, clientY, data.client, paletteColor(p, 0), true)}
-      {box('principal-designer', pdX, row2Y, data.principalDesigner, paletteColor(p, 1))}
-      {box('principal-contractor', pcX, row2Y, data.principalContractor, paletteColor(p, 1))}
-      {box('designers', desX, row3Y, data.designers, paletteColor(p, 2))}
-      {box('contractors', conX, row3Y, data.contractors, paletteColor(p, 2))}
-      {box('workers', cx - boxW / 2, workersY, data.workers, paletteColor(p, 3))}
+      {box('client', cx - boxW / 2, clientY, data.client, clientFill, clientText, true)}
+      {box('principal-designer', pdX, row2Y, data.principalDesigner, principalFill, nodeText)}
+      {box('principal-contractor', pcX, row2Y, data.principalContractor, principalFill, nodeText)}
+      {box('designers', desX, row3Y, data.designers, designerFill, nodeText)}
+      {box('contractors', conX, row3Y, data.contractors, designerFill, nodeText)}
+      {box('workers', cx - boxW / 2, workersY, data.workers, workerFill, workerText)}
     </svg>
   );
 }
