@@ -12,7 +12,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const sideSchema = z.object({
   title: z.string().min(1).max(22),
@@ -64,17 +64,22 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const leftColour = paletteColor(paletteId, 0);
-  const rightColour = paletteColor(paletteId, 1);
-  const cardFill = paletteColor(paletteId, 5);
-  const cardStroke = paletteColor(paletteId, 3);
-  const titleText = paletteColor(paletteId, 5);
-  const subtitleText = paletteColor(paletteId, 5);
-  const statLabelText = paletteColor(paletteId, 0);
-  const statValueText = paletteColor(paletteId, 0);
-  const topicText = paletteColor(paletteId, 0);
-  const vsBgColour = paletteColor(paletteId, 0);
-  const vsTextColour = paletteColor(paletteId, 5);
+  const palette = getPalette(paletteId);
+  // Per handover: Left nodeFill; right accent. Header-text colour flips
+  // accordingly because the two headers sit on different slot colours.
+  const leftColour = palette.nodeFill;
+  const rightColour = palette.accent;
+  const leftTitleText = palette.text;
+  const rightTitleText = palette.accentText;
+  const cardFill = lighten(palette.nodeFill, 0.88);
+  const cardStroke = palette.nodeStroke;
+  const statLabelText = palette.nodeFill;
+  const statValueText = palette.nodeFill;
+  const topicText = palette.nodeFill;
+  // VS medallion uses accent so it visually arbitrates between the two sides
+  // rather than matching either one.
+  const vsBgColour = palette.accent;
+  const vsTextColour = palette.accentText;
 
   const paddingX = 28;
   const topicH = data.topic ? 26 : 0;
@@ -170,7 +175,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
               fontFamily={font}
               fontSize={18}
               fontWeight={700}
-              fill={titleText}
+              fill={s.nodeId === 'left' ? leftTitleText : rightTitleText}
             >
               {truncate(s.data.title, 22)}
             </text>
@@ -183,7 +188,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
                 textAnchor="middle"
                 fontFamily={font}
                 fontSize={11}
-                fill={subtitleText}
+                fill={s.nodeId === 'left' ? leftTitleText : rightTitleText}
                 opacity={0.85}
               >
                 {truncate(s.data.subtitle, 38)}

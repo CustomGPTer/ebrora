@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette } from '../../palettes';
 
 const dataSchema = z
   .object({
@@ -54,12 +54,13 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const headerFill = paletteColor(paletteId, 0);
-  const headerText = paletteColor(paletteId, 5);
-  const rowAltFill = paletteColor(paletteId, 5);
-  const cellText = paletteColor(paletteId, 0);
-  const borderColour = paletteColor(paletteId, 3);
-  const topicText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  const headerFill = palette.accent;
+  const headerText = palette.accentText;
+  const rowAltFill = palette.bg;
+  const cellText = palette.nodeFill;
+  const borderColour = palette.nodeStroke;
+  const topicText = palette.nodeFill;
 
   const paddingX = 24;
   const topicH = data.topic ? 26 : 0;

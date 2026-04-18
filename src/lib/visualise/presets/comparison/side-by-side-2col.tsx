@@ -14,7 +14,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const columnSchema = z.object({
   title: z.string().min(1).max(28),
@@ -59,11 +59,16 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const headerText = paletteColor(paletteId, 5);
-  const bodyFill = paletteColor(paletteId, 5);
-  const bodyStroke = paletteColor(paletteId, 3);
-  const itemText = paletteColor(paletteId, 0);
-  const topicText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  // Per handover: Left = nodeFill; right = accent.
+  const leftHeaderFill = palette.nodeFill;
+  const rightHeaderFill = palette.accent;
+  const leftHeaderText = palette.text;
+  const rightHeaderText = palette.accentText;
+  const bodyFill = lighten(palette.nodeFill, 0.88);
+  const bodyStroke = palette.nodeStroke;
+  const itemText = palette.nodeFill;
+  const topicText = palette.nodeFill;
 
   const paddingX = 40;
   const paddingTopicTop = data.topic ? 22 : 0;
@@ -99,7 +104,8 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       {data.columns.map((col, i) => {
         const x = paddingX + i * (colW + gap);
         const nodeId = `col-${i}`;
-        const headerFill = customColors[nodeId] ?? paletteColor(paletteId, i === 0 ? 0 : 1);
+        const headerFill = customColors[nodeId] ?? (i === 0 ? leftHeaderFill : rightHeaderFill);
+        const headerText = i === 0 ? leftHeaderText : rightHeaderText;
 
         // Items: spaced down the body
         const itemGap = 10;

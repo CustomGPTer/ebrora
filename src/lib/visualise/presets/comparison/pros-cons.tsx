@@ -12,7 +12,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, darken, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   topic: z.string().max(40).optional(),
@@ -45,16 +45,16 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const headerText = paletteColor(paletteId, 5);
-  const bodyFill = paletteColor(paletteId, 5);
-  const itemText = paletteColor(paletteId, 0);
-  const topicText = paletteColor(paletteId, 0);
-
-  // Semantic colours from palette slots — 0 for pros (primary, "go"), 1 for
-  // cons (secondary, "caution"). Deliberately keeps brand identity even on
-  // hi-vis / mono palettes rather than hard-coding green/red.
-  const prosColour = paletteColor(paletteId, 0);
-  const consColour = paletteColor(paletteId, 1);
+  const palette = getPalette(paletteId);
+  // Per handover: pros = nodeFill, cons = darken(nodeFill, 0.2). Tick/cross
+  // icons use palette.accent to break up the monochrome reading.
+  const prosColour = palette.nodeFill;
+  const consColour = darken(palette.nodeFill, 0.2);
+  const iconAccent = palette.accent;
+  const headerText = palette.text;
+  const bodyFill = lighten(palette.nodeFill, 0.88);
+  const itemText = palette.nodeFill;
+  const topicText = palette.nodeFill;
 
   const paddingX = 40;
   const paddingTopicTop = data.topic ? 22 : 0;
@@ -155,14 +155,14 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
                   {col.iconType === 'tick' ? (
                     <path
                       d={`M ${iconCx - 4} ${iconCy} L ${iconCx - 1} ${iconCy + 3} L ${iconCx + 4} ${iconCy - 3}`}
-                      stroke={colFill}
+                      stroke={iconAccent}
                       strokeWidth={2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       fill="none"
                     />
                   ) : (
-                    <g stroke={colFill} strokeWidth={2} strokeLinecap="round">
+                    <g stroke={iconAccent} strokeWidth={2} strokeLinecap="round">
                       <line x1={iconCx - 4} y1={iconCy - 4} x2={iconCx + 4} y2={iconCy + 4} />
                       <line x1={iconCx - 4} y1={iconCy + 4} x2={iconCx + 4} y2={iconCy - 4} />
                     </g>

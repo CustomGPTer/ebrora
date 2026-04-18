@@ -12,7 +12,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   topic: z.string().max(40).optional(),
@@ -54,14 +54,16 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const headerFill = paletteColor(paletteId, 0);
-  const headerText = paletteColor(paletteId, 5);
-  const rowAltFill = paletteColor(paletteId, 5);
-  const rowLabelFill = paletteColor(paletteId, 4);
-  const rowLabelText = paletteColor(paletteId, 0);
-  const cellText = paletteColor(paletteId, 0);
-  const borderColour = paletteColor(paletteId, 3);
-  const topicText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  const headerFill = palette.accent;
+  // Header row sits on accent — its text needs accentText contrast.
+  const headerText = palette.accentText;
+  const rowAltFill = palette.bg;
+  const rowLabelFill = lighten(palette.nodeFill, 0.85);
+  const rowLabelText = palette.nodeFill;
+  const cellText = palette.nodeFill;
+  const borderColour = palette.nodeStroke;
+  const topicText = palette.nodeFill;
 
   const paddingX = 24;
   const topicH = data.topic ? 26 : 0;
