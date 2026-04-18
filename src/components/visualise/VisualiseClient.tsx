@@ -44,14 +44,14 @@ import DraftList from './DraftList';
 // logic, sidebar panels, text edit registry, history stack, etc. It's only
 // opened when the user clicks Edit on a VisualCard, so it doesn't need to
 // be in the initial bundle.
-const CanvasEditor = dynamic(() => import('./Canvas/CanvasEditor'), {
+const CanvasEditor = dynamic(() => import('./canvas/CanvasEditor'), {
   ssr: false,
   loading: () => <CanvasEditorLoadingOverlay />,
 });
 
 // ExportModal pulls in html2canvas and jspdf (via its helpers), both of
 // which are large. Only opened when the user clicks Export.
-const ExportModal = dynamic(() => import('./Export/ExportModal'), {
+const ExportModal = dynamic(() => import('./export/ExportModal'), {
   ssr: false,
   loading: () => <ExportModalLoadingOverlay />,
 });
