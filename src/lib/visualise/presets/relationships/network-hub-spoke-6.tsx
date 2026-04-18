@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette } from '../../palettes';
 
 const nodeSchema = z.object({
   label: z.string().min(1).max(18),
@@ -41,11 +41,13 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const hubFill = paletteColor(paletteId, 0);
-  const hubText = paletteColor(paletteId, 5);
-  const spokeFill = paletteColor(paletteId, 2);
-  const spokeText = paletteColor(paletteId, 5);
-  const edgeColour = paletteColor(paletteId, 1);
+  const palette = getPalette(paletteId);
+  // Per handover: Hub = accent; spokes = nodeFill; edges = nodeStroke.
+  const hubFill = palette.accent;
+  const hubText = palette.accentText;
+  const spokeFill = palette.nodeFill;
+  const spokeText = palette.text;
+  const edgeColour = palette.nodeStroke;
 
   const cx = width / 2;
   const cy = height / 2;
@@ -91,7 +93,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const fill = customColors[nodeId] ?? spokeFill;
         return (
           <g key={nodeId} data-id={nodeId}>
-            <circle cx={sx} cy={sy} r={spokeR} fill={fill} stroke={paletteColor(paletteId, 5)} strokeWidth={1.5} />
+            <circle cx={sx} cy={sy} r={spokeR} fill={fill} stroke={palette.bg} strokeWidth={1.5} />
             <text
               x={sx}
               y={sy + 4}
@@ -109,7 +111,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
 
       {/* Hub on top */}
       <g data-id="hub">
-        <circle cx={cx} cy={cy} r={hubR} fill={customColors['hub'] ?? hubFill} stroke={paletteColor(paletteId, 5)} strokeWidth={2} />
+        <circle cx={cx} cy={cy} r={hubR} fill={customColors['hub'] ?? hubFill} stroke={palette.bg} strokeWidth={2} />
         <text
           x={cx}
           y={cy + 4}

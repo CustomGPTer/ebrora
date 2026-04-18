@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, darken } from '../../palettes';
 
 const sideSchema = z.object({
   label: z.string().min(1).max(20),
@@ -42,13 +42,16 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const leftFill = paletteColor(paletteId, 0);
-  const rightFill = paletteColor(paletteId, 2);
-  const overlapFill = paletteColor(paletteId, 1);
-  const leftText = paletteColor(paletteId, 5);
-  const rightText = paletteColor(paletteId, 5);
-  const overlapText = paletteColor(paletteId, 5);
-  const labelColour = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  // Per handover: each circle a distinct colour (nodeFill + accent); overlap
+  // is a darkened blend — visually reads as "both" without cloning either side.
+  const leftFill = palette.nodeFill;
+  const rightFill = palette.accent;
+  const overlapFill = darken(palette.nodeFill, 0.1);
+  const leftText = palette.text;
+  const rightText = palette.accentText;
+  const overlapText = palette.text;
+  const labelColour = palette.nodeFill;
 
   const cy = height / 2;
   const r = Math.min(width * 0.3, height * 0.4);

@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const setSchema = z.object({
   label: z.string().min(1).max(26),
@@ -38,12 +38,15 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const outerFill = paletteColor(paletteId, 4);
-  const middleFill = paletteColor(paletteId, 2);
-  const innerFill = paletteColor(paletteId, 0);
-  const outerText = paletteColor(paletteId, 0);
-  const middleText = paletteColor(paletteId, 5);
-  const innerText = paletteColor(paletteId, 5);
+  const palette = getPalette(paletteId);
+  // Per handover: accent for innermost (the "core" set), nodeFill for middle,
+  // a light tint for the outer set. Text colours follow the fill.
+  const outerFill = lighten(palette.nodeFill, 0.6);
+  const middleFill = palette.nodeFill;
+  const innerFill = palette.accent;
+  const outerText = palette.nodeFill;
+  const middleText = palette.text;
+  const innerText = palette.accentText;
 
   const pad = 14;
   const outerW = width - pad * 2;

@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   setA: z.string().min(1).max(24),
@@ -25,12 +25,15 @@ const defaultData: Data = {
 };
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
-  const p = settings.paletteId;
-  const cA = paletteColor(p, 0);
-  const cB = paletteColor(p, 1);
-  const cC = paletteColor(p, 2);
-  const textDark = paletteColor(p, 0);
-  const intersectColor = paletteColor(p, 5);
+  const palette = getPalette(settings.paletteId);
+  // Per handover: 3 distinct — nodeFill + accent + lighten(nodeFill, 0.4).
+  // Some palettes (notably mono, where accent is mid-grey) will show less
+  // distinction between circles; acceptable trade per handover.
+  const cA = palette.nodeFill;
+  const cB = palette.accent;
+  const cC = lighten(palette.nodeFill, 0.4);
+  const textDark = palette.nodeFill;
+  const intersectColor = palette.accentText;
   const font = settings.font ?? 'Inter, sans-serif';
 
   const cx = width / 2;

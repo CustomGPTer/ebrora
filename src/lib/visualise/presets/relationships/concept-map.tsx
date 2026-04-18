@@ -12,7 +12,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette } from '../../palettes';
 
 const conceptSchema = z.object({
   label: z.string().min(1).max(24),
@@ -62,11 +62,13 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const nodeFill = paletteColor(paletteId, 2);
-  const nodeStroke = paletteColor(paletteId, 0);
-  const nodeText = paletteColor(paletteId, 5);
-  const edgeColour = paletteColor(paletteId, 1);
-  const edgeText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  // Per handover: concepts flat nodeFill; links nodeStroke; link labels nodeFill.
+  const nodeFill = palette.nodeFill;
+  const nodeStroke = palette.nodeStroke;
+  const nodeText = palette.text;
+  const edgeColour = palette.nodeStroke;
+  const edgeText = palette.nodeFill;
 
   const cx = width / 2;
   const cy = height / 2;
@@ -156,7 +158,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
               height={16}
               rx={8}
               ry={8}
-              fill={paletteColor(paletteId, 5)}
+              fill={palette.bg}
               stroke={edgeColour}
               strokeWidth={1}
               opacity={0.95}

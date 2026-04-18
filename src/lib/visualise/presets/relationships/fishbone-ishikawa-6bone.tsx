@@ -14,7 +14,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, darken } from '../../palettes';
 
 const boneSchema = z.object({
   category: z.string().min(1).max(18),
@@ -47,12 +47,17 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const spineColour = paletteColor(paletteId, 0);
-  const boneColour = paletteColor(paletteId, 1);
-  const causeColour = paletteColor(paletteId, 2);
-  const textColour = paletteColor(paletteId, 0);
-  const effectFill = paletteColor(paletteId, 0);
-  const effectText = paletteColor(paletteId, 5);
+  const palette = getPalette(paletteId);
+  // Per handover: spine = nodeFill; bones alternate nodeFill / darken(nodeFill, 0.15).
+  // Cause labels use nodeStroke. Effect box uses accent so the "outcome" stands
+  // out from the cause-categories.
+  const spineColour = palette.nodeFill;
+  const boneColourA = palette.nodeFill;
+  const boneColourB = darken(palette.nodeFill, 0.15);
+  const causeColour = palette.nodeStroke;
+  const textColour = palette.nodeFill;
+  const effectFill = palette.accent;
+  const effectText = palette.accentText;
 
   // Layout zones
   const marginX = 30;
@@ -115,7 +120,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const tipX = anchorX - boneDx;
         const tipY = isTop ? anchorY - boneDy : anchorY + boneDy;
         const nodeId = `bone-${i}`;
-        const fill = customColors[nodeId] ?? boneColour;
+        const fill = customColors[nodeId] ?? (i % 2 === 0 ? boneColourA : boneColourB);
 
         // Cause slots along the bone: evenly distributed between 35 % and 85 % of the bone length.
         const causeCount = bone.causes.length;
@@ -209,7 +214,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
           rx={6}
           ry={6}
           fill={customColors['effect'] ?? effectFill}
-          stroke={paletteColor(paletteId, 5)}
+          stroke={palette.bg}
           strokeWidth={1.5}
         />
         <text
