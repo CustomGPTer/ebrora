@@ -235,7 +235,7 @@ export const fishboneIshikawa6BonePreset: Preset<Data> = {
   tags: ['fishbone', 'ishikawa', 'cause-effect', 'root-cause', 'analysis'],
   description: 'Cause-and-effect diagram with one effect and 6 category bones.',
   aiDescription:
-    'Use when the text is a root-cause analysis of a single outcome — one central effect with contributing causes grouped into exactly 6 categories. Each category carries 1–3 specific causes as twigs. Prefer "concept-map" when the shape is a web of peer concepts linked by labelled relationships rather than a centred cause-effect breakdown; prefer "hierarchy-mindmap-centre" when the content is a topic breakdown with no single "effect" to anchor on.',
+    'Use when the text is a root-cause analysis of a single outcome — one central effect with contributing causes grouped into exactly 6 categories. Each category carries 1–3 specific causes as twigs. Prefer "concept-map" when the shape is a web of peer concepts linked by labelled relationships rather than a centred cause-effect breakdown; prefer "hierarchy-mindmap-centre" when the content is a topic breakdown with no single "effect" to anchor on. Do NOT use for sequential processes, task lists, or any content where there is no single "effect" being analysed — fishbone is ONLY for cause-and-effect analysis.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

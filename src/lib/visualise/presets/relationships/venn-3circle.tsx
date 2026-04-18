@@ -65,7 +65,7 @@ export const venn3CirclePreset: Preset<Data> = {
   category: 'relationships',
   tags: ['venn', 'overlap', 'relationship', 'intersection'],
   description: 'Three overlapping circles with a shared intersection.',
-  aiDescription: 'Three-circle Venn diagram showing overlapping sets. Use when the text describes three concepts that share common ground — e.g. cost/quality/time, people/process/technology, safety/quality/schedule.',
+  aiDescription: 'Three-circle Venn diagram showing overlapping sets. Use when the text describes three concepts that share common ground — e.g. cost/quality/time, people/process/technology, safety/quality/schedule. Do NOT use for sequential steps, lists of tasks, or items that do not genuinely overlap — a 3-step process is NOT a Venn diagram.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

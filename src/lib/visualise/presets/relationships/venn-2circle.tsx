@@ -171,7 +171,7 @@ export const venn2CirclePreset: Preset<Data> = {
   tags: ['venn', 'overlap', 'comparison', 'shared'],
   description: 'Two overlapping circles — left-only, overlap, right-only.',
   aiDescription:
-    'Use when the text compares exactly two groups, options, or concepts and explicitly calls out what they share vs what is unique to each. Good for "A vs B with common ground" narratives. Prefer "venn-3circle" for three-way overlaps; prefer "compare-side-by-side-2col" or "compare-pros-cons" when there is no overlap or the content is just two parallel lists.',
+    'Use when the text compares exactly two groups, options, or concepts and explicitly calls out what they share vs what is unique to each. Good for "A vs B with common ground" narratives. Prefer "venn-3circle" for three-way overlaps; prefer "compare-side-by-side-2col" or "compare-pros-cons" when there is no overlap or the content is just two parallel lists. Do NOT use for sequential steps or items that do not genuinely overlap — a 2-step process is NOT a Venn diagram.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

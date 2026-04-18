@@ -179,7 +179,7 @@ export const eulerNestedPreset: Preset<Data> = {
   tags: ['euler', 'nested', 'subset', 'inclusion', 'scope'],
   description: 'Three concentric rectangles — outer ⊃ middle ⊃ inner.',
   aiDescription:
-    'Use when the text describes a strict subset relationship: "all of X; of those, some are Y; of those, some are Z". Good for scope-narrowing diagrams, inclusion chains, zooming from broad to specific. Prefer "venn-2circle" or "venn-3circle" when sets overlap partially rather than being strict subsets.',
+    'Use when the text describes a strict subset relationship: "all of X; of those, some are Y; of those, some are Z". Good for scope-narrowing diagrams, inclusion chains, zooming from broad to specific. Prefer "venn-2circle" or "venn-3circle" when sets overlap partially rather than being strict subsets. Do NOT use for sequential steps, task lists, or any content where items do not strictly contain each other.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
