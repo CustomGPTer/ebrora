@@ -65,10 +65,17 @@ interface BuildSystemPromptOptions {
    * Mutually exclusive with regenerateFrom (regenerate is always legacy shape).
    */
   variantMode?: boolean;
+  /**
+   * Batch CQ: clarification answers from the pre-generate question flow.
+   * When present, these become authoritative hints appended to the prompt
+   * (the AI must honour them over text-inferred guesses). Each answer is
+   * {topic, value} where topic ∈ {family,preset,count,palette,data}.
+   */
+  clarifyAnswers?: Array<{ topic: string; value: string }>;
 }
 
 export function buildSystemPrompt(options: BuildSystemPromptOptions = {}): string {
-  const { forcePresetId, visualCount, regenerateFrom, variantMode } = options;
+  const { forcePresetId, visualCount, regenerateFrom, variantMode, clarifyAnswers } = options;
 
   const catalogue = buildPresetCatalogue(forcePresetId);
   const palettes = buildPaletteList();
@@ -76,7 +83,7 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions = {}): strin
   // Variant mode gets a totally different schema + rule set. Handle it first
   // so the legacy branch below stays unchanged for regenerate-path callers.
   if (variantMode) {
-    return buildVariantModePrompt(catalogue, palettes, visualCount, forcePresetId);
+    return buildVariantModePrompt(catalogue, palettes, visualCount, forcePresetId, clarifyAnswers);
   }
 
   const constraints: string[] = [];
@@ -97,6 +104,11 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions = {}): strin
       `CONSTRAINT: You are regenerating a single visual. The previous preset was "${regenerateFrom}". Strongly prefer a DIFFERENT preset this time — either a different preset in the same family (if it fits) or a preset from a different family that still captures the concept. Only reuse "${regenerateFrom}" if no alternative is appropriate. Return exactly 1 visual.`,
     );
   }
+
+  // Batch CQ: clarify answers become authoritative hints. The AI must honour
+  // these even if its own reading of the text would prefer something else.
+  const clarifyBlock = buildClarifyConstraintsBlock(clarifyAnswers);
+  if (clarifyBlock) constraints.push(clarifyBlock);
 
   const conceptCountPhrase = visualCount
     ? `exactly ${visualCount} distinct concept${visualCount === 1 ? '' : 's'}`
@@ -177,6 +189,7 @@ function buildVariantModePrompt(
   palettes: string,
   visualCount: 1 | 2 | 3 | undefined,
   forcePresetId: string | undefined,
+  clarifyAnswers: Array<{ topic: string; value: string }> | undefined,
 ): string {
   const conceptCountPhrase = visualCount
     ? `exactly ${visualCount} distinct concept${visualCount === 1 ? '' : 's'}`
@@ -190,6 +203,11 @@ function buildVariantModePrompt(
       `CONSTRAINT: The user has pinned preset "${forcePresetId}" as the FIRST variant. The 2nd and 3rd variants should still be different, structurally-complementary presets from the catalogue.`,
     );
   }
+
+  // Batch CQ: variant mode honours clarify answers the same way as the
+  // single-shot branch. Authoritative over AI inference.
+  const clarifyBlock = buildClarifyConstraintsBlock(clarifyAnswers);
+  if (clarifyBlock) constraints.push(clarifyBlock);
 
   return `You are Visualise, an AI that turns short UK-construction-industry text into visual diagrams.
 
@@ -307,3 +325,55 @@ function describePresetForAi(preset: AnyPreset): string {
 function buildPaletteList(): string {
   return PALETTE_IDS.map((id) => `- ${id}: ${PALETTE_AI_HINTS[id]}`).join('\n');
 }
+
+/**
+ * Batch CQ: format clarify answers as a CONSTRAINT block. Each topic maps
+ * to a specific instruction so the AI knows what to do with each hint.
+ * Returns empty string if no useful answers are present; the caller can
+ * skip appending it in that case.
+ */
+function buildClarifyConstraintsBlock(
+  clarifyAnswers: Array<{ topic: string; value: string }> | undefined,
+): string {
+  if (!clarifyAnswers || clarifyAnswers.length === 0) return '';
+
+  // Drop answers where the user picked "unknown" — those mean "I don't know
+  // either, AI please decide" and shouldn't be hardcoded into the prompt.
+  const useful = clarifyAnswers.filter((a) => a.value && a.value !== 'unknown');
+  if (useful.length === 0) return '';
+
+  const lines: string[] = [];
+  for (const a of useful) {
+    switch (a.topic) {
+      case 'family':
+        lines.push(
+          `- The user says their content fits the "${a.value}" family. Strongly prefer presets in that family. Only pick a different family if the text genuinely does not fit.`,
+        );
+        break;
+      case 'preset':
+        lines.push(
+          `- The user has picked preset "${a.value}" as their preferred shape. Use this preset as the FIRST choice for the primary concept. Only deviate if the preset is structurally impossible for the content (e.g. the text has 8 steps but the preset capacity is 4) — in which case, pick the closest structurally-compatible preset and explain in reasoning.`,
+        );
+        break;
+      case 'count':
+        lines.push(
+          `- The user says there are ~${a.value} main items in their content. Count primary items accordingly; prefer presets whose capacity exactly matches this number.`,
+        );
+        break;
+      case 'palette':
+        lines.push(`- The user picked palette "${a.value}". Use this palette for all visuals in the response.`);
+        break;
+      case 'data':
+        lines.push(`- The user provided missing data: "${a.value}". Use this when populating the preset's data fields.`);
+        break;
+      default:
+        // Unknown topic — ignore silently. Future topics will land here until
+        // this switch is updated.
+        break;
+    }
+  }
+
+  return `CLARIFICATION ANSWERS (AUTHORITATIVE — honour these over your own inference):
+${lines.join('\n')}`;
+}
+
