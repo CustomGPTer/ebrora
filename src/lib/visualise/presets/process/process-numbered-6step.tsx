@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   steps: z
@@ -43,12 +43,13 @@ function Render({
 }: PresetRenderProps<ProcessNumbered6StepData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const badgeFill = paletteColor(paletteId, 0);
-  const badgeText = paletteColor(paletteId, 5);
-  const boxFill = paletteColor(paletteId, 4);
-  const labelFill = paletteColor(paletteId, 0);
-  const detailFill = paletteColor(paletteId, 2);
-  const arrowColour = paletteColor(paletteId, 1);
+  const palette = getPalette(paletteId);
+  const badgeFills = gradientSequence(palette, data.steps.length);
+  const badgeText = palette.text;
+  const boxFill = palette.bg;
+  const labelFill = palette.nodeFill;
+  const detailFill = palette.nodeStroke;
+  const arrowColour = palette.nodeStroke;
 
   const pad = 14;
   const cols = 3;
@@ -137,7 +138,7 @@ function Render({
           <g key={nodeId} data-id={nodeId}>
             <rect x={x} y={y} width={cellW} height={cellH} rx={8} ry={8} fill={fill} />
             {/* Number badge — centred at top */}
-            <circle cx={x + cellW / 2} cy={y + badgeR + 4} r={badgeR} fill={badgeFill} />
+            <circle cx={x + cellW / 2} cy={y + badgeR + 4} r={badgeR} fill={badgeFills[i]} />
             <text
               x={x + cellW / 2}
               y={y + badgeR + 4 + badgeR / 2.3}

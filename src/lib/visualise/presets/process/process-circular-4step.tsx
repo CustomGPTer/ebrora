@@ -11,7 +11,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   centreLabel: z.string().max(18).optional(),
@@ -59,11 +59,15 @@ function Render({
 }: PresetRenderProps<ProcessCircular4StepData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const centreFill = paletteColor(paletteId, 0);
-  const centreText = paletteColor(paletteId, 5);
-  const wedgeText = paletteColor(paletteId, 5);
-  const detailText = paletteColor(paletteId, 2);
-  const gapStroke = paletteColor(paletteId, 5);
+  const palette = getPalette(paletteId);
+  // Pattern B: gradient wedges around the ring; centre hub uses accent so it
+  // reads as the anchor rather than competing with the wedge colours.
+  const wedgeFills = gradientSequence(palette, data.steps.length);
+  const centreFill = palette.accent;
+  const centreText = palette.accentText;
+  const wedgeText = palette.text;
+  const detailText = palette.nodeFill;
+  const gapStroke = palette.bg;
 
   const cx = width / 2;
   const cy = height / 2;
@@ -76,9 +80,6 @@ function Render({
 
   // Start wedge 0 at the top (centre at -90°)
   const startAngle = -90 - segAngle / 2;
-
-  // Wedge fill indices — alternate to keep adjacent wedges distinguishable
-  const fillIndex = (i: number): number => [0, 2, 3, 1][i % 4];
 
   return (
     <svg
@@ -96,7 +97,7 @@ function Render({
         const ly = cy + labelR * Math.sin(rad);
 
         const nodeId = `step-${i}`;
-        const fill = customColors[nodeId] ?? paletteColor(paletteId, fillIndex(i));
+        const fill = customColors[nodeId] ?? wedgeFills[i];
 
         return (
           <g key={nodeId} data-id={nodeId}>

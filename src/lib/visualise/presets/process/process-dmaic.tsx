@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const stageSchema = z.object({
   title: z.string().min(1).max(14),
@@ -39,8 +39,14 @@ function Render({
 }: PresetRenderProps<ProcessDmaicData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const titleText = paletteColor(paletteId, 5);
-  const summaryText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  // Handover suggested Pattern C (flat nodeFill) for DMAIC; using Pattern A here
+  // instead because the chevron shape already communicates sequence and flat
+  // fills would produce 5 identical chevrons with no visual progression. The
+  // gradient subtly reinforces the stage order without implying hierarchy.
+  const stageFills = gradientSequence(palette, data.stages.length);
+  const titleText = palette.text;
+  const summaryText = palette.nodeFill;
 
   const pad = 14;
   const overlap = 18; // chevron notch depth
@@ -49,11 +55,6 @@ function Render({
   const nStages = data.stages.length;
   const bandW = width - pad * 2;
   const stageW = (bandW + overlap * (nStages - 1)) / nStages;
-
-  const fillForIndex = (i: number): string => {
-    const idx = [0, 1, 2, 3, 0][i] ?? 0;
-    return paletteColor(paletteId, idx);
-  };
 
   return (
     <svg
@@ -64,7 +65,7 @@ function Render({
       {data.stages.map((stage, i) => {
         const x = pad + i * (stageW - overlap);
         const nodeId = `stage-${i}`;
-        const fill = customColors[nodeId] ?? fillForIndex(i);
+        const fill = customColors[nodeId] ?? stageFills[i];
 
         // Chevron path — left edge flat for first, notched for subsequent;
         // right edge pointed for all but the last.

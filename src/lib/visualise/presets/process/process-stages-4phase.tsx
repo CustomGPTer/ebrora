@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence, lighten } from '../../palettes';
 
 const phaseSchema = z.object({
   title: z.string().min(1).max(20),
@@ -51,12 +51,13 @@ function Render({
 }: PresetRenderProps<ProcessStages4PhaseData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const phaseFillBase = paletteColor(paletteId, 0);
-  const phaseBody = paletteColor(paletteId, 4);
-  const numberText = paletteColor(paletteId, 5);
-  const titleText = paletteColor(paletteId, 0);
-  const bulletText = paletteColor(paletteId, 0);
-  const bulletDot = paletteColor(paletteId, 2);
+  const palette = getPalette(paletteId);
+  // Pattern A: per-phase gradient headers so the 4 stages read as a progression.
+  const phaseFills = gradientSequence(palette, data.phases.length);
+  const phaseBody = lighten(palette.nodeFill, 0.85);
+  const numberText = palette.text;
+  const bulletText = palette.nodeFill;
+  const bulletDot = lighten(palette.nodeFill, 0.2);
 
   const pad = 12;
   const gap = 10;
@@ -75,7 +76,7 @@ function Render({
         const x = pad + i * (phaseW + gap);
         const y = pad;
         const nodeId = `phase-${i}`;
-        const headerFill = customColors[`${nodeId}-header`] ?? phaseFillBase;
+        const headerFill = customColors[`${nodeId}-header`] ?? phaseFills[i];
         const bodyFill = customColors[nodeId] ?? phaseBody;
 
         return (

@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   centreLabel: z.string().max(14).optional(),
@@ -59,11 +59,13 @@ function Render({
 }: PresetRenderProps<ProcessCircular6StepData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const centreFill = paletteColor(paletteId, 0);
-  const centreText = paletteColor(paletteId, 5);
-  const wedgeText = paletteColor(paletteId, 5);
-  const detailText = paletteColor(paletteId, 5);
-  const gapStroke = paletteColor(paletteId, 5);
+  const palette = getPalette(paletteId);
+  const wedgeFills = gradientSequence(palette, data.steps.length);
+  const centreFill = palette.accent;
+  const centreText = palette.accentText;
+  const wedgeText = palette.text;
+  const detailText = palette.text;
+  const gapStroke = palette.bg;
 
   const cx = width / 2;
   const cy = height / 2;
@@ -74,8 +76,6 @@ function Render({
   const segAngle = 360 / n;
   const gapDeg = 1.5;
   const startAngle = -90 - segAngle / 2;
-
-  const fillIndex = (i: number): number => [0, 2, 1, 3, 0, 2][i % 6];
 
   return (
     <svg
@@ -93,7 +93,7 @@ function Render({
         const ly = cy + labelR * Math.sin(rad);
 
         const nodeId = `step-${i}`;
-        const fill = customColors[nodeId] ?? paletteColor(paletteId, fillIndex(i));
+        const fill = customColors[nodeId] ?? wedgeFills[i];
 
         return (
           <g key={nodeId} data-id={nodeId}>

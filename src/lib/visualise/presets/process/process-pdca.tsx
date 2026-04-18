@@ -13,7 +13,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const quadrantSchema = z.object({
   title: z.string().min(1).max(14),
@@ -65,12 +65,13 @@ function Render({
 }: PresetRenderProps<ProcessPdcaData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const titleFill = paletteColor(paletteId, 0);
-  const titleText = paletteColor(paletteId, 5);
-  const cellFill = paletteColor(paletteId, 4);
-  const cellText = paletteColor(paletteId, 0);
-  const arrowColour = paletteColor(paletteId, 1);
-  const bulletColour = paletteColor(paletteId, 2);
+  const palette = getPalette(paletteId);
+  const titleFill = palette.nodeFill;
+  const titleText = palette.text;
+  const cellFill = lighten(palette.nodeFill, 0.88);
+  const cellText = palette.nodeFill;
+  const arrowColour = palette.nodeStroke;
+  const bulletColour = palette.accent;
 
   const pad = 14;
   const gap = 10;
