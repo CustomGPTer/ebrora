@@ -1,8 +1,13 @@
 'use client';
 
 // =============================================================================
-// PaletteChooser — 6 swatches, each showing the 4 primary colours of one
-// palette. Clicking selects.
+// PaletteChooser — 6 swatches, each showing the 4 visually-distinctive slots
+// of one palette. Clicking selects.
+//
+// Batch 2: migrated from 6-tuple slice to 5-slot Palette object. The 4 strips
+// we show are [bg, nodeFill, nodeStroke, accent] — chosen because they're the
+// four that define the palette's visual identity; `text` is usually white and
+// would render as a blank strip.
 //
 // Render compact enough to fit in the 260 px settings sidebar without
 // horizontal scroll — 3 cols × 2 rows at default sidebar width.
@@ -21,7 +26,8 @@ export default function PaletteChooser({ value, onChange }: Props) {
     <div className="grid grid-cols-2 gap-2">
       {PALETTE_IDS.map((id) => {
         const active = id === value;
-        const colours = PALETTES[id];
+        const palette = PALETTES[id];
+        const strips = [palette.bg, palette.nodeFill, palette.nodeStroke, palette.accent];
         return (
           <button
             key={id}
@@ -35,7 +41,7 @@ export default function PaletteChooser({ value, onChange }: Props) {
             aria-pressed={active}
           >
             <div className="flex h-5 overflow-hidden rounded">
-              {colours.slice(0, 4).map((c, i) => (
+              {strips.map((c, i) => (
                 <div key={i} style={{ background: c }} className="flex-1" />
               ))}
             </div>
