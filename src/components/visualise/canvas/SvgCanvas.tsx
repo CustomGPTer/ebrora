@@ -4,7 +4,7 @@
 // SvgCanvas — pan/zoom container for a single rendered preset.
 //
 // Hosts an 8 px (world-space) grid background and the preset's natural
-// <svg viewBox>. Zoom is wheel-driven, zoom-at-cursor, clamped 0.1× to 4×.
+// <svg viewBox>. Zoom is wheel-driven, snap-to-centre, clamped 0.1× to 4×.
 // Pan is Space+drag (held-space cursor becomes grab/grabbing).
 //
 // The outer wrapper is fixed-size (fills the CanvasEditor main area). A
@@ -35,6 +35,11 @@ export interface SvgCanvasApi {
   setViewport: (v: Viewport) => void;
   fitToContent: () => void;
   resetTo100: () => void;
+  /**
+   * Set an exact scale, snapping the content to the centre of the viewport.
+   * Used by the zoom slider in the top toolbar.
+   */
+  setScaleCentred: (scale: number) => void;
 }
 
 interface Props {
@@ -137,6 +142,19 @@ export default function SvgCanvas({
     pushViewport({ scale: 1, panX, panY });
   }, [containerSize, contentWidth, contentHeight, pushViewport]);
 
+  const setScaleCentred = useCallback(
+    (nextRaw: number) => {
+      if (containerSize.w <= 0 || containerSize.h <= 0) return;
+      const nextScale = clamp(nextRaw, MIN_SCALE, MAX_SCALE);
+      pushViewport({
+        scale: nextScale,
+        panX: (containerSize.w - contentWidth * nextScale) / 2,
+        panY: (containerSize.h - contentHeight * nextScale) / 2,
+      });
+    },
+    [containerSize, contentWidth, contentHeight, pushViewport],
+  );
+
   // Fit on first layout.
   const didInitialFit = useRef(false);
   useEffect(() => {
@@ -154,42 +172,41 @@ export default function SvgCanvas({
       setViewport: (v) => pushViewport(v),
       fitToContent,
       resetTo100,
+      setScaleCentred,
     };
     return () => {
       if (apiRef.current) apiRef.current = null;
     };
-  }, [apiRef, viewport, pushViewport, fitToContent, resetTo100]);
+  }, [apiRef, viewport, pushViewport, fitToContent, resetTo100, setScaleCentred]);
 
-  // Wheel → zoom at cursor. Must be non-passive to call preventDefault.
+  // Wheel → zoom. Must be non-passive to call preventDefault.
+  // Per Jon's preference: zoom SNAPS to centre the chart in the viewport
+  // rather than zooming-at-cursor. This keeps the content predictably
+  // positioned and means a zoom-out never leaves the chart drifted.
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const rect = el.getBoundingClientRect();
-      const cx = e.clientX - rect.left;
-      const cy = e.clientY - rect.top;
 
       // ~15 % per notch — ctrl-wheel (pinch on trackpad) is a finer pinch step.
       const factor = e.ctrlKey ? (e.deltaY < 0 ? 1.05 : 1 / 1.05) : e.deltaY < 0 ? 1.15 : 1 / 1.15;
 
       pushViewport((prev) => {
         const nextScale = clamp(prev.scale * factor, MIN_SCALE, MAX_SCALE);
-        // Keep the cursor over the same content point.
-        const xInContent = (cx - prev.panX) / prev.scale;
-        const yInContent = (cy - prev.panY) / prev.scale;
+        // Snap to centre the content within the container at the new scale.
         return {
           scale: nextScale,
-          panX: cx - xInContent * nextScale,
-          panY: cy - yInContent * nextScale,
+          panX: (containerSize.w - contentWidth * nextScale) / 2,
+          panY: (containerSize.h - contentHeight * nextScale) / 2,
         };
       });
     };
 
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, [pushViewport]);
+  }, [pushViewport, containerSize.w, containerSize.h, contentWidth, contentHeight]);
 
   // Space hold → drag cursor. Keydown/keyup on window (so focus can be anywhere).
   useEffect(() => {

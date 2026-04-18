@@ -1116,7 +1116,7 @@ export default function CanvasEditor({
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-white flex flex-col"
+      className="fixed left-0 right-0 bottom-0 top-16 z-[100] bg-white flex flex-col"
       role="dialog"
       aria-modal="true"
       aria-label="Canvas editor"
@@ -1173,13 +1173,39 @@ export default function CanvasEditor({
             </svg>
           </ToolbarButton>
           <div className="mx-1 h-5 border-l border-gray-200" />
-          <ToolbarButton onClick={() => canvasApiRef.current?.fitToContent()} label="Fit (Ctrl+0)">
-            <span className="text-xs font-medium">Fit</span>
+          <ToolbarButton
+            onClick={() => canvasApiRef.current?.fitToContent()}
+            label="Reset view — fit to window (Ctrl+0)"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9V5a2 2 0 0 1 2-2h4" />
+              <path d="M15 3h4a2 2 0 0 1 2 2v4" />
+              <path d="M21 15v4a2 2 0 0 1-2 2h-4" />
+              <path d="M9 21H5a2 2 0 0 1-2-2v-4" />
+            </svg>
           </ToolbarButton>
           <ToolbarButton onClick={() => canvasApiRef.current?.resetTo100()} label="100 % (Ctrl+1)">
             <span className="text-xs font-medium">100%</span>
           </ToolbarButton>
-          <span className="ml-1 px-2 text-xs font-mono text-gray-500 tabular-nums w-12 text-center">
+          {/* Zoom slider — drag for precise zoom control. Reads the live viewport
+              scale so it tracks wheel-zoom changes in real time, and writes back
+              via setScaleCentred which snaps the content to the viewport centre. */}
+          <input
+            type="range"
+            min={10}
+            max={400}
+            step={5}
+            value={Math.round(viewport.scale * 100)}
+            onChange={(e) => {
+              const pct = parseInt(e.target.value, 10);
+              if (!Number.isFinite(pct)) return;
+              canvasApiRef.current?.setScaleCentred(pct / 100);
+            }}
+            aria-label="Zoom level"
+            title={`Zoom: ${Math.round(viewport.scale * 100)}%`}
+            className="mx-2 w-24 accent-[#1B5B50] cursor-pointer"
+          />
+          <span className="px-2 text-xs font-mono text-gray-500 tabular-nums w-12 text-center">
             {Math.round(viewport.scale * 100)}%
           </span>
           <div className="mx-1 h-5 border-l border-gray-200" />
