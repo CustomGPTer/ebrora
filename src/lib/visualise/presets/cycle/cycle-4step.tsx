@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   steps: z.array(z.object({
@@ -30,7 +30,9 @@ const defaultData: Data = {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
-  const arc = paletteColor(p, 2);
+  const palette = getPalette(p);
+  const stepFills = gradientSequence(palette, data.steps.length);
+  const arc = palette.nodeStroke;
   const font = settings.font ?? 'Inter, sans-serif';
 
   const cx = width / 2;
@@ -73,25 +75,25 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       })}
 
       {data.centreLabel ? (
-        <text x={cx} y={cy + 4} textAnchor="middle" fontFamily={font} fontSize={14} fontWeight={700} fill={paletteColor(p, 0)}>
+        <text x={cx} y={cy + 4} textAnchor="middle" fontFamily={font} fontSize={14} fontWeight={700} fill={palette.nodeFill}>
           {truncate(data.centreLabel, 14)}
         </text>
       ) : null}
 
       {data.steps.map((step, i) => {
         const pos = positions[i];
-        const fill = paletteColor(p, i);
+        const fill = stepFills[i];
         const nodeId = `step-${i}`;
         const labelY = pos.y + 4;
         const detailY = pos.y + nodeR + 14;
         return (
           <g key={nodeId} data-id={nodeId}>
-            <circle cx={pos.x} cy={pos.y} r={nodeR} fill={fill} stroke={paletteColor(p, 5)} strokeWidth={2} />
-            <text x={pos.x} y={labelY} textAnchor="middle" fontFamily={font} fontSize={13} fontWeight={700} fill={paletteColor(p, 5)}>
+            <circle cx={pos.x} cy={pos.y} r={nodeR} fill={fill} stroke={palette.bg} strokeWidth={2} />
+            <text x={pos.x} y={labelY} textAnchor="middle" fontFamily={font} fontSize={13} fontWeight={700} fill={palette.text}>
               {truncate(step.label, 10)}
             </text>
             {step.detail ? (
-              <text x={pos.x} y={detailY} textAnchor="middle" fontFamily={font} fontSize={10} fill={paletteColor(p, 0)}>
+              <text x={pos.x} y={detailY} textAnchor="middle" fontFamily={font} fontSize={10} fill={palette.nodeFill}>
                 {truncate(step.detail, 20)}
               </text>
             ) : null}

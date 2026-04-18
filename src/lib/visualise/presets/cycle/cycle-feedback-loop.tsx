@@ -11,7 +11,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const stepSchema = z.object({
   label: z.string().min(1).max(20),
@@ -46,11 +46,17 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const forwardColour = paletteColor(paletteId, 0);
-  const feedbackColour = paletteColor(paletteId, 1);
-  const nodeStroke = paletteColor(paletteId, 5);
-  const labelText = paletteColor(paletteId, 5);
-  const detailText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  const stepFills = gradientSequence(palette, 4);
+  // Per handover Pattern B for cycle-feedback-loop: feedback arrow uses accent
+  // to differentiate it from the forward flow.
+  const forwardColour = palette.nodeStroke;
+  const feedbackColour = palette.accent;
+  const nodeStroke = palette.bg;
+  const labelText = palette.text;
+  const detailText = palette.nodeFill;
+  // Feedback-pill text sits on `feedbackColour` (= accent), so it needs accentText.
+  const feedbackPillText = palette.accentText;
 
   const n = 4;
   const paddingX = 40;
@@ -125,7 +131,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
           fontFamily={font}
           fontSize={12}
           fontWeight={600}
-          fill={forwardColour}
+          fill={palette.nodeFill}
           opacity={0.85}
         >
           {truncate(data.systemLabel, 24)}
@@ -178,7 +184,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
           fontFamily={font}
           fontSize={11}
           fontWeight={700}
-          fill={labelText}
+          fill={feedbackPillText}
         >
           {truncate(data.feedback.label, 26)}
         </text>
@@ -188,7 +194,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       {data.steps.map((step, i) => {
         const pos = stepPositions[i];
         const nodeId = `step-${i}`;
-        const fill = customColors[nodeId] ?? paletteColor(paletteId, i % 4);
+        const fill = customColors[nodeId] ?? stepFills[i];
         return (
           <g key={nodeId} data-id={nodeId}>
             <rect

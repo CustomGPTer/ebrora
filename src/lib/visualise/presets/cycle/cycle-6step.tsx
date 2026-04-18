@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   steps: z
@@ -45,11 +45,12 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const arc = paletteColor(paletteId, 2);
-  const centreText = paletteColor(paletteId, 0);
-  const nodeStroke = paletteColor(paletteId, 5);
-  const labelText = paletteColor(paletteId, 5);
-  const detailText = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  const stepFills = gradientSequence(palette, data.steps.length);
+  const arc = palette.nodeStroke;
+  const centreText = palette.nodeFill;
+  const labelText = palette.text;
+  const detailText = palette.nodeFill;
 
   const cx = width / 2;
   const cy = height / 2;
@@ -129,7 +130,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
       {data.steps.map((step, i) => {
         const pos = positions[i];
         const nodeId = `step-${i}`;
-        const fill = customColors[nodeId] ?? paletteColor(paletteId, i % 6);
+        const fill = customColors[nodeId] ?? stepFills[i];
         const labelY = pos.y + 4;
         // Detail placement: push outward along the node's radial line.
         const a = (pos.angle * Math.PI) / 180;
@@ -142,7 +143,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
               cy={pos.y}
               r={nodeR}
               fill={fill}
-              stroke={nodeStroke}
+              stroke={palette.bg}
               strokeWidth={2}
             />
             <text
