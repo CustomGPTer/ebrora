@@ -111,7 +111,15 @@ export async function POST(req: NextRequest) {
     // Variant mode is ONLY valid for fresh generations. Regenerate path stays
     // on the legacy single-visual shape so it continues to swap a single
     // VisualInstance cleanly.
-    const useVariantMode = Boolean(variantMode) && !isRegenerate;
+    //
+    // Batch 1 bug fix: default to TRUE when the client omits the field.
+    // Previously `Boolean(undefined) === false` would silently drop users
+    // onto the legacy path if the client forgot to send variantMode, which
+    // reduced output quality (no alternatives to swap to). Now the flow is:
+    //   regenerate → always false
+    //   explicit false → false
+    //   undefined or true → true
+    const useVariantMode = !isRegenerate && variantMode !== false;
 
     // ── Tier check ──────────────────────────────────────────────────────────
     const subscription = await prisma.subscription.findUnique({
@@ -394,6 +402,11 @@ export async function POST(req: NextRequest) {
         ...existingBlob,
         visuals: mergedVisuals,
         updatedAt: nowIso,
+        // Batch 1: preserve existing blob-level reasoning on single-visual
+        // regenerate — the overall narrative hasn't changed, only one visual.
+        // (The new reasoning from this call applies to only one visual and
+        // would be misleading if stored at the document level.)
+        reasoning: existingBlob.reasoning,
       };
     } else if (documentId && existingBlob) {
       // Replace-all inside an existing document.
@@ -404,6 +417,8 @@ export async function POST(req: NextRequest) {
         visuals: validVisuals.map((v, i) => toVisualInstance(v, i, randomUUID)),
         createdAt: existingBlob.createdAt,
         updatedAt: nowIso,
+        // Batch 1: fresh reasoning from the full regeneration.
+        reasoning: dropResult.reasoning,
       };
     } else {
       // New document.
@@ -414,6 +429,8 @@ export async function POST(req: NextRequest) {
         visuals: validVisuals.map((v, i) => toVisualInstance(v, i, randomUUID)),
         createdAt: nowIso,
         updatedAt: nowIso,
+        // Batch 1: AI chain-of-thought for the DocumentView banner.
+        reasoning: dropResult.reasoning,
       };
     }
 
