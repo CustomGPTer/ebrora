@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
       visualId,
       variantMode,
       silent,
+      clarifyAnswers,
     } = body;
 
     // visualId requires documentId
@@ -279,6 +280,10 @@ export async function POST(req: NextRequest) {
       visualCount: resolveCount(visualCountPreference, isRegenerate),
       regenerateFrom: regeneratingFromPresetId ?? undefined,
       variantMode: useVariantMode,
+      // Batch CQ: clarifyAnswers are ignored in regenerate mode — the existing
+      // visual already has a preset, so re-applying clarify hints could produce
+      // a mismatched swap. Only threaded through for fresh generations.
+      clarifyAnswers: isRegenerate ? undefined : clarifyAnswers,
     });
 
     // ── Call OpenAI with JSON retry loop ────────────────────────────────────
