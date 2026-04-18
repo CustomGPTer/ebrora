@@ -23,6 +23,10 @@
     {
       "path": "/api/cron/cleanup-org-charts",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-visualise",
+      "schedule": "15 3 * * *"
     }
   ],
   "functions": {
