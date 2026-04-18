@@ -31,6 +31,19 @@
 //   The `caption` and `node_descriptions` fields are OPTIONAL in both shapes
 //   so the validator doesn't hard-fail if the model omits them — the UI
 //   gracefully hides the sub-text block when they're missing.
+//
+// AMENDMENT (Batch 1 bug fix — "Slot overflow + reasoning"):
+//   Two new top-level fields to fix the 8-concepts-into-6-boxes silent-truncate
+//   bug seen in the screenshot:
+//     - reasoning       : REQUIRED. A 1–4 sentence plain-English explanation
+//                         of what the AI identified in the user text and why
+//                         it picked these presets. Displayed to the user above
+//                         the diagrams (transparency + learning loop).
+//     - concept_counts  : OPTIONAL. Array of integers, one per concept, giving
+//                         the number of primary items the AI identified for
+//                         that concept. Used by post-generation validation to
+//                         catch "AI said 8, preset holds 6" mismatches before
+//                         they reach the user.
 // =============================================================================
 
 import { z } from 'zod';
@@ -44,6 +57,13 @@ import { VISUALISE_MAX_VISUALS_PER_GENERATION } from '@/lib/visualise/constants'
 export const VISUALISE_CAPTION_MAX_CHARS = 240; // ~200 target, 240 hard cap
 export const VISUALISE_NODE_DESC_MAX_CHARS = 140; // 120 target, 140 hard cap
 export const VISUALISE_NODE_DESC_MAX_COUNT = 12; // any preset's primary list maxes out around 8–10
+
+/**
+ * Batch 1 bug fix — chain-of-thought reasoning the AI must return on every
+ * response. Target ~200 chars, hard cap 600. Long enough to explain concept
+ * count + preset choice; short enough to render comfortably above the visuals.
+ */
+export const VISUALISE_REASONING_MAX_CHARS = 600;
 
 /** Reusable optional string schema with max length, empty treated as absent. */
 function optionalCapString(max: number) {
@@ -80,6 +100,10 @@ export function buildAiResponseSchema() {
 
   return z.object({
     document_title: z.string().min(1).max(100),
+    // Batch 1: REQUIRED chain-of-thought explaining concept count + preset choice.
+    reasoning: z.string().min(1).max(VISUALISE_REASONING_MAX_CHARS),
+    // Batch 1: OPTIONAL per-concept counts for post-gen capacity validation.
+    concept_counts: z.array(z.number().int().min(0).max(50)).optional(),
     visuals: z.array(visualSchema).min(1).max(VISUALISE_MAX_VISUALS_PER_GENERATION),
   });
 }
@@ -117,6 +141,10 @@ export function buildVariantAiResponseSchema() {
 
   return z.object({
     document_title: z.string().min(1).max(100),
+    // Batch 1: REQUIRED chain-of-thought explaining concept count + preset choice.
+    reasoning: z.string().min(1).max(VISUALISE_REASONING_MAX_CHARS),
+    // Batch 1: OPTIONAL per-concept counts for post-gen capacity validation.
+    concept_counts: z.array(z.number().int().min(0).max(50)).optional(),
     visuals: z.array(conceptSchema).min(1).max(VISUALISE_MAX_VISUALS_PER_GENERATION),
   });
 }

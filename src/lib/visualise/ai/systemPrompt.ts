@@ -21,15 +21,32 @@
 //       must handle sequential data — filters PDCA/RACI out automatically)
 //     - 1 unconventional alternate rule (variant #3 may be a less-obvious
 //       but still valid structural fit, for variety)
+//
+// AMENDMENT (Batch 1 bug fix — "Slot overflow + reasoning"):
+//   - Each preset entry in the catalogue now includes a `capacity:` line
+//     describing its primary slot count and structural archetype (from
+//     PRESET_CAPACITY manifest). Tells the AI at selection time whether the
+//     preset can physically hold the number of concepts it identified.
+//   - Response schema adds a REQUIRED top-level `reasoning` field and an
+//     OPTIONAL `concept_counts` array. The AI must describe (1) how many
+//     concepts it identified, (2) how many primary items each concept
+//     contains, (3) why it picked each preset.
+//   - New COUNT-FIRST RULE: model must count concepts + items BEFORE picking
+//     presets, and must pick only presets whose capacity accommodates those
+//     counts. If no preset fits, the model is instructed to split the concept
+//     or pick the nearest compatible stretchier preset — never silently
+//     truncate content to fit a too-small preset.
 // =============================================================================
 
 import { getAllPresets, type AnyPreset } from '@/lib/visualise/presets';
+import { describeCapacityForAi } from '@/lib/visualise/presets/capacity';
 import { PALETTE_IDS, PALETTE_AI_HINTS } from '@/lib/visualise/palettes';
 import { VISUALISE_MAX_VISUALS_PER_GENERATION } from '@/lib/visualise/constants';
 import {
   VISUALISE_CAPTION_MAX_CHARS,
   VISUALISE_NODE_DESC_MAX_CHARS,
   VISUALISE_NODE_DESC_MAX_COUNT,
+  VISUALISE_REASONING_MAX_CHARS,
 } from './validateResponse';
 
 interface BuildSystemPromptOptions {
@@ -91,18 +108,29 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions = {}): strin
 
 Your job:
 1. Read the user text enclosed in <user_work_description> tags.
-2. Identify ${conceptCountPhrase} from the text that benefit most from visualisation.
-3. For each concept, pick the best preset from the PRESETS catalogue below.
-4. Populate that preset's data with concrete labels, numbers, and nodes drawn from the user's text.
-5. Write a concise caption (1–3 sentences, max ${VISUALISE_CAPTION_MAX_CHARS} chars) summarising what the visual shows.
-6. Write a description for each primary node (max ${VISUALISE_NODE_DESC_MAX_CHARS} chars per description, up to ${VISUALISE_NODE_DESC_MAX_COUNT} descriptions). Descriptions should expand on each node label with context from the user's text.
-7. Pick a palette that suits the content.
-8. Return a single JSON object matching the RESPONSE SCHEMA exactly.
+2. COUNT the distinct concepts in the text that benefit from visualisation. For each concept, COUNT the number of primary items (steps, events, roles, tiers, branches, etc.) it contains. Write these counts down in your reasoning BEFORE picking presets.
+3. Identify ${conceptCountPhrase} from the text.
+4. For each concept, pick the best preset from the PRESETS catalogue below whose capacity ACCOMMODATES that concept's item count. The preset's capacity is stated on its "capacity:" line.
+5. Populate that preset's data with concrete labels, numbers, and nodes drawn from the user's text.
+6. Write a concise caption (1–3 sentences, max ${VISUALISE_CAPTION_MAX_CHARS} chars) summarising what the visual shows.
+7. Write a description for each primary node (max ${VISUALISE_NODE_DESC_MAX_CHARS} chars per description, up to ${VISUALISE_NODE_DESC_MAX_COUNT} descriptions). Descriptions should expand on each node label with context from the user's text.
+8. Pick a palette that suits the content.
+9. Write top-level \`reasoning\` (max ${VISUALISE_REASONING_MAX_CHARS} chars) explaining: how many concepts you identified, how many primary items each concept has, and why you chose each preset.
+10. Return a single JSON object matching the RESPONSE SCHEMA exactly.
+
+CAPACITY RULE (CRITICAL — prevents silent content truncation):
+- Every preset in the catalogue below has a "capacity:" line (e.g. "exactly 6 steps", "3–7 tasks", "up to 8 bars").
+- You MUST only pick a preset whose capacity can hold ALL the primary items of the concept. If the user's text has 8 sequential steps, you MUST NOT pick a preset with "exactly 6 steps" capacity — you would be forced to drop 2 steps.
+- If NO preset accommodates the count, choose the nearest option in this priority order:
+    (a) Pick a preset with a flexible range that holds the count (e.g. for 8 sequential items, prefer timeline-horizontal-8event, or chart-bar-vertical, over process-numbered-6step).
+    (b) If the user's text genuinely covers two separate ideas, split it into two concepts and return two visuals.
+    (c) Only as a last resort, and ONLY after stating this clearly in your \`reasoning\`, may you summarise the concept to fit a smaller preset. Prefer (a) and (b) over (c).
+- NEVER silently drop items to fit a preset's schema. If the count exceeds the preset's max, your visual will fail post-generation validation and be discarded.
 
 RULES:
 - Never invent facts, numbers, dates, or names the user did not provide or clearly imply. If the text has no numbers, do not pick a chart preset — pick a diagram.
 - Prefer construction-specific presets (IDs starting "con-") when the text mentions CDM, RAMS, NEC, permits, CSCS, site roles, H&S hierarchy, risk matrices, or similar regulated domains.
-- Respect each preset's "Do NOT use for" guidance strictly. If the text doesn't match a preset's intended use, pick a different preset.
+- Respect each preset's "when to use" guidance strictly. If the text doesn't match a preset's intended use, pick a different preset.
 - Visual titles: 3 to 8 words. Never repeat the document title.
 - Node labels: 40 characters maximum.
 - Captions: 1–3 sentences, up to ${VISUALISE_CAPTION_MAX_CHARS} characters. Neutral, descriptive — not promotional.
@@ -116,6 +144,8 @@ ${constraints.join('\n')}
 RESPONSE SCHEMA:
 {
   "document_title": "3 to 10 word title summarising the whole document",
+  "reasoning": "<1–4 sentences explaining: concepts identified, primary item count for each, preset choice rationale. Max ${VISUALISE_REASONING_MAX_CHARS} chars.>",
+  "concept_counts": [<integer count of primary items for each concept, in order>],
   "visuals": [
     {
       "preset_id": "<exact ID from the PRESETS catalogue>",
@@ -167,23 +197,34 @@ You are operating in VARIANT MODE. For each concept identified in the user text,
 
 Your job:
 1. Read the user text enclosed in <user_work_description> tags.
-2. Identify ${conceptCountPhrase} from the text that benefit most from visualisation.
-3. For EACH concept, pick up to 3 structurally different presets that all fit the concept's data shape.
-4. Populate each variant's data with concrete labels, numbers, and nodes drawn from the user's text. The SAME semantic data should appear in every variant — only the visual style changes.
-5. Write ONE caption per concept (1–3 sentences, max ${VISUALISE_CAPTION_MAX_CHARS} chars) summarising what the visual shows. Captions are concept-level, not variant-level — they apply equally regardless of which preset the user picks.
-6. Write ONE list of node descriptions per concept (max ${VISUALISE_NODE_DESC_MAX_CHARS} chars each, up to ${VISUALISE_NODE_DESC_MAX_COUNT} items). Descriptions are concept-level too — they survive variant swaps.
-7. Pick ONE palette per concept.
-8. Return a single JSON object matching the RESPONSE SCHEMA exactly.
+2. COUNT the distinct concepts in the text that benefit from visualisation. For each concept, COUNT the number of primary items (steps, events, roles, tiers, branches, etc.). Write these counts down in your reasoning BEFORE picking presets.
+3. Identify ${conceptCountPhrase} from the text.
+4. For EACH concept, pick up to 3 structurally different presets whose capacity ACCOMMODATES that concept's item count. The preset's capacity is stated on its "capacity:" line.
+5. Populate each variant's data with concrete labels, numbers, and nodes drawn from the user's text. The SAME semantic data should appear in every variant — only the visual style changes.
+6. Write ONE caption per concept (1–3 sentences, max ${VISUALISE_CAPTION_MAX_CHARS} chars) summarising what the visual shows. Captions are concept-level, not variant-level — they apply equally regardless of which preset the user picks.
+7. Write ONE list of node descriptions per concept (max ${VISUALISE_NODE_DESC_MAX_CHARS} chars each, up to ${VISUALISE_NODE_DESC_MAX_COUNT} items). Descriptions are concept-level too — they survive variant swaps.
+8. Pick ONE palette per concept.
+9. Write top-level \`reasoning\` (max ${VISUALISE_REASONING_MAX_CHARS} chars) explaining: how many concepts you identified, how many primary items each concept has, and why you picked each variant set.
+10. Return a single JSON object matching the RESPONSE SCHEMA exactly.
+
+CAPACITY RULE (CRITICAL — prevents silent content truncation):
+- Every preset in the catalogue below has a "capacity:" line (e.g. "exactly 6 steps", "3–7 tasks", "up to 8 bars").
+- EVERY variant you return MUST have a capacity that accommodates the concept's primary item count. If the user's text has 8 sequential steps, you MUST NOT pick a preset with "exactly 6 steps" capacity as any of the 3 variants — you would be forced to drop 2 steps.
+- If NO preset accommodates the count for a given structural family, pick from a different structural family that does. Example: for 8 sequential items, timeline-horizontal-8event fits exactly, chart-bar-vertical fits up to 8, hierarchy-mindmap-centre fits 4–8.
+- If the user's text genuinely covers two separate ideas, split it into two concepts and return two visuals rather than cramming one long list into a too-small preset.
+- Returning fewer variants (2 or even 1) is ACCEPTABLE when capacity-compatible options are limited. Returning 3 capacity-incompatible variants is NOT acceptable — the incompatible ones will be dropped by validation and the user will see an error.
+- NEVER silently drop items from the data to fit a preset's schema.
 
 VARIANT SELECTION RULES:
-- The 3 variants MUST be structurally different families (do NOT return 3 flow presets; return e.g. flow + timeline + process-stages).
-- Variants 1 and 2: pick the two most obvious structural fits for the concept.
-- Variant 3: pick ONE unconventional but still valid fit (a preset from a different family that still captures the concept). This gives the user a creative alternative they might not have considered. If no unconventional fit exists, return only 2 variants.
-- If fewer than 3 presets genuinely fit, return 2 or even 1 variant. Never pad with poor fits.
+- The variants MUST be structurally different families where possible (do NOT return 3 flow presets; return e.g. flow + timeline + process-stages). But capacity compatibility takes precedence: a capacity-matching variant from the same family beats a capacity-mismatching variant from a different family.
+- Variant 1: the most obvious structural + capacity fit for the concept.
+- Variant 2: a structurally different but still capacity-compatible preset.
+- Variant 3: an unconventional but still valid (and capacity-compatible) fit — a preset from another family that still captures the concept. Gives the user a creative alternative. If no capacity-compatible unconventional fit exists, return only 2 variants.
+- If fewer than 3 presets are capacity-compatible AND structurally fit, return 2 or even 1 variant. Never pad with poor or capacity-incompatible fits.
 - Every variant's data MUST validate against its preset's own schema. If a preset requires exactly N items, make sure your data has exactly N items.
 
 SEQUENCE-FIRST RULE:
-- If the user text is an ORDERED LIST or SEQUENCE of steps (e.g. "1. do X, 2. do Y, 3. do Z" or prose describing a chronological process), EVERY variant MUST be a preset that handles sequential data. Valid families for sequences: flow-linear-*, process-numbered-*, process-stages-*, timeline-horizontal-*, timeline-vertical-*, process-circular-* (when the steps genuinely repeat).
+- If the user text is an ORDERED LIST or SEQUENCE of steps (e.g. "1. do X, 2. do Y, 3. do Z" or prose describing a chronological process), EVERY variant MUST be a preset that handles sequential data. Valid families for sequences: flow-linear-*, process-numbered-*, process-stages-*, timeline-horizontal-*, timeline-vertical-*, timeline-gantt-*, timeline-milestones, process-circular-* (when the steps genuinely repeat).
 - For sequences, NEVER pick PDCA unless the text is explicitly about Plan-Do-Check-Act continuous improvement. NEVER pick RACI unless the text explicitly assigns roles. NEVER pick DMAIC unless the text is explicitly about Six Sigma. NEVER pick SWOT / BCG / fishbone for a sequence.
 
 CAPTION AND DESCRIPTION RULES:
@@ -194,7 +235,7 @@ CAPTION AND DESCRIPTION RULES:
 GENERAL RULES:
 - Never invent facts, numbers, dates, or names the user did not provide or clearly imply. If the text has no numbers, do not pick a chart preset — pick a diagram.
 - Prefer construction-specific presets (IDs starting "con-") when the text mentions CDM, RAMS, NEC, permits, CSCS, site roles, H&S hierarchy, risk matrices, or similar regulated domains.
-- Respect each preset's "Do NOT use for" guidance strictly. If the text doesn't match a preset's intended use, pick a different preset.
+- Respect each preset's "when to use" guidance strictly. If the text doesn't match a preset's intended use, pick a different preset.
 - Visual titles: 3 to 8 words. Never repeat the document title.
 - Node labels: 40 characters maximum.
 - Use British spelling (e.g. "colour", "organise", "visualise").
@@ -205,6 +246,8 @@ ${constraints.join('\n')}
 RESPONSE SCHEMA:
 {
   "document_title": "3 to 10 word title summarising the whole document",
+  "reasoning": "<1–4 sentences: concept count, primary-item count per concept, preset choice rationale. Max ${VISUALISE_REASONING_MAX_CHARS} chars.>",
+  "concept_counts": [<integer count of primary items for each concept, in order>],
   "visuals": [
     {
       "title": "<3 to 8 words — concept-level title>",
@@ -252,9 +295,11 @@ function buildPresetCatalogue(forcePresetId?: string): string {
 
 function describePresetForAi(preset: AnyPreset): string {
   const example = JSON.stringify(preset.defaultData);
+  const capacity = describeCapacityForAi(preset.id);
   return `- id: ${preset.id}
   name: ${preset.name}
   category: ${preset.category}
+  capacity: ${capacity}
   when to use: ${preset.aiDescription}
   data example: ${example}`;
 }

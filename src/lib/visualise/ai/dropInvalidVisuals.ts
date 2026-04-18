@@ -17,7 +17,18 @@
 //
 //   `toVisualInstance()` now accepts optional caption / nodeDescriptions /
 //   variants and threads them through to the VisualInstance being created.
+//
+// AMENDMENT (Batch 1 bug fix — "Slot overflow + reasoning"):
+//   - dropInvalidVisuals / dropInvalidVariants now ALSO drop any visual whose
+//     picked preset's capacity cannot accommodate the AI's declared concept
+//     count (if one was declared). This catches the "AI said 8 concepts but
+//     picked a 6-slot preset" bug at the validation layer — before such a
+//     visual can be shown to the user with silently-truncated content.
+//   - DropInvalidResult exposes the (optional) top-level reasoning string so
+//     the caller can thread it through to the blob + the UI banner.
 // =============================================================================
+
+import { capacityAccommodates, getCapacity } from '@/lib/visualise/presets/capacity';
 
 import type { AiResponse, VariantAiResponse } from './validateResponse';
 import { getPresetById } from '@/lib/visualise/presets';
@@ -50,6 +61,11 @@ export interface DropInvalidResult {
   valid: ValidatedVisual[];
   droppedCount: number;
   droppedReasons: { presetId: string; reason: string }[];
+  /**
+   * Batch 1: AI's chain-of-thought. Threaded through so the route can store
+   * it on the blob and the UI can render it above the visuals.
+   */
+  reasoning?: string;
 }
 
 /**
@@ -61,7 +77,12 @@ export function dropInvalidVisuals(response: AiResponse): DropInvalidResult {
   const valid: ValidatedVisual[] = [];
   const droppedReasons: { presetId: string; reason: string }[] = [];
 
-  for (const v of response.visuals) {
+  // Index concept_counts by position so we can compare against the chosen
+  // preset's capacity. When counts aren't provided, capacity check is skipped.
+  const conceptCounts = response.concept_counts ?? [];
+
+  for (let i = 0; i < response.visuals.length; i++) {
+    const v = response.visuals[i];
     const preset = getPresetById(v.preset_id);
 
     // This shouldn't happen — the top-level schema restricts preset_id to
@@ -69,6 +90,26 @@ export function dropInvalidVisuals(response: AiResponse): DropInvalidResult {
     if (!preset) {
       droppedReasons.push({ presetId: v.preset_id, reason: 'preset not registered' });
       console.warn('[visualise] Dropped visual — preset not registered', { preset_id: v.preset_id });
+      continue;
+    }
+
+    // Batch 1: capacity gate. If the AI declared a concept count for this slot
+    // and it exceeds the preset's max capacity, drop the visual rather than
+    // let it through with silently-truncated data. We intentionally check
+    // BEFORE Zod so the dropped-reason is capacity-specific (easier to debug).
+    const declaredCount = conceptCounts[i];
+    if (typeof declaredCount === 'number' && !capacityAccommodates(v.preset_id, declaredCount)) {
+      const cap = getCapacity(v.preset_id);
+      const capStr = cap
+        ? `${cap.primary.min === cap.primary.max ? `exactly ${cap.primary.max}` : `${cap.primary.min}–${cap.primary.max}`} ${cap.primaryUnit}(s)`
+        : 'unknown capacity';
+      const reason = `capacity mismatch — AI declared ${declaredCount} concepts, preset holds ${capStr}`;
+      droppedReasons.push({ presetId: v.preset_id, reason });
+      console.warn('[visualise] Dropped visual — capacity mismatch', {
+        preset_id: v.preset_id,
+        declaredCount,
+        capacity: cap,
+      });
       continue;
     }
 
@@ -99,6 +140,7 @@ export function dropInvalidVisuals(response: AiResponse): DropInvalidResult {
     valid,
     droppedCount: droppedReasons.length,
     droppedReasons,
+    reasoning: response.reasoning,
   };
 }
 
@@ -116,7 +158,13 @@ export function dropInvalidVariants(response: VariantAiResponse): DropInvalidRes
   const valid: ValidatedVisual[] = [];
   const droppedReasons: { presetId: string; reason: string }[] = [];
 
-  for (const concept of response.visuals) {
+  // Index concept_counts by concept position (one count per concept, shared
+  // across all variants of that concept because variants carry the same data).
+  const conceptCounts = response.concept_counts ?? [];
+
+  for (let ci = 0; ci < response.visuals.length; ci++) {
+    const concept = response.visuals[ci];
+    const declaredCount = conceptCounts[ci];
     const survivingVariants: { presetId: string; data: unknown; title?: string }[] = [];
 
     for (const variant of concept.variants) {
@@ -128,6 +176,26 @@ export function dropInvalidVariants(response: VariantAiResponse): DropInvalidRes
         });
         console.warn('[visualise] Dropped variant — preset not registered', {
           preset_id: variant.preset_id,
+        });
+        continue;
+      }
+
+      // Batch 1: per-variant capacity gate. Each variant must independently
+      // accommodate the concept's declared count. Variants that can't are
+      // dropped individually; the concept survives as long as at least one
+      // does. Matches the existing "ALL variants must fail to drop concept"
+      // rule — capacity just becomes another fail reason.
+      if (typeof declaredCount === 'number' && !capacityAccommodates(variant.preset_id, declaredCount)) {
+        const cap = getCapacity(variant.preset_id);
+        const capStr = cap
+          ? `${cap.primary.min === cap.primary.max ? `exactly ${cap.primary.max}` : `${cap.primary.min}–${cap.primary.max}`} ${cap.primaryUnit}(s)`
+          : 'unknown capacity';
+        const reason = `capacity mismatch — concept has ${declaredCount} items, preset holds ${capStr}`;
+        droppedReasons.push({ presetId: variant.preset_id, reason });
+        console.warn('[visualise] Dropped variant — capacity mismatch', {
+          preset_id: variant.preset_id,
+          declaredCount,
+          capacity: cap,
         });
         continue;
       }
@@ -181,6 +249,7 @@ export function dropInvalidVariants(response: VariantAiResponse): DropInvalidRes
     valid,
     droppedCount: droppedReasons.length,
     droppedReasons,
+    reasoning: response.reasoning,
   };
 }
 
