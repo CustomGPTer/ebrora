@@ -76,7 +76,7 @@ export const quadrantSwotPreset: Preset<Data> = {
   category: 'positioning',
   tags: ['swot', 'analysis', 'strategy', 'quadrant'],
   description: 'Strengths, Weaknesses, Opportunities, Threats on a 2×2 grid.',
-  aiDescription: 'Classic SWOT 2×2 with 0–5 bullet points per quadrant. Use when the text discusses strategic positioning, pre-tender analysis, or any analysis that splits into internal/external × positive/negative.',
+  aiDescription: 'Classic SWOT 2×2 with 0–5 bullet points per quadrant. Use when the text discusses strategic positioning, pre-tender analysis, or any analysis that splits into internal/external × positive/negative. Do NOT use unless the text explicitly maps to Strengths, Weaknesses, Opportunities, and Threats — a generic 4-item list or a 4-step process is NOT a SWOT.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

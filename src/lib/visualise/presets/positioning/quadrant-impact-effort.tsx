@@ -238,7 +238,7 @@ export const quadrantImpactEffortPreset: Preset<Data> = {
   tags: ['prioritisation', 'impact', 'effort', 'quadrant', 'quick-wins'],
   description: 'Prioritisation matrix with Quick Wins, Major Projects, Fill-Ins, and Thankless Tasks.',
   aiDescription:
-    'Use when the text is prioritisation or backlog triage — tasks, ideas, or initiatives scored on impact vs effort. Fixed quadrants: Quick Wins (high-impact + low-effort, top-left), Major Projects (high-impact + high-effort, top-right), Fill-Ins (low-impact + low-effort, bottom-left), Thankless Tasks (low-impact + high-effort, bottom-right). 0–5 items per quadrant. Prefer "quadrant-2x2-generic" when axes are something other than impact and effort; prefer "quadrant-bcg" for portfolio analysis with growth × market share.',
+    'Use when the text is prioritisation or backlog triage — tasks, ideas, or initiatives scored on impact vs effort. Fixed quadrants: Quick Wins (high-impact + low-effort, top-left), Major Projects (high-impact + high-effort, top-right), Fill-Ins (low-impact + low-effort, bottom-left), Thankless Tasks (low-impact + high-effort, bottom-right). 0–5 items per quadrant. Prefer "quadrant-2x2-generic" when axes are something other than impact and effort; prefer "quadrant-bcg" for portfolio analysis with growth × market share. Do NOT use unless the text explicitly positions items on impact and effort — a plain 4-item list or a sequential process is NOT an impact/effort matrix.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

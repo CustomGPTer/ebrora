@@ -241,7 +241,7 @@ export const quadrantBcgPreset: Preset<Data> = {
   tags: ['bcg', 'growth-share', 'portfolio', 'quadrant', 'strategy'],
   description: 'Portfolio matrix with Stars, Question Marks, Cash Cows, and Dogs.',
   aiDescription:
-    'Use when the text is portfolio analysis on the classic growth-vs-share frame. Horizontal axis is market share (low left, high right); vertical is market growth (low bottom, high top). Quadrant names are fixed — Stars (high-growth + high-share), Question Marks (high-growth + low-share), Cash Cows (low-growth + high-share), Dogs (low-growth + low-share). Populate 0–5 items per quadrant. Prefer "quadrant-2x2-generic" when the axes or quadrant titles should be custom; prefer "quadrant-impact-effort" for prioritisation shapes.',
+    'Use when the text is portfolio analysis on the classic growth-vs-share frame. Horizontal axis is market share (low left, high right); vertical is market growth (low bottom, high top). Quadrant names are fixed — Stars (high-growth + high-share), Question Marks (high-growth + low-share), Cash Cows (low-growth + high-share), Dogs (low-growth + low-share). Populate 0–5 items per quadrant. Prefer "quadrant-2x2-generic" when the axes or quadrant titles should be custom; prefer "quadrant-impact-effort" for prioritisation shapes. Do NOT use unless the text is explicitly about market share / growth portfolio analysis — never for a generic 4-item list.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
