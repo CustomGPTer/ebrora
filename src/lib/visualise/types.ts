@@ -13,6 +13,25 @@
 // transform effect. Reversible via undo. Fixed-length preset schemas (e.g.
 // `flow-linear-4step` requires exactly 4 steps) can't accept hard-delete,
 // so every preset supports soft-hide uniformly.
+//
+// AMENDMENT (Batch 10 — "Variants & Sub-text"):
+//   Added per-VisualInstance fields:
+//     - variants           : up to 3 AI-picked alternate {presetId, data} pairs
+//                            covering the same concept in different visual styles.
+//                            The active preset+data is NOT duplicated in the
+//                            variants array — they represent the *other* options.
+//     - caption            : 1–3 sentences of prose context for the whole visual
+//                            (~200 chars). Rendered below the visual.
+//     - nodeDescriptions   : ordered list of ~120-char node descriptions.
+//                            Index-aligned with whatever the preset treats as its
+//                            primary node list (steps, events, rows, etc.).
+//                            Rendered as an ordered list below the caption.
+//     - previousState      : 1-step undo snapshot captured just before a preset
+//                            swap. Only the fields that change on a swap are
+//                            stored. Cleared once the user swaps again or saves.
+//   Rationale: chose VisualInstance-level fields over per-preset schema changes
+//   to avoid touching all 50 preset Zod schemas and render functions. Captions
+//   and descriptions survive preset switches unchanged. See phase-1 handover.
 // =============================================================================
 
 import type { PresetCategory } from './presets/types';
@@ -59,6 +78,38 @@ export interface VisualCanvasState {
   groups: Record<string, { nodeIds: string[] }>;
 }
 
+/**
+ * A single alternate preset+data pair the AI generated alongside the active one.
+ * The active visual's presetId + data are NOT stored here — variants are the
+ * *other* options the user can swap to instantly without an AI round-trip.
+ *
+ * When a variant is promoted to active (user clicks the pill), the current
+ * active preset+data pair is pushed back into the variants list so the swap
+ * is reversible within the same session.
+ */
+export interface VariantOption {
+  presetId: string;
+  /** Preset-specific payload; validated against that preset's dataSchema. */
+  data: unknown;
+  /** Optional title the AI proposed for this variant. Falls back to visual.title if absent. */
+  title?: string;
+}
+
+/**
+ * 1-step undo snapshot, captured before a preset swap or auto-remap.
+ * Only the fields that a swap touches are stored — keeps the blob small.
+ * `cause` is a UI hint ('variant-swap' | 'gallery-pick' | 'auto-remap').
+ */
+export interface PreviousVisualState {
+  presetId: string;
+  data: unknown;
+  title: string;
+  variants: VariantOption[];
+  caption?: string;
+  nodeDescriptions?: string[];
+  cause: 'variant-swap' | 'gallery-pick' | 'auto-remap';
+}
+
 /** A single visual inside a document. */
 export interface VisualInstance {
   /** Client-generated UUID. */
@@ -72,6 +123,29 @@ export interface VisualInstance {
   canvas: VisualCanvasState;
   /** Stack order within the document — used for vertical placement in DocumentView. */
   order: number;
+  /**
+   * Up to 3 alternate preset+data pairs the AI generated alongside the active
+   * one. Empty array for legacy visuals generated before Batch 10. Swapping
+   * between these is a pure client-side operation — no AI call, no quota.
+   */
+  variants?: VariantOption[];
+  /**
+   * 1–3 sentence narrative caption for the whole visual (~200 chars).
+   * Rendered as a paragraph below the visual.
+   */
+  caption?: string;
+  /**
+   * Ordered list of ~120-char descriptions for the primary nodes of the visual.
+   * Index-aligned with the preset's primary node list. Rendered as an ordered
+   * list below the caption. Survives preset swaps — the list is semantic, not
+   * preset-specific.
+   */
+  nodeDescriptions?: string[];
+  /**
+   * 1-step undo snapshot, present only immediately after a swap. Cleared
+   * when the user swaps again, saves, regenerates, or dismisses the undo UI.
+   */
+  previousState?: PreviousVisualState;
 }
 
 /**
@@ -112,6 +186,20 @@ export interface GenerateRequest {
    * Requires documentId to be set. Cost: 1 use, same as a full generation.
    */
   visualId?: string;
+  /**
+   * Batch 10: when true, each generated concept should return 3 preset
+   * variants instead of 1. The first variant becomes active; the other 2
+   * become `variants` on the VisualInstance. Ignored in regenerate mode.
+   * Default: true for new generations (opt-out only).
+   */
+  variantMode?: boolean;
+  /**
+   * Batch 10: marks this request as a silent auto-remap triggered by the
+   * user cycling to a preset outside the variant set. Server treats this
+   * identically to a visualId regenerate (same quota cost) but the client
+   * suppresses the "regenerate warning" modal. Requires visualId + forcePresetId.
+   */
+  silent?: boolean;
 }
 
 /** Response from GET /api/visualise/access. */
