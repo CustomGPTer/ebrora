@@ -182,7 +182,7 @@ export const cycle6StepPreset: Preset<Data> = {
   tags: ['cycle', 'loop', 'iteration', 'six-phase'],
   description: 'Six steps arranged in a clockwise circular cycle.',
   aiDescription:
-    'Six nodes arranged around a circle with clockwise curved arrows between them. Use for iterative cycles with exactly 6 distinct phases — e.g. a governance loop, a review cycle, a six-stage improvement model. Prefer "cycle-4step" for classic 4-phase iterations like Plan-Do-Check-Act; prefer "process-circular-6step" when the shape is a sequenced process rather than a repeating loop.',
+    'Six nodes arranged around a circle with clockwise curved arrows between them. Use for iterative cycles with exactly 6 distinct phases — e.g. a governance loop, a review cycle, a six-stage improvement model. Prefer "cycle-4step" for classic 4-phase iterations like Plan-Do-Check-Act; prefer "process-circular-6step" when the shape is a sequenced process rather than a repeating loop. Do NOT use for one-off 6-step sequences where the steps do not repeat — use flow-linear-5step, process-numbered-6step, or timeline-horizontal-* instead.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

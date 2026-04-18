@@ -255,7 +255,7 @@ export const cycleFeedbackLoopPreset: Preset<Data> = {
   tags: ['cycle', 'feedback', 'loop', 'system', 'control'],
   description: 'Four linear steps with a labelled feedback arrow returning to the start.',
   aiDescription:
-    'Use when the text describes a system with a distinct forward flow and a separate feedback signal that closes back on the start — e.g. measurement-driven adjustment, output-monitoring loops, closed-loop control. The four steps read left-to-right; the dashed arc underneath carries a label describing what is fed back. Prefer "cycle-4step" or "cycle-6step" when every stage is a peer phase in a symmetric loop (no distinct "feedback" channel); prefer "process-pdca" when the content is explicitly Plan-Do-Check-Act quadrants.',
+    'Use when the text describes a system with a distinct forward flow and a separate feedback signal that closes back on the start — e.g. measurement-driven adjustment, output-monitoring loops, closed-loop control. The four steps read left-to-right; the dashed arc underneath carries a label describing what is fed back. Prefer "cycle-4step" or "cycle-6step" when every stage is a peer phase in a symmetric loop (no distinct "feedback" channel); prefer "process-pdca" when the content is explicitly Plan-Do-Check-Act quadrants. Do NOT use unless the text explicitly describes a feedback mechanism that closes the loop — a plain linear process is NOT a feedback loop.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

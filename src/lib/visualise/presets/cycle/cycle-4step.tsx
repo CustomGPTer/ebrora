@@ -110,7 +110,7 @@ export const cycle4StepPreset: Preset<Data> = {
   category: 'cycle',
   tags: ['cycle', 'loop', 'iteration', 'pdca'],
   description: 'Four steps arranged in a clockwise circular cycle.',
-  aiDescription: 'Circular cycle with 4 nodes and curved arrows between them. Use for iterative loops such as PDCA (Plan-Do-Check-Act), continuous improvement cycles, or any repeating 4-step process.',
+  aiDescription: 'Circular cycle with 4 nodes and curved arrows between them. Use for iterative loops such as PDCA (Plan-Do-Check-Act), continuous improvement cycles, or any repeating 4-step process. Do NOT use for one-off sequences where the steps do not genuinely repeat (e.g. an onboarding checklist, a construction phase plan, or a one-time project timeline) — those should use flow-linear-4step, timeline-horizontal-*, or process-stages-4phase instead.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
