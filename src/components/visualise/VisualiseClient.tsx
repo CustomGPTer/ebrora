@@ -204,6 +204,12 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
             text,
             forcePresetId: forcePresetId || undefined,
             visualCountPreference: visualCountPreference === 'any' ? undefined : visualCountPreference,
+            // Batch 10: variant mode is the new default — each concept returns
+            // up to 3 preset variants so the user can swap instantly without
+            // another AI round-trip. Users who pinned a specific preset via
+            // advanced options will still get that preset as variant #1, with
+            // 2 complementary alternates for the same concept.
+            variantMode: true,
           }),
         });
 
@@ -250,6 +256,64 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
         refreshAccess();
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Regenerate failed');
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [documentId, refreshAccess],
+  );
+
+  // ── Gallery pick — silent auto-remap ────────────────────────────────────
+  // Batch 10: fired when the user picks a preset from the "Browse all
+  // templates" gallery. The request carries `silent: true` + `forcePresetId`
+  // so the server locks the AI to that preset and the client doesn't show
+  // the Regenerate warning modal. Preserves concept-level caption / node
+  // descriptions / variants (see generate route — it merges those from the
+  // existing visual rather than replacing).
+  //
+  // Cost: 1 use (same as full regenerate). Initial generate was free under
+  // question 10(a); gallery picks charge because they require an AI call.
+  const handleGalleryPickVisual = useCallback(
+    async (visualId: string, presetId: string) => {
+      if (!documentId) return;
+      setIsGenerating(true);
+      setError(null);
+      try {
+        const res = await fetch('/api/visualise/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            documentId,
+            visualId,
+            forcePresetId: presetId,
+            silent: true,
+          }),
+        });
+        const payload = await res.json();
+        if (!res.ok) {
+          setError(payload?.error ?? 'Template switch failed');
+          return;
+        }
+        // The new blob already contains the swapped visual with preserved
+        // concept fields. The VisualCard stashed a `previousState` snapshot
+        // before firing this handler — merge it onto the swapped visual so
+        // the undo toast appears on the fresh server-returned instance.
+        const serverDoc = payload.document as VisualiseDocumentBlob;
+        setDocument((prev) => {
+          if (!prev) return serverDoc;
+          const localSnapshot = prev.visuals.find((v) => v.id === visualId)?.previousState;
+          if (!localSnapshot) return serverDoc;
+          return {
+            ...serverDoc,
+            visuals: serverDoc.visuals.map((v) =>
+              v.id === visualId ? { ...v, previousState: { ...localSnapshot, cause: 'gallery-pick' } } : v,
+            ),
+          };
+        });
+        setIsDirty(false);
+        refreshAccess();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Template switch failed');
       } finally {
         setIsGenerating(false);
       }
@@ -394,6 +458,7 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
           onUpdateVisual={updateVisual}
           onDeleteVisual={deleteVisual}
           onRegenerateVisual={handleRegenerateVisual}
+          onGalleryPickVisual={handleGalleryPickVisual}
           onSave={handleSave}
           onReset={handleReset}
         />

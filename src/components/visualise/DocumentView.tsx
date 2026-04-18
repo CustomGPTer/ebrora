@@ -18,6 +18,7 @@ interface Props {
   onUpdateVisual: (visualId: string, patch: Partial<VisualInstance>) => void;
   onDeleteVisual: (visualId: string) => void;
   onRegenerateVisual: (visualId: string) => void;
+  onGalleryPickVisual: (visualId: string, presetId: string) => void;
   onSave: () => void;
   onReset: () => void;
 }
@@ -30,6 +31,7 @@ export default function DocumentView({
   onUpdateVisual,
   onDeleteVisual,
   onRegenerateVisual,
+  onGalleryPickVisual,
   onSave,
   onReset,
 }: Props) {
@@ -115,6 +117,7 @@ export default function DocumentView({
                 onUpdate={(patch) => onUpdateVisual(visual.id, patch)}
                 onDelete={() => onDeleteVisual(visual.id)}
                 onRegenerate={() => onRegenerateVisual(visual.id)}
+                onGalleryPick={(presetId) => onGalleryPickVisual(visual.id, presetId)}
               />
             ))}
         </div>
