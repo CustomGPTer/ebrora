@@ -60,7 +60,10 @@ export const VISUALISE_LOGO_MAX_BYTES = 1 * 1024 * 1024; // 1 MB
 
 /**
  * Tool slug for AiToolGeneration / AiToolUsage reuse.
- * Must match the new 'visualise' entry in AiToolSlug.
+ * Stored as the `tool_slug` string value in those tables; not part of
+ * the AiToolSlug TypeScript union because Visualise runs on its own
+ * /api/visualise/* routes and doesn't use the generic ai-tools prompt
+ * framework (TOOL_CONVERSATION_INSTRUCTIONS, TOOL_GENERATION_SCHEMAS).
  */
 export const VISUALISE_TOOL_SLUG = 'visualise' as const;
 
