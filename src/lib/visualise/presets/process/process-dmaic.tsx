@@ -130,7 +130,7 @@ export const processDmaicPreset: Preset<ProcessDmaicData> = {
   tags: ['process', 'dmaic', 'improvement', 'six-sigma'],
   description: 'DMAIC five-stage improvement framework as a chevron band.',
   aiDescription:
-    'Use when the text describes a Six-Sigma / process-improvement framework with the specific five stages Define, Measure, Analyse, Improve, Control — or any equivalent five-stage problem-solving approach where each stage feeds into the next. Prefer "process-pdca" for the four-phase Plan-Do-Check-Act cycle; prefer "flow-linear-5step" when the five stages are domain-specific rather than framework-named.',
+    'Use when the text describes a Six-Sigma / process-improvement framework with the specific five stages Define, Measure, Analyse, Improve, Control — or any equivalent five-stage problem-solving approach where each stage feeds into the next. Prefer "process-pdca" for the four-phase Plan-Do-Check-Act cycle; prefer "flow-linear-5step" when the five stages are domain-specific rather than framework-named. Do NOT use unless the text explicitly mentions Six Sigma, DMAIC, or the five named stages. A generic 5-step process is NOT DMAIC — use flow-linear-5step instead.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

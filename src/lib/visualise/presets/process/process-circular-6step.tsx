@@ -158,7 +158,7 @@ export const processCircular6StepPreset: Preset<ProcessCircular6StepData> = {
   tags: ['process', 'circular', 'wheel', 'stages'],
   description: 'Six pie-wedge stages arranged around a central hub label.',
   aiDescription:
-    'Use for a 6-stage rollout, half-year cadence, or process wheel where each stage is equal weight and proceeds around a ring. Prefer "process-circular-4step" for 4 stages. Prefer a PDCA-style preset when the content is an explicit feedback loop between four phases.',
+    'Use for a 6-stage rollout, half-year cadence, or process wheel where each stage is equal weight and proceeds around a ring. Prefer "process-circular-4step" for 4 stages. Prefer a PDCA-style preset when the content is an explicit feedback loop between four phases. Do NOT use for one-off 6-step sequences that do not repeat as a ring — use flow-linear-5step, process-numbered-6step, or timeline-horizontal-* instead.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

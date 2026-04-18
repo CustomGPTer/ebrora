@@ -161,7 +161,7 @@ export const processCircular4StepPreset: Preset<ProcessCircular4StepData> = {
   tags: ['process', 'circular', 'wheel', 'stages'],
   description: 'Four pie-wedge stages arranged around a central hub label.',
   aiDescription:
-    'Use for a 4-stage programme, quarterly cadence, or high-level lifecycle where each stage is equal weight and proceeds around a ring, but the ring is not an explicit feedback loop. Prefer "cycle-4step" when the relationship is an explicit feedback loop (PDCA-style); prefer "process-stages-4phase" when the content is strategic phases rather than an operational cadence.',
+    'Use for a 4-stage programme, quarterly cadence, or high-level lifecycle where each stage is equal weight and proceeds around a ring, but the ring is not an explicit feedback loop. Prefer "cycle-4step" when the relationship is an explicit feedback loop (PDCA-style); prefer "process-stages-4phase" when the content is strategic phases rather than an operational cadence. Do NOT use for one-off 4-step sequences that do not repeat as a ring — use flow-linear-4step or timeline-horizontal-* instead.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
