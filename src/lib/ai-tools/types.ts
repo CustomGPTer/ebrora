@@ -53,9 +53,7 @@ export type AiToolSlug =
   | 'waste-management'
   | 'invasive-species'
   // ── Batch 3 — Commercial Upload Tools ────────────────────────────────────
-  | 'contract-scope-reviewer'
-  // ── Visualise — Visual document creator (separate UI, independent quota) ─
-  | 'visualise';
+  | 'contract-scope-reviewer';
 
 /** Metadata for each AI tool */
 export interface AiToolConfig {
