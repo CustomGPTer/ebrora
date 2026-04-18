@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   cards: z.array(z.object({
@@ -30,20 +30,25 @@ const defaultData: Data = {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
+  const palette = getPalette(p);
   const font = settings.font ?? 'Inter, sans-serif';
-  const cardFill = paletteColor(p, 5);
-  const accent = paletteColor(p, 0);
-  const secondary = paletteColor(p, 2);
-  const borderColor = paletteColor(p, 4);
+  // Per handover: "Card fill nodeFill; accent border on 'headline' KPI (first
+  // card)." We take a slightly lighter nodeFill tint for card bg so the big
+  // value (nodeFill) still reads as emphasised against it.
+  const cardFill = lighten(palette.nodeFill, 0.88);
+  const accent = palette.nodeFill;
+  const secondary = palette.nodeStroke;
+  const borderColor = lighten(palette.nodeFill, 0.55);
+  const headlineBorder = palette.accent;
 
   const gap = 16;
   const cardW = (width - 32 - gap * 2) / 3;
   const cardH = Math.min(height - 32, 140);
   const y = (height - cardH) / 2;
 
-  const deltaColor = (dir?: 'up' | 'down' | 'flat') => {
-    if (dir === 'up') return paletteColor(p, 1);
-    if (dir === 'down') return paletteColor(p, 3);
+  const deltaColor = (dir?: 'up' | 'down' | 'flat'): string => {
+    if (dir === 'up') return palette.nodeStroke;
+    if (dir === 'down') return palette.accent;
     return secondary;
   };
 
@@ -54,7 +59,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const nodeId = `kpi-${i}`;
         return (
           <g key={nodeId} data-id={nodeId}>
-            <rect x={x} y={y} width={cardW} height={cardH} rx={10} fill={cardFill} stroke={borderColor} strokeWidth={1} />
+            <rect x={x} y={y} width={cardW} height={cardH} rx={10} fill={cardFill} stroke={i === 0 ? headlineBorder : borderColor} strokeWidth={i === 0 ? 2 : 1} />
             <text x={x + 14} y={y + 22} fontFamily={font} fontSize={11} fontWeight={500} fill={secondary} textAnchor="start">
               {truncate(card.label, 22).toUpperCase()}
             </text>

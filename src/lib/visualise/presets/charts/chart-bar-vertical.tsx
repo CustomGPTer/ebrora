@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   xLabel: z.string().max(40).optional(),
@@ -42,10 +42,11 @@ function ChartBarVerticalRender({
   height,
 }: PresetRenderProps<ChartBarVerticalData>): ReactElement {
   const { paletteId, customColors } = settings;
-  const axisColor = paletteColor(paletteId, 2);
-  const gridColor = paletteColor(paletteId, 4);
-  const textColor = paletteColor(paletteId, 0);
-  const barFill = paletteColor(paletteId, 1);
+  const palette = getPalette(paletteId);
+  const barFills = gradientSequence(palette, data.bars.length);
+  const axisColor = palette.nodeStroke;
+  const gridColor = lighten(palette.nodeFill, 0.8);
+  const textColor = palette.nodeFill;
 
   const padLeft = 44;
   const padRight = 16;
@@ -99,7 +100,7 @@ function ChartBarVerticalRender({
         const h = niceMax > 0 ? (bar.value / niceMax) * plotH : 0;
         const y = padTop + plotH - h;
         const nodeId = `bar-${i}`;
-        const fill = customColors[nodeId] ?? barFill;
+        const fill = customColors[nodeId] ?? barFills[i];
         return (
           <g key={nodeId} data-id={nodeId}>
             <rect x={x} y={y} width={barW} height={h} rx={2} ry={2} fill={fill} />

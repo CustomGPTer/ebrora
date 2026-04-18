@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   slices: z.array(z.object({
@@ -31,8 +31,15 @@ const defaultData: Data = {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
+  const palette = getPalette(p);
   const font = settings.font ?? 'Inter, sans-serif';
-  const textDark = paletteColor(p, 0);
+  const textDark = palette.nodeFill;
+  // Pattern F: per-slice gradient so each slice is visually distinguishable
+  // without shouting. Percentage labels sit on the slice fill, so they use
+  // palette.text (always reads on any gradient value).
+  const sliceFills = gradientSequence(palette, data.slices.length);
+  const sliceStroke = palette.bg;
+  const pctText = palette.text;
 
   const total = data.slices.reduce((sum, s) => sum + s.value, 0);
   const R = Math.min(width * 0.35, height * 0.45);
@@ -55,16 +62,16 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
     const labelX = cx + R * 0.65 * Math.cos(midAngle);
     const labelY = cy + R * 0.65 * Math.sin(midAngle);
     const path = `M ${cx} ${cy} L ${x1} ${y1} A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-    return { path, fill: paletteColor(p, i), pct, label: slice.label, value: slice.value, labelX, labelY };
+    return { path, fill: sliceFills[i], pct, label: slice.label, value: slice.value, labelX, labelY };
   });
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: 'auto', display: 'block' }}>
       {arcs.map((a, i) => (
         <g key={`slice-${i}`} data-id={`slice-${i}`}>
-          <path d={a.path} fill={a.fill} stroke={paletteColor(p, 5)} strokeWidth={1.5} />
+          <path d={a.path} fill={a.fill} stroke={sliceStroke} strokeWidth={1.5} />
           {data.showPercent && a.pct >= 0.06 ? (
-            <text x={a.labelX} y={a.labelY + 3} textAnchor="middle" fontFamily={font} fontSize={11} fontWeight={600} fill={paletteColor(p, 5)}>
+            <text x={a.labelX} y={a.labelY + 3} textAnchor="middle" fontFamily={font} fontSize={11} fontWeight={600} fill={pctText}>
               {Math.round(a.pct * 100)}%
             </text>
           ) : null}
