@@ -132,7 +132,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'What AI tools are included?',
-    a: 'All plans — including Free — have access to every AI tool: COSHH assessments, safety alerts, RFIs, incident reports, toolbox talk generator, permit to dig, lift plans, and many more. The difference is how many documents you can generate per month.',
+    a: 'Most AI tools are available on every paid tier — COSHH assessments, safety alerts, RFIs, incident reports, toolbox talk generator, permit to dig, lift plans, and many more. Visualise (AI visual document creator) requires Starter or higher. The difference between paid tiers is mainly how many documents you can generate per month.',
   },
   {
     q: 'Can I upload my company logo?',
