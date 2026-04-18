@@ -121,7 +121,7 @@ export const conRaciMatrix4ColPreset: Preset<Data> = {
   category: 'construction',
   tags: ['raci', 'responsibility', 'matrix', 'roles'],
   description: 'Tasks versus four roles, with Responsible/Accountable/Consulted/Informed badges.',
-  aiDescription: 'RACI matrix with 4 role columns and 2–6 task rows. Each cell must be one of R, A, C, I, or "-" (not applicable). Use for responsibility assignment, NEC contract responsibility splits, or role-clarification exercises. Every task should have exactly one A (Accountable).',
+  aiDescription: 'RACI matrix with 4 role columns and 2–6 task rows. Each cell must be one of R, A, C, I, or "-" (not applicable). Use for responsibility assignment, NEC contract responsibility splits, or role-clarification exercises. Every task should have exactly one A (Accountable). Do NOT use unless the text explicitly lists roles/people alongside tasks — if the text is just a list of tasks or steps without role assignments, pick flow-linear-*, process-numbered-*, or a checklist format instead.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
