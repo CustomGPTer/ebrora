@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const branchSchema = z.object({
   condition: z.string().min(1).max(24),
@@ -43,12 +43,16 @@ function Render({
 }: PresetRenderProps<FlowMultiGatewayData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const entryFill = paletteColor(paletteId, 0);
-  const diamondFill = paletteColor(paletteId, 1);
-  const branchFill = paletteColor(paletteId, 2);
-  const textOnPrimary = paletteColor(paletteId, 5);
-  const arrowColour = paletteColor(paletteId, 1);
-  const conditionFill = paletteColor(paletteId, 0);
+  const palette = getPalette(paletteId);
+  const entryFill = palette.nodeFill;
+  const diamondFill = palette.nodeFill;
+  // Per handover: branches use gradient — so outcomes read as a ranked set.
+  const branchFills = gradientSequence(palette, data.branches.length);
+  const textOnPrimary = palette.text;
+  const arrowColour = palette.nodeStroke;
+  // Condition pill sits within each branch card; use nodeStroke for contrast
+  // against the branch gradient — always darker, always readable.
+  const conditionFill = palette.nodeStroke;
 
   const pad = 16;
   const entryW = Math.min(180, width * 0.28);
@@ -160,7 +164,7 @@ function Render({
       {data.branches.map((b, i) => {
         const by = branchY0 + i * (branchH + branchGap);
         const nodeId = `branch-${i}`;
-        const fill = customColors[nodeId] ?? branchFill;
+        const fill = customColors[nodeId] ?? branchFills[i];
         return (
           <g key={nodeId} data-id={nodeId}>
             <rect x={branchX} y={by} width={branchW} height={branchH} rx={6} ry={6} fill={fill} />

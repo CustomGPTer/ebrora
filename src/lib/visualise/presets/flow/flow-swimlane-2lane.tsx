@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence, lighten } from '../../palettes';
 
 const stepSchema = z.object({
   label: z.string().min(1).max(32),
@@ -54,12 +54,14 @@ function Render({
 }: PresetRenderProps<FlowSwimlane2LaneData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const laneBg = paletteColor(paletteId, 4);
-  const laneHeader = paletteColor(paletteId, 0);
-  const laneHeaderText = paletteColor(paletteId, 5);
-  const stepFill = paletteColor(paletteId, 2);
-  const stepText = paletteColor(paletteId, 5);
-  const arrowColour = paletteColor(paletteId, 1);
+  const palette = getPalette(paletteId);
+  // Per handover: lane headers nodeFill; lane bg = lighten(nodeFill, 0.92);
+  // steps per lane use gradient so the sequence reads within each row.
+  const laneBg = lighten(palette.nodeFill, 0.92);
+  const laneHeader = palette.nodeFill;
+  const laneHeaderText = palette.text;
+  const stepText = palette.text;
+  const arrowColour = palette.nodeStroke;
 
   const pad = 10;
   const laneHeaderW = 100;
@@ -95,6 +97,7 @@ function Render({
         const stepW = (lanesW - stepGap * (stepCount - 1) - 12) / stepCount;
         const stepH = Math.min(40, laneH - 20);
         const stepY = laneY + (laneH - stepH) / 2;
+        const stepFills = gradientSequence(palette, stepCount);
 
         return (
           <g key={`lane-${li}`}>
@@ -141,7 +144,7 @@ function Render({
             {lane.steps.map((step, si) => {
               const sx = lanesX + 6 + si * (stepW + stepGap);
               const nodeId = `lane-${li}-step-${si}`;
-              const fill = customColors[nodeId] ?? stepFill;
+              const fill = customColors[nodeId] ?? stepFills[si];
               return (
                 <g key={nodeId} data-id={nodeId}>
                   <rect x={sx} y={stepY} width={stepW} height={stepH} rx={6} ry={6} fill={fill} />

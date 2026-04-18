@@ -7,7 +7,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette } from '../../palettes';
 
 const stepSchema = z.object({
   label: z.string().min(1).max(40),
@@ -37,11 +37,14 @@ function Render({
 }: PresetRenderProps<FlowBranching1To2Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const sourceFill = paletteColor(paletteId, 0);
-  const branchFill = paletteColor(paletteId, 2);
-  const textOnPrimary = paletteColor(paletteId, 5);
-  const arrowFill = paletteColor(paletteId, 1);
-  const detailFill = paletteColor(paletteId, 2);
+  const palette = getPalette(paletteId);
+  // Per handover Pattern H: source nodeFill; branches accent for differentiation.
+  const sourceFill = palette.nodeFill;
+  const branchFill = palette.accent;
+  const sourceText = palette.text;
+  const branchText = palette.accentText;
+  const arrowFill = palette.nodeStroke;
+  const detailFill = palette.nodeStroke;
 
   const pad = 20;
   const nodeW = Math.min(200, (width - pad * 2) * 0.32);
@@ -110,7 +113,7 @@ function Render({
           x={sourceX + nodeW / 2}
           y={sourceY + nodeH / 2 + 5}
           textAnchor="middle"
-          fill={textOnPrimary}
+          fill={sourceText}
           fontFamily={font}
           fontSize={Math.min(14, nodeW / 12)}
           fontWeight={600}
@@ -143,7 +146,7 @@ function Render({
               x={branchX + nodeW / 2}
               y={by + nodeH / 2 + 5}
               textAnchor="middle"
-              fill={textOnPrimary}
+              fill={branchText}
               fontFamily={font}
               fontSize={Math.min(14, nodeW / 12)}
               fontWeight={600}

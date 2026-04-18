@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette } from '../../palettes';
 
 const dataSchema = z.object({
   entry: z.string().min(1).max(40),
@@ -35,12 +35,13 @@ function FlowDecisionYesNoRender({
   height,
 }: PresetRenderProps<FlowDecisionYesNoData>): ReactElement {
   const p = settings.paletteId;
-  const boxFill = paletteColor(p, 0);
-  const diamondFill = paletteColor(p, 1);
-  const yesFill = paletteColor(p, 2);
-  const noFill = paletteColor(p, 3);
-  const textLight = paletteColor(p, 5);
-  const lineColor = paletteColor(p, 2);
+  const palette = getPalette(p);
+  const boxFill = palette.nodeFill;
+  const diamondFill = palette.nodeStroke;
+  const yesFill = palette.nodeFill;
+  const noFill = palette.accent;
+  const textLight = palette.text;
+  const lineColor = palette.nodeStroke;
   const font = settings.font ?? 'Inter, sans-serif';
   const cx = width / 2;
 
@@ -65,10 +66,10 @@ function FlowDecisionYesNoRender({
       </g>
 
       <line x1={cx - 90} y1={height / 2} x2={40} y2={height / 2} stroke={lineColor} strokeWidth={2} markerEnd="url(#fd-arrow)" />
-      <text x={cx - 55} y={height / 2 - 6} textAnchor="middle" fill={paletteColor(p, 1)} fontFamily={font} fontSize={11} fontWeight={600}>{data.noLabel}</text>
+      <text x={cx - 55} y={height / 2 - 6} textAnchor="middle" fill={palette.nodeStroke} fontFamily={font} fontSize={11} fontWeight={600}>{data.noLabel}</text>
 
       <line x1={cx + 90} y1={height / 2} x2={width - 40} y2={height / 2} stroke={lineColor} strokeWidth={2} markerEnd="url(#fd-arrow)" />
-      <text x={cx + 55} y={height / 2 - 6} textAnchor="middle" fill={paletteColor(p, 1)} fontFamily={font} fontSize={11} fontWeight={600}>{data.yesLabel}</text>
+      <text x={cx + 55} y={height / 2 - 6} textAnchor="middle" fill={palette.nodeStroke} fontFamily={font} fontSize={11} fontWeight={600}>{data.yesLabel}</text>
 
       <g data-id="no-outcome">
         <rect x={8} y={height / 2 - 21} width={100} height={42} rx={8} fill={noFill} />

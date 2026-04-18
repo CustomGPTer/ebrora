@@ -7,7 +7,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   steps: z
@@ -39,10 +39,11 @@ function Render({
   height,
 }: PresetRenderProps<FlowLinear5StepData>): ReactElement {
   const { paletteId, customColors } = settings;
-  const nodeFill = paletteColor(paletteId, 0);
-  const nodeTextFill = paletteColor(paletteId, 5);
-  const arrowFill = paletteColor(paletteId, 1);
-  const detailFill = paletteColor(paletteId, 2);
+  const palette = getPalette(paletteId);
+  const stepFills = gradientSequence(palette, data.steps.length);
+  const nodeTextFill = palette.text;
+  const arrowFill = palette.nodeStroke;
+  const detailFill = palette.nodeStroke;
 
   const padding = 16;
   const gap = 12;
@@ -75,7 +76,7 @@ function Render({
       {data.steps.map((step, i) => {
         const x = padding + i * (nodeWidth + gap);
         const nodeId = `step-${i}`;
-        const fill = customColors[nodeId] ?? nodeFill;
+        const fill = customColors[nodeId] ?? stepFills[i];
         return (
           <g key={nodeId} data-id={nodeId}>
             <rect

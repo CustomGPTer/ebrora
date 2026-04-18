@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence, lighten } from '../../palettes';
 
 const itemsSchema = z.array(z.string().min(1).max(40)).min(2).max(5);
 
@@ -47,11 +47,14 @@ function Render({
 }: PresetRenderProps<FlowSipocData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const headerFill = paletteColor(paletteId, 0);
-  const headerText = paletteColor(paletteId, 5);
-  const cellFill = paletteColor(paletteId, 4);
-  const cellText = paletteColor(paletteId, 0);
-  const accentColour = paletteColor(paletteId, 2);
+  const palette = getPalette(paletteId);
+  // SIPOC reads left-to-right upstream-to-downstream — per handover recipe,
+  // Pattern A for each column header so the 5-stage flow is visually clear.
+  const headerFills = gradientSequence(palette, COLS.length);
+  const headerText = palette.text;
+  const cellFill = lighten(palette.nodeFill, 0.85);
+  const cellText = palette.nodeFill;
+  const accentColour = palette.accent;
 
   const pad = 8;
   const colGap = 4;
@@ -69,7 +72,7 @@ function Render({
         const x = pad + ci * (colW + colGap);
         const items = data[col.field];
         const headerId = `col-${col.id}`;
-        const headerColour = customColors[headerId] ?? headerFill;
+        const headerColour = customColors[headerId] ?? headerFills[ci];
 
         return (
           <g key={col.id}>
