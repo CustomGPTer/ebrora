@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const leafSchema = z.object({
   label: z.string().min(1).max(20),
@@ -48,13 +48,15 @@ function Render({
 }: PresetRenderProps<HierarchyTreeGenericData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const rootFill = paletteColor(paletteId, 0);
-  const branchFill = paletteColor(paletteId, 2);
-  const leafFill = paletteColor(paletteId, 4);
-  const rootText = paletteColor(paletteId, 5);
-  const branchText = paletteColor(paletteId, 5);
-  const leafText = paletteColor(paletteId, 0);
-  const connector = paletteColor(paletteId, 2);
+  const palette = getPalette(paletteId);
+  // Pattern D for an uneven tree: accent apex, nodeFill branches, lightened leaves.
+  const rootFill = palette.accent;
+  const branchFill = palette.nodeFill;
+  const leafFill = lighten(palette.nodeFill, 0.6);
+  const rootText = palette.accentText;
+  const branchText = palette.text;
+  const leafText = palette.nodeFill;
+  const connector = palette.nodeStroke;
 
   const pad = 12;
   const nBranch = data.branches.length;

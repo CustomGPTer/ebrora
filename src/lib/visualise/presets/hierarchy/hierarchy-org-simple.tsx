@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence, lighten } from '../../palettes';
 
 const dataSchema = z.object({
   root: z.object({
@@ -32,11 +32,15 @@ const defaultData: Data = {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
-  const rootFill = paletteColor(p, 0);
-  const childFill = paletteColor(p, 1);
-  const textLight = paletteColor(p, 5);
-  const lineColor = paletteColor(p, 2);
-  const subColor = paletteColor(p, 3);
+  const palette = getPalette(p);
+  // Pattern D: root (accent) stands out above its children (gradient).
+  const childFills = gradientSequence(palette, data.children.length);
+  const rootFill = palette.accent;
+  const rootText = palette.accentText;
+  const childText = palette.text;
+  const lineColor = palette.nodeStroke;
+  const rootSubColor = palette.accentText;
+  const childSubColor = lighten(palette.text, 0.15);
   const font = settings.font ?? 'Inter, sans-serif';
 
   const boxW = Math.min(160, (width - 40) / 3 - 10);
@@ -58,9 +62,9 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
 
       <g data-id="root">
         <rect x={rootX} y={rootY} width={boxW} height={boxH} rx={8} fill={rootFill} />
-        <text x={rootX + boxW / 2} y={rootY + (data.root.subtitle ? 22 : boxH / 2 + 5)} textAnchor="middle" fill={textLight} fontFamily={font} fontSize={13} fontWeight={600}>{truncate(data.root.label, 18)}</text>
+        <text x={rootX + boxW / 2} y={rootY + (data.root.subtitle ? 22 : boxH / 2 + 5)} textAnchor="middle" fill={rootText} fontFamily={font} fontSize={13} fontWeight={600}>{truncate(data.root.label, 18)}</text>
         {data.root.subtitle ? (
-          <text x={rootX + boxW / 2} y={rootY + 38} textAnchor="middle" fill={subColor} fontFamily={font} fontSize={10}>{truncate(data.root.subtitle, 22)}</text>
+          <text x={rootX + boxW / 2} y={rootY + 38} textAnchor="middle" fill={rootSubColor} fontFamily={font} fontSize={10} opacity={0.85}>{truncate(data.root.subtitle, 22)}</text>
         ) : null}
       </g>
 
@@ -68,10 +72,10 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const nodeId = `child-${i}`;
         return (
           <g key={nodeId} data-id={nodeId}>
-            <rect x={childXs[i]} y={childY} width={boxW} height={boxH} rx={8} fill={childFill} />
-            <text x={childXs[i] + boxW / 2} y={childY + (c.subtitle ? 22 : boxH / 2 + 5)} textAnchor="middle" fill={textLight} fontFamily={font} fontSize={12} fontWeight={600}>{truncate(c.label, 18)}</text>
+            <rect x={childXs[i]} y={childY} width={boxW} height={boxH} rx={8} fill={childFills[i]} />
+            <text x={childXs[i] + boxW / 2} y={childY + (c.subtitle ? 22 : boxH / 2 + 5)} textAnchor="middle" fill={childText} fontFamily={font} fontSize={12} fontWeight={600}>{truncate(c.label, 18)}</text>
             {c.subtitle ? (
-              <text x={childXs[i] + boxW / 2} y={childY + 38} textAnchor="middle" fill={paletteColor(p, 4)} fontFamily={font} fontSize={10}>{truncate(c.subtitle, 22)}</text>
+              <text x={childXs[i] + boxW / 2} y={childY + 38} textAnchor="middle" fill={childSubColor} fontFamily={font} fontSize={10}>{truncate(c.subtitle, 22)}</text>
             ) : null}
           </g>
         );

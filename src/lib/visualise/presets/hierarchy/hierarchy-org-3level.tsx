@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, lighten } from '../../palettes';
 
 const nodeSchema = z.object({
   label: z.string().min(1).max(22),
@@ -51,15 +51,19 @@ function Render({
 }: PresetRenderProps<HierarchyOrg3LevelData>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const topFill = paletteColor(paletteId, 0);
-  const midFill = paletteColor(paletteId, 2);
-  const botFill = paletteColor(paletteId, 4);
-  const topText = paletteColor(paletteId, 5);
-  const midText = paletteColor(paletteId, 5);
-  const botText = paletteColor(paletteId, 0);
-  const subText = paletteColor(paletteId, 5);
-  const botSubText = paletteColor(paletteId, 2);
-  const connector = paletteColor(paletteId, 2);
+  const palette = getPalette(paletteId);
+  // Pattern D: top uses accent; middle uses nodeFill; bottom uses a light tint
+  // so depth reads visually at a glance.
+  const topFill = palette.accent;
+  const midFill = palette.nodeFill;
+  const botFill = lighten(palette.nodeFill, 0.6);
+  const topText = palette.accentText;
+  const midText = palette.text;
+  const botText = palette.nodeFill;
+  const topSubText = palette.accentText;
+  const midSubText = palette.text;
+  const botSubText = palette.nodeStroke;
+  const connector = palette.nodeStroke;
 
   const pad = 14;
   const nMid = data.middle.length;
@@ -146,9 +150,10 @@ function Render({
             x={topCx}
             y={topY + topH / 2 + 14}
             textAnchor="middle"
-            fill={subText}
+            fill={topSubText}
             fontFamily={font}
             fontSize={10}
+            opacity={0.85}
           >
             {truncate(data.top.subtitle, 26)}
           </text>
@@ -178,9 +183,10 @@ function Render({
                 x={midCxs[mi]}
                 y={midY + midH / 2 + 13}
                 textAnchor="middle"
-                fill={subText}
+                fill={midSubText}
                 fontFamily={font}
                 fontSize={9}
+                opacity={0.85}
               >
                 {truncate(m.subtitle, 24)}
               </text>

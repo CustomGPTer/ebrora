@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   tiers: z.array(z.object({
@@ -30,9 +30,16 @@ const defaultData: Data = {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
+  const palette = getPalette(p);
   const font = settings.font ?? 'Inter, sans-serif';
-  const textLight = paletteColor(p, 5);
-  const detailColor = paletteColor(p, 0);
+  const tierFills = gradientSequence(palette, data.tiers.length);
+  tierFills[0] = palette.accent;  // apex gets the accent colour — highlights the top of the hierarchy
+  const textLight = palette.text;
+  const detailColor = palette.nodeFill;
+  // Apex (tier 0) is accent-filled, so its text needs accentText contrast — not `text`
+  // which is tuned for nodeFill. Tiers 1–2 stay on `text` since they're gradient fills
+  // derived from nodeFill.
+  const apexText = palette.accentText;
 
   const padding = 24;
   const usableH = height - padding * 2;
@@ -55,17 +62,17 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const topRight = apex + topWidth / 2;
         const bottomLeft = apex - clampedBottom / 2;
         const bottomRight = apex + clampedBottom / 2;
-        const fill = paletteColor(p, i);
+        const fill = tierFills[i];
         const points = `${topLeft},${top} ${topRight},${top} ${bottomRight},${bottom} ${bottomLeft},${bottom}`;
         const nodeId = `tier-${i}`;
         return (
           <g key={nodeId} data-id={nodeId}>
-            <polygon points={points} fill={fill} stroke={paletteColor(p, 5)} strokeWidth={1.5} />
-            <text x={apex} y={top + tierH / 2 + 2} textAnchor="middle" fontFamily={font} fontSize={13} fontWeight={600} fill={i < 3 ? textLight : detailColor}>
+            <polygon points={points} fill={fill} stroke={palette.bg} strokeWidth={1.5} />
+            <text x={apex} y={top + tierH / 2 + 2} textAnchor="middle" fontFamily={font} fontSize={13} fontWeight={600} fill={i === 0 ? apexText : (i < 3 ? textLight : detailColor)}>
               {truncate(tier.label, 22)}
             </text>
             {tier.detail ? (
-              <text x={apex} y={top + tierH / 2 + 16} textAnchor="middle" fontFamily={font} fontSize={10} fill={i < 3 ? textLight : detailColor} fillOpacity={0.85}>
+              <text x={apex} y={top + tierH / 2 + 16} textAnchor="middle" fontFamily={font} fontSize={10} fill={i === 0 ? apexText : (i < 3 ? textLight : detailColor)} fillOpacity={0.85}>
                 {truncate(tier.detail, 28)}
               </text>
             ) : null}

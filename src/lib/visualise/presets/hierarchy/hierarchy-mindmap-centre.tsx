@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette } from '../../palettes';
 
 const spokeSchema = z.object({
   label: z.string().min(1).max(22),
@@ -41,12 +41,15 @@ function truncate(s: string, max: number): string {
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const { paletteId, customColors } = settings;
   const font = settings.font ?? 'Inter, sans-serif';
-  const centreFill = paletteColor(paletteId, 0);
-  const centreText = paletteColor(paletteId, 5);
-  const spokeFill = paletteColor(paletteId, 2);
-  const spokeText = paletteColor(paletteId, 5);
-  const detailText = paletteColor(paletteId, 0);
-  const edgeColour = paletteColor(paletteId, 2);
+  const palette = getPalette(paletteId);
+  const centreFill = palette.accent;
+  // Centre node is accent-filled — its text needs accentText contrast.
+  // Spokes are nodeFill, so their text uses `text` as normal.
+  const centreText = palette.accentText;
+  const spokeFill = palette.nodeFill;
+  const spokeText = palette.text;
+  const detailText = palette.nodeFill;
+  const edgeColour = palette.nodeStroke;
 
   const cx = width / 2;
   const cy = height / 2;

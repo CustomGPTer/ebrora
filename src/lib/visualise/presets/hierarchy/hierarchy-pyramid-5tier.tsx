@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
-import { paletteColor } from '../../palettes';
+import { getPalette, gradientSequence } from '../../palettes';
 
 const dataSchema = z.object({
   tiers: z.array(z.object({
@@ -37,9 +37,13 @@ function truncate(s: string, max: number): string {
 
 function Render({ data, settings, width, height }: PresetRenderProps<Data>): ReactElement {
   const p = settings.paletteId;
+  const palette = getPalette(p);
   const font = settings.font ?? 'Inter, sans-serif';
-  const textLight = paletteColor(p, 5);
-  const detailColor = paletteColor(p, 0);
+  const tierFills = gradientSequence(palette, data.tiers.length);
+  tierFills[0] = palette.accent;  // apex gets the accent colour
+  const textLight = palette.text;
+  const detailColor = palette.nodeFill;
+  const apexText = palette.accentText;
   const { customColors } = settings;
 
   const padding = 20;
@@ -68,12 +72,13 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
         const bottomLeft = apex - clampedBottom / 2;
         const bottomRight = apex + clampedBottom / 2;
         const nodeId = `tier-${i}`;
-        const fill = customColors[nodeId] ?? paletteColor(p, i);
+        const fill = customColors[nodeId] ?? tierFills[i];
         const points = `${topLeft},${top} ${topRight},${top} ${bottomRight},${bottom} ${bottomLeft},${bottom}`;
         const useLight = i < tierCount - 1;
+        const tierTextFill = i === 0 ? apexText : (useLight ? textLight : detailColor);
         return (
           <g key={nodeId} data-id={nodeId}>
-            <polygon points={points} fill={fill} stroke={paletteColor(p, 5)} strokeWidth={1.5} />
+            <polygon points={points} fill={fill} stroke={palette.bg} strokeWidth={1.5} />
             <text
               x={apex}
               y={top + tierH / 2 + 2}
@@ -81,7 +86,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
               fontFamily={font}
               fontSize={12}
               fontWeight={700}
-              fill={useLight ? textLight : detailColor}
+              fill={tierTextFill}
             >
               {truncate(tier.label, 20)}
             </text>
@@ -92,7 +97,7 @@ function Render({ data, settings, width, height }: PresetRenderProps<Data>): Rea
                 textAnchor="middle"
                 fontFamily={font}
                 fontSize={9}
-                fill={useLight ? textLight : detailColor}
+                fill={tierTextFill}
                 fillOpacity={0.9}
               >
                 {truncate(tier.detail, 30)}
