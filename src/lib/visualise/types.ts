@@ -32,6 +32,12 @@
 //   Rationale: chose VisualInstance-level fields over per-preset schema changes
 //   to avoid touching all 50 preset Zod schemas and render functions. Captions
 //   and descriptions survive preset switches unchanged. See phase-1 handover.
+//
+// AMENDMENT (Batch 1 bug fix — "Slot overflow + reasoning"):
+//   Added optional top-level `reasoning` on VisualiseDocumentBlob. Carries the
+//   AI's chain-of-thought explaining concept count + preset choice, so the
+//   DocumentView can render a dismissible banner above the visuals. Optional
+//   for backward compatibility with pre-Batch-1 drafts.
 // =============================================================================
 
 import type { PresetCategory } from './presets/types';
@@ -164,6 +170,15 @@ export interface VisualiseDocumentBlob {
   visuals: VisualInstance[];
   createdAt: string;
   updatedAt: string;
+  /**
+   * Batch 1: AI's chain-of-thought from the most recent generate/regenerate.
+   * 1–4 sentences explaining concept count + preset choices. Optional for
+   * backward compat with pre-Batch-1 drafts (renderer hides the banner when
+   * absent). Refreshed on every full generate; partial single-visual
+   * regenerate returns its own reasoning but only the full-generate value
+   * is persisted to the blob.
+   */
+  reasoning?: string;
 }
 
 /** Visual count preference the user can send with a Generate request. */
