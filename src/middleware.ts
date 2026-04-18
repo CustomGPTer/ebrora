@@ -140,6 +140,7 @@ export default withAuth(
           pathname.startsWith('/auth/') ||
           pathname.startsWith('/free-templates') ||
           pathname.startsWith('/tools') ||
+          pathname.startsWith('/visualise') ||
           pathname === '/sitemap.xml' ||
           pathname === '/robots.txt' ||
           /\.(ico|png|jpg|jpeg|svg|gif|webp|css|js|woff|woff2)$/.test(pathname);
