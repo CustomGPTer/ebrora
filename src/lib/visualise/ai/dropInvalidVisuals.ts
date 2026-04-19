@@ -287,5 +287,9 @@ export function toVisualInstance(
     variants: validated.variants,
     caption: validated.caption,
     nodeDescriptions: validated.nodeDescriptions,
+    // Batch 1b — stamp the AI's initial preset choice so the canvas editor
+    // can always point the user back to it via an "AI chose this" badge
+    // in the preset gallery, even after they swap templates a few times.
+    aiOriginalPresetId: validated.presetId,
   };
 }

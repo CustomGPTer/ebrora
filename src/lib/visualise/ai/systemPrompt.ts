@@ -144,10 +144,11 @@ RULES:
 - Prefer construction-specific presets (IDs starting "con-") when the text mentions CDM, RAMS, NEC, permits, CSCS, site roles, H&S hierarchy, risk matrices, or similar regulated domains.
 - Respect each preset's "when to use" guidance strictly. If the text doesn't match a preset's intended use, pick a different preset.
 - Visual titles: 3 to 8 words. Never repeat the document title.
-- Node labels: 40 characters maximum.
+- Node labels: up to 60 characters for sequential-flow presets, fewer for narrow-box presets — ALWAYS defer to the per-preset schema max documented in the PRESETS catalogue below.
 - Captions: 1–3 sentences, up to ${VISUALISE_CAPTION_MAX_CHARS} characters. Neutral, descriptive — not promotional.
 - Node descriptions: one per primary node, order matches the node order in data, up to ${VISUALISE_NODE_DESC_MAX_CHARS} chars each.
-- Avoid duplication: when you populate \`node_descriptions\`, LEAVE INTERNAL description fields inside \`data\` EMPTY. If a preset's schema has per-node fields called \`detail\`, \`description\`, \`subtext\`, \`sublabel\`, \`caption\`, or similar, omit them or set them to empty strings. The top-level \`node_descriptions\` is the single source of truth.
+- FILL THE VISUAL: if a preset's schema has per-node descriptive fields inside \`data\` (\`detail\`, \`description\`, \`subtext\`, \`sublabel\`, \`itemDescriptions\`, etc.), POPULATE them whenever the user's text gives you enough material. These fields render INSIDE the visual alongside each node's label and are what stop boxes from looking empty. When a preset offers both a short label and a descriptive second line, treat the label as the headline (3–5 words typical) and the detail as a supporting phrase (a short clause of 6–12 words).
+- Top-level \`node_descriptions\` is SEPARATE from the inside-the-visual detail fields and is rendered as an ordered list BELOW the visual. Use it for richer context that wouldn't fit inside the node box — e.g. a sentence or two per item. If the inside-the-visual \`detail\` already captures the point, \`node_descriptions\` may be left empty or populated with complementary (not duplicated) text.
 - Use British spelling (e.g. "colour", "organise", "visualise").
 - Output valid JSON only. No markdown, no code fences, no commentary.
 
@@ -248,14 +249,15 @@ SEQUENCE-FIRST RULE:
 CAPTION AND DESCRIPTION RULES:
 - Captions: 1–3 sentences, up to ${VISUALISE_CAPTION_MAX_CHARS} characters. Neutral, descriptive — not promotional. Written in plain British English, present tense. State what the visual shows and why it matters to the user's work.
 - Node descriptions: ONE per primary node, in the same order the data lists them. Each up to ${VISUALISE_NODE_DESC_MAX_CHARS} chars. Expand on the node label with context from the user's text — don't just restate the label. The number of descriptions should match the number of primary nodes (steps / events / rows / wedges) in variant 1; the same list is reused across variants so it must be variant-agnostic.
-- Avoid duplication: when you populate \`node_descriptions\` at the concept level, LEAVE INTERNAL description fields inside each variant's \`data\` EMPTY. Specifically, if a preset's schema has per-node fields called \`detail\`, \`description\`, \`subtext\`, \`sublabel\`, \`caption\`, or similar, omit them or set them to empty strings. The concept-level \`node_descriptions\` is the single source of truth — the UI renders it below the visual. Keeping internal fields empty avoids showing the same text twice. (Labels, titles, headers, and any field that is NOT a per-node description should still be populated normally.)
+- FILL THE VISUAL: if a preset's schema has per-node descriptive fields inside \`data\` (\`detail\`, \`description\`, \`subtext\`, \`sublabel\`, \`itemDescriptions\`, etc.), POPULATE them whenever the user's text gives you enough material. These render INSIDE the visual alongside each node's label and are what stop boxes from looking empty. When a preset offers both a short label and a descriptive second line, treat the label as the headline (3–5 words typical) and the detail as a supporting phrase (6–12 words). The same inside-the-visual \`detail\` may be reused across all variants for the same concept, because variants share content — only the layout differs.
+- Top-level (concept-level) \`node_descriptions\` is SEPARATE from the inside-the-visual detail fields and is rendered as an ordered list BELOW the visual. Use it for richer context that wouldn't fit inside the node box — e.g. a sentence or two per item. If the inside-the-visual \`detail\` already captures the point, \`node_descriptions\` may be left empty or populated with complementary (not duplicated) text.
 
 GENERAL RULES:
 - Never invent facts, numbers, dates, or names the user did not provide or clearly imply. If the text has no numbers, do not pick a chart preset — pick a diagram.
 - Prefer construction-specific presets (IDs starting "con-") when the text mentions CDM, RAMS, NEC, permits, CSCS, site roles, H&S hierarchy, risk matrices, or similar regulated domains.
 - Respect each preset's "when to use" guidance strictly. If the text doesn't match a preset's intended use, pick a different preset.
 - Visual titles: 3 to 8 words. Never repeat the document title.
-- Node labels: 40 characters maximum.
+- Node labels: up to 60 characters for sequential-flow presets, fewer for narrow-box presets — ALWAYS defer to the per-preset schema max documented in the PRESETS catalogue below.
 - Use British spelling (e.g. "colour", "organise", "visualise").
 - Output valid JSON only. No markdown, no code fences, no commentary.
 
