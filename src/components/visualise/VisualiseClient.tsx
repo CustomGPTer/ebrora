@@ -36,6 +36,8 @@ import type {
 import type { ClarifyAnswer } from '@/lib/visualise/ai/clarify/types';
 
 import GenerateScreen from './GenerateScreen';
+import EntryChooser from './EntryChooser';
+import TemplateFirstScreen from './TemplateFirstScreen';
 import DocumentView from './DocumentView';
 import QuotaBar from './QuotaBar';
 import DraftList from './DraftList';
@@ -84,11 +86,15 @@ interface Props {
   initialDocumentId?: string;
 }
 
-type View = 'generate' | 'document' | 'loading';
+type View = 'entry' | 'generate' | 'template-first' | 'document' | 'loading';
 
 export default function VisualiseClient({ tier, initialDocumentId }: Props) {
   const [access, setAccess] = useState<AccessResponse | null>(null);
-  const [view, setView] = useState<View>(initialDocumentId ? 'loading' : 'generate');
+  // Batch 3b — default to 'entry' (the mode-chooser) for new users without
+  // a draft in-flight. The draft-load path still goes straight to 'loading'
+  // and then 'document'. The AI-first flow that pre-dates 3b is still the
+  // default if the user picks that entry card.
+  const [view, setView] = useState<View>(initialDocumentId ? 'loading' : 'entry');
   const [document, setDocument] = useState<VisualiseDocumentBlob | null>(null);
   const [documentId, setDocumentId] = useState<string | null>(initialDocumentId ?? null);
   const [isDirty, setIsDirty] = useState(false);
@@ -247,7 +253,7 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
 
   // ── Regenerate one visual ───────────────────────────────────────────────
   const handleRegenerateVisual = useCallback(
-    async (visualId: string) => {
+    async (visualId: string, source: 'original' | 'current-content' = 'original') => {
       if (!documentId) return;
       setIsGenerating(true);
       setError(null);
@@ -255,7 +261,12 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
         const res = await fetch('/api/visualise/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ documentId, visualId }),
+          body: JSON.stringify({
+            documentId,
+            visualId,
+            // Batch 3a — defaults to 'original' for legacy callers.
+            regenerateSource: source,
+          }),
         });
         const payload = await res.json();
         if (!res.ok) {
@@ -263,7 +274,6 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
           return;
         }
         setDocument(payload.document as VisualiseDocumentBlob);
-        // Regenerate writes the blob server-side, so client state matches the blob again.
         setIsDirty(false);
         refreshAccess();
       } catch (e) {
@@ -395,7 +405,9 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
     setIsDirty(false);
     setEditingVisualId(null);
     setExportOpen(false);
-    setView('generate');
+    // Batch 3b — reset returns to the entry chooser so the user can pick
+    // AI-first or template-first for their next document.
+    setView('entry');
     refreshAccess();
   }, [documentId, refreshAccess]);
 
@@ -407,7 +419,8 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
     setIsDirty(false);
     setEditingVisualId(null);
     setExportOpen(false);
-    setView('generate');
+    // Batch 3b — new draft returns to entry chooser, same reason.
+    setView('entry');
   }, [isDirty]);
 
   // ── Render ──────────────────────────────────────────────────────────────
@@ -454,6 +467,19 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
           <div className="inline-block w-10 h-10 border-4 border-[#1B5B50] border-t-transparent rounded-full animate-spin" />
           <p className="mt-4 text-gray-600">Loading draft…</p>
         </div>
+      ) : view === 'entry' ? (
+        <EntryChooser
+          onChooseAi={() => setView('generate')}
+          onChooseTemplate={() => setView('template-first')}
+        />
+      ) : view === 'template-first' ? (
+        <TemplateFirstScreen
+          access={access}
+          onGenerate={handleGenerate}
+          isGenerating={isGenerating}
+          onBack={() => setView('entry')}
+          generateError={error}
+        />
       ) : view === 'generate' ? (
         <GenerateScreen
           access={access}
@@ -486,7 +512,11 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
         <CanvasEditor
           document={document}
           editingVisualId={editingVisualId}
+          isGenerating={isGenerating}
           onUpdateVisual={updateVisual}
+          onRegenerateVisual={handleRegenerateVisual}
+          onGalleryPickVisual={handleGalleryPickVisual}
+          onOpenExport={() => setExportOpen(true)}
           onClose={closeCanvas}
         />
       ) : null}

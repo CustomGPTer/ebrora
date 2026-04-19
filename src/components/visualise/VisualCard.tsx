@@ -37,7 +37,7 @@ interface Props {
   isGenerating: boolean;
   onUpdate: (patch: Partial<VisualInstance>) => void;
   onDelete: () => void;
-  onRegenerate: () => void;
+  onRegenerate: (source?: 'original' | 'current-content') => void;
   onGalleryPick: (presetId: string) => void;
 }
 
@@ -374,10 +374,11 @@ export default function VisualCard({
       {/* Regenerate warning modal */}
       <RegenerateWarningModal
         open={regenOpen}
+        templateLocked={Boolean(visual.templateLocked)}
         onClose={() => setRegenOpen(false)}
-        onConfirm={() => {
+        onConfirm={(source) => {
           setRegenOpen(false);
-          onRegenerate();
+          onRegenerate(source);
         }}
       />
 
