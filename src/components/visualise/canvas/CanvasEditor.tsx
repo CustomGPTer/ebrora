@@ -92,11 +92,35 @@ import ContextMenu, { type ContextMenuItem } from './ContextMenu';
 import InlineTextEditor, { type InlineTextEditorRect } from './InlineTextEditor';
 import PresetGallery, { type PresetSwapOutcome } from './Sidebar/PresetGallery';
 import SettingsPanel from './Sidebar/SettingsPanel';
+// Batch 1b — modals reachable from the canvas editor's top toolbar and
+// template gallery. RegenerateWarningModal already existed (used from
+// VisualCard on the document view); we reuse it verbatim rather than
+// duplicate the copy. ApplyTemplateModal is new in this batch.
+import RegenerateWarningModal from '../RegenerateWarningModal';
+import ApplyTemplateModal from './ApplyTemplateModal';
 
 interface Props {
   document: VisualiseDocumentBlob;
   editingVisualId: string | null;
+  /** Parent-level generating state — disables destructive toolbar actions
+   *  (Regenerate, Apply template) while an AI call is in flight. */
+  isGenerating: boolean;
   onUpdateVisual: (visualId: string, patch: Partial<VisualInstance>) => void;
+  /** Full regenerate of the currently-edited visual using the AI + source.
+   *  Fires the server-side generate route with `visualId` and optional
+   *  `regenerateSource` ('original' | 'current-content'). Consumes one
+   *  credit. Batch 1b + Batch 3a. */
+  onRegenerateVisual: (
+    visualId: string,
+    source?: 'original' | 'current-content',
+  ) => void;
+  /** Silent auto-remap: force a specific preset and ask the AI to re-map
+   *  the original source text into it. Used from the Apply-Template modal
+   *  when the user picks an incompatible preset from the sidebar gallery.
+   *  Consumes one credit. Batch 1b. */
+  onGalleryPickVisual: (visualId: string, presetId: string) => void;
+  /** Open the shared ExportModal (the same one DocumentView opens). Batch 1b. */
+  onOpenExport: () => void;
   onClose: () => void;
 }
 
@@ -174,7 +198,11 @@ interface TextEditState {
 export default function CanvasEditor({
   document: docBlob,
   editingVisualId,
+  isGenerating,
   onUpdateVisual,
+  onRegenerateVisual,
+  onGalleryPickVisual,
+  onOpenExport,
   onClose,
 }: Props) {
   const visual = useMemo(() => {
@@ -185,6 +213,14 @@ export default function CanvasEditor({
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [swapWarning, setSwapWarning] = useState<string | null>(null);
+
+  // Batch 1b — modal state for the two new flows reachable from this editor.
+  // `applyTemplateTarget` is the preset ID the user tapped in the sidebar
+  // gallery that didn't schema-fit; when non-null the ApplyTemplateModal is
+  // open. `regenerateOpen` drives the reused RegenerateWarningModal from
+  // the toolbar Regenerate button. Both modals swallow Escape internally.
+  const [applyTemplateTarget, setApplyTemplateTarget] = useState<string | null>(null);
+  const [regenerateOpen, setRegenerateOpen] = useState(false);
 
   const [viewport, setViewport] = useState<Viewport>({ scale: 1, panX: 0, panY: 0 });
   const viewportRef = useRef(viewport);
@@ -461,6 +497,61 @@ export default function CanvasEditor({
     },
     [editingVisualId, visual, onUpdateVisual],
   );
+
+  // Batch 1b — incompatible preset pick. The gallery bubbles up the target
+  // preset ID here instead of silently swapping to defaultData; we open the
+  // ApplyTemplateModal which confirms before committing an AI re-map.
+  const handleApplyIntent = useCallback((presetId: string) => {
+    setApplyTemplateTarget(presetId);
+  }, []);
+
+  // Batch 1b — user confirmed "Apply template" in the modal. Fire the
+  // silent auto-remap (same server path the VisualCard gallery uses) and
+  // close the modal. The server will return the full document blob with
+  // the swapped visual + preserved concept-level fields (caption,
+  // nodeDescriptions, variants). We also clear any stale swap warning so
+  // the amber banner doesn't linger across a successful remap.
+  const handleConfirmApplyTemplate = useCallback(() => {
+    if (!editingVisualId || !applyTemplateTarget) return;
+    const targetId = applyTemplateTarget;
+    onGalleryPickVisual(editingVisualId, targetId);
+    setApplyTemplateTarget(null);
+    setSwapWarning(null);
+    setSelectedIds(new Set());
+  }, [editingVisualId, applyTemplateTarget, onGalleryPickVisual]);
+
+  // Batch 1b — the toolbar Regenerate button routes through the existing
+  // RegenerateWarningModal for quota/edit awareness, then fires the parent's
+  // onRegenerateVisual. Batch 3a — receives the user's source choice
+  // (original vs tidy-up) from the modal and threads it through.
+  const handleConfirmRegenerate = useCallback(
+    (source: 'original' | 'current-content') => {
+      if (!editingVisualId) return;
+      onRegenerateVisual(editingVisualId, source);
+      setRegenerateOpen(false);
+      setSwapWarning(null);
+      setSelectedIds(new Set());
+    },
+    [editingVisualId, onRegenerateVisual],
+  );
+
+  // Batch 3a — toggle templateLocked on the current visual. A pinned
+  // visual keeps its preset across any regenerate. Click to toggle; we
+  // just flip the flag locally and the next save persists it.
+  const handleToggleTemplateLock = useCallback(() => {
+    if (!editingVisualId || !visual) return;
+    onUpdateVisual(editingVisualId, {
+      templateLocked: !visual.templateLocked,
+    });
+  }, [editingVisualId, visual, onUpdateVisual]);
+
+  // Memoised name for the Apply-Template modal copy — avoids a fallback
+  // flash of "undefined" while the modal opens.
+  const applyTemplateTargetName = useMemo(() => {
+    if (!applyTemplateTarget) return '';
+    const target = getPresetById(applyTemplateTarget);
+    return target?.name ?? applyTemplateTarget;
+  }, [applyTemplateTarget]);
 
   // ── Coord helpers ─────────────────────────────────────────────────────────
   const clientToWorld = useCallback((clientX: number, clientY: number): { x: number; y: number } | null => {
@@ -1209,6 +1300,58 @@ export default function CanvasEditor({
             {Math.round(viewport.scale * 100)}%
           </span>
           <div className="mx-1 h-5 border-l border-gray-200" />
+          {/* ── Batch 1b — Regenerate + Export ─────────────────────────────── */}
+          {/* Both disabled while the parent is mid-generate to avoid double-
+              submits and to surface progress clearly. The Regenerate button
+              opens the same confirmation modal VisualCard uses, so the user
+              always sees the quota cost before committing. */}
+          <ToolbarButton
+            onClick={() => setRegenerateOpen(true)}
+            disabled={isGenerating || !visual}
+            label="Regenerate this visual with AI (1 use)"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12a9 9 0 1 1-3-6.7" />
+              <polyline points="21 3 21 9 15 9" />
+            </svg>
+          </ToolbarButton>
+          {/* Batch 3a — template lock toggle. When active (visual.templateLocked
+              true), the icon shows a closed padlock; otherwise open. Clicking
+              toggles. The server respects the flag on any subsequent regenerate. */}
+          <ToolbarButton
+            onClick={handleToggleTemplateLock}
+            disabled={isGenerating || !visual}
+            active={Boolean(visual?.templateLocked)}
+            label={
+              visual?.templateLocked
+                ? 'Template is locked — click to unlock (Regenerate will keep this preset)'
+                : 'Lock this template — future regenerates will keep this exact preset'
+            }
+          >
+            {visual?.templateLocked ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="4" y="11" width="16" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="4" y="11" width="16" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 0 1 8 0" />
+              </svg>
+            )}
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={onOpenExport}
+            disabled={isGenerating || !visual}
+            label="Export (PNG / SVG / PDF)"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </ToolbarButton>
+          <div className="mx-1 h-5 border-l border-gray-200" />
           <ToolbarButton
             onClick={() => setLeftOpen((v) => !v)}
             label="Toggle preset gallery"
@@ -1270,7 +1413,9 @@ export default function CanvasEditor({
               <PresetGallery
                 currentPresetId={visual.presetId}
                 currentData={visual.data}
+                aiOriginalPresetId={visual.aiOriginalPresetId}
                 onSwap={handlePresetSwap}
+                onApplyIntent={handleApplyIntent}
               />
             ) : null}
           </aside>
@@ -1286,13 +1431,28 @@ export default function CanvasEditor({
               {swapWarning ? (
                 <div className="px-4 py-2 bg-amber-50 border-b border-amber-200 flex items-start justify-between gap-3">
                   <p className="text-xs text-amber-800 flex-1">{swapWarning}</p>
-                  <button
-                    type="button"
-                    onClick={() => setSwapWarning(null)}
-                    className="text-xs font-semibold text-amber-800 hover:underline flex-shrink-0"
-                  >
-                    Dismiss
-                  </button>
+                  <div className="flex-shrink-0 flex items-center gap-3">
+                    {/* Batch 1b — primary action: regenerate from here instead
+                        of sending the user back to the document view. Routes
+                        through the same modal as the toolbar Regenerate so the
+                        quota cost is visible before the AI call. Disabled
+                        while a generation is already in flight. */}
+                    <button
+                      type="button"
+                      onClick={() => setRegenerateOpen(true)}
+                      disabled={isGenerating}
+                      className="text-xs font-semibold text-amber-900 underline decoration-amber-700 underline-offset-2 hover:text-amber-950 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Regenerate with AI
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSwapWarning(null)}
+                      className="text-xs font-semibold text-amber-800 hover:underline"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
                 </div>
               ) : null}
 
@@ -1396,6 +1556,23 @@ export default function CanvasEditor({
           onCancel={cancelTextEdit}
         />
       ) : null}
+
+      {/* ── Batch 1b — Apply Template confirmation ───────────────────────── */}
+      <ApplyTemplateModal
+        open={applyTemplateTarget !== null}
+        targetPresetName={applyTemplateTargetName}
+        isGenerating={isGenerating}
+        onClose={() => setApplyTemplateTarget(null)}
+        onConfirm={handleConfirmApplyTemplate}
+      />
+
+      {/* ── Batch 1b — Regenerate confirmation (reused from VisualCard) ──── */}
+      <RegenerateWarningModal
+        open={regenerateOpen}
+        templateLocked={Boolean(visual?.templateLocked)}
+        onClose={() => setRegenerateOpen(false)}
+        onConfirm={handleConfirmRegenerate}
+      />
 
       <span className="sr-only" aria-hidden="true">
         {historyVersion}
