@@ -10,7 +10,7 @@
 //   5. On commit, applyTextEdit writes the new value into visual.data.
 //
 // Conditional-text presets (timeline, KPI cards) need the `data` arg to
-// resolve textIndex correctly — e.g. timeline-horizontal-5event renders
+// resolve textIndex correctly — e.g. timeline-horizontal renders
 // [label, detail?, date?] so textIndex 1 maps to `detail` if detail is
 // present, otherwise to `date`. The registry entries handle this per-preset.
 //
@@ -78,34 +78,25 @@ function getAt(obj: unknown, ...keys: (string | number)[]): unknown {
 
 const PRESET_TEXT_PATHS: Record<string, Resolver> = {
   // ── Flow ────────────────────────────────────────────────────────────────
-  'flow-linear-4step': (dataId, i) => {
+  // Batch 4a-i — flow-linear-{3,4,5}step consolidated into flow-linear.
+  // maxLength matches SEQUENTIAL_LABEL_MAX (60) and SEQUENTIAL_DETAIL_MAX (120)
+  // — the old 3/4-step resolvers used 40/120, the old 5-step resolver used
+  // 32/100; all 3 schemas allow up to 60/120 since Batch 2a, so the narrower
+  // inline-edit caps were outdated.
+  'flow-linear': (dataId, i) => {
     const idx = matchIndexedId(dataId, 'step');
     if (idx === null) return null;
-    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 40 };
+    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 60 };
     if (i === 1) return { path: `steps.${idx}.detail`, maxLength: 120 };
     return null;
   },
 
-  'flow-linear-3step': (dataId, i) => {
+  // Batch 4a-ii-a — flow-linear-vertical-4step consolidated into flow-linear-vertical.
+  // maxLength matches SEQUENTIAL_LABEL_MAX (60) / SEQUENTIAL_DETAIL_MAX (120) per Batch 2a.
+  'flow-linear-vertical': (dataId, i) => {
     const idx = matchIndexedId(dataId, 'step');
     if (idx === null) return null;
-    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 40 };
-    if (i === 1) return { path: `steps.${idx}.detail`, maxLength: 120 };
-    return null;
-  },
-
-  'flow-linear-5step': (dataId, i) => {
-    const idx = matchIndexedId(dataId, 'step');
-    if (idx === null) return null;
-    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 32 };
-    if (i === 1) return { path: `steps.${idx}.detail`, maxLength: 100 };
-    return null;
-  },
-
-  'flow-linear-vertical-4step': (dataId, i) => {
-    const idx = matchIndexedId(dataId, 'step');
-    if (idx === null) return null;
-    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 40 };
+    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 60 };
     if (i === 1) return { path: `steps.${idx}.detail`, maxLength: 120 };
     return null;
   },
@@ -210,7 +201,10 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
   },
 
   // ── Process ─────────────────────────────────────────────────────────────
-  'process-numbered-6step': (dataId, i, data) => {
+  // Batch 4a-ii-c-i — process-numbered-6step consolidated into process-numbered.
+  // maxLength aligns with SEQUENTIAL_LABEL_MAX (60) / SEQUENTIAL_DETAIL_MAX (120) —
+  // the old resolver used 32/80 matching a now-retired narrower schema.
+  'process-numbered': (dataId, i, data) => {
     const idx = matchIndexedId(dataId, 'step');
     if (idx === null) return null;
     const step = getAt(data, 'steps', idx) as
@@ -219,14 +213,19 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
     // DOM order inside each step <g>: badge-number <text> (positional),
     // label, optional detail.
     if (i === 0) return null; // number badge text — not editable
-    if (i === 1) return { path: `steps.${idx}.label`, maxLength: 32 };
-    if (i === 2 && step?.detail != null) return { path: `steps.${idx}.detail`, maxLength: 80 };
+    if (i === 1) return { path: `steps.${idx}.label`, maxLength: 60 };
+    if (i === 2 && step?.detail != null) return { path: `steps.${idx}.detail`, maxLength: 120 };
     return null;
   },
 
-  'process-circular-4step': (dataId, i, data) => {
+  // Batch 4a-ii-b — process-circular-4step / -6step consolidated into process-circular.
+  // maxLength aligns with SEQUENTIAL_LABEL_MAX (60) / SEQUENTIAL_DETAIL_MAX (120) —
+  // the old per-count resolvers used tighter caps (22/40 and 20/28) which mirrored
+  // their now-retired schemas; the consolidated schema matches every other
+  // sequential/cyclical preset.
+  'process-circular': (dataId, i, data) => {
     if (dataId === 'centre') {
-      if (i === 0) return { path: 'centreLabel', maxLength: 18 };
+      if (i === 0) return { path: 'centreLabel', maxLength: 20 };
       return null;
     }
     const idx = matchIndexedId(dataId, 'step');
@@ -234,23 +233,8 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
     const step = getAt(data, 'steps', idx) as
       | { label?: string; detail?: string }
       | undefined;
-    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 22 };
-    if (i === 1 && step?.detail != null) return { path: `steps.${idx}.detail`, maxLength: 40 };
-    return null;
-  },
-
-  'process-circular-6step': (dataId, i, data) => {
-    if (dataId === 'centre') {
-      if (i === 0) return { path: 'centreLabel', maxLength: 14 };
-      return null;
-    }
-    const idx = matchIndexedId(dataId, 'step');
-    if (idx === null) return null;
-    const step = getAt(data, 'steps', idx) as
-      | { label?: string; detail?: string }
-      | undefined;
-    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 20 };
-    if (i === 1 && step?.detail != null) return { path: `steps.${idx}.detail`, maxLength: 28 };
+    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 60 };
+    if (i === 1 && step?.detail != null) return { path: `steps.${idx}.detail`, maxLength: 120 };
     return null;
   },
 
@@ -297,7 +281,11 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
     return { path: `phases.${idx}.bullets.${bulletIdx}`, maxLength: 36, textAlign: 'left' };
   },
 
-  'timeline-horizontal-8event': (dataId, i, data) => {
+  // Batch 4a-ii-c-ii — timeline-horizontal-5event / -8event consolidated into
+  // timeline-horizontal; timeline-vertical-5event consolidated into timeline-vertical.
+  // maxLength values align with SEQUENTIAL_LABEL_MAX (60) / SEQUENTIAL_DETAIL_MAX (120);
+  // the old per-count resolvers used tighter caps matching their now-retired schemas.
+  'timeline-horizontal': (dataId, i, data) => {
     const idx = matchIndexedId(dataId, 'event');
     if (idx === null) return null;
     const ev = getAt(data, 'events', idx) as
@@ -305,15 +293,15 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
       | undefined;
     if (!ev) return null;
     // DOM order: label (always), detail (if present), date (if present).
-    const fields: Array<{ name: string; max: number }> = [{ name: 'label', max: 20 }];
-    if (ev.detail != null) fields.push({ name: 'detail', max: 40 });
-    if (ev.date != null) fields.push({ name: 'date', max: 16 });
+    const fields: Array<{ name: string; max: number }> = [{ name: 'label', max: 60 }];
+    if (ev.detail != null) fields.push({ name: 'detail', max: 120 });
+    if (ev.date != null) fields.push({ name: 'date', max: 20 });
     const f = fields[i];
     if (!f) return null;
     return { path: `events.${idx}.${f.name}`, maxLength: f.max };
   },
 
-  'timeline-vertical-5event': (dataId, i, data) => {
+  'timeline-vertical': (dataId, i, data) => {
     const idx = matchIndexedId(dataId, 'event');
     if (idx === null) return null;
     const ev = getAt(data, 'events', idx) as
@@ -321,13 +309,13 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
       | undefined;
     if (!ev) return null;
     // DOM order inside each event <g>: label, date (if present, on pill),
-    // detail (if present). Note: the axis-side duplicate date text lives
-    // OUTSIDE the event <g> so it isn't counted here.
+    // detail (if present). Axis-side duplicate date text lives OUTSIDE the
+    // event <g> so it isn't counted here.
     const fields: Array<{ name: string; max: number; textAlign?: 'left' | 'center' | 'right' }> = [
-      { name: 'label', max: 32, textAlign: 'left' },
+      { name: 'label', max: 60, textAlign: 'left' },
     ];
     if (ev.date != null) fields.push({ name: 'date', max: 20, textAlign: 'center' });
-    if (ev.detail != null) fields.push({ name: 'detail', max: 80, textAlign: 'left' });
+    if (ev.detail != null) fields.push({ name: 'detail', max: 120, textAlign: 'left' });
     const f = fields[i];
     if (!f) return null;
     return { path: `events.${idx}.${f.name}`, maxLength: f.max, textAlign: f.textAlign };
@@ -532,15 +520,21 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
     return null;
   },
 
-  'cycle-6step': (dataId, i, data) => {
+  // Batch 4a-ii-b — cycle-4step / cycle-6step consolidated into cycle-steps.
+  // maxLength aligns with SEQUENTIAL_LABEL_MAX / SEQUENTIAL_DETAIL_MAX — the
+  // old per-count resolvers used narrower caps matching their retired schemas.
+  'cycle-steps': (dataId, i, data) => {
+    if (dataId === 'centre') {
+      if (i === 0) return { path: 'centreLabel', maxLength: 24 };
+      return null;
+    }
     const idx = matchIndexedId(dataId, 'step');
     if (idx === null) return null;
     const step = getAt(data, 'steps', idx) as
       | { label?: string; detail?: string }
       | undefined;
-    // DOM order inside each step <g>: label, (optional detail).
-    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 28 };
-    if (i === 1 && step?.detail != null) return { path: `steps.${idx}.detail`, maxLength: 50 };
+    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 60 };
+    if (i === 1 && step?.detail != null) return { path: `steps.${idx}.detail`, maxLength: 120 };
     return null;
   },
 
@@ -722,20 +716,8 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
   },
 
   // ── Timeline ────────────────────────────────────────────────────────────
-  'timeline-horizontal-5event': (dataId, i, data) => {
-    const idx = matchIndexedId(dataId, 'event');
-    if (idx === null) return null;
-    const ev = getAt(data, 'events', idx) as
-      | { label?: string; detail?: string; date?: string }
-      | undefined;
-    if (!ev) return null;
-    const fields: Array<{ name: string; max: number }> = [{ name: 'label', max: 16 }];
-    if (ev.detail != null) fields.push({ name: 'detail', max: 40 });
-    if (ev.date != null) fields.push({ name: 'date', max: 20 });
-    const f = fields[i];
-    if (!f) return null;
-    return { path: `events.${idx}.${f.name}`, maxLength: f.max };
-  },
+  // Batch 4a-ii-c-ii — timeline-horizontal-5event removed; consolidated
+  // timeline-horizontal resolver is above in the Batch 4a-ii-c-ii block.
 
   // ── Hierarchy ───────────────────────────────────────────────────────────
   'hierarchy-org-simple': (dataId, i, data) => {
@@ -766,13 +748,8 @@ const PRESET_TEXT_PATHS: Record<string, Resolver> = {
   },
 
   // ── Cycle ───────────────────────────────────────────────────────────────
-  'cycle-4step': (dataId, i) => {
-    const idx = matchIndexedId(dataId, 'step');
-    if (idx === null) return null;
-    if (i === 0) return { path: `steps.${idx}.label`, maxLength: 24 };
-    if (i === 1) return { path: `steps.${idx}.detail`, maxLength: 44 };
-    return null;
-  },
+  // Batch 4a-ii-b — cycle-4step removed; cycle-steps resolver above handles
+  // both old counts after silent preset-ID migration.
 
   // ── Positioning ─────────────────────────────────────────────────────────
   'quadrant-swot': (dataId, i) => {
