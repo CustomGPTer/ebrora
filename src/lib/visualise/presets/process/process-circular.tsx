@@ -72,16 +72,25 @@ interface Layout {
   labelFontDiv: number;
   detailFontSize: number;
   detailYOffset: number;
+  /** Batch 4d — char caps to prevent text crossing into adjacent wedges
+   *  (wedges narrow as count rises; label/detail horizontal space shrinks). */
+  labelTrunc: number;
+  detailTrunc: number;
 }
 
 const LAYOUT: Record<number, Layout> = {
-  3: { rOuterRatio: 0.40, rInnerRatio: 0.50, gapDeg: 2.5, labelFontMax: 15, labelFontDiv: 7,  detailFontSize: 11, detailYOffset: 15 },
-  4: { rOuterRatio: 0.42, rInnerRatio: 0.48, gapDeg: 2.0, labelFontMax: 14, labelFontDiv: 8,  detailFontSize: 10, detailYOffset: 14 },
-  5: { rOuterRatio: 0.43, rInnerRatio: 0.47, gapDeg: 1.7, labelFontMax: 13, labelFontDiv: 9,  detailFontSize: 10, detailYOffset: 13 },
-  6: { rOuterRatio: 0.44, rInnerRatio: 0.46, gapDeg: 1.5, labelFontMax: 12, labelFontDiv: 10, detailFontSize: 10, detailYOffset: 12 },
-  7: { rOuterRatio: 0.45, rInnerRatio: 0.45, gapDeg: 1.3, labelFontMax: 11, labelFontDiv: 11, detailFontSize: 9,  detailYOffset: 11 },
-  8: { rOuterRatio: 0.46, rInnerRatio: 0.44, gapDeg: 1.1, labelFontMax: 10, labelFontDiv: 12, detailFontSize: 9,  detailYOffset: 10 },
+  3: { rOuterRatio: 0.40, rInnerRatio: 0.50, gapDeg: 2.5, labelFontMax: 15, labelFontDiv: 7,  detailFontSize: 11, detailYOffset: 15, labelTrunc: 18, detailTrunc: 30 },
+  4: { rOuterRatio: 0.42, rInnerRatio: 0.48, gapDeg: 2.0, labelFontMax: 14, labelFontDiv: 8,  detailFontSize: 10, detailYOffset: 14, labelTrunc: 15, detailTrunc: 26 },
+  5: { rOuterRatio: 0.43, rInnerRatio: 0.47, gapDeg: 1.7, labelFontMax: 13, labelFontDiv: 9,  detailFontSize: 10, detailYOffset: 13, labelTrunc: 14, detailTrunc: 22 },
+  6: { rOuterRatio: 0.44, rInnerRatio: 0.46, gapDeg: 1.5, labelFontMax: 12, labelFontDiv: 10, detailFontSize: 10, detailYOffset: 12, labelTrunc: 12, detailTrunc: 20 },
+  7: { rOuterRatio: 0.45, rInnerRatio: 0.45, gapDeg: 1.3, labelFontMax: 11, labelFontDiv: 11, detailFontSize: 9,  detailYOffset: 11, labelTrunc: 11, detailTrunc: 18 },
+  8: { rOuterRatio: 0.46, rInnerRatio: 0.44, gapDeg: 1.1, labelFontMax: 10, labelFontDiv: 12, detailFontSize: 9,  detailYOffset: 10, labelTrunc: 10, detailTrunc: 16 },
 };
+
+/** Batch 4d — simple character-cap truncation with ellipsis fallback. */
+function truncate(s: string, max: number): string {
+  return s.length <= max ? s : `${s.slice(0, max - 1)}…`;
+}
 
 function wedgePath(cx: number, cy: number, rOuter: number, rInner: number, a1: number, a2: number): string {
   const rad = (deg: number): number => (deg * Math.PI) / 180;
@@ -115,7 +124,7 @@ function ProcessCircularRender({
   const gapStroke = palette.bg;
 
   const layout = LAYOUT[n] ?? LAYOUT[8];
-  const { rOuterRatio, rInnerRatio, gapDeg, labelFontMax, labelFontDiv, detailFontSize, detailYOffset } = layout;
+  const { rOuterRatio, rInnerRatio, gapDeg, labelFontMax, labelFontDiv, detailFontSize, detailYOffset, labelTrunc, detailTrunc } = layout;
 
   const cx = width / 2;
   const cy = height / 2;
@@ -162,7 +171,7 @@ function ProcessCircularRender({
               fontSize={labelFontSize}
               fontWeight={700}
             >
-              {step.label}
+              {truncate(step.label, labelTrunc)}
             </text>
             {step.detail ? (
               <text
@@ -173,7 +182,7 @@ function ProcessCircularRender({
                 fontFamily={font}
                 fontSize={detailFontSize}
               >
-                {step.detail}
+                {truncate(step.detail, detailTrunc)}
               </text>
             ) : null}
           </g>

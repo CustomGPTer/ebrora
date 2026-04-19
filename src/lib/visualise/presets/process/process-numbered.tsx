@@ -65,18 +65,29 @@ interface Layout {
   gap: number;
   labelFontMax: number;
   detailFontSize: number;
+  /** Batch 4d — character caps to prevent overflow into adjacent cells.
+   *  Tuned against a ~900px canvas at each count. Labels are usually short
+   *  (2–4 words) so caps are generous; details are the risk surface and
+   *  get tighter caps. */
+  labelTrunc: number;
+  detailTrunc: number;
 }
 
 const LAYOUT: Record<number, Layout> = {
-  3:  { pad: 16, gap: 14, labelFontMax: 16, detailFontSize: 12 },
-  4:  { pad: 14, gap: 14, labelFontMax: 15, detailFontSize: 11 },
-  5:  { pad: 14, gap: 12, labelFontMax: 14, detailFontSize: 11 },
-  6:  { pad: 14, gap: 12, labelFontMax: 14, detailFontSize: 11 },
-  7:  { pad: 12, gap: 10, labelFontMax: 13, detailFontSize: 10 },
-  8:  { pad: 12, gap: 10, labelFontMax: 13, detailFontSize: 10 },
-  9:  { pad: 10, gap: 8,  labelFontMax: 12, detailFontSize: 10 },
-  10: { pad: 10, gap: 8,  labelFontMax: 12, detailFontSize: 10 },
+  3:  { pad: 16, gap: 14, labelFontMax: 16, detailFontSize: 12, labelTrunc: 30, detailTrunc: 46 },
+  4:  { pad: 14, gap: 14, labelFontMax: 15, detailFontSize: 11, labelTrunc: 26, detailTrunc: 40 },
+  5:  { pad: 14, gap: 12, labelFontMax: 14, detailFontSize: 11, labelTrunc: 24, detailTrunc: 38 },
+  6:  { pad: 14, gap: 12, labelFontMax: 14, detailFontSize: 11, labelTrunc: 24, detailTrunc: 36 },
+  7:  { pad: 12, gap: 10, labelFontMax: 13, detailFontSize: 10, labelTrunc: 22, detailTrunc: 34 },
+  8:  { pad: 12, gap: 10, labelFontMax: 13, detailFontSize: 10, labelTrunc: 22, detailTrunc: 32 },
+  9:  { pad: 10, gap: 8,  labelFontMax: 12, detailFontSize: 10, labelTrunc: 18, detailTrunc: 28 },
+  10: { pad: 10, gap: 8,  labelFontMax: 12, detailFontSize: 10, labelTrunc: 18, detailTrunc: 26 },
 };
+
+/** Batch 4d — simple character-cap truncation with ellipsis fallback. */
+function truncate(s: string, max: number): string {
+  return s.length <= max ? s : `${s.slice(0, max - 1)}…`;
+}
 
 /**
  * Grid shape for a given step count. n≤4 uses one row (process-numbered
@@ -135,7 +146,7 @@ function ProcessNumberedRender({
   const arrowColour = palette.nodeStroke;
 
   const layout = LAYOUT[n] ?? LAYOUT[10];
-  const { pad, gap, labelFontMax, detailFontSize } = layout;
+  const { pad, gap, labelFontMax, detailFontSize, labelTrunc, detailTrunc } = layout;
 
   const grid = gridFor(n);
   // Cell width keyed on the wider of the two rows (topCount). When the bottom
@@ -250,7 +261,7 @@ function ProcessNumberedRender({
               fontSize={labelFontSize}
               fontWeight={700}
             >
-              {step.label}
+              {truncate(step.label, labelTrunc)}
             </text>
             {step.detail ? (
               <text
@@ -261,7 +272,7 @@ function ProcessNumberedRender({
                 fontFamily={font}
                 fontSize={detailFontSize}
               >
-                {step.detail}
+                {truncate(step.detail, detailTrunc)}
               </text>
             ) : null}
           </g>
