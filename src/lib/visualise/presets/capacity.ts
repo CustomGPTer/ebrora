@@ -68,24 +68,16 @@ export interface PresetCapacity {
 // Derived from each preset's dataSchema Zod constraints (audited Batch 1).
 // ─────────────────────────────────────────────────────────────────────────────
 export const PRESET_CAPACITY: Record<string, PresetCapacity> = {
-  // ── flow (10) ────────────────────────────────────────────────────────────
-  'flow-linear-3step': {
-    primary: { min: 3, max: 3 },
+  // ── flow (8) ─────────────────────────────────────────────────────────────
+  // Batch 4a-i — flow-linear-{3,4,5}step consolidated into flow-linear (3–10)
+  'flow-linear': {
+    primary: { min: 3, max: 10 },
     primaryUnit: 'step',
     structure: 'sequential',
   },
-  'flow-linear-4step': {
-    primary: { min: 4, max: 4 },
-    primaryUnit: 'step',
-    structure: 'sequential',
-  },
-  'flow-linear-5step': {
-    primary: { min: 5, max: 5 },
-    primaryUnit: 'step',
-    structure: 'sequential',
-  },
-  'flow-linear-vertical-4step': {
-    primary: { min: 4, max: 4 },
+  // Batch 4a-ii-a — flow-linear-vertical-4step consolidated into flow-linear-vertical (3–10)
+  'flow-linear-vertical': {
+    primary: { min: 3, max: 10 },
     primaryUnit: 'step',
     structure: 'sequential',
   },
@@ -123,20 +115,17 @@ export const PRESET_CAPACITY: Record<string, PresetCapacity> = {
     secondary: { min: 2, max: 5, unit: 'item per column' },
   },
 
-  // ── process (6) ──────────────────────────────────────────────────────────
-  'process-numbered-6step': {
-    primary: { min: 6, max: 6 },
+  // ── process (5) ──────────────────────────────────────────────────────────
+  // Batch 4a-ii-c-i — process-numbered-6step consolidated into process-numbered (3–10)
+  'process-numbered': {
+    primary: { min: 3, max: 10 },
     primaryUnit: 'step',
     structure: 'sequential',
   },
-  'process-circular-4step': {
-    primary: { min: 4, max: 4 },
-    primaryUnit: 'step',
-    structure: 'cyclical',
-  },
-  'process-circular-6step': {
-    primary: { min: 6, max: 6 },
-    primaryUnit: 'step',
+  // Batch 4a-ii-b — process-circular-4step and -6step consolidated into process-circular (3–8)
+  'process-circular': {
+    primary: { min: 3, max: 8 },
+    primaryUnit: 'stage',
     structure: 'cyclical',
   },
   'process-pdca': {
@@ -155,19 +144,16 @@ export const PRESET_CAPACITY: Record<string, PresetCapacity> = {
     structure: 'sequential',
   },
 
-  // ── timeline (6) ─────────────────────────────────────────────────────────
-  'timeline-horizontal-5event': {
-    primary: { min: 5, max: 5 },
+  // ── timeline (5) ─────────────────────────────────────────────────────────
+  // Batch 4a-ii-c-ii — timeline-horizontal-5event/-8event consolidated into timeline-horizontal (3–12),
+  //                    timeline-vertical-5event consolidated into timeline-vertical (3–10)
+  'timeline-horizontal': {
+    primary: { min: 3, max: 12 },
     primaryUnit: 'event',
     structure: 'sequential',
   },
-  'timeline-horizontal-8event': {
-    primary: { min: 8, max: 8 },
-    primaryUnit: 'event',
-    structure: 'sequential',
-  },
-  'timeline-vertical-5event': {
-    primary: { min: 5, max: 5 },
+  'timeline-vertical': {
+    primary: { min: 3, max: 10 },
     primaryUnit: 'event',
     structure: 'sequential',
   },
@@ -318,14 +304,10 @@ export const PRESET_CAPACITY: Record<string, PresetCapacity> = {
     structure: 'parallel',
   },
 
-  // ── cycle (3) ────────────────────────────────────────────────────────────
-  'cycle-4step': {
-    primary: { min: 4, max: 4 },
-    primaryUnit: 'step',
-    structure: 'cyclical',
-  },
-  'cycle-6step': {
-    primary: { min: 6, max: 6 },
+  // ── cycle (2) ────────────────────────────────────────────────────────────
+  // Batch 4a-ii-b — cycle-4step and cycle-6step consolidated into cycle-steps (3–8)
+  'cycle-steps': {
+    primary: { min: 3, max: 8 },
     primaryUnit: 'step',
     structure: 'cyclical',
   },
