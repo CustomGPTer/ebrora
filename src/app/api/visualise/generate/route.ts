@@ -51,6 +51,7 @@ import {
 import { getPresetById } from '@/lib/visualise/presets';
 import type {
   VisualiseDocumentBlob,
+  VisualInstance,
   GenerateRequest,
   VisualCountPreference,
 } from '@/lib/visualise/types';
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
       variantMode,
       silent,
       clarifyAnswers,
+      regenerateSource,
     } = body;
 
     // visualId requires documentId
@@ -181,9 +183,26 @@ export async function POST(req: NextRequest) {
 
     // ── Resolve source text ─────────────────────────────────────────────────
     // NEW: user-pasted in body.text. Regenerate: pulled from blob.sourceText.
+    //
+    // Batch 3a — for per-visual regenerate the caller may request
+    // `regenerateSource: 'current-content'`, which serialises the current
+    // visual's labels + details + title into a short "tidy up what I've got"
+    // context instead of restarting from the original prompt. Useful when
+    // the user has edited text in the canvas and wants the AI to refine
+    // rather than overwrite.
     let sourceText: string;
     if (isRegenerate) {
-      sourceText = existingBlob?.sourceText ?? '';
+      if (regenerateSource === 'current-content' && existingBlob && visualId) {
+        const currentVisual = existingBlob.visuals.find((v) => v.id === visualId);
+        if (currentVisual) {
+          sourceText = serialiseVisualAsSourceText(currentVisual, existingBlob.sourceText);
+        } else {
+          // Visual not found in blob — fall back to original text.
+          sourceText = existingBlob.sourceText ?? '';
+        }
+      } else {
+        sourceText = existingBlob?.sourceText ?? '';
+      }
       if (!sourceText) {
         return NextResponse.json(
           { error: 'Cannot regenerate — original source text is not stored on this document' },
@@ -195,6 +214,24 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Missing text' }, { status: 400 });
       }
       sourceText = text;
+    }
+
+    // ── Template lock ───────────────────────────────────────────────────────
+    // Batch 3a — when a regenerating visual has `templateLocked: true`, the
+    // server forces the AI to target that exact preset regardless of what
+    // the body says. Explicit `forcePresetId` in the body takes precedence
+    // (the client has just picked a specific preset — probably via silent
+    // auto-remap — which is itself a user-driven preset choice). This means
+    // a user who locks a template and then picks a different preset from
+    // the gallery ends up with the lock pinned to the newly-chosen preset.
+    let resolvedForcePresetId: string | undefined = forcePresetId;
+    if (isRegenerate && !forcePresetId && existingBlob && visualId) {
+      const lockedVisual = existingBlob.visuals.find(
+        (v) => v.id === visualId && v.templateLocked === true,
+      );
+      if (lockedVisual) {
+        resolvedForcePresetId = lockedVisual.presetId;
+      }
     }
 
     // Word-count bounds.
@@ -319,9 +356,14 @@ export async function POST(req: NextRequest) {
     // top-level validation (variant mode)" errors). Family / count /
     // palette / data answers continue through the clarify block — those
     // are lighter hints that don't conflict with the response schema.
-    let effectiveForcePresetId = forcePresetId;
+    //
+    // Batch 3a — seed from `resolvedForcePresetId` instead of the raw
+    // body `forcePresetId` so that a `templateLocked` flag on the target
+    // visual correctly pins the AI to its current preset even when the
+    // client didn't send an explicit force.
+    let effectiveForcePresetId = resolvedForcePresetId;
     let effectiveClarifyAnswers = clarifyAnswers;
-    if (!isRegenerate && clarifyAnswers && !forcePresetId) {
+    if (!isRegenerate && clarifyAnswers && !resolvedForcePresetId) {
       const presetAnswer = clarifyAnswers.find(
         (a) => a.topic === 'preset' && a.value && a.value !== 'unknown',
       );
@@ -510,6 +552,17 @@ export async function POST(req: NextRequest) {
       // Full Regenerate (silent=false) gets fresh caption/descriptions from
       // the AI; legacy regenerate visuals never had them.
       const preserveConceptFields = Boolean(silent);
+      // Batch 1b — aiOriginalPresetId tracks the AI's last picked preset
+      // so the canvas editor can badge it in the gallery. Two rules:
+      //   - Silent auto-remap (user forced a preset): preserve the existing
+      //     value. The user's pick doesn't become the "AI's choice".
+      //   - Full regenerate (AI freely picked): update to the new presetId.
+      // For legacy visuals without the field, silent regen falls back to
+      // the EXISTING preset (not the new forced one) — the closest safe
+      // approximation of "what the AI last gave you".
+      const aiOriginalPresetId = preserveConceptFields
+        ? (existingVisual.aiOriginalPresetId ?? existingVisual.presetId)
+        : newVisual.presetId;
       mergedVisuals[targetIndex] = {
         ...newVisual,
         id: existingVisual.id,
@@ -519,6 +572,14 @@ export async function POST(req: NextRequest) {
           ? existingVisual.nodeDescriptions
           : newVisual.nodeDescriptions,
         variants: preserveConceptFields ? existingVisual.variants : newVisual.variants,
+        aiOriginalPresetId,
+        // Batch 3a — templateLocked is a user-driven UI flag. It survives
+        // every regen path (full, silent auto-remap) because the lock
+        // reflects the user's intent to pin the preset; only a full
+        // replace-all document regenerate drops it (which is handled
+        // automatically because that path builds fresh visuals with
+        // `toVisualInstance`, which doesn't set the field).
+        templateLocked: existingVisual.templateLocked,
       };
       blobPayload = {
         ...existingBlob,
@@ -678,4 +739,83 @@ async function markFailed(generationId: string, errorMessage: string) {
       completed_at: new Date(),
     },
   });
+}
+
+// =============================================================================
+// Batch 3a — serialise a VisualInstance into a short prompt fragment suitable
+// for feeding to the AI as "current content" in a tidy-up regenerate.
+//
+// Strategy: walk the visual's title + caption + labels/details from `data`
+// and from `nodeDescriptions`, concatenate into a compact plain-text
+// representation. We deliberately avoid dumping JSON — the AI should treat
+// this as *user-supplied prose about the visual's content*, not as a
+// preset data shape it has to preserve verbatim. The original prompt's
+// "COUNT concepts + items" rules in systemPrompt still apply, so the AI
+// infers count + structure from the prose rather than the JSON scaffolding.
+//
+// Kept defensive: unknown schemas (preset schemas we don't recognise) fall
+// back to listing whatever string values we can find in `data`. The caller
+// already validated that the visual exists — here we just stringify it.
+// =============================================================================
+function serialiseVisualAsSourceText(
+  visual: VisualInstance,
+  fallbackOriginalText: string | undefined,
+): string {
+  const parts: string[] = [];
+  if (visual.title) parts.push(`Title: ${visual.title}`);
+  if (visual.caption) parts.push(visual.caption);
+
+  // Extract label/detail pairs from common sequential shapes. The presets in
+  // the flow / process / cycle / timeline families all use `steps[]` or
+  // `events[]` arrays of `{ label, detail?, date? }` — we handle those
+  // generically so a new preset added later automatically works here.
+  const data = visual.data as Record<string, unknown> | null;
+  if (data && typeof data === 'object') {
+    for (const key of Object.keys(data)) {
+      const val = (data as Record<string, unknown>)[key];
+      if (Array.isArray(val)) {
+        const entries: string[] = [];
+        for (const item of val) {
+          if (typeof item === 'string') {
+            entries.push(item);
+          } else if (item && typeof item === 'object') {
+            const obj = item as Record<string, unknown>;
+            const label = typeof obj.label === 'string' ? obj.label : undefined;
+            const detail = typeof obj.detail === 'string' ? obj.detail : undefined;
+            const date = typeof obj.date === 'string' ? obj.date : undefined;
+            const description = typeof obj.description === 'string' ? obj.description : undefined;
+            const pieces = [label, detail, description, date].filter(Boolean);
+            if (pieces.length) entries.push(pieces.join(' — '));
+          }
+        }
+        if (entries.length) {
+          parts.push(`${humanise(key)}:\n- ${entries.join('\n- ')}`);
+        }
+      } else if (typeof val === 'string' && val.trim().length > 0) {
+        parts.push(`${humanise(key)}: ${val}`);
+      }
+    }
+  }
+
+  if (visual.nodeDescriptions && visual.nodeDescriptions.length > 0) {
+    parts.push('Additional context:\n- ' + visual.nodeDescriptions.join('\n- '));
+  }
+
+  const text = parts.join('\n\n').trim();
+  // Safety net — if serialisation produced nothing useful (very minimal
+  // visual, unusual preset shape), fall back to the document's original
+  // source text so the AI at least has something to work with.
+  if (text.length < 20 && fallbackOriginalText) {
+    return fallbackOriginalText;
+  }
+  return text;
+}
+
+/** Turn a camelCase or snake_case key into a Title Case label for prose output. */
+function humanise(key: string): string {
+  const spaced = key
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .trim();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
