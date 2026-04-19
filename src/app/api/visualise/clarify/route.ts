@@ -37,7 +37,7 @@ function sanitiseAnswer(raw: unknown): ClarifyAnswer | null {
   if (!raw || typeof raw !== 'object') return null;
   const obj = raw as { topic?: unknown; value?: unknown };
   if (typeof obj.topic !== 'string' || typeof obj.value !== 'string') return null;
-  const validTopics: ClarifyTopic[] = ['family', 'preset', 'count', 'palette', 'data'];
+  const validTopics: ClarifyTopic[] = ['family', 'preset', 'count', 'item-count', 'palette', 'data'];
   if (!validTopics.includes(obj.topic as ClarifyTopic)) return null;
 
   // Server-side safety net for the 40-word cap. Client enforces at entry time
@@ -94,19 +94,29 @@ export async function POST(req: NextRequest): Promise<NextResponse<ClarifyRespon
     return NextResponse.json({ done: true } satisfies ClarifyResponse);
   }
 
+  // Batch 4b-a — optional forcePresetId from the template-first flow.
+  // Validated loosely: just a non-empty string under 64 chars. Unknown
+  // preset IDs are handled by decide() / generateQuestion() falling back
+  // to the default (no-preset-locked) flow.
+  const rawForcePreset = (body as { forcePresetId?: unknown }).forcePresetId;
+  const forcePresetId =
+    typeof rawForcePreset === 'string' && rawForcePreset.length > 0 && rawForcePreset.length < 64
+      ? rawForcePreset
+      : undefined;
+
   // Try the AI-driven question generator first. It reads the user's text +
-  // prior answers and tailors a specific question. If it fails (timeout,
-  // JSON parse error, schema violation), fall back to rule-based decide()
-  // so the clarify flow stays working.
+  // prior answers + forcePresetId and tailors a specific question. If it
+  // fails (timeout, JSON parse error, schema violation), fall back to
+  // rule-based decide() so the clarify flow stays working.
   try {
-    const result = await generateQuestion(text, priorAnswers);
+    const result = await generateQuestion(text, priorAnswers, forcePresetId);
     return NextResponse.json(result satisfies ClarifyResponse);
   } catch (error) {
     console.warn(
       '[visualise/clarify] AI question generation failed, falling back to rule-based decide:',
       error instanceof Error ? error.message : error,
     );
-    const result = decide(text, priorAnswers);
+    const result = decide(text, priorAnswers, { forcePresetId });
     return NextResponse.json(result satisfies ClarifyResponse);
   }
 }
