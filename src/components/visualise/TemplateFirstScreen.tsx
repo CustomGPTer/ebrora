@@ -1,9 +1,9 @@
 'use client';
 
 // =============================================================================
-// TemplateFirstScreen — Batch 3b
+// TemplateFirstScreen — Batch 3b, extended in Batch 4b-b
 //
-// Two-step screen for the "Start from a template" entry path:
+// Three-step screen for the "Start from a template" entry path:
 //
 //   Step A: Browse. User sees a category-tabbed grid of every registered
 //           preset. Clicking a tile selects it (doesn't advance) — confirm-
@@ -16,18 +16,27 @@
 //           button. "Change template" link goes back to step A without
 //           losing the text.
 //
-// Both steps share the same container, so navigation between them is
+//   Step C: Clarify (Batch 4b-b). After the user clicks Generate, mount
+//           ClarifyPanel with forcePresetId = the chosen template. The
+//           clarify infrastructure (Batch 4b-a) reads the forced preset
+//           and asks only the questions that are still useful — typically
+//           item-count for flexible presets (3–10 / 3–12 chips) and data
+//           gap-fillers for presets with named slots the text hasn't
+//           filled (swimlane lane names, SIPOC process name, venn set
+//           names, fishbone categories). When ClarifyPanel completes, its
+//           onComplete fires with the answer array which we forward to
+//           onGenerate. If the clarify server has no questions to ask,
+//           it returns done=true immediately and the panel passes through
+//           to generate with empty answers.
+//
+// All three steps share the same container, so navigation between them is
 // in-component state only — no route changes, no lost text.
 //
-// On Generate, calls the parent's onGenerate(text, forcePresetId) using
-// the same signature as GenerateScreen so VisualiseClient can reuse its
-// existing handleGenerate. The `visualCountPreference` is implicitly 1
-// for the template-first flow — if the user picked a specific preset
-// they want a single visual of that preset, not multiple.
-//
-// No clarifying-questions flow here. Template-first users have chosen
-// their layout; clarifying questions about "did you mean a process or a
-// timeline" become irrelevant.
+// On Generate (from step B), we transition to step C rather than calling
+// onGenerate directly. That way the user sees the clarify round before
+// their quota is spent on a generate call that might need more context.
+// If the user clicks "Edit text" (ClarifyPanel's onCancel), we return to
+// step B so they can revise the source without losing it.
 // =============================================================================
 
 import { useMemo, useState } from 'react';
@@ -40,6 +49,7 @@ import {
   getCategoryTileBgHover,
 } from '@/lib/visualise/categoryColors';
 import type { ClarifyAnswer } from '@/lib/visualise/ai/clarify/types';
+import ClarifyPanel from './ClarifyPanel';
 
 interface Props {
   access: AccessResponse | null;
@@ -77,7 +87,7 @@ export default function TemplateFirstScreen({
   onBack,
   generateError,
 }: Props) {
-  const [step, setStep] = useState<'browse' | 'compose'>('browse');
+  const [step, setStep] = useState<'browse' | 'compose' | 'clarify'>('browse');
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const [category, setCategory] = useState<'all' | PresetCategory>('all');
   const [search, setSearch] = useState('');
@@ -127,8 +137,29 @@ export default function TemplateFirstScreen({
 
   const handleSubmit = () => {
     if (!canGenerate || !selectedPresetId) return;
-    // Template-first flow always requests a single visual of the chosen preset.
-    onGenerate(text, selectedPresetId, 1);
+    // Batch 4b-b — don't call onGenerate directly; transition to the clarify
+    // step so the preset-aware ClarifyPanel can run first. For flexible
+    // presets and presets with named slots this yields an item-count or
+    // data gap-filling question before we spend the user's quota. For
+    // fixed-count presets with self-evident text, the clarify server
+    // returns done=true immediately and ClarifyPanel passes through to
+    // onComplete with no user-visible delay beyond the initial loading
+    // spinner.
+    setStep('clarify');
+  };
+
+  // Batch 4b-b — ClarifyPanel.onComplete: forward the collected answers
+  // (possibly empty) to the parent's onGenerate. Template-first flow always
+  // wants exactly 1 visual of the chosen preset.
+  const handleClarifyComplete = (answers: ClarifyAnswer[]) => {
+    if (!selectedPresetId) return;
+    onGenerate(text, selectedPresetId, 1, answers);
+  };
+
+  // Batch 4b-b — ClarifyPanel.onCancel: user wants to edit their source
+  // text. Return to the compose step with text + selectedPresetId preserved.
+  const handleClarifyCancel = () => {
+    setStep('compose');
   };
 
   // ── Step A: browse ───────────────────────────────────────────────────────
@@ -245,6 +276,40 @@ export default function TemplateFirstScreen({
             Continue →
           </button>
         </div>
+      </div>
+    );
+  }
+
+  // ── Step C: clarify (Batch 4b-b) ─────────────────────────────────────────
+  // After the user clicks Generate in step B we transition here rather than
+  // calling onGenerate. ClarifyPanel reads forcePresetId and (via the
+  // infrastructure landed in Batch 4b-a) asks item-count for flexible
+  // presets or data gap-fillers for presets with named slots. When done,
+  // the answers forward to onGenerate; on cancel, we return to compose.
+  if (step === 'clarify' && selectedPresetId && selectedPreset) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-6">
+        {/* Header — show the chosen template so the user always remembers
+            what they picked while answering clarifying questions. */}
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#E6F0EE] border border-[#1B5B50]/20 mb-5">
+          <div
+            className="h-16 w-24 flex-shrink-0 flex items-center justify-center overflow-hidden rounded bg-white border border-gray-100"
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: selectedPreset.thumbnailSvg }}
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-[#1B5B50]">{selectedPreset.name}</p>
+            <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">{selectedPreset.description}</p>
+          </div>
+        </div>
+
+        <ClarifyPanel
+          text={text}
+          forcePresetId={selectedPresetId}
+          onComplete={handleClarifyComplete}
+          onCancel={handleClarifyCancel}
+          isGenerating={isGenerating}
+        />
       </div>
     );
   }

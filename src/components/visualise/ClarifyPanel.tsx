@@ -48,9 +48,22 @@ interface Props {
    * calls via `isLoading`.
    */
   isGenerating?: boolean;
+  /**
+   * Batch 4b-a — when the parent knows the target preset (e.g. the user
+   * came through the template-first flow), pass it here. The clarify
+   * server uses it to skip family/preset questions and jump to item-count
+   * / data (gap-filling) topics instead.
+   */
+  forcePresetId?: string;
 }
 
-export default function ClarifyPanel({ text, onComplete, onCancel, isGenerating = false }: Props) {
+export default function ClarifyPanel({
+  text,
+  onComplete,
+  onCancel,
+  isGenerating = false,
+  forcePresetId,
+}: Props) {
   const [priorAnswers, setPriorAnswers] = useState<ClarifyAnswer[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<ClarifyQuestion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +83,10 @@ export default function ClarifyPanel({ text, onComplete, onCancel, isGenerating 
         const res = await fetch('/api/visualise/clarify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, priorAnswers: answersToSend }),
+          // Batch 4b-a — forwards forcePresetId when the parent supplies one
+          // (template-first flow). When omitted the server defaults to the
+          // legacy "no preset locked" behaviour, preserving backward compat.
+          body: JSON.stringify({ text, priorAnswers: answersToSend, forcePresetId }),
         });
         if (!res.ok) {
           // On server error just proceed to generate with what we have.
@@ -103,7 +119,7 @@ export default function ClarifyPanel({ text, onComplete, onCancel, isGenerating 
         setIsLoading(false);
       }
     },
-    [text, onComplete],
+    [text, onComplete, forcePresetId],
   );
 
   // Fire the first clarify call on mount. Dependency on askServer is fine
@@ -330,6 +346,7 @@ function ClarifyAnswerHistory({ answers }: { answers: ClarifyAnswer[] }) {
     family: 'Shape',
     preset: 'Preset',
     count: 'Count',
+    'item-count': 'Items',
     palette: 'Style',
     data: 'Data',
   };
