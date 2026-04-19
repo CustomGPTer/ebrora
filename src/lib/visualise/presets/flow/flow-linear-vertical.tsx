@@ -62,18 +62,30 @@ interface Layout {
   detailFontSize: number;
   chipRadius: number;
   rx: number;
+  /** Batch 4d — char cap on detail text. Detail sits to the right of the
+   *  label rect (textAnchor="start") starting at approximately width/2 + 30,
+   *  so available horizontal space is roughly width/2 - 30. At width=900
+   *  that gives ~420px which fits ~60–90 chars depending on font; caps
+   *  here leave a right-edge margin and tighten at high counts when the
+   *  font shrinks further. */
+  detailTrunc: number;
 }
 
 const LAYOUT: Record<number, Layout> = {
-  3:  { gap: 20, nodeHeightMax: 68, fontSizeMax: 16, detailFontSize: 13, chipRadius: 10, rx: 8 },
-  4:  { gap: 18, nodeHeightMax: 58, fontSizeMax: 15, detailFontSize: 12, chipRadius: 10, rx: 8 },
-  5:  { gap: 16, nodeHeightMax: 50, fontSizeMax: 14, detailFontSize: 11, chipRadius: 9,  rx: 7 },
-  6:  { gap: 14, nodeHeightMax: 44, fontSizeMax: 13, detailFontSize: 10, chipRadius: 8,  rx: 7 },
-  7:  { gap: 12, nodeHeightMax: 38, fontSizeMax: 12, detailFontSize: 10, chipRadius: 8,  rx: 6 },
-  8:  { gap: 10, nodeHeightMax: 34, fontSizeMax: 11, detailFontSize: 9,  chipRadius: 7,  rx: 6 },
-  9:  { gap: 9,  nodeHeightMax: 30, fontSizeMax: 11, detailFontSize: 9,  chipRadius: 7,  rx: 5 },
-  10: { gap: 8,  nodeHeightMax: 26, fontSizeMax: 10, detailFontSize: 8,  chipRadius: 6,  rx: 5 },
+  3:  { gap: 20, nodeHeightMax: 68, fontSizeMax: 16, detailFontSize: 13, chipRadius: 10, rx: 8, detailTrunc: 72 },
+  4:  { gap: 18, nodeHeightMax: 58, fontSizeMax: 15, detailFontSize: 12, chipRadius: 10, rx: 8, detailTrunc: 68 },
+  5:  { gap: 16, nodeHeightMax: 50, fontSizeMax: 14, detailFontSize: 11, chipRadius: 9,  rx: 7, detailTrunc: 60 },
+  6:  { gap: 14, nodeHeightMax: 44, fontSizeMax: 13, detailFontSize: 10, chipRadius: 8,  rx: 7, detailTrunc: 54 },
+  7:  { gap: 12, nodeHeightMax: 38, fontSizeMax: 12, detailFontSize: 10, chipRadius: 8,  rx: 6, detailTrunc: 48 },
+  8:  { gap: 10, nodeHeightMax: 34, fontSizeMax: 11, detailFontSize: 9,  chipRadius: 7,  rx: 6, detailTrunc: 42 },
+  9:  { gap: 9,  nodeHeightMax: 30, fontSizeMax: 11, detailFontSize: 9,  chipRadius: 7,  rx: 5, detailTrunc: 38 },
+  10: { gap: 8,  nodeHeightMax: 26, fontSizeMax: 10, detailFontSize: 8,  chipRadius: 6,  rx: 5, detailTrunc: 34 },
 };
+
+/** Batch 4d — simple character-cap truncation with ellipsis fallback. */
+function truncateDetail(s: string, max: number): string {
+  return s.length <= max ? s : `${s.slice(0, max - 1)}…`;
+}
 
 function FlowLinearVerticalRender({
   data,
@@ -91,7 +103,7 @@ function FlowLinearVerticalRender({
   const font = settings.font ?? 'Inter, sans-serif';
 
   const layout = LAYOUT[nodeCount] ?? LAYOUT[10];
-  const { gap, nodeHeightMax, fontSizeMax, detailFontSize, chipRadius, rx } = layout;
+  const { gap, nodeHeightMax, fontSizeMax, detailFontSize, chipRadius, rx, detailTrunc } = layout;
 
   // Vertical layout sizing.
   const padTop = 20;
@@ -182,7 +194,7 @@ function FlowLinearVerticalRender({
                 fontFamily={font}
                 fontSize={detailFontSize}
               >
-                {step.detail}
+                {truncateDetail(step.detail, detailTrunc)}
               </text>
             ) : null}
             {i < nodeCount - 1 ? (

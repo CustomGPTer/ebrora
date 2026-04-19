@@ -86,18 +86,28 @@ interface Layout {
   detailFontSize: number;
   /** Vertical offset between rect bottom and detail-line baseline. */
   detailYOffset: number;
+  /** Batch 4d — char cap on detail text. Detail line sits below each node
+   *  rect with textAnchor="middle" and will visually overflow into adjacent
+   *  nodes without truncation. Caps are sized against nodeWidth at each
+   *  count — conservative to avoid collision with neighbour nodes. */
+  detailTrunc: number;
 }
 
 const LAYOUT: Record<number, Layout> = {
-  3:  { padding: 20, gap: 20, nodeHeightMax: 88, heightRatio: 0.52, fontSizeMax: 18, chipRadius: 10, rx: 8, detailFontSize: 11, detailYOffset: 24 },
-  4:  { padding: 20, gap: 16, nodeHeightMax: 80, heightRatio: 0.50, fontSizeMax: 16, chipRadius: 10, rx: 8, detailFontSize: 11, detailYOffset: 24 },
-  5:  { padding: 16, gap: 12, nodeHeightMax: 72, heightRatio: 0.45, fontSizeMax: 14, chipRadius: 8,  rx: 7, detailFontSize: 10, detailYOffset: 22 },
-  6:  { padding: 14, gap: 10, nodeHeightMax: 68, heightRatio: 0.42, fontSizeMax: 13, chipRadius: 8,  rx: 7, detailFontSize: 10, detailYOffset: 20 },
-  7:  { padding: 12, gap: 9,  nodeHeightMax: 64, heightRatio: 0.40, fontSizeMax: 12, chipRadius: 7,  rx: 6, detailFontSize: 9,  detailYOffset: 18 },
-  8:  { padding: 12, gap: 8,  nodeHeightMax: 60, heightRatio: 0.38, fontSizeMax: 12, chipRadius: 7,  rx: 6, detailFontSize: 9,  detailYOffset: 16 },
-  9:  { padding: 10, gap: 7,  nodeHeightMax: 56, heightRatio: 0.36, fontSizeMax: 11, chipRadius: 7,  rx: 5, detailFontSize: 8,  detailYOffset: 14 },
-  10: { padding: 10, gap: 6,  nodeHeightMax: 52, heightRatio: 0.35, fontSizeMax: 11, chipRadius: 7,  rx: 5, detailFontSize: 8,  detailYOffset: 12 },
+  3:  { padding: 20, gap: 20, nodeHeightMax: 88, heightRatio: 0.52, fontSizeMax: 18, chipRadius: 10, rx: 8, detailFontSize: 11, detailYOffset: 24, detailTrunc: 42 },
+  4:  { padding: 20, gap: 16, nodeHeightMax: 80, heightRatio: 0.50, fontSizeMax: 16, chipRadius: 10, rx: 8, detailFontSize: 11, detailYOffset: 24, detailTrunc: 34 },
+  5:  { padding: 16, gap: 12, nodeHeightMax: 72, heightRatio: 0.45, fontSizeMax: 14, chipRadius: 8,  rx: 7, detailFontSize: 10, detailYOffset: 22, detailTrunc: 30 },
+  6:  { padding: 14, gap: 10, nodeHeightMax: 68, heightRatio: 0.42, fontSizeMax: 13, chipRadius: 8,  rx: 7, detailFontSize: 10, detailYOffset: 20, detailTrunc: 26 },
+  7:  { padding: 12, gap: 9,  nodeHeightMax: 64, heightRatio: 0.40, fontSizeMax: 12, chipRadius: 7,  rx: 6, detailFontSize: 9,  detailYOffset: 18, detailTrunc: 23 },
+  8:  { padding: 12, gap: 8,  nodeHeightMax: 60, heightRatio: 0.38, fontSizeMax: 12, chipRadius: 7,  rx: 6, detailFontSize: 9,  detailYOffset: 16, detailTrunc: 20 },
+  9:  { padding: 10, gap: 7,  nodeHeightMax: 56, heightRatio: 0.36, fontSizeMax: 11, chipRadius: 7,  rx: 5, detailFontSize: 8,  detailYOffset: 14, detailTrunc: 18 },
+  10: { padding: 10, gap: 6,  nodeHeightMax: 52, heightRatio: 0.35, fontSizeMax: 11, chipRadius: 7,  rx: 5, detailFontSize: 8,  detailYOffset: 12, detailTrunc: 16 },
 };
+
+/** Batch 4d — simple character-cap truncation with ellipsis fallback. */
+function truncateDetail(s: string, max: number): string {
+  return s.length <= max ? s : `${s.slice(0, max - 1)}…`;
+}
 
 function FlowLinearRender({
   data,
@@ -117,7 +127,7 @@ function FlowLinearRender({
   // validation somehow we fall back to the 10-step layout (widest row, smallest
   // nodes) rather than throw at render.
   const layout = LAYOUT[nodeCount] ?? LAYOUT[10];
-  const { padding, gap, nodeHeightMax, heightRatio, fontSizeMax, chipRadius, rx, detailFontSize, detailYOffset } = layout;
+  const { padding, gap, nodeHeightMax, heightRatio, fontSizeMax, chipRadius, rx, detailFontSize, detailYOffset, detailTrunc } = layout;
 
   const nodeWidth = (width - padding * 2 - gap * (nodeCount - 1)) / nodeCount;
   const nodeHeight = Math.min(nodeHeightMax, height * heightRatio);
@@ -199,7 +209,7 @@ function FlowLinearRender({
                 fontFamily={settings.font ?? 'Inter, sans-serif'}
                 fontSize={detailFontSize}
               >
-                {step.detail}
+                {truncateDetail(step.detail, detailTrunc)}
               </text>
             ) : null}
             {i < nodeCount - 1 ? (
