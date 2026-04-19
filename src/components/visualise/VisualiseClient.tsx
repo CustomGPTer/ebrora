@@ -218,10 +218,18 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
             visualCountPreference: visualCountPreference === 'any' ? undefined : visualCountPreference,
             // Batch 10: variant mode is the new default — each concept returns
             // up to 3 preset variants so the user can swap instantly without
-            // another AI round-trip. Users who pinned a specific preset via
-            // advanced options will still get that preset as variant #1, with
-            // 2 complementary alternates for the same concept.
-            variantMode: true,
+            // another AI round-trip.
+            //
+            // Batch 3b hotfix: when the user has forced a specific preset
+            // (template-first flow, or the advanced "force preset" option),
+            // disable variant mode. Forcing a preset tells the AI "use this
+            // preset"; variant mode tells it "return 3 preset alternatives
+            // per concept". Those two instructions conflict — the AI returns
+            // a response that fails top-level schema validation with
+            // "AI response failed top-level validation (variant mode)".
+            // Template-first users have chosen their preset deliberately;
+            // they don't want alternatives anyway.
+            variantMode: forcePresetId ? false : true,
             // Batch CQ: clarifying answers from the pre-generate questions
             // flow. Session-scoped client-side — once this call returns (or
             // fails) the answers are gone unless the user hits Continue
