@@ -143,6 +143,29 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
     }
   };
 
+  const handleResetVisualiseUsage = async () => {
+    if (!editingUser) return;
+    if (!confirm(`Reset Visualise usage for ${editingUser.email}? This will mark this month's Visualise generations as FAILED so they stop counting against quota. History is preserved.`)) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/visualise/reset-usage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: editingUser.email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Failed');
+      alert(`Reset ${data.affected} generation(s) for ${editingUser.email}.`);
+      router.refresh();
+    } catch (e) {
+      alert(e instanceof Error ? `Error: ${e.message}` : 'Error resetting usage');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const exportCSV = () => {
     const headers = ['Name', 'Email', 'Role', 'Tier', 'Verified', 'Status', 'RAMS', 'AI Tools', 'Auth', 'Joined'];
     const rows = users.map((u) => [
@@ -431,6 +454,24 @@ export function UsersClient({ users, currentPage, totalPages, totalCount, curren
                       </button>
                     </>
                   )}
+                </div>
+              </div>
+
+              {/* Visualise Usage Reset */}
+              <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: 'var(--admin-bg-secondary)', borderRadius: '0.5rem' }}>
+                <label className="admin-label">Visualise Usage</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <span style={{ color: 'var(--admin-text-muted)', fontSize: '0.875rem' }}>
+                    Reset this user&apos;s Visualise quota for the current month.
+                  </span>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn--outline admin-btn--sm"
+                    onClick={handleResetVisualiseUsage}
+                    disabled={loading}
+                  >
+                    {loading ? 'Working...' : 'Reset Usage'}
+                  </button>
                 </div>
               </div>
             </div>
