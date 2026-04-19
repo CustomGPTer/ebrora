@@ -19,6 +19,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
 import { decide } from '@/lib/visualise/ai/clarify/decide';
+import { generateQuestion } from '@/lib/visualise/ai/clarify/generateQuestion';
 import {
   CLARIFY_MAX_ANSWER_WORDS,
   CLARIFY_MAX_ROUNDS,
@@ -87,6 +88,25 @@ export async function POST(req: NextRequest): Promise<NextResponse<ClarifyRespon
     }
   }
 
-  const result = decide(text, priorAnswers);
-  return NextResponse.json(result satisfies ClarifyResponse);
+  // Hard cap: if the client has already sent CLARIFY_MAX_ROUNDS answers,
+  // short-circuit to done without making an AI call.
+  if (priorAnswers.length >= CLARIFY_MAX_ROUNDS) {
+    return NextResponse.json({ done: true } satisfies ClarifyResponse);
+  }
+
+  // Try the AI-driven question generator first. It reads the user's text +
+  // prior answers and tailors a specific question. If it fails (timeout,
+  // JSON parse error, schema violation), fall back to rule-based decide()
+  // so the clarify flow stays working.
+  try {
+    const result = await generateQuestion(text, priorAnswers);
+    return NextResponse.json(result satisfies ClarifyResponse);
+  } catch (error) {
+    console.warn(
+      '[visualise/clarify] AI question generation failed, falling back to rule-based decide:',
+      error instanceof Error ? error.message : error,
+    );
+    const result = decide(text, priorAnswers);
+    return NextResponse.json(result satisfies ClarifyResponse);
+  }
 }
