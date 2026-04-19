@@ -29,6 +29,7 @@ import { del } from '@vercel/blob';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import type { VisualiseDocumentBlob } from '@/lib/visualise/types';
+import { migrateVisualiseDocumentBlob } from '@/lib/visualise/migrations/presetIdMigrations';
 
 export const maxDuration = 30;
 
@@ -92,6 +93,11 @@ export async function GET(
       console.error('[visualise.drafts.get] blob JSON parse failed', { id, err });
       return NextResponse.json({ error: 'Draft content is corrupt' }, { status: 502 });
     }
+
+    // Batch 4a-i — silently remap retired preset IDs to their consolidated
+    // replacements. Pure function; returns the same reference when no remap
+    // was needed. User sees their draft open and render as before.
+    blob = migrateVisualiseDocumentBlob(blob);
 
     return NextResponse.json(blob);
   } catch (error) {
