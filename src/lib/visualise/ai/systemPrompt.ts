@@ -134,7 +134,7 @@ CAPACITY RULE (CRITICAL — prevents silent content truncation):
 - Every preset in the catalogue below has a "capacity:" line (e.g. "exactly 6 steps", "3–7 tasks", "up to 8 bars").
 - You MUST only pick a preset whose capacity can hold ALL the primary items of the concept. If the user's text has 8 sequential steps, you MUST NOT pick a preset with "exactly 6 steps" capacity — you would be forced to drop 2 steps.
 - If NO preset accommodates the count, choose the nearest option in this priority order:
-    (a) Pick a preset with a flexible range that holds the count (e.g. for 8 sequential items, prefer timeline-horizontal-8event, or chart-bar-vertical, over process-numbered-6step).
+    (a) Pick a preset with a flexible range that holds the count (e.g. for 8 sequential items, prefer process-numbered, timeline-horizontal, or chart-bar-vertical over a preset with a fixed narrower capacity).
     (b) If the user's text genuinely covers two separate ideas, split it into two concepts and return two visuals.
     (c) Only as a last resort, and ONLY after stating this clearly in your \`reasoning\`, may you summarise the concept to fit a smaller preset. Prefer (a) and (b) over (c).
 - NEVER silently drop items to fit a preset's schema. If the count exceeds the preset's max, your visual will fail post-generation validation and be discarded.
@@ -229,7 +229,7 @@ Your job:
 CAPACITY RULE (CRITICAL — prevents silent content truncation):
 - Every preset in the catalogue below has a "capacity:" line (e.g. "exactly 6 steps", "3–7 tasks", "up to 8 bars").
 - EVERY variant you return MUST have a capacity that accommodates the concept's primary item count. If the user's text has 8 sequential steps, you MUST NOT pick a preset with "exactly 6 steps" capacity as any of the 3 variants — you would be forced to drop 2 steps.
-- If NO preset accommodates the count for a given structural family, pick from a different structural family that does. Example: for 8 sequential items, timeline-horizontal-8event fits exactly, chart-bar-vertical fits up to 8, hierarchy-mindmap-centre fits 4–8.
+- If NO preset accommodates the count for a given structural family, pick from a different structural family that does. Example: for 8 sequential items, timeline-horizontal fits up to 12 events, chart-bar-vertical fits up to 8, hierarchy-mindmap-centre fits 4–8.
 - If the user's text genuinely covers two separate ideas, split it into two concepts and return two visuals rather than cramming one long list into a too-small preset.
 - Returning fewer variants (2 or even 1) is ACCEPTABLE when capacity-compatible options are limited. Returning 3 capacity-incompatible variants is NOT acceptable — the incompatible ones will be dropped by validation and the user will see an error.
 - NEVER silently drop items from the data to fit a preset's schema.
@@ -243,7 +243,7 @@ VARIANT SELECTION RULES:
 - Every variant's data MUST validate against its preset's own schema. If a preset requires exactly N items, make sure your data has exactly N items.
 
 SEQUENCE-FIRST RULE:
-- If the user text is an ORDERED LIST or SEQUENCE of steps (e.g. "1. do X, 2. do Y, 3. do Z" or prose describing a chronological process), EVERY variant MUST be a preset that handles sequential data. Valid families for sequences: flow-linear-*, process-numbered-*, process-stages-*, timeline-horizontal-*, timeline-vertical-*, timeline-gantt-*, timeline-milestones, process-circular-* (when the steps genuinely repeat).
+- If the user text is an ORDERED LIST or SEQUENCE of steps (e.g. "1. do X, 2. do Y, 3. do Z" or prose describing a chronological process), EVERY variant MUST be a preset that handles sequential data. Valid families for sequences: flow-linear, process-numbered, process-stages-*, timeline-horizontal, timeline-vertical, timeline-gantt-*, timeline-milestones, process-circular (when the steps genuinely repeat).
 - For sequences, NEVER pick PDCA unless the text is explicitly about Plan-Do-Check-Act continuous improvement. NEVER pick RACI unless the text explicitly assigns roles. NEVER pick DMAIC unless the text is explicitly about Six Sigma. NEVER pick SWOT / BCG / fishbone for a sequence.
 
 CAPTION AND DESCRIPTION RULES:
@@ -360,6 +360,11 @@ function buildClarifyConstraintsBlock(
       case 'count':
         lines.push(
           `- The user says there are ~${a.value} main items in their content. Count primary items accordingly; prefer presets whose capacity exactly matches this number.`,
+        );
+        break;
+      case 'item-count':
+        lines.push(
+          `- The user has explicitly chosen ${a.value} items for the locked preset. You MUST generate exactly ${a.value} primary items — do not round up or down, do not add or drop items to fit a different layout aesthetic.`,
         );
         break;
       case 'palette':
