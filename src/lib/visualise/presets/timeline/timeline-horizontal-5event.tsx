@@ -7,12 +7,13 @@ import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
 import { getPalette, gradientSequence } from '../../palettes';
+import { SEQUENTIAL_LABEL_MAX, SEQUENTIAL_DETAIL_MAX } from '../common';
 
 const dataSchema = z.object({
   events: z.array(z.object({
-    label: z.string().min(1).max(32),
+    label: z.string().min(1).max(SEQUENTIAL_LABEL_MAX),
     date: z.string().max(20).optional(),
-    detail: z.string().max(80).optional(),
+    detail: z.string().max(SEQUENTIAL_DETAIL_MAX).optional(),
   })).length(5),
 });
 
