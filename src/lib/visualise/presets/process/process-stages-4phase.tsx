@@ -147,7 +147,7 @@ export const processStages4PhasePreset: Preset<ProcessStages4PhaseData> = {
   tags: ['process', 'phases', 'lifecycle', 'strategy'],
   description: 'Four strategic phase blocks with phase numbers, titles, and bullet points.',
   aiDescription:
-    'Use when the text describes a lifecycle, programme, or initiative in four strategic phases — Discovery / Design / Delivery / Closure, or equivalent. Good for high-level narratives where each phase has a distinct objective and multiple activities. Prefer "flow-linear-4step" for operational step-by-step flows. Prefer "process-pdca" when the content is explicitly about Plan-Do-Check-Act improvement.',
+    'Use when the text describes a lifecycle, programme, or initiative in four strategic phases — Discovery / Design / Delivery / Closure, or equivalent. Good for high-level narratives where each phase has a distinct objective and multiple activities. Prefer "flow-linear" for operational step-by-step flows. Prefer "process-pdca" when the content is explicitly about Plan-Do-Check-Act improvement.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

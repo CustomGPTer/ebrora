@@ -2,7 +2,7 @@
 // Preset: process-pdca
 // Classic Plan–Do–Check–Act (PDCA / Deming cycle) 2×2 grid with curved
 // arrows rotating clockwise around the boundary. Visually distinct from
-// cycle-4step (circular node layout) and process-circular-4step (wedge
+// cycle-steps (circular node layout) and process-circular (wedge
 // ring): the grid form reads well in formal reports and presentations.
 //
 // The four quadrant titles (Plan / Do / Check / Act) are the canonical
@@ -185,7 +185,7 @@ export const processPdcaPreset: Preset<ProcessPdcaData> = {
   tags: ['process', 'pdca', 'deming', 'improvement', 'quadrant'],
   description: 'Classic PDCA (Plan–Do–Check–Act) continuous-improvement 2×2 grid.',
   aiDescription:
-    'Use when the text describes a continuous-improvement cycle with four phases: planning, execution, measurement, and adjustment. Canonical for Plan–Do–Check–Act (Deming cycle) write-ups, quality-improvement narratives, audit-and-correct loops, and lean-methodology explanations. Prefer "cycle-4step" when the content is explicitly about a circular-node loop diagram; prefer "process-circular-4step" for a 4-wedge ring where the stages are not explicitly PDCA-named. Do NOT use for linear 4-step sequences where the steps do not repeat as a continuous-improvement loop (e.g. an induction → drug test → RAMS briefing → start-of-shift briefing pre-start sequence is NOT PDCA — use flow-linear-4step, process-numbered-*, or timeline-horizontal-* instead). Do NOT force unrelated items into Plan/Do/Check/Act slots.',
+    'Use when the text describes a continuous-improvement cycle with four phases: planning, execution, measurement, and adjustment. Canonical for Plan–Do–Check–Act (Deming cycle) write-ups, quality-improvement narratives, audit-and-correct loops, and lean-methodology explanations. Prefer "cycle-steps" when the content is explicitly about a circular-node loop diagram; prefer "process-circular" for a 4-wedge ring where the stages are not explicitly PDCA-named. Do NOT use for linear 4-step sequences where the steps do not repeat as a continuous-improvement loop (e.g. an induction → drug test → RAMS briefing → start-of-shift briefing pre-start sequence is NOT PDCA — use flow-linear, process-numbered-*, or timeline-horizontal-* instead). Do NOT force unrelated items into Plan/Do/Check/Act slots.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
