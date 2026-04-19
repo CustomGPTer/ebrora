@@ -171,7 +171,7 @@ export const timelineRoadmapQuartersPreset: Preset<TimelineRoadmapQuartersData> 
   tags: ['timeline', 'roadmap', 'quarters', 'planning'],
   description: 'Four-column roadmap with 1–4 items per quarter.',
   aiDescription:
-    'Use when the text describes plans, activities, or deliverables organised into four time buckets — Q1/Q2/Q3/Q4, four months, four phases, or four release windows. Each column holds 1–4 items, optionally each with a short category tag. Prefer "timeline-horizontal-5event" or "timeline-horizontal-8event" when the content is event-dated milestones rather than grouped activities.',
+    'Use when the text describes plans, activities, or deliverables organised into four time buckets — Q1/Q2/Q3/Q4, four months, four phases, or four release windows. Each column holds 1–4 items, optionally each with a short category tag. Prefer "timeline-horizontal" when the content is event-dated milestones rather than grouped activities.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">

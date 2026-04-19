@@ -2,7 +2,7 @@
 // Preset: timeline-milestones
 // Horizontal timeline with 3–6 flagged milestones. Each milestone has a
 // flag marker rising above the axis + a prominent label and subtitle
-// below. Denser and more celebratory than timeline-horizontal-5event —
+// below. Denser and more celebratory than timeline-horizontal —
 // use for significant programme markers rather than every event.
 // =============================================================================
 
@@ -140,7 +140,7 @@ export const timelineMilestonesPreset: Preset<TimelineMilestonesData> = {
   tags: ['timeline', 'milestones', 'programme', 'flagged'],
   description: '3–6 prominent milestones with flag markers above a horizontal axis.',
   aiDescription:
-    'Use when the text describes a small number (3–6) of significant, flag-worthy milestones — major programme waypoints, key decisions, or high-level release markers. Visually heavier than timeline-horizontal-5event: each milestone gets a flag callout to emphasise its importance. Prefer "timeline-horizontal-5event" or "timeline-horizontal-8event" for dense event lists where each event is equal weight.',
+    'Use when the text describes a small number (3–6) of significant, flag-worthy milestones — major programme waypoints, key decisions, or high-level release markers. Visually heavier than timeline-horizontal: each milestone gets a flag callout to emphasise its importance. Prefer "timeline-horizontal" for dense event lists where each event is equal weight.',
   dataSchema,
   defaultData,
   thumbnailSvg: `<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
