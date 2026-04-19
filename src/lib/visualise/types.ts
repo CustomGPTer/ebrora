@@ -42,14 +42,37 @@
 
 import type { PresetCategory } from './presets/types';
 
-/** IDs of the 6 built-in palettes (see palettes.ts). */
+/**
+ * IDs of every built-in palette (see palettes.ts).
+ *
+ * Batch 1a (2026-04-19) extended this union from 6 to 14 palettes. The
+ * original 6 are surfaced as "primary" and always visible in the sidebar
+ * palette chooser. The 8 added in Batch 1a are "secondary" — hidden behind
+ * a "More colours" expand control to preserve the compact default layout.
+ * Functionally they are equivalent; any palette can be used anywhere a
+ * PaletteId is expected. Grouping is defined in palettes.ts via
+ * PALETTE_IDS_PRIMARY / PALETTE_IDS_SECONDARY.
+ *
+ * Existing drafts with pre-Batch-1a paletteIds continue to validate because
+ * the union is additive — no value has been removed.
+ */
 export type PaletteId =
+  // Primary (original 6) — always visible in the palette chooser.
   | 'ebrora-primary'
   | 'ebrora-gold'
   | 'hi-vis'
   | 'slate'
   | 'mono'
-  | 'earth';
+  | 'earth'
+  // Secondary (Batch 1a) — shown when the user expands "More colours".
+  | 'marine'
+  | 'stone'
+  | 'highway'
+  | 'verdant'
+  | 'brick'
+  | 'heritage'
+  | 'nordic'
+  | 'rail';
 
 /** Per-visual rendering settings. */
 export interface VisualSettings {
@@ -152,6 +175,36 @@ export interface VisualInstance {
    * when the user swaps again, saves, regenerates, or dismisses the undo UI.
    */
   previousState?: PreviousVisualState;
+  /**
+   * Batch 1b — the preset ID the AI chose the last time this visual was
+   * AI-generated (full generate or full regenerate). Preserved across user-
+   * driven actions: gallery picks (silent auto-remap), canvas edits, and
+   * palette swaps leave it untouched.
+   *
+   * Used by the canvas editor's preset gallery to surface a small "AI chose
+   * this" badge so the user can always find their way back to the AI's
+   * original suggestion after experimenting with other templates. Falls
+   * back to the current `presetId` for pre-Batch-1b drafts where the field
+   * is absent — the badge will appear on whatever preset the visual has
+   * when first loaded in a post-Batch-1b client. Not a perfect reconstruction
+   * of history, but harmless and self-healing: any subsequent full regenerate
+   * restores the invariant.
+   */
+  aiOriginalPresetId?: string;
+  /**
+   * Batch 3a — when true, the user has explicitly pinned this visual to its
+   * current preset. Any regenerate (full or silent auto-remap) should honour
+   * the lock: the server sends `forcePresetId = visual.presetId` on a
+   * regenerate request. Flipping back to AI-chosen preset is a single click
+   * — tapping the lock icon again clears the flag.
+   *
+   * Locks persist across saves and page reloads. They do NOT survive a
+   * full-document replace-all (that's treated as starting over). They do
+   * survive silent auto-remaps triggered by the user picking a different
+   * preset from the sidebar gallery — picking a preset IS a re-lock,
+   * pinning to the newly-chosen one.
+   */
+  templateLocked?: boolean;
 }
 
 /**
@@ -224,6 +277,23 @@ export interface GenerateRequest {
    * Session-scoped client-side; never persisted.
    */
   clarifyAnswers?: Array<{ topic: string; value: string }>;
+  /**
+   * Batch 3a — controls what the AI sees as "the source" when regenerating
+   * a single visual. Only valid when `visualId` is set.
+   *
+   * 'original' (default): use the document's stored `sourceText` from the
+   *   initial generation. This is the legacy behaviour and produces a true
+   *   "start again" regenerate. Any user-driven edits to labels / details
+   *   are overwritten with fresh AI content.
+   *
+   * 'current-content': serialise the CURRENT visual's labels + details +
+   *   title + caption into a short piece of context and pass THAT as the
+   *   source. Useful when the user has edited text in the canvas and wants
+   *   the AI to refine / normalise / expand without throwing away their
+   *   manual work. Think of it as "tidy up what I've got" rather than
+   *   "start over".
+   */
+  regenerateSource?: 'original' | 'current-content';
 }
 
 /** Response from GET /api/visualise/access. */

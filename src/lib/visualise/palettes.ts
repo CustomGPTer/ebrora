@@ -123,6 +123,119 @@ export const PALETTES: Record<PaletteId, Palette> = {
     // Dark on olive accent — white is borderline (~3.3:1); this is ~5.7:1.
     accentText: '#1A1A1A',
   },
+
+  // ─── Batch 1a — Secondary palettes ────────────────────────────────────────
+  // These eight are surfaced via the "More colours" expand in the sidebar
+  // chooser. Each is domain-tuned (utilities / civils / traffic / ecology /
+  // heritage / residential / sustainability / rail) rather than brand-tuned.
+  //
+  // WCAG targets honoured on both nodeFill/text and accent/accentText:
+  // AA normal (≥4.5:1) on every pairing, verified against the sRGB relative
+  // luminance formula (L = 0.2126·R + 0.7152·G + 0.0722·B, linearised).
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Deep navy utilities blue with a utility-teal accent. Fits water/wastewater,
+  // marine works, coastal infrastructure. Close neighbour to United Utilities'
+  // working palette; intentionally not identical — this is a lookalike, not
+  // the UU brand.
+  marine: {
+    bg: '#EEF4F7',
+    nodeFill: '#0B3954',
+    nodeStroke: '#082438',
+    text: '#FFFFFF', // navy on white ~ 13.1:1, AAA.
+    accent: '#3EC1D3',
+    // White on bright teal fails (~2.5:1); near-black reads ~8.8:1.
+    accentText: '#0C1F26',
+  },
+
+  // Cool charcoal/stone with a gold-ochre accent — suits civils, concrete,
+  // structures, foundations. The accent echoes rebar/hi-vis without being
+  // site-safety loud.
+  stone: {
+    bg: '#F2F3F5',
+    nodeFill: '#4A5568',
+    nodeStroke: '#2D3748',
+    text: '#FFFFFF', // ~7.5:1, AAA.
+    accent: '#E2B04A',
+    // White on warm gold fails (~2.4:1); near-black reads ~8.2:1.
+    accentText: '#1A1A1A',
+  },
+
+  // Traffic red + MUTCD black — highway works, traffic management, TMPs,
+  // road-space booking. Distinct from hi-vis (which is orange-led) — highway
+  // leads with red and pairs with flat black rather than blue.
+  highway: {
+    bg: '#FAFAFA',
+    nodeFill: '#C1272D',
+    nodeStroke: '#8B1B1F',
+    text: '#FFFFFF', // ~5.9:1, AA.
+    accent: '#1A1A1A',
+    // White on near-black ~ 20:1, AAA.
+    accentText: '#FFFFFF',
+  },
+
+  // Forest green + moss accent. Ecology, arboriculture, planning/landscape,
+  // SuDS, habitat reports. Reads as "vegetation" rather than "corporate".
+  verdant: {
+    bg: '#F1F5EB',
+    nodeFill: '#3F5F2C',
+    nodeStroke: '#2B4320',
+    text: '#FFFFFF', // ~7.4:1, AAA.
+    accent: '#96B56E',
+    // White on light moss fails (~3.1:1); dark olive reads ~7.1:1.
+    accentText: '#1F2A14',
+  },
+
+  // Terracotta brick + warm cream accent. Residential, brickwork, small
+  // build schemes, private-client reports where "industrial" looks wrong.
+  brick: {
+    bg: '#FAF3EA',
+    nodeFill: '#8B3A2E',
+    nodeStroke: '#5E251C',
+    text: '#FFFFFF', // ~6.8:1, AA.
+    accent: '#D9B382',
+    // White on sand cream fails (~2.7:1); dark brown reads ~7.1:1.
+    accentText: '#3A2117',
+  },
+
+  // Deep burgundy + antique gold — listed buildings, conservation areas,
+  // heritage impact assessments. More formal than brick; pairs with the
+  // serif headings often used in heritage reports.
+  heritage: {
+    bg: '#FAF5EF',
+    nodeFill: '#5C1F29',
+    nodeStroke: '#3E111A',
+    text: '#FFFFFF', // ~10.2:1, AAA.
+    accent: '#C9A86A',
+    // White on antique gold fails (~2.6:1); near-black reads ~8.5:1.
+    accentText: '#2B1A0B',
+  },
+
+  // Nordic blue + pale sky accent — climate resilience, flood risk, net
+  // zero / sustainability reports, environmental permitting. Cool and
+  // low-saturation by design; "clinical" without being sterile.
+  nordic: {
+    bg: '#F5F9FC',
+    nodeFill: '#1E4F6B',
+    nodeStroke: '#0F3349',
+    text: '#FFFFFF', // ~8.1:1, AAA.
+    accent: '#76B6C4',
+    // White on pale sky fails (~2.4:1); near-black reads ~8.2:1.
+    accentText: '#0C1D26',
+  },
+
+  // Network-Rail-inspired deep blue + hi-vis orange. Rail schemes, station
+  // works, possession planning, NR framework submissions. Lookalike (not
+  // identical) to NR brand blue to stay clear of trade-mark friction.
+  rail: {
+    bg: '#FAF0E6',
+    nodeFill: '#003473',
+    nodeStroke: '#001C42',
+    text: '#FFFFFF', // ~11.4:1, AAA.
+    accent: '#F77F00',
+    // White on hi-vis orange fails (~2.5:1); near-black reads ~8.1:1.
+    accentText: '#1A1A1A',
+  },
 };
 
 /** Display name used in UI pickers and AI descriptions. */
@@ -133,6 +246,15 @@ export const PALETTE_LABELS: Record<PaletteId, string> = {
   slate: 'Slate',
   mono: 'Monochrome',
   earth: 'Earth',
+  // Batch 1a — secondary palettes.
+  marine: 'Marine',
+  stone: 'Stone',
+  highway: 'Highway',
+  verdant: 'Verdant',
+  brick: 'Brick',
+  heritage: 'Heritage',
+  nordic: 'Nordic',
+  rail: 'Rail',
 };
 
 /** Short AI-facing hint explaining when to pick each palette. */
@@ -143,16 +265,60 @@ export const PALETTE_AI_HINTS: Record<PaletteId, string> = {
   slate: 'blue-grey, corporate neutral — commercial docs, formal reports',
   mono: 'greys only, minimalist — black-and-white print, submissions',
   earth: 'browns and greens, natural — ecology, landscape, arb, contaminated land',
+  // Batch 1a — secondary palettes. Tuned for specific construction sub-domains;
+  // the AI should prefer these when the source text is clearly about the named
+  // domain and fall back to ebrora-primary if the topic is generic.
+  marine: 'navy + utility teal — water/wastewater, coastal, marine, flood works',
+  stone: 'cool charcoal + gold-ochre — civils, concrete, foundations, structures',
+  highway: 'traffic red + black — highway works, traffic management, TMPs',
+  verdant: 'forest green + moss — ecology, arboriculture, planning, landscape, SuDS',
+  brick: 'terracotta + cream — residential, small build, brickwork, private client',
+  heritage: 'burgundy + antique gold — listed buildings, conservation, heritage impact',
+  nordic: 'nordic blue + pale sky — climate, flood risk, net zero, sustainability',
+  rail: 'deep blue + hi-vis orange — rail schemes, station works, possessions, NR',
 };
 
-/** List of all palette IDs — useful for iterating in UI pickers. */
-export const PALETTE_IDS: readonly PaletteId[] = [
+/**
+ * Primary palette IDs — the original 6, always visible in the palette chooser.
+ * These are brand-neutral / executive-neutral and work for any document.
+ */
+export const PALETTE_IDS_PRIMARY: readonly PaletteId[] = [
   'ebrora-primary',
   'ebrora-gold',
   'hi-vis',
   'slate',
   'mono',
   'earth',
+] as const;
+
+/**
+ * Secondary palette IDs — added in Batch 1a. Surfaced in the sidebar behind a
+ * "More colours" expand to keep the default chooser compact. Each is tuned for
+ * a specific construction sub-domain (see PALETTE_AI_HINTS for the matchups).
+ */
+export const PALETTE_IDS_SECONDARY: readonly PaletteId[] = [
+  'marine',
+  'stone',
+  'highway',
+  'verdant',
+  'brick',
+  'heritage',
+  'nordic',
+  'rail',
+] as const;
+
+/**
+ * Flat list of ALL palette IDs (primary first, then secondary).
+ *
+ * Consumers that don't care about the primary/secondary split should keep
+ * using this — e.g. the AI system prompt (where the model needs to see every
+ * option) and the response validator (enum over every legal ID). The UI
+ * palette chooser is the one place that *does* care about the split, and it
+ * imports PALETTE_IDS_PRIMARY and PALETTE_IDS_SECONDARY directly.
+ */
+export const PALETTE_IDS: readonly PaletteId[] = [
+  ...PALETTE_IDS_PRIMARY,
+  ...PALETTE_IDS_SECONDARY,
 ] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
