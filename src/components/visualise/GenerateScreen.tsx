@@ -15,7 +15,7 @@
 // (either the decide function said "done" or the user hit "Generate anyway").
 // =============================================================================
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { AccessResponse, VisualCountPreference } from '@/lib/visualise/types';
 import { VISUALISE_TEXT_MIN_WORDS, VISUALISE_TEXT_MAX_WORDS } from '@/lib/visualise/constants';
 import { getAllPresets } from '@/lib/visualise/presets';
@@ -32,9 +32,16 @@ interface Props {
     visualCountPreference?: VisualCountPreference,
     clarifyAnswers?: ClarifyAnswer[],
   ) => void;
+  /**
+   * Parent's error state. When set while we're in the clarify phase, we
+   * flip back to the input phase so the user sees their textarea (and
+   * the error banner in the parent explains what went wrong) instead of
+   * a frozen "Sending to generate…" spinner inside ClarifyPanel.
+   */
+  generateError?: string | null;
 }
 
-export default function GenerateScreen({ access, isGenerating, onGenerate }: Props) {
+export default function GenerateScreen({ access, isGenerating, onGenerate, generateError }: Props) {
   const [text, setText] = useState('');
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [forcePresetId, setForcePresetId] = useState<string>('');
@@ -44,6 +51,18 @@ export default function GenerateScreen({ access, isGenerating, onGenerate }: Pro
   // 'clarify' = ClarifyPanel mounted with user's text. Cancelling clarify
   // returns to 'input' without discarding the text (user can tweak and retry).
   const [phase, setPhase] = useState<'input' | 'clarify'>('input');
+
+  // Batch CQ: if the parent reports a generate error while we're in the
+  // clarify phase, flip back to the input phase. Parent's banner is above
+  // us showing the error; dropping back to input lets the user edit their
+  // text and try again, rather than leaving ClarifyPanel stuck on
+  // "Sending to generate…". We only react to a fresh error appearing,
+  // not every render — the check is inside a useEffect so we don't loop.
+  useEffect(() => {
+    if (generateError && phase === 'clarify') {
+      setPhase('input');
+    }
+  }, [generateError, phase]);
 
   const wordCount = useMemo(() => {
     const t = text.trim();
@@ -76,6 +95,7 @@ export default function GenerateScreen({ access, isGenerating, onGenerate }: Pro
     return (
       <ClarifyPanel
         text={text.trim()}
+        isGenerating={isGenerating}
         onComplete={(answers) => {
           onGenerate(
             text.trim(),
@@ -85,8 +105,8 @@ export default function GenerateScreen({ access, isGenerating, onGenerate }: Pro
           );
           // Leave phase as 'clarify' — VisualiseClient will flip the view to
           // 'document' once the generate response comes back. If generation
-          // fails, returning to input phase is handled by the parent via
-          // error state + re-mount of this component on new-draft click.
+          // fails, the `generateError` effect above will flip phase back to
+          // 'input' automatically.
         }}
         onCancel={() => setPhase('input')}
       />

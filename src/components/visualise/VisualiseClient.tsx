@@ -460,6 +460,11 @@ export default function VisualiseClient({ tier, initialDocumentId }: Props) {
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
           tier={tier}
+          // Batch CQ: pass the parent's error state so GenerateScreen can
+          // detect generate failure and flip its clarify phase back to
+          // the input form, instead of leaving ClarifyPanel frozen on a
+          // "Sending to generate…" spinner after a failure.
+          generateError={error}
         />
       ) : document ? (
         <DocumentView

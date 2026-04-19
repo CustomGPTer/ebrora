@@ -40,9 +40,17 @@ interface Props {
   onComplete: (answers: ClarifyAnswer[]) => void;
   /** Called when the user clicks "Start over" to edit their original text. */
   onCancel: () => void;
+  /**
+   * Whether the parent's /api/visualise/generate call is currently in
+   * flight. Used to disable the "Generate anyway" button while a generate
+   * is already running, preventing duplicate submits. Optional — when
+   * absent we only guard against ClarifyPanel's own in-flight clarify
+   * calls via `isLoading`.
+   */
+  isGenerating?: boolean;
 }
 
-export default function ClarifyPanel({ text, onComplete, onCancel }: Props) {
+export default function ClarifyPanel({ text, onComplete, onCancel, isGenerating = false }: Props) {
   const [priorAnswers, setPriorAnswers] = useState<ClarifyAnswer[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<ClarifyQuestion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,17 +75,24 @@ export default function ClarifyPanel({ text, onComplete, onCancel }: Props) {
         if (!res.ok) {
           // On server error just proceed to generate with what we have.
           // Failing closed would trap the user; failing open preserves
-          // the pre-CQ UX.
+          // the pre-CQ UX. Clear the question so chips don't stay
+          // clickable while the parent handles generate.
+          setCurrentQuestion(null);
           onComplete(answersToSend);
           return;
         }
         const payload = (await res.json()) as ClarifyResponse;
         if (payload.done) {
+          // Done — clear the question so the UI shows a finalising state
+          // rather than the last chip set. If the parent's generate fails,
+          // the panel stays mounted but frozen — no stale chips to click.
+          setCurrentQuestion(null);
           onComplete(answersToSend);
           return;
         }
         if (!payload.nextQuestion) {
           // Server said not done but gave no question — treat as done.
+          setCurrentQuestion(null);
           onComplete(answersToSend);
           return;
         }
@@ -185,7 +200,16 @@ export default function ClarifyPanel({ text, onComplete, onCancel }: Props) {
               />
             )}
           </div>
-        ) : null}
+        ) : (
+          // Question cleared — we've called onComplete and are waiting for
+          // the parent's generate to either succeed (panel unmounts) or fail
+          // (error banner above, user clicks Start over to reset). Frozen
+          // state prevents stale chip clicks from looping answers.
+          <div className="flex items-center gap-3 text-gray-500 text-sm">
+            <span className="w-4 h-4 border-2 border-[#1B5B50] border-t-transparent rounded-full animate-spin" />
+            Sending to generate…
+          </div>
+        )}
       </div>
 
       {/* Footer controls */}
@@ -200,10 +224,10 @@ export default function ClarifyPanel({ text, onComplete, onCancel }: Props) {
         <button
           type="button"
           onClick={handleGenerateAnyway}
-          disabled={isLoading}
+          disabled={isLoading || isGenerating}
           className="px-4 py-2 rounded-lg bg-[#1B5B50] text-white text-sm font-semibold hover:bg-[#144840] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          Generate anyway
+          {isGenerating ? 'Generating…' : 'Generate anyway'}
         </button>
       </div>
     </div>
