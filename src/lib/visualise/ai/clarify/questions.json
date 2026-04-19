@@ -19,9 +19,7 @@
       "topic": "preset",
       "prompt": "Which kind of flow?",
       "chips": [
-        { "value": "flow-linear-3step",      "label": "Linear — 3 steps" },
-        { "value": "flow-linear-4step",      "label": "Linear — 4 steps" },
-        { "value": "flow-linear-5step",      "label": "Linear — 5 steps" },
+        { "value": "flow-linear",            "label": "Linear flow" },
         { "value": "flow-decision-yesno",    "label": "Yes/no decision" },
         { "value": "flow-multi-gateway",     "label": "Multi-way decision" },
         { "value": "flow-branching-1to2",    "label": "Parallel branches" },
@@ -35,9 +33,8 @@
       "topic": "preset",
       "prompt": "Which kind of timeline?",
       "chips": [
-        { "value": "timeline-horizontal-5event",  "label": "Horizontal — 5 events" },
-        { "value": "timeline-horizontal-8event",  "label": "Horizontal — 8 events" },
-        { "value": "timeline-vertical-5event",    "label": "Vertical — 5 events" },
+        { "value": "timeline-horizontal",         "label": "Horizontal timeline" },
+        { "value": "timeline-vertical",           "label": "Vertical timeline" },
         { "value": "timeline-milestones",         "label": "Milestones" },
         { "value": "timeline-roadmap-quarters",   "label": "Roadmap by quarters" },
         { "value": "timeline-gantt-lite",         "label": "Gantt chart" },
@@ -84,11 +81,9 @@
       "topic": "preset",
       "prompt": "Which cycle?",
       "chips": [
-        { "value": "cycle-4step",             "label": "4-step cycle" },
-        { "value": "cycle-6step",             "label": "6-step cycle" },
+        { "value": "cycle-steps",             "label": "Cycle (flexible steps)" },
         { "value": "cycle-feedback-loop",     "label": "Feedback loop" },
-        { "value": "process-circular-4step",  "label": "Circular — 4" },
-        { "value": "process-circular-6step",  "label": "Circular — 6" },
+        { "value": "process-circular",        "label": "Circular process" },
         { "value": "process-pdca",            "label": "PDCA" },
         { "value": "unknown",                 "label": "Not sure" }
       ]
@@ -125,9 +120,8 @@
         { "value": "process-stages-4phase",   "label": "4-phase stages" },
         { "value": "process-dmaic",           "label": "DMAIC" },
         { "value": "process-pdca",            "label": "PDCA" },
-        { "value": "process-numbered-6step",  "label": "6 numbered steps" },
-        { "value": "process-circular-4step",  "label": "Circular — 4" },
-        { "value": "process-circular-6step",  "label": "Circular — 6" },
+        { "value": "process-numbered",        "label": "Numbered process" },
+        { "value": "process-circular",        "label": "Circular process" },
         { "value": "unknown",                 "label": "Not sure" }
       ]
     }

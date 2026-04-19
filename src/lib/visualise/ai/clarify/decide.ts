@@ -1,19 +1,24 @@
 // =============================================================================
-// Visualise — Clarify Decide (Batch CQ)
+// Visualise — Clarify Decide (Batch CQ, Batch 4b-a)
 //
-// Given user text + prior answers, decide whether to ask another clarifying
-// question or proceed to generate. Topic priority per scope doc:
-//   family → preset → count → palette → data
+// Given user text + prior answers + optional forcePresetId, decide whether
+// to ask another clarifying question or proceed to generate. Topic priority
+// per scope doc:
+//   family → preset → count → item-count → palette → data
 //
 // The "AI stops early" heuristic:
 //   - Skip `family` if the text trivially matches a family keyword regex
-//     (reliable, no AI call needed).
-//   - Skip `preset` if the user has already given a preset OR no family
-//     was resolved (asking for a preset without a family is nonsensical).
-//   - Skip `count` if a digit+word pattern (e.g. "4 stages") is present.
-//   - Skip `palette` if already answered — never ask proactively; palette
-//     is the least load-bearing topic for avoiding the "no valid visuals"
-//     error and bumping through it risks question fatigue.
+//     (reliable, no AI call needed), OR if a forcePresetId / preset answer
+//     already fixes the family.
+//   - Skip `preset` if the user has already given a preset OR a forcePresetId
+//     is set OR no family was resolved (asking for a preset without a family
+//     is nonsensical).
+//   - Skip `count` (the pre-preset-selection form) if a digit+word pattern
+//     (e.g. "4 stages") is present OR a specific preset is already locked.
+//   - BATCH 4b-a — emit `item-count` when a specific preset is locked AND
+//     its capacity has min !== max (i.e. the preset is flexible) AND the
+//     count is not already resolved from text or prior answers.
+//   - Skip `palette` if already answered — never ask proactively.
 //   - Always consider `data` in the final round ONLY if the chosen preset
 //     requires structured input the text doesn't obviously provide.
 //
@@ -30,6 +35,7 @@ import type {
 import { CLARIFY_MAX_ROUNDS } from './types';
 import questions from './questions.json';
 import { getPresetById } from '../../presets';
+import { getCapacity } from '../../presets/capacity';
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -108,8 +114,16 @@ function detectCountFromText(text: string): number | null {
 
 /**
  * Does the chosen preset need structured data the free text doesn't obviously
- * supply? Only a subset of presets — quadrants, charts with axes, matrices —
- * benefit from a data question. For most presets the AI can extract from prose.
+ * supply? A subset of presets benefits from a data question:
+ *   - quadrants and axis-based charts want axis labels
+ *   - vs-card and head-to-head want two named options
+ *   - gantt wants durations
+ *
+ * Batch 4b-a — extended for the template-first flow. When a user arrives
+ * with a forcePresetId and writes thin text, the AI may not have enough
+ * domain hints to fill named slots (e.g. swimlane lane names, SIPOC
+ * centre-process name, venn set names). This function returns a prompt
+ * when that's the case; the caller emits it as a `data` topic question.
  */
 function presetNeedsDataQuestion(presetId: string, text: string): string | null {
   const p = getPresetById(presetId);
@@ -136,6 +150,47 @@ function presetNeedsDataQuestion(presetId: string, text: string): string | null 
     }
   }
 
+  // Batch 4b-a — Swimlanes need lane names. If the text doesn't name at least
+  // two roles / lanes / parties, the AI has to guess — ask instead.
+  if (presetId === 'flow-swimlane-2lane' || presetId === 'flow-swimlane-3lane') {
+    const hasRoles = /\b(role|lane|team|party|department|engineer|manager|operative|contractor|client|supplier|quality|safety|design|delivery)\b/i.test(text);
+    if (!hasRoles) {
+      const n = presetId === 'flow-swimlane-3lane' ? 'three' : 'two';
+      return `Your swimlane needs ${n} named roles (who owns each lane). Which roles or teams are involved, and what does each do?`;
+    }
+  }
+
+  // Batch 4b-a — SIPOC wants the name of the process it describes. The 5
+  // columns (Suppliers / Inputs / Process / Outputs / Customers) are named,
+  // but the SIPOC itself needs a title — without it the AI has to invent one.
+  if (presetId === 'flow-sipoc') {
+    const wordCount = text.trim().split(/\s+/).length;
+    if (wordCount < 25) {
+      return 'Your SIPOC needs a process name. Which process are you mapping (e.g. "Precast beam installation", "Permit approval")?';
+    }
+  }
+
+  // Batch 4b-a — Venn diagrams need the set names. If the text doesn't
+  // mention overlap or comparison terms, the AI struggles to identify
+  // what the circles represent.
+  if (presetId === 'venn-2circle' || presetId === 'venn-3circle') {
+    const hasSetHints = /\b(overlap|common|both|shared|and also|while|versus|intersection)\b/i.test(text);
+    if (!hasSetHints) {
+      const n = presetId === 'venn-3circle' ? 'three' : 'two';
+      return `Your Venn needs ${n} named sets. What does each circle represent, and what do they share?`;
+    }
+  }
+
+  // Batch 4b-a — Fishbone wants named cause categories. Standard 6M's
+  // (Man/Method/Machine/Material/Measurement/Mother Nature) or construction-
+  // specific categories. Ask if the text doesn't suggest any.
+  if (presetId === 'fishbone-ishikawa-6bone') {
+    const hasCauseHints = /\b(cause|reason|why|because|factor|root|contributor|6m|five m)\b/i.test(text);
+    if (!hasCauseHints) {
+      return 'Your fishbone needs a problem statement and cause categories. What is the problem, and what broad categories might the causes fall into (e.g. people, method, equipment, materials)?';
+    }
+  }
+
   return null;
 }
 
@@ -148,24 +203,68 @@ export interface DecideResult {
   round?: number;
 }
 
+export interface DecideOptions {
+  /**
+   * Batch 4b-a — when the caller knows the preset (template-first flow),
+   * pass it here. `decide()` skips family + preset questions and jumps
+   * straight to item-count (if flexible) / data (if thin text).
+   */
+  forcePresetId?: string;
+}
+
 /**
- * Given the current text + prior answers, decide what to ask next.
- * Pure function — no AI calls, no side effects. The live AI call for
- * free-text data extraction is triggered separately in dataExtract.ts
- * when this function returns a topic='data' question.
+ * Batch 4b-a — build an item-count question dynamically for a locked preset.
+ * Chips are bounded by the preset's capacity range, capped at 10 chips to
+ * stay visually sensible in the ClarifyPanel chip row.
+ *
+ * Returns null if the preset is not flexible (min === max) or has no
+ * capacity entry — callers should skip item-count in those cases.
  */
-export function decide(text: string, priorAnswers: ClarifyAnswer[]): DecideResult {
+function buildItemCountQuestion(presetId: string, round: number): ClarifyQuestion | null {
+  const cap = getCapacity(presetId);
+  if (!cap) return null;
+  const { min, max } = cap.primary;
+  if (min >= max) return null;
+
+  const unit = cap.primaryUnit;
+  const chips = [] as { value: string; label: string }[];
+  for (let n = min; n <= max; n += 1) {
+    chips.push({ value: String(n), label: String(n) });
+  }
+  chips.push({ value: 'unknown', label: 'Not sure' });
+
+  return {
+    topic: 'item-count',
+    prompt: `How many ${unit}s? (${min}–${max})`,
+    chips,
+    round,
+  };
+}
+
+/**
+ * Given the current text + prior answers + optional forcePresetId, decide
+ * what to ask next. Pure function — no AI calls, no side effects. The live
+ * AI call for free-text data extraction is triggered separately in
+ * dataExtract.ts when this function returns a topic='data' question.
+ */
+export function decide(
+  text: string,
+  priorAnswers: ClarifyAnswer[],
+  options: DecideOptions = {},
+): DecideResult {
   const round = priorAnswers.length;
+  const { forcePresetId } = options;
 
   // Hard cap — scope doc says up to 3 rounds total.
   if (round >= CLARIFY_MAX_ROUNDS) {
     return { done: true };
   }
 
-  // Resolve existing knowledge from answers + text.
+  // Resolve existing knowledge from answers + text + forcePresetId.
   const familyAnswer = findAnswer(priorAnswers, 'family') as FamilyHint | undefined;
   const presetAnswer = findAnswer(priorAnswers, 'preset');
   const countAnswer = findAnswer(priorAnswers, 'count');
+  const itemCountAnswer = findAnswer(priorAnswers, 'item-count');
   const paletteAnswer = findAnswer(priorAnswers, 'palette');
   const dataAnswer = findAnswer(priorAnswers, 'data');
 
@@ -174,13 +273,25 @@ export function decide(text: string, priorAnswers: ClarifyAnswer[]): DecideResul
     detectFamilyFromText(text);
 
   const resolvedCount: number | null =
-    countAnswer && countAnswer !== 'unknown' ? parseInt(countAnswer, 10) : detectCountFromText(text);
+    itemCountAnswer && itemCountAnswer !== 'unknown'
+      ? parseInt(itemCountAnswer, 10)
+      : countAnswer && countAnswer !== 'unknown'
+        ? parseInt(countAnswer, 10)
+        : detectCountFromText(text);
+
+  // Batch 4b-a — locked preset is either forced by the caller (template-first
+  // flow) or chosen by the user via the preset chip question. Either path
+  // means we know the target; skip family/preset and work on count+data.
+  const lockedPresetId: string | undefined =
+    forcePresetId ??
+    (presetAnswer && presetAnswer !== 'unknown' ? presetAnswer : undefined);
 
   // -------------------------------------------------------------------------
   // Topic selection — in priority order. Pick the first unresolved topic.
 
-  // 1. family — ask if not detected AND not answered
-  if (!resolvedFamily && !familyAnswer) {
+  // 1. family — ask if not detected AND not answered AND no preset locked.
+  //    (If a preset is locked, its own family is implicit — no need to ask.)
+  if (!lockedPresetId && !resolvedFamily && !familyAnswer) {
     return {
       nextQuestion: { ...(questions.family as ClarifyQuestion), round },
       done: false,
@@ -188,8 +299,9 @@ export function decide(text: string, priorAnswers: ClarifyAnswer[]): DecideResul
     };
   }
 
-  // 2. preset — ask if family is known but preset isn't, AND a chip set exists
-  if (resolvedFamily && !presetAnswer) {
+  // 2. preset — ask if family is known but preset isn't, AND no preset is
+  //    locked, AND a chip set exists for the family.
+  if (!lockedPresetId && resolvedFamily && !presetAnswer) {
     const presetQs = (questions.presetByFamily as Record<string, ClarifyQuestion | undefined>);
     const presetQ = presetQs[resolvedFamily];
     if (presetQ) {
@@ -202,11 +314,9 @@ export function decide(text: string, priorAnswers: ClarifyAnswer[]): DecideResul
     // No preset chips for this family — fall through to later topics.
   }
 
-  // 3. count — ask if unresolved AND preset is unknown (so we still have choice to make)
-  //    Skip count when user has locked a specific preset — the preset's own
-  //    schema constrains count and asking is just friction.
-  const hasLockedPreset = presetAnswer && presetAnswer !== 'unknown';
-  if (!resolvedCount && !countAnswer && !hasLockedPreset) {
+  // 3. count (pre-preset) — ask if unresolved AND no preset locked yet
+  //    (otherwise item-count is the right path).
+  if (!resolvedCount && !countAnswer && !lockedPresetId) {
     return {
       nextQuestion: { ...(questions.count as ClarifyQuestion), round },
       done: false,
@@ -214,10 +324,24 @@ export function decide(text: string, priorAnswers: ClarifyAnswer[]): DecideResul
     };
   }
 
-  // 4. data — ask if preset is locked AND preset requires structured input
+  // 4. item-count (Batch 4b-a) — ask if a preset is locked AND flexible AND
+  //    the count isn't already resolved. Skipped silently for fixed-count
+  //    presets (min === max) — no question needed.
+  if (lockedPresetId && !itemCountAnswer && !resolvedCount) {
+    const itemCountQ = buildItemCountQuestion(lockedPresetId, round);
+    if (itemCountQ) {
+      return {
+        nextQuestion: itemCountQ,
+        done: false,
+        round,
+      };
+    }
+  }
+
+  // 5. data — ask if preset is locked AND preset needs structured input
   //    the text doesn't obviously supply. Live question, not from JSON.
-  if (hasLockedPreset && !dataAnswer) {
-    const dataPrompt = presetNeedsDataQuestion(presetAnswer!, text);
+  if (lockedPresetId && !dataAnswer) {
+    const dataPrompt = presetNeedsDataQuestion(lockedPresetId, text);
     if (dataPrompt) {
       return {
         nextQuestion: {
@@ -232,9 +356,9 @@ export function decide(text: string, priorAnswers: ClarifyAnswer[]): DecideResul
     }
   }
 
-  // 5. palette — don't ask proactively. Scope says palette is "woven in where
-  //    relevant" not prominently asked. We skip unless the user has resolved
-  //    everything else and the palette isn't set AND a round is still available
+  // 6. palette — don't ask proactively. Scope says palette is "woven in where
+  //    relevant" not prominently asked. Skip unless the user has resolved
+  //    everything else and palette isn't set AND a round is still available
   //    — which in practice means round 3 with everything else resolved, rare.
   //    Even then: don't ask. Palette defaults are fine; better UX to skip.
   void paletteAnswer; // acknowledge the variable exists; see note above

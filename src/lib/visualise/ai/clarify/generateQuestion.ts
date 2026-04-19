@@ -30,7 +30,8 @@ import type {
   ClarifyTopic,
 } from './types';
 import { CLARIFY_MAX_ANSWER_WORDS } from './types';
-import { getAllPresets } from '../../presets';
+import { getAllPresets, getPresetById } from '../../presets';
+import { getCapacity, describeCapacityForAi } from '../../presets/capacity';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -77,14 +78,43 @@ function summarisePriorAnswers(answers: ClarifyAnswer[]): string {
  * Call the AI to decide what to ask next. Returns `done: true` if no useful
  * question remains, or a tailored ClarifyQuestion. Throws on hard failure
  * (network, API key, etc.) — caller is expected to fall back to decide().
+ *
+ * Batch 4b-a — accepts optional forcePresetId. When set, the AI is told the
+ * preset is already locked and is instructed to skip family/preset topics,
+ * ask item-count for flexible presets, and ask targeted data questions for
+ * thin text. The rule-based decide() fallback mirrors this behaviour.
  */
 export async function generateQuestion(
   text: string,
   priorAnswers: ClarifyAnswer[],
+  forcePresetId?: string,
 ): Promise<AiQuestionResult> {
   const round = priorAnswers.length;
   const catalogue = buildCompressedCatalogue();
   const priorSummary = summarisePriorAnswers(priorAnswers);
+
+  // Batch 4b-a — when a preset is locked, compute its context block for the
+  // system prompt. Gives the AI enough detail to ask preset-specific
+  // item-count or data questions instead of generic family/preset ones.
+  let lockedPresetBlock = '';
+  if (forcePresetId) {
+    const preset = getPresetById(forcePresetId);
+    const cap = getCapacity(forcePresetId);
+    if (preset && cap) {
+      const flexible = cap.primary.min < cap.primary.max;
+      lockedPresetBlock = `\n\nLOCKED PRESET (user has already picked this):
+  id: ${preset.id}
+  name: ${preset.name}
+  capacity: ${describeCapacityForAi(preset.id)}
+  flexible-count: ${flexible ? 'yes — you MAY ask item-count if the source text is ambiguous about count' : 'no — do NOT ask about count'}
+  description: ${preset.description}
+When a preset is locked:
+  - DO NOT ask "family" or "preset" — that decision is made.
+  - If flexible-count is yes AND the text doesn't make the count obvious, emit { action: "ask", question: { topic: "item-count", prompt: "...", chips: [{"value": "3", "label": "3"}, ...] } } with chips covering the preset's capacity range (and a "Not sure" chip with value "unknown").
+  - If the preset has named slots the text doesn't fill (e.g. swimlane lane names, SIPOC process name, venn set names, quadrant axes), emit { action: "ask", question: { topic: "data", prompt: "...", placeholder: "..." } }.
+  - Otherwise return { action: "generate" } immediately.`;
+    }
+  }
 
   const systemPrompt = `You are Visualise's clarifying-question generator for a UK construction industry SaaS.
 
@@ -98,16 +128,16 @@ OR
   { "action": "ask", "question": { "prompt": string, "topic": string, "placeholder": string } }
 
 Rules:
-1. Only ask if the answer would genuinely change which preset is picked. If the text is already clear, return { "action": "generate" } immediately. Signs of clarity: explicit family name (e.g. "PDCA cycle"), explicit count (e.g. "5 steps"), a known framework name (SWOT, BCG, RACI, fishbone).
-2. The question topic must be one of: "family", "preset", "count", "palette", "data".
-3. Prefer chip-based questions (4-7 chips). Include a "Not sure" chip with value "unknown". Only use free-text (placeholder instead of chips) for the "data" topic when a preset has already been picked AND needs specific structured input (e.g. axis labels for a quadrant).
+1. Only ask if the answer would genuinely change which preset is picked OR how many items it holds. If the text is already clear, return { "action": "generate" } immediately. Signs of clarity: explicit family name (e.g. "PDCA cycle"), explicit count (e.g. "5 steps"), a known framework name (SWOT, BCG, RACI, fishbone).
+2. The question topic must be one of: "family", "preset", "count", "item-count", "palette", "data".
+3. Prefer chip-based questions (4-11 chips). Include a "Not sure" chip with value "unknown". Only use free-text (placeholder instead of chips) for the "data" topic when a preset has already been picked AND needs specific structured input (e.g. axis labels for a quadrant, lane names for a swimlane, set names for a venn).
 4. Make questions SPECIFIC to the user's text — reference their actual domain ("your RAMS approval process" not "your process"). Generic questions waste the user's time.
-5. If the user has already answered family/preset/count, do NOT ask those again. Check the prior answers below.
+5. If the user has already answered family/preset/count/item-count, do NOT ask those again. Check the prior answers below.
 6. For data topic free-text answers, the user is capped at ${CLARIFY_MAX_ANSWER_WORDS} words. Keep the question tight.
 7. Hard cap: max 3 rounds total. Current round: ${round + 1} of 3. If this is round 3 and you'd still want to ask, return generate instead — the user has done enough.
 
 Available preset catalogue (grouped by family):
-${catalogue}
+${catalogue}${lockedPresetBlock}
 
 The user's pasted text, prior answers, and the current round are in the user message.`;
 
@@ -146,7 +176,7 @@ Return one of the two schemas above. JSON only — no markdown, no code fences.`
   }
 
   const q = parsed.question;
-  const validTopics: ClarifyTopic[] = ['family', 'preset', 'count', 'palette', 'data'];
+  const validTopics: ClarifyTopic[] = ['family', 'preset', 'count', 'item-count', 'palette', 'data'];
   if (typeof q.topic !== 'string' || !validTopics.includes(q.topic as ClarifyTopic)) {
     throw new Error(`AI returned invalid topic: ${q.topic}`);
   }
@@ -156,7 +186,7 @@ Return one of the two schemas above. JSON only — no markdown, no code fences.`
 
   // Chip-based question
   if (Array.isArray(q.chips)) {
-    if (q.chips.length < 2 || q.chips.length > 10) {
+    if (q.chips.length < 2 || q.chips.length > 13) {
       throw new Error(`AI returned invalid chip count: ${q.chips.length}`);
     }
     const chips = q.chips

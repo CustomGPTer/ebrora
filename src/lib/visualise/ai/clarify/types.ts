@@ -18,18 +18,23 @@
 // =============================================================================
 
 /**
- * The five topics a clarifying question can cover, in priority order:
- *   1. family  — structural family (flow / hierarchy / timeline / …)
- *   2. preset  — specific preset within a family
- *   3. count   — how many main items in the text
- *   4. palette — visual style
- *   5. data    — free-text answer to a live question about missing data
+ * The six topics a clarifying question can cover, in priority order:
+ *   1. family     — structural family (flow / hierarchy / timeline / …)
+ *   2. preset     — specific preset within a family
+ *   3. count      — how many main items in the text (pre-preset-selection;
+ *                   narrows the family/preset shortlist)
+ *   4. item-count — exactly how many items in the chosen flexible preset
+ *                   (post-preset-selection; Batch 4b-a). Only emitted when
+ *                   a specific preset is locked (via user chip answer or
+ *                   `forcePresetId`) AND its capacity has min !== max.
+ *   5. palette    — visual style
+ *   6. data       — free-text answer to a live question about missing data
  *
  * `palette` is declared here for completeness but in practice is woven
  * in opportunistically by `decide.ts` rather than being asked outright —
  * see the decide function's topic-priority comment.
  */
-export type ClarifyTopic = 'family' | 'preset' | 'count' | 'palette' | 'data';
+export type ClarifyTopic = 'family' | 'preset' | 'count' | 'item-count' | 'palette' | 'data';
 
 /**
  * Structural families recognised by the preset catalogue. Mirrors the
@@ -94,6 +99,15 @@ export interface ClarifyRequest {
   text: string;
   /** All answers given so far in this clarify session. Empty on round 1. */
   priorAnswers?: ClarifyAnswer[];
+  /**
+   * Batch 4b-a — when the caller already knows which preset the user is
+   * targeting (e.g. they arrived via the template-first flow and picked
+   * a tile), pass its ID here. The clarifier will skip family and preset
+   * questions, ask `item-count` if the preset is flexible, and run
+   * template-first gap-filling (swimlane lane names, SIPOC centre, etc.)
+   * if the text is thin for the preset's slots.
+   */
+  forcePresetId?: string;
 }
 
 /**
