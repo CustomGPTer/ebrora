@@ -209,16 +209,52 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Draft cap (new documents only) ──────────────────────────────────────
+    // Auto-delete the oldest draft(s) when at or over the cap so the user
+    // never sees a "draft cap reached" error. This is Jon's explicit UX
+    // decision — rather than blocking the user and asking them to free up
+    // space, we silently roll over their drafts like a browser history.
+    //
+    // "Oldest" = lowest last_saved_at. Drafts the user has touched most
+    // recently are the ones they care about; the stale ones at the bottom
+    // of the list are the ones they haven't looked at in days.
+    //
+    // We delete enough rows to bring the count to DRAFT_CAP - 1, so that
+    // after the new draft is created below, the user is exactly at the cap
+    // (never over). Blob delete is best-effort per the pattern in
+    // src/app/api/visualise/drafts/[id]/route.ts — if blob cleanup fails
+    // we still remove the DB row so the user isn't blocked.
     if (!documentId) {
       const draftCount = await prisma.visualiseDocument.count({ where: { user_id: userId } });
       if (draftCount >= VISUALISE_DRAFT_CAP) {
-        return NextResponse.json(
-          {
-            error: `Draft cap reached (${VISUALISE_DRAFT_CAP}). Delete an existing draft before creating a new one.`,
-            draftLimit: VISUALISE_DRAFT_CAP,
-          },
-          { status: 409 },
-        );
+        const toDeleteCount = draftCount - VISUALISE_DRAFT_CAP + 1;
+        const stale = await prisma.visualiseDocument.findMany({
+          where: { user_id: userId },
+          orderBy: { last_saved_at: 'asc' },
+          take: toDeleteCount,
+          select: { id: true, blob_url: true },
+        });
+
+        for (const doc of stale) {
+          if (doc.blob_url) {
+            try {
+              await del(doc.blob_url);
+            } catch (err) {
+              console.warn('[visualise.generate] stale-draft blob delete failed', {
+                id: doc.id,
+                err,
+              });
+            }
+          }
+        }
+
+        if (stale.length > 0) {
+          await prisma.visualiseDocument.deleteMany({
+            where: { id: { in: stale.map((d) => d.id) } },
+          });
+          console.log(
+            `[visualise.generate] auto-deleted ${stale.length} stale draft(s) for user ${userId} to make room`,
+          );
+        }
       }
     }
 
