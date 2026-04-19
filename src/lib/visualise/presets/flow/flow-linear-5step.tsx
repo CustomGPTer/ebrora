@@ -8,13 +8,18 @@ import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
 import { getPalette, gradientSequence } from '../../palettes';
+import {
+  OrderingChip,
+  SEQUENTIAL_LABEL_MAX,
+  SEQUENTIAL_DETAIL_MAX,
+} from '../common';
 
 const dataSchema = z.object({
   steps: z
     .array(
       z.object({
-        label: z.string().min(1).max(32),
-        detail: z.string().max(100).optional(),
+        label: z.string().min(1).max(SEQUENTIAL_LABEL_MAX),
+        detail: z.string().max(SEQUENTIAL_DETAIL_MAX).optional(),
       }),
     )
     .length(5),
@@ -87,6 +92,17 @@ function Render({
               rx={7}
               ry={7}
               fill={fill}
+            />
+            {/* Batch 2a — ordering chip, top-left of the node rect. Slightly
+                smaller radius than 3/4-step because the boxes are narrower. */}
+            <OrderingChip
+              index={i}
+              cx={x + 10}
+              cy={nodeY + 10}
+              radius={8}
+              fill={palette.accent}
+              textColour={palette.accentText}
+              fontFamily={settings.font ?? 'Inter, sans-serif'}
             />
             <text
               x={x + nodeWidth / 2}

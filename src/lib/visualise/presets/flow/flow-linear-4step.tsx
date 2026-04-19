@@ -7,13 +7,18 @@ import { z } from 'zod';
 import type { ReactElement } from 'react';
 import type { Preset, PresetRenderProps } from '../types';
 import { getPalette, gradientSequence } from '../../palettes';
+import {
+  OrderingChip,
+  SEQUENTIAL_LABEL_MAX,
+  SEQUENTIAL_DETAIL_MAX,
+} from '../common';
 
 const dataSchema = z.object({
   steps: z
     .array(
       z.object({
-        label: z.string().min(1).max(40),
-        detail: z.string().max(120).optional(),
+        label: z.string().min(1).max(SEQUENTIAL_LABEL_MAX),
+        detail: z.string().max(SEQUENTIAL_DETAIL_MAX).optional(),
       }),
     )
     .length(4),
@@ -85,6 +90,16 @@ function FlowLinear4StepRender({
               rx={8}
               ry={8}
               fill={fill}
+            />
+            {/* Batch 2a — ordering chip. Sits at the top-left of the rect
+                so arrows between nodes don't get cluttered by it. */}
+            <OrderingChip
+              index={i}
+              cx={x + 12}
+              cy={nodeY + 12}
+              fill={palette.accent}
+              textColour={palette.accentText}
+              fontFamily={settings.font ?? 'Inter, sans-serif'}
             />
             <text
               x={x + nodeWidth / 2}
