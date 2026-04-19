@@ -275,15 +275,35 @@ export async function POST(req: NextRequest) {
       ? findVisualPresetId(existingBlob, visualId ?? '')
       : undefined;
 
+    // Batch CQ fix: if the user picked a specific preset via clarify, route
+    // it through the proven `forcePresetId` path rather than the clarify
+    // constraints block. The force-preset path has been reliable for
+    // months; the "use this preset as FIRST choice" wording in the clarify
+    // block was causing variant-mode schema drift ("AI response failed
+    // top-level validation (variant mode)" errors). Family / count /
+    // palette / data answers continue through the clarify block — those
+    // are lighter hints that don't conflict with the response schema.
+    let effectiveForcePresetId = forcePresetId;
+    let effectiveClarifyAnswers = clarifyAnswers;
+    if (!isRegenerate && clarifyAnswers && !forcePresetId) {
+      const presetAnswer = clarifyAnswers.find(
+        (a) => a.topic === 'preset' && a.value && a.value !== 'unknown',
+      );
+      if (presetAnswer) {
+        effectiveForcePresetId = presetAnswer.value;
+        effectiveClarifyAnswers = clarifyAnswers.filter((a) => a.topic !== 'preset');
+      }
+    }
+
     const systemPrompt = buildSystemPrompt({
-      forcePresetId,
+      forcePresetId: effectiveForcePresetId,
       visualCount: resolveCount(visualCountPreference, isRegenerate),
       regenerateFrom: regeneratingFromPresetId ?? undefined,
       variantMode: useVariantMode,
       // Batch CQ: clarifyAnswers are ignored in regenerate mode — the existing
       // visual already has a preset, so re-applying clarify hints could produce
       // a mismatched swap. Only threaded through for fresh generations.
-      clarifyAnswers: isRegenerate ? undefined : clarifyAnswers,
+      clarifyAnswers: isRegenerate ? undefined : effectiveClarifyAnswers,
     });
 
     // ── Call OpenAI with JSON retry loop ────────────────────────────────────
@@ -329,7 +349,68 @@ export async function POST(req: NextRequest) {
     let dropResult;
     let aiDocumentTitle: string;
     if (useVariantMode) {
-      const parsedVariant = parseVariantAiResponse(documentContent);
+      let parsedVariant = parseVariantAiResponse(documentContent);
+
+      // Batch CQ safety net: if variant-mode validation failed AND clarify
+      // hints were present, retry once with clarify stripped. The clarify
+      // constraints block can occasionally confuse the AI about the
+      // variant-mode response shape — this fallback ensures a bad clarify
+      // interaction can't permanently block generation. We don't do this
+      // fallback for the legacy (non-variant) branch because its schema is
+      // looser and drift is vanishingly rare.
+      if (
+        !parsedVariant.success &&
+        effectiveClarifyAnswers &&
+        effectiveClarifyAnswers.length > 0
+      ) {
+        console.warn(
+          '[visualise] variant-mode validation failed WITH clarify hints — retrying once without hints',
+        );
+        const fallbackSystemPrompt = buildSystemPrompt({
+          forcePresetId: effectiveForcePresetId,
+          visualCount: resolveCount(visualCountPreference, isRegenerate),
+          regenerateFrom: regeneratingFromPresetId ?? undefined,
+          variantMode: useVariantMode,
+          clarifyAnswers: undefined,
+        });
+        const fallbackMessages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+          { role: 'system', content: fallbackSystemPrompt },
+          { role: 'user', content: userMessage },
+        ];
+        let fallbackContent: unknown = null;
+        let fallbackRetryCount = 0;
+        while (fallbackRetryCount <= MAX_RETRIES) {
+          const fallbackCompletion = await openai.chat.completions.create({
+            model: 'gpt-4.1',
+            messages: fallbackMessages,
+            temperature: 0.5,
+            max_tokens: 16000,
+            response_format: { type: 'json_object' },
+          });
+          const fallbackText = fallbackCompletion.choices[0]?.message?.content;
+          if (!fallbackText) break;
+          try {
+            fallbackContent = JSON.parse(fallbackText);
+            break;
+          } catch {
+            if (fallbackRetryCount >= MAX_RETRIES) break;
+            fallbackMessages.push({ role: 'assistant', content: fallbackText });
+            fallbackMessages.push({
+              role: 'user',
+              content:
+                'Your response was not valid JSON. Please respond with ONLY a valid JSON object — no markdown, no code fences, no commentary.',
+            });
+            fallbackRetryCount++;
+          }
+        }
+        if (fallbackContent) {
+          parsedVariant = parseVariantAiResponse(fallbackContent);
+          if (parsedVariant.success) {
+            documentContent = fallbackContent;
+          }
+        }
+      }
+
       if (!parsedVariant.success) {
         await markFailed(generationId, `Variant AI response invalid: ${parsedVariant.error.message}`);
         return NextResponse.json(
