@@ -214,28 +214,69 @@ export interface DecideOptions {
 
 /**
  * Batch 4b-a — build an item-count question dynamically for a locked preset.
- * Chips are bounded by the preset's capacity range, capped at 10 chips to
- * stay visually sensible in the ClarifyPanel chip row.
+ * Chips are bounded by the preset's flexible dimension, capped at 10 chips
+ * plus a "Not sure" chip to stay visually sensible in the ClarifyPanel row.
  *
- * Returns null if the preset is not flexible (min === max) or has no
- * capacity entry — callers should skip item-count in those cases.
+ * Batch 4c hotfix — if the PRIMARY dimension is fixed (e.g. pros-cons has
+ * `primary: { min: 2, max: 2 }` because there are always 2 sides), but the
+ * SECONDARY dimension is flexible (e.g. 1–6 points per side), ask about the
+ * secondary dimension instead. Previously the function returned null for
+ * these presets and the AI just picked whatever it wanted — often 3 of
+ * each when the user wanted 5 or 6.
+ *
+ * Priority: primary if flexible (covers all Batch 4a consolidated presets
+ * and anything else with `primary.min < primary.max`); otherwise secondary
+ * if flexible; otherwise return null (fully fixed preset — nothing to ask).
+ *
+ * When both are flexible (only `table-clean` as of writing), primary wins —
+ * columns are the more impactful structural choice than rows.
  */
 function buildItemCountQuestion(presetId: string, round: number): ClarifyQuestion | null {
   const cap = getCapacity(presetId);
   if (!cap) return null;
-  const { min, max } = cap.primary;
-  if (min >= max) return null;
 
-  const unit = cap.primaryUnit;
+  // Pick the flexible dimension — primary first, then secondary.
+  let min: number;
+  let max: number;
+  let unit: string;
+  if (cap.primary.min < cap.primary.max) {
+    min = cap.primary.min;
+    max = cap.primary.max;
+    unit = cap.primaryUnit;
+  } else if (cap.secondary && cap.secondary.min < cap.secondary.max) {
+    min = cap.secondary.min;
+    max = cap.secondary.max;
+    unit = cap.secondary.unit;
+  } else {
+    return null;
+  }
+
   const chips = [] as { value: string; label: string }[];
   for (let n = min; n <= max; n += 1) {
     chips.push({ value: String(n), label: String(n) });
   }
   chips.push({ value: 'unknown', label: 'Not sure' });
 
+  // Phrase the prompt naturally. Secondary units are already phrased as
+  // compound nouns ("point per side" / "step per lane" / "item per column")
+  // in the capacity manifest — the correct plural is "points per side"
+  // (pluralise the head noun), not "point per sides" (pluralise the whole
+  // phrase). Primary units are bare singulars so simple 's' suffix works.
+  // If a unit already ends in 's' we leave it alone.
+  function pluralise(u: string): string {
+    const perIdx = u.indexOf(' per ');
+    if (perIdx > 0) {
+      const head = u.slice(0, perIdx);
+      const tail = u.slice(perIdx);
+      return head.endsWith('s') ? u : `${head}s${tail}`;
+    }
+    return u.endsWith('s') ? u : `${u}s`;
+  }
+  const pluralUnit = pluralise(unit);
+
   return {
     topic: 'item-count',
-    prompt: `How many ${unit}s? (${min}–${max})`,
+    prompt: `How many ${pluralUnit}? (${min}–${max})`,
     chips,
     round,
   };

@@ -96,21 +96,41 @@ export async function generateQuestion(
   // Batch 4b-a — when a preset is locked, compute its context block for the
   // system prompt. Gives the AI enough detail to ask preset-specific
   // item-count or data questions instead of generic family/preset ones.
+  //
+  // Batch 4c hotfix — `flexible-count` was previously derived from ONLY the
+  // primary capacity dimension. Some presets (pros-cons, swimlanes, sipoc,
+  // matrices, raci, roadmap-quarters) have a fixed primary but a flexible
+  // secondary — those presets need item-count asked on the secondary
+  // dimension, not skipped. Now derived from whichever dimension is
+  // flexible, with a range hint in the prompt so the AI emits chips
+  // bounded correctly.
   let lockedPresetBlock = '';
   if (forcePresetId) {
     const preset = getPresetById(forcePresetId);
     const cap = getCapacity(forcePresetId);
     if (preset && cap) {
-      const flexible = cap.primary.min < cap.primary.max;
+      // Determine which dimension (if any) is flexible — primary wins if
+      // both are flexible. Matches decide.ts's buildItemCountQuestion logic.
+      let flexRange: { min: number; max: number; unit: string } | null = null;
+      if (cap.primary.min < cap.primary.max) {
+        flexRange = { min: cap.primary.min, max: cap.primary.max, unit: cap.primaryUnit };
+      } else if (cap.secondary && cap.secondary.min < cap.secondary.max) {
+        flexRange = { min: cap.secondary.min, max: cap.secondary.max, unit: cap.secondary.unit };
+      }
+
+      const flexLine = flexRange
+        ? `yes — ${flexRange.min}–${flexRange.max} ${flexRange.unit}(s). If the text is ambiguous about how many, ask item-count with chips covering ${flexRange.min}…${flexRange.max} plus a "Not sure" chip with value "unknown".`
+        : 'no — all dimensions are fixed. Do NOT ask about count.';
+
       lockedPresetBlock = `\n\nLOCKED PRESET (user has already picked this):
   id: ${preset.id}
   name: ${preset.name}
   capacity: ${describeCapacityForAi(preset.id)}
-  flexible-count: ${flexible ? 'yes — you MAY ask item-count if the source text is ambiguous about count' : 'no — do NOT ask about count'}
+  flexible-count: ${flexLine}
   description: ${preset.description}
 When a preset is locked:
   - DO NOT ask "family" or "preset" — that decision is made.
-  - If flexible-count is yes AND the text doesn't make the count obvious, emit { action: "ask", question: { topic: "item-count", prompt: "...", chips: [{"value": "3", "label": "3"}, ...] } } with chips covering the preset's capacity range (and a "Not sure" chip with value "unknown").
+  - If flexible-count is yes AND the text doesn't make the count obvious, emit { action: "ask", question: { topic: "item-count", prompt: "...", chips: [...] } }.
   - If the preset has named slots the text doesn't fill (e.g. swimlane lane names, SIPOC process name, venn set names, quadrant axes), emit { action: "ask", question: { topic: "data", prompt: "...", placeholder: "..." } }.
   - Otherwise return { action: "generate" } immediately.`;
     }
