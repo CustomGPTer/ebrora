@@ -39,7 +39,7 @@
 // =============================================================================
 
 import { getAllPresets, type AnyPreset } from '@/lib/visualise/presets';
-import { describeCapacityForAi } from '@/lib/visualise/presets/capacity';
+import { describeCapacityForAi, getCapacity } from '@/lib/visualise/presets/capacity';
 import { PALETTE_IDS, PALETTE_AI_HINTS } from '@/lib/visualise/palettes';
 import { VISUALISE_MAX_VISUALS_PER_GENERATION } from '@/lib/visualise/constants';
 import {
@@ -107,7 +107,7 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions = {}): strin
 
   // Batch CQ: clarify answers become authoritative hints. The AI must honour
   // these even if its own reading of the text would prefer something else.
-  const clarifyBlock = buildClarifyConstraintsBlock(clarifyAnswers);
+  const clarifyBlock = buildClarifyConstraintsBlock(clarifyAnswers, forcePresetId);
   if (clarifyBlock) constraints.push(clarifyBlock);
 
   const conceptCountPhrase = visualCount
@@ -207,7 +207,7 @@ function buildVariantModePrompt(
 
   // Batch CQ: variant mode honours clarify answers the same way as the
   // single-shot branch. Authoritative over AI inference.
-  const clarifyBlock = buildClarifyConstraintsBlock(clarifyAnswers);
+  const clarifyBlock = buildClarifyConstraintsBlock(clarifyAnswers, forcePresetId);
   if (clarifyBlock) constraints.push(clarifyBlock);
 
   return `You are Visualise, an AI that turns short UK-construction-industry text into visual diagrams.
@@ -336,6 +336,7 @@ function buildPaletteList(): string {
  */
 function buildClarifyConstraintsBlock(
   clarifyAnswers: Array<{ topic: string; value: string }> | undefined,
+  forcePresetId?: string,
 ): string {
   if (!clarifyAnswers || clarifyAnswers.length === 0) return '';
 
@@ -343,6 +344,22 @@ function buildClarifyConstraintsBlock(
   // either, AI please decide" and shouldn't be hardcoded into the prompt.
   const useful = clarifyAnswers.filter((a) => a.value && a.value !== 'unknown');
   if (useful.length === 0) return '';
+
+  // Batch 4c hotfix — `item-count` may refer to either primary OR secondary
+  // dimension depending on which is flexible for the locked preset. Look up
+  // the dimension label so the instruction to the AI is precise ("5 points
+  // per side" for pros-cons, not just "5 items").
+  let itemCountDimension: string | null = null;
+  if (forcePresetId) {
+    const cap = getCapacity(forcePresetId);
+    if (cap) {
+      if (cap.primary.min < cap.primary.max) {
+        itemCountDimension = cap.primaryUnit;
+      } else if (cap.secondary && cap.secondary.min < cap.secondary.max) {
+        itemCountDimension = cap.secondary.unit;
+      }
+    }
+  }
 
   const lines: string[] = [];
   for (const a of useful) {
@@ -363,9 +380,20 @@ function buildClarifyConstraintsBlock(
         );
         break;
       case 'item-count':
-        lines.push(
-          `- The user has explicitly chosen ${a.value} items for the locked preset. You MUST generate exactly ${a.value} primary items — do not round up or down, do not add or drop items to fit a different layout aesthetic.`,
-        );
+        if (itemCountDimension) {
+          // Dimension known — precise instruction, AI has no room to misread.
+          lines.push(
+            `- The user has explicitly chosen ${a.value} ${itemCountDimension}(s) for the locked preset. You MUST generate exactly ${a.value} ${itemCountDimension}(s) — do not round up or down, do not add or drop items to fit a different layout aesthetic.`,
+          );
+        } else {
+          // Fallback for cases where forcePresetId wasn't passed in (older
+          // callers, or clarify answered via chip-chosen preset not
+          // forcePresetId). Keep the generic wording — the AI can still
+          // read the locked preset's aiDescription to infer what counts.
+          lines.push(
+            `- The user has explicitly chosen ${a.value} items for the locked preset. You MUST generate exactly ${a.value} primary items — do not round up or down, do not add or drop items to fit a different layout aesthetic.`,
+          );
+        }
         break;
       case 'palette':
         lines.push(`- The user picked palette "${a.value}". Use this palette for all visuals in the response.`);
