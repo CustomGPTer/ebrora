@@ -11,7 +11,7 @@
 // for soft-delete. A hidden node is still present in the preset's data + the
 // canvas state, but rendered with `display: none` by CanvasEditor's DOM
 // transform effect. Reversible via undo. Fixed-length preset schemas (e.g.
-// `flow-linear-4step` requires exactly 4 steps) can't accept hard-delete,
+// `flow-swimlane-2lane` requires exactly 2 lanes) can't accept hard-delete,
 // so every preset supports soft-hide uniformly.
 //
 // AMENDMENT (Batch 10 — "Variants & Sub-text"):
