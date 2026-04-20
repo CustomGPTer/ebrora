@@ -130,9 +130,15 @@ function gridLetterToEN(letters: string): [number, number] | null {
   const l1 = letters[0].toUpperCase();
   const l2 = letters[1].toUpperCase();
   
+  // OS National Grid skips the letter 'I' in both positions. Returning -1
+  // for any input containing 'I' causes gridLetterToEN to return null below.
+  // (Bug fix: previously letterIndex returned 8 for both 'I' and 'J', so any
+  //  reference like "IA" would silently decode as the "JA" grid square.)
   const letterIndex = (c: string): number => {
-    const code = c.charCodeAt(0) - 65; // A=0
-    return code > 8 ? code - 1 : code; // skip I
+    if (c === "I") return -1;                      // reject 'I'
+    const code = c.charCodeAt(0) - 65;             // A=0
+    if (code < 0 || code > 25) return -1;          // only A-Z valid
+    return code > 8 ? code - 1 : code;             // skip I in indexing
   };
   
   const i1 = letterIndex(l1);

@@ -102,8 +102,8 @@ export const CONTROL_MEASURES: ControlMeasure[] = [
   { id: "lev_booth", name: "LEV / extraction booth", hierarchy: 3, hierarchyLabel: "Engineering", reductionFactor: 0.05, practicality: "low", costRating: 3, notes: "Enclosed extraction booth for workshop cutting. Reduces exposure ~95%." },
   { id: "enclosure", name: "Full enclosure of process", hierarchy: 3, hierarchyLabel: "Engineering", reductionFactor: 0.05, practicality: "low", costRating: 3, notes: "Total enclosure with extraction. Highest engineering control." },
   { id: "ventilation", name: "General forced ventilation", hierarchy: 3, hierarchyLabel: "Engineering", reductionFactor: 0.5, practicality: "medium", costRating: 2, notes: "Fans and ducting to dilute and remove airborne dust. Less effective than LEV." },
-  { id: "reduce_duration", name: "Reduce exposure duration (rotation)", hierarchy: 4, hierarchyLabel: "Administrative", reductionFactor: 0.7, practicality: "high", costRating: 1, notes: "Job rotation, task scheduling to limit individual exposure time." },
-  { id: "segregation", name: "Segregation (exclusion zone)", hierarchy: 4, hierarchyLabel: "Administrative", reductionFactor: 0.6, practicality: "high", costRating: 1, notes: "Keep non-essential workers away from dust-generating area. Barriers and signage." },
+  { id: "reduce_duration", name: "Reduce exposure duration (rotation)", hierarchy: 4, hierarchyLabel: "Administrative", reductionFactor: 1.0, practicality: "high", costRating: 1, notes: "NOTE: This is a TIME control, not a concentration control. Model its effect by REDUCING THE TASK DURATION in the task schedule above (e.g. from 240 min to 120 min). Selecting this alone does not reduce calculated concentration." },
+  { id: "segregation", name: "Segregation (exclusion zone)", hierarchy: 4, hierarchyLabel: "Administrative", reductionFactor: 1.0, practicality: "high", costRating: 1, notes: "NOTE: This is a SCOPE / BYSTANDER control — it protects non-essential workers, not the operator doing the task. It does not reduce the operator's exposure concentration. Record on the risk assessment separately." },
   { id: "damp_sweep", name: "Damp sweeping / vacuum (not dry sweep)", hierarchy: 4, hierarchyLabel: "Administrative", reductionFactor: 0.7, practicality: "high", costRating: 1, notes: "Avoid dry sweeping which resuspends settled dust." },
 ];
 
@@ -168,15 +168,29 @@ export function applyControls(
   controlIds: string[]
 ): number {
   if (controlIds.length === 0) return uncontrolled;
-  // Apply controls multiplicatively (each reduces the remaining exposure)
-  let concentration = uncontrolled;
+  // Apply controls multiplicatively, BUT cap the cumulative reduction at
+  // 95 % (floor factor 0.05). Stacking water suppression + LEV + general
+  // ventilation naively multiplies to 0.0075 (99.25 % reduction) which
+  // overstates what real-world control combinations achieve — published
+  // studies (HSE INDG463, HSE RR1071 on tool-mounted LEV) typically find
+  // 85–95 % reduction even when multiple engineering controls are in
+  // place. The floor reflects that no combination of engineering /
+  // administrative controls alone (i.e. short of elimination) will
+  // reliably eliminate exposure — PPE is always required as a backstop.
+  // Elimination (reductionFactor = 0) is NOT capped — zero exposure is
+  // achievable when the task is entirely avoided.
+  const MIN_CUMULATIVE_FACTOR = 0.05;
+  let cumulativeFactor = 1;
+  let hasElimination = false;
   for (const cid of controlIds) {
     const ctrl = CONTROL_MEASURES.find(c => c.id === cid);
-    if (ctrl) {
-      concentration *= ctrl.reductionFactor;
-    }
+    if (!ctrl) continue;
+    if (ctrl.reductionFactor === 0) { hasElimination = true; break; }
+    cumulativeFactor *= ctrl.reductionFactor;
   }
-  return concentration;
+  if (hasElimination) return 0;
+  if (cumulativeFactor < MIN_CUMULATIVE_FACTOR) cumulativeFactor = MIN_CUMULATIVE_FACTOR;
+  return uncontrolled * cumulativeFactor;
 }
 
 /** Calculate time (minutes) to reach a given WEL at a given concentration */

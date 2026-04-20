@@ -38,10 +38,14 @@ export interface PartHGradient {
 }
 
 export const PART_H_GRADIENTS: PartHGradient[] = [
-  { diameterMM: 75, minGradient: 40, notes: "Waste pipe (individual appliance)" },
-  { diameterMM: 100, minGradient: 40, notes: "1 WC min. 1:40 (or 1:80 with min 1 WC)" },
-  { diameterMM: 150, minGradient: 150, notes: "Min 1:150 (or 1:80 preferred for self-cleansing)" },
-  { diameterMM: 225, minGradient: 225, notes: "Larger sewers - check self-cleansing velocity" },
+  { diameterMM: 75,  minGradient: 40,  notes: "Waste pipe (individual appliance) — 1:40 min per ADH Table 6" },
+  // ADH Table 6: 100mm pipe is 1:40 min for flows <1 L/s (no WC, low-flow branch),
+  // or 1:80 min for flows ≥1 L/s with at least one WC (WC flush provides scouring).
+  // Defaulting to 1:80 (the normal domestic case with a WC); user should tighten to
+  // 1:40 manually if designing a low-flow branch without a WC discharging into it.
+  { diameterMM: 100, minGradient: 80,  notes: "1:80 min where flow ≥1 L/s and ≥1 WC connected (normal domestic case); tighten to 1:40 for low-flow branches <1 L/s with no WC" },
+  { diameterMM: 150, minGradient: 150, notes: "1:150 min per ADH Table 6 (requires ≥5 WC or flow ≥1 L/s); 1:80 or steeper preferred for self-cleansing" },
+  { diameterMM: 225, minGradient: 225, notes: "Larger sewers — check self-cleansing velocity at minimum flow (see BS EN 16933-2)" },
 ];
 
 // ─── Proportional Depth Ratios ───────────────────────────────
@@ -217,14 +221,19 @@ export function runDesignChecks(
     });
   }
 
-  // Minimum velocity for foul
+  // Minimum design-flow velocity (BS EN 16933-2). This is a general minimum
+  // that applies primarily to surface water / combined sewers which actually
+  // run at or near full bore during design storms. Foul sewers are assessed
+  // by the self-cleansing check at 1/3 depth above (0.75 m/s), as foul
+  // sewers almost never run full bore. Retained here as an informational
+  // sanity check on the full-bore velocity regardless of sewer type.
   checks.push({
     id: "min_velocity",
-    label: "Minimum full-bore velocity (foul sewers)",
+    label: "Minimum full-bore velocity (design flow — surface water / combined)",
     value: `${fullBoreVelocity.toFixed(2)} m/s`,
-    threshold: ">= 0.6 m/s",
-    pass: fullBoreVelocity >= 0.6,
-    regulation: "BS EN 752 Clause 8.2",
+    threshold: ">= 0.7 m/s (foul sewers use self-cleansing check above)",
+    pass: fullBoreVelocity >= 0.7,
+    regulation: "BS EN 16933-2 / Sewerage Sector Guidance Appendix C",
   });
 
   return checks;

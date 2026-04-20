@@ -59,18 +59,25 @@ export interface DayworkResult {
 // ─── Constants ───────────────────────────────────────────────
 
 export const LABOUR_GRADES: LabourGrade[] = [
-  { id: "general",     label: "General Operative",   baseRate: 15.75 },
-  { id: "skilled",     label: "Skilled Operative",    baseRate: 17.50 },
-  { id: "craftsman",   label: "Craftsman",            baseRate: 18.75 },
-  { id: "chargehand",  label: "Chargehand",           baseRate: 19.85 },
-  { id: "foreman",     label: "Foreman",              baseRate: 21.50 },
-  { id: "plant-op",    label: "Plant Operator",       baseRate: 18.25 },
-  { id: "hgv-driver",  label: "HGV Driver",           baseRate: 17.80 },
-  { id: "banksman",    label: "Banksman / Slinger",   baseRate: 17.00 },
-  { id: "steel-fixer", label: "Steel Fixer",          baseRate: 19.25 },
-  { id: "pipelayer",   label: "Pipelayer",            baseRate: 18.50 },
-  { id: "shuttering",  label: "Shuttering Joiner",    baseRate: 19.50 },
-  { id: "custom",      label: "Custom / Other",       baseRate: 16.00 },
+  // CIJC Working Rule Agreement — Pay Promulgation effective 30 June 2025.
+  // These are the basic minimum hourly rates (WR.1). The percentage addition
+  // (see RICS_DEFAULTS) is added ON TOP to cover employer's NI, CITB levy,
+  // holiday pay, pension, travel, supervision, overheads, and profit.
+  // If your local rate is higher (e.g. London weighting, subcontractor rate,
+  // task-specific productivity rate), edit the base rate field inline and
+  // keep the percentage addition unchanged.
+  { id: "general",     label: "General Operative",   baseRate: 12.60 }, // CIJC General Operative (1260p)
+  { id: "skilled",     label: "Skilled Operative (SR2)", baseRate: 14.52 }, // CIJC Skill Rate 2 (1452p)
+  { id: "craftsman",   label: "Craftsman",            baseRate: 15.83 }, // CIJC Craft Rate (1583p)
+  { id: "chargehand",  label: "Chargehand",           baseRate: 16.60 }, // Craft + ~5% supervisory differential
+  { id: "foreman",     label: "Foreman",              baseRate: 18.00 }, // Site supervisory — above craft
+  { id: "plant-op",    label: "Plant Operator (SR3)", baseRate: 13.58 }, // CIJC Skill Rate 3 (1358p)
+  { id: "hgv-driver",  label: "HGV Driver (SR3)",     baseRate: 13.58 }, // CIJC Skill Rate 3 (1358p)
+  { id: "banksman",    label: "Banksman / Slinger (SR4)", baseRate: 12.84 }, // CIJC Skill Rate 4 (1284p)
+  { id: "steel-fixer", label: "Steel Fixer (Craft)",  baseRate: 15.83 }, // CIJC Craft Rate
+  { id: "pipelayer",   label: "Pipelayer (SR2)",      baseRate: 14.52 }, // CIJC Skill Rate 2
+  { id: "shuttering",  label: "Shuttering Joiner (Craft)", baseRate: 15.83 }, // CIJC Craft Rate
+  { id: "custom",      label: "Custom / Other",       baseRate: 13.00 },
 ];
 
 /** RICS default percentage additions — Civil Engineering vs Building */
