@@ -134,13 +134,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 changeFrequency: 'monthly',
                 priority: 0.8,
       },
-      {
-                // Visualise — AI visual document creator (Starter+)
-                url: `${baseUrl}/visualise`,
-                lastModified: new Date(),
-                changeFrequency: 'weekly',
-                priority: 0.9,
-      },
+      // Visualise — intentionally excluded from sitemap.
+      // Route is hidden / direct-access-only; also noindexed in page metadata.
       {
                 url: `${baseUrl}/privacy-policy`,
                 lastModified: new Date('2025-01-01'),
