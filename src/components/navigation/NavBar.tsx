@@ -215,19 +215,8 @@ export function NavBar() {
                 />
               </div>
 
-              {/* Visualise (Batch 4 — new top-level feature with "New" badge) */}
-              <Link
-                href="/visualise"
-                className={`group relative ${linkClass(isActive("/visualise"))}`}
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  Visualise
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#D4A44C] bg-[#FDF6E8] px-1.5 py-0.5 rounded leading-none">
-                    New
-                  </span>
-                </span>
-                <span className={underlineClass(isActive("/visualise"))} />
-              </Link>
+              {/* Visualise — intentionally hidden from navigation.
+                  Route still exists at /visualise for direct access only. */}
 
               {/* Blog */}
               <Link href="/blog" className={`group ${linkClass(isActive("/blog"))}`}>
