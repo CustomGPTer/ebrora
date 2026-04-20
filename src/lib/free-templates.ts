@@ -30,8 +30,11 @@ import type { FtCategory, FtSubcategory } from "@/data/free-template-categories"
 export interface FtTemplateFile {
   /** Display title (auto-generated from filename) */
   title: string;
-  /** URL-safe slug derived from template-name portion of filename */
+  /** URL-safe slug derived from template-name portion of filename.
+   *  May include a `-${fileType}` suffix to disambiguate xlsx/docx pairs. */
   slug: string;
+  /** Clean slug without the disambiguation suffix — used for download filenames. */
+  baseSlug: string;
   /** Original full filename with extension (e.g. cat--subcat--name.xlsx) */
   fileName: string;
   /** File extension without dot, lowercase: xlsx, xlsm, docx, pptx, pdf */
@@ -180,6 +183,15 @@ function parseFlatFilename(fileName: string): ParsedFlatFile | null {
 /**
  * Scan the flat data/free-templates/ directory and build a lookup map:
  * Map<categorySlug, Map<subcategorySlug, FtTemplateFile[]>>
+ *
+ * COLLISION HANDLING:
+ *   When two files share the same (category, subcategory, base slug) — e.g.
+ *   `...--concrete-pour-record-sheet.xlsx` and `...--concrete-pour-record-sheet.docx` —
+ *   both would produce the same URL and only one would ever render. To avoid this,
+ *   we do a two-pass scan: first collect every parsed file, then assign slugs.
+ *   Templates with a unique base slug in their subcategory keep the clean slug
+ *   (preserves existing URLs / SEO). Colliding templates get the file type
+ *   appended, e.g. `concrete-pour-record-sheet-xlsx` and `concrete-pour-record-sheet-docx`.
  */
 function scanFlatDir(): Map<string, Map<string, FtTemplateFile[]>> {
   const result = new Map<string, Map<string, FtTemplateFile[]>>();
@@ -187,6 +199,16 @@ function scanFlatDir(): Map<string, Map<string, FtTemplateFile[]>> {
   if (!fs.existsSync(BASE_DIR)) return result;
 
   const entries = fs.readdirSync(BASE_DIR, { withFileTypes: true });
+
+  // ── Pass 1: parse every file and group by (cat, subcat, baseSlug) ──
+  interface StagedEntry {
+    parsed: ParsedFlatFile;
+    baseSlug: string;
+    fileType: string;
+  }
+  const staged: StagedEntry[] = [];
+  // key = `${categorySlug}::${subcategorySlug}::${baseSlug}`
+  const collisionCounts = new Map<string, number>();
 
   for (const entry of entries) {
     if (!entry.isFile()) continue;
@@ -196,12 +218,28 @@ function scanFlatDir(): Map<string, Map<string, FtTemplateFile[]>> {
     const parsed = parseFlatFilename(entry.name);
     if (!parsed) continue;
 
-    const { categorySlug, subcategorySlug, templateNameSlug, fileName, ext, filePath } = parsed;
+    const baseSlug = parsed.templateNameSlug
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+    const fileType = parsed.ext.slice(1);
 
-    const fileType = ext.slice(1);
+    staged.push({ parsed, baseSlug, fileType });
+
+    const key = `${parsed.categorySlug}::${parsed.subcategorySlug}::${baseSlug}`;
+    collisionCounts.set(key, (collisionCounts.get(key) ?? 0) + 1);
+  }
+
+  // ── Pass 2: build FtTemplateFile objects with collision-aware slugs ──
+  for (const { parsed, baseSlug, fileType } of staged) {
+    const { categorySlug, subcategorySlug, templateNameSlug, fileName, filePath } = parsed;
+
+    const key = `${categorySlug}::${subcategorySlug}::${baseSlug}`;
+    const hasCollision = (collisionCounts.get(key) ?? 0) > 1;
+    const slug = hasCollision ? `${baseSlug}-${fileType}` : baseSlug;
+
     const fileSize = getFileSize(filePath);
     const preview = findPreview(filePath);
-    const slug = templateNameSlug.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     const title = slugToTitle(templateNameSlug);
     const description = `Free ${FILE_TYPE_LABELS[fileType] || fileType.toUpperCase()} template: ${title}. Download for UK construction sites.`;
 
@@ -212,6 +250,7 @@ function scanFlatDir(): Map<string, Map<string, FtTemplateFile[]>> {
     const template: FtTemplateFile = {
       title,
       slug,
+      baseSlug,
       fileName,
       fileType,
       fileTypeLabel: FILE_TYPE_LABELS[fileType] || fileType.toUpperCase(),
