@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: 'Visualise — AI Visual Document Creator for UK Construction | Ebrora',
   description:
     'Turn text into professional construction diagrams in seconds. Flowcharts, timelines, org charts, risk matrices, CDM hierarchies, and more. AI-powered. Dozens of presets. Fully editable canvas.',
+  // Hidden route — not linked from site navigation, not in sitemap.
+  // Tell search engines not to index even if they find it (e.g. via referrer).
+  robots: { index: false, follow: false },
   alternates: { canonical: 'https://www.ebrora.com/visualise' },
   openGraph: {
     title: 'Visualise | Ebrora',
