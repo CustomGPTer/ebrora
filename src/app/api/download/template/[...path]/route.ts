@@ -167,8 +167,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
  
     const contentType = CONTENT_TYPES[template.fileType] || "application/octet-stream";
  
-    // User-friendly download name (just the template-name part, not the full flat filename)
-    const friendlyName = `${template.slug}.${template.fileType}`;
+    // User-friendly download name (just the template-name part, not the full flat filename).
+    // Use baseSlug rather than slug so collision-disambiguated slugs like
+    // "concrete-pour-record-sheet-xlsx" don't produce ugly filenames like
+    // "concrete-pour-record-sheet-xlsx.xlsx".
+    const friendlyName = `${template.baseSlug}.${template.fileType}`;
  
     return new NextResponse(fileBuffer, {
       status: 200,
