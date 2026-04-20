@@ -5,6 +5,7 @@ import { useState, useMemo, useCallback } from "react";
 import {
   powellCBRtoModulus, powellModulusToCBR,
   aashtoCBRtoModulus, aashtoModulusToCBR,
+  aashtoValidityWarning,
   southAfricanCBRtoModulus, southAfricanModulusToCBR,
   getSubgradeClass, SUBGRADE_CLASSES, SOIL_REFERENCES,
   generateChartData,
@@ -445,15 +446,27 @@ export default function CBRModulusConverterClient() {
               {(["powell", "aashto", "south_african"] as Method[]).map(m => {
                 const val = result.allMethods[m];
                 const isActive = m === method;
+                const aashtoOutOfRange = m === "aashto" && result.cbr > 10;
                 return (
-                  <div key={m} className={`rounded-lg border p-2 text-center ${isActive ? "bg-ebrora-light border-ebrora/30" : "bg-white border-gray-200"}`}>
+                  <div key={m} className={`rounded-lg border p-2 text-center ${isActive ? "bg-ebrora-light border-ebrora/30" : "bg-white border-gray-200"} ${aashtoOutOfRange ? "ring-1 ring-amber-400" : ""}`}>
                     <div className="text-[10px] font-semibold text-gray-500 uppercase">{m === "powell" ? "Powell" : m === "aashto" ? "AASHTO" : "SA"}</div>
                     <div className="text-base font-bold text-gray-800">{fmtNum(val, 1)}</div>
                     <div className="text-[10px] text-gray-400">{direction === "cbr_to_modulus" ? "MPa" : "%"}</div>
+                    {aashtoOutOfRange && <div className="text-[9px] text-amber-700 font-semibold mt-0.5">out of range</div>}
                   </div>
                 );
               })}
             </div>
+            {/* AASHTO validity warning — shown when CBR > 10 per the 1993 Guide */}
+            {(() => {
+              const warning = aashtoValidityWarning(result.cbr);
+              if (!warning) return null;
+              return (
+                <div className="mt-2 rounded-md bg-amber-50 border border-amber-200 p-2 text-[11px] text-amber-900 leading-snug">
+                  <strong className="font-semibold">AASHTO validity: </strong>{warning}
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
@@ -520,7 +533,7 @@ export default function CBRModulusConverterClient() {
 
       {/* Footer */}
       <div className="text-[11px] text-gray-400 leading-relaxed px-1 space-y-1">
-        <p>Conversion methods: Powell et al (1984) E = 17.6 x CBR^0.64 (MPa) per TRL Report 615 / DMRB HD 26; AASHTO (1993) MR = 1500 x CBR (psi); South African method E = 10 x CBR for CBR less than 5, E = 17.6 x CBR^0.64 for CBR 5 or greater. Subgrade classification per HD 26 (DMRB Volume 7, Section 2, Part 2).</p>
+        <p>Conversion methods: Powell et al (1984) E = 17.6 x CBR^0.64 (MPa) per TRL Laboratory Report 1132 / DMRB HD 26 (now CD 226); AASHTO (1993) Mr = 1500 x CBR (psi), valid for CBR ≤ 10 only per the AASHTO Guide; South African method E = 10 x CBR for CBR less than 5, E = 17.6 x CBR^0.64 for CBR 5 or greater, per TRH4 and CSRA TRH16. Subgrade classification per HD 26 (DMRB Volume 7, Section 2, Part 2).</p>
         <p>This tool provides indicative conversions based on published empirical relationships. Actual stiffness modulus depends on soil type, moisture content, stress state, and in-situ conditions. Laboratory testing (CBR per BS 1377, FWD testing, or plate bearing tests) should be used for design purposes.</p>
       </div>
     </div>
