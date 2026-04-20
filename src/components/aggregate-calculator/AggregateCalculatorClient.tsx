@@ -67,7 +67,7 @@ async function exportPDF(
   doc.rect(M, y - 2, CW, 5, "F");
   doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   const cols = [0, 8, 55, 80, 105, 130, 155, 185, 210, 240];
-  ["#", "Material", "Area (m²)", "Depth (mm)", "Density (t/m³)", "Compacted m³", "Loose m³", "Tonnes", "Wagons", "Bulk Bags"].forEach((h, i) => doc.text(h, M + cols[i], y + 1));
+  ["#", "Material", "Area (m²)", "Depth (mm)", "Comp. Density (t/m³)", "Compacted m³", "Loose m³", "Tonnes", "Wagons", "Bulk Bags"].forEach((h, i) => doc.text(h, M + cols[i], y + 1));
   y += 5.5; doc.setFont("helvetica", "normal");
 
   const active = rows.filter(r => { const res = calculateRow(r, wagonTonnes, bulkBagTonnes); return res.tonnes > 0; });
@@ -228,7 +228,7 @@ export default function AggregateCalculatorClient() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              {["Material", "Label", "Area (m²)", "Depth (mm)", "Density (t/m³)", "Tonnes", "Comp. m³", "Loose m³", "Wagons", "Bags", ""].map(h => (
+              {["Material", "Label", "Area (m²)", "Depth (mm)", "Compacted Density (t/m³)", "Tonnes", "Comp. m³", "Loose m³", "Wagons", "Bags", ""].map(h => (
                 <th key={h} className="px-2 py-2.5 text-center text-[11px] font-bold uppercase tracking-wide text-gray-500">{h}</th>
               ))}
             </tr>
@@ -314,7 +314,7 @@ export default function AggregateCalculatorClient() {
                   <input type="number" step={5} value={row.depth !== null ? row.depth * 1000 : ""} placeholder="0"
                     onChange={e => updateRow(row.id, { depth: e.target.value === "" ? null : parseFloat(e.target.value) / 1000 })}
                     className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg bg-blue-50/40 tabular-nums" /></div>
-                <div><label className="block text-[10px] text-gray-400 mb-0.5">Density (t/m³)</label>
+                <div><label className="block text-[10px] text-gray-400 mb-0.5">Compacted Density (t/m³)</label>
                   <input type="number" step={0.01} value={row.overrideDensity ?? ""} placeholder={String(mat?.compactedDensity || "")}
                     onChange={e => updateRow(row.id, { overrideDensity: e.target.value === "" ? null : parseFloat(e.target.value) })}
                     className="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg bg-blue-50/40 tabular-nums" /></div>
@@ -342,8 +342,7 @@ export default function AggregateCalculatorClient() {
       {/* Footer */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-          Densities are typical UK compacted values. Confirm with supplier for specific materials. Loose volumes calculated using bulking factors.
-          Wagon loads and bulk bags rounded up. This is a PAID tool — PDFs are white-label (no Ebrora branding).
+          Densities are typical UK <strong>compacted</strong> values (what sits in place after compaction) — suppliers often quote <em>loose/bulk</em> density which is 15–25% lower. If you enter a supplier's loose value in the override, tonnage will be under-stated. Loose volumes below are calculated using bulking factors. Wagon loads and bulk bags rounded up. This is a PAID tool — PDFs are white-label (no Ebrora branding).
         </p>
       </div>
     </div>
