@@ -137,7 +137,7 @@ export const SHAPES: ShapeDef[] = [
       { id: "riser", label: "Riser Height", unit: "m", step: 0.01, placeholder: "0.15" },
       { id: "going", label: "Going (tread depth)", unit: "m", step: 0.01, placeholder: "0.25" },
       { id: "numberOfSteps", label: "Number of Steps", unit: "no.", step: 1, placeholder: "12" },
-      { id: "waistThickness", label: "Waist Thickness", unit: "m", step: 0.01, placeholder: "0.15" },
+      { id: "waistThickness", label: "Waist Thickness (⊥ to slope)", unit: "m", step: 0.01, placeholder: "0.15" },
     ],
   },
 ];
@@ -202,8 +202,17 @@ export function calculateShapeVolume(shape: ShapeType, values: Record<string, nu
     case "pile-cap":
       return v("length") * v("width") * v("depth") * (v("quantity") || 1);
     case "steps": {
-      const stepVol = v("stepWidth") * v("going") * v("riser") * (v("numberOfSteps") || 1);
-      // Add waist volume (simplified as a slab under the steps)
+      // Each step (above the waist) is a right-triangular prism: base = going,
+      // height = riser, extruded across the stepWidth. Volume per step is
+      //   (going × riser) / 2 × stepWidth
+      // The previous formula omitted the × 0.5 factor, double-counting the
+      // step concrete as a rectangular prism and over-ordering by ~30 % on
+      // typical residential flights. FIXED.
+      const stepVol = v("stepWidth") * v("going") * v("riser") * (v("numberOfSteps") || 1) * 0.5;
+      // Waist is the sloped slab supporting the steps.
+      // IMPORTANT: waistThickness is measured PERPENDICULAR to the slope
+      // (UK drawing convention). Enter the slab thickness at right-angles to
+      // the sloped soffit, not a vertical dimension.
       const stairLength = v("going") * (v("numberOfSteps") || 1);
       const stairHeight = v("riser") * (v("numberOfSteps") || 1);
       const waistLength = Math.sqrt(stairLength ** 2 + stairHeight ** 2);

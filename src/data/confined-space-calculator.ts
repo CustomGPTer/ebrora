@@ -4,6 +4,9 @@
 /* ── Types ─────────────────────────────────────────────────────── */
 
 export interface RiskOption {
+  /** Stable identifier used by the risk-specific controls lookup. Do not change
+   *  these strings without updating RISK_SPECIFIC_CONTROLS keys. */
+  id?: string;
   label: string;
   weight: number;
 }
@@ -62,11 +65,11 @@ export const SCORING_SECTIONS: ScoringSection[] = [
     description: "Select all specified risks that are present. If none are present, this is not a confined space under the Regulations.",
     mode: "multi",
     options: [
-      { label: "Serious injury from fire or explosion", weight: 5 },
-      { label: "Loss of consciousness from increase in body temperature", weight: 5 },
-      { label: "Loss of consciousness or asphyxiation from gas, fume, vapour or lack of oxygen", weight: 5 },
-      { label: "Drowning from increase in liquid level", weight: 5 },
-      { label: "Asphyxiation from free-flowing solid or entrapment", weight: 5 },
+      { id: "fire_explosion",     label: "Serious injury from fire or explosion", weight: 5 },
+      { id: "temperature",        label: "Loss of consciousness from increase in body temperature", weight: 5 },
+      { id: "gas_fume",           label: "Loss of consciousness or asphyxiation from gas, fume, vapour or lack of oxygen", weight: 5 },
+      { id: "drowning",           label: "Drowning from increase in liquid level", weight: 5 },
+      { id: "free_flowing_solid", label: "Asphyxiation from free-flowing solid or entrapment", weight: 5 },
     ],
   },
   {
@@ -158,7 +161,7 @@ export const CATEGORY_REQUIREMENTS: Record<NCCategory, CategoryRequirements> = {
     qualification: "C&G 6160-01",
     rescuePlan: "Suitable emergency rescue plan in place",
     gasMonitoring: "Gas monitor requirements to be assessed and provided if necessary",
-    topMan: "No Top Man required provided those entering are provided with suitable means of communication and easy access/egress",
+    topMan: "HSE ACOP L101 recommends a person stationed outside the space for ALL confined-space entries regardless of risk category. At NC1 this may be reduced where good two-way communication and easy egress exist, but the duty-holder must be satisfied that competent external rescue is still available and that leaving no attendant is justified in the risk assessment.",
     healthAssessment: "Operatives health assessed to safety critical worker standard, where escape BA is to be worn",
     training: "Safety briefing required for those entering - to be delivered on site by a competent person who holds a Low Risk C&G 6160-01 qualification",
     firstAid: "Level 2 Emergency First Aid at Work Training",
@@ -178,7 +181,7 @@ export const CATEGORY_REQUIREMENTS: Record<NCCategory, CategoryRequirements> = {
     healthAssessment: "Operatives health assessed to safety critical worker standard, where escape BA is to be worn",
     training: "Level 2 Medium Risk C&G 6160-02 training required for those entering, and C&G 6160-04/09 for Entry Controller",
     firstAid: "Level 2 Emergency First Aid at Work Training",
-    baEscapeSet: "10-minute escape set may be required subject to possible atmosphere risk assessment",
+    baEscapeSet: "10-minute escape set required where the atmosphere risk assessment identifies any potential for toxic gases, flammable atmospheres, or oxygen deficiency — regardless of pre-entry test result, because atmospheres can change during work",
     ventilation: "Suitable means of access/egress provided (if not already available)",
     harness: "Not required",
     access: "Suitable means of access/egress provided (if not already available)",
@@ -315,7 +318,33 @@ export const RISK_SPECIFIC_CONTROLS: Record<string, RiskSpecificControl> = {
   },
 };
 
-/** Map foreseeable risk option index to risk-specific control key */
+/**
+ * Look up the risk-specific controls for a given foreseeable-risk option.
+ * Prefers the option's stable `id`; falls back to label match if `id` is
+ * missing (defensive — older data may not have the id field set).
+ */
+export function getRiskSpecificControls(option: RiskOption): RiskSpecificControl | null {
+  if (option.id && RISK_SPECIFIC_CONTROLS[option.id]) {
+    return RISK_SPECIFIC_CONTROLS[option.id];
+  }
+  // Fallback: label-based lookup for legacy callers
+  const labelMap: Record<string, string> = {
+    "Serious injury from fire or explosion": "fire_explosion",
+    "Loss of consciousness from increase in body temperature": "temperature",
+    "Loss of consciousness or asphyxiation from gas, fume, vapour or lack of oxygen": "gas_fume",
+    "Drowning from increase in liquid level": "drowning",
+    "Asphyxiation from free-flowing solid or entrapment": "free_flowing_solid",
+  };
+  const key = labelMap[option.label];
+  return key ? RISK_SPECIFIC_CONTROLS[key] ?? null : null;
+}
+
+/**
+ * @deprecated Use `getRiskSpecificControls(option)` with the option's `id`
+ * field instead. This index-based map silently breaks if the options array
+ * is reordered and is retained only for backwards compatibility with any
+ * existing callers.
+ */
 export const RISK_INDEX_TO_KEY: Record<number, string> = {
   0: "fire_explosion",
   1: "temperature",

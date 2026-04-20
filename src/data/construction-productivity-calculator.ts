@@ -67,11 +67,14 @@ export function getSkillFactor(skilled: number, general: number): number {
   const total = skilled + general;
   if (total === 0) return 0;
   const ratio = skilled / total;
-  if (ratio >= 0.6) return 1;
-  if (ratio >= 0.5) return 0.95;
-  if (ratio >= 0.4) return 0.9;
-  if (ratio >= 0.3) return 0.85;
-  return 0.8;
+  // Range 0.65–1.00 (35 % spread) reflects the 30–40 % productivity gap
+  // commonly cited between fully-skilled and fully-unskilled crews in UK
+  // productivity studies (CIRIA, Spon's).
+  if (ratio >= 0.6) return 1.00;
+  if (ratio >= 0.5) return 0.92;
+  if (ratio >= 0.4) return 0.85;
+  if (ratio >= 0.3) return 0.75;
+  return 0.65;
 }
 
 // ─── 9 Task Configurations ───────────────────────────────────────
@@ -106,7 +109,7 @@ export const TASKS: TaskConfig[] = [
       ]},
       { id: "floorsAbove", label: "Floors Above Ground", type: "number", min: 0, max: 30, step: 1, unit: "floors", placeholder: "0", helpText: "Height penalty: -5% per floor (min factor 0.5)" },
       { id: "craneAssist", label: "Crane Assistance", type: "select", options: [
-        { label: "Yes", value: 1.5 }, { label: "No", value: 1 },
+        { label: "Yes", value: 1.35 }, { label: "No", value: 1 },
       ]},
       { id: "rebarType", label: "Rebar Type", type: "select", options: [
         { label: "Standard Black Bar", value: 1 }, { label: "Epoxy-Coated", value: 0.95 },

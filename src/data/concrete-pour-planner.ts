@@ -186,6 +186,11 @@ export function calculatePour(inputs: PourInputs): PourResult {
   let cumulativeM3 = 0;
   let tacoExceedances = 0;
   let tacoCautions = 0;
+  // Track the last absolute discharge-end minute (no wrap at 1440) so the
+  // total pour duration remains accurate even if the pour crosses multiple
+  // midnights. The string dischargeEnd field wraps at 24h for display, but
+  // this counter does not.
+  let lastDischargeEndMinAbs = startMin;
 
   const onSiteEvents: { time: number; delta: number }[] = [];
   const wagonTripCount: number[] = new Array(fleetSize).fill(0);
@@ -263,6 +268,8 @@ export function calculatePour(inputs: PourInputs): PourResult {
 
     // Update pump free time
     pumpFreeAt[bestPump] = dischargeEndMin;
+    // Track absolute (non-wrapping) end time for accurate duration.
+    if (dischargeEndMin > lastDischargeEndMinAbs) lastDischargeEndMinAbs = dischargeEndMin;
 
     // Wagon departs, does round trip, arrives again
     const nextArrival = departMin + roundTripMinutes;
@@ -279,8 +286,6 @@ export function calculatePour(inputs: PourInputs): PourResult {
     if (current > peak) peak = current;
   }
 
-  const lastEndMin = schedule.length > 0 ? timeToMin(schedule[schedule.length - 1].dischargeEnd) : startMin;
-
   const pumpStats: PumpStats[] = activePumps.map((p, i) => ({
     pumpNumber: i + 1,
     label: p.label,
@@ -290,9 +295,12 @@ export function calculatePour(inputs: PourInputs): PourResult {
     busyMinutes: Math.round(pumpBusy[i]),
   }));
 
+  // Duration uses absolute minutes (never wraps) so multi-day pours stay accurate.
+  const totalPourDuration = schedule.length > 0 ? Math.max(0, lastDischargeEndMinAbs - startMin) : 0;
+
   return {
     totalLoads,
-    totalPourDuration: lastEndMin >= startMin ? lastEndMin - startMin : (1440 - startMin) + lastEndMin,
+    totalPourDuration,
     firstTruckArrival: minToTime(startMin),
     lastDischargeEnd: schedule.length > 0 ? schedule[schedule.length - 1].dischargeEnd : startTime,
     schedule,
