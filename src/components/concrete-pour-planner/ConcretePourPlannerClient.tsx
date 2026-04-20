@@ -345,13 +345,13 @@ export default function ConcretePourPlannerClient() {
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
             <h3 className="text-sm font-bold text-gray-700">Truck Dispatch Schedule</h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">{result.totalLoads} loads across {inputs.fleetSize} wagons and {result.pumpCount} pump{result.pumpCount > 1 ? "s" : ""}. Peak {result.peakWagonsOnSite} on-site simultaneously.</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">{result.totalLoads} loads across {inputs.fleetSize} wagons and {result.pumpCount} pump{result.pumpCount > 1 ? "s" : ""}. Peak {result.peakWagonsOnSite} on-site simultaneously. <span className="text-gray-500">“TACO” = Time As Charged Out (minutes from batching at the plant to start of discharge on site) — compared against the workability guideline.</span></p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-gray-200">
                 {["#", "Wagon", "Trip", "Pump", "Arrival", "Discharge", "End", "Depart", "Load", "Cumul.", "Wait", "TACO", "Progress"].map(h => (
-                  <th key={h} className="px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-wide text-gray-500">{h}</th>
+                  <th key={h} className="px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-wide text-gray-500" title={h === "TACO" ? "Time As Charged Out — minutes since batching at the plant" : undefined}>{h}</th>
                 ))}
               </tr></thead>
               <tbody className="divide-y divide-gray-50">
