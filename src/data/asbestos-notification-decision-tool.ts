@@ -462,12 +462,12 @@ export const DECISION_NODES: TreeNode[] = [
   },
   {
     id: "nnlw-or-nonlic",
-    question: "Will the work be sporadic and of low intensity, with a short duration (typically under 1 hour per task, no more than 2 hours total in any 7 days)?",
-    helpText: "The distinction between NNLW and non-licensed work depends on the duration and intensity of exposure. Short-duration, sporadic work with low fibre release is typically non-licensed. Longer or more intensive work is NNLW.",
-    regulation: "CAR 2012 Reg 3(2)",
+    question: "Will the work be sporadic and of low intensity, with a short duration (no more than 1 hour total in any 7 consecutive days per worker)?",
+    helpText: "Per HSE ACOP L143 and CAR 2012 Reg 3(2), work is non-licensed (and not notifiable) only where exposure is sporadic and low intensity AND the total working time on asbestos per worker does not exceed 1 hour in any 7 consecutive days. Longer or more intensive work is NNLW.",
+    regulation: "CAR 2012 Reg 3(2), HSE ACOP L143 paras 45–47",
     options: [
-      { label: "Yes -- short duration, sporadic, low intensity", terminalId: "non-licensed" },
-      { label: "No -- longer duration, repeated, or higher intensity", terminalId: "nnlw" },
+      { label: "Yes — ≤1 hour per worker in any 7 consecutive days, sporadic and low intensity", terminalId: "non-licensed" },
+      { label: "No — exceeds the 1-hour/7-day threshold, or not sporadic, or higher intensity", terminalId: "nnlw" },
       { label: "Not sure", description: "If in doubt, treat as NNLW (higher category)", terminalId: "nnlw" },
     ],
   },
