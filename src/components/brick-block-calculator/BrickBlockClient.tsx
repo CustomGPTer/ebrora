@@ -64,7 +64,8 @@ async function exportPDF(
     y += 5;
 
     doc.setFont("helvetica", "bold");
-    doc.text(`${unit?.category === "brick" ? "Bricks" : "Blocks"}: ${fmtNum(res.unitCount, 0)} | Mortar: ${fmtNum(res.mortarM3, 3)} m³ | Cement: ${res.cementBags} × 25kg bags | Sand: ${fmtNum(res.sandTonnes, 2)} t`, M, y);
+    const limeText = res.limeBags > 0 ? ` | Lime: ${res.limeBags} × 25kg bags` : "";
+    doc.text(`${unit?.category === "brick" ? "Bricks" : "Blocks"}: ${fmtNum(res.unitCount, 0)} | Mortar: ${fmtNum(res.mortarM3, 3)} m³ | Cement: ${res.cementBags} × 25kg bags${limeText} | Sand: ${fmtNum(res.sandTonnes, 2)} t`, M, y);
     doc.setFont("helvetica", "normal");
     y += 8;
   });
@@ -84,11 +85,14 @@ async function exportPDF(
   doc.setTextColor(0, 0, 0); y += 6;
 
   doc.setFontSize(6); doc.setDrawColor(200, 200, 200);
-  const totRows = [
+  const totRows: string[][] = [
     ["Net wall area", `${fmtNum(totals.netArea, 2)} m2`, "Cement (25kg bags)", `${totals.cementBags}`],
     ["Total units", `${fmtNum(totals.unitCount, 0)}`, "Sand", `${fmtNum(totals.sandTonnes, 2)} t`],
     ["Total mortar", `${fmtNum(totals.mortarM3, 3)} m3`, "", ""],
   ];
+  if (totals.limeBags > 0) {
+    totRows.splice(2, 0, ["", "", "Hydrated lime (25kg bags)", `${totals.limeBags}`]);
+  }
   for (const tr of totRows) {
     tcx = M;
     tr.forEach((t, i) => {
@@ -149,8 +153,8 @@ export default function BrickBlockClient() {
   const results = useMemo(() => rows.map(calculateWall), [rows]);
   const totals = useMemo(() => results.reduce((a, r) => ({
     grossArea: a.grossArea + r.grossArea, openingArea: a.openingArea + r.openingArea, netArea: a.netArea + r.netArea,
-    unitCount: a.unitCount + r.unitCount, mortarM3: a.mortarM3 + r.mortarM3, cementBags: a.cementBags + r.cementBags, sandTonnes: a.sandTonnes + r.sandTonnes,
-  }), { grossArea: 0, openingArea: 0, netArea: 0, unitCount: 0, mortarM3: 0, cementBags: 0, sandTonnes: 0 }), [results]);
+    unitCount: a.unitCount + r.unitCount, mortarM3: a.mortarM3 + r.mortarM3, cementBags: a.cementBags + r.cementBags, limeBags: a.limeBags + r.limeBags, sandTonnes: a.sandTonnes + r.sandTonnes,
+  }), { grossArea: 0, openingArea: 0, netArea: 0, unitCount: 0, mortarM3: 0, cementBags: 0, limeBags: 0, sandTonnes: 0 }), [results]);
   const hasData = totals.unitCount > 0;
 
   const handleExport = useCallback(async () => { setExporting(true); try { await exportPDF({ company, site, manager, preparedBy, date: assessDate }, rows, results, totals); } finally { setExporting(false); } }, [site, manager, preparedBy, assessDate, rows, results, totals]);
@@ -158,14 +162,15 @@ export default function BrickBlockClient() {
   return (
     <div className="space-y-5">
       {hasData && (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           {[
-            { label: "Total Units", value: fmtNum(totals.unitCount, 0), sub: `${fmtNum(totals.netArea, 1)} m² net`, bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-800", dot: "bg-amber-500" },
-            { label: "Net Area", value: `${fmtNum(totals.netArea, 1)} m²`, sub: `${fmtNum(totals.openingArea, 1)} m² deducted`, bg: "bg-slate-50", border: "border-slate-200", text: "text-slate-800", dot: "bg-slate-500" },
-            { label: "Mortar", value: `${fmtNum(totals.mortarM3, 3)} m³`, sub: "Total mortar volume", bg: "bg-gray-50", border: "border-gray-200", text: "text-gray-800", dot: "bg-gray-500" },
-            { label: "Cement", value: `${totals.cementBags} bags`, sub: "25kg bags", bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-800", dot: "bg-emerald-500" },
-            { label: "Sand", value: `${fmtNum(totals.sandTonnes, 2)} t`, sub: "Building sand", bg: "bg-yellow-50", border: "border-yellow-200", text: "text-yellow-800", dot: "bg-yellow-500" },
-          ].map(c => (
+            { label: "Total Units", value: fmtNum(totals.unitCount, 0), sub: `${fmtNum(totals.netArea, 1)} m² net`, bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-800", dot: "bg-amber-500", show: true },
+            { label: "Net Area", value: `${fmtNum(totals.netArea, 1)} m²`, sub: `${fmtNum(totals.openingArea, 1)} m² deducted`, bg: "bg-slate-50", border: "border-slate-200", text: "text-slate-800", dot: "bg-slate-500", show: true },
+            { label: "Mortar", value: `${fmtNum(totals.mortarM3, 3)} m³`, sub: "Total mortar volume", bg: "bg-gray-50", border: "border-gray-200", text: "text-gray-800", dot: "bg-gray-500", show: true },
+            { label: "Cement", value: `${totals.cementBags} bags`, sub: "25kg bags", bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-800", dot: "bg-emerald-500", show: true },
+            { label: "Lime", value: `${totals.limeBags} bags`, sub: "25kg hydrated lime", bg: "bg-stone-50", border: "border-stone-200", text: "text-stone-800", dot: "bg-stone-500", show: totals.limeBags > 0 },
+            { label: "Sand", value: `${fmtNum(totals.sandTonnes, 2)} t`, sub: "Building sand", bg: "bg-yellow-50", border: "border-yellow-200", text: "text-yellow-800", dot: "bg-yellow-500", show: true },
+          ].filter(c => c.show).map(c => (
             <div key={c.label} className={`border rounded-xl p-4 ${c.bg} ${c.border}`}>
               <div className="flex items-center gap-2 mb-2"><span className={`w-2.5 h-2.5 rounded-full ${c.dot}`} /><span className={`text-[11px] font-bold uppercase tracking-wide ${c.text}`}>{c.label}</span></div>
               <div className={`text-xl font-bold ${c.text}`}>{c.value}</div>
@@ -266,11 +271,14 @@ export default function BrickBlockClient() {
 
               {/* Row output */}
               {res.unitCount > 0 && (
-                <div className="bg-gray-50 rounded-xl p-3 grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+                <div className={`bg-gray-50 rounded-xl p-3 grid grid-cols-2 ${res.limeBags > 0 ? "sm:grid-cols-6" : "sm:grid-cols-5"} gap-3 text-xs`}>
                   <div><span className="text-gray-400">Net Area</span><div className="font-bold tabular-nums">{fmtNum(res.netArea, 1)} m²</div></div>
                   <div><span className="text-gray-400">{unit?.category === "brick" ? "Bricks" : "Blocks"}</span><div className="font-bold tabular-nums">{fmtNum(res.unitCount, 0)}</div></div>
                   <div><span className="text-gray-400">Mortar</span><div className="font-medium tabular-nums">{fmtNum(res.mortarM3, 3)} m³</div></div>
                   <div><span className="text-gray-400">Cement</span><div className="font-medium tabular-nums">{res.cementBags} bags</div></div>
+                  {res.limeBags > 0 && (
+                    <div><span className="text-gray-400">Lime</span><div className="font-medium tabular-nums">{res.limeBags} bags</div></div>
+                  )}
                   <div><span className="text-gray-400">Sand</span><div className="font-medium tabular-nums">{fmtNum(res.sandTonnes, 2)} t</div></div>
                 </div>
               )}
@@ -283,7 +291,7 @@ export default function BrickBlockClient() {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>Add Wall Section</button>
 
       <div className="pt-4 border-t border-gray-100"><p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-        Single-skin stretcher bond. Add 5–10% waste when ordering. Mortar quantities include bed and perp joints with 10mm joint width. White-label PDF.</p></div>
+        Single-skin stretcher bond. Mixes (M2 / M4 / M6 / M12) are BS 5628 cement:lime:sand by volume — hydrated lime is required for the designations as shown; substituting plasticiser changes the mix. Mortar quantities include bed and perp joints with 10mm joint width and scale with block thickness. Add 5–10% waste when ordering. White-label PDF.</p></div>
     </div>
   );
 }
