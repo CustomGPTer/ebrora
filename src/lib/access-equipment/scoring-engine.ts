@@ -104,8 +104,13 @@ export function rankEquipment(inputs: SelectorInputs): RankedEquipment[] {
     const frequencyMatch = f <= eq.maxFrequencyCode;
     if (!frequencyMatch) disqualifyReasons.push('Access frequency exceeds equipment suitability');
 
-    const environmentMatch = env === 1 ? eq.indoorAllowed : eq.outdoorAllowed;
-    if (!environmentMatch) disqualifyReasons.push(`Not suitable for ${env === 1 ? 'indoor' : 'outdoor'} use`);
+    // Environment matching is defensive: explicit handling for known codes (1 = indoor, 2 = outdoor).
+    // If a future code (e.g. 3 = both) is added, equipment must satisfy BOTH env flags to match.
+    const environmentMatch =
+      env === 1 ? eq.indoorAllowed :
+      env === 2 ? eq.outdoorAllowed :
+      (eq.indoorAllowed && eq.outdoorAllowed);
+    if (!environmentMatch) disqualifyReasons.push(`Not suitable for ${env === 1 ? 'indoor' : env === 2 ? 'outdoor' : 'mixed indoor/outdoor'} use`);
 
     const groundMatch = g <= eq.maxGroundCode;
     if (!groundMatch) disqualifyReasons.push('Ground conditions exceed equipment capability');
