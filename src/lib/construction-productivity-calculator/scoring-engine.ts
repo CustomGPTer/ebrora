@@ -29,7 +29,12 @@ export function calculateOutput(task: TaskConfig, inputs: TaskInputs): CalcBreak
   const constraintsFactor = getSelectFactor(CONSTRAINT_OPTIONS, inputs.constraints as string);
   const skillFactor = getSkillFactor(inputs.skilledOps, inputs.generalOps);
 
-  // Crew factor: for non-gang-based tasks, output scales by total crew
+  // Crew factor: for non-gang-based tasks, output scales with crew size
+  // following a sub-linear Cobb-Douglas form (exponent 0.85). Linear scaling
+  // over-states productivity because larger crews lose time to coordination
+  // overhead, workspace contention, and material-handling bottlenecks.
+  //   1 man:  1.00     2 men: 1.80     4 men: 3.25
+  //   8 men:  5.87    12 men: 8.29    20 men: 12.77
   const totalCrew = inputs.skilledOps + inputs.generalOps;
   let crewFactor = 1;
   let gangCount = 1;
@@ -38,7 +43,7 @@ export function calculateOutput(task: TaskConfig, inputs: TaskInputs): CalcBreak
     gangCount = (inputs.gangCount as number) || 1;
     crewFactor = 1; // gang-based = base rate is per gang, scaled by gang count
   } else {
-    crewFactor = totalCrew;
+    crewFactor = totalCrew > 0 ? Math.pow(totalCrew, 0.85) : 0;
     if (task.id === "muck-shift") crewFactor = 1; // muck shift is plant-driven, not crew-driven
   }
 
@@ -72,9 +77,19 @@ export function calculateOutput(task: TaskConfig, inputs: TaskInputs): CalcBreak
     }
 
     if (task.id === "muck-shift" && field.id === "haulDistance") {
-      // Haul penalty: -0.2 per 100m beyond 0
+      // Haul penalty: −20 %/100 m for the first 300 m (typical NRSWA/site
+      // movements), then exponential decay beyond 300 m to represent
+      // long-haul cycle-time growth. Hard floor at 0.20 prevents absurd
+      // zero-productivity outputs for extreme hauls but still lets 500 m,
+      // 1 km and 2 km give meaningfully different results (0.30, 0.20, 0.20).
       const haulM = (inputVal as number) || 0;
-      const haulPenalty = Math.max(1 - (haulM / 100) * 0.2, 0.4);
+      let haulPenalty: number;
+      if (haulM <= 300) {
+        haulPenalty = Math.max(1 - (haulM / 100) * 0.2, 0.4);
+      } else {
+        const excess = haulM - 300;
+        haulPenalty = Math.max(0.4 * Math.exp(-excess / 700), 0.2);
+      }
       taskFactors.push({ label: "Haul distance factor", value: haulPenalty });
       taskProduct *= haulPenalty;
       return;
@@ -109,9 +124,19 @@ export function calculateOutput(task: TaskConfig, inputs: TaskInputs): CalcBreak
     }
 
     if (field.id === "layerThickness" && task.id === "road-base-laying") {
+      // Thickness factor: 200 mm is the baseline calibrated rate.
+      //   Above 200 mm: −10 % per additional 100 mm, floor 0.5.
+      //   Below 200 mm: +10 % per 100 mm reduction, cap 1.25 (thinner
+      //   layers cover more area per m³ of material handled).
       const thickness = (inputVal as number) || 200;
-      const extra = Math.max(thickness - 200, 0);
-      const tf = Math.max(1 - (extra / 100) * 0.1, 0.5);
+      let tf: number;
+      if (thickness >= 200) {
+        const extra = thickness - 200;
+        tf = Math.max(1 - (extra / 100) * 0.1, 0.5);
+      } else {
+        const thin = 200 - thickness;
+        tf = Math.min(1 + (thin / 100) * 0.1, 1.25);
+      }
       taskFactors.push({ label: "Thickness factor", value: tf });
       taskProduct *= tf;
       return;
