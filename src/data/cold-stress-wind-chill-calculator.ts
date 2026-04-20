@@ -86,15 +86,21 @@ export function getRiskCategory(wci: number): RiskCategory {
 }
 
 // ─── Frostbite Risk Assessment ───────────────────────────────
-// Based on Environment Canada / US NWS frostbite charts
+// Based on Environment Canada / US NWS frostbite charts.
+// Published band boundaries (WCI in °C, exposed skin):
+//     > −27       No significant risk
+//   −27 to −39    Frostbite possible in ~30 minutes
+//   −40 to −47    Frostbite in ~10 minutes
+//   −48 to −54    Frostbite in 5–10 minutes (severe)
+//    ≤ −55        Frostbite in under 2 minutes (extreme)
 export function assessFrostbiteRisk(wci: number): FrostbiteRisk {
   if (wci > -27) {
     return { category: "none", label: "Low risk", timeMinutes: null, description: "Frostbite unlikely at this wind chill for normal exposure durations" };
   }
-  if (wci > -35) {
+  if (wci > -40) {
     return { category: "30min", label: "30 minutes", timeMinutes: 30, description: "Exposed skin can develop frostbite in approximately 30 minutes" };
   }
-  if (wci > -48) {
+  if (wci > -47) {
     return { category: "10min", label: "10 minutes", timeMinutes: 10, description: "Exposed skin can develop frostbite in approximately 10 minutes" };
   }
   if (wci > -55) {

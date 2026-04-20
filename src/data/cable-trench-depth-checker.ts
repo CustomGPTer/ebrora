@@ -475,7 +475,18 @@ export function calculateTrenchArrangement(
     return b.diameterMm - a.diameterMm;
   });
 
-  // Arrange horizontally with required separations
+  // Arrange horizontally with required separations.
+  // Build per-service counters so services of the same type are numbered
+  // globally (#1, #2, …) across the whole arrangement — not within a single
+  // entry. This fixes a labelling collision when the user splits the same
+  // service across multiple entries (e.g. two separate "BT Copper" entries
+  // would both show "#1" under the previous per-entry index).
+  const sameServiceCounts: Record<string, number> = {};
+  const sameServiceSeen: Record<string, number> = {};
+  for (const s of servicesWithCover) {
+    sameServiceCounts[s.serviceId] = (sameServiceCounts[s.serviceId] ?? 0) + 1;
+  }
+
   const arranged: ArrangedService[] = [];
   let xCursor = WALL_CLEARANCE; // start with wall clearance
 
@@ -484,15 +495,18 @@ export function calculateTrenchArrangement(
     const sType = SERVICE_TYPES.find(st => st.id === s.serviceId)!;
     const radius = s.diameterMm / 2;
 
-    // Calculate separation from previous service
+    // Separation from previous neighbour (edge-to-edge, per NJUG Vol 1).
+    // The diameter terms are applied by xCursor/radius geometry below — this
+    // value is purely the required gap between adjacent service surfaces.
     let sepFromPrev = 0;
     if (i > 0) {
       const prev = servicesWithCover[i - 1];
       const rule = getSeparation(prev.serviceId, s.serviceId);
       sepFromPrev = rule ? rule.minSeparation : 250;
-      // Add half diameters of both services (edge-to-edge separation)
     }
 
+    // xCursor tracks the right edge of the previously-placed service.
+    // Current service's left edge = xCursor + sepFromPrev; centre = left edge + radius.
     const xCentre = i === 0
       ? WALL_CLEARANCE + radius
       : xCursor + sepFromPrev + radius;
@@ -501,7 +515,11 @@ export function calculateTrenchArrangement(
     const topOfService = actualCover;
     const bottomOfService = actualCover + s.diameterMm;
 
-    const svcLabel = sType.shortLabel + (servicesWithCover.filter(sv => sv.serviceId === s.serviceId).length > 1 ? ` #${s.index + 1}` : "");
+    // Globally sequential label: BT Copper #1, BT Copper #2, … regardless of
+    // how many entries the user split the same service across.
+    const needsNumber = sameServiceCounts[s.serviceId] > 1;
+    sameServiceSeen[s.serviceId] = (sameServiceSeen[s.serviceId] ?? 0) + 1;
+    const svcLabel = sType.shortLabel + (needsNumber ? ` #${sameServiceSeen[s.serviceId]}` : "");
 
     arranged.push({
       entryId: s.entryId,
@@ -561,6 +579,18 @@ export function calculateTrenchArrangement(
     const serviceGroups = new Set(arranged.map(a => getServiceGroup(a.serviceId)));
     if (serviceGroups.has("water") && serviceGroups.has("drainage")) {
       warnings.push("CRITICAL: Potable water MUST be above foul drainage at all crossing points (Water UK standard).");
+
+      // Check the actual arranged cover depths: if water cover exceeds drainage
+      // cover, water would sit BELOW drainage, violating the rule. This can
+      // occur on private land (drainage minimum 500mm, water minimum 750mm
+      // for frost protection) unless the designer increases drainage depth.
+      const waterMin = Math.min(...arranged.filter(a => getServiceGroup(a.serviceId) === "water").map(a => a.coverDepth));
+      const drainageMin = Math.min(...arranged.filter(a => getServiceGroup(a.serviceId) === "drainage").map(a => a.coverDepth));
+      if (waterMin > drainageMin) {
+        warnings.push(
+          `CRITICAL CONFIGURATION CONFLICT: Water cover (${waterMin}mm) exceeds drainage cover (${drainageMin}mm) — at crossings the water main would pass BELOW the drain, violating Water UK. On this surface type, increase drainage cover to at least ${waterMin}mm (matching or deeper than water), or route crossings through separate depth bands.`
+        );
+      }
     }
     if (serviceGroups.has("hv-electricity")) {
       warnings.push("HV electricity crossings require cable tile protection and minimum 150mm vertical separation.");

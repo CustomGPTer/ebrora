@@ -1,8 +1,23 @@
 // src/data/cbr-modulus-converter.ts
+//
+// Three conversion methods between California Bearing Ratio (CBR %) and
+// resilient / elastic modulus (E or Mr, in MPa):
+//
+//   • Powell et al (1984) — TRL Laboratory Report 1132. UK/DMRB default.
+//     E (MPa) = 17.6 × CBR^0.64
+//     Stated validity: 2 < CBR < 12, but commonly extrapolated.
+//
+//   • AASHTO (1993) — Guide for Design of Pavement Structures, Part II.
+//     Mr (psi) = 1500 × CBR
+//     Stated validity: CBR ≤ 10 ONLY. Beyond CBR = 10 the relationship
+//     breaks down (Mr asymptotes); use site-specific testing.
+//
+//   • South African method — TRH4 (Structural Design of Flexible Pavements)
+//     and CSRA TRH16. Hybrid linear/power form.
 
 // ─── Conversion Methods ──────────────────────────────────────
 
-/** Powell et al (1984) — TRL/DMRB standard method */
+/** Powell et al (1984) — TRL Laboratory Report 1132, adopted in DMRB HD 26/CD 226 */
 export function powellCBRtoModulus(cbr: number): number {
   if (cbr <= 0) return 0;
   return 17.6 * Math.pow(cbr, 0.64);
@@ -14,7 +29,11 @@ export function powellModulusToCBR(modulus: number): number {
   return Math.pow(modulus / 17.6, 1 / 0.64);
 }
 
-/** AASHTO (1993): MR (psi) = 1500 x CBR, converted to MPa */
+/**
+ * AASHTO (1993): Mr (psi) = 1500 × CBR, converted to MPa.
+ * NOTE: valid only for CBR ≤ 10 per the 1993 AASHTO Guide; beyond that the
+ * linear relationship significantly overstates modulus (see aashtoWarning).
+ */
 export function aashtoCBRtoModulus(cbr: number): number {
   if (cbr <= 0) return 0;
   return (1500 * cbr) / 145.038; // psi to MPa
@@ -25,7 +44,18 @@ export function aashtoModulusToCBR(modulus: number): number {
   return (modulus * 145.038) / 1500;
 }
 
-/** South African method: E = 10 x CBR for CBR < 5, E = 17.6 x CBR^0.64 for CBR >= 5 */
+/** Returns a warning string when an AASHTO calculation is outside published validity, or null if in range. */
+export function aashtoValidityWarning(cbr: number): string | null {
+  if (cbr > 10) {
+    return `AASHTO (1993) Mr = 1500 × CBR is only valid for CBR ≤ 10 — at CBR ${cbr.toFixed(1)}%, the linear relationship is extrapolated and will over-state modulus. Use Powell or site-specific resilient modulus testing for higher CBR values.`;
+  }
+  return null;
+}
+
+/** South African method (TRH4 / CSRA TRH16): hybrid linear–power form.
+ *  E = 10 × CBR          for CBR < 5
+ *  E = 17.6 × CBR^0.64   for CBR ≥ 5 (continuous at the boundary: both give 50 MPa at CBR=5)
+ */
 export function southAfricanCBRtoModulus(cbr: number): number {
   if (cbr <= 0) return 0;
   if (cbr < 5) return 10 * cbr;

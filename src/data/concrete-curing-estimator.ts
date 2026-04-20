@@ -41,6 +41,16 @@ export interface CuringResult {
   estimatedHours: number;
   estimatedDays: number;
   targetStrengthMPa: number;
+  /** User's originally requested target strength in MPa (before any moisture-factor cap). */
+  requestedTargetMPa: number;
+  /**
+   * False when the requested target is unattainable under the selected curing
+   * method because the moisture factor reduces the asymptotic strength below
+   * the requested target (e.g. "100% of 28-day" with exposed curing caps at
+   * 75% of fcm28). When false, estimatedHours/Days refer to the time to reach
+   * the capped effective target, not the requested target.
+   */
+  targetAchievable: boolean;
   fcm28: number;
   maturityRequired: number;
   equivalentAge20C: number;
@@ -61,14 +71,25 @@ export interface CuringResult {
 }
 
 // ─── Constants ───────────────────────────────────────────────
+// s-coefficient per BS EN 1992-1-1 §3.1.2(6) Table 3.1:
+//     Class R  (CEM 42.5R, 52.5N, 52.5R): s = 0.20
+//     Class N  (CEM 32.5R, 42.5N):         s = 0.25
+//     Class S  (CEM 32.5N):                s = 0.38
+// Blended cements (CEM II/B-V, CEM III/A, CEM III/B) are not explicitly
+// covered by EC2 Table 3.1 — the elevated values used here follow UK
+// practice in PD 6687-1:2010 Annex E / CIRIA C660 to capture slower early
+// strength gain typical of high PFA/GGBS contents.
+// Datum temperature T0 for the Nurse-Saul maturity method follows
+// CIRIA 660 (−10 to −11°C). ASTM C1074 (US convention) uses 0°C as a
+// default and requires calibration.
 export const CEMENT_TYPES: CementInfo[] = [
   { type: "CEM_I_525R",  label: "CEM I 52.5R (Rapid)",        s: 0.20, datumTemp: -10, description: "Rapid hardening Portland cement" },
   { type: "CEM_I_425R",  label: "CEM I 42.5R (Standard Rapid)", s: 0.20, datumTemp: -10, description: "Standard rapid Portland cement" },
   { type: "CEM_I_425N",  label: "CEM I 42.5N (Normal)",        s: 0.25, datumTemp: -10, description: "Normal Portland cement" },
   { type: "CEM_IIA_L",   label: "CEM II/A-L 32.5R (Limestone)", s: 0.25, datumTemp: -10, description: "Portland-limestone cement" },
-  { type: "CEM_IIB_V",   label: "CEM II/B-V 32.5R (PFA)",     s: 0.38, datumTemp: -10, description: "Portland-fly ash cement" },
-  { type: "CEM_IIIA",    label: "CEM III/A 42.5N (GGBS 36-65%)", s: 0.38, datumTemp: -11, description: "Blast furnace cement (moderate GGBS)" },
-  { type: "CEM_IIIB",    label: "CEM III/B 32.5N (GGBS 66-80%)", s: 0.55, datumTemp: -11, description: "Blast furnace cement (high GGBS)" },
+  { type: "CEM_IIB_V",   label: "CEM II/B-V 32.5R (PFA)",     s: 0.38, datumTemp: -10, description: "Portland-fly ash cement (non-EC2 table value; PD 6687-1)" },
+  { type: "CEM_IIIA",    label: "CEM III/A 42.5N (GGBS 36-65%)", s: 0.38, datumTemp: -11, description: "Blast furnace cement, moderate GGBS (non-EC2 table value; PD 6687-1)" },
+  { type: "CEM_IIIB",    label: "CEM III/B 32.5N (GGBS 66-80%)", s: 0.50, datumTemp: -11, description: "Blast furnace cement, high GGBS (non-EC2 table value; PD 6687-1 range 0.45–0.55)" },
 ];
 
 export const STRENGTH_CLASSES: StrengthClassInfo[] = [
@@ -183,6 +204,12 @@ export function calculateCuring(
   const moistureFactor = CURING_METHODS.find(m => m.method === curingMethod)!.moistureFactor;
   const effectiveFcm28 = fcm28 * moistureFactor;
   const effectiveTargetMPa = Math.min(targetMPa, effectiveFcm28);
+  /**
+   * True when the user's requested target exceeds the asymptotic strength
+   * under the chosen curing method — in which case the main estimatedHours
+   * refers to the capped effective target, not the original request.
+   */
+  const targetCapped = targetMPa > effectiveFcm28;
 
   // Check achievability
   const noGain = effectiveTemp <= datumTemp;
@@ -263,6 +290,12 @@ export function calculateCuring(
 
   // ── Recommendations
   const recommendations: string[] = [];
+  if (targetCapped) {
+    const cappedPct = Math.round((effectiveFcm28 / fcm28) * 100);
+    recommendations.push(
+      `TARGET NOT FULLY ACHIEVABLE: The chosen curing method has a moisture factor of ${moistureFactor.toFixed(2)}, which limits the asymptotic strength to ~${cappedPct}% of fcm28 (${effectiveFcm28.toFixed(1)} MPa vs the requested ${targetMPa.toFixed(1)} MPa). The estimated time below refers to reaching the capped strength, NOT the original target. To reach the full target, upgrade to formwork/insulation curing or specify cube testing before load application.`,
+    );
+  }
   if (frostWarning) {
     recommendations.push("CRITICAL: Curing temperature is at or below freezing. Concrete will suffer frost damage if it freezes before reaching 5 MPa. Use heated enclosures, insulation blankets, or delay the pour.");
     recommendations.push("Do not allow fresh concrete to freeze within the first 24 hours. Consider using accelerators or hot water in the mix.");
@@ -289,11 +322,22 @@ export function calculateCuring(
   }
   recommendations.push("This is an estimate based on the Eurocode maturity method. Actual strength should be verified by cube testing per BS EN 12390-3 before striking formwork or applying loads.");
   recommendations.push("Ensure curing protection is maintained continuously. Interruptions in curing can permanently reduce final strength.");
+  // ── Method disclosures (flagged in peer review)
+  recommendations.push(
+    `Maturity method uses datum temperature T0 = ${datumTemp}°C per CIRIA 660 / UK convention. If cross-checking against ASTM C1074 (US), note that ASTM uses T0 = 0°C as a default and requires site-specific calibration — results will differ.`,
+  );
+  if (insulationBoost > 0) {
+    recommendations.push(
+      `Insulation boost of +${insulationBoost}°C is a simplified model for heat-of-hydration retention (scales linearly with element thickness). For mass-pour thermal analysis (element thickness > 500 mm), use CIRIA C766 / C660 peak-temperature methods rather than this estimator.`,
+    );
+  }
 
   return {
     estimatedHours: Math.round(realHours),
     estimatedDays: Math.round(realDays * 10) / 10,
     targetStrengthMPa: Math.round(effectiveTargetMPa * 10) / 10,
+    requestedTargetMPa: Math.round(targetMPa * 10) / 10,
+    targetAchievable: !targetCapped && !noGain,
     fcm28,
     maturityRequired: Math.round(maturityRequired),
     equivalentAge20C: Math.round(equivDays20C * 10) / 10,
