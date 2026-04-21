@@ -6,8 +6,9 @@ import {
   ALL_SPECIES, SPECIES_GROUPS, WORKS_TYPES, MONTH_NAMES, MONTH_FULL,
   TRAFFIC_LABELS, TRAFFIC_COLOURS,
   assessConflicts, getCalendarData,
+  BAT_ROOST_POTENTIAL_LABEL,
 } from "@/data/ecological-exclusion-zone-checker";
-import type { Month, TrafficLight, ConflictResult, AssessmentResult } from "@/data/ecological-exclusion-zone-checker";
+import type { Month, TrafficLight, ConflictResult, AssessmentResult, BatRoostPotential } from "@/data/ecological-exclusion-zone-checker";
 
 function todayISO() { return new Date().toISOString().slice(0, 10); }
 
@@ -334,7 +335,7 @@ async function exportPDF(
       { label: "Species Assessed", value: String(result.totalSpecies), sub: `${result.conflictCount} with constraints`, rgb: [59, 130, 246] },
       { label: "Licences Required", value: String(result.licenceCount), sub: result.licenceCount > 0 ? "Apply before works" : "None needed", rgb: result.licenceCount > 0 ? [220, 38, 38] : [22, 163, 74] },
       { label: "Surveys Required", value: String(result.surveyCount), sub: result.surveyCount > 0 ? "Commission surveys" : "None needed", rgb: result.surveyCount > 0 ? [245, 158, 11] : [22, 163, 74] },
-      { label: "Optimal Months", value: result.optimalWindow ? String(result.optimalWindow.length) : "0", sub: "No high-severity conflicts", rgb: [22, 163, 74] },
+      { label: "Optimal Months", value: result.optimalWindow ? (result.optimalWindow.length === 12 ? "Any" : String(result.optimalWindow.length)) : "0", sub: result.optimalWindow && result.optimalWindow.length === 12 ? "No high-severity periods" : "No high-severity conflicts", rgb: [22, 163, 74] },
     ];
     cards.forEach((c, ci) => {
       const cx = M + ci * (cardW + 2);
@@ -496,9 +497,16 @@ async function exportPDF(
     doc.setFillColor(232, 240, 236); doc.setDrawColor(27, 87, 69);
     doc.roundedRect(M, y, CW, 10, 1.5, 1.5, "FD");
     doc.setTextColor(27, 87, 69); doc.setFontSize(7); doc.setFont("helvetica", "bold");
-    doc.text("OPTIMAL WORKS WINDOW (no high-severity conflicts):", M + 4, y + 4);
+    doc.text(
+      result.optimalWindow.length === 12
+        ? "OPTIMAL WORKS WINDOW: Any month -- no high-severity restricted periods apply to the selected species."
+        : "OPTIMAL WORKS WINDOW (no high-severity conflicts):",
+      M + 4, y + 4,
+    );
     doc.setFont("helvetica", "normal"); doc.setFontSize(6.5);
-    doc.text(result.optimalWindow.map(m2 => MONTH_FULL[m2]).join(", "), M + 4, y + 8);
+    if (result.optimalWindow.length < 12) {
+      doc.text(result.optimalWindow.map(m2 => MONTH_FULL[m2]).join(", "), M + 4, y + 8);
+    }
     doc.setTextColor(0, 0, 0); doc.setDrawColor(200, 200, 200); y += 14;
   }
 
@@ -552,8 +560,14 @@ export default function EcologicalExclusionZoneCheckerClient() {
   const [startMonth, setStartMonth] = useState<Month>(1);
   const [endMonth, setEndMonth] = useState<Month>(12);
   const [showOptimalWindow, setShowOptimalWindow] = useState(false);
+  const [batRoostPotential, setBatRoostPotential] = useState<BatRoostPotential>("none");
 
   const hasData = selectedSpecies.size > 0;
+  // Show the bat roost potential selector only when at least one bat species is selected.
+  const batsSelected = useMemo(
+    () => Array.from(selectedSpecies).some(id => String(id).startsWith("bat-")),
+    [selectedSpecies],
+  );
 
   const result = useMemo<AssessmentResult | null>(() => {
     if (!hasData) return null;
@@ -562,8 +576,9 @@ export default function EcologicalExclusionZoneCheckerClient() {
       startMonth,
       endMonth,
       Array.from(selectedWorks),
+      batRoostPotential,
     );
-  }, [selectedSpecies, startMonth, endMonth, selectedWorks, hasData]);
+  }, [selectedSpecies, startMonth, endMonth, selectedWorks, hasData, batRoostPotential]);
 
   const handleExport = useCallback(async () => {
     if (!result) return;
@@ -581,6 +596,7 @@ export default function EcologicalExclusionZoneCheckerClient() {
     setStartMonth(1); setEndMonth(12);
     setSite(""); setManager(""); setPreparedBy(""); setAssessDate(todayISO());
     setShowOptimalWindow(false);
+    setBatRoostPotential("none");
   }, []);
 
   return (
@@ -692,13 +708,41 @@ export default function EcologicalExclusionZoneCheckerClient() {
         <MonthRangeSelector start={startMonth} end={endMonth} onStartChange={setStartMonth} onEndChange={setEndMonth} />
         <WorksTypeSelector selected={selectedWorks} onChange={setSelectedWorks} />
         <SpeciesSelector selected={selectedSpecies} onChange={setSelectedSpecies} />
+        {batsSelected && (
+          <div className="border-t border-gray-100 pt-4">
+            <label className="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-2">Bat Roost Potential</label>
+            <p className="text-[11px] text-gray-500 mb-2 leading-relaxed">
+              BCT 4th ed. (2023) survey effort scales with roost suitability. Select the assessed potential to receive the correct survey prescription in the action list. Leave as &ldquo;Not assessed&rdquo; to receive the full effort matrix.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {(["none","low","moderate","high"] as BatRoostPotential[]).map(p => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setBatRoostPotential(p)}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    batRoostPotential === p
+                      ? "bg-ebrora text-white border-ebrora"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-ebrora hover:text-ebrora"
+                  }`}
+                >
+                  {BAT_ROOST_POTENTIAL_LABEL[p]}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Optimal Window Panel ──────────────────────────── */}
       {showOptimalWindow && result && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
           <h3 className="text-sm font-bold text-emerald-800 mb-2">Optimal Works Window</h3>
-          <p className="text-xs text-emerald-700 mb-3">Months with no high-severity restricted periods for any of the selected species:</p>
+          <p className="text-xs text-emerald-700 mb-3">
+            {result.optimalWindow && result.optimalWindow.length === 12
+              ? "No high-severity restricted periods apply to any of the selected species — works can be scheduled in any month of the year."
+              : "Months with no high-severity restricted periods for any of the selected species:"}
+          </p>
           {result.optimalWindow && result.optimalWindow.length > 0 ? (
             <div className="flex flex-wrap gap-1.5">
               {([1,2,3,4,5,6,7,8,9,10,11,12] as Month[]).map(mo => {
