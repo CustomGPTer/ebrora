@@ -553,7 +553,7 @@ async function exportPDF(
     ["F10 Guidance:", HSE_CONTACTS.f10Guidance],
     ["HSE L153 Guidance:", HSE_CONTACTS.l153Url],
     ["HSE Info Line:", `${HSE_CONTACTS.hseInfoLine} (${HSE_CONTACTS.hseInfoLineHours})`],
-    ["Notifications Email:", HSE_CONTACTS.f10EnquiriesEmail],
+    ["F10 Enquiries:", `Telephone ${HSE_CONTACTS.hseInfoLine} (HSE no longer accepts F10 by email or post)`],
     ["HSE Address:", HSE_CONTACTS.hseAddress],
   ];
   const contactPanelH = contactItems.length * 4.5 + 6;
@@ -1302,7 +1302,7 @@ export default function F10NotificationCheckerClient() {
                   { label: "F10 Portal", value: HSE_CONTACTS.f10Portal },
                   { label: "Guidance", value: HSE_CONTACTS.f10Guidance },
                   { label: "HSE Info Line", value: HSE_CONTACTS.hseInfoLine, sub: HSE_CONTACTS.hseInfoLineHours },
-                  { label: "Email", value: HSE_CONTACTS.f10EnquiriesEmail },
+                  { label: "Submission", value: "Online only — HSE no longer accepts F10 by email or post" },
                   { label: "L153", value: HSE_CONTACTS.l153Url },
                 ].map(c => (
                   <div key={c.label} className="flex items-start gap-2">
