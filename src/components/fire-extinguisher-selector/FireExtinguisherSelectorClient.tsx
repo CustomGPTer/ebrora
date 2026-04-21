@@ -94,7 +94,96 @@ function ExtinguisherBandDiagram() {
 }
 
 // ─── SVG: Siting Coverage Diagram ────────────────────────────────
-function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }: { floorArea: number; extinguisherCount: number; travelDistance: number }) {
+// Class A agents drive the fire point count (BS 5306-8:2023 clause 5);
+// CO2 and ABC powder co-locate at those same points; Class D gets its own
+// dedicated station sited adjacent to the metal-working hazard.
+const CLASS_A_TYPE_IDS = new Set(["water", "foam", "water-mist", "wet-chemical"]);
+
+// BS EN 3-7 colour coding per agent — used for stacked icons on the plan
+const AGENT_COLOURS: Record<string, { body: string; head: string; label: string }> = {
+  water:          { body: "#EF4444", head: "#991B1B", label: "W" },
+  foam:           { body: "#F59E0B", head: "#92400E", label: "F" },
+  "water-mist":   { body: "#F8FAFC", head: "#94A3B8", label: "WM" },
+  "wet-chemical": { body: "#EAB308", head: "#854D0E", label: "WC" },
+  co2:            { body: "#374151", head: "#0F172A", label: "CO2" },
+  "powder-abc":   { body: "#3B82F6", head: "#1E3A8A", label: "P" },
+  "class-d":      { body: "#6366F1", head: "#3730A3", label: "D" },
+};
+
+interface FirePointComposition {
+  label: string;
+  agents: { typeId: string; label: string; body: string; head: string }[];
+  compositionTag: string;
+  isSpecialist: boolean;
+}
+
+function buildFirePointComposition(
+  requiredTypes: { typeId: string; quantity: number }[],
+  floorArea: number
+): FirePointComposition[] {
+  const classAUnits: string[] = [];
+  const co2Units: string[] = [];
+  const powderUnits: string[] = [];
+  let classDPresent = false;
+
+  for (const t of requiredTypes) {
+    if (t.typeId === "class-d") { classDPresent = true; continue; }
+    if (CLASS_A_TYPE_IDS.has(t.typeId)) {
+      for (let i = 0; i < t.quantity; i++) classAUnits.push(t.typeId);
+    } else if (t.typeId === "co2") {
+      for (let i = 0; i < t.quantity; i++) co2Units.push(t.typeId);
+    } else if (t.typeId === "powder-abc") {
+      for (let i = 0; i < t.quantity; i++) powderUnits.push(t.typeId);
+    }
+  }
+
+  const totalUnits = classAUnits.length + co2Units.length + powderUnits.length + (classDPresent ? 1 : 0);
+  if (totalUnits === 0) return [];
+
+  // Primary fire point count = one per Class A unit. If there's no Class A
+  // requirement, fall back to the count of CO2/powder stations.
+  let primaryCount = classAUnits.length || (co2Units.length + powderUnits.length);
+  // BS 5306-8:2023 min 2 extinguishers per storey, except small premises (≤100m²).
+  const minFP = floorArea > 100 ? 2 : 1;
+  primaryCount = Math.max(minFP, primaryCount);
+
+  const points: FirePointComposition[] = [];
+  for (let i = 0; i < primaryCount; i++) {
+    const agents: FirePointComposition["agents"] = [];
+    const pickAgent = (typeId: string | undefined) => {
+      if (!typeId) return;
+      const col = AGENT_COLOURS[typeId];
+      if (col) agents.push({ typeId, ...col });
+    };
+    pickAgent(classAUnits[i]);
+    pickAgent(co2Units[i]);
+    pickAgent(powderUnits[i]);
+    const compositionTag = agents.length > 0 ? agents.map(a => a.label).join("+") : "--";
+    points.push({ label: `FP${i + 1}`, agents, compositionTag, isSpecialist: false });
+  }
+
+  if (classDPresent) {
+    const col = AGENT_COLOURS["class-d"];
+    points.push({
+      label: `FP${points.length + 1}`,
+      agents: col ? [{ typeId: "class-d", ...col }] : [],
+      compositionTag: "D (Metal)",
+      isSpecialist: true,
+    });
+  }
+
+  return points;
+}
+
+function SitingCoverageDiagram({
+  floorArea,
+  requiredTypes,
+  travelDistance,
+}: {
+  floorArea: number;
+  requiredTypes: { typeId: string; quantity: number }[];
+  travelDistance: number;
+}) {
   const W = 700, H = 440;
   const PAD = { top: 55, right: 50, bottom: 65, left: 60 };
   const planW = W - PAD.left - PAD.right;
@@ -121,43 +210,73 @@ function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }:
   const gridM = realW <= 15 ? 2 : realW <= 40 ? 5 : 10;
   const gridPx = m2px(gridM);
 
-  // Place fire points in a 2D staggered grid filling the space
-  const positions: { x: number; y: number; id: string; realX: number; realY: number }[] = [];
-  const n = Math.max(1, extinguisherCount);
+  // Build fire point compositions (BS 5306-8:2023 grouping rule)
+  const firePoints = buildFirePointComposition(requiredTypes, floorArea);
+  const n = firePoints.length;
 
-  if (n === 1) {
-    positions.push({ x: ox + drawW / 2, y: oy + drawH / 2, id: "FP1", realX: realW / 2, realY: realH / 2 });
-  } else if (n === 2) {
-    const inset = 0.25;
-    positions.push({ x: ox + drawW * inset, y: oy + drawH * 0.5, id: "FP1", realX: realW * inset, realY: realH * 0.5 });
-    positions.push({ x: ox + drawW * (1 - inset), y: oy + drawH * 0.5, id: "FP2", realX: realW * (1 - inset), realY: realH * 0.5 });
-  } else {
-    // Distribute in a grid that respects the floor aspect ratio
-    const cols = Math.max(2, Math.ceil(Math.sqrt(n * (realW / realH))));
-    const rows = Math.max(1, Math.ceil(n / cols));
-    const insetX = drawW * 0.12;
-    const insetY = drawH * 0.15;
-    const spaceX = cols > 1 ? (drawW - 2 * insetX) / (cols - 1) : 0;
-    const spaceY = rows > 1 ? (drawH - 2 * insetY) / (rows - 1) : 0;
+  // Empty state — no extinguishers yet specified
+  if (n === 0) {
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 500 }}>
+        <rect x={0} y={0} width={W} height={H} fill="#FAFBFC" rx={4} />
+        <text x={W / 2} y={H / 2 - 8} textAnchor="middle" fontSize={13} fontWeight={700} fill="#1F2937">FIRE EXTINGUISHER SITING PLAN</text>
+        <text x={W / 2} y={H / 2 + 14} textAnchor="middle" fontSize={10} fill="#6B7280">Add fire risks to generate a siting plan</text>
+      </svg>
+    );
+  }
+
+  // Place fire points — spacing driven by the governing BS 5306-8:2023 metric
+  // (max travel distance to the nearest extinguisher), not arbitrary insets.
+  // Each point sits at the centre of an equal-area grid cell so coverage
+  // circles naturally blanket the floor with honest overlap. Short rows are
+  // spread across the full width (staggered vs the row above), which reduces
+  // corner reach distances compared with centre-aligned short rows.
+  const positions: { x: number; y: number; row: number; col: number; realX: number; realY: number; fp: FirePointComposition }[] = [];
+
+  // Choose cols/rows to match the floor aspect ratio
+  const layoutCols = n === 1 ? 1 : Math.min(n, Math.max(1, Math.round(Math.sqrt(n * realW / realH))));
+  const layoutRows = Math.ceil(n / layoutCols);
+  const cellHpx = drawH / layoutRows;
+  const cellHm = realH / layoutRows;
+
+  {
     let idx = 0;
-    for (let r = 0; r < rows && idx < n; r++) {
-      const colsInRow = r === rows - 1 && n % cols !== 0 ? n % cols : Math.min(cols, n - idx);
-      const rowInsetX = cols > 1 && colsInRow < cols ? insetX + (cols - colsInRow) * spaceX / 2 : insetX;
-      const rowSpaceX = colsInRow > 1 ? (drawW - 2 * rowInsetX) / (colsInRow - 1) : 0;
+    for (let r = 0; r < layoutRows && idx < n; r++) {
+      const colsInRow = Math.min(layoutCols, n - idx);
+      const rowCellWpx = drawW / colsInRow;
+      const rowCellWm = realW / colsInRow;
       for (let c = 0; c < colsInRow && idx < n; c++) {
-        const px = colsInRow === 1 ? ox + drawW / 2 : ox + rowInsetX + c * rowSpaceX;
-        const py = rows === 1 ? oy + drawH / 2 : oy + insetY + r * spaceY;
-        const rx = (px - ox) / scale;
-        const ry = (py - oy) / scale;
-        positions.push({ x: px, y: py, id: `FP${idx + 1}`, realX: rx, realY: ry });
+        const px = ox + rowCellWpx * (c + 0.5);
+        const py = layoutRows === 1 ? oy + drawH / 2 : oy + cellHpx * (r + 0.5);
+        const rx = rowCellWm * (c + 0.5);
+        const ry = layoutRows === 1 ? realH / 2 : cellHm * (r + 0.5);
+        positions.push({ x: px, y: py, row: r, col: c, realX: rx, realY: ry, fp: firePoints[idx] });
         idx++;
       }
     }
   }
 
-  // Coverage radius — clamp visual size so circles are visible but don't dwarf the plan
-  const rawCoverPx = m2px(Math.min(travelDistance, 30));
-  const maxVisualR = Math.min(rawCoverPx, Math.max(drawW, drawH) * 0.45);
+  // Actual max reach — distance from the worst-case floor point to its nearest
+  // fire point. Sampled on a 20×20 grid; this is the compliance metric that
+  // must stay ≤ travelDistance per BS 5306-8:2023.
+  let maxReachM = 0;
+  const SAMPLES = 20;
+  for (let i = 0; i <= SAMPLES; i++) {
+    for (let j = 0; j <= SAMPLES; j++) {
+      const sx = (realW * i) / SAMPLES;
+      const sy = (realH * j) / SAMPLES;
+      let minDist = Infinity;
+      for (const p of positions) {
+        const d = Math.hypot(sx - p.realX, sy - p.realY);
+        if (d < minDist) minDist = d;
+      }
+      if (minDist > maxReachM) maxReachM = minDist;
+    }
+  }
+  const isCompliant = maxReachM <= travelDistance;
+
+  // Coverage radius — let circles extend naturally; overlap demonstrates compliance
+  const coverR = m2px(Math.min(travelDistance, 30));
 
   // Exits integrated into walls
   const exitW = m2px(Math.max(1.2, realW * 0.06));
@@ -165,6 +284,13 @@ function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }:
     { x: ox, y: oy + drawH * 0.7, side: "left" as const },
     { x: ox + drawW, y: oy + drawH * 0.15, side: "right" as const },
   ];
+
+  // Badge sizing — width grows with the number of agents at each point
+  const iconW = 7;
+  const iconH = 10;
+  const iconGap = 2;
+  const badgePadX = 5;
+  const badgePadY = 4;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 500 }}>
@@ -174,13 +300,14 @@ function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }:
       {/* Title block */}
       <text x={W / 2} y={20} textAnchor="middle" fontSize={13} fontWeight={700} fill="#1F2937">FIRE EXTINGUISHER SITING PLAN</text>
       <text x={W / 2} y={35} textAnchor="middle" fontSize={9} fill="#6B7280">
-        {Math.round(floorArea)}m2 floor area | {extinguisherCount} fire point{extinguisherCount !== 1 ? "s" : ""} | Max {travelDistance}m travel distance | BS 5306-8:2023
+        {Math.round(floorArea)}m2 floor area | {firePoints.length} fire point{firePoints.length !== 1 ? "s" : ""} | Max {travelDistance}m travel distance | BS 5306-8:2023
       </text>
       <line x1={PAD.left} y1={44} x2={W - PAD.right} y2={44} stroke="#D1D5DB" strokeWidth={0.5} />
 
-      {/* Clip region for coverage circles */}
+      {/* Shared defs — clip region and tick marker */}
       <defs>
         <clipPath id="floorClip"><rect x={ox} y={oy} width={drawW} height={drawH} /></clipPath>
+        <marker id="dimTick" markerWidth="1" markerHeight="6" refX="0.5" refY="3" orient="auto"><line x1="0.5" y1="0" x2="0.5" y2="6" stroke="#64748B" strokeWidth="1" /></marker>
       </defs>
 
       {/* Grid lines */}
@@ -200,55 +327,65 @@ function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }:
       {/* Inner wall line */}
       <rect x={ox + 3.5} y={oy + 3.5} width={drawW - 7} height={drawH - 7} rx={0} fill="none" stroke="#94A3B8" strokeWidth={0.5} />
 
-      {/* Coverage circles — clipped to floor */}
+      {/* Coverage circles — clipped to floor; overlap demonstrates BS 5306-8 compliance */}
       <g clipPath="url(#floorClip)">
         {positions.map((p, i) => (
-          <circle key={`cov-${i}`} cx={p.x} cy={p.y} r={maxVisualR} fill="#1B5745" opacity={0.08} stroke="#1B5745" strokeWidth={1.2} strokeDasharray="8,4" />
+          <circle key={`cov-${i}`} cx={p.x} cy={p.y} r={coverR} fill="#1B5745" opacity={0.12} stroke="#1B5745" strokeWidth={1} strokeDasharray="6,4" />
         ))}
       </g>
 
-      {/* Distance annotations between fire points */}
-      {positions.length >= 2 && positions.map((p, i) => {
-        // Connect to nearest neighbour not already connected
+      {/* Distance annotations — only between consecutive points within the same row */}
+      {positions.map((p, i) => {
         const next = positions[i + 1];
-        if (!next) return null;
+        if (!next || next.row !== p.row) return null;
         const distM = Math.round(Math.sqrt(Math.pow(p.realX - next.realX, 2) + Math.pow(p.realY - next.realY, 2)));
         const mx = (p.x + next.x) / 2;
-        const my = (p.y + next.y) / 2 - 10;
+        const my = (p.y + next.y) / 2 - 26;
         return (
           <g key={`dist-${i}`}>
-            <line x1={p.x} y1={p.y - 18} x2={next.x} y2={next.y - 18} stroke="#64748B" strokeWidth={0.8} strokeDasharray="4,3" markerStart="url(#dimTick)" markerEnd="url(#dimTick)" />
-            <rect x={mx - 16} y={my - 18} width={32} height={14} rx={3} fill="white" stroke="#94A3B8" strokeWidth={0.6} />
-            <text x={mx} y={my - 9} textAnchor="middle" fontSize={8} fontWeight={700} fill="#374151">{distM}m</text>
+            <line x1={p.x} y1={p.y - 22} x2={next.x} y2={next.y - 22} stroke="#64748B" strokeWidth={0.8} strokeDasharray="4,3" markerStart="url(#dimTick)" markerEnd="url(#dimTick)" />
+            <rect x={mx - 18} y={my - 5} width={36} height={12} rx={3} fill="white" stroke="#94A3B8" strokeWidth={0.6} />
+            <text x={mx} y={my + 4} textAnchor="middle" fontSize={8} fontWeight={700} fill="#374151">{distM}m</text>
           </g>
         );
       })}
 
-      {/* Dimension tick marker */}
-      <defs>
-        <marker id="dimTick" markerWidth="1" markerHeight="6" refX="0.5" refY="3" orient="auto"><line x1="0.5" y1="0" x2="0.5" y2="6" stroke="#64748B" strokeWidth="1" /></marker>
-      </defs>
-
-      {/* Fire point markers */}
-      {positions.map((p) => (
-        <g key={p.id}>
-          {/* Shadow */}
-          <circle cx={p.x + 1} cy={p.y + 1} r={16} fill="#00000010" />
-          {/* Outer ring */}
-          <circle cx={p.x} cy={p.y} r={15} fill="white" stroke="#DC2626" strokeWidth={2.5} />
-          {/* Inner fill */}
-          <circle cx={p.x} cy={p.y} r={11} fill="#FEF2F2" />
-          {/* Extinguisher body */}
-          <rect x={p.x - 3.5} y={p.y - 6} width={7} height={10} rx={1.5} fill="#DC2626" />
-          {/* Extinguisher head */}
-          <rect x={p.x - 2.5} y={p.y - 8.5} width={5} height={3} rx={1} fill="#7F1D1D" />
-          {/* Nozzle */}
-          <line x1={p.x + 2.5} y1={p.y - 7} x2={p.x + 5} y2={p.y - 4} stroke="#7F1D1D" strokeWidth={1} strokeLinecap="round" />
-          {/* Label badge */}
-          <rect x={p.x - 14} y={p.y + 18} width={28} height={13} rx={3} fill="#1E293B" />
-          <text x={p.x} y={p.y + 27} textAnchor="middle" fontSize={8} fontWeight={700} fill="white">{p.id}</text>
-        </g>
-      ))}
+      {/* Fire point markers — stacked EN 3-7 icons; badge width grows with agent count */}
+      {positions.map((p) => {
+        const agents = p.fp.agents;
+        const nAgents = Math.max(1, agents.length);
+        const badgeW = nAgents * iconW + (nAgents - 1) * iconGap + badgePadX * 2;
+        const badgeH = iconH + badgePadY * 2 + 3;
+        const badgeX = p.x - badgeW / 2;
+        const badgeY = p.y - badgeH / 2;
+        const borderCol = p.fp.isSpecialist ? "#6366F1" : "#DC2626";
+        const fillCol = p.fp.isSpecialist ? "#EEF2FF" : "#FEF2F2";
+        return (
+          <g key={p.fp.label}>
+            {/* Shadow */}
+            <rect x={badgeX + 1} y={badgeY + 1} width={badgeW} height={badgeH} rx={6} fill="#00000012" />
+            {/* Outer badge */}
+            <rect x={badgeX} y={badgeY} width={badgeW} height={badgeH} rx={6} fill="white" stroke={borderCol} strokeWidth={2.2} />
+            {/* Inner fill */}
+            <rect x={badgeX + 2} y={badgeY + 2} width={badgeW - 4} height={badgeH - 4} rx={5} fill={fillCol} />
+            {/* Extinguisher icons — side by side, one per agent */}
+            {agents.map((a, ai) => {
+              const iconX = badgeX + badgePadX + ai * (iconW + iconGap);
+              const iconY = badgeY + badgePadY + 3;
+              const needsStroke = a.body === "#F8FAFC";
+              return (
+                <g key={`${p.fp.label}-${a.typeId}-${ai}`}>
+                  <rect x={iconX + 1} y={iconY - 3} width={iconW - 2} height={3} rx={0.8} fill={a.head} />
+                  <rect x={iconX} y={iconY} width={iconW} height={iconH} rx={1.5} fill={a.body} stroke={needsStroke ? "#CBD5E1" : "none"} strokeWidth={needsStroke ? 0.8 : 0} />
+                </g>
+              );
+            })}
+            {/* Label — FP id + composition tag */}
+            <rect x={p.x - 26} y={badgeY + badgeH + 3} width={52} height={13} rx={3} fill="#1E293B" />
+            <text x={p.x} y={badgeY + badgeH + 12} textAnchor="middle" fontSize={7.5} fontWeight={700} fill="white">{p.fp.label} · {p.fp.compositionTag}</text>
+          </g>
+        );
+      })}
 
       {/* Exit markers — integrated into walls */}
       {exits.map((ex, i) => {
@@ -256,16 +393,12 @@ function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }:
         const doorX = isLeft ? ox - 1.5 : ox + drawW - 1.5;
         return (
           <g key={`exit-${i}`}>
-            {/* Door opening (gap in wall) */}
             <rect x={doorX} y={ex.y - exitW / 2} width={6} height={exitW} fill="#FAFBFC" stroke="none" />
-            {/* Door swing arc */}
             <path d={isLeft
               ? `M ${ox} ${ex.y - exitW / 2} A ${exitW} ${exitW} 0 0 0 ${ox - exitW * 0.7} ${ex.y}`
               : `M ${ox + drawW} ${ex.y - exitW / 2} A ${exitW} ${exitW} 0 0 1 ${ox + drawW + exitW * 0.7} ${ex.y}`
             } fill="none" stroke="#16A34A" strokeWidth={1} strokeDasharray="3,2" />
-            {/* Door leaf */}
             <line x1={isLeft ? ox : ox + drawW} y1={ex.y - exitW / 2} x2={isLeft ? ox - exitW * 0.65 : ox + drawW + exitW * 0.65} y2={ex.y - 1} stroke="#16A34A" strokeWidth={1.5} />
-            {/* EXIT label */}
             <rect x={isLeft ? ox - 38 : ox + drawW + 8} y={ex.y - 7} width={28} height={14} rx={2} fill="#16A34A" />
             <text x={isLeft ? ox - 24 : ox + drawW + 22} y={ex.y + 3} textAnchor="middle" fontSize={7} fontWeight={700} fill="white">EXIT</text>
           </g>
@@ -280,28 +413,29 @@ function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }:
       <line x1={ox - 16} y1={oy} x2={ox - 16} y2={oy + drawH} stroke="#374151" strokeWidth={1} markerStart="url(#dimTick)" markerEnd="url(#dimTick)" />
       <text x={ox - 28} y={oy + drawH / 2} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151" transform={`rotate(-90, ${ox - 28}, ${oy + drawH / 2})`}>{realH}m</text>
 
-      {/* Legend bar */}
+      {/* Legend bar — BS EN 3-7 agent colour key + coverage note */}
       <rect x={PAD.left - 5} y={H - 50} width={W - PAD.left - PAD.right + 10} height={40} rx={5} fill="#F1F5F9" stroke="#E2E8F0" strokeWidth={0.5} />
-
-      <circle cx={PAD.left + 18} cy={H - 30} r={8} fill="#FEF2F2" stroke="#DC2626" strokeWidth={1.5} />
-      <rect x={PAD.left + 15} y={H - 34} width={6} height={7} rx={1} fill="#DC2626" />
-      <text x={PAD.left + 34} y={H - 27} fontSize={9} fill="#374151" fontWeight={600}>Fire Point</text>
-
-      <circle cx={PAD.left + 128} cy={H - 30} r={10} fill="#1B5745" opacity={0.1} stroke="#1B5745" strokeWidth={1.2} strokeDasharray="4,2" />
-      <text x={PAD.left + 146} y={H - 27} fontSize={9} fill="#374151" fontWeight={600}>{travelDistance}m Coverage</text>
-
-      <line x1={PAD.left + 268} y1={H - 33} x2={PAD.left + 278} y2={H - 28} stroke="#16A34A" strokeWidth={1.5} />
-      <rect x={PAD.left + 280} y={H - 37} width={18} height={13} rx={2} fill="#16A34A" />
-      <text x={PAD.left + 285} y={H - 28} fontSize={6} fontWeight={700} fill="white">EXIT</text>
-      <text x={PAD.left + 306} y={H - 27} fontSize={9} fill="#374151" fontWeight={600}>Emergency Exit</text>
-
-      <line x1={PAD.left + 418} y1={H - 30} x2={PAD.left + 440} y2={H - 30} stroke="#64748B" strokeWidth={0.8} strokeDasharray="4,3" />
-      <text x={PAD.left + 448} y={H - 27} fontSize={9} fill="#374151" fontWeight={600}>Distance</text>
-
-      <rect x={PAD.left + 518} y={H - 36} width={12} height={12} fill="none" stroke="#CBD5E1" strokeWidth={0.5} />
-      <text x={PAD.left + 538} y={H - 27} fontSize={8} fill="#9CA3AF">Grid: {gridM}m</text>
-
-      <text x={W - PAD.right + 5} y={H - 8} textAnchor="end" fontSize={8} fill="#9CA3AF">NTS -- indicative layout only</text>
+      {[
+        { label: "Water", body: "#EF4444" },
+        { label: "Foam", body: "#F59E0B" },
+        { label: "CO2", body: "#374151" },
+        { label: "Powder", body: "#3B82F6" },
+        { label: "Wet Chem", body: "#EAB308" },
+        { label: "Class D", body: "#6366F1" },
+      ].map((item, i) => {
+        const lx = PAD.left + 5 + i * 95;
+        return (
+          <g key={item.label}>
+            <rect x={lx} y={H - 41} width={6} height={10} rx={1} fill={item.body} stroke="#94A3B8" strokeWidth={0.4} />
+            <text x={lx + 12} y={H - 33} fontSize={8.5} fill="#374151" fontWeight={600}>{item.label}</text>
+          </g>
+        );
+      })}
+      <text x={PAD.left + 5} y={H - 18} fontSize={8} fill="#64748B">Green dashed circles show {travelDistance}m travel distance. Fire points may host multiple agents (e.g. W+CO2) per BS 5306-8:2023 clause 5.</text>
+      <text x={PAD.left + 5} y={H - 8} fontSize={8} fontWeight={700} fill={isCompliant ? "#16A34A" : "#DC2626"}>
+        Max reach to nearest FP: {maxReachM.toFixed(1)}m {isCompliant ? "≤" : ">"} {travelDistance}m limit {isCompliant ? "✓ COMPLIANT" : "✗ NON-COMPLIANT — add fire points"}
+      </text>
+      <text x={W - PAD.right + 5} y={H - 8} textAnchor="end" fontSize={8} fill="#9CA3AF">NTS -- indicative layout only | Grid: {gridM}m</text>
     </svg>
   );
 }
@@ -1013,7 +1147,7 @@ export default function FireExtinguisherSelectorClient() {
             <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-4">Siting Coverage Plan</div>
             <SitingCoverageDiagram
               floorArea={totalArea}
-              extinguisherCount={result.totalExtinguishers}
+              requiredTypes={result.areas.flatMap(a => a.requiredTypes.map(r => ({ typeId: r.typeId, quantity: r.quantity })))}
               travelDistance={areas[0]?.travelDistance || 30}
             />
           </div>
