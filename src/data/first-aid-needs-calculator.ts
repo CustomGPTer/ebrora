@@ -141,7 +141,6 @@ export const KIT_CONTENTS: KitItem[] = [
   { item: "Individually wrapped sterile plasters (assorted)", smallKit: "20", mediumKit: "40", largeKit: "60", travelKit: "20" },
   { item: "Sterile eye pads", smallKit: "2", mediumKit: "4", largeKit: "6", travelKit: "2" },
   { item: "Individually wrapped triangular bandages", smallKit: "2", mediumKit: "6", largeKit: "8", travelKit: "2" },
-  { item: "Safety pins", smallKit: "6", mediumKit: "12", largeKit: "24", travelKit: "6" },
   { item: "Medium sterile unmedicated wound dressings (12x12cm)", smallKit: "6", mediumKit: "8", largeKit: "12", travelKit: "2" },
   { item: "Large sterile unmedicated wound dressings (18x18cm)", smallKit: "2", mediumKit: "4", largeKit: "6", travelKit: "1" },
   { item: "Sterile wound cleansing wipes", smallKit: "20", mediumKit: "40", largeKit: "60", travelKit: "10" },
@@ -165,15 +164,16 @@ export function calculateRequirements(inputs: SiteInputs): FirstAidRequirement {
 
   // HSE L74 recommended ratios
   if (riskLevel === "low") {
-    // Low risk: 1 FAW per 50, or appointed person for <50
-    fawPerWorkers = 50;
-    efawPerWorkers = 25;
+    // Low risk (offices, shops, libraries): 1 FAW per 100, appointed person for <50
+    fawPerWorkers = 100;
+    efawPerWorkers = 50;
   } else if (riskLevel === "medium") {
-    // Medium: 1 FAW per 50, EFAW for smaller groups
+    // Medium risk (light manufacturing, warehousing, food processing): 1 FAW per 50
     fawPerWorkers = 50;
     efawPerWorkers = 20;
   } else {
-    // High risk (construction): 1 FAW per 25
+    // High risk (construction): 1 FAW per 50 per L74; 1:25 applied here as
+    // construction industry good practice (exceeds L74 minimum)
     fawPerWorkers = 25;
     efawPerWorkers = 10;
   }

@@ -1,5 +1,5 @@
 // src/data/fire-extinguisher-selector.ts
-// Fire Extinguisher Selector -- BS 5306-8:2012, RRFSO 2005, BS EN 3
+// Fire Extinguisher Selector -- BS 5306-8:2023, RRFSO 2005, BS EN 3
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -308,7 +308,7 @@ export const FIRE_CLASS_DETAILS: Record<FireClass, { label: string; description:
 // ─── Siting Rules ───────────────────────────────────────────────
 
 export const SITING_RULES: SitingRule[] = [
-  { id: "travel-30m", rule: "Maximum 30m travel distance to any extinguisher", standard: "BS 5306-8 cl.6.2", details: "No person should have to travel more than 30 metres from the site of a fire to reach an extinguisher. In high-risk areas, consider reducing to 15m." },
+  { id: "travel-30m", rule: "Travel distance per fire class: 30m Class A/C; 10m Class B, F and electrical", standard: "BS 5306-8:2023 cl.6.2", details: "No person should have to travel more than the class-specific maximum from the site of a fire to reach an appropriate extinguisher. Class A and C: 30m maximum. Class B, F and electrical: 10m maximum. High-risk areas may warrant shorter distances." },
   { id: "visible", rule: "Mounted on wall brackets or stands at visible locations", standard: "BS 5306-8 cl.6.3", details: "Extinguishers should be sited on dedicated stands or wall brackets. Handle height should be approximately 1m from floor level (max 1.5m for lighter units)." },
   { id: "escape-routes", rule: "Position near escape routes and exits", standard: "BS 5306-8 cl.6.2", details: "Place extinguishers near room exits, along escape routes, and at final exit doors. Users should not have to pass the fire to reach an extinguisher." },
   { id: "grouping", rule: "Group extinguishers at fire points where practicable", standard: "BS 5306-8 cl.6.3", details: "Where multiple types are needed, group them together at designated fire points with appropriate signage." },
@@ -348,7 +348,7 @@ export const INSPECTION_SCHEDULE: InspectionTask[] = [
 // ─── Regulatory References ──────────────────────────────────────
 
 export const REGULATORY_REFS = [
-  { ref: "BS 5306-8:2012", title: "Fire extinguishing installations and equipment on premises -- Selection and positioning of portable fire extinguishers", relevance: "Primary standard for extinguisher type selection, quantity calculation, and siting requirements" },
+  { ref: "BS 5306-8:2023", title: "Fire extinguishing installations and equipment on premises -- Selection and positioning of portable fire extinguishers. Code of practice", relevance: "Primary standard for extinguisher type selection, quantity calculation, and siting requirements. Supersedes BS 5306-8:2012 (withdrawn 8 Nov 2023)." },
   { ref: "RRFSO 2005", title: "Regulatory Reform (Fire Safety) Order 2005", relevance: "Legal duty on the Responsible Person to provide appropriate fire-fighting equipment and train staff. Articles 13, 17, 21." },
   { ref: "BS EN 3 series", title: "Portable fire extinguishers -- Ratings, performance, construction", relevance: "Defines fire ratings (e.g. 13A, 89B), test methods, colour coding, and labelling requirements" },
   { ref: "BS 5306-3:2017", title: "Commissioning and maintenance of portable fire extinguishers", relevance: "Defines inspection frequencies, service intervals, and competence requirements for maintenance" },
@@ -360,6 +360,22 @@ export const REGULATORY_REFS = [
 ];
 
 // ─── Calculation Logic ──────────────────────────────────────────
+
+// BS 5306-8:2023 maximum travel distance to an appropriate extinguisher, per fire class.
+// 30m for Class A and C; 10m for Class B, F and electrical fires.
+export const CLASS_MAX_TRAVEL_M: Record<FireClass, number> = {
+  A: 30,
+  B: 10,
+  C: 30,
+  D: 10,     // conservative — Class D is case-by-case in BS 5306-8; kept close to hazard
+  F: 10,
+  ELECTRICAL: 10,
+};
+
+// Threshold above which any Class A area requires at least 2 extinguishers.
+// BS 5306-8:2023 reduced this from 100m² (2012) to 50m² in its updated
+// provision guidance for small premises (FIA 2024 summary).
+const CLASS_A_MIN_TWO_AREA_M2 = 50;
 
 function getFireClasses(risks: string[]): FireClass[] {
   const classes = new Set<FireClass>();
@@ -388,9 +404,11 @@ function calculateQuantityForArea(
   floorArea: number,
   travelDistance: number,
   size: ExtinguisherSize,
-  riskLevel: RiskLevel
+  riskLevel: RiskLevel,
+  classMaxTravelM: number = 30,
 ): number {
-  // BS 5306-8: based on fire rating coverage and travel distance
+  // BS 5306-8:2023 — quantity is the governing of (a) Class A rating coverage,
+  // (b) travel distance coverage, (c) small-premises minimum of 2 when > 50m².
   let qty = 1;
 
   // Coverage calculation for Class A (main quantity driver)
@@ -400,18 +418,17 @@ function calculateQuantityForArea(
     qty = Math.ceil(floorArea / effectiveCoverage);
   }
 
-  // Travel distance check: 30m max means we need coverage radius ~ 30m
-  // For a rectangular space, ensure max travel <30m from any point
+  // Travel distance check — each unit covers a circle of the shorter of the
+  // user's travel distance and the class-specific BS 5306-8 maximum.
   if (floorArea > 0 && travelDistance > 0) {
-    // Approximate: for max 30m travel, one extinguisher covers ~2800m2 circle
-    // But practical coverage accounting for obstacles is much less
-    const maxTravelCoverage = Math.PI * Math.pow(Math.min(travelDistance, 30), 2);
+    const effectiveTravel = Math.min(travelDistance, classMaxTravelM);
+    const maxTravelCoverage = Math.PI * Math.pow(effectiveTravel, 2);
     const travelQty = Math.ceil(floorArea / maxTravelCoverage);
     qty = Math.max(qty, travelQty);
   }
 
-  // Minimum 2 extinguishers for any floor >100m2
-  if (floorArea > 100 && qty < 2) qty = 2;
+  // BS 5306-8:2023 — minimum 2 extinguishers for any Class A area > 50m²
+  if (floorArea > CLASS_A_MIN_TWO_AREA_M2 && qty < 2) qty = 2;
 
   // Minimum 1 per floor always
   return Math.max(qty, 1);
@@ -436,6 +453,11 @@ export function calculateAreaResult(
   // For each fire class needed, select the best extinguisher type
   const classesHandled = new Set<FireClass>();
 
+  // Track floor area already credited to Class A by "supplementary" types
+  // (wet-chem, ABC powder etc. BS 5306-8 rates them for Class A but they are
+  // sited adjacent to their primary hazard, not distributed across the floor.)
+  let classACreditedM2 = 0;
+
   // Priority 1: Handle Class F first (only wet chemical or water mist)
   if (fireClasses.includes("F")) {
     const wetChem = EXTINGUISHER_TYPES.find(e => e.id === "wet-chemical")!;
@@ -447,12 +469,16 @@ export function calculateAreaResult(
         size: bestSize.capacity,
         fireRating: bestSize.fireRatingA !== "-" ? `${bestSize.fireRatingA}` : "F-rated",
         quantity: Math.max(1, Math.ceil(area.risks.filter(r => r === "cooking").length || 1)),
-        reason: "BS 5306-8 -- mandatory for Class F cooking oil/fat fires",
+        reason: "BS 5306-8:2023 -- mandatory for Class F cooking oil/fat fires",
         coveragePerUnit: bestSize.coverageM2A,
         bandHex: wetChem.bandHex,
       });
       classesHandled.add("F");
-      if (wetChem.suitability.A === "suitable") classesHandled.add("A");
+      // Wet-chem has a Class A rating so it credits Class A cover in the
+      // fryer's immediate area only (its coverage rating), NOT the whole floor.
+      if (wetChem.suitability.A === "suitable") {
+        classACreditedM2 += bestSize.coverageM2A;
+      }
     }
   }
 
@@ -505,46 +531,60 @@ export function calculateAreaResult(
     const powder = EXTINGUISHER_TYPES.find(e => e.id === "powder-abc")!;
     const bestSize = selectBestSize(powder, "C");
     if (bestSize) {
+      const powderQty = Math.max(1, Math.ceil(area.floorArea / 400));
       requiredTypes.push({
         typeId: powder.id,
         typeName: powder.type,
         size: bestSize.capacity,
         fireRating: `${bestSize.fireRatingA} / ${bestSize.fireRatingB}`,
-        quantity: Math.max(1, Math.ceil(area.floorArea / 400)),
+        quantity: powderQty,
         reason: "ABC powder -- only portable type effective on gas fires (Class C)",
         coveragePerUnit: bestSize.coverageM2A,
         bandHex: powder.bandHex,
       });
       classesHandled.add("C");
-      if (powder.suitability.A === "suitable") classesHandled.add("A");
+      // ABC powder has A+B ratings; credit only its own coverage per unit × qty
+      // towards the remaining Class A/B sizing, not the whole floor.
+      if (powder.suitability.A === "suitable") {
+        classACreditedM2 += bestSize.coverageM2A * powderQty;
+      }
       if (powder.suitability.B === "suitable") classesHandled.add("B");
     }
     sitingNotes.push("Powder extinguishers reduce visibility -- avoid in confined areas where escape routes could be obscured");
   }
 
   // Priority 5: Handle Class A (foam preferred, or water)
-  if (fireClasses.includes("A") && !classesHandled.has("A")) {
-    // Prefer foam if Class B also needed, otherwise water or foam
+  // Size for the floor area NOT already credited to supplementary types.
+  const remainingClassAArea = Math.max(0, area.floorArea - classACreditedM2);
+  if (fireClasses.includes("A") && !classesHandled.has("A") && remainingClassAArea > 0) {
+    const foam = EXTINGUISHER_TYPES.find(e => e.id === "foam")!;
+    const water = EXTINGUISHER_TYPES.find(e => e.id === "water")!;
+    // Prefer foam if Class B also needed (dual-purpose); otherwise water is
+    // the traditional Class A choice and cheaper per-unit.
     const hasClassB = fireClasses.includes("B") && !classesHandled.has("B");
-    const type = hasClassB
-      ? EXTINGUISHER_TYPES.find(e => e.id === "foam")!
-      : EXTINGUISHER_TYPES.find(e => e.id === "foam")!; // Foam is generally preferred as dual-purpose
+    const type = hasClassB ? foam : water;
     const bestSize = selectBestSize(type, "A");
     if (bestSize) {
-      const qty = calculateQuantityForArea(area.floorArea, area.travelDistance, bestSize, premisesRiskLevel);
+      const qty = calculateQuantityForArea(remainingClassAArea, area.travelDistance, bestSize, premisesRiskLevel, CLASS_MAX_TRAVEL_M.A);
+      const areaNote = remainingClassAArea < area.floorArea
+        ? `${qty} units for remaining ${remainingClassAArea}m2 Class A area (after ${classACreditedM2}m2 covered by supplementary types) at ${premisesRiskLevel} risk`
+        : `${qty} units for ${area.floorArea}m2 floor area at ${premisesRiskLevel} risk`;
       requiredTypes.push({
         typeId: type.id,
         typeName: type.type,
         size: bestSize.capacity,
         fireRating: bestSize.fireRatingA !== "-" ? `${bestSize.fireRatingA} / ${bestSize.fireRatingB}` : bestSize.fireRatingB,
         quantity: qty,
-        reason: `Primary Class A protection -- ${qty} units for ${area.floorArea}m2 floor area at ${premisesRiskLevel} risk`,
+        reason: `Primary Class A protection -- ${areaNote}`,
         coveragePerUnit: bestSize.coverageM2A,
         bandHex: type.bandHex,
       });
       classesHandled.add("A");
       if (type.suitability.B === "suitable") classesHandled.add("B");
     }
+  } else if (fireClasses.includes("A") && !classesHandled.has("A")) {
+    // Supplementary types already cover the full floor; still mark handled.
+    classesHandled.add("A");
   }
 
   // Handle remaining Class B if not yet covered
@@ -566,15 +606,20 @@ export function calculateAreaResult(
     }
   }
 
-  // Siting notes
-  if (area.travelDistance > 30) {
-    sitingNotes.push(`Travel distance ${area.travelDistance}m exceeds BS 5306-8 max 30m -- additional extinguisher stations required`);
+  // Siting notes — per-class BS 5306-8:2023 travel distance warnings
+  const hasShortTravelClass = fireClasses.some(c => c === "B" || c === "F" || c === "ELECTRICAL");
+  if (hasShortTravelClass && area.travelDistance > 10) {
+    const presentShortClasses = fireClasses.filter(c => c === "B" || c === "F" || c === "ELECTRICAL").join(", ");
+    sitingNotes.push(`Travel distance ${area.travelDistance}m exceeds BS 5306-8:2023 maximum of 10m for Class ${presentShortClasses} fires -- plan additional fire points adjacent to these specific hazards (extinguisher quantities above have been sized assuming 10m coverage circles for those classes)`);
+  }
+  if (fireClasses.includes("A") && area.travelDistance > 30) {
+    sitingNotes.push(`Travel distance ${area.travelDistance}m exceeds BS 5306-8:2023 maximum of 30m for Class A fires -- additional extinguisher stations required`);
   }
   if (area.floorArea > 400 && premisesRiskLevel === "high") {
-    sitingNotes.push("High-risk area >400m2 -- consider reducing travel distance to 15m and increasing provision");
+    sitingNotes.push("High-risk area >400m2 -- consider reducing travel distance further and increasing provision");
   }
   if (area.risks.includes("cooking")) {
-    sitingNotes.push("Wet chemical extinguisher must be within 2m of deep fat fryers per BS 5306-8");
+    sitingNotes.push("Wet chemical extinguisher must be within 2m of deep fat fryers per BS 5306-8:2023");
   }
 
   const totalExtinguishers = requiredTypes.reduce((sum, r) => sum + r.quantity, 0);

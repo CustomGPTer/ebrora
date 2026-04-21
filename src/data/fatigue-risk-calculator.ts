@@ -99,28 +99,48 @@ export function shiftDuration(start: string, end: string): number {
   return e - s;
 }
 
-export function isNightShift(start: string, end: string): boolean {
+// Calculates hours of overlap between a shift and the statutory night period
+// (23:00-06:00). Shift may cross midnight (end < start).
+export function nightPeriodOverlap(start: string, end: string): number {
   const s = timeToHours(start);
-  const e = timeToHours(end);
-  // Night if any part falls between 23:00-06:00
-  if (e <= s) return true; // crosses midnight
-  if (s >= 23 || s < 6) return true;
-  if (e > 23 || e <= 6) return true;
-  return false;
+  let e = timeToHours(end);
+  if (e <= s) e += 24; // crosses midnight
+
+  // Night period is 23:00-06:00 (i.e. 23-30 on the extended timeline).
+  // Compute overlap across two wrapped windows: [23,30] and also [-1,6] for
+  // early-morning-only shifts (e.g. 04:00-08:00) where s is 4, e is 8.
+  const windows: [number, number][] = [
+    [23, 30], // today's night into tomorrow morning
+    [-1, 6],  // yesterday's night tail into today's early morning (s ≈ 4, e ≈ 8)
+  ];
+
+  let overlap = 0;
+  for (const [ws, we] of windows) {
+    overlap = Math.max(overlap, Math.max(0, Math.min(e, we) - Math.max(s, ws)));
+  }
+  return overlap;
 }
 
-// ─── Circadian Factor (HSE RR446) ────────────────────────────
-// Risk peaks at 02:00-06:00 (circadian low), elevated for early starts before 06:00
+// WTR 1998 Reg 2: a night worker is someone who normally works ≥3 hours during
+// the night period (23:00-06:00) as a normal course. Used for both the
+// circadian factor and the WTR night-work check.
+export function isNightShift(start: string, end: string): boolean {
+  return nightPeriodOverlap(start, end) >= 3;
+}
+
+// ─── Circadian Factor ────────────────────────────────────────
+// Informed by shift-work research (HSE RR446 etc). Risk peaks at 02:00-06:00
+// (circadian low); elevated for early starts that curtail sleep.
 function circadianFactor(start: string, end: string): number {
   const s = timeToHours(start);
-  // Night shift (any part in 02:00-06:00) = highest
+  // Qualifying night shift per WTR Reg 2 (≥3h overlap with 23:00-06:00)
   if (isNightShift(start, end)) {
-    // Deep night (start 22:00-02:00) = worst
+    // Deep night (start 22:00-02:00) = worst, spans circadian nadir
     if (s >= 22 || s <= 2) return 1.8;
     // Late night
     return 1.5;
   }
-  // Early morning start (before 06:00)
+  // Early morning start (before 06:00) — short sleep, pre-dawn start
   if (s < 6) return 1.4;
   // Early start (06:00-07:00) — curtails sleep
   if (s < 7) return 1.15;
@@ -378,13 +398,13 @@ function checkWTR(shifts: ShiftEntry[], analyses: ShiftAnalysis[], mode: Pattern
     reference: "WTR 1998 Reg 4",
   });
 
-  // 4. Night work: 8 hours in any 24h period (for night workers)
+  // 4. Night work: per-shift length (stricter than WTR's 17-week average)
   const nightShifts = workingAnalyses.filter(a => a.isNight);
   const maxNightLength = nightShifts.length > 0 ? Math.max(...nightShifts.map(a => a.shiftLength)) : 0;
   if (nightShifts.length > 0) {
     checks.push({
       rule: "Night Work Limit",
-      requirement: "Night workers: maximum 8 hours in any 24-hour period (average)",
+      requirement: "Night workers: normal hours should not exceed 8 hours per 24-hour period (WTR: 17-week average; this check applies 8h to each night shift)",
       actual: `${maxNightLength.toFixed(1)} hours (longest night shift)`,
       compliant: maxNightLength <= 8,
       reference: "WTR 1998 Reg 6",

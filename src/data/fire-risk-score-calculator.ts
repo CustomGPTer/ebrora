@@ -255,7 +255,7 @@ export const FIRE_SECTIONS: Record<SiteMode, FireSection[]> = {
       ],
     },
     {
-      id: "con-responsible", title: "Management & Competence", regulatoryRef: "Article 18 — Duty to provide information",
+      id: "con-responsible", title: "Management & Competence", regulatoryRef: "Article 21 — Training",
       questions: [
         { id: "con-r1", text: "Is a fire safety coordinator identified for the site?" },
         { id: "con-r2", text: "Have all personnel received fire safety induction training?" },
