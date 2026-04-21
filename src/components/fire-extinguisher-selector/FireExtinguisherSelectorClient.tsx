@@ -34,7 +34,7 @@ function ExtinguisherBandDiagram() {
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 320 }}>
       {/* Title */}
       <text x={W / 2} y={16} textAnchor="middle" fontSize={12} fontWeight={700} fill="#1F2937">Fire Extinguisher Suitability Matrix</text>
-      <text x={W / 2} y={30} textAnchor="middle" fontSize={8} fill="#6B7280">Per BS 5306-8:2012 and BS EN 3 series</text>
+      <text x={W / 2} y={30} textAnchor="middle" fontSize={8} fill="#6B7280">Per BS 5306-8:2023 and BS EN 3 series</text>
 
       {/* Column headers (fire classes) */}
       {FIRE_CLASSES.map((fc, ci) => {
@@ -174,7 +174,7 @@ function SitingCoverageDiagram({ floorArea, extinguisherCount, travelDistance }:
       {/* Title block */}
       <text x={W / 2} y={20} textAnchor="middle" fontSize={13} fontWeight={700} fill="#1F2937">FIRE EXTINGUISHER SITING PLAN</text>
       <text x={W / 2} y={35} textAnchor="middle" fontSize={9} fill="#6B7280">
-        {Math.round(floorArea)}m2 floor area | {extinguisherCount} fire point{extinguisherCount !== 1 ? "s" : ""} | Max {travelDistance}m travel distance | BS 5306-8:2012
+        {Math.round(floorArea)}m2 floor area | {extinguisherCount} fire point{extinguisherCount !== 1 ? "s" : ""} | Max {travelDistance}m travel distance | BS 5306-8:2023
       </text>
       <line x1={PAD.left} y1={44} x2={W - PAD.right} y2={44} stroke="#D1D5DB" strokeWidth={0.5} />
 
@@ -414,7 +414,7 @@ async function exportPDF(
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
   doc.text(`Premises: ${premises?.label || "Custom"} | Areas: ${areas.length} | Total: ${result.totalExtinguishers} extinguisher${result.totalExtinguishers !== 1 ? "s" : ""}`, M, 18);
   doc.setFontSize(7);
-  doc.text(`BS 5306-8:2012 | RRFSO 2005 | BS EN 3 | Ref: ${docRef}`, M, 23);
+  doc.text(`BS 5306-8:2023 | RRFSO 2005 | BS EN 3 | Ref: ${docRef}`, M, 23);
   doc.setTextColor(0, 0, 0); y = 34;
 
   // ── Site Info Panel ──
@@ -434,7 +434,7 @@ async function exportPDF(
 
   // ── Scope ──
   doc.setFontSize(7); doc.setFont("helvetica", "italic"); doc.setTextColor(80, 80, 80);
-  const scopeText = `Fire extinguisher selection and siting assessment for ${header.site || "the above site"}. Premises type: ${premises?.label || "Custom"}. ${areas.length} area(s) assessed covering ${areas.reduce((s, a) => s + a.floorArea, 0)}m2 total floor area. Fire classes identified: ${result.overallFireClasses.join(", ")}. Assessment per BS 5306-8:2012 and RRFSO 2005.`;
+  const scopeText = `Fire extinguisher selection and siting assessment for ${header.site || "the above site"}. Premises type: ${premises?.label || "Custom"}. ${areas.length} area(s) assessed covering ${areas.reduce((s, a) => s + a.floorArea, 0)}m2 total floor area. Fire classes identified: ${result.overallFireClasses.join(", ")}. Assessment per BS 5306-8:2023 and RRFSO 2005.`;
   const scopeLines = doc.splitTextToSize(scopeText, CW);
   doc.text(scopeLines, M, y); y += scopeLines.length * 3 + 3;
   doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "normal");
@@ -678,7 +678,7 @@ async function exportPDF(
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
     doc.setFontSize(5.5); doc.setTextColor(130, 130, 130); doc.setFont("helvetica", "normal");
-    doc.text("This assessment is decision-support guidance per BS 5306-8:2012. It does not replace a site-specific fire risk assessment by a competent person.", M, 290);
+    doc.text("This assessment is decision-support guidance per BS 5306-8:2023. It does not replace a site-specific fire risk assessment by a competent person.", M, 290);
     doc.text(`Ref: ${docRef} | Rev 0 | ${header.date || todayISO()}`, M, 293);
     doc.text(`Page ${i} of ${totalPages}`, W - M, 293, { align: "right" });
   }
@@ -891,7 +891,13 @@ export default function FireExtinguisherSelectorClient() {
                       <input type="number" min={5} max={60} value={area.travelDistance} onChange={e => updateArea(area.id, "travelDistance", Math.max(5, Math.min(60, parseInt(e.target.value) || 30)))}
                         className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none" />
                       {area.travelDistance > 30 && (
-                        <p className="text-[10px] text-red-500 mt-0.5">Exceeds BS 5306-8 max 30m</p>
+                        <p className="text-[10px] text-red-500 mt-0.5">Exceeds BS 5306-8:2023 Class A/C max 30m</p>
+                      )}
+                      {area.travelDistance > 10 && area.travelDistance <= 30 && area.risks.some(r => {
+                        const risk = FIRE_RISKS.find(fr => fr.id === r);
+                        return risk?.fireClasses.some(fc => fc === "B" || fc === "F" || fc === "ELECTRICAL");
+                      }) && (
+                        <p className="text-[10px] text-amber-600 mt-0.5">Exceeds BS 5306-8:2023 max 10m for Class B/F/electrical fires present in this area</p>
                       )}
                     </div>
                   </div>
@@ -1178,7 +1184,7 @@ export default function FireExtinguisherSelectorClient() {
       {/* ── Footer ──────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-          This tool provides decision-support guidance per BS 5306-8:2012, RRFSO 2005, and BS EN 3. It does not replace a site-specific fire risk assessment by a competent fire safety professional. Always verify recommendations with your Responsible Person or fire safety advisor.
+          This tool provides decision-support guidance per BS 5306-8:2023, RRFSO 2005, and BS EN 3. It does not replace a site-specific fire risk assessment by a competent fire safety professional. Always verify recommendations with your Responsible Person or fire safety advisor.
         </p>
       </div>
     </div>
