@@ -219,9 +219,9 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
       "As soon as practicable BEFORE the construction phase begins (HSE recommends at least 14 days before start on site).",
     recommendedLeadDays: 14,
     method:
-      "Online submission via the HSE F10 portal (preferred) or by sending an F10 form to the HSE by post.",
+      "Online submission only via the HSE F10 portal (https://form.hse.gov.uk/f10). HSE no longer accepts paper forms or notifications by email or post.",
     form: "F10 -- Notification of construction project",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
       "The CLIENT is responsible for submitting the F10 notification under CDM 2015 reg 6(1). The duty cannot be delegated, although the client may arrange for another party (e.g. the PD) to prepare the form on their behalf.",
     updateRequired: false,
@@ -255,9 +255,9 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
       "As soon as practicable BEFORE the construction phase begins (HSE recommends at least 14 days before start on site).",
     recommendedLeadDays: 14,
     method:
-      "Online submission via the HSE F10 portal (preferred) or by sending an F10 form to the HSE by post.",
+      "Online submission only via the HSE F10 portal (https://form.hse.gov.uk/f10). HSE no longer accepts paper forms or notifications by email or post.",
     form: "F10 -- Notification of construction project",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
       "The CLIENT is responsible for submitting the F10 notification under CDM 2015 reg 6(1).",
     updateRequired: false,
@@ -309,16 +309,16 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
   "new-notifiable-multi-pre-start": {
     id: "new-notifiable-multi-pre-start",
     notifiable: true,
-    title: "NOTIFIABLE -- Construction Already Started (Overdue)",
+    title: "NOTIFIABLE -- Construction Already Started (Overdue, Multi-Contractor)",
     description:
       "The project is notifiable AND construction has already begun. The F10 must be submitted IMMEDIATELY -- failure to notify before works commenced is a breach of CDM 2015 reg 6(1).",
     deadline:
       "IMMEDIATE -- submit the F10 without further delay. Under CDM 2015 reg 6(1), the notification should have been made BEFORE the construction phase began.",
     recommendedLeadDays: 0,
     method:
-      "Online submission via the HSE F10 portal without delay. Document the reason for late notification in the project records.",
+      "Online submission only via the HSE F10 portal (https://form.hse.gov.uk/f10) without delay. Document the reason for late notification in the project records. HSE no longer accepts paper forms or notifications by email or post.",
     form: "F10 -- Notification of construction project",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
       "The CLIENT is responsible for submitting the F10. Failure to notify a notifiable project is an offence under HSWA 1974 s33 and may attract HSE enforcement action.",
     updateRequired: false,
@@ -353,7 +353,7 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
     method:
       "Log in to the HSE F10 portal using the original submission reference and update the Principal Contractor particulars.",
     form: "F10 -- Notification of construction project (Update)",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
       "The CLIENT is responsible for updating the F10 under CDM 2015 reg 6(2), even where the incoming PC prepares the revision.",
     updateRequired: true,
@@ -385,7 +385,7 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
     method:
       "Log in to the HSE F10 portal using the original submission reference and update the Principal Designer particulars.",
     form: "F10 -- Notification of construction project (Update)",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
       "The CLIENT is responsible for updating the F10 under CDM 2015 reg 6(2).",
     updateRequired: true,
@@ -417,7 +417,7 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
     method:
       "Log in to the HSE F10 portal using the original submission reference and update the relevant particulars.",
     form: "F10 -- Notification of construction project (Update)",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
       "The CLIENT is responsible for updating the F10 under CDM 2015 reg 6(2).",
     updateRequired: true,
@@ -468,24 +468,24 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
     notifiable: true,
     title: "DOMESTIC CLIENT -- Duties Transfer to PC (and F10 Required)",
     description:
-      "The project is for a domestic client (private home, not a business). The project is notifiable under reg 6. Client duties transfer to the Principal Contractor under reg 7(1), or to the Principal Designer if there is a written agreement (reg 7(2)).",
+      "The project is for a domestic client (private home, not a business). The project is notifiable under reg 6. Client duties transfer to the Principal Contractor under reg 7(1), or to the Principal Designer if there is a written agreement (reg 7(1)(c)).",
     deadline:
       "As soon as practicable before the construction phase begins (HSE recommends at least 14 days before start).",
     recommendedLeadDays: 14,
     method:
-      "Online submission via the HSE F10 portal by the PC (or PD with written agreement), not the domestic client.",
+      "Online submission only via the HSE F10 portal (https://form.hse.gov.uk/f10) by the PC (or PD with written agreement under reg 7(1)(c)), not the domestic client. HSE no longer accepts paper forms or notifications by email or post.",
     form: "F10 -- Notification of construction project",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
-      "The PRINCIPAL CONTRACTOR submits the F10 under CDM 2015 reg 7(1), unless there is a written agreement between the PD and the domestic client transferring the duties to the PD (reg 7(2)).",
+      "The PRINCIPAL CONTRACTOR submits the F10 under CDM 2015 reg 7(1), unless there is a written agreement between the PD and the domestic client transferring the duties to the PD (reg 7(1)(c)).",
     updateRequired: false,
     displayRequired: true,
     pdPcAppointmentRequired: true,
     recordKeeping:
-      "Retain a copy of the F10, the HSE acknowledgement, and any written agreement transferring duties under reg 7(2). Display the F10 on site.",
+      "Retain a copy of the F10, the HSE acknowledgement, and any written agreement transferring duties under reg 7(1)(c). Display the F10 on site.",
     regulations: [
       "CDM 2015 Reg 7(1) -- Domestic client duties transfer to PC",
-      "CDM 2015 Reg 7(2) -- Written agreement for PD to take on duties",
+      "CDM 2015 Reg 7(1)(c) -- Written agreement for PD to take on duties",
       "CDM 2015 Reg 6(1) -- Notification to HSE",
       "CDM 2015 Reg 6(4) -- Display on site",
       "HSE L153 -- Managing health and safety in construction",
@@ -493,7 +493,7 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
     additionalNotes: [
       "A 'domestic client' means an individual having work done at their private dwelling that is not connected with any business.",
       "Under reg 7(1), if the client does NOT appoint a PC, the domestic client duties transfer automatically.",
-      "Under reg 7(2), a PD may take on the client duties by WRITTEN agreement with the domestic client.",
+      "Under reg 7(1)(c), a PD may take on the client duties by WRITTEN agreement with the domestic client.",
       "The domestic client retains no CDM duties once transferred.",
     ],
   },
@@ -503,23 +503,23 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
     title:
       "DOMESTIC CLIENT -- Duties Transfer to PD (Written Agreement, F10 Required)",
     description:
-      "The project is for a domestic client AND a written agreement exists between the Principal Designer and the domestic client transferring the client duties to the PD under CDM 2015 reg 7(2). The project is notifiable.",
+      "The project is for a domestic client AND a written agreement exists between the Principal Designer and the domestic client transferring the client duties to the PD under CDM 2015 reg 7(1)(c). The project is notifiable.",
     deadline:
       "As soon as practicable before the construction phase begins (HSE recommends at least 14 days before start).",
     recommendedLeadDays: 14,
     method:
-      "Online submission via the HSE F10 portal by the Principal Designer.",
+      "Online submission only via the HSE F10 portal (https://form.hse.gov.uk/f10) by the Principal Designer. HSE no longer accepts paper forms or notifications by email or post.",
     form: "F10 -- Notification of construction project",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
-      "The PRINCIPAL DESIGNER submits the F10 under the written reg 7(2) agreement.",
+      "The PRINCIPAL DESIGNER submits the F10 under the written reg 7(1)(c) agreement.",
     updateRequired: false,
     displayRequired: true,
     pdPcAppointmentRequired: true,
     recordKeeping:
-      "Retain a signed copy of the reg 7(2) written agreement alongside the F10. Display the F10 on site.",
+      "Retain a signed copy of the reg 7(1)(c) written agreement alongside the F10. Display the F10 on site.",
     regulations: [
-      "CDM 2015 Reg 7(2) -- Written agreement for PD to take on client duties",
+      "CDM 2015 Reg 7(1)(c) -- Written agreement for PD to take on client duties",
       "CDM 2015 Reg 6(1) -- Notification to HSE",
       "CDM 2015 Reg 6(4) -- Display on site",
       "HSE L153 -- Managing health and safety in construction",
@@ -535,20 +535,20 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
     notifiable: false,
     title: "DOMESTIC CLIENT -- Not Notifiable (Duties Still Transfer)",
     description:
-      "The project is for a domestic client and does NOT meet the reg 6(1) notification thresholds. No F10 required, but the client duties still transfer to the PC (reg 7(1)) or PD (reg 7(2)).",
+      "The project is for a domestic client and does NOT meet the reg 6(1) notification thresholds. No F10 required, but the client duties still transfer to the PC (reg 7(1)) or PD (reg 7(1)(c)).",
     deadline: "Not applicable -- project is not notifiable.",
     method: "No F10 submission required.",
     form: "N/A",
     responsiblePerson:
-      "All other CDM duties remain. The PC (or PD under a reg 7(2) agreement) takes on the domestic client duties.",
+      "All other CDM duties remain. The PC (or PD under a reg 7(1)(c) agreement) takes on the domestic client duties.",
     updateRequired: false,
     displayRequired: false,
     pdPcAppointmentRequired: false,
     recordKeeping:
-      "Retain any reg 7(2) written agreement. Record the notifiability determination for project records.",
+      "Retain any reg 7(1)(c) written agreement. Record the notifiability determination for project records.",
     regulations: [
       "CDM 2015 Reg 7(1) -- Domestic client duties transfer",
-      "CDM 2015 Reg 7(2) -- Written agreement for PD",
+      "CDM 2015 Reg 7(1)(c) -- Written agreement for PD",
       "CDM 2015 Reg 6(1) -- Notification thresholds",
       "HSE L153 -- Managing health and safety in construction",
     ],
@@ -598,7 +598,7 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
     method:
       "Print a copy of the HSE F10 acknowledgement (or the current revised F10) and display it on the site noticeboard or an equivalent location visible to all workers.",
     form: "F10 -- Notification of construction project (display copy)",
-    portalUrl: "https://notifications.hse.gov.uk/F10/Online/Create",
+    portalUrl: "https://form.hse.gov.uk/f10",
     responsiblePerson:
       "The Principal Contractor is responsible for ensuring the F10 is displayed on site under reg 13.",
     updateRequired: true,
@@ -616,6 +616,171 @@ export const TERMINAL_RESULTS: Record<string, TerminalResult> = {
       "HSE inspectors will look for the displayed F10 during a site visit -- absence is visible evidence of non-compliance.",
       "If the F10 particulars have changed since the original submission, update the F10 before displaying.",
       "Consider laminating the displayed copy to protect against weather.",
+    ],
+  },
+
+  // ── EXTRA terminals introduced during Batch 5 review ─────────
+  // Splits the late-notification path into single vs multi-contractor outcomes
+  // (the original `new-notifiable-multi-pre-start` blanket-applied PD/PC duties
+  // even to single-contractor projects, which is wrong under reg 5).
+  "new-notifiable-single-pre-start": {
+    id: "new-notifiable-single-pre-start",
+    notifiable: true,
+    title: "NOTIFIABLE -- Construction Already Started (Overdue, Single Contractor)",
+    description:
+      "The project is notifiable AND construction has already begun. The F10 must be submitted IMMEDIATELY -- failure to notify before works commenced is a breach of CDM 2015 reg 6(1). As only one contractor is involved, PD/PC appointment under reg 5 is not strictly required, but the contractor carries PC-equivalent duties.",
+    deadline:
+      "IMMEDIATE -- submit the F10 without further delay. Under CDM 2015 reg 6(1), the notification should have been made BEFORE the construction phase began.",
+    recommendedLeadDays: 0,
+    method:
+      "Online submission only via the HSE F10 portal (https://form.hse.gov.uk/f10) without delay. Document the reason for late notification in the project records. HSE no longer accepts paper forms or notifications by email or post.",
+    form: "F10 -- Notification of construction project",
+    portalUrl: "https://form.hse.gov.uk/f10",
+    responsiblePerson:
+      "The CLIENT is responsible for submitting the F10. Failure to notify a notifiable project is an offence under HSWA 1974 s33 and may attract HSE enforcement action.",
+    updateRequired: false,
+    displayRequired: true,
+    pdPcAppointmentRequired: false,
+    recordKeeping:
+      "Record the reason for late notification, the date construction started, and the date the F10 was submitted. Display the F10 on site immediately upon receipt of the HSE acknowledgement.",
+    regulations: [
+      "CDM 2015 Reg 6(1) -- Notification to HSE",
+      "CDM 2015 Reg 6(4) -- Display on site",
+      "CDM 2015 Reg 15 -- Duties of contractors (single-contractor obligations)",
+      "HSWA 1974 s33 -- Offences",
+      "HSE L153 -- Managing health and safety in construction",
+    ],
+    additionalNotes: [
+      "A late F10 is better than no F10. Submit immediately.",
+      "If additional contractors are subsequently engaged, PD/PC must be appointed in writing under reg 5 and the F10 must be updated under reg 6(2).",
+      "The HSE may make enquiries about the delay. Be prepared to explain the reasons.",
+      "Late notification does not retrospectively cover the pre-notification period -- the client remained in breach.",
+    ],
+  },
+
+  // Differentiates the non-notifiable-domestic outcome based on contractor count
+  // (the original tree asked the question but used the same terminal either way).
+  "domestic-not-notifiable-multi": {
+    id: "domestic-not-notifiable-multi",
+    notifiable: false,
+    title: "DOMESTIC CLIENT -- Not Notifiable (Multi-Contractor, PD/PC Still Required)",
+    description:
+      "The project is for a domestic client and does NOT meet the reg 6(1) notification thresholds, so no F10 is required. However more than one contractor is engaged, so a Principal Designer and Principal Contractor MUST still be appointed in writing under reg 5. Client duties transfer to the PC under reg 7(1)(b), or to the PD under reg 7(1)(c) if a written agreement is in place.",
+    deadline: "Not applicable -- project is not notifiable. Reg 5 PD/PC appointments must be in place before the construction phase begins.",
+    method: "No F10 submission required.",
+    form: "N/A",
+    responsiblePerson:
+      "PD and PC must be appointed in writing by the domestic client under reg 5. Client duties then transfer to the PC (reg 7(1)(b)) or PD by written agreement (reg 7(1)(c)). If the domestic client fails to appoint, reg 7(2) applies: the designer in control of the pre-construction phase becomes the PD, the contractor in control of the construction phase becomes the PC.",
+    updateRequired: false,
+    displayRequired: false,
+    pdPcAppointmentRequired: true,
+    recordKeeping:
+      "Retain written reg 5 appointments and any reg 7(1)(c) PD agreement. Record the notifiability determination for project records.",
+    regulations: [
+      "CDM 2015 Reg 5 -- Appointment of PD and PC (multi-contractor)",
+      "CDM 2015 Reg 6(1) -- Notification thresholds",
+      "CDM 2015 Reg 7(1) -- Domestic client duty transfer",
+      "CDM 2015 Reg 7(2) -- Default appointments where domestic client fails to appoint",
+      "HSE L153 -- Managing health and safety in construction",
+    ],
+    additionalNotes: [
+      "Even non-notifiable domestic projects must comply with the rest of CDM 2015.",
+      "Without written reg 5 appointments, reg 7(2) automatically defaults the PD/PC roles to the relevant designer/contractor in control.",
+    ],
+  },
+
+  "domestic-not-notifiable-single": {
+    id: "domestic-not-notifiable-single",
+    notifiable: false,
+    title: "DOMESTIC CLIENT -- Not Notifiable (Single Contractor)",
+    description:
+      "The project is for a domestic client and does NOT meet the reg 6(1) notification thresholds. As only one contractor is involved, PD/PC appointment is not required. Domestic client duties transfer to the contractor under reg 7(1)(a).",
+    deadline: "Not applicable -- project is not notifiable.",
+    method: "No F10 submission required.",
+    form: "N/A",
+    responsiblePerson:
+      "The CONTRACTOR takes on the domestic client duties under reg 7(1)(a) in addition to their own contractor duties under reg 15.",
+    updateRequired: false,
+    displayRequired: false,
+    pdPcAppointmentRequired: false,
+    recordKeeping:
+      "Record the notifiability determination for project records. The contractor must retain evidence of compliance with reg 15 contractor duties.",
+    regulations: [
+      "CDM 2015 Reg 7(1)(a) -- Domestic client duties transfer to single contractor",
+      "CDM 2015 Reg 6(1) -- Notification thresholds",
+      "CDM 2015 Reg 15 -- Duties of contractors",
+      "HSE L153 -- Managing health and safety in construction",
+    ],
+    additionalNotes: [
+      "Even non-notifiable domestic projects must comply with the rest of CDM 2015.",
+      "If a second contractor is engaged at any point, the project becomes a multi-contractor project: the domestic client must appoint PD/PC in writing under reg 5 and the duty transfer route changes to reg 7(1)(b).",
+    ],
+  },
+
+  // Differentiates "yes -- written appointment in place" (proceed with update) from
+  // "no -- get the appointment in writing first" (update is BLOCKED until appointed).
+  // Original tree collapsed both onto update-required-pc-change which lost the action item.
+  "update-blocked-pc-no-written-appointment": {
+    id: "update-blocked-pc-no-written-appointment",
+    notifiable: true,
+    title: "F10 UPDATE BLOCKED -- Secure PC Written Appointment First",
+    description:
+      "A change of Principal Contractor has been initiated, but the new PC has not yet been appointed in writing by the client. CDM 2015 reg 5(1)(b) requires PC appointments to be in writing. The F10 update under reg 6(2) cannot be completed honestly until the written appointment is in place; meanwhile the client is exposed to the reg 5(3)/(4) consequence of carrying the PC duties personally.",
+    deadline: "IMMEDIATE -- arrange the written PC appointment, then update the F10 within days.",
+    recommendedLeadDays: 0,
+    method: "Once the written reg 5 appointment is in place, update the F10 via the HSE portal (https://form.hse.gov.uk/f10) using the original submission reference.",
+    form: "F10 -- Notification of construction project (Update, after written appointment)",
+    portalUrl: "https://form.hse.gov.uk/f10",
+    responsiblePerson:
+      "The CLIENT must (1) make the written PC appointment under reg 5(1)(b), then (2) update the F10 under reg 6(2). Until step (1) is complete, the client carries the PC duties under reg 5(4).",
+    updateRequired: true,
+    displayRequired: true,
+    pdPcAppointmentRequired: true,
+    recordKeeping:
+      "Retain the new written reg 5 appointment, the H&S file handover from the outgoing PC, and both the original and revised F10. Display the new F10 once issued.",
+    regulations: [
+      "CDM 2015 Reg 5(1)(b) -- Written appointment of Principal Contractor",
+      "CDM 2015 Reg 5(4) -- Client carries PC duties if no written PC appointed",
+      "CDM 2015 Reg 6(2) -- Notification of change of particulars",
+      "CDM 2015 Reg 6(4) -- Display on site",
+      "HSE L153 -- Managing health and safety in construction",
+    ],
+    additionalNotes: [
+      "Re-appointment MUST be in writing before the F10 update is submitted.",
+      "Outgoing PC must hand over all H&S file material before the change takes effect.",
+      "Until the written appointment is made, the client is the PC by default and bears the reg 13/14 PC duties personally.",
+    ],
+  },
+
+  "update-blocked-pd-no-written-appointment": {
+    id: "update-blocked-pd-no-written-appointment",
+    notifiable: true,
+    title: "F10 UPDATE BLOCKED -- Secure PD Written Appointment First",
+    description:
+      "A change of Principal Designer has been initiated, but the new PD has not yet been appointed in writing by the client. CDM 2015 reg 5(1)(a) requires PD appointments to be in writing. The F10 update under reg 6(2) cannot be completed honestly until the written appointment is in place; meanwhile the client carries the PD duties under reg 5(3).",
+    deadline: "IMMEDIATE -- arrange the written PD appointment, then update the F10 within days.",
+    recommendedLeadDays: 0,
+    method: "Once the written reg 5 appointment is in place, update the F10 via the HSE portal (https://form.hse.gov.uk/f10) using the original submission reference.",
+    form: "F10 -- Notification of construction project (Update, after written appointment)",
+    portalUrl: "https://form.hse.gov.uk/f10",
+    responsiblePerson:
+      "The CLIENT must (1) make the written PD appointment under reg 5(1)(a), then (2) update the F10 under reg 6(2). Until step (1) is complete, the client carries the PD duties under reg 5(3).",
+    updateRequired: true,
+    displayRequired: true,
+    pdPcAppointmentRequired: true,
+    recordKeeping:
+      "Retain the new written reg 5 appointment, the pre-construction information handover from the outgoing PD, and both the original and revised F10. Display the new F10 once issued.",
+    regulations: [
+      "CDM 2015 Reg 5(1)(a) -- Written appointment of Principal Designer",
+      "CDM 2015 Reg 5(3) -- Client carries PD duties if no written PD appointed",
+      "CDM 2015 Reg 6(2) -- Notification of change of particulars",
+      "CDM 2015 Reg 11 -- PD duties",
+      "HSE L153 -- Managing health and safety in construction",
+    ],
+    additionalNotes: [
+      "Re-appointment MUST be in writing before the F10 update is submitted.",
+      "PD handover must include all pre-construction information gathered to date.",
+      "Until the written appointment is made, the client is the PD by default and bears the reg 11 PD duties personally.",
     ],
   },
 };
@@ -668,8 +833,26 @@ export const NEW_PROJECT_NODES: TreeNode[] = [
       },
       {
         label: "YES -- construction has ALREADY started without F10 submitted",
-        description: "Late notification -- submit immediately.",
+        description: "Late notification -- the next question determines whether PD/PC appointment is required.",
+        nextNodeId: "new-3a",
+      },
+    ],
+  },
+  {
+    id: "new-3a",
+    question:
+      "(Late notification) Will more than one contractor be engaged on the project at any point?",
+    helpText:
+      "Even for late-notified projects, the reg 5 PD/PC appointment trigger turns on whether the project is multi-contractor. A single-contractor late-notified project does not require PD/PC under reg 5; the contractor carries reg 15 duties.",
+    regulation: "CDM 2015 Reg 5",
+    options: [
+      {
+        label: "Yes -- more than one contractor (PD/PC required)",
         terminalId: "new-notifiable-multi-pre-start",
+      },
+      {
+        label: "No -- only a single contractor",
+        terminalId: "new-notifiable-single-pre-start",
       },
     ],
   },
@@ -731,7 +914,7 @@ export const UPDATE_NODES: TreeNode[] = [
     question:
       "Has the new Principal Contractor been appointed in writing by the client?",
     helpText:
-      "Under reg 5, the PC appointment must be in writing. Without a written appointment, the client takes on the PC duties themselves until appointment is made.",
+      "Under reg 5, the PC appointment must be in writing. Without a written appointment, the client takes on the PC duties themselves under reg 5(4) until appointment is made -- and the F10 update should not be submitted listing a PC that has not yet been formally appointed.",
     regulation: "CDM 2015 Reg 5(1)(b)",
     options: [
       {
@@ -740,8 +923,8 @@ export const UPDATE_NODES: TreeNode[] = [
       },
       {
         label: "No -- appointment not yet written",
-        description: "Secure the written appointment BEFORE updating the F10.",
-        terminalId: "update-required-pc-change",
+        description: "F10 update is BLOCKED until the written appointment is in place.",
+        terminalId: "update-blocked-pc-no-written-appointment",
       },
     ],
   },
@@ -750,7 +933,7 @@ export const UPDATE_NODES: TreeNode[] = [
     question:
       "Has the new Principal Designer been appointed in writing by the client?",
     helpText:
-      "Under reg 5, the PD appointment must be in writing. Without a written appointment, the client takes on the PD duties themselves until appointment is made.",
+      "Under reg 5, the PD appointment must be in writing. Without a written appointment, the client takes on the PD duties themselves under reg 5(3) until appointment is made -- and the F10 update should not be submitted listing a PD that has not yet been formally appointed.",
     regulation: "CDM 2015 Reg 5(1)(a)",
     options: [
       {
@@ -759,8 +942,8 @@ export const UPDATE_NODES: TreeNode[] = [
       },
       {
         label: "No -- appointment not yet written",
-        description: "Secure the written appointment BEFORE updating the F10.",
-        terminalId: "update-required-pd-change",
+        description: "F10 update is BLOCKED until the written appointment is in place.",
+        terminalId: "update-blocked-pd-no-written-appointment",
       },
     ],
   },
@@ -822,13 +1005,13 @@ export const DOMESTIC_NODES: TreeNode[] = [
   {
     id: "dom-2",
     question:
-      "Is there a written agreement between the Principal Designer and the domestic client transferring client duties to the PD under reg 7(2)?",
+      "Is there a written agreement between the Principal Designer and the domestic client transferring client duties to the PD under reg 7(1)(c)?",
     helpText:
-      "Reg 7(2) allows a PD to take on the domestic client duties, but only by written agreement. Without such an agreement, reg 7(1) applies and the duties fall to the PC.",
-    regulation: "CDM 2015 Reg 7(2)",
+      "Reg 7(1)(c) allows a PD to take on the domestic client duties, but only by written agreement. Without such an agreement, reg 7(1) applies and the duties fall to the PC.",
+    regulation: "CDM 2015 Reg 7(1)(c)",
     options: [
       {
-        label: "Yes -- signed reg 7(2) agreement in place",
+        label: "Yes -- signed reg 7(1)(c) agreement in place",
         terminalId: "domestic-duties-to-pd",
       },
       {
@@ -842,16 +1025,18 @@ export const DOMESTIC_NODES: TreeNode[] = [
     question:
       "Will more than one contractor be engaged on the project at any point?",
     helpText:
-      "Even for non-notifiable domestic projects, PD/PC must be appointed in writing where multiple contractors are involved.",
+      "Even for non-notifiable domestic projects, PD/PC must be appointed in writing under reg 5 where multiple contractors are involved. Reg 7(1)(b) transfers client duties to the PC. For a single-contractor domestic project, reg 7(1)(a) transfers the duties to that contractor and PD/PC appointment is not required.",
     regulation: "CDM 2015 Reg 5",
     options: [
       {
         label: "Yes -- multiple contractors",
-        terminalId: "domestic-not-notifiable",
+        description: "PD and PC must still be appointed in writing under reg 5.",
+        terminalId: "domestic-not-notifiable-multi",
       },
       {
         label: "No -- single contractor only",
-        terminalId: "domestic-not-notifiable",
+        description: "Domestic client duties transfer to the contractor under reg 7(1)(a).",
+        terminalId: "domestic-not-notifiable-single",
       },
     ],
   },
@@ -934,14 +1119,20 @@ export const CATEGORY_FIRST_NODE: Record<F10Category, string> = {
 // ─── HSE Contact Details ────────────────────────────────────────
 
 export const HSE_CONTACTS = {
-  f10Portal: "https://notifications.hse.gov.uk/F10/Online/Create",
-  f10Guidance: "https://www.hse.gov.uk/construction/cdm/2015/notification.htm",
+  // Verified from https://www.hse.gov.uk/forms/notification/f10.htm (April 2026):
+  // HSE no longer accepts F10 submissions by email or post. Submission is online only.
+  // The HSE Customer Services Team handles F10 enquiries via telephone.
+  f10Portal: "https://form.hse.gov.uk/f10",
+  f10Guidance: "https://www.hse.gov.uk/forms/notification/f10.htm",
+  f10ConstructionGuidance: "https://www.hse.gov.uk/construction/cdm/2015/notification.htm",
   l153Url: "https://www.hse.gov.uk/pubns/books/l153.htm",
   hseInfoLine: "0300 003 1747",
   hseInfoLineHours: "Monday to Friday, 8:30am to 5pm",
   hseAddress:
     "Health and Safety Executive, Redgrave Court, Merton Road, Bootle, Merseyside L20 7HS",
-  f10EnquiriesEmail: "notifications@hse.gov.uk",
+  // F10 enquiries are routed through the Customer Services Team telephone (above).
+  // HSE does not publish a dedicated F10 enquiries email -- previous "notifications@hse.gov.uk"
+  // address removed as it could not be verified against the HSE F10 page.
 };
 
 // ─── F10 Field Catalogue (mandatory fields per HSE F10 form) ────
@@ -956,6 +1147,29 @@ export interface F10Field {
   description: string;
 }
 
+// CDM 2015 Schedule 1 ("Particulars to be notified under regulation 6") contains
+// 15 paragraphs. The mapping below uses the actual statutory paragraph numbers
+// for the items that ARE in Schedule 1, and labels the additional fields the
+// HSE F10 portal asks for (project name, existing site use, demolition flag,
+// submission date) as "HSE F10 form (additional)" -- they are not legally
+// required by Schedule 1 but the online portal collects them.
+//
+// Schedule 1 (CDM 2015):
+//   1.  Date of forwarding the notice
+//   2.  Address of the construction site
+//   3.  Name of the local authority
+//   4.  Brief description of the project and the construction work
+//   5.  Contact details of the client
+//   6.  Contact details of the principal designer
+//   7.  Contact details of the principal contractor
+//   8.  Date planned for the start of the construction phase
+//   9.  Time allocated by the client under reg 4(1) for the construction work
+//  10.  Planned duration of the construction phase
+//  11.  Estimated maximum number of people at work on site
+//  12.  Planned number of contractors on the construction site
+//  13.  Name and address of any contractor already appointed
+//  14.  Name and address of any designer already appointed
+//  15.  Declaration signed by or on behalf of the client
 export const F10_FIELDS: F10Field[] = [
   // Project identification
   {
@@ -963,9 +1177,9 @@ export const F10_FIELDS: F10Field[] = [
     label: "Project name / title",
     section: "Project Identification",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 1",
+    mandatoryReg: "HSE F10 form (additional, not in Sched 1)",
     inputSource: "projectName",
-    description: "Short identifying name for the project (e.g. 'Main Street Flats -- Fit-out').",
+    description: "Short identifying name for the project (e.g. 'Main Street Flats -- Fit-out'). Not a statutory Sched 1 particular but collected by the HSE F10 online portal as a project identifier.",
   },
   {
     id: "site-address",
@@ -991,16 +1205,16 @@ export const F10_FIELDS: F10Field[] = [
     label: "Brief description of existing use of site",
     section: "Project Identification",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 4",
+    mandatoryReg: "HSE F10 form (additional, not in Sched 1)",
     inputSource: "existingUse",
-    description: "What the site is currently used for (e.g. 'vacant warehouse', 'occupied office').",
+    description: "What the site is currently used for (e.g. 'vacant warehouse', 'occupied office'). Collected by the HSE F10 portal but not a statutory Sched 1 particular.",
   },
   {
     id: "brief-description",
     label: "Brief description of the construction work",
     section: "Project Identification",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 5",
+    mandatoryReg: "CDM 2015 Sched 1 para 4",
     inputSource: "briefDescription",
     description:
       "One- or two-sentence description of the works (e.g. 'Demolition of existing warehouse and erection of 12-storey residential building').",
@@ -1011,7 +1225,7 @@ export const F10_FIELDS: F10Field[] = [
     label: "Planned date for construction phase start",
     section: "Timing & Workforce",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 6",
+    mandatoryReg: "CDM 2015 Sched 1 para 8",
     inputSource: "plannedStartDate",
     description: "Date construction work is planned to begin on site.",
   },
@@ -1020,16 +1234,16 @@ export const F10_FIELDS: F10Field[] = [
     label: "Planned duration of the construction phase",
     section: "Timing & Workforce",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 7",
+    mandatoryReg: "CDM 2015 Sched 1 para 10",
     inputSource: "durationWeeks",
-    description: "Expected total length of the construction phase, in weeks.",
+    description: "Expected total length of the construction phase, in weeks. (Sched 1 para 9 -- the time allocated by the client under reg 4(1) -- is a related but separately-listed particular and is captured by the HSE F10 portal.)",
   },
   {
     id: "peak-workers",
     label: "Estimated maximum number of people working simultaneously on site",
     section: "Timing & Workforce",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 8",
+    mandatoryReg: "CDM 2015 Sched 1 para 11",
     inputSource: "peakSimultaneousWorkers",
     description: "Peak simultaneous workforce -- drives the reg 6(1) threshold test.",
   },
@@ -1038,7 +1252,7 @@ export const F10_FIELDS: F10Field[] = [
     label: "Estimated number of contractor organisations on the project",
     section: "Timing & Workforce",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 9",
+    mandatoryReg: "CDM 2015 Sched 1 para 12",
     inputSource: "contractorOrganisationCount",
     description: "Number of separate contractor companies expected to be engaged.",
   },
@@ -1047,10 +1261,10 @@ export const F10_FIELDS: F10Field[] = [
     label: "Does the project involve demolition?",
     section: "Timing & Workforce",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 10",
+    mandatoryReg: "HSE F10 form (additional, not in Sched 1)",
     inputSource: "demolitionInvolved",
     description:
-      "If yes, additional duties apply under CDM 2015 Part 4 (construction site health and safety).",
+      "If yes, additional duties apply under CDM 2015 Part 4 (construction site health and safety). Collected by the HSE F10 portal but not a statutory Sched 1 particular.",
   },
   // Duty holders
   {
@@ -1058,77 +1272,77 @@ export const F10_FIELDS: F10Field[] = [
     label: "Client's name",
     section: "Duty Holders",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 11",
+    mandatoryReg: "CDM 2015 Sched 1 para 5",
     inputSource: "clientName",
-    description: "Name of the client (or domestic client where reg 7 applies).",
+    description: "Name of the client (or domestic client where reg 7 applies). Sched 1 para 5 requires full contact details (name, address, telephone, email) -- this field captures the name component.",
   },
   {
     id: "client-address",
     label: "Client's address and contact details",
     section: "Duty Holders",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 12",
+    mandatoryReg: "CDM 2015 Sched 1 para 5",
     inputSource: "manual",
-    description: "Address, telephone, email of the client.",
+    description: "Address, telephone, email of the client (Sched 1 para 5 contact details).",
   },
   {
     id: "pd-name",
     label: "Principal Designer's name (if appointed)",
     section: "Duty Holders",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 13",
+    mandatoryReg: "CDM 2015 Sched 1 para 6",
     inputSource: "pdName",
     description:
-      "Must be appointed in writing under reg 5 where more than one contractor is engaged.",
+      "Must be appointed in writing under reg 5 where more than one contractor is engaged. Sched 1 para 6 requires PD contact details.",
   },
   {
     id: "pd-address",
     label: "Principal Designer's address and contact details",
     section: "Duty Holders",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 14",
+    mandatoryReg: "CDM 2015 Sched 1 para 6",
     inputSource: "manual",
-    description: "Address, telephone, email of the PD.",
+    description: "Address, telephone, email of the PD (Sched 1 para 6 contact details).",
   },
   {
     id: "pc-name",
     label: "Principal Contractor's name (if appointed)",
     section: "Duty Holders",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 15",
+    mandatoryReg: "CDM 2015 Sched 1 para 7",
     inputSource: "pcName",
     description:
-      "Must be appointed in writing under reg 5 where more than one contractor is engaged.",
+      "Must be appointed in writing under reg 5 where more than one contractor is engaged. Sched 1 para 7 requires PC contact details.",
   },
   {
     id: "pc-address",
     label: "Principal Contractor's address and contact details",
     section: "Duty Holders",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 16",
+    mandatoryReg: "CDM 2015 Sched 1 para 7",
     inputSource: "manual",
-    description: "Address, telephone, email of the PC.",
+    description: "Address, telephone, email of the PC (Sched 1 para 7 contact details).",
   },
   // Declaration
   {
     id: "declaration",
     label:
-      "Declaration by client that PD / PC are aware of their duties (for multi-contractor projects)",
+      "Declaration by client that they are aware of their CDM 2015 duties",
     section: "Declaration",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 17",
+    mandatoryReg: "CDM 2015 Sched 1 para 15",
     inputSource: "manual",
     description:
-      "Client declaration that the PD and PC are aware of their duties under CDM 2015. Online portal captures this as a tick box.",
+      "Declaration signed by or on behalf of the client that the client is aware of the duties under CDM 2015. The HSE F10 online portal captures this as a tick box.",
   },
   {
     id: "submission-date",
     label: "Date of notification",
     section: "Declaration",
     required: true,
-    mandatoryReg: "CDM 2015 Sched 1 para 18",
+    mandatoryReg: "CDM 2015 Sched 1 para 1",
     inputSource: "derived",
-    description: "Date the F10 is submitted to HSE. Auto-captured by the online portal.",
+    description: "Date the F10 is forwarded to HSE (Sched 1 para 1, 'date of forwarding the notice'). Auto-captured by the online portal at the moment of submission.",
   },
 ];
 
@@ -1223,9 +1437,9 @@ export const RESPONSIBLE_PERSON_GUIDANCE = {
         "The PRINCIPAL CONTRACTOR -- domestic client duties transfer to the PC under reg 7(1).",
     },
     {
-      scenario: "Domestic client (with reg 7(2) written agreement)",
+      scenario: "Domestic client (with reg 7(1)(c) written agreement)",
       responsible:
-        "The PRINCIPAL DESIGNER -- client duties transfer to the PD by written agreement under reg 7(2).",
+        "The PRINCIPAL DESIGNER -- client duties transfer to the PD by written agreement under reg 7(1)(c).",
     },
     {
       scenario: "Change of particulars (reg 6(2))",

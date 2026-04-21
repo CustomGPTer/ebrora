@@ -23,10 +23,14 @@ export interface ExcavationResult {
   bankM3: number;
   bulkedM3: number;
   tonnes: number;
-  wagonLoads: number;
+  wagonLoadsByWeight: number;
+  wagonLoadsByVolume: number;
+  wagonLoads: number;          // governing (max of by-weight, by-volume)
+  governedBy: "weight" | "volume" | "none";
 }
 
 export const DEFAULT_WAGON_TONNES = 20;
+export const DEFAULT_WAGON_BODY_M3 = 12; // standard 8-wheel UK tipper body capacity
 
 export function genId() { return Math.random().toString(36).slice(2, 10); }
 
@@ -45,10 +49,18 @@ export function createEmptyRow(): ExcavationRow {
   return { id: genId(), label: "", length: null, width: null, depth: null, soilTypeId: "clay", overrideDensity: null, overrideBulking: null };
 }
 
-export function calculateExcavation(row: ExcavationRow, wagonTonnes: number): ExcavationResult {
-  if (!row.length || !row.width || !row.depth) return { bankM3: 0, bulkedM3: 0, tonnes: 0, wagonLoads: 0 };
+export function calculateExcavation(
+  row: ExcavationRow,
+  wagonTonnes: number,
+  wagonBodyM3: number = DEFAULT_WAGON_BODY_M3,
+): ExcavationResult {
+  const empty: ExcavationResult = {
+    bankM3: 0, bulkedM3: 0, tonnes: 0,
+    wagonLoadsByWeight: 0, wagonLoadsByVolume: 0, wagonLoads: 0, governedBy: "none",
+  };
+  if (!row.length || !row.width || !row.depth) return empty;
   const soil = SOIL_TYPES.find(s => s.id === row.soilTypeId);
-  if (!soil) return { bankM3: 0, bulkedM3: 0, tonnes: 0, wagonLoads: 0 };
+  if (!soil) return empty;
 
   const density = row.overrideDensity ?? soil.densityTPerM3;
   const bulking = row.overrideBulking ?? soil.bulkingFactor;
@@ -56,7 +68,17 @@ export function calculateExcavation(row: ExcavationRow, wagonTonnes: number): Ex
   const bankM3 = row.length * row.width * row.depth;
   const bulkedM3 = bankM3 * bulking;
   const tonnes = bankM3 * density;
-  const wagonLoads = wagonTonnes > 0 ? tonnes / wagonTonnes : 0;
 
-  return { bankM3, bulkedM3, tonnes, wagonLoads };
+  // Wagons are constrained by BOTH weight and volume capacity.
+  // For dense spoil (rock, clay) weight typically governs; for light, low-density
+  // material (peat, topsoil) the body fills before the weight rating is reached,
+  // so volume governs and more wagon trips are needed than a weight-only model
+  // would predict. The governing load is the larger of the two.
+  const wagonLoadsByWeight = wagonTonnes > 0 ? tonnes / wagonTonnes : 0;
+  const wagonLoadsByVolume = wagonBodyM3 > 0 ? bulkedM3 / wagonBodyM3 : 0;
+  const wagonLoads = Math.max(wagonLoadsByWeight, wagonLoadsByVolume);
+  const governedBy: ExcavationResult["governedBy"] =
+    wagonLoadsByVolume > wagonLoadsByWeight ? "volume" : "weight";
+
+  return { bankM3, bulkedM3, tonnes, wagonLoadsByWeight, wagonLoadsByVolume, wagonLoads, governedBy };
 }

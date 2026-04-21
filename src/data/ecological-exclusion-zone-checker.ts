@@ -34,6 +34,38 @@ export type SpeciesGroup =
   | "white-clawed-crayfish" | "atlantic-salmon" | "freshwater-pearl-mussel"
   | "lamprey" | "invasive-plants" | "tpo-trees" | "protected-plants";
 
+// Bat roost potential drives the survey effort required (BCT 4th ed. 2023).
+// "none" suppresses the roost-potential-banded actions; the species-level actions
+// still apply. The selector is shown in the UI only when the user selects any
+// species in the "bats" group.
+export type BatRoostPotential = "none" | "low" | "moderate" | "high";
+export const BAT_ROOST_POTENTIAL_LABEL: Record<BatRoostPotential, string> = {
+  none: "Not assessed",
+  low: "Low (negligible roost features)",
+  moderate: "Moderate (some roost features)",
+  high: "High / confirmed roost",
+};
+
+// BCT (2023) Bat Surveys for Professional Ecologists, 4th edition: dusk emergence
+// surveys take precedence; dawn re-entry surveys are no longer routinely endorsed
+// because bats may return to a roost before the surveyor arrives, producing false
+// negatives. Optimal survey window is May-September (peak May-August). April and
+// October surveys are generally too cold for reliable activity-based assessment.
+// Survey effort scales with roost potential, NOT a blanket "minimum 2 visits".
+export function batSurveyEffortText(potential: BatRoostPotential): string {
+  switch (potential) {
+    case "low":
+      return "BCT 4th ed. (2023) survey effort: 1 dusk emergence survey within May-September (optimal window). Night vision aids recommended.";
+    case "moderate":
+      return "BCT 4th ed. (2023) survey effort: 2 dusk emergence surveys, with at least 1 between May and August (peak optimal window) and the other within May-September. Night vision aids recommended.";
+    case "high":
+      return "BCT 4th ed. (2023) survey effort: 3 dusk emergence surveys, with at least 2 between May and August (peak optimal window). At least one survey should ideally fall in mid-June (peak breeding) for confirmed roosts. Night vision aids recommended.";
+    case "none":
+    default:
+      return "BCT 4th ed. (2023) survey effort scales with roost potential: 1 dusk emergence survey for low, 2 for moderate, 3 for high/confirmed roost (with at least 2 of the 3 between May and August). Optimal survey window is May-September; dawn re-entry surveys are no longer routinely endorsed.";
+  }
+}
+
 export interface RestrictedPeriod {
   label: string;
   months: Month[];
@@ -531,20 +563,16 @@ const INVASIVE_PLANTS: SpeciesProfile[] = [
   },
 ];
 
-// Protected Plants (WCA Schedule 8)
-const PROTECTED_PLANTS: SpeciesProfile[] = [
-  {
-    id: "bluebell", group: "protected-plants", name: "Bluebell (Hyacinthoides non-scripta)",
-    legislation: ["Wildlife and Countryside Act 1981 (Schedule 8)"],
-    prohibitions: ["Intentionally pick, uproot, or destroy (on any land)", "Sell wild bluebells or their bulbs"],
-    restrictedPeriods: [
-      { label: "Flowering / visible", months: [4, 5, 6], severity: "moderate", description: "Bluebells flower April-June. Bulbs are present year-round but visible growth aids identification and avoidance." },
-    ],
-    exclusionZoneM: 5, exclusionZoneNote: "5m buffer from bluebell colonies where practicable. Translocation may be possible under ecological supervision.",
-    yearRoundProtection: true, habitatFeatures: ["Ancient woodland", "Hedgerows", "Shaded banks"],
-    category: "plant", epsSpecies: false,
-  },
-];
+// Protected Plants (WCA Schedule 8 — full pick/uproot/destroy protection under s.13(1)(a))
+// Note: Bluebell (Hyacinthoides non-scripta) is intentionally NOT listed here. Although bluebell
+// appears on Schedule 8, it is listed only for the s.13(2) sale offence, NOT the s.13(1)(a)
+// pick/uproot/destroy offence. The general s.13(1)(b) offence of uprooting any wild plant
+// without landowner consent applies, but on construction sites the developer typically has
+// landowner consent, so bluebell does not constitute a meaningful construction constraint.
+// (Sources: JNCC; Thomson Ecology; BSBI Code of Conduct.)
+// Schedule 8 species that DO carry the full pick/uproot/destroy protection (lady's slipper
+// orchid, fen orchid, wild gladiolus, etc.) can be added to this array as required.
+const PROTECTED_PLANTS: SpeciesProfile[] = [];
 
 // TPO Trees
 const TPO_TREES: SpeciesProfile = {
@@ -558,10 +586,10 @@ const TPO_TREES: SpeciesProfile = {
     "Failure to comply can result in unlimited fines",
   ],
   restrictedPeriods: [
-    { label: "Bird nesting season (additional constraint)", months: [3, 4, 5, 6, 7, 8], severity: "moderate", description: "TPO consent is required year-round. Nesting season adds bird protection constraints. 6 weeks LPA notification/consent period." },
+    { label: "Bird nesting season (additional constraint)", months: [3, 4, 5, 6, 7, 8], severity: "moderate", description: "TPO consent is required year-round. Nesting season adds bird protection constraints. Allow up to 8 weeks for LPA determination of TPO consent applications (or 6 weeks notification period for trees in conservation areas not covered by a TPO)." },
   ],
   exclusionZoneM: 15,
-  exclusionZoneNote: "Root Protection Area (RPA) defined by BS 5837:2012 — typically 12x stem diameter at 1.5m height. No excavation, storage, or vehicle access within RPA without arboricultural supervision.",
+  exclusionZoneNote: "Root Protection Area (RPA) defined by BS 5837:2012 -- a circle whose radius equals 12 x stem diameter measured at 1.5m height (single stem), capped at 15m radius. No excavation, storage, or vehicle access within RPA without arboricultural supervision.",
   yearRoundProtection: true,
   habitatFeatures: ["Individual specimen trees", "Groups or woodland areas covered by TPO", "Conservation area trees (6 weeks notice to LPA for any works)"],
   category: "plant", epsSpecies: false,
@@ -605,7 +633,7 @@ export const SPECIES_GROUPS: { group: SpeciesGroup; label: string; species: Spec
   { group: "freshwater-pearl-mussel", label: "Freshwater Pearl Mussel", species: [PEARL_MUSSEL] },
   { group: "lamprey", label: "Lamprey", species: [LAMPREY] },
   { group: "invasive-plants", label: "Invasive Plants", species: INVASIVE_PLANTS },
-  { group: "protected-plants", label: "Protected Plants", species: PROTECTED_PLANTS },
+  ...(PROTECTED_PLANTS.length > 0 ? [{ group: "protected-plants" as SpeciesGroup, label: "Protected Plants", species: PROTECTED_PLANTS }] : []),
   { group: "tpo-trees", label: "TPO Trees", species: [TPO_TREES] },
 ];
 
@@ -630,6 +658,7 @@ function getActionsForConflict(
   species: SpeciesProfile,
   conflictingPeriods: RestrictedPeriod[],
   worksTypes: WorksType[],
+  batRoostPotential: BatRoostPotential = "none",
 ): { actions: string[]; licenceRequired: boolean; surveyRequired: boolean; eclerkRequired: boolean } {
   const actions: string[] = [];
   let licenceRequired = false;
@@ -653,12 +682,12 @@ function getActionsForConflict(
   switch (species.group) {
     case "bats":
       surveyRequired = true;
-      actions.push("Commission bat activity surveys (emergence/re-entry surveys) by a licensed bat ecologist. Surveys are valid April-September only (minimum 2 visits, at least one dusk and one dawn).");
+      actions.push(`Commission bat surveys by a licensed bat ecologist. ${batSurveyEffortText(batRoostPotential)}`);
       if (hasLighting) {
-        actions.push("Prepare a lighting design to avoid illumination of roost entrances, flight lines, and foraging habitat. Use low-level, directional, warm-white (<2700K) lighting.");
+        actions.push("Prepare a lighting design to avoid illumination of roost entrances, flight lines, and foraging habitat per ILP/BCT GN08/23. Use low-level, directional, warm-white lighting (ideally below 2700K).");
       }
       if (hasGroundDisturbance || hasVegetationRemoval) {
-        actions.push("Maintain vegetation buffers around known roost features. Avoid tree felling during bat activity season without prior survey.");
+        actions.push("Maintain vegetation buffers around known roost features. Avoid tree felling during bat activity season (May-September) without prior survey.");
       }
       eclerkRequired = true;
       actions.push("Appoint an Ecological Clerk of Works (ECoW) to supervise works near confirmed roost locations.");
@@ -667,12 +696,12 @@ function getActionsForConflict(
     case "great-crested-newts":
       surveyRequired = true;
       if (hasGroundDisturbance || hasWatercourseImpact) {
-        actions.push("Commission eDNA survey of waterbodies within 250m (valid March-June) or traditional presence/absence surveys (4 visits, mid-March to mid-June).");
+        actions.push("Commission eDNA survey of waterbodies within 250m. The Natural England-validated eDNA window is 15 April - 30 June only (samples outside this window are not accepted by accredited labs). Alternatively, traditional presence/absence surveys (4-6 visits, mid-March to mid-June, with at least 2 between mid-April and mid-May).");
         actions.push("If GCN confirmed: apply for EPS licence or register under Natural England District Level Licensing (DLL) scheme.");
         actions.push("Install temporary amphibian fencing around 50m core zone before ground-breaking works commence.");
         eclerkRequired = true;
       } else {
-        actions.push("Commission eDNA survey of waterbodies within 250m (valid March-June) as a precaution if ponds are present nearby.");
+        actions.push("Commission eDNA survey of waterbodies within 250m (Natural England window 15 April - 30 June) as a precaution if ponds are present nearby.");
       }
       break;
 
@@ -840,6 +869,7 @@ export function assessConflicts(
   startMonth: Month,
   endMonth: Month,
   worksTypeIds: string[],
+  batRoostPotential: BatRoostPotential = "none",
 ): AssessmentResult {
   const worksMonths = getWorksMonths(startMonth, endMonth);
   const selectedWorks = WORKS_TYPES.filter(w => worksTypeIds.includes(w.id));
@@ -851,7 +881,7 @@ export function assessConflicts(
     );
 
     const { actions, licenceRequired, surveyRequired, eclerkRequired } =
-      getActionsForConflict(species, conflictingPeriods, selectedWorks);
+      getActionsForConflict(species, conflictingPeriods, selectedWorks, batRoostPotential);
 
     let trafficLight: TrafficLight = "green";
     if (conflictingPeriods.length > 0) {
@@ -880,7 +910,11 @@ export function assessConflicts(
     if (c.trafficLight === "yellow" && overallTrafficLight === "green") overallTrafficLight = "yellow";
   }
 
-  // Find optimal window — months where NO high-severity conflicts exist
+  // Find optimal window — months where NO high-severity conflicts exist.
+  // When no species are selected, optimalWindow = null (nothing to assess).
+  // When all 12 months are clear (e.g. only invasive plants selected with no
+  // high-severity periods), we return all 12 months so the UI can communicate
+  // "any time of year" rather than the previous misleading "0 optimal months".
   const optimalMonths: Month[] = [];
   for (let m = 1; m <= 12; m++) {
     const mo = m as Month;
@@ -908,7 +942,10 @@ export function assessConflicts(
     conflictCount,
     licenceCount,
     surveyCount,
-    optimalWindow: optimalMonths.length > 0 && optimalMonths.length < 12 ? optimalMonths : null,
+    // Return optimalMonths if any species are selected and at least 1 month is clear.
+    // Length === 12 means all months are clear (no high-severity periods anywhere) —
+    // this is now returned (rather than null) so consumers can show "any time of year".
+    optimalWindow: selectedSpecies.length > 0 && optimalMonths.length > 0 ? optimalMonths : null,
     summary,
   };
 }

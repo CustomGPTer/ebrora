@@ -689,7 +689,7 @@ export const COMPETENT_PERSON_GUIDANCE = {
     "On multi-contractor projects, the Principal Contractor is responsible for ensuring excavations are designed and supervised by a competent person.",
     "Batter angle calculations must be reviewed against the actual soil exposed during excavation -- this tool provides an indicative starting point only.",
     "Any deviation from the calculated geometry (softening, fissures, water ingress, unexpected ground) must trigger immediate reassessment.",
-    "A permit-to-dig and a daily inspection (reg 26(3) record) must be in place for any excavation deeper than 1.2 m.",
+    "Inspections of any excavation in which any person works are required under CDM 2015 reg 22(3) -- at the start of every shift, after any event likely to affect strength or stability, and after accidental fall of material. The written inspection report is required under CDM 2015 reg 24. A permit-to-dig and competent-person assessment should be in place regardless of depth -- CDM 2015 contains no fixed depth threshold (the legacy 1.2 m rule originates from pre-1996 prescriptive regulations and is no longer in force).",
     "Where depth exceeds 4.5 m, a temporary works designer should review the design; above 6 m, designer input is mandatory.",
   ],
 };
