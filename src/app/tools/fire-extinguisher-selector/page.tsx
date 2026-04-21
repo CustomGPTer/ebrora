@@ -5,9 +5,9 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Fire Extinguisher Selector | Free Construction Tool | Ebrora",
-  description: "Select and size portable fire extinguishers per BS 5306-8:2012, RRFSO 2005, and BS EN 3. Multi-area assessment, full suitability matrix, siting calculations, signage schedule, inspection checklist, and professional PDF export.",
+  description: "Select and size portable fire extinguishers per BS 5306-8:2023, RRFSO 2005, and BS EN 3. Multi-area assessment, full suitability matrix, siting calculations, signage schedule, inspection checklist, and professional PDF export.",
   alternates: { canonical: "https://www.ebrora.com/tools/fire-extinguisher-selector" },
-  openGraph: { title: "Fire Extinguisher Selector | Ebrora", description: "Select portable fire extinguishers per BS 5306-8:2012. Multi-area assessment with siting calculations, suitability matrix, signage requirements, and inspection schedule.", url: "https://www.ebrora.com/tools/fire-extinguisher-selector", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
+  openGraph: { title: "Fire Extinguisher Selector | Ebrora", description: "Select portable fire extinguishers per BS 5306-8:2023. Multi-area assessment with siting calculations, suitability matrix, signage requirements, and inspection schedule.", url: "https://www.ebrora.com/tools/fire-extinguisher-selector", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
 };
 
 const ToolClient = dynamic(
@@ -23,7 +23,7 @@ const ToolClient = dynamic(
   }
 );
 
-const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Fire Extinguisher Selector", description: "Select and size portable fire extinguishers per BS 5306-8:2012 and RRFSO 2005. Multi-area assessment with full suitability matrix, siting calculations, signage schedule, and inspection checklist.", url: "https://www.ebrora.com/tools/fire-extinguisher-selector", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
+const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Fire Extinguisher Selector", description: "Select and size portable fire extinguishers per BS 5306-8:2023 and RRFSO 2005. Multi-area assessment with full suitability matrix, siting calculations, signage schedule, and inspection checklist.", url: "https://www.ebrora.com/tools/fire-extinguisher-selector", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
 
 export default function FireExtinguisherSelectorPage() {
   return (
@@ -37,7 +37,7 @@ export default function FireExtinguisherSelectorPage() {
             <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">Free</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Fire Extinguisher Selector</h1>
-          <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">Select, size, and position portable fire extinguishers per BS 5306-8:2012 and RRFSO 2005. Multi-area assessment with full suitability matrix, siting calculations, and professional PDF export.</p>
+          <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">Select, size, and position portable fire extinguishers per BS 5306-8:2023 and RRFSO 2005. Multi-area assessment with full suitability matrix, siting calculations, and professional PDF export.</p>
         </div>
         <ToolClient />
       </div>
