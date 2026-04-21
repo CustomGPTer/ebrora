@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import type { ExcavationRow } from "@/data/excavation-spoil-calculator";
-import { SOIL_TYPES, DEFAULT_WAGON_TONNES, createEmptyRow, calculateExcavation } from "@/data/excavation-spoil-calculator";
+import { SOIL_TYPES, DEFAULT_WAGON_TONNES, DEFAULT_WAGON_BODY_M3, createEmptyRow, calculateExcavation } from "@/data/excavation-spoil-calculator";
 import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 
 function fmtNum(v: number, dp = 2): string {
@@ -14,7 +14,8 @@ function todayISO() { return new Date().toISOString().slice(0, 10); }
 
 async function exportPDF(
   header: { company: string; site: string; manager: string; preparedBy: string; date: string },
-  rows: ExcavationRow[], wagonTonnes: number, totals: { bankM3: number; bulkedM3: number; tonnes: number; wagonLoads: number },
+  rows: ExcavationRow[], wagonTonnes: number, wagonBodyM3: number,
+  totals: { bankM3: number; bulkedM3: number; tonnes: number; wagonLoads: number; volumeGovernsAny: boolean },
 ) {
   const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF("l", "mm", "a4");
@@ -25,7 +26,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(13); doc.setFont("helvetica", "bold");
   doc.text("EXCAVATION & SPOIL CALCULATION", M, 10);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")} | Wagon: ${wagonTonnes}t`, M, 17);
+  doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")} | Wagon: ${wagonTonnes}t / ${wagonBodyM3} m3`, M, 17);
   y = 28; doc.setTextColor(0, 0, 0);
 
   doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
@@ -58,12 +59,13 @@ async function exportPDF(
 
   doc.setFontSize(6); doc.setDrawColor(200, 200, 200);
   rows.forEach((row, i) => {
-    const res = calculateExcavation(row, wagonTonnes);
+    const res = calculateExcavation(row, wagonTonnes, wagonBodyM3);
     if (res.bankM3 === 0) return;
     if (y > 195) { doc.addPage(); y = M; }
     const soil = SOIL_TYPES.find(s => s.id === row.soilTypeId);
     const rowH = 5.5; cx = M;
-    [String(i + 1), row.label || `Area ${i + 1}`, fmtNum(row.length ?? 0, 1), fmtNum(row.width ?? 0, 1), fmtNum(row.depth ?? 0, 1), soil?.name || "-", fmtNum(res.bankM3, 1), fmtNum(res.bulkedM3, 1), fmtNum(res.tonnes, 1), fmtNum(res.wagonLoads, 1)].forEach((t, ci) => {
+    const wagonsCell = `${fmtNum(res.wagonLoads, 1)}${res.governedBy === "volume" ? " (V)" : ""}`;
+    [String(i + 1), row.label || `Area ${i + 1}`, fmtNum(row.length ?? 0, 1), fmtNum(row.width ?? 0, 1), fmtNum(row.depth ?? 0, 1), soil?.name || "-", fmtNum(res.bankM3, 1), fmtNum(res.bulkedM3, 1), fmtNum(res.tonnes, 1), wagonsCell].forEach((t, ci) => {
       doc.rect(cx, y, tblCols[ci], rowH, "D");
       doc.setTextColor(0, 0, 0); doc.setFont("helvetica", ci <= 1 ? "bold" : "normal");
       const lines = doc.splitTextToSize(t, tblCols[ci] - 4);
@@ -109,7 +111,10 @@ async function exportPDF(
 
   const pc = doc.getNumberOfPages();
   for (let p = 1; p <= pc; p++) { doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Planning estimate. Verify with site investigations. Bulking factors and densities are typical UK values.", M, 205);
+    const note = totals.volumeGovernsAny
+      ? "Planning estimate. Verify with site investigations. Bulking factors and densities are typical UK values. (V) = volume governs wagon count for this row (low-density spoil fills body before reaching weight limit)."
+      : "Planning estimate. Verify with site investigations. Bulking factors and densities are typical UK values.";
+    doc.text(note, M, 205);
     doc.text(`Ref: ${docRef} | Page ${p} of ${pc}`, W - M - 50, 205);
   }
   doc.save(`excavation-spoil-${todayISO()}.pdf`);
@@ -118,6 +123,7 @@ async function exportPDF(
 export default function ExcavationSpoilClient() {
   const [rows, setRows] = useState<ExcavationRow[]>([createEmptyRow()]);
   const [wagonTonnes, setWagonTonnes] = useState(DEFAULT_WAGON_TONNES);
+  const [wagonBodyM3, setWagonBodyM3] = useState(DEFAULT_WAGON_BODY_M3);
   const [site, setSite] = useState(""); const [manager, setManager] = useState("");
   const [preparedBy, setPreparedBy] = useState(""); const [company, setCompany] = useState(""); const [assessDate, setAssessDate] = useState(todayISO());
   const [showSettings, setShowSettings] = useState(false); const [exporting, setExporting] = useState(false);
@@ -127,11 +133,23 @@ export default function ExcavationSpoilClient() {
   const removeRow = useCallback((id: string) => { setRows(prev => prev.length <= 1 ? [createEmptyRow()] : prev.filter(r => r.id !== id)); }, []);
   const clearAll = useCallback(() => { setRows([createEmptyRow()]); setSite(""); setManager(""); setPreparedBy(""); }, []);
 
-  const results = useMemo(() => rows.map(r => calculateExcavation(r, wagonTonnes)), [rows, wagonTonnes]);
-  const totals = useMemo(() => results.reduce((a, r) => ({ bankM3: a.bankM3 + r.bankM3, bulkedM3: a.bulkedM3 + r.bulkedM3, tonnes: a.tonnes + r.tonnes, wagonLoads: a.wagonLoads + r.wagonLoads }), { bankM3: 0, bulkedM3: 0, tonnes: 0, wagonLoads: 0 }), [results]);
+  const results = useMemo(() => rows.map(r => calculateExcavation(r, wagonTonnes, wagonBodyM3)), [rows, wagonTonnes, wagonBodyM3]);
+  const totals = useMemo(() => {
+    const summed = results.reduce(
+      (a, r) => ({
+        bankM3: a.bankM3 + r.bankM3,
+        bulkedM3: a.bulkedM3 + r.bulkedM3,
+        tonnes: a.tonnes + r.tonnes,
+        wagonLoads: a.wagonLoads + r.wagonLoads,
+        volumeGovernsAny: a.volumeGovernsAny || r.governedBy === "volume",
+      }),
+      { bankM3: 0, bulkedM3: 0, tonnes: 0, wagonLoads: 0, volumeGovernsAny: false },
+    );
+    return summed;
+  }, [results]);
   const hasData = totals.bankM3 > 0;
 
-  const handleExport = useCallback(async () => { setExporting(true); try { await exportPDF({ company, site, manager, preparedBy, date: assessDate }, rows, wagonTonnes, totals); } finally { setExporting(false); } }, [site, manager, preparedBy, assessDate, rows, wagonTonnes, totals]);
+  const handleExport = useCallback(async () => { setExporting(true); try { await exportPDF({ company, site, manager, preparedBy, date: assessDate }, rows, wagonTonnes, wagonBodyM3, totals); } finally { setExporting(false); } }, [company, site, manager, preparedBy, assessDate, rows, wagonTonnes, wagonBodyM3, totals]);
 
   return (
     <div className="space-y-5">
@@ -166,12 +184,13 @@ export default function ExcavationSpoilClient() {
       </div>
 
       {showSettings && (
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 grid grid-cols-2 sm:grid-cols-6 gap-3">
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Site Name</label><input type="text" value={site} onChange={e => setSite(e.target.value)} placeholder="Site" className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Site Manager</label><input type="text" value={manager} onChange={e => setManager(e.target.value)} placeholder="Manager" className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Prepared By</label><input type="text" value={preparedBy} onChange={e => setPreparedBy(e.target.value)} placeholder="Name" className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Date</label><input type="date" value={assessDate} onChange={e => setAssessDate(e.target.value)} className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none" /></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Wagon (t)</label><input type="number" step={1} min={1} max={40} value={wagonTonnes} onChange={e => setWagonTonnes(parseFloat(e.target.value) || 20)} className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none tabular-nums" /></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1" title="Maximum payload of haulage wagon">Wagon (t)</label><input type="number" step={1} min={1} max={40} value={wagonTonnes} onChange={e => setWagonTonnes(parseFloat(e.target.value) || DEFAULT_WAGON_TONNES)} className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none tabular-nums" /></div>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1" title="Wagon body volume capacity. Volume governs for low-density spoil (peat, topsoil) where the body fills before the weight limit is reached.">Body (m³)</label><input type="number" step={0.5} min={1} max={30} value={wagonBodyM3} onChange={e => setWagonBodyM3(parseFloat(e.target.value) || DEFAULT_WAGON_BODY_M3)} className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:border-ebrora outline-none tabular-nums" /></div>
         </div>
       )}
 
@@ -208,7 +227,7 @@ export default function ExcavationSpoilClient() {
                   <td className="px-2 py-1.5 text-center tabular-nums font-medium">{fmtNum(res.bankM3, 1)}</td>
                   <td className="px-2 py-1.5 text-center tabular-nums text-gray-600">{fmtNum(res.bulkedM3, 1)}</td>
                   <td className="px-2 py-1.5 text-center tabular-nums font-medium">{fmtNum(res.tonnes, 1)}</td>
-                  <td className="px-2 py-1.5 text-center tabular-nums text-gray-600">{fmtNum(res.wagonLoads, 1)}</td>
+                  <td className="px-2 py-1.5 text-center tabular-nums text-gray-600" title={res.governedBy === "volume" ? `Volume governs (by-weight ${fmtNum(res.wagonLoadsByWeight, 1)}, by-volume ${fmtNum(res.wagonLoadsByVolume, 1)})` : `Weight governs (by-weight ${fmtNum(res.wagonLoadsByWeight, 1)}, by-volume ${fmtNum(res.wagonLoadsByVolume, 1)})`}>{fmtNum(res.wagonLoads, 1)}{res.governedBy === "volume" ? <span className="text-[10px] font-semibold text-amber-600 ml-0.5">V</span> : null}</td>
                   <td className="px-1 py-1.5"><button onClick={() => removeRow(row.id)} className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button></td>
                 </tr>
@@ -237,7 +256,7 @@ export default function ExcavationSpoilClient() {
                   <div><span className="text-gray-400">Bank m³</span><div className="font-bold tabular-nums">{fmtNum(res.bankM3, 1)}</div></div>
                   <div><span className="text-gray-400">Bulked m³</span><div className="font-medium tabular-nums">{fmtNum(res.bulkedM3, 1)}</div></div>
                   <div><span className="text-gray-400">Tonnes</span><div className="font-bold tabular-nums">{fmtNum(res.tonnes, 1)}</div></div>
-                  <div><span className="text-gray-400">Wagons</span><div className="font-medium tabular-nums">{fmtNum(res.wagonLoads, 1)}</div></div>
+                  <div><span className="text-gray-400">Wagons</span><div className="font-medium tabular-nums">{fmtNum(res.wagonLoads, 1)}{res.governedBy === "volume" ? <span className="text-[10px] font-semibold text-amber-600 ml-0.5">V</span> : null}</div></div>
                 </div>
               )}
             </div>
@@ -249,7 +268,7 @@ export default function ExcavationSpoilClient() {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>Add Excavation Area</button>
 
       <div className="pt-4 border-t border-gray-100"><p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-        Bulking factors and densities are typical UK values. Confirm with site investigation data. Bank volume = in-situ undisturbed ground. Bulked volume = after excavation (for transport). White-label PDF — no Ebrora branding.</p></div>
+        Bulking factors and densities are typical UK values. Confirm with site investigation data. Bank volume = in-situ undisturbed ground. Bulked volume = after excavation (for transport). Wagon count uses the larger of by-weight and by-volume capacity; <span className="font-semibold text-amber-600">V</span> indicates volume governs (low-density spoil fills the body before reaching the weight rating). White-label PDF — no Ebrora branding.</p></div>
     </div>
   );
 }
