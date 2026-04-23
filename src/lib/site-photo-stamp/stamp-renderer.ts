@@ -98,54 +98,104 @@ function drawStampCard(
   const pad = Math.round(base * 0.018);          // outer padding from edge
   const cardPad = Math.round(base * 0.02);        // inner card padding
   const radius = Math.round(base * 0.012);        // corner radius
-  const headerH = Math.round(base * 0.06);        // header band height
+  const headerBaseH = Math.round(base * 0.06);    // header band height (no note)
   const gap = Math.round(base * 0.012);           // row vertical gap
   const labelFs = Math.round(base * 0.022);       // label font
   const valueFs = Math.round(base * 0.024);       // value font
   const headerFs = Math.round(base * 0.028);      // header font
+  const noteFs = Math.round(base * 0.023);        // note font (header subtitle)
   const iconSize = Math.round(headerFs * 1.05);   // badge icon
   const labelCol = Math.round(base * 0.12);       // width of left label column
+  const colonPad = Math.round(base * 0.008);      // padding for colon separator
 
   // ── Compose rows ──
-  interface Row { label: string; value: string; }
+  interface Row { label: string; value: string; mono: boolean; }
   const rows: Row[] = [];
 
-  rows.push({ label: "Time", value: formatTimestamp(meta.timestamp, settings.timestampFormat) });
+  rows.push({
+    label: "Time",
+    value: formatTimestamp(meta.timestamp, settings.timestampFormat),
+    mono: false,
+  });
 
   if (settings.showAddress && meta.address) {
-    rows.push({ label: "Address", value: meta.address });
+    rows.push({ label: "Address", value: meta.address, mono: false });
   }
 
   if (settings.showCoords && meta.lat != null && meta.lon != null) {
     const c = settings.coordFormat === "dms"
       ? formatCoordsDms(meta.lat, meta.lon)
       : formatCoordsDecimal(meta.lat, meta.lon, 6);
-    rows.push({ label: "Coord", value: c });
+    rows.push({ label: "Coord", value: c, mono: true });
   }
 
-  // Optional rows from settings.
-  if (settings.projectName) rows.push({ label: "Project", value: settings.projectName });
-  if (settings.siteName) rows.push({ label: "Site", value: settings.siteName });
-  if (settings.contractor) rows.push({ label: "Contractor", value: settings.contractor });
-  if (settings.operative) rows.push({ label: "Operative", value: settings.operative });
-  if (meta.uniqueId) rows.push({ label: "Record ID", value: meta.uniqueId });
+  if (settings.projectName) rows.push({ label: "Project", value: settings.projectName, mono: false });
+  if (settings.siteName) rows.push({ label: "Site", value: settings.siteName, mono: false });
+  if (settings.contractor) rows.push({ label: "Contractor", value: settings.contractor, mono: false });
+  if (settings.operative) rows.push({ label: "Operative", value: settings.operative, mono: false });
+  if (meta.uniqueId) rows.push({ label: "Record ID", value: meta.uniqueId, mono: true });
 
-  // ── Measure card ──
-  ctx.save();
+  // ── Determine card width from content ────────────────────────
+  // Card shrinks to fit the longest row on a single line, capped by an
+  // overall maximum so it never dominates the photo.
   const maxCardW = Math.min(Math.round(w * 0.72), Math.round(base * 1.7));
-  const cardX = pad;
-  const cardW = maxCardW;
+  const minCardW = Math.round(base * 0.55);
 
-  // First pass: measure row heights given wrap width.
-  const valueMaxW = cardW - cardPad * 2 - labelCol - Math.round(base * 0.008);
-  ctx.font = weightFont(valueFs, "500");
+  ctx.save();
+
+  // Measure natural widths (single-line, no wrapping yet) so we can size.
+  let naturalInnerW = 0;
+  for (const r of rows) {
+    ctx.font = r.mono ? monoFont(valueFs, "600") : weightFont(valueFs, "600");
+    const vW = ctx.measureText(r.value).width;
+    const rowInnerW = labelCol + vW;
+    if (rowInnerW > naturalInnerW) naturalInnerW = rowInnerW;
+  }
+
+  // Header content (icon + title) also drives minimum width.
+  const hasIcon = variant.id === "icon" && !!variant.icon;
+  const iconGap = Math.round(iconSize * 0.5);
+  ctx.font = weightFont(headerFs, "700");
+  const title = template.title.toUpperCase();
+  const titleW = ctx.measureText(title).width;
+  const headerInnerW = (hasIcon ? iconSize + iconGap : 0) + titleW;
+  if (headerInnerW > naturalInnerW) naturalInnerW = headerInnerW;
+
+  // Clamp to [min, max] and add padding to get final cardW.
+  const targetInnerW = Math.max(
+    minCardW - cardPad * 2,
+    Math.min(naturalInnerW, maxCardW - cardPad * 2)
+  );
+  const cardInnerW = targetInnerW;
+  const cardW = cardInnerW + cardPad * 2;
+  const valueMaxW = cardInnerW - labelCol - colonPad;
+
+  // ── Measure row heights with wrapping now that cardW is fixed ──
   const rowHeights = rows.map((r) => {
-    const lines = wrapText(ctx, r.value, valueMaxW);
+    ctx.font = r.mono ? monoFont(valueFs, "600") : weightFont(valueFs, "600");
+    const lines = wrapText(ctx, r.value, valueMaxW, 2);
     return Math.max(lines.length * (valueFs * 1.25), valueFs * 1.25);
   });
 
-  const rowsBlockH = rowHeights.reduce((s, v) => s + v, 0) + gap * (rows.length - 1);
+  // ── Note (optional subtitle below title in header) ────────────
+  const rawNote = (meta.note ?? "").trim();
+  const hasNote = rawNote.length > 0;
+  let noteLines: string[] = [];
+  let headerH = headerBaseH;
+  const titleAreaH = Math.round(headerFs * 1.85); // title portion when note present
+
+  if (hasNote) {
+    ctx.font = weightFont(noteFs, "500");
+    noteLines = wrapText(ctx, rawNote, cardInnerW, 3);
+    const noteLineH = Math.round(noteFs * 1.35);
+    const notePadBottom = Math.round(base * 0.012);
+    headerH = titleAreaH + noteLines.length * noteLineH + notePadBottom;
+  }
+
+  // ── Compute card position ─────────────────────────────────────
+  const rowsBlockH = rowHeights.reduce((s, v) => s + v, 0) + gap * Math.max(0, rows.length - 1);
   const cardH = headerH + cardPad * 2 + rowsBlockH;
+  const cardX = pad;
   const cardY = h - pad - cardH;
 
   // ── Card background with shadow ──
@@ -157,8 +207,6 @@ function drawStampCard(
   ctx.fillStyle = "rgba(255,255,255,0.97)";
   ctx.fill();
 
-  // Drop shadow is applied — reset before drawing over the card so the text
-  // doesn't get a visible shadow offset.
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
   ctx.shadowOffsetY = 0;
@@ -169,7 +217,6 @@ function drawStampCard(
   const isOutline = variant.id === "outline";
   const headerBorder = isOutline ? (variant.borderColor ?? template.baseColor) : null;
 
-  // Clip header to the top rounded corners only.
   ctx.save();
   roundRectPathTopOnly(ctx, cardX, cardY, cardW, headerH, radius);
   ctx.clip();
@@ -177,10 +224,10 @@ function drawStampCard(
   if (isOutline) {
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(cardX, cardY, cardW, headerH);
-    // Bottom stroke as separator
     if (headerBorder) {
+      const strokeH = Math.max(2, Math.round(base * 0.003));
       ctx.fillStyle = headerBorder;
-      ctx.fillRect(cardX, cardY + headerH - Math.max(2, Math.round(base * 0.003)), cardW, Math.max(2, Math.round(base * 0.003)));
+      ctx.fillRect(cardX, cardY + headerH - strokeH, cardW, strokeH);
     }
   } else {
     ctx.fillStyle = headerBg;
@@ -189,14 +236,17 @@ function drawStampCard(
   ctx.restore();
 
   // ── Header text + optional icon ──
-  const hasIcon = variant.id === "icon" && variant.icon;
-  const iconGap = Math.round(iconSize * 0.5);
   const headerPadX = cardPad;
   let textX = cardX + headerPadX;
   const headerTextColour = isOutline ? (variant.borderColor ?? template.baseColor) : headerFg;
 
+  // Title sits in the top portion of the header. Vertically centered within
+  // the base header height when there's no note, or within the dedicated
+  // titleAreaH slot when a note is present.
+  const titleCenterY = hasNote ? cardY + titleAreaH / 2 : cardY + headerBaseH / 2;
+
   if (hasIcon && variant.icon) {
-    const iconY = cardY + (headerH - iconSize) / 2;
+    const iconY = titleCenterY - iconSize / 2;
     drawBadgeIcon(ctx, variant.icon, textX, iconY, iconSize, headerTextColour);
     textX += iconSize + iconGap;
   }
@@ -204,9 +254,21 @@ function drawStampCard(
   ctx.fillStyle = headerTextColour;
   ctx.font = weightFont(headerFs, "700");
   ctx.textBaseline = "middle";
-  const title = template.title.toUpperCase();
-  const headerTextY = cardY + headerH / 2;
-  ctx.fillText(truncate(ctx, title, cardW - headerPadX * 2 - (hasIcon ? iconSize + iconGap : 0)), textX, headerTextY);
+  ctx.textAlign = "left";
+  const titleMaxW = cardW - headerPadX * 2 - (hasIcon ? iconSize + iconGap : 0);
+  ctx.fillText(truncate(ctx, title, titleMaxW), textX, titleCenterY);
+
+  // Note lines (below title, same header colour, slightly lighter weight)
+  if (hasNote) {
+    ctx.font = weightFont(noteFs, "500");
+    ctx.fillStyle = headerTextColour;
+    const noteLineH = Math.round(noteFs * 1.35);
+    let ny = cardY + titleAreaH + noteLineH / 2 - Math.round(noteFs * 0.05);
+    for (const line of noteLines) {
+      ctx.fillText(line, cardX + cardPad, ny);
+      ny += noteLineH;
+    }
+  }
 
   // ── Body rows ──
   let y = cardY + headerH + cardPad;
@@ -214,21 +276,18 @@ function drawStampCard(
     const r = rows[i];
     const rowH = rowHeights[i];
     const labelY = y + rowH / 2;
-    const isMono = r.label === "Coord" || r.label === "Record ID";
 
     ctx.fillStyle = "#6B7280";
     ctx.font = weightFont(labelFs, "600");
     ctx.textBaseline = "middle";
     ctx.fillText(r.label, cardX + cardPad, labelY);
 
-    // Colon separator
     ctx.fillStyle = "#9CA3AF";
     ctx.fillText(":", cardX + cardPad + labelCol - Math.round(base * 0.015), labelY);
 
-    // Value (possibly wrapped)
     ctx.fillStyle = "#0F172A";
-    ctx.font = isMono ? monoFont(valueFs, "600") : weightFont(valueFs, "600");
-    const lines = wrapText(ctx, r.value, valueMaxW);
+    ctx.font = r.mono ? monoFont(valueFs, "600") : weightFont(valueFs, "600");
+    const lines = wrapText(ctx, r.value, valueMaxW, 2);
     const lineH = valueFs * 1.25;
     const startY = y + rowH / 2 - ((lines.length - 1) * lineH) / 2;
     for (let j = 0; j < lines.length; j++) {
@@ -463,7 +522,7 @@ function truncate(ctx: CanvasRenderingContext2D, text: string, maxW: number): st
   return text.slice(0, Math.max(0, lo - 1)) + "…";
 }
 
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxW: number, maxLines = 2): string[] {
   // Word-wrap that respects commas and spaces. If a single token is too long,
   // it's allowed to overflow (better than truncating an address mid-word).
   if (!text) return [""];
@@ -480,8 +539,12 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxW: number): st
     }
   }
   if (line) out.push(line.trimEnd());
-  // Cap at 2 lines to keep cards compact; collapse the rest.
-  if (out.length > 2) return [out[0], truncate(ctx, out.slice(1).join(" "), maxW)];
+  // Cap at maxLines to keep cards compact; collapse/truncate the rest.
+  if (out.length > maxLines) {
+    const kept = out.slice(0, maxLines - 1);
+    const tail = truncate(ctx, out.slice(maxLines - 1).join(" "), maxW);
+    return [...kept, tail];
+  }
   return out;
 }
 

@@ -86,6 +86,9 @@ export interface StampMeta {
   siteName?: string;
   contractor?: string;
   operative?: string;
+  /** Optional free-text note rendered below the template title on the stamp.
+   *  Wraps to a maximum of 3 lines at the card width. */
+  note?: string;
 }
 
 /** User settings, persisted to localStorage (Batch 6). */
