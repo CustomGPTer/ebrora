@@ -1,19 +1,38 @@
 // src/components/site-photo-stamp/TemplatePreviewCard.tsx
 //
-// Small visual card that previews how a template's variant will look
-// on a stamped photo. Used on the landing screen's template grid.
+// Small visual card that previews how a template's variant will look on a
+// stamped photo. Used by the template grid on the landing screen and inside
+// the quick-switcher modal.
+//
+// Three variant rendering modes:
+//   • solid       — filled coloured strip at the bottom of the faux photo.
+//   • transparent — no strip; title text floats on the photo in the
+//                   template's base colour with a thin white stroke (matches
+//                   the real stamp renderer).
+//   • icon        — filled strip + leading badge icon.
+//
+// A small lock button sits in the top-right corner of every card. Tapping
+// it engages or releases the 6-hour lock on that exact template + variant,
+// *without* triggering a tap on the card itself (click event stops
+// propagation in the lock button).
 "use client";
 
-import type { Template, TemplateVariant, StampIcon } from "@/lib/site-photo-stamp/types";
+import type {
+  Template,
+  TemplateVariant,
+  StampIcon,
+} from "@/lib/site-photo-stamp/types";
 
 interface Props {
   template: Template;
   variant: TemplateVariant;
   selected: boolean;
+  locked?: boolean;
   onClick: () => void;
+  onLockToggle?: () => void;
 }
 
-// ─── Badge icons (lucide-react style, inline SVG) ────────────────
+// ─── Badge icons (lucide-style inline SVG) ───────────────────────
 
 function BadgeIcon({ name, colour }: { name: StampIcon; colour: string }) {
   const common = {
@@ -67,23 +86,53 @@ function BadgeIcon({ name, colour }: { name: StampIcon; colour: string }) {
   }
 }
 
-// ─── Card ────────────────────────────────────────────────────────
+// ─── Lock icon ─────────────────────────────────────────────────
 
-export default function TemplatePreviewCard({ template, variant, selected, onClick }: Props) {
-  const isOutline = variant.id === "outline";
-  const borderColour = isOutline ? (variant.borderColor ?? template.baseColor) : "transparent";
+function LockIcon({ locked }: { locked: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill={locked ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={locked ? 1.5 : 2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <rect x="4" y="11" width="16" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 018 0v4" fill="none" />
+    </svg>
+  );
+}
+
+// ─── Card ───────────────────────────────────────────────────────
+
+export default function TemplatePreviewCard({
+  template,
+  variant,
+  selected,
+  locked = false,
+  onClick,
+  onLockToggle,
+}: Props) {
+  const isTransparent = variant.id === "transparent";
+
+  // Ring styling — lock takes precedence visually when engaged.
+  const ringClass = selected
+    ? "ring-2 ring-[#1B5B50] ring-offset-2 scale-[1.02]"
+    : locked
+    ? "ring-2 ring-amber-400 ring-offset-1"
+    : "ring-1 ring-gray-200 hover:ring-gray-300 active:scale-[0.98]";
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`relative group flex flex-col items-stretch rounded-xl overflow-hidden transition-all duration-150 text-left ${
-        selected
-          ? "ring-2 ring-[#1B5B50] ring-offset-2 scale-[1.02]"
-          : "ring-1 ring-gray-200 hover:ring-gray-300 active:scale-[0.98]"
-      }`}
+      className={`relative group flex flex-col items-stretch rounded-xl overflow-hidden transition-all duration-150 text-left bg-white ${ringClass}`}
       aria-pressed={selected}
-      aria-label={`${template.title} — ${variant.label}`}
+      aria-label={`${template.title} — ${variant.label}${locked ? ", locked" : ""}`}
     >
       {/* Faux photo area */}
       <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
@@ -97,30 +146,85 @@ export default function TemplatePreviewCard({ template, variant, selected, onCli
           }}
         />
 
-        {/* Stamp strip (bottom of 'photo') */}
-        <div
-          className="absolute left-2 right-2 bottom-2 rounded-md px-2 py-1.5 text-[10px] font-semibold flex items-center gap-1.5 shadow-sm"
-          style={{
-            backgroundColor: variant.accentColor,
-            color: variant.textColor,
-            border: isOutline ? `2px solid ${borderColour}` : "none",
-          }}
-        >
-          {variant.icon && (
-            <span className="shrink-0" aria-hidden>
-              <BadgeIcon name={variant.icon} colour={variant.textColor} />
+        {/* Lock button — top-right, stops click propagation */}
+        {onLockToggle && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onLockToggle();
+            }}
+            className={`absolute top-1.5 right-1.5 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+              locked
+                ? "bg-amber-500 text-white shadow"
+                : "bg-black/40 text-white/90 hover:bg-black/60"
+            }`}
+            aria-label={
+              locked
+                ? `Unlock ${template.title}`
+                : `Lock ${template.title} for 6 hours`
+            }
+            aria-pressed={locked}
+          >
+            <LockIcon locked={locked} />
+          </button>
+        )}
+
+        {/* Stamp preview */}
+        {isTransparent ? (
+          <div
+            className="absolute left-2 right-2 bottom-2 flex items-center pointer-events-none"
+          >
+            <span
+              className="text-[11px] font-bold uppercase tracking-wide truncate"
+              style={{
+                color: template.baseColor,
+                // Thin white outline mimics the canvas stroke applied by the
+                // real stamp renderer for the transparent variant.
+                textShadow:
+                  "-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 2px rgba(255,255,255,0.9)",
+              }}
+            >
+              {template.title}
             </span>
-          )}
-          <span className="truncate uppercase tracking-wide">{template.title}</span>
-        </div>
+          </div>
+        ) : (
+          <div
+            className="absolute left-2 right-2 bottom-2 rounded-md px-2 py-1.5 text-[10px] font-semibold flex items-center gap-1.5 shadow-sm pointer-events-none"
+            style={{
+              backgroundColor: variant.accentColor,
+              color: variant.textColor,
+            }}
+          >
+            {variant.icon && (
+              <span className="shrink-0" aria-hidden>
+                <BadgeIcon name={variant.icon} colour={variant.textColor} />
+              </span>
+            )}
+            <span className="truncate uppercase tracking-wide">
+              {template.title}
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Card label */}
+      {/* Card label row */}
       <div className="px-2.5 py-2 bg-white border-t border-gray-100">
         <p className="text-[11px] font-semibold text-gray-900 truncate">
           {template.title}
         </p>
-        <p className="text-[10px] text-gray-500">{variant.label}</p>
+        <p className="text-[10px] truncate">
+          {locked ? (
+            <span className="text-amber-600 font-semibold flex items-center gap-1">
+              <span aria-hidden>
+                <LockIcon locked />
+              </span>
+              Locked · 6h
+            </span>
+          ) : (
+            <span className="text-gray-500">{variant.label}</span>
+          )}
+        </p>
       </div>
     </button>
   );

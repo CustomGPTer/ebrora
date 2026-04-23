@@ -10,10 +10,17 @@
 
 import { useEffect, useState } from "react";
 import type { CapturedPhoto } from "@/lib/site-photo-stamp/capture";
-import type { Template, TemplateVariant } from "@/lib/site-photo-stamp/types";
+import type {
+  Template,
+  TemplateVariant,
+  TemplateId,
+  VariantId,
+} from "@/lib/site-photo-stamp/types";
 import {
   formatCoordsDecimal,
 } from "@/lib/site-photo-stamp/geolocation";
+import QuickSwitcher from "./QuickSwitcher";
+import LockControl from "./LockControl";
 
 interface Props {
   captured: CapturedPhoto;
@@ -22,6 +29,14 @@ interface Props {
   onRetake: () => void;
   /** Called with the optional note text when the user taps Apply stamp. */
   onApply: (note: string) => void;
+
+  // ── Sticky-template wiring (Batch 7) ──
+  onTemplateChange?: (templateId: TemplateId, variantId: VariantId) => void;
+  lockedTemplate?: TemplateId;
+  lockedVariant?: VariantId;
+  onToggleLock?: (templateId: TemplateId, variantId: VariantId) => void;
+  lockActive?: boolean;
+  recentlyUsed?: { template: Template; variant: TemplateVariant } | null;
 }
 
 const NOTE_MAX = 200;
@@ -49,6 +64,12 @@ export default function CapturedPreview({
   variant,
   onRetake,
   onApply,
+  onTemplateChange,
+  lockedTemplate,
+  lockedVariant,
+  onToggleLock,
+  lockActive = false,
+  recentlyUsed = null,
 }: Props) {
   const [note, setNote] = useState("");
 
@@ -76,13 +97,32 @@ export default function CapturedPreview({
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
         </button>
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-500">
-            Review
-          </p>
-          <p className="text-sm font-semibold text-gray-900 truncate">
-            {template.title} · {variant.label}
-          </p>
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          {onTemplateChange ? (
+            <QuickSwitcher
+              template={template}
+              variant={variant}
+              onSelect={onTemplateChange}
+              lockedTemplate={lockedTemplate}
+              lockedVariant={lockedVariant}
+              onToggleLock={onToggleLock}
+              lockActive={lockActive}
+              recentlyUsed={recentlyUsed}
+            />
+          ) : (
+            <p className="text-sm font-semibold text-gray-900 truncate">
+              {template.title} · {variant.label}
+            </p>
+          )}
+          {onToggleLock && (
+            <LockControl
+              template={template}
+              variant={variant}
+              locked={lockActive}
+              onToggle={() => onToggleLock(template.id, variant.id)}
+              compact
+            />
+          )}
         </div>
       </section>
 
@@ -96,18 +136,30 @@ export default function CapturedPreview({
             width={captured.width}
             height={captured.height}
           />
-          {/* Mock stamp — just to show the selected template. Real compositor in Batch 3. */}
+          {/* Mock stamp — approximates how the selected template will render. */}
           <div className="absolute left-2 right-2 bottom-2 pointer-events-none">
-            <div
-              className="inline-block px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide rounded-md shadow-sm"
-              style={{
-                backgroundColor: variant.accentColor,
-                color: variant.textColor,
-                border: variant.id === "outline" ? `2px solid ${variant.borderColor ?? template.baseColor}` : "none",
-              }}
-            >
-              {template.title}
-            </div>
+            {variant.id === "transparent" ? (
+              <span
+                className="inline-block text-[11px] font-bold uppercase tracking-wide"
+                style={{
+                  color: template.baseColor,
+                  textShadow:
+                    "-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 2px rgba(255,255,255,0.9)",
+                }}
+              >
+                {template.title}
+              </span>
+            ) : (
+              <div
+                className="inline-block px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide rounded-md shadow-sm"
+                style={{
+                  backgroundColor: variant.accentColor,
+                  color: variant.textColor,
+                }}
+              >
+                {template.title}
+              </div>
+            )}
           </div>
         </div>
       </section>

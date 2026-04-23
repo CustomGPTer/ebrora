@@ -9,9 +9,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { StampedRecord, Settings, Tier } from "@/lib/site-photo-stamp/types";
+import type {
+  StampedRecord,
+  Settings,
+  Tier,
+  Template,
+  TemplateVariant,
+  TemplateId,
+  VariantId,
+} from "@/lib/site-photo-stamp/types";
 import { sharePhoto, shareViaMailto, buildRecordFilename } from "@/lib/site-photo-stamp/share";
 import { generatePdf, buildPdfFilename } from "@/lib/site-photo-stamp/pdf-export";
+import QuickSwitcher from "./QuickSwitcher";
+import LockControl from "./LockControl";
 
 interface Props {
   stamped: StampedRecord;
@@ -20,9 +30,35 @@ interface Props {
   settings: Settings;
   onRetake: () => void;
   onToast: (msg: string) => void;
+
+  // ── Sticky-template wiring (Batch 7) ──
+  // The pill on the result screen sets what the *next* capture starts on,
+  // since this stamp is already baked into the image.
+  currentTemplate?: Template;
+  currentVariant?: TemplateVariant;
+  onTemplateChange?: (templateId: TemplateId, variantId: VariantId) => void;
+  lockedTemplate?: TemplateId;
+  lockedVariant?: VariantId;
+  onToggleLock?: (templateId: TemplateId, variantId: VariantId) => void;
+  lockActive?: boolean;
+  recentlyUsed?: { template: Template; variant: TemplateVariant } | null;
 }
 
-export default function ResultScreen({ stamped, tier, settings, onRetake, onToast }: Props) {
+export default function ResultScreen({
+  stamped,
+  tier,
+  settings,
+  onRetake,
+  onToast,
+  currentTemplate,
+  currentVariant,
+  onTemplateChange,
+  lockedTemplate,
+  lockedVariant,
+  onToggleLock,
+  lockActive = false,
+  recentlyUsed = null,
+}: Props) {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -108,13 +144,37 @@ export default function ResultScreen({ stamped, tier, settings, onRetake, onToas
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
         </button>
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-500">
-            Ready to share
-          </p>
-          <p className="text-sm font-semibold text-gray-900 truncate">
-            {stamped.meta.templateTitle}
-          </p>
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          {currentTemplate && currentVariant && onTemplateChange ? (
+            <QuickSwitcher
+              template={currentTemplate}
+              variant={currentVariant}
+              onSelect={onTemplateChange}
+              lockedTemplate={lockedTemplate}
+              lockedVariant={lockedVariant}
+              onToggleLock={onToggleLock}
+              lockActive={lockActive}
+              recentlyUsed={recentlyUsed}
+            />
+          ) : (
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-500">
+                Ready to share
+              </p>
+              <p className="text-sm font-semibold text-gray-900 truncate">
+                {stamped.meta.templateTitle}
+              </p>
+            </div>
+          )}
+          {currentTemplate && currentVariant && onToggleLock && (
+            <LockControl
+              template={currentTemplate}
+              variant={currentVariant}
+              locked={lockActive}
+              onToggle={() => onToggleLock(currentTemplate.id, currentVariant.id)}
+              compact
+            />
+          )}
         </div>
       </section>
 

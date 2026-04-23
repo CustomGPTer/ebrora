@@ -15,7 +15,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { TEMPLATES, getTemplate } from "@/lib/site-photo-stamp/templates";
-import TemplatePreviewCard from "./TemplatePreviewCard";
 import type {
   TemplateId,
   VariantId,
@@ -39,7 +38,16 @@ import {
   QuotaExceededError,
 } from "@/lib/site-photo-stamp/gallery-db";
 import { useSettings } from "@/lib/site-photo-stamp/use-settings";
+import {
+  resolveSticky,
+  isLockActive,
+  markUsed,
+  engageLock,
+  releaseLock,
+} from "@/lib/site-photo-stamp/sticky-selection";
 import { usePaidToolAccess } from "@/hooks/usePaidToolAccess";
+import TemplateGrid from "./TemplateGrid";
+import LockControl from "./LockControl";
 
 const DesktopBlockScreen = dynamic(() => import("./DesktopBlockScreen"), { ssr: false });
 const InstallPrompt = dynamic(() => import("./InstallPrompt"), { ssr: false });
@@ -133,28 +141,22 @@ export default function SitePhotoStampClient() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  // Once settings load from localStorage, seed the landing screen's template
-  // picker with the user's saved defaults (but only once — subsequent
-  // settings changes shouldn't overwrite mid-session picks).
+  // Once settings load from localStorage, resolve the sticky selection —
+  // priority: active lock → last-used within 30 min → default. We only do
+  // this once per session so subsequent settings changes (e.g. the user
+  // editing their default in Settings) don't overwrite mid-session picks.
   useEffect(() => {
     if (settingsLoaded && !initialisedFromSettings) {
-      const tmpl = getTemplate(settings.defaultTemplate);
-      const variant = tmpl.variants.find((v) => v.id === settings.defaultVariant)
-        ? settings.defaultVariant
+      const sticky = resolveSticky(settings);
+      const tmpl = getTemplate(sticky.templateId);
+      const variantId = tmpl.variants.find((v) => v.id === sticky.variantId)
+        ? sticky.variantId
         : tmpl.variants[0].id;
       setSelectedTemplate(tmpl.id);
-      setSelectedVariant(variant);
+      setSelectedVariant(variantId);
       setInitialisedFromSettings(true);
     }
-  }, [settingsLoaded, initialisedFromSettings, settings.defaultTemplate, settings.defaultVariant]);
-
-  const cards = useMemo(
-    () =>
-      TEMPLATES.flatMap((t) =>
-        t.variants.map((v) => ({ template: t, variant: v, key: `${t.id}:${v.id}` }))
-      ),
-    []
-  );
+  }, [settingsLoaded, initialisedFromSettings, settings]);
 
   const resolvedTemplate: Template = useMemo(
     () => getTemplate(selectedTemplate),
@@ -165,6 +167,69 @@ export default function SitePhotoStampClient() {
       resolvedTemplate.variants.find((v) => v.id === selectedVariant) ??
       resolvedTemplate.variants[0],
     [resolvedTemplate, selectedVariant]
+  );
+
+  // ── Lock state / recently-used ──────────────────────────────
+
+  const lockLive = isLockActive(settings);
+  const lockOnCurrent =
+    lockLive &&
+    settings.lockedTemplate === resolvedTemplate.id &&
+    settings.lockedVariant === resolvedVariant.id;
+
+  // Template + variant objects for the currently-locked pair (or last-used
+  // if no lock is live). Used to populate the Recently Used row.
+  const recentlyUsed = useMemo<{ template: Template; variant: TemplateVariant } | null>(() => {
+    const t = settings.lockedTemplate ?? settings.lastUsedTemplate;
+    const v = settings.lockedVariant ?? settings.lastUsedVariant;
+    if (!t || !v) return null;
+    // Only surface if it's actually different from what's selected right now,
+    // so the Recently Used row isn't the same thing the user is already on.
+    if (t === resolvedTemplate.id && v === resolvedVariant.id) return null;
+    const tmpl = getTemplate(t);
+    const vt = tmpl.variants.find((x) => x.id === v);
+    if (!vt) return null;
+    return { template: tmpl, variant: vt };
+  }, [settings, resolvedTemplate, resolvedVariant]);
+
+  // ── Pick / lock handlers ────────────────────────────────────
+
+  const pickTemplate = useCallback(
+    (templateId: TemplateId, variantId: VariantId) => {
+      setSelectedTemplate(templateId);
+      setSelectedVariant(variantId);
+      // Always refresh soft memory on an explicit pick.
+      const patch: Partial<typeof settings> = { ...markUsed(templateId, variantId) };
+      // If a lock is currently engaged, let it follow the new selection —
+      // the lock is a "sticky mode", not a specific-template binding. This
+      // also refreshes the 6h lockedAt stamp.
+      if (isLockActive(settings)) {
+        Object.assign(patch, engageLock(templateId, variantId));
+      }
+      updateSettings(patch);
+    },
+    [settings, updateSettings]
+  );
+
+  const toggleLock = useCallback(
+    (templateId: TemplateId, variantId: VariantId) => {
+      const locked =
+        isLockActive(settings) &&
+        settings.lockedTemplate === templateId &&
+        settings.lockedVariant === variantId;
+      if (locked) {
+        updateSettings(releaseLock());
+        setToast("Lock released.");
+      } else {
+        // Tapping a card's lock icon also selects that card — the user's
+        // intent is "use this and keep using it".
+        setSelectedTemplate(templateId);
+        setSelectedVariant(variantId);
+        updateSettings(engageLock(templateId, variantId));
+        setToast("Template locked for 6 hours.");
+      }
+    },
+    [settings, updateSettings]
   );
 
   // ── Gallery count ────────────────────────────────────────────
@@ -270,6 +335,19 @@ export default function SitePhotoStampClient() {
         }
       }
 
+      // Refresh the sticky soft-memory and (if live) the lock window, so a
+      // rapid sequence of captures doesn't age out mid-walk.
+      const stickyPatch: Partial<typeof settings> = {
+        ...markUsed(resolvedTemplate.id, resolvedVariant.id),
+      };
+      if (isLockActive(settings)) {
+        Object.assign(
+          stickyPatch,
+          engageLock(resolvedTemplate.id, resolvedVariant.id)
+        );
+      }
+      updateSettings(stickyPatch);
+
       URL.revokeObjectURL(captured.previewUrl);
       setView({ kind: "result", stamped: record });
       setGalleryRefresh((n) => n + 1);
@@ -278,7 +356,7 @@ export default function SitePhotoStampClient() {
     } finally {
       setRendering(false);
     }
-  }, [view, rendering, resolvedTemplate, resolvedVariant, tier, settings]);
+  }, [view, rendering, resolvedTemplate, resolvedVariant, tier, settings, updateSettings]);
 
   // ── Navigation ───────────────────────────────────────────────
 
@@ -389,6 +467,14 @@ export default function SitePhotoStampClient() {
           settings={settings}
           onRetake={backToLanding}
           onToast={setToast}
+          currentTemplate={resolvedTemplate}
+          currentVariant={resolvedVariant}
+          onTemplateChange={pickTemplate}
+          lockedTemplate={settings.lockedTemplate}
+          lockedVariant={settings.lockedVariant}
+          onToggleLock={toggleLock}
+          lockActive={lockOnCurrent}
+          recentlyUsed={recentlyUsed}
         />
         <div className="px-4 -mt-6 pb-6">
           <button
@@ -414,6 +500,12 @@ export default function SitePhotoStampClient() {
           variant={resolvedVariant}
           onRetake={discardCaptured}
           onApply={applyStamp}
+          onTemplateChange={pickTemplate}
+          lockedTemplate={settings.lockedTemplate}
+          lockedVariant={settings.lockedVariant}
+          onToggleLock={toggleLock}
+          lockActive={lockOnCurrent}
+          recentlyUsed={recentlyUsed}
         />
         {rendering && (
           <div
@@ -512,24 +604,28 @@ export default function SitePhotoStampClient() {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-gray-900">Choose a template</h2>
           <span className="text-[11px] text-gray-500">
-            {TEMPLATES.length} templates · {cards.length} styles
+            {TEMPLATES.length} templates · 3 styles
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5">
-          {cards.map(({ template, variant, key }) => (
-            <TemplatePreviewCard
-              key={key}
-              template={template}
-              variant={variant}
-              selected={selectedTemplate === template.id && selectedVariant === variant.id}
-              onClick={() => {
-                setSelectedTemplate(template.id);
-                setSelectedVariant(variant.id);
-              }}
-            />
-          ))}
+        <div className="mb-4">
+          <LockControl
+            template={resolvedTemplate}
+            variant={resolvedVariant}
+            locked={lockOnCurrent}
+            onToggle={() => toggleLock(resolvedTemplate.id, resolvedVariant.id)}
+          />
         </div>
+
+        <TemplateGrid
+          selectedTemplate={selectedTemplate}
+          selectedVariant={selectedVariant}
+          onSelect={pickTemplate}
+          lockedTemplate={settings.lockedTemplate}
+          lockedVariant={settings.lockedVariant}
+          onToggleLock={toggleLock}
+          recentlyUsed={recentlyUsed}
+        />
       </section>
 
       <section className="px-4">

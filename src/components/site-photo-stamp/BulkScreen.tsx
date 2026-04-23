@@ -314,8 +314,8 @@ export default function BulkScreen({
           className="w-10 h-10 rounded-lg shrink-0 shadow-sm"
           style={{
             backgroundColor: variant.accentColor,
-            border: variant.id === "outline"
-              ? `2px solid ${variant.borderColor ?? template.baseColor}`
+            border: variant.id === "transparent"
+              ? "1px dashed rgba(0,0,0,0.2)"
               : "none",
           }}
         />
