@@ -1,6 +1,6 @@
 // src/lib/site-photo-stamp/templates.ts
 //
-// All 13 site photo stamp templates, each with 3 variants.
+// All 18 site photo stamp templates, each with 3 variants.
 // Variants: solid (colour block, white text), outline (white block, coloured
 // text + border), icon (solid colour + badge icon).
 //
@@ -172,6 +172,61 @@ export const TEMPLATES: Template[] = [
       solid("#15803D"),
       outline("#15803D", "#14532D"),
       withIcon("#15803D", "eye"),
+    ],
+  },
+  {
+    id: "concrete-pour",
+    title: "Concrete Pour",
+    description: "Pre-pour checks, slump, cube samples, delivery ticket and strike times.",
+    baseColor: "#57534E",
+    variants: [
+      solid("#57534E"),
+      outline("#57534E", "#292524"),
+      withIcon("#57534E", "clipboard"),
+    ],
+  },
+  {
+    id: "services",
+    title: "Existing Services",
+    description: "Identification of buried or live services — gas, water, HV/LV, comms.",
+    baseColor: "#CA8A04",
+    variants: [
+      solid("#CA8A04", "#1F1300"),
+      outline("#CA8A04", "#854D0E"),
+      withIcon("#CA8A04", "warning", "#1F1300"),
+    ],
+  },
+  {
+    id: "commissioning",
+    title: "Commissioning",
+    description: "MEICA commissioning, energisation, pressure test or flow test evidence.",
+    baseColor: "#0891B2",
+    variants: [
+      solid("#0891B2"),
+      outline("#0891B2", "#155E75"),
+      withIcon("#0891B2", "check"),
+    ],
+  },
+  {
+    id: "dilapidation",
+    title: "Dilapidation",
+    description: "Pre-works condition record of adjacent property, highway or existing asset.",
+    baseColor: "#374151",
+    variants: [
+      solid("#374151"),
+      outline("#374151", "#111827"),
+      withIcon("#374151", "clipboard"),
+    ],
+  },
+  {
+    id: "excavation",
+    title: "Excavation",
+    description: "CAT & Genny scan, service drawings and pre-dig checks for permit to dig.",
+    baseColor: "#D97706",
+    variants: [
+      solid("#D97706"),
+      outline("#D97706", "#92400E"),
+      withIcon("#D97706", "warning"),
     ],
   },
   {

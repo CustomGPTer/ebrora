@@ -17,6 +17,11 @@ export type TemplateId =
   | "plant-inspection"
   | "permit-photo"
   | "environmental-record"
+  | "concrete-pour"
+  | "services"
+  | "commissioning"
+  | "dilapidation"
+  | "excavation"
   | "before-after";
 
 /** Variant style within a template (user can pick, e.g. solid vs outline). */
