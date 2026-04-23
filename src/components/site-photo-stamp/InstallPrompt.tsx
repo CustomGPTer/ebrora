@@ -1,173 +1,260 @@
 // src/components/site-photo-stamp/InstallPrompt.tsx
 //
-// Add-to-home-screen prompt. Shows once per session.
+// Dedicated install card for Ebrora Photo Stamp.
 //
-// - Android + modern Chromium browsers: uses `beforeinstallprompt`.
-// - iOS Safari (no event API): static instruction card with step-by-step.
-// - Already installed (standalone display mode) or dismissed this session: hidden.
+// Behaviour:
+//   • Shows only when the page is NOT already running as an installed PWA
+//   • Honours a local dismissal cookie so we don't nag people who said no
+//   • On Android / Chromium: listens for `beforeinstallprompt`, then triggers
+//     the native install dialog when the user taps our Install button
+//   • On iOS Safari: Apple doesn't support programmatic install, so we show
+//     an inline "Share → Add to Home Screen" illustration instead
+//   • The card uses the Photo Stamp wordmark so it's visually distinct from
+//     any future Ebrora-wide install prompt
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
-const SESSION_KEY = "spstamp:install-dismissed";
+const DISMISS_KEY = "spstamp:install:dismissed-until";
+const DISMISS_DAYS = 14; // how long to suppress after the user closes the card
+const APPEAR_DELAY_MS = 1800; // let the page render first so we're not intrusive
 
-interface BIPEvent extends Event {
+type Platform = "android" | "ios" | "other";
+
+interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
-type Mode = "android" | "ios" | null;
+function detectPlatform(): Platform {
+  if (typeof navigator === "undefined") return "other";
+  const ua = navigator.userAgent;
+  if (/iPad|iPhone|iPod/.test(ua) && !(window as { MSStream?: unknown }).MSStream) return "ios";
+  if (/Android/.test(ua)) return "android";
+  return "other";
+}
+
+function isStandalone(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia?.("(display-mode: standalone)").matches === true ||
+    (window.navigator as { standalone?: boolean }).standalone === true
+  );
+}
+
+function isDismissed(): boolean {
+  try {
+    const until = localStorage.getItem(DISMISS_KEY);
+    if (!until) return false;
+    const n = parseInt(until, 10);
+    if (Number.isNaN(n)) return false;
+    return Date.now() < n;
+  } catch {
+    return false;
+  }
+}
 
 export default function InstallPrompt() {
-  const [mode, setMode] = useState<Mode>(null);
-  const [deferred, setDeferred] = useState<BIPEvent | null>(null);
+  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
+  const [platform, setPlatform] = useState<Platform>("other");
+  const [installing, setInstalling] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Don't show when already installed.
+    if (isStandalone()) return;
+    // Respect prior dismissal.
+    if (isDismissed()) return;
 
-    // Skip if already dismissed this session.
-    try {
-      if (sessionStorage.getItem(SESSION_KEY) === "1") return;
-    } catch {
-      // sessionStorage unavailable (e.g. private browsing restrictions) — proceed.
+    const p = detectPlatform();
+    setPlatform(p);
+
+    // iOS has no beforeinstallprompt — show our inline instructions instead.
+    if (p === "ios") {
+      const t = setTimeout(() => setVisible(true), APPEAR_DELAY_MS);
+      return () => clearTimeout(t);
     }
 
-    // Skip if already installed (standalone or iOS standalone).
-    const isStandalone =
-      window.matchMedia?.("(display-mode: standalone)").matches ||
-      (window.navigator as { standalone?: boolean }).standalone === true;
-    if (isStandalone) return;
-
-    // Android path — listen for the native event.
-    const onBip = (e: Event) => {
+    // Android / Chromium — wait for the browser to signal installability,
+    // then surface our styled prompt in place of the native mini-infobar.
+    const onBeforeInstall = (e: Event) => {
       e.preventDefault();
-      setDeferred(e as BIPEvent);
-      setMode("android");
-      // Small delay so it doesn't jump in on first paint.
-      setTimeout(() => setVisible(true), 1200);
+      setDeferred(e as BeforeInstallPromptEvent);
+      setTimeout(() => setVisible(true), APPEAR_DELAY_MS);
     };
-    window.addEventListener("beforeinstallprompt", onBip);
+    const onInstalled = () => {
+      setVisible(false);
+      setDeferred(null);
+    };
 
-    // iOS detection — Safari on iOS/iPadOS. Exclude in-app browsers.
-    const ua = window.navigator.userAgent;
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
-    const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-    if (isIOS && isSafari) {
-      setMode("ios");
-      setTimeout(() => setVisible(true), 1500);
-    }
-
-    return () => window.removeEventListener("beforeinstallprompt", onBip);
+    window.addEventListener("beforeinstallprompt", onBeforeInstall);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
   }, []);
 
-  const dismiss = () => {
+  const install = useCallback(async () => {
+    if (!deferred || installing) return;
+    setInstalling(true);
     try {
-      sessionStorage.setItem(SESSION_KEY, "1");
+      await deferred.prompt();
+      const choice = await deferred.userChoice;
+      if (choice.outcome === "accepted") {
+        setVisible(false);
+      } else {
+        // User picked "cancel" inside the native dialog — snooze our card too.
+        snooze();
+        setVisible(false);
+      }
+      setDeferred(null);
     } catch {
-      // ignore
+      // Rare: the prompt can be rejected by the browser if called twice.
+      setDeferred(null);
+    } finally {
+      setInstalling(false);
     }
+  }, [deferred, installing]);
+
+  const snooze = () => {
+    try {
+      const until = Date.now() + DISMISS_DAYS * 24 * 60 * 60 * 1000;
+      localStorage.setItem(DISMISS_KEY, String(until));
+    } catch {
+      // ignore quota / private mode failures
+    }
+  };
+
+  const dismiss = () => {
+    snooze();
     setVisible(false);
   };
 
-  const install = async () => {
-    if (!deferred) return;
-    try {
-      await deferred.prompt();
-      await deferred.userChoice;
-    } catch {
-      // user cancelled or platform error — either way, dismiss for this session.
-    }
-    dismiss();
-  };
-
-  if (!mode || !visible) return null;
+  if (!visible) return null;
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[90] px-4 pb-4 pt-3"
-      role="dialog"
-      aria-label="Install Site Photo Stamp"
+      className="fixed inset-x-0 bottom-0 z-[100] px-3 pb-3 pt-6 pointer-events-none"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)" }}
     >
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in slide-in-from-bottom duration-300">
-        <div className="p-4 flex items-start gap-3">
-          <div className="shrink-0 w-11 h-11 rounded-xl bg-[#1B5B50] flex items-center justify-center text-white font-bold text-lg" style={{ fontFamily: "'Playfair Display', serif" }}>
-            E
-          </div>
+      <div
+        role="dialog"
+        aria-labelledby="spstamp-install-title"
+        className="pointer-events-auto max-w-md mx-auto bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in slide-in-from-bottom fade-in duration-300"
+      >
+        {/* Header row with icon + wordmark text + close */}
+        <div className="px-4 pt-4 pb-2 flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/site-photo-stamp/icon-192.png"
+            alt=""
+            className="w-14 h-14 rounded-2xl shrink-0 shadow-sm ring-1 ring-black/5"
+            width={56}
+            height={56}
+          />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 mb-0.5">
-              Install Site Photo Stamp
-            </p>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              {mode === "android"
-                ? "Add to your home screen for quick one-tap access to site photo recording."
-                : "Tap the Share button, then choose 'Add to Home Screen' for quick access on site."}
+            <h3
+              id="spstamp-install-title"
+              className="text-[15px] font-bold text-gray-900 leading-tight"
+            >
+              Install Ebrora Photo Stamp
+            </h3>
+            <p className="text-[11.5px] text-gray-500 mt-0.5 leading-snug">
+              Add to your home screen — opens fullscreen like a native app.
             </p>
           </div>
           <button
             type="button"
             onClick={dismiss}
-            className="shrink-0 text-gray-400 hover:text-gray-600 p-1 -m-1"
-            aria-label="Dismiss"
+            className="shrink-0 -mr-1 -mt-1 w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition"
+            aria-label="Not now"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {mode === "android" && (
-          <div className="px-4 pb-4 flex gap-2">
-            <button
-              type="button"
-              onClick={dismiss}
-              className="flex-1 py-2.5 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Not now
-            </button>
-            <button
-              type="button"
-              onClick={install}
-              className="flex-1 py-2.5 text-sm font-semibold text-white bg-[#1B5B50] hover:bg-[#144540] rounded-lg transition-colors"
-            >
-              Install
-            </button>
-          </div>
-        )}
+        {/* Body */}
+        <div className="px-4 pb-4">
+          {platform === "ios" ? <IosInstructions /> : <AndroidAction onInstall={install} ready={!!deferred} installing={installing} />}
+        </div>
 
-        {mode === "ios" && (
-          <div className="px-4 pb-4">
-            <ol className="text-xs text-gray-600 space-y-1.5 pl-1">
-              <li className="flex gap-2">
-                <span className="font-semibold text-[#1B5B50]">1.</span>
-                <span>
-                  Tap the <strong>Share</strong> icon{" "}
-                  <span className="inline-flex items-center justify-center w-4 h-4 align-middle">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-full h-full">
-                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                      <polyline points="16 6 12 2 8 6" />
-                      <line x1="12" y1="2" x2="12" y2="15" />
-                    </svg>
-                  </span>{" "}
-                  at the bottom of Safari.
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-semibold text-[#1B5B50]">2.</span>
-                <span>
-                  Scroll and tap <strong>Add to Home Screen</strong>.
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-semibold text-[#1B5B50]">3.</span>
-                <span>
-                  Tap <strong>Add</strong> in the top right.
-                </span>
-              </li>
-            </ol>
-          </div>
-        )}
+        {/* Footer */}
+        <div className="px-4 pb-3 -mt-1 flex items-center justify-center gap-1.5 text-[10.5px] text-gray-400">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>No app store. No login. Works offline.</span>
+        </div>
       </div>
+    </div>
+  );
+}
+
+// ─── Android / Chromium ─────────────────────────────────────────
+
+function AndroidAction({
+  onInstall,
+  ready,
+  installing,
+}: {
+  onInstall: () => void;
+  ready: boolean;
+  installing: boolean;
+}) {
+  if (ready) {
+    return (
+      <button
+        type="button"
+        onClick={onInstall}
+        disabled={installing}
+        className="w-full py-3 rounded-xl bg-[#1B5B50] text-white text-sm font-semibold hover:bg-[#144540] transition-colors active:scale-[0.98] shadow-sm disabled:opacity-70"
+      >
+        {installing ? "Opening install…" : "Install app"}
+      </button>
+    );
+  }
+  // Browsers that haven't fired beforeinstallprompt yet — show a soft hint.
+  return (
+    <div className="px-3 py-2.5 rounded-xl bg-gray-50 text-[12px] text-gray-600 leading-relaxed">
+      In your browser menu (⋮), tap{" "}
+      <span className="font-semibold text-gray-900">Install app</span> or{" "}
+      <span className="font-semibold text-gray-900">Add to Home screen</span>.
+    </div>
+  );
+}
+
+// ─── iOS Safari ─────────────────────────────────────────────────
+
+function IosInstructions() {
+  return (
+    <div className="rounded-xl bg-gray-50 p-3">
+      <p className="text-[12px] font-semibold text-gray-900 mb-2">To install:</p>
+      <ol className="space-y-2 text-[12px] text-gray-700">
+        <li className="flex items-center gap-2.5">
+          <span className="shrink-0 w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[10px] font-semibold text-gray-600">
+            1
+          </span>
+          <span className="flex items-center gap-1.5 flex-1">
+            Tap the Share icon
+            <svg className="w-4 h-4 text-[#1B5B50] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
+            </svg>
+            at the bottom of Safari
+          </span>
+        </li>
+        <li className="flex items-center gap-2.5">
+          <span className="shrink-0 w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[10px] font-semibold text-gray-600">
+            2
+          </span>
+          <span className="flex-1">
+            Choose <span className="font-semibold text-gray-900">Add to Home Screen</span>
+          </span>
+        </li>
+      </ol>
     </div>
   );
 }
