@@ -1,8 +1,14 @@
 // src/lib/site-photo-stamp/templates.ts
 //
 // All 18 site photo stamp templates, each with 3 variants.
-// Variants: solid (colour block, white text), outline (white block, coloured
-// text + border), icon (solid colour + badge icon).
+// Variants:
+//   • solid       — full colour block, white (or dark) body text.
+//   • transparent — no background; body text in white sitting directly on
+//                   the photo. The title is drawn in the template's base
+//                   colour with a thin white stroke so it remains legible
+//                   on dark photographs.
+//   • icon        — solid colour block + badge icon on the left of the
+//                   title (check / cross / warning / eye / clipboard).
 //
 // Colour palette chosen for maximum scannability on site prints and the
 // construction-industry convention (green = positive/good practice, amber =
@@ -19,12 +25,14 @@ const solid = (bg: string, fg = "#FFFFFF") => ({
   textColor: fg,
 });
 
-const outline = (bg: string, fg: string) => ({
-  id: "outline" as const,
-  label: "Outline",
-  accentColor: "#FFFFFF",
-  textColor: fg,
-  borderColor: bg,
+const transparent = () => ({
+  id: "transparent" as const,
+  label: "Transparent",
+  // Renderer special-cases the "transparent" accent: no card fill is drawn,
+  // body text is white, and the title is painted in the template's base
+  // colour with a white stroke. See stamp-renderer.ts / drawStampCard.
+  accentColor: "transparent",
+  textColor: "#FFFFFF",
 });
 
 const withIcon = (
@@ -49,7 +57,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#1E40AF",
     variants: [
       solid("#1E40AF"),
-      outline("#1E40AF", "#1E40AF"),
+      transparent(),
       withIcon("#1E40AF", "clipboard"),
     ],
   },
@@ -60,7 +68,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#F59E0B",
     variants: [
       solid("#F59E0B", "#1F1300"),
-      outline("#F59E0B", "#92400E"),
+      transparent(),
       withIcon("#F59E0B", "warning", "#1F1300"),
     ],
   },
@@ -71,7 +79,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#DC2626",
     variants: [
       solid("#DC2626"),
-      outline("#DC2626", "#991B1B"),
+      transparent(),
       withIcon("#DC2626", "warning"),
     ],
   },
@@ -82,7 +90,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#16A34A",
     variants: [
       solid("#16A34A"),
-      outline("#16A34A", "#166534"),
+      transparent(),
       withIcon("#16A34A", "check"),
     ],
   },
@@ -93,7 +101,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#0EA5E9",
     variants: [
       solid("#0EA5E9"),
-      outline("#0EA5E9", "#0369A1"),
+      transparent(),
       withIcon("#0EA5E9", "eye"),
     ],
   },
@@ -104,7 +112,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#B91C1C",
     variants: [
       solid("#B91C1C"),
-      outline("#B91C1C", "#7F1D1D"),
+      transparent(),
       withIcon("#B91C1C", "cross"),
     ],
   },
@@ -115,7 +123,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#0D9488",
     variants: [
       solid("#0D9488"),
-      outline("#0D9488", "#115E59"),
+      transparent(),
       withIcon("#0D9488", "check"),
     ],
   },
@@ -126,7 +134,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#1B5B50",
     variants: [
       solid("#1B5B50"),
-      outline("#1B5B50", "#134037"),
+      transparent(),
       withIcon("#1B5B50", "clipboard"),
     ],
   },
@@ -137,7 +145,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#B45309",
     variants: [
       solid("#B45309"),
-      outline("#B45309", "#78350F"),
+      transparent(),
       withIcon("#B45309", "clipboard"),
     ],
   },
@@ -148,7 +156,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#EA580C",
     variants: [
       solid("#EA580C"),
-      outline("#EA580C", "#9A3412"),
+      transparent(),
       withIcon("#EA580C", "check"),
     ],
   },
@@ -159,7 +167,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#7C3AED",
     variants: [
       solid("#7C3AED"),
-      outline("#7C3AED", "#5B21B6"),
+      transparent(),
       withIcon("#7C3AED", "clipboard"),
     ],
   },
@@ -170,7 +178,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#15803D",
     variants: [
       solid("#15803D"),
-      outline("#15803D", "#14532D"),
+      transparent(),
       withIcon("#15803D", "eye"),
     ],
   },
@@ -181,7 +189,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#57534E",
     variants: [
       solid("#57534E"),
-      outline("#57534E", "#292524"),
+      transparent(),
       withIcon("#57534E", "clipboard"),
     ],
   },
@@ -192,7 +200,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#CA8A04",
     variants: [
       solid("#CA8A04", "#1F1300"),
-      outline("#CA8A04", "#854D0E"),
+      transparent(),
       withIcon("#CA8A04", "warning", "#1F1300"),
     ],
   },
@@ -203,7 +211,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#0891B2",
     variants: [
       solid("#0891B2"),
-      outline("#0891B2", "#155E75"),
+      transparent(),
       withIcon("#0891B2", "check"),
     ],
   },
@@ -214,7 +222,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#374151",
     variants: [
       solid("#374151"),
-      outline("#374151", "#111827"),
+      transparent(),
       withIcon("#374151", "clipboard"),
     ],
   },
@@ -225,7 +233,7 @@ export const TEMPLATES: Template[] = [
     baseColor: "#D97706",
     variants: [
       solid("#D97706"),
-      outline("#D97706", "#92400E"),
+      transparent(),
       withIcon("#D97706", "warning"),
     ],
   },
@@ -237,7 +245,7 @@ export const TEMPLATES: Template[] = [
     forceTwoUp: true,
     variants: [
       solid("#475569"),
-      outline("#475569", "#1E293B"),
+      transparent(),
       withIcon("#475569", "check"),
     ],
   },

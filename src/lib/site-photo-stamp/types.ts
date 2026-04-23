@@ -25,7 +25,7 @@ export type TemplateId =
   | "before-after";
 
 /** Variant style within a template (user can pick, e.g. solid vs outline). */
-export type VariantId = "solid" | "outline" | "icon";
+export type VariantId = "solid" | "transparent" | "icon";
 
 /** Iconography for the 'icon' variant. */
 export type StampIcon = "check" | "cross" | "warning" | "eye" | "clipboard";
@@ -33,11 +33,12 @@ export type StampIcon = "check" | "cross" | "warning" | "eye" | "clipboard";
 export interface TemplateVariant {
   id: VariantId;
   label: string;
-  /** Background colour of the stamp card. */
+  /** Background colour of the stamp card (CSS colour; "transparent" for the
+   *  transparent variant — renderer then draws text directly on the photo). */
   accentColor: string;
-  /** Text colour on top of accentColor. */
+  /** Text colour for body rows on top of accentColor. */
   textColor: string;
-  /** Optional border colour (used by 'outline' variant). */
+  /** Reserved for future use. Not set by any current variant. */
   borderColor?: string;
   /** Optional badge icon (used by 'icon' variant). */
   icon?: StampIcon;
@@ -111,6 +112,23 @@ export interface Settings {
   companyName: string;
   /** Data URL of user's custom logo. Paid-tier only; enforced at render. */
   companyLogoDataUrl: string;
+
+  // ── Sticky template selection (Batch 7) ──
+  // Soft memory — remembers the user's last pick for 30 minutes.
+  /** Template last chosen via picker or capture. */
+  lastUsedTemplate?: TemplateId;
+  /** Variant last chosen via picker or capture. */
+  lastUsedVariant?: VariantId;
+  /** Epoch ms of the last selection. */
+  lastUsedAt?: number;
+
+  // Hard memory — survives for 6 hours after the lock was last refreshed.
+  /** Template currently locked by the user. */
+  lockedTemplate?: TemplateId;
+  /** Variant currently locked by the user. */
+  lockedVariant?: VariantId;
+  /** Epoch ms of the last time the lock was engaged / refreshed. */
+  lockedAt?: number;
 }
 
 /** Default settings applied on first load. */

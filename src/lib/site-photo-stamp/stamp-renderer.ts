@@ -198,47 +198,43 @@ function drawStampCard(
   const cardX = pad;
   const cardY = h - pad - cardH;
 
-  // ── Card background with shadow ──
-  ctx.shadowColor = "rgba(0,0,0,0.25)";
-  ctx.shadowBlur = Math.round(base * 0.012);
-  ctx.shadowOffsetY = Math.round(base * 0.004);
+  const isTransparent = variant.id === "transparent";
 
-  roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
-  ctx.fillStyle = "rgba(255,255,255,0.97)";
-  ctx.fill();
+  // ── Card background with shadow (omitted for transparent variant) ──
+  if (!isTransparent) {
+    ctx.shadowColor = "rgba(0,0,0,0.25)";
+    ctx.shadowBlur = Math.round(base * 0.012);
+    ctx.shadowOffsetY = Math.round(base * 0.004);
 
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetY = 0;
+    roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
+    ctx.fillStyle = "rgba(255,255,255,0.97)";
+    ctx.fill();
 
-  // ── Header band ──
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+  }
+
+  // ── Header band (filled for solid / icon; skipped for transparent) ──
   const headerBg = variant.accentColor;
   const headerFg = variant.textColor;
-  const isOutline = variant.id === "outline";
-  const headerBorder = isOutline ? (variant.borderColor ?? template.baseColor) : null;
 
-  ctx.save();
-  roundRectPathTopOnly(ctx, cardX, cardY, cardW, headerH, radius);
-  ctx.clip();
-
-  if (isOutline) {
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(cardX, cardY, cardW, headerH);
-    if (headerBorder) {
-      const strokeH = Math.max(2, Math.round(base * 0.003));
-      ctx.fillStyle = headerBorder;
-      ctx.fillRect(cardX, cardY + headerH - strokeH, cardW, strokeH);
-    }
-  } else {
+  if (!isTransparent) {
+    ctx.save();
+    roundRectPathTopOnly(ctx, cardX, cardY, cardW, headerH, radius);
+    ctx.clip();
     ctx.fillStyle = headerBg;
     ctx.fillRect(cardX, cardY, cardW, headerH);
+    ctx.restore();
   }
-  ctx.restore();
 
   // ── Header text + optional icon ──
   const headerPadX = cardPad;
   let textX = cardX + headerPadX;
-  const headerTextColour = isOutline ? (variant.borderColor ?? template.baseColor) : headerFg;
+  // Transparent variant: title painted in the template's base colour with a
+  // thin white stroke so it pops on dark photos. Solid / icon variants keep
+  // the existing header foreground colour.
+  const headerTextColour = isTransparent ? template.baseColor : headerFg;
 
   // Title sits in the top portion of the header. Vertically centered within
   // the base header height when there's no note, or within the dedicated
@@ -251,41 +247,68 @@ function drawStampCard(
     textX += iconSize + iconGap;
   }
 
-  ctx.fillStyle = headerTextColour;
   ctx.font = weightFont(headerFs, "700");
   ctx.textBaseline = "middle";
   ctx.textAlign = "left";
   const titleMaxW = cardW - headerPadX * 2 - (hasIcon ? iconSize + iconGap : 0);
-  ctx.fillText(truncate(ctx, title, titleMaxW), textX, titleCenterY);
+  const titleText = truncate(ctx, title, titleMaxW);
 
-  // Note lines (below title, same header colour, slightly lighter weight)
+  if (isTransparent) {
+    // Thin white stroke behind the coloured title so it stays legible on
+    // dark photos. Proportional stroke width keeps crispness at all sizes.
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = Math.max(2, Math.round(headerFs * 0.14));
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
+    ctx.strokeText(titleText, textX, titleCenterY);
+  }
+  ctx.fillStyle = headerTextColour;
+  ctx.fillText(titleText, textX, titleCenterY);
+
+  // Note lines (below title). Same colour treatment as the title — with a
+  // matching white stroke on the transparent variant for readability.
   if (hasNote) {
     ctx.font = weightFont(noteFs, "500");
-    ctx.fillStyle = headerTextColour;
     const noteLineH = Math.round(noteFs * 1.35);
     let ny = cardY + titleAreaH + noteLineH / 2 - Math.round(noteFs * 0.05);
     for (const line of noteLines) {
+      if (isTransparent) {
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = Math.max(2, Math.round(noteFs * 0.14));
+        ctx.lineJoin = "round";
+        ctx.miterLimit = 2;
+        ctx.strokeText(line, cardX + cardPad, ny);
+      }
+      ctx.fillStyle = headerTextColour;
       ctx.fillText(line, cardX + cardPad, ny);
       ny += noteLineH;
     }
   }
 
   // ── Body rows ──
+  // Colour choice:
+  //   • solid / icon  → grey labels, dark slate values on the white card.
+  //   • transparent   → pure white labels + values, strict (no stroke); if
+  //                     the photo is too bright the user switches band.
+  const bodyLabelColour = isTransparent ? "rgba(255,255,255,0.85)" : "#6B7280";
+  const bodyColonColour = isTransparent ? "rgba(255,255,255,0.55)" : "#9CA3AF";
+  const bodyValueColour = isTransparent ? "#FFFFFF" : "#0F172A";
+
   let y = cardY + headerH + cardPad;
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
     const rowH = rowHeights[i];
     const labelY = y + rowH / 2;
 
-    ctx.fillStyle = "#6B7280";
+    ctx.fillStyle = bodyLabelColour;
     ctx.font = weightFont(labelFs, "600");
     ctx.textBaseline = "middle";
     ctx.fillText(r.label, cardX + cardPad, labelY);
 
-    ctx.fillStyle = "#9CA3AF";
+    ctx.fillStyle = bodyColonColour;
     ctx.fillText(":", cardX + cardPad + labelCol - Math.round(base * 0.015), labelY);
 
-    ctx.fillStyle = "#0F172A";
+    ctx.fillStyle = bodyValueColour;
     ctx.font = r.mono ? monoFont(valueFs, "600") : weightFont(valueFs, "600");
     const lines = wrapText(ctx, r.value, valueMaxW, 2);
     const lineH = valueFs * 1.25;
