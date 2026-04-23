@@ -57,7 +57,9 @@ const nextConfig = {
                         },
                         {
                                       key: 'Permissions-Policy',
-                                      value: 'camera=(), microphone=(), geolocation=()',
+                                      // geolocation=(self) is required by /site-photo-stamp to stamp photos with GPS.
+                                      // camera remains off — <input capture> does not require the camera permission.
+                                      value: 'camera=(), microphone=(), geolocation=(self)',
                         },
                         {
                                       key: 'Strict-Transport-Security',
@@ -65,7 +67,7 @@ const nextConfig = {
                         },
                         {
                                       key: 'Content-Security-Policy',
-                                      value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.ebrora.com https://cdn.ebrora.com https://www.google-analytics.com https://*.stripe.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://api.openai.com https://*.paypal.com https://*.stripe.com https://*.vercel-insights.com https://archive-api.open-meteo.com https://api.open-meteo.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://checkout.stripe.com",
+                                      value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.ebrora.com https://cdn.ebrora.com https://www.google-analytics.com https://*.stripe.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://api.openai.com https://*.paypal.com https://*.stripe.com https://*.vercel-insights.com https://archive-api.open-meteo.com https://api.open-meteo.com https://api.bigdatacloud.net; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://checkout.stripe.com",
                         },
                                 ],
             },
