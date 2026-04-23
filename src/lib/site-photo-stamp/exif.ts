@@ -230,14 +230,28 @@ function parseGps(
   const latRef = readGpsRef(latRefEntry, little);
   const lonRef = readGpsRef(lonRefEntry, little);
 
+  // Reject if the reference bytes aren't a valid cardinal. This guards
+  // against photos where the GPS IFD is present but never populated
+  // (ref bytes left as 0x00).
+  if (latRef !== "N" && latRef !== "S") return null;
+  if (lonRef !== "E" && lonRef !== "W") return null;
+
   const lat = readGpsCoord(view, tiffStart, latEntry, little);
   const lon = readGpsCoord(view, tiffStart, lonEntry, little);
   if (lat == null || lon == null) return null;
 
-  return {
-    lat: latRef === "S" ? -lat : lat,
-    lon: lonRef === "W" ? -lon : lon,
-  };
+  const finalLat = latRef === "S" ? -lat : lat;
+  const finalLon = lonRef === "W" ? -lon : lon;
+
+  // Reject Null Island — (0, 0) is in the Atlantic off the coast of West
+  // Africa and is almost certainly an unpopulated GPS field rather than a
+  // real construction-site location.
+  if (finalLat === 0 && finalLon === 0) return null;
+
+  // Sanity-check bounds.
+  if (Math.abs(finalLat) > 90 || Math.abs(finalLon) > 180) return null;
+
+  return { lat: finalLat, lon: finalLon };
 }
 
 function readGpsRef(entry: IfdEntry, little: boolean): string {
