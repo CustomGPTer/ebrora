@@ -84,7 +84,7 @@ export default withAuth(
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     response.headers.set('X-XSS-Protection', '1; mode=block');
-    response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    response.headers.set('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
     response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
     return response;
   },
