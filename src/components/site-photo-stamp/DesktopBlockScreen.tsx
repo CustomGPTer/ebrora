@@ -2,11 +2,19 @@
 //
 // Shown when the user opens /site-photo-stamp on a device that isn't
 // a mobile phone. Displays the URL + a QR code so they can hop across.
+//
+// Also provides an escape hatch ("Continue on this device") in case our
+// detection misfires — e.g. iPad with desktop UA, "Request Desktop Site"
+// mode on iOS, or any browser that doesn't identify itself as mobile.
 "use client";
 
 import { useEffect, useState } from "react";
 
-export default function DesktopBlockScreen() {
+interface Props {
+  onOverride?: () => void;
+}
+
+export default function DesktopBlockScreen({ onOverride }: Props) {
   const [url, setUrl] = useState("");
   const [qrSvg, setQrSvg] = useState<string>("");
 
@@ -90,6 +98,25 @@ export default function DesktopBlockScreen() {
         <div className="text-xs text-gray-400">
           Add to your phone's home screen once opened for quick access.
         </div>
+
+        {onOverride && (
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mb-3">
+              Already on your phone? Some mobile browsers aren't detected
+              automatically.
+            </p>
+            <button
+              type="button"
+              onClick={onOverride}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1B5B50] hover:underline"
+            >
+              Continue on this device
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

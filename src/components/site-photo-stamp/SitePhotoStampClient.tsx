@@ -66,7 +66,23 @@ function useIsMobile() {
       const standalone =
         window.matchMedia?.("(display-mode: standalone)").matches ||
         (window.navigator as { standalone?: boolean }).standalone === true;
-      setIsMobile(w <= 900 || uaMobile || !!standalone);
+      // `pointer: coarse` = primary input is a finger (phone/tablet).
+      // Survives "Request Desktop Site" on iOS/Android, which spoofs the UA
+      // but can't change the physical input method.
+      const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+      // `hover: none` = input device can't hover (another finger-input signal).
+      const noHover = window.matchMedia?.("(hover: none)").matches ?? false;
+      // Any touch support at all.
+      const touchPoints = (window.navigator.maxTouchPoints ?? 0) > 0;
+
+      setIsMobile(
+        w <= 900 ||
+        uaMobile ||
+        !!standalone ||
+        coarsePointer ||
+        noHover ||
+        touchPoints
+      );
     };
 
     check();
@@ -113,6 +129,7 @@ const MAX_BYTES = 25 * 1024 * 1024;
 
 export default function SitePhotoStampClient() {
   const isMobile = useIsMobile();
+  const [desktopOverride, setDesktopOverride] = useState(false);
   const paid = usePaidToolAccess();
   const tier = (paid.tier ?? "FREE") as Tier;
 
@@ -308,7 +325,9 @@ export default function SitePhotoStampClient() {
     );
   }
 
-  if (!isMobile) return <DesktopBlockScreen />;
+  if (!isMobile && !desktopOverride) {
+    return <DesktopBlockScreen onOverride={() => setDesktopOverride(true)} />;
+  }
 
   // ── Settings ─────────────────────────────────────────────────
   if (view.kind === "settings") {
