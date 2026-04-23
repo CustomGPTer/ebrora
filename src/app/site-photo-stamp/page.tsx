@@ -1,5 +1,5 @@
 // src/app/site-photo-stamp/page.tsx
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
@@ -31,6 +31,23 @@ export const metadata: Metadata = {
     "Site Photo Stamp | Construction Record, Close Call, Near Miss Photos | Ebrora",
   description:
     "Capture, stamp and share site photos on mobile. 13 construction templates (Construction Record, Close Call, Near Miss, Good Practice, Defect, Quality Record and more) with date, location and project metadata. Works offline on your phone — photos never leave your device unless you share them.",
+  // ─── PWA: Scoped manifest so /site-photo-stamp installs as its own standalone app ───
+  manifest: "/site-photo-stamp/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Photo Stamp",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: [
+      { url: "/site-photo-stamp/icon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/site-photo-stamp/icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/site-photo-stamp/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/site-photo-stamp/icon-180.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   alternates: {
     canonical: "https://www.ebrora.com/site-photo-stamp",
   },
@@ -50,6 +67,16 @@ export const metadata: Metadata = {
     description:
       "Stamp site photos with date, location and record type. Free for UK construction site teams.",
   },
+};
+
+// Viewport (Next.js 14+ expects theme colour here, not in metadata).
+export const viewport: Viewport = {
+  themeColor: "#1B5B50",
+  width: "device-width",
+  initialScale: 1,
+  // Locking zoom keeps the camera capture UI stable when users tap fields.
+  maximumScale: 1,
+  userScalable: false,
 };
 
 const pageSchema = {
