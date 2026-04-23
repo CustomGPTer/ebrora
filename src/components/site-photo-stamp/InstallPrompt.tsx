@@ -5,10 +5,17 @@
 // Behaviour:
 //   • Shows only when the page is NOT already running as an installed PWA
 //   • Honours a local dismissal cookie so we don't nag people who said no
+//   • Registers the /site-photo-stamp/ service worker on mount — this is
+//     required before Chrome / Chromium will ever fire the install event.
+//     Without a registered SW the Android branch is dead code.
 //   • On Android / Chromium: listens for `beforeinstallprompt`, then triggers
 //     the native install dialog when the user taps our Install button
 //   • On iOS Safari: Apple doesn't support programmatic install, so we show
 //     an inline "Share → Add to Home Screen" illustration instead
+//   • Fallback: after FALLBACK_DELAY_MS the card is surfaced with the
+//     "open your browser menu" hint even if `beforeinstallprompt` never
+//     fires (Firefox, Samsung Internet, Brave, and Chrome before the user
+//     has built up enough engagement all fall into this bucket).
 //   • The card uses the Photo Stamp wordmark so it's visually distinct from
 //     any future Ebrora-wide install prompt
 "use client";
@@ -16,8 +23,10 @@
 import { useEffect, useState, useCallback } from "react";
 
 const DISMISS_KEY = "spstamp:install:dismissed-until";
-const DISMISS_DAYS = 14; // how long to suppress after the user closes the card
-const APPEAR_DELAY_MS = 1800; // let the page render first so we're not intrusive
+const DISMISS_DAYS = 14;            // how long to suppress after the user closes the card
+const APPEAR_DELAY_MS = 1800;       // let the page render first so we're not intrusive
+const FALLBACK_DELAY_MS = 4500;     // surface the soft-hint card anyway if the install event
+                                    // never fires — covers non-Chromium mobile browsers
 
 type Platform = "android" | "ios" | "other";
 
@@ -54,11 +63,45 @@ function isDismissed(): boolean {
   }
 }
 
+// ─── Service worker registration ────────────────────────────────
+
+function registerPhotoStampServiceWorker() {
+  if (typeof window === "undefined") return;
+  if (!("serviceWorker" in navigator)) return;
+  // Don't bother in non-secure contexts (SW registration would fail anyway).
+  if (!window.isSecureContext) return;
+
+  const register = () => {
+    navigator.serviceWorker
+      .register("/site-photo-stamp/sw.js", { scope: "/site-photo-stamp/" })
+      .catch(() => {
+        // Non-fatal — the app still works without SW; we just won't be able
+        // to surface the native install dialog, and the fallback card will
+        // direct the user to their browser menu instead.
+      });
+  };
+
+  if (document.readyState === "complete") {
+    register();
+  } else {
+    window.addEventListener("load", register, { once: true });
+  }
+}
+
 export default function InstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
   const [platform, setPlatform] = useState<Platform>("other");
   const [installing, setInstalling] = useState(false);
+
+  // Register the SW on mount. This needs to run before Chrome will ever
+  // decide the page is installable, and it's idempotent so re-mounts are
+  // fine. Not gated on isStandalone / isDismissed — we want the SW live
+  // even for users who've dismissed the install card, so the PWA still
+  // works offline and is installable through their browser menu.
+  useEffect(() => {
+    registerPhotoStampServiceWorker();
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -70,7 +113,8 @@ export default function InstallPrompt() {
     const p = detectPlatform();
     setPlatform(p);
 
-    // iOS has no beforeinstallprompt — show our inline instructions instead.
+    // iOS has no beforeinstallprompt — show our inline instructions after
+    // a short delay so the page has time to render first.
     if (p === "ios") {
       const t = setTimeout(() => setVisible(true), APPEAR_DELAY_MS);
       return () => clearTimeout(t);
@@ -90,9 +134,17 @@ export default function InstallPrompt() {
 
     window.addEventListener("beforeinstallprompt", onBeforeInstall);
     window.addEventListener("appinstalled", onInstalled);
+
+    // Fallback timer — covers browsers that never fire beforeinstallprompt
+    // (Firefox, Samsung Internet, Brave) and Chrome pre-engagement. If the
+    // real event fires later, AndroidAction upgrades the soft-hint text to
+    // a live "Install app" button because `deferred` flips truthy.
+    const fallback = setTimeout(() => setVisible(true), FALLBACK_DELAY_MS);
+
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       window.removeEventListener("appinstalled", onInstalled);
+      clearTimeout(fallback);
     };
   }, []);
 
