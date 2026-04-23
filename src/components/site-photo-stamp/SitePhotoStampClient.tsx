@@ -66,23 +66,7 @@ function useIsMobile() {
       const standalone =
         window.matchMedia?.("(display-mode: standalone)").matches ||
         (window.navigator as { standalone?: boolean }).standalone === true;
-      // `pointer: coarse` = primary input is a finger (phone/tablet).
-      // Survives "Request Desktop Site" on iOS/Android, which spoofs the UA
-      // but can't change the physical input method.
-      const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false;
-      // `hover: none` = input device can't hover (another finger-input signal).
-      const noHover = window.matchMedia?.("(hover: none)").matches ?? false;
-      // Any touch support at all.
-      const touchPoints = (window.navigator.maxTouchPoints ?? 0) > 0;
-
-      setIsMobile(
-        w <= 900 ||
-        uaMobile ||
-        !!standalone ||
-        coarsePointer ||
-        noHover ||
-        touchPoints
-      );
+      setIsMobile(w <= 900 || uaMobile || !!standalone);
     };
 
     check();
@@ -129,7 +113,6 @@ const MAX_BYTES = 25 * 1024 * 1024;
 
 export default function SitePhotoStampClient() {
   const isMobile = useIsMobile();
-  const [desktopOverride, setDesktopOverride] = useState(false);
   const paid = usePaidToolAccess();
   const tier = (paid.tier ?? "FREE") as Tier;
 
@@ -237,7 +220,7 @@ export default function SitePhotoStampClient() {
 
   // ── Apply stamp ──────────────────────────────────────────────
 
-  const applyStamp = useCallback(async () => {
+  const applyStamp = useCallback(async (note?: string) => {
     if (view.kind !== "captured" || rendering) return;
     const captured = view.captured;
 
@@ -248,6 +231,7 @@ export default function SitePhotoStampClient() {
       const fullMeta: StampMeta = {
         templateTitle: resolvedTemplate.title,
         ...captured.meta,
+        note: note && note.length > 0 ? note : undefined,
         projectName: settings.projectName || undefined,
         siteName: settings.siteName || undefined,
         contractor: settings.contractor || undefined,
@@ -325,9 +309,7 @@ export default function SitePhotoStampClient() {
     );
   }
 
-  if (!isMobile && !desktopOverride) {
-    return <DesktopBlockScreen onOverride={() => setDesktopOverride(true)} />;
-  }
+  if (!isMobile) return <DesktopBlockScreen />;
 
   // ── Settings ─────────────────────────────────────────────────
   if (view.kind === "settings") {
@@ -431,7 +413,7 @@ export default function SitePhotoStampClient() {
           template={resolvedTemplate}
           variant={resolvedVariant}
           onRetake={discardCaptured}
-          onApplyStub={applyStamp}
+          onApply={applyStamp}
         />
         {rendering && (
           <div

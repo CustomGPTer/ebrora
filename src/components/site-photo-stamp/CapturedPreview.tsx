@@ -8,7 +8,7 @@
 // "Retake" discards the capture and returns to the landing screen.
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { CapturedPhoto } from "@/lib/site-photo-stamp/capture";
 import type { Template, TemplateVariant } from "@/lib/site-photo-stamp/types";
 import {
@@ -20,8 +20,11 @@ interface Props {
   template: Template;
   variant: TemplateVariant;
   onRetake: () => void;
-  onApplyStub: () => void;
+  /** Called with the optional note text when the user taps Apply stamp. */
+  onApply: (note: string) => void;
 }
+
+const NOTE_MAX = 200;
 
 function formatTimestamp(iso: string): string {
   try {
@@ -45,8 +48,10 @@ export default function CapturedPreview({
   template,
   variant,
   onRetake,
-  onApplyStub,
+  onApply,
 }: Props) {
+  const [note, setNote] = useState("");
+
   // Revoke preview URL when unmounting or when the captured object changes.
   useEffect(() => {
     return () => {
@@ -107,6 +112,31 @@ export default function CapturedPreview({
         </div>
       </section>
 
+      {/* Note input (optional) */}
+      <section className="px-4 pb-4">
+        <label className="block">
+          <div className="flex items-baseline justify-between mb-1.5">
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-gray-500">
+              Note <span className="normal-case tracking-normal font-normal text-gray-400">(optional)</span>
+            </span>
+            <span className={`text-[10px] ${note.length > NOTE_MAX - 20 ? "text-amber-600" : "text-gray-400"}`}>
+              {note.length} / {NOTE_MAX}
+            </span>
+          </div>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value.slice(0, NOTE_MAX))}
+            placeholder="Add a short description e.g. trip hazard at entrance, cones now placed"
+            rows={3}
+            maxLength={NOTE_MAX}
+            className="w-full px-3 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#1B5B50] focus:ring-1 focus:ring-[#1B5B50] focus:outline-none resize-none leading-snug"
+          />
+        </label>
+        <p className="mt-1 text-[10px] text-gray-400 leading-relaxed">
+          Appears under the template title on the stamp, up to 3 lines.
+        </p>
+      </section>
+
       {/* Metadata card */}
       <section className="px-4 pb-4">
         <div className="bg-white rounded-xl border border-gray-100 divide-y divide-gray-100">
@@ -155,14 +185,14 @@ export default function CapturedPreview({
           </button>
           <button
             type="button"
-            onClick={onApplyStub}
+            onClick={() => onApply(note.trim())}
             className="flex-1 py-3.5 rounded-xl bg-[#1B5B50] text-white text-sm font-semibold hover:bg-[#144540] transition-colors active:scale-[0.98] shadow-sm"
           >
             Apply stamp
           </button>
         </div>
         <p className="mt-4 text-[11px] text-gray-400 text-center leading-relaxed">
-          Full stamp rendering, save and share arrive in the next update.
+          Stamp is composited on your device. Nothing is uploaded.
         </p>
       </section>
     </div>
