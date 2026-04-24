@@ -37,6 +37,7 @@ import { capturePhoto, UnsupportedImageError } from "@/lib/site-photo-stamp/capt
 import { renderStamp } from "@/lib/site-photo-stamp/stamp-renderer";
 import {
   saveRecord,
+  getRecord,
   GalleryFullError,
   QuotaExceededError,
   countRecords,
@@ -83,6 +84,67 @@ interface Progress {
   total: number;
 }
 
+/**
+ * Lightweight in-memory record held for the whole batch's results phase.
+ * The full-size JPEG (`imageBlob`) is the biggest memory hog — at 2048 px
+ * long edge it's ~500 KB–1.2 MB per photo, and a 30-photo batch pinning
+ * all of them resident simultaneously has tipped low-RAM mobile devices
+ * over into "low memory" errors. So we keep only the tiny thumbnailBlob
+ * plus metadata here, and rehydrate the full blobs from IndexedDB on
+ * demand for PDF export / share.
+ *
+ * `imageBlob` is kept in-memory ONLY for records that could NOT be
+ * persisted (gallery full, or device storage quota full) — otherwise it's
+ * null and we'll re-fetch via getRecord(id) at export time.
+ */
+interface LiteResult {
+  id: string;
+  templateId: TemplateId;
+  variantId: VariantId;
+  thumbnailBlob: Blob;
+  meta: StampMeta;
+  createdAt: number;
+  /** Full JPEG retained in-memory ONLY for records that didn't make it to
+   *  IndexedDB. Null for records that are safely persisted. */
+  imageBlob: Blob | null;
+}
+
+/**
+ * Rehydrates an array of lite results into full StampedRecord[] for the
+ * PDF/share pipelines, which need `imageBlob` populated. Records with an
+ * in-memory imageBlob (save failed during the batch) are used directly;
+ * records with a null imageBlob are re-fetched from IndexedDB.
+ *
+ * Throws a friendly error if a record can't be found — this should only
+ * happen if the user manually deleted it from the gallery between finishing
+ * the batch and clicking Export.
+ */
+async function rehydrateResults(lite: LiteResult[]): Promise<StampedRecord[]> {
+  const full: StampedRecord[] = [];
+  for (const r of lite) {
+    if (r.imageBlob) {
+      full.push({
+        id: r.id,
+        templateId: r.templateId,
+        variantId: r.variantId,
+        imageBlob: r.imageBlob,
+        thumbnailBlob: r.thumbnailBlob,
+        meta: r.meta,
+        createdAt: r.createdAt,
+      });
+      continue;
+    }
+    const fromIdb = await getRecord(r.id);
+    if (!fromIdb) {
+      throw new Error(
+        "One of the photos in this batch is no longer in your gallery — it may have been deleted. Please re-stamp before exporting."
+      );
+    }
+    full.push(fromIdb);
+  }
+  return full;
+}
+
 export default function BulkScreen({
   template,
   variant,
@@ -95,7 +157,7 @@ export default function BulkScreen({
 }: Props) {
   const [pending, setPending] = useState<Pending[]>([]);
   const [progress, setProgress] = useState<Progress | null>(null);
-  const [results, setResults] = useState<StampedRecord[] | null>(null);
+  const [results, setResults] = useState<LiteResult[] | null>(null);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [galleryCount, setGalleryCount] = useState<number>(0);
 
@@ -354,7 +416,7 @@ export default function BulkScreen({
     const live = await getCurrentLocation(8000);
     const fallback = live ? { lat: live.lat, lon: live.lon } : undefined;
 
-    const produced: StampedRecord[] = [];
+    const produced: LiteResult[] = [];
     let galleryFull = false;
     let quotaFull = false;
     // Note text that wins per photo: override if set, else the trimmed
@@ -408,15 +470,33 @@ export default function BulkScreen({
         };
         URL.revokeObjectURL(captured.previewUrl);
 
-        // Save to gallery (best effort).
+        // Save to gallery (best effort). Track whether THIS record made
+        // it to IndexedDB — if not, we need to keep its full imageBlob
+        // in memory so the user can still export/share it.
+        let persisted = false;
         try {
-          if (!galleryFull && !quotaFull) await saveRecord(record);
+          if (!galleryFull && !quotaFull) {
+            await saveRecord(record);
+            persisted = true;
+          }
         } catch (err) {
           if (err instanceof GalleryFullError) galleryFull = true;
           else if (err instanceof QuotaExceededError) quotaFull = true;
         }
 
-        produced.push(record);
+        // Push only a lite record. If the record is safely in IDB we drop
+        // the full imageBlob from memory immediately (it gets rehydrated
+        // on demand during PDF export). If saving failed, keep the blob
+        // so the user can still share/export before leaving the screen.
+        produced.push({
+          id: record.id,
+          templateId: record.templateId,
+          variantId: record.variantId,
+          thumbnailBlob: record.thumbnailBlob,
+          meta: record.meta,
+          createdAt: record.createdAt,
+          imageBlob: persisted ? null : record.imageBlob,
+        });
 
         // Drop this photo from the persisted session. If the user
         // refreshes mid-batch, only unstamped photos restore.
@@ -446,6 +526,13 @@ export default function BulkScreen({
             : "Couldn't process one of the photos.";
         onToast(msg);
       }
+
+      // Yield to the event loop between photos. Gives the browser a
+      // chance to run GC (dropping the just-used canvas + decoded
+      // bitmap), repaint the progress UI, and service any pending
+      // tasks — critical on low-RAM mobile devices where a tight serial
+      // loop otherwise accumulates pressure until a canvas alloc fails.
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
 
     setProgress({ phase: "processing", done: pending.length, total: pending.length });
@@ -473,8 +560,12 @@ export default function BulkScreen({
     if (!results || results.length === 0 || progress) return;
     setProgress({ phase: "pdf", done: 0, total: results.length });
     try {
+      // Fetch full-size JPEG blobs from IndexedDB for records that were
+      // persisted. Lite records keep their in-memory blob (they're the
+      // ones that couldn't be saved, so they'd be lost without this copy).
+      const fullRecords = await rehydrateResults(results);
       const blob = await generatePdf({
-        records: results,
+        records: fullRecords,
         settings,
         tier,
         companyName: settings.companyName || undefined,
@@ -485,7 +576,7 @@ export default function BulkScreen({
       const url = URL.createObjectURL(blob);
       const a = pdfLinkRef.current ?? document.createElement("a");
       a.href = url;
-      a.download = buildPdfFilename(results);
+      a.download = buildPdfFilename(fullRecords);
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
     } catch (err) {
@@ -493,35 +584,44 @@ export default function BulkScreen({
     } finally {
       setProgress(null);
     }
-  }, [results, progress, tier, onToast]);
+  }, [results, progress, tier, settings, onToast]);
 
   const sharePdfBlob = useCallback(async () => {
     if (!results || progress) return;
     setProgress({ phase: "sharing", done: 0, total: 1 });
     try {
       let blob = pdfBlob;
+      let filename: string;
       if (!blob) {
+        const fullRecords = await rehydrateResults(results);
         blob = await generatePdf({
-          records: results,
+          records: fullRecords,
           settings,
           tier,
           companyName: settings.companyName || undefined,
           onProgress: (done, total) => setProgress({ phase: "pdf", done, total }),
         });
         setPdfBlob(blob);
+        filename = buildPdfFilename(fullRecords);
+      } else {
+        // Previously cached blob — we just need a filename; buildPdfFilename
+        // only reads record.meta, which lite results already carry.
+        filename = buildPdfFilename(results);
       }
       const outcome = await sharePdf(
         blob,
-        buildPdfFilename(results),
+        filename,
         "Site photo records",
         `${results.length} stamped site photo${results.length === 1 ? "" : "s"}.`
       );
       if (outcome === "unsupported") onToast("Sharing isn't supported on this device — use Export PDF instead.");
       else if (outcome === "error") onToast("Couldn't open the share sheet. Try Export PDF instead.");
+    } catch (err) {
+      onToast(err instanceof Error ? err.message : "Couldn't share this batch.");
     } finally {
       setProgress(null);
     }
-  }, [results, progress, pdfBlob, tier, onToast]);
+  }, [results, progress, pdfBlob, tier, settings, onToast]);
 
   const startOver = useCallback(() => {
     setResults(null);
@@ -915,7 +1015,7 @@ export default function BulkScreen({
 
 // ─── Result thumb ───────────────────────────────────────────────
 
-function ResultThumb({ record }: { record: StampedRecord }) {
+function ResultThumb({ record }: { record: LiteResult }) {
   const [url, setUrl] = useState<string>("");
   useEffect(() => {
     const u = URL.createObjectURL(record.thumbnailBlob);
