@@ -3,6 +3,23 @@
 // Bulk photo workflow: add up to 30 photos, apply the same template/variant
 // to all, process them in sequence, auto-save to gallery, then offer Export
 // PDF + Share PDF + Done.
+//
+// Notes (Batch 8):
+//   • A global note text field applies to every photo with no override.
+//   • Each pending photo has a small ✎ pencil affordance that opens a
+//     bottom-sheet editor for a per-photo override. Overrides win over the
+//     global note. Clearing an override falls back to the global note.
+//   • Thumbnails with an override show a tiny text preview strip so they're
+//     scannable in a long list.
+//   • The whole session (photos, global note, per-photo overrides,
+//     template + variant) persists to IndexedDB for 2 hours since the last
+//     edit, so a browser refresh / accidental navigation / phone lock
+//     doesn't wipe a partially-prepared batch. Writes are immediate for
+//     photo add/remove (expensive to re-do) and debounced 600ms for text
+//     edits (cheap to retype; no point hammering IDB on every keystroke).
+//   • Mid-batch progress is persisted too: after each successful stamp,
+//     the photo is removed from the saved session. A refresh in the middle
+//     of stamping restores only the unstamped photos with their notes.
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -13,6 +30,8 @@ import type {
   StampMeta,
   Tier,
   Settings,
+  TemplateId,
+  VariantId,
 } from "@/lib/site-photo-stamp/types";
 import { capturePhoto, UnsupportedImageError } from "@/lib/site-photo-stamp/capture";
 import { renderStamp } from "@/lib/site-photo-stamp/stamp-renderer";
@@ -22,6 +41,10 @@ import {
   QuotaExceededError,
   countRecords,
   MAX_RECORDS,
+  saveBulkSession,
+  loadBulkSession,
+  clearBulkSession,
+  type BulkSession,
 } from "@/lib/site-photo-stamp/gallery-db";
 import { getCurrentLocation } from "@/lib/site-photo-stamp/geolocation";
 import { generatePdf, buildPdfFilename } from "@/lib/site-photo-stamp/pdf-export";
@@ -29,6 +52,10 @@ import { sharePdf } from "@/lib/site-photo-stamp/share";
 
 const BULK_LIMIT = 30;
 const MAX_BYTES = 25 * 1024 * 1024;
+/** Character ceiling for notes — must match CapturedPreview's NOTE_MAX. */
+const NOTE_MAX = 200;
+/** Text edits hit IDB at most once per this interval. */
+const DEBOUNCE_MS = 600;
 
 interface Props {
   template: Template;
@@ -46,6 +73,8 @@ interface Pending {
   id: string;
   file: File;
   thumbnailUrl: string;
+  /** Per-photo note override. If undefined, falls back to the global note. */
+  note?: string;
 }
 
 interface Progress {
@@ -70,9 +99,34 @@ export default function BulkScreen({
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [galleryCount, setGalleryCount] = useState<number>(0);
 
+  // Notes (Batch 8)
+  const [globalNote, setGlobalNote] = useState<string>("");
+  /** ID of the pending photo whose note editor is currently open, else null. */
+  const [editorTargetId, setEditorTargetId] = useState<string | null>(null);
+  /** Once the IDB restore attempt completes (success or failure), this flips
+   *  true so the persistence effect can start saving without clobbering an
+   *  in-flight restore. */
+  const [restoreAttempted, setRestoreAttempted] = useState(false);
+
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const pdfLinkRef = useRef<HTMLAnchorElement>(null);
+
+  // Latest props for use inside the persistence effect — the effect
+  // fires on state changes; capturing props via ref keeps it from
+  // saving whenever the parent re-renders with a new template object
+  // identity.
+  const templateIdRef = useRef<TemplateId>(template.id);
+  const variantIdRef = useRef<VariantId>(variant.id);
+  templateIdRef.current = template.id;
+  variantIdRef.current = variant.id;
+
+  // One-shot flag: set immediately after a successful restore, consumed
+  // by the next persistence run. Prevents the restore's state update
+  // from triggering a wasteful re-save and — more importantly — stops
+  // it from bumping lastEditAt, which would artificially extend the
+  // 2-hour TTL every time the user reopens the app.
+  const skipNextPersistRef = useRef(false);
 
   // ── Gallery count (for capacity check) ────────────────────────
   useEffect(() => {
@@ -86,6 +140,112 @@ export default function BulkScreen({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── Restore bulk session from IDB (one-shot on mount) ─────────
+  //
+  // Runs exactly once. If the session is within the 2-hour TTL, we
+  // rehydrate photos, notes, and template selection. Per the UX
+  // decisions: toast the user so they know what happened; silently
+  // skip if no session or it's expired.
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const session = await loadBulkSession();
+        if (cancelled) return;
+        if (!session || session.photos.length === 0) {
+          setRestoreAttempted(true);
+          return;
+        }
+
+        // Convert persisted Blobs back into browser File objects +
+        // fresh object URLs. We key each on its original pending id
+        // so per-photo note overrides remain valid.
+        const restored: Pending[] = session.photos.map((p) => ({
+          id: p.id,
+          file: new File([p.blob], p.name, { type: p.blob.type || "image/jpeg" }),
+          thumbnailUrl: URL.createObjectURL(p.blob),
+          note: p.note && p.note.length > 0 ? p.note : undefined,
+        }));
+
+        setPending(restored);
+        setGlobalNote(session.globalNote ?? "");
+        // Skip the single persist-effect run triggered by this state
+        // update, otherwise we'd immediately re-save and bump lastEditAt.
+        skipNextPersistRef.current = true;
+        const overrideCount = restored.filter((p) => p.note).length;
+        const plural = restored.length === 1 ? "" : "s";
+        onToast(
+          overrideCount > 0
+            ? `Bulk session restored — ${restored.length} photo${plural}, ${overrideCount} custom note${overrideCount === 1 ? "" : "s"}.`
+            : `Bulk session restored — ${restored.length} photo${plural}.`
+        );
+      } catch {
+        // Silent — the user just sees an empty bulk screen, no harm done.
+      } finally {
+        if (!cancelled) setRestoreAttempted(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // Mount-only. Intentionally excludes onToast from deps — see comment.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Persist bulk session to IDB ───────────────────────────────
+  //
+  // Writes the current (pending, globalNote, template, variant) state to
+  // IDB whenever the user edits anything meaningful. Text changes are
+  // debounced by DEBOUNCE_MS so rapid typing doesn't spam IDB; photo
+  // add/remove reaches IDB immediately via its own handlers below.
+  //
+  // Guarded by restoreAttempted so we don't overwrite a pending restore
+  // with the empty initial state.
+  useEffect(() => {
+    if (!restoreAttempted) return;
+    if (skipNextPersistRef.current) {
+      skipNextPersistRef.current = false;
+      return;
+    }
+
+    // If nothing to persist and no session to clear, do nothing. We only
+    // want the effect to actively clear when pending was non-empty and
+    // has just become empty (explicit clear or last photo removed).
+    const handle = setTimeout(async () => {
+      if (pending.length === 0 && globalNote.length === 0) {
+        await clearBulkSession();
+        return;
+      }
+      const session: BulkSession = {
+        id: "current",
+        photos: pending.map((p) => ({
+          id: p.id,
+          blob: p.file,
+          name: p.file.name,
+          note: p.note,
+        })),
+        globalNote,
+        templateId: templateIdRef.current,
+        variantId: variantIdRef.current,
+        lastEditAt: Date.now(),
+      };
+      const ok = await saveBulkSession(session);
+      if (!ok) {
+        // Storage full. Try metadata-only salvage so at least the notes
+        // and template selection survive a refresh — photos will be
+        // lost, but the user's typing isn't wasted.
+        await saveBulkSession({
+          ...session,
+          photos: [],
+        });
+      }
+    }, DEBOUNCE_MS);
+
+    return () => clearTimeout(handle);
+  }, [restoreAttempted, pending, globalNote]);
 
   // ── Add photos ────────────────────────────────────────────────
 
@@ -158,6 +318,23 @@ export default function BulkScreen({
     });
   }, []);
 
+  // Set or clear the per-photo note override. Passing empty string clears
+  // the override (photo falls back to the global note at stamp time).
+  const setPendingNote = useCallback((id: string, note: string) => {
+    setPending((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? { ...p, note: note.trim().length > 0 ? note.slice(0, NOTE_MAX) : undefined }
+          : p
+      )
+    );
+  }, []);
+
+  const editorTarget = useMemo(
+    () => (editorTargetId ? pending.find((p) => p.id === editorTargetId) ?? null : null),
+    [editorTargetId, pending]
+  );
+
   const clearAll = useCallback(() => {
     pending.forEach((p) => URL.revokeObjectURL(p.thumbnailUrl));
     setPending([]);
@@ -180,6 +357,14 @@ export default function BulkScreen({
     const produced: StampedRecord[] = [];
     let galleryFull = false;
     let quotaFull = false;
+    // Note text that wins per photo: override if set, else the trimmed
+    // global note if non-empty, else undefined (no note on stamp).
+    const trimmedGlobal = globalNote.trim();
+
+    // Mutable list of unprocessed photo ids. After each successful stamp
+    // we drop the id and rewrite the bulk session so a refresh mid-batch
+    // restores only the remaining photos.
+    const remainingIds = new Set(pending.map((p) => p.id));
 
     for (let i = 0; i < pending.length; i++) {
       const p = pending[i];
@@ -189,6 +374,12 @@ export default function BulkScreen({
           fallbackCoords: fallback,
           skipLiveLocation: true,
         });
+        const effectiveNote =
+          (p.note && p.note.trim().length > 0
+            ? p.note.trim()
+            : trimmedGlobal.length > 0
+            ? trimmedGlobal
+            : undefined) ?? undefined;
         const fullMeta: StampMeta = {
           templateTitle: template.title,
           ...captured.meta,
@@ -196,6 +387,7 @@ export default function BulkScreen({
           siteName: settings.siteName || undefined,
           contractor: settings.contractor || undefined,
           operative: settings.operative || undefined,
+          note: effectiveNote,
         };
         const rendered = await renderStamp({
           photoBlob: captured.blob,
@@ -225,6 +417,26 @@ export default function BulkScreen({
         }
 
         produced.push(record);
+
+        // Drop this photo from the persisted session. If the user
+        // refreshes mid-batch, only unstamped photos restore.
+        remainingIds.delete(p.id);
+        if (remainingIds.size > 0) {
+          const stillPending = pending.filter((pp) => remainingIds.has(pp.id));
+          void saveBulkSession({
+            id: "current",
+            photos: stillPending.map((pp) => ({
+              id: pp.id,
+              blob: pp.file,
+              name: pp.file.name,
+              note: pp.note,
+            })),
+            globalNote,
+            templateId: template.id,
+            variantId: variant.id,
+            lastEditAt: Date.now(),
+          });
+        }
       } catch (err) {
         const msg =
           err instanceof UnsupportedImageError
@@ -244,12 +456,16 @@ export default function BulkScreen({
     setProgress(null);
     onBatchSaved();
 
+    // Once we reach the results phase the session is fully consumed —
+    // drop it regardless of whether every photo succeeded.
+    void clearBulkSession();
+
     if (galleryFull) {
       onToast(`Gallery is full — newest photos weren't auto-saved. You can still export them.`);
     } else if (quotaFull) {
       onToast(`Device storage is full — some photos weren't saved. Export them now.`);
     }
-  }, [pending, progress, template, variant, tier, onToast, onBatchSaved]);
+  }, [pending, progress, template, variant, tier, settings, onToast, onBatchSaved, globalNote]);
 
   // ── Export PDF ───────────────────────────────────────────────
 
@@ -538,6 +754,47 @@ export default function BulkScreen({
         </div>
       </section>
 
+      {/* Global note — applies to every photo without a per-photo override */}
+      <section className="px-4 pb-4">
+        <div className="rounded-xl bg-white border border-gray-200 p-3">
+          <div className="flex items-baseline justify-between mb-1.5">
+            <label
+              htmlFor="bulk-global-note"
+              className="text-[11px] font-semibold uppercase tracking-widest text-gray-500"
+            >
+              Note for all photos{" "}
+              <span className="normal-case tracking-normal font-normal text-gray-400">(optional)</span>
+            </label>
+            <span
+              className={`text-[10px] ${
+                globalNote.length > NOTE_MAX - 20 ? "text-amber-600" : "text-gray-400"
+              }`}
+            >
+              {globalNote.length} / {NOTE_MAX}
+            </span>
+          </div>
+          <textarea
+            id="bulk-global-note"
+            value={globalNote}
+            onChange={(e) => setGlobalNote(e.target.value.slice(0, NOTE_MAX))}
+            maxLength={NOTE_MAX}
+            rows={2}
+            placeholder={
+              pending.length === 0
+                ? "e.g. Gate left open — contractor access road"
+                : "e.g. Progress update at Chamber 3"
+            }
+            className="w-full text-sm text-gray-900 placeholder:text-gray-400 bg-transparent border-0 p-0 resize-none focus:outline-none focus:ring-0"
+          />
+          {pending.some((p) => p.note) && (
+            <p className="text-[10.5px] text-gray-400 mt-1.5 leading-snug">
+              Tap any photo thumbnail below for a one-off note that overrides this.
+              Photos with their own note show a blue strip.
+            </p>
+          )}
+        </div>
+      </section>
+
       {/* Capacity warning */}
       {cappedForGallery && (
         <section className="px-4 pb-3">
@@ -552,21 +809,57 @@ export default function BulkScreen({
       {pending.length > 0 ? (
         <section className="px-4">
           <div className="grid grid-cols-3 gap-2">
-            {pending.map((p) => (
-              <div key={p.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 ring-1 ring-gray-200">
-                <img src={p.thumbnailUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
-                <button
-                  type="button"
-                  onClick={() => removePending(p.id)}
-                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition"
-                  aria-label="Remove photo"
+            {pending.map((p) => {
+              const hasOverride = !!p.note;
+              return (
+                <div
+                  key={p.id}
+                  className={`relative aspect-square rounded-lg overflow-hidden bg-gray-100 ring-1 ${
+                    hasOverride ? "ring-blue-300" : "ring-gray-200"
+                  }`}
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            ))}
+                  <img src={p.thumbnailUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
+
+                  {/* Remove × — top-right */}
+                  <button
+                    type="button"
+                    onClick={() => removePending(p.id)}
+                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition"
+                    aria-label="Remove photo"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+
+                  {/* Note pencil — top-left, filled when a custom note is set */}
+                  <button
+                    type="button"
+                    onClick={() => setEditorTargetId(p.id)}
+                    className={`absolute top-1 left-1 w-6 h-6 rounded-full flex items-center justify-center transition ${
+                      hasOverride
+                        ? "bg-blue-500 text-white shadow"
+                        : "bg-black/50 text-white/90 hover:bg-black/70"
+                    }`}
+                    aria-label={hasOverride ? "Edit custom note" : "Add custom note"}
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                    </svg>
+                  </button>
+
+                  {/* Note preview strip — bottom overlay, only when override set */}
+                  {hasOverride && (
+                    <div
+                      className="absolute left-0 right-0 bottom-0 bg-blue-600/90 text-white text-[9.5px] leading-tight px-1.5 py-1 truncate"
+                      title={p.note}
+                    >
+                      {p.note}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       ) : (
@@ -595,6 +888,24 @@ export default function BulkScreen({
             Stamp {pending.length} photo{pending.length === 1 ? "" : "s"}
           </button>
         </section>
+      )}
+
+      {editorTarget && (
+        <NoteEditor
+          key={editorTarget.id}
+          thumbnailUrl={editorTarget.thumbnailUrl}
+          initial={editorTarget.note ?? ""}
+          globalNote={globalNote.trim()}
+          onSave={(text) => {
+            setPendingNote(editorTarget.id, text);
+            setEditorTargetId(null);
+          }}
+          onClear={() => {
+            setPendingNote(editorTarget.id, "");
+            setEditorTargetId(null);
+          }}
+          onCancel={() => setEditorTargetId(null)}
+        />
       )}
 
       <BatchProgress progress={progress} />
@@ -649,6 +960,159 @@ function BatchProgress({ progress }: { progress: Progress | null }) {
           />
         </div>
         <p className="text-xs text-gray-500 mt-2">Everything runs on your device.</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Per-photo note editor (bottom sheet) ──────────────────────
+//
+// Opened by tapping the pencil icon on any pending thumbnail. Shows the
+// photo, an editable text field seeded with the current override (or
+// empty), a short hint about the global note that would otherwise apply,
+// and three actions:
+//   • Save  — write the typed text as the per-photo override.
+//   • Clear — delete the override; the photo falls back to the global note.
+//   • Cancel — bail without changes.
+//
+// The Clear action is only offered when an override is already set, since
+// "clear" is otherwise indistinguishable from "cancel".
+
+interface NoteEditorProps {
+  thumbnailUrl: string;
+  initial: string;
+  globalNote: string;
+  onSave: (text: string) => void;
+  onClear: () => void;
+  onCancel: () => void;
+}
+
+function NoteEditor({
+  thumbnailUrl,
+  initial,
+  globalNote,
+  onSave,
+  onClear,
+  onCancel,
+}: NoteEditorProps) {
+  const [text, setText] = useState(initial);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
+  const hadOverride = initial.length > 0;
+  const trimmed = text.trim();
+
+  return (
+    <div
+      className="fixed inset-0 z-[115] flex items-end"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Edit note for this photo"
+    >
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/50 animate-in fade-in duration-150"
+        onClick={onCancel}
+        aria-label="Close"
+      />
+
+      <div className="relative z-10 w-full bg-white rounded-t-2xl shadow-2xl max-h-[92vh] flex flex-col animate-in slide-in-from-bottom duration-200">
+        <div className="flex items-start gap-3 px-4 py-3 border-b border-gray-200">
+          <img
+            src={thumbnailUrl}
+            alt=""
+            className="w-14 h-14 rounded-lg object-cover bg-gray-100 shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <h2 className="text-base font-semibold text-gray-900 leading-tight">
+              Note for this photo
+            </h2>
+            <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">
+              {globalNote
+                ? <>Overrides the shared note <span className="text-gray-700">"{globalNote}"</span>.</>
+                : "Just this photo — no shared note is set."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="shrink-0 w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-600"
+            aria-label="Close"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="px-4 py-4 flex-1">
+          <div className="flex items-baseline justify-between mb-1.5">
+            <label
+              htmlFor="note-editor-input"
+              className="text-[11px] font-semibold uppercase tracking-widest text-gray-500"
+            >
+              Custom note
+            </label>
+            <span
+              className={`text-[10px] ${
+                text.length > NOTE_MAX - 20 ? "text-amber-600" : "text-gray-400"
+              }`}
+            >
+              {text.length} / {NOTE_MAX}
+            </span>
+          </div>
+          <textarea
+            id="note-editor-input"
+            value={text}
+            onChange={(e) => setText(e.target.value.slice(0, NOTE_MAX))}
+            maxLength={NOTE_MAX}
+            rows={3}
+            autoFocus
+            placeholder="Describe what's in this photo…"
+            className="w-full text-sm text-gray-900 placeholder:text-gray-400 bg-gray-50 border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-[#1B5B50] focus:border-[#1B5B50]"
+          />
+        </div>
+
+        <div className="px-4 pt-2 pb-5 border-t border-gray-100 flex gap-2">
+          {hadOverride && (
+            <button
+              type="button"
+              onClick={onClear}
+              className="shrink-0 px-3.5 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 active:scale-[0.98] transition-colors"
+            >
+              Clear
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 py-2.5 rounded-xl bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => onSave(trimmed)}
+            disabled={trimmed === initial.trim()}
+            className="flex-1 py-2.5 rounded-xl bg-[#1B5B50] text-white text-sm font-semibold hover:bg-[#144540] transition-colors active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {hadOverride ? "Update" : "Save"}
+          </button>
+        </div>
       </div>
     </div>
   );
