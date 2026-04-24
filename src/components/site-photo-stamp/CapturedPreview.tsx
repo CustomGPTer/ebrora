@@ -220,7 +220,7 @@ export default function CapturedPreview({
             warn={hasCoords && addressUnavailable}
             hint={
               hasCoords && addressUnavailable
-                ? "Address lookup service didn't respond"
+                ? "Coordinates are stamped — address will retry on the next photo"
                 : undefined
             }
           />
