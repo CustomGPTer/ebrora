@@ -2,13 +2,16 @@
 //
 // Canvas-based image downscaler.
 //
-// • Target: 2560px long edge, JPEG quality 0.92 (configurable).
+// • Target: 2048px long edge, JPEG quality 0.92 (configurable).
 // • Applies EXIF orientation so portrait photos from iOS don't come out
 //   sideways.
 // • Uses createImageBitmap where available (much faster on large photos).
 // • Rejects HEIC/HEIF with a recognisable error — these cannot be decoded in
 //   canvas by any current browser, and photos shot by iOS through the
 //   <input capture="environment"> API are already JPEG.
+// • Releases the decoded bitmap and collapses the canvas backing buffer as
+//   soon as the JPEG has been encoded, to keep peak memory down on
+//   low-RAM Android WebViews.
 
 export interface DownscaleResult {
   blob: Blob;
@@ -19,7 +22,7 @@ export interface DownscaleResult {
 }
 
 export interface DownscaleOptions {
-  /** Long-edge pixel target. Default 2560. */
+  /** Long-edge pixel target. Default 2048. */
   longEdge?: number;
   /** JPEG quality 0–1. Default 0.92. */
   quality?: number;
@@ -52,7 +55,7 @@ export async function downscalePhoto(
   const bitmap = await decodeImage(file);
   const { naturalWidth, naturalHeight } = bitmap;
 
-  const longEdge = opts.longEdge ?? 2560;
+  const longEdge = opts.longEdge ?? 2048;
   const quality = opts.quality ?? 0.92;
   const orientation = opts.orientation ?? 1;
 
@@ -66,32 +69,46 @@ export async function downscalePhoto(
 
   // Swap width/height for orientation codes 5–8 (90°/270° rotations).
   const rotated = orientation >= 5 && orientation <= 8;
+  const outputWidth = rotated ? scaledH : scaledW;
+  const outputHeight = rotated ? scaledW : scaledH;
+
   const canvas = document.createElement("canvas");
-  canvas.width = rotated ? scaledH : scaledW;
-  canvas.height = rotated ? scaledW : scaledH;
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
 
-  const ctx = canvas.getContext("2d", { alpha: false });
-  if (!ctx) {
+  try {
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) {
+      throw new Error("Canvas 2D context unavailable");
+    }
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    applyOrientationTransform(ctx, orientation, scaledW, scaledH);
+
+    // drawImage accepts both ImageBitmap and HTMLImageElement.
+    ctx.drawImage(bitmap.source as CanvasImageSource, 0, 0, scaledW, scaledH);
+    // Release the decoded source as soon as it's been painted — no need
+    // to hold 30+ MB of pixel data through the encode step.
     bitmap.close?.();
-    throw new Error("Canvas 2D context unavailable");
+
+    const blob = await canvasToJpegBlob(canvas, quality);
+    return {
+      blob,
+      width: outputWidth,
+      height: outputHeight,
+      originalWidth: naturalWidth,
+      originalHeight: naturalHeight,
+    };
+  } finally {
+    // Belt-and-braces: idempotent, safe to call again if drawImage threw
+    // before we could close it above.
+    bitmap.close?.();
+    // Zeroing dimensions drops the canvas's backing pixel buffer on
+    // every major engine without waiting for GC.
+    canvas.width = 0;
+    canvas.height = 0;
   }
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-
-  applyOrientationTransform(ctx, orientation, scaledW, scaledH);
-
-  // drawImage accepts both ImageBitmap and HTMLImageElement.
-  ctx.drawImage(bitmap.source as CanvasImageSource, 0, 0, scaledW, scaledH);
-  bitmap.close?.();
-
-  const blob = await canvasToJpegBlob(canvas, quality);
-  return {
-    blob,
-    width: canvas.width,
-    height: canvas.height,
-    originalWidth: naturalWidth,
-    originalHeight: naturalHeight,
-  };
 }
 
 // ─── Decode helpers ─────────────────────────────────────────────

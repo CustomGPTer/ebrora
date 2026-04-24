@@ -56,29 +56,40 @@ export async function renderStamp(opts: RenderStampOptions): Promise<RenderStamp
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext("2d", { alpha: false });
-  if (!ctx) {
+
+  try {
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) {
+      throw new Error("Canvas 2D context unavailable");
+    }
+
+    // 1. Photo base layer.
+    ctx.drawImage(bitmap.source as CanvasImageSource, 0, 0, width, height);
+    // Release the decoded source — the photo has been painted, we don't
+    // need the original bitmap through the rest of the composite.
     bitmap.close?.();
-    throw new Error("Canvas 2D context unavailable");
+
+    // 2. Stamp card (bottom-left).
+    drawStampCard(ctx, width, height, template, variant, meta, settings);
+
+    // 3. Unique-ID vertical ribbon (right edge).
+    drawVerticalRibbon(ctx, width, height, meta.uniqueId);
+
+    // 4. Watermark / company logo.
+    await drawWatermark(ctx, width, height, tier, settings);
+
+    // 5. Encode and thumbnail.
+    const blob = await canvasToJpegBlob(canvas, quality);
+    const thumbnailBlob = await makeThumbnail(canvas, 512, 0.82);
+    return { blob, thumbnailBlob, width, height };
+  } finally {
+    // Idempotent — safe if drawImage threw before the inline close ran.
+    bitmap.close?.();
+    // Free the full-resolution canvas backing buffer immediately. At
+    // 4000×3000 this is ~48 MB of RGBA pixels.
+    canvas.width = 0;
+    canvas.height = 0;
   }
-
-  // 1. Photo base layer.
-  ctx.drawImage(bitmap.source as CanvasImageSource, 0, 0, width, height);
-  bitmap.close?.();
-
-  // 2. Stamp card (bottom-left).
-  drawStampCard(ctx, width, height, template, variant, meta, settings);
-
-  // 3. Unique-ID vertical ribbon (right edge).
-  drawVerticalRibbon(ctx, width, height, meta.uniqueId);
-
-  // 4. Watermark / company logo.
-  await drawWatermark(ctx, width, height, tier, settings);
-
-  // 5. Encode and thumbnail.
-  const blob = await canvasToJpegBlob(canvas, quality);
-  const thumbnailBlob = await makeThumbnail(canvas, 512, 0.82);
-  return { blob, thumbnailBlob, width, height };
 }
 
 // ─── Stamp card (bottom-left) ──────────────────────────────────
@@ -696,9 +707,14 @@ async function makeThumbnail(source: HTMLCanvasElement, maxDim: number, quality:
   const c = document.createElement("canvas");
   c.width = tw;
   c.height = th;
-  const ctx = c.getContext("2d", { alpha: false });
-  if (!ctx) throw new Error("Thumbnail context unavailable");
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(source, 0, 0, tw, th);
-  return canvasToJpegBlob(c, quality);
+  try {
+    const ctx = c.getContext("2d", { alpha: false });
+    if (!ctx) throw new Error("Thumbnail context unavailable");
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(source, 0, 0, tw, th);
+    return await canvasToJpegBlob(c, quality);
+  } finally {
+    c.width = 0;
+    c.height = 0;
+  }
 }
