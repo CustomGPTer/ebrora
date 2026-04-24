@@ -1,14 +1,20 @@
 // src/lib/site-photo-stamp/geolocation.ts
 //
-// Thin wrappers around browser geolocation and BigDataCloud reverse geocoding.
+// Thin wrappers around browser geolocation and reverse geocoding.
 //
-// BigDataCloud client endpoint:
-//   https://api.bigdatacloud.net/data/reverse-geocode-client
-// Public, keyless, CORS-enabled, and generous rate limits — standard choice
-// for client-side reverse geocoding without managing an API key.
+// Reverse geocoding strategy:
+//   1. BigDataCloud's client endpoint (primary) — public, keyless,
+//      CORS-enabled, ~100k req/day free tier. Each attempt gets one
+//      silent retry on transient failure.
+//   2. OpenStreetMap Nominatim (fallback) — free, keyless, CORS-enabled.
+//      Usage policy asks for ~1 req/sec and a descriptive User-Agent;
+//      we're well under the ceiling. Same retry policy.
+//   3. Give up → return null. The UI then shows a gentle "Address
+//      unavailable" message and the stamp falls back to coords only.
 //
-// All functions fail gracefully: denial, timeout, and network failure all
-// resolve to null so the caller can continue without location.
+// Every attempt has a per-request timeout so a hung endpoint can't stall
+// the whole pipeline. All errors are swallowed and converted to null —
+// callers never see exceptions from this module.
 
 export interface Coords {
   lat: number;
@@ -53,24 +59,94 @@ export function getCurrentLocation(timeoutMs = 8000): Promise<Coords | null> {
   });
 }
 
-/**
- * Reverse-geocode a lat/lon into a human-readable UK-style address.
- * Returns null on any failure — the caller falls back to coords-only display.
- */
-export async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
+// ─── Reverse geocoding (cascade with retries) ──────────────────
+
+/** Per-attempt timeout in ms. Total worst case = 2 * (BDC + Nominatim) ≈ 24s. */
+const PROVIDER_TIMEOUT_MS = 6000;
+/** Wait between the first failed attempt and its retry, in ms. */
+const RETRY_DELAY_MS = 800;
+
+async function fetchWithTimeout(url: string, init?: RequestInit, timeoutMs = PROVIDER_TIMEOUT_MS): Promise<Response | null> {
   try {
-    const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`;
     const ctrl = new AbortController();
-    const killer = setTimeout(() => ctrl.abort(), 6000);
-    const resp = await fetch(url, { signal: ctrl.signal });
+    const killer = setTimeout(() => ctrl.abort(), timeoutMs);
+    const resp = await fetch(url, { ...init, signal: ctrl.signal });
     clearTimeout(killer);
-    if (!resp.ok) return null;
-    const data = await resp.json();
+    return resp;
+  } catch {
+    return null;
+  }
+}
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/**
+ * Try a single reverse-geocode provider up to twice — once immediately,
+ * once after RETRY_DELAY_MS on transient failure. Returns null if both
+ * attempts fail; the caller then falls through to the next provider.
+ */
+async function tryProvider(
+  fetcher: (lat: number, lon: number) => Promise<string | null>,
+  lat: number,
+  lon: number
+): Promise<string | null> {
+  const first = await fetcher(lat, lon);
+  if (first) return first;
+  await sleep(RETRY_DELAY_MS);
+  return fetcher(lat, lon);
+}
+
+// ─── Provider 1: BigDataCloud ────────────────────────────────
+
+async function fetchBigDataCloud(lat: number, lon: number): Promise<string | null> {
+  const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`;
+  const resp = await fetchWithTimeout(url);
+  if (!resp || !resp.ok) return null;
+  try {
+    const data = (await resp.json()) as Record<string, unknown>;
     return formatBdcAddress(data);
   } catch {
     return null;
   }
 }
+
+// ─── Provider 2: OpenStreetMap Nominatim ─────────────────────
+
+async function fetchNominatim(lat: number, lon: number): Promise<string | null> {
+  // Nominatim's usage policy asks for a descriptive User-Agent. Browsers
+  // silently override User-Agent, but Nominatim also accepts a `email=`
+  // query param or descriptive referrer — our origin header fulfils that.
+  const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+  const resp = await fetchWithTimeout(url, {
+    headers: { Accept: "application/json" },
+  });
+  if (!resp || !resp.ok) return null;
+  try {
+    const data = (await resp.json()) as Record<string, unknown>;
+    return formatNominatimAddress(data);
+  } catch {
+    return null;
+  }
+}
+
+// ─── Public entry point ──────────────────────────────────────
+
+/**
+ * Reverse-geocode a lat/lon into a human-readable address.
+ * Cascades BigDataCloud → Nominatim with a retry on each. Returns null
+ * only if all four attempts fail, at which point the UI will show a
+ * generic "Address unavailable" message and the stamp will render with
+ * coords only.
+ */
+export async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
+  const fromBdc = await tryProvider(fetchBigDataCloud, lat, lon);
+  if (fromBdc) return fromBdc;
+  const fromNominatim = await tryProvider(fetchNominatim, lat, lon);
+  if (fromNominatim) return fromNominatim;
+  return null;
+}
+
+// ─── Address formatters ──────────────────────────────────────
 
 /**
  * Compose a concise, Timemark-style address line from BigDataCloud output.
@@ -92,6 +168,51 @@ function formatBdcAddress(d: Record<string, unknown>): string | null {
 
   const out = [head, tail].filter(Boolean).join(" ").trim();
   return out.length > 0 ? out : null;
+}
+
+/**
+ * Compose a concise address line from Nominatim's jsonv2 response.
+ * Nominatim's schema is different from BDC — fields live under `address`
+ * and use OSM's tag names (road, house_number, suburb, town, city,
+ * postcode, country_code). We build the same shape as BDC's output so
+ * downstream formatting stays consistent regardless of provider.
+ */
+function formatNominatimAddress(d: Record<string, unknown>): string | null {
+  const addr = (d.address && typeof d.address === "object")
+    ? (d.address as Record<string, unknown>)
+    : {};
+
+  const number = str(addr, "house_number");
+  const street = str(addr, "road") || str(addr, "pedestrian") || str(addr, "footway") || "";
+  // Nominatim layers locality from finest to coarsest — pick the first populated.
+  const locality =
+    str(addr, "suburb") ||
+    str(addr, "neighbourhood") ||
+    str(addr, "hamlet") ||
+    str(addr, "village") ||
+    "";
+  const city =
+    str(addr, "city") ||
+    str(addr, "town") ||
+    str(addr, "municipality") ||
+    str(addr, "county") ||
+    str(addr, "state") ||
+    "";
+  const postcode = str(addr, "postcode") || "";
+  const country = (str(addr, "country_code") || "").toUpperCase();
+
+  const streetLine = [number, street].filter(Boolean).join(" ");
+  const parts = [streetLine, locality, city].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
+  const head = parts.join(", ");
+  const tail = [postcode, country !== "GB" ? country : ""].filter(Boolean).join(" ").trim();
+
+  const out = [head, tail].filter(Boolean).join(" ").trim();
+  if (out.length > 0) return out;
+
+  // Nominatim always returns a top-level `display_name` — coarse, but
+  // better than nothing when no structured fields came back.
+  const display = str(d, "display_name");
+  return display.length > 0 ? display : null;
 }
 
 // ─── helpers ────────────────────────────────────────────────────
