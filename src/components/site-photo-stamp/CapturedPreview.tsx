@@ -153,7 +153,10 @@ export default function CapturedPreview({
               <div
                 className="inline-block px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide rounded-md shadow-sm"
                 style={{
-                  backgroundColor: variant.accentColor,
+                  backgroundColor:
+                    variant.id === "solid"
+                      ? `${variant.accentColor}CC`
+                      : variant.accentColor,
                   color: variant.textColor,
                 }}
               >

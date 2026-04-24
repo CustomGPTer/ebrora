@@ -192,7 +192,12 @@ export default function TemplatePreviewCard({
           <div
             className="absolute left-2 right-2 bottom-2 rounded-md px-2 py-1.5 text-[10px] font-semibold flex items-center gap-1.5 shadow-sm pointer-events-none"
             style={{
-              backgroundColor: variant.accentColor,
+              // Solid variant: 0.8 alpha so the photo shows through, matching
+              // the real canvas renderer. Icon variant: full opacity.
+              backgroundColor:
+                variant.id === "solid"
+                  ? `${variant.accentColor}CC`
+                  : variant.accentColor,
               color: variant.textColor,
             }}
           >
