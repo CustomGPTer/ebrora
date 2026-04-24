@@ -159,9 +159,15 @@ export default function TemplatePreviewCard({
       aria-pressed={selected}
       aria-label={`${template.title} — ${variant.label}${locked ? ", locked" : ""}`}
     >
-      {/* Faux photo area */}
-      <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden">
-        {/* Simulated photo grain */}
+      {/* Gray banner area.
+          Previously a 4:3 faux-photo area with the banner absolute-positioned
+          at the bottom — which left a huge amount of unused gray space.
+          Now the area is just tall enough to hold the banner with 8px (py-2)
+          of gray padding above and below. The banner flows in normal layout
+          (no longer absolute). The lock button stays at top-1.5 right-1.5
+          so it naturally sits on top of the banner with a ~2px spill above. */}
+      <div className="relative bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden px-2 py-2">
+        {/* Simulated photo grain — still absolute so it fills the whole area */}
         <div
           aria-hidden
           className="absolute inset-0 opacity-40"
@@ -171,7 +177,8 @@ export default function TemplatePreviewCard({
           }}
         />
 
-        {/* Lock button — top-right, stops click propagation */}
+        {/* Lock button — absolute, top-right, sits over the banner (~2px
+            spill above its top edge). */}
         {onLockToggle && (
           <button
             type="button"
@@ -195,10 +202,11 @@ export default function TemplatePreviewCard({
           </button>
         )}
 
-        {/* Stamp preview */}
+        {/* Stamp preview — in-flow (not absolute) so the surrounding gray
+            padding (py-2) sits naturally above and below. */}
         {isTransparent ? (
           <div
-            className="absolute left-2 right-2 bottom-2 flex items-center pointer-events-none"
+            className="relative flex items-center py-1.5 pointer-events-none"
           >
             <span
               className="text-[11px] font-bold uppercase tracking-wide truncate"
@@ -222,7 +230,7 @@ export default function TemplatePreviewCard({
           </div>
         ) : (
           <div
-            className="absolute left-2 right-2 bottom-2 rounded-md px-2 py-1.5 text-[10px] font-semibold flex items-center gap-1.5 shadow-sm pointer-events-none"
+            className="relative rounded-md px-2 py-1.5 text-[10px] font-semibold flex items-center gap-1.5 shadow-sm pointer-events-none"
             style={{
               // Solid variant: 0.8 alpha so the photo shows through, matching
               // the real canvas renderer. Icon variant: full opacity.
