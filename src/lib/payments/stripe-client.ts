@@ -16,7 +16,17 @@ function getStripe(): Stripe {
       throw new Error('STRIPE_SECRET_KEY is not set');
     }
     _stripe = new Stripe(key, {
-      apiVersion: '2026-03-25.dahlia',
+      // Tracks whatever API version the installed stripe SDK was built
+      // against. Prevents build failures each time Stripe publishes a
+      // dated patch within the same codename (currently 'dahlia') — the
+      // alternative is manually bumping a hardcoded date string every
+      // few weeks to match whatever Vercel's fresh npm install pulls.
+      //
+      // Note: we use Stripe.API_VERSION (the runtime constant) rather
+      // than Stripe.LatestApiVersion, because the latter is a type-only
+      // export, not a runtime value. API_VERSION is typed as a subtype
+      // of LatestApiVersion, so assignment is still safe.
+      apiVersion: Stripe.API_VERSION,
     });
   }
   return _stripe;
