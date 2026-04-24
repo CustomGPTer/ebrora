@@ -221,6 +221,16 @@ export default function SitePhotoStampClient() {
 
   // ── Pick / lock handlers ────────────────────────────────────
 
+  // Scroll the landing screen back to the "Take photo" card when the user
+  // picks or locks a template further down the page. Respects OS-level
+  // reduced-motion preference.
+  const scrollToTop = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const prefersReduced =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    window.scrollTo({ top: 0, behavior: prefersReduced ? "auto" : "smooth" });
+  }, []);
+
   const pickTemplate = useCallback(
     (templateId: TemplateId, variantId: VariantId) => {
       setSelectedTemplate(templateId);
@@ -234,8 +244,9 @@ export default function SitePhotoStampClient() {
         Object.assign(patch, engageLock(templateId, variantId));
       }
       updateSettings(patch);
+      scrollToTop();
     },
-    [settings, updateSettings]
+    [settings, updateSettings, scrollToTop]
   );
 
   const toggleLock = useCallback(
@@ -255,8 +266,9 @@ export default function SitePhotoStampClient() {
         updateSettings(engageLock(templateId, variantId));
         setToast("Template locked for 6 hours.");
       }
+      scrollToTop();
     },
-    [settings, updateSettings]
+    [settings, updateSettings, scrollToTop]
   );
 
   // ── Gallery count ────────────────────────────────────────────
