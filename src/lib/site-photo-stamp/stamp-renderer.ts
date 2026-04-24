@@ -94,6 +94,82 @@ export async function renderStamp(opts: RenderStampOptions): Promise<RenderStamp
 
 // ─── Stamp card (bottom-left) ──────────────────────────────────
 
+/**
+ * Picks a contrasting stroke colour for the transparent-variant title and
+ * note text, which are painted in `template.baseColor` directly on the
+ * photo. Uses the WCAG relative-luminance formula so that any fill — hex,
+ * rgb/rgba, or named — gets paired with a stroke that visibly separates it
+ * from the text fill rather than blending into it (e.g. a white outline
+ * around white or pale-blue text would vanish).
+ *
+ * Returns "#FFFFFF" for dark fills and "#1F2937" (near-black slate) for
+ * light fills. Falls back to white if the colour can't be parsed.
+ */
+function contrastingStrokeColour(fill: string): string {
+  const rgb = parseColourToRgb(fill);
+  if (!rgb) return "#FFFFFF";
+  // Perceived luminance (Rec. 709). Above ~0.6 is "light" to the eye.
+  const [r, g, b] = rgb;
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return luminance > 0.6 ? "#1F2937" : "#FFFFFF";
+}
+
+/**
+ * Parses a CSS colour string into an [r, g, b] triple (0–255). Handles
+ * #RGB, #RRGGBB, rgb()/rgba(), and any named colour the browser knows —
+ * by asking the canvas to resolve it. Returns null if unresolvable.
+ */
+function parseColourToRgb(colour: string): [number, number, number] | null {
+  const s = colour.trim();
+
+  // #RGB or #RRGGBB
+  if (s.startsWith("#")) {
+    const hex = s.slice(1);
+    if (hex.length === 3) {
+      const r = parseInt(hex[0] + hex[0], 16);
+      const g = parseInt(hex[1] + hex[1], 16);
+      const b = parseInt(hex[2] + hex[2], 16);
+      if ([r, g, b].every((n) => !Number.isNaN(n))) return [r, g, b];
+    }
+    if (hex.length === 6 || hex.length === 8) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      if ([r, g, b].every((n) => !Number.isNaN(n))) return [r, g, b];
+    }
+    return null;
+  }
+
+  // rgb() / rgba()
+  const m = s.match(/^rgba?\s*\(([^)]+)\)$/i);
+  if (m) {
+    const parts = m[1].split(",").map((p) => parseFloat(p.trim()));
+    if (parts.length >= 3 && parts.slice(0, 3).every((n) => !Number.isNaN(n))) {
+      return [parts[0], parts[1], parts[2]];
+    }
+    return null;
+  }
+
+  // Named colour — resolve via a throwaway 1×1 canvas.
+  try {
+    const probe = document.createElement("canvas");
+    probe.width = 1;
+    probe.height = 1;
+    const pctx = probe.getContext("2d");
+    if (!pctx) return null;
+    pctx.fillStyle = "#000";
+    pctx.fillStyle = s;
+    // If the browser rejected the value, fillStyle will still be "#000000".
+    const resolved = pctx.fillStyle as string;
+    if (resolved.startsWith("#")) {
+      return parseColourToRgb(resolved);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function drawStampCard(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -252,9 +328,16 @@ function drawStampCard(
   const headerPadX = cardPad;
   let textX = cardX + headerPadX;
   // Transparent variant: title painted in the template's base colour with a
-  // thin white stroke so it pops on dark photos. Solid / icon variants keep
-  // the existing header foreground colour.
+  // thin contrasting stroke so it pops on dark photos. Solid / icon variants
+  // keep the existing header foreground colour.
   const headerTextColour = isTransparent ? template.baseColor : headerFg;
+  // Auto-picked stroke colour — dark for light fills, white for dark fills —
+  // so the outline visibly separates the text from the photo rather than
+  // blending into the fill itself. Computed once and reused for the note
+  // lines below.
+  const transparentStrokeColour = isTransparent
+    ? contrastingStrokeColour(template.baseColor)
+    : "#FFFFFF";
 
   // Title sits in the top portion of the header. Vertically centered within
   // the base header height when there's no note, or within the dedicated
@@ -274,9 +357,9 @@ function drawStampCard(
   const titleText = truncate(ctx, title, titleMaxW);
 
   if (isTransparent) {
-    // Thin white stroke behind the coloured title so it stays legible on
-    // dark photos. Proportional stroke width keeps crispness at all sizes.
-    ctx.strokeStyle = "#FFFFFF";
+    // Thin contrasting stroke behind the coloured title so it stays legible
+    // on busy photos. Proportional stroke width keeps crispness at all sizes.
+    ctx.strokeStyle = transparentStrokeColour;
     ctx.lineWidth = Math.max(2, Math.round(headerFs * 0.14));
     ctx.lineJoin = "round";
     ctx.miterLimit = 2;
@@ -286,14 +369,14 @@ function drawStampCard(
   ctx.fillText(titleText, textX, titleCenterY);
 
   // Note lines (below title). Same colour treatment as the title — with a
-  // matching white stroke on the transparent variant for readability.
+  // matching contrasting stroke on the transparent variant for readability.
   if (hasNote) {
     ctx.font = weightFont(noteFs, "500");
     const noteLineH = Math.round(noteFs * 1.35);
     let ny = cardY + titleAreaH + noteLineH / 2 - Math.round(noteFs * 0.05);
     for (const line of noteLines) {
       if (isTransparent) {
-        ctx.strokeStyle = "#FFFFFF";
+        ctx.strokeStyle = transparentStrokeColour;
         ctx.lineWidth = Math.max(2, Math.round(noteFs * 0.14));
         ctx.lineJoin = "round";
         ctx.miterLimit = 2;
