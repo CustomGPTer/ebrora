@@ -128,9 +128,14 @@ export default function BulkScreen({
 
   const onCameraChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Materialise the FileList into a plain File[] before clearing the
+      // input. Without this snapshot, `e.target.value = ""` immediately
+      // empties the FileList (it's a live collection tied to the input),
+      // and `addFiles` would iterate nothing.
       const f = e.target.files;
+      const snapshot = f ? Array.from(f) : [];
       e.target.value = "";
-      if (f && f.length) addFiles(f);
+      if (snapshot.length) addFiles(snapshot);
     },
     [addFiles]
   );
@@ -138,8 +143,9 @@ export default function BulkScreen({
   const onGalleryChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const f = e.target.files;
+      const snapshot = f ? Array.from(f) : [];
       e.target.value = "";
-      if (f && f.length) addFiles(f);
+      if (snapshot.length) addFiles(snapshot);
     },
     [addFiles]
   );

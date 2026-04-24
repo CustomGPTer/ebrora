@@ -583,7 +583,7 @@ export default function SitePhotoStampClient() {
               <p className="text-[11px] font-semibold uppercase tracking-widest text-white/70">
                 Site Photo Stamp
               </p>
-              <h1 className="text-xl font-bold mt-0.5">Record a site photo</h1>
+              <h1 className="text-xl font-bold mt-0.5 !text-white">Record a site photo</h1>
             </div>
             <button
               type="button"
