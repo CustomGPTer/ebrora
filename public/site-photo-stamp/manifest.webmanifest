@@ -2,13 +2,19 @@
   "name": "Ebrora Photo Stamp",
   "short_name": "Photo Stamp",
   "description": "Capture, stamp and share site photos with date, location and template.",
-  "start_url": "/site-photo-stamp",
+  "start_url": "/site-photo-stamp/",
   "scope": "/site-photo-stamp/",
-  "id": "/site-photo-stamp/",
+  "id": "ebrora-photo-stamp",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
   "theme_color": "#1B5B50",
   "background_color": "#1B5B50",
+  "lang": "en-GB",
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
   "icons": [
     {
       "src": "/site-photo-stamp/icon-192.png",
