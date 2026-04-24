@@ -59,12 +59,25 @@ function ConfirmReset({ onCancel, onConfirm }: { onCancel: () => void; onConfirm
 
 // ─── Reusable bits ──────────────────────────────────────────────
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionCard({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <section className="mb-4">
       <h2 className="px-4 mb-2 text-[11px] font-semibold uppercase tracking-widest text-gray-500">
         {title}
       </h2>
+      {subtitle && (
+        <p className="px-4 -mt-1 mb-2 text-[12px] font-medium text-[#991B1B]">
+          {subtitle}
+        </p>
+      )}
       <div className="mx-4 bg-white rounded-xl border border-gray-100 divide-y divide-gray-100">
         {children}
       </div>
@@ -436,8 +449,11 @@ export default function SettingsScreen({
       </SectionCard>
 
       {/* Your details */}
-      <SectionCard title="Your details">
-        <Row label="Project" hint="Appears as a row on every stamp when set">
+      <SectionCard
+        title="Your details"
+        subtitle="Appears as a row on every stamp when set"
+      >
+        <Row label="Project">
           <TextField
             value={settings.projectName}
             onChange={(v) => onChange({ projectName: v })}
