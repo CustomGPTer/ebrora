@@ -195,6 +195,19 @@ export default function BulkScreen({
     countRecords().then(setGalleryCount).catch(() => setGalleryCount(0));
   }, []);
 
+  // ── Scroll to top when BulkScreen opens ──────────────────────
+  //
+  // The parent keeps the user's scroll position when it swaps views,
+  // so without this the user lands on the bulk screen still scrolled
+  // wherever they were on the template picker. Use `auto` (instant)
+  // rather than `smooth` so there's no visible jump animation during
+  // the view transition — the content just starts at the top.
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  }, []);
+
   // Revoke pending preview URLs on unmount/clear.
   useEffect(() => {
     return () => {
