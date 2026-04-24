@@ -164,8 +164,8 @@ export default function TemplatePreviewCard({
           at the bottom — which left a huge amount of unused gray space.
           Now the area is just tall enough to hold the banner with 8px (py-2)
           of gray padding above and below. The banner flows in normal layout
-          (no longer absolute). The lock button stays at top-1.5 right-1.5
-          so it naturally sits on top of the banner with a ~2px spill above. */}
+          (no longer absolute). The lock button lives in the white label row
+          below so it sits on a clean background at a consistent height. */}
       <div className="relative bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden px-2 py-2">
         {/* Simulated photo grain — still absolute so it fills the whole area */}
         <div
@@ -176,31 +176,6 @@ export default function TemplatePreviewCard({
               "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.6), transparent 50%), radial-gradient(circle at 70% 70%, rgba(0,0,0,0.15), transparent 50%)",
           }}
         />
-
-        {/* Lock button — absolute, top-right, sits over the banner (~2px
-            spill above its top edge). */}
-        {onLockToggle && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onLockToggle();
-            }}
-            className={`absolute top-1.5 right-1.5 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
-              locked
-                ? "bg-amber-500 text-white shadow"
-                : "bg-black/40 text-white/90 hover:bg-black/60"
-            }`}
-            aria-label={
-              locked
-                ? `Unlock ${template.title}`
-                : `Lock ${template.title} for 6 hours`
-            }
-            aria-pressed={locked}
-          >
-            <LockIcon locked={locked} />
-          </button>
-        )}
 
         {/* Stamp preview — in-flow (not absolute) so the surrounding gray
             padding (py-2) sits naturally above and below. */}
@@ -254,27 +229,57 @@ export default function TemplatePreviewCard({
       </div>
 
       {/* Card label row.
-          `leading-tight` + `mb-0` scope away the global `p { margin-bottom: 1rem }`
-          and `body { line-height: 1.6 }` rules in globals.css that would
-          otherwise inflate this row by ~33 px per tile. `mt-0.5` puts a tiny
-          2 px gap between the title and subtitle lines. py-1 keeps vertical
-          padding tight. */}
-      <div className="px-2.5 py-1 bg-white border-t border-gray-100">
-        <p className="text-[11px] font-semibold text-gray-900 truncate leading-tight mb-0">
-          {template.title}
-        </p>
-        <p className="text-[10px] truncate leading-tight mb-0 mt-0.5">
-          {locked ? (
-            <span className="text-amber-600 font-semibold flex items-center gap-1">
-              <span aria-hidden>
-                <LockIcon locked />
+          Flex layout: title+subtitle text block on the left (grows to fill
+          available width and truncates long titles), padlock button on the
+          right (28px, vertically centered). `items-center` centres both
+          sides on the row's cross axis — since the padlock is 28px and the
+          text block is ~27px, they sit at essentially the same midline.
+          `leading-tight` + `mb-0` scope away the global
+          `p { margin-bottom: 1rem }` and `body { line-height: 1.6 }` rules
+          in globals.css that would otherwise inflate this row by ~33 px
+          per tile. `mt-0.5` puts a tiny 2 px gap between the title and
+          subtitle lines. py-1 keeps equal 4 px white padding above and
+          below the padlock. */}
+      <div className="px-2.5 py-1 bg-white border-t border-gray-100 flex items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-semibold text-gray-900 truncate leading-tight mb-0">
+            {template.title}
+          </p>
+          <p className="text-[10px] truncate leading-tight mb-0 mt-0.5">
+            {locked ? (
+              <span className="text-amber-600 font-semibold flex items-center gap-1">
+                <span aria-hidden>
+                  <LockIcon locked />
+                </span>
+                Locked · 6h
               </span>
-              Locked · 6h
-            </span>
-          ) : (
-            <span className="text-gray-500">{variant.label}</span>
-          )}
-        </p>
+            ) : (
+              <span className="text-gray-500">{variant.label}</span>
+            )}
+          </p>
+        </div>
+        {onLockToggle && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onLockToggle();
+            }}
+            className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+              locked
+                ? "bg-amber-500 text-white shadow"
+                : "bg-black/40 text-white/90 hover:bg-black/60"
+            }`}
+            aria-label={
+              locked
+                ? `Unlock ${template.title}`
+                : `Lock ${template.title} for 6 hours`
+            }
+            aria-pressed={locked}
+          >
+            <LockIcon locked={locked} />
+          </button>
+        )}
       </div>
     </button>
   );
