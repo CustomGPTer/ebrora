@@ -2,6 +2,12 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    // Explicit id keeps this app distinctly identifiable from other
+    // installable apps on the same origin (e.g. /site-photo-stamp, which
+    // ships its own scoped manifest with id: "ebrora-photo-stamp"). Chrome
+    // keys installs by manifest id — with distinct ids, users can install
+    // both side-by-side as separate home-screen icons.
+    id: 'ebrora',
     name: 'Ebrora — AI Construction Document Generators & Templates',
     short_name: 'Ebrora',
     description:
