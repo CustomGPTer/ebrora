@@ -216,7 +216,16 @@ function drawStampCard(
   }
 
   // ── Header band (filled for solid / icon; skipped for transparent) ──
-  const headerBg = variant.accentColor;
+  // Solid variant gets a softened fill (0.8 alpha) so the photo shows
+  // faintly through the coloured block. Icon variant stays fully opaque so
+  // the badge reads crisply. Text (title + body rows) is always fully
+  // opaque regardless of band — we only dim the coloured fill, not the
+  // glyphs. Transparent variant is skipped entirely (no band at all).
+  const SOLID_HEADER_ALPHA = 0.8;
+  const headerBg =
+    variant.id === "solid"
+      ? withAlpha(variant.accentColor, SOLID_HEADER_ALPHA)
+      : variant.accentColor;
   const headerFg = variant.textColor;
 
   if (!isTransparent) {
@@ -503,6 +512,41 @@ function weightFont(size: number, weight: string) {
 }
 function monoFont(size: number, weight: string) {
   return `${weight} ${size}px ${MONO}`;
+}
+
+/**
+ * Return the given CSS colour with an overridden alpha channel.
+ * Handles the only input forms present in our templates:
+ *   • "#RRGGBB"  (primary case — every template.baseColor is this form)
+ *   • "#RGB"     (safety fallback, none in current palette)
+ *   • "rgb(…)"   (safety fallback for future flexibility)
+ * Any unrecognised input is returned unchanged, so a bad colour never
+ * collapses the stamp to empty — it just renders at full opacity.
+ */
+function withAlpha(colour: string, alpha: number): string {
+  const a = Math.max(0, Math.min(1, alpha));
+  if (colour.startsWith("#")) {
+    const hex = colour.slice(1);
+    let r: number, g: number, b: number;
+    if (hex.length === 6) {
+      r = parseInt(hex.slice(0, 2), 16);
+      g = parseInt(hex.slice(2, 4), 16);
+      b = parseInt(hex.slice(4, 6), 16);
+    } else if (hex.length === 3) {
+      r = parseInt(hex[0] + hex[0], 16);
+      g = parseInt(hex[1] + hex[1], 16);
+      b = parseInt(hex[2] + hex[2], 16);
+    } else {
+      return colour;
+    }
+    if ([r, g, b].some((n) => Number.isNaN(n))) return colour;
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+  const rgbMatch = colour.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+  if (rgbMatch) {
+    return `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, ${a})`;
+  }
+  return colour;
 }
 
 function roundRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
