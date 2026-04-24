@@ -145,6 +145,12 @@ export default function SitePhotoStampClient() {
   // priority: active lock → last-used within 30 min → default. We only do
   // this once per session so subsequent settings changes (e.g. the user
   // editing their default in Settings) don't overwrite mid-session picks.
+  //
+  // We also garbage-collect expired lock fields here: if lockedAt is past
+  // the 6h window but lockedTemplate / lockedVariant are still in storage,
+  // we clear them. Without this step stale IDs accumulate in localStorage
+  // and various downstream components would (incorrectly) read them as
+  // indicating a live lock.
   useEffect(() => {
     if (settingsLoaded && !initialisedFromSettings) {
       const sticky = resolveSticky(settings);
@@ -155,8 +161,18 @@ export default function SitePhotoStampClient() {
       setSelectedTemplate(tmpl.id);
       setSelectedVariant(variantId);
       setInitialisedFromSettings(true);
+
+      // Expired-lock cleanup. Uses the same predicate as isLockActive so
+      // the two can never disagree about what "expired" means.
+      const hasLockRemnants =
+        settings.lockedTemplate !== undefined ||
+        settings.lockedVariant !== undefined ||
+        settings.lockedAt !== undefined;
+      if (hasLockRemnants && !isLockActive(settings)) {
+        updateSettings(releaseLock());
+      }
     }
-  }, [settingsLoaded, initialisedFromSettings, settings]);
+  }, [settingsLoaded, initialisedFromSettings, settings, updateSettings]);
 
   const resolvedTemplate: Template = useMemo(
     () => getTemplate(selectedTemplate),
@@ -177,11 +193,22 @@ export default function SitePhotoStampClient() {
     settings.lockedTemplate === resolvedTemplate.id &&
     settings.lockedVariant === resolvedVariant.id;
 
+  // Gated copies — only expose the stored lock IDs to the UI if the 6h
+  // window is still live. Without this gate, expired locks leave
+  // lockedTemplate / lockedVariant in localStorage and downstream
+  // components (TemplateGrid, TemplatePreviewCard) flag them as "locked"
+  // purely by ID match, ignoring the expiry clock entirely.
+  const liveLockedTemplate = lockLive ? settings.lockedTemplate : undefined;
+  const liveLockedVariant = lockLive ? settings.lockedVariant : undefined;
+
   // Template + variant objects for the currently-locked pair (or last-used
   // if no lock is live). Used to populate the Recently Used row.
   const recentlyUsed = useMemo<{ template: Template; variant: TemplateVariant } | null>(() => {
-    const t = settings.lockedTemplate ?? settings.lastUsedTemplate;
-    const v = settings.lockedVariant ?? settings.lastUsedVariant;
+    // Only prefer the locked pair if the 6h window is still live; otherwise
+    // fall back to last-used. Without this gate an expired lock lingering
+    // in storage would keep showing as "Recently used" forever.
+    const t = (lockLive ? settings.lockedTemplate : undefined) ?? settings.lastUsedTemplate;
+    const v = (lockLive ? settings.lockedVariant : undefined) ?? settings.lastUsedVariant;
     if (!t || !v) return null;
     // Only surface if it's actually different from what's selected right now,
     // so the Recently Used row isn't the same thing the user is already on.
@@ -190,7 +217,7 @@ export default function SitePhotoStampClient() {
     const vt = tmpl.variants.find((x) => x.id === v);
     if (!vt) return null;
     return { template: tmpl, variant: vt };
-  }, [settings, resolvedTemplate, resolvedVariant]);
+  }, [settings, lockLive, resolvedTemplate, resolvedVariant]);
 
   // ── Pick / lock handlers ────────────────────────────────────
 
@@ -470,8 +497,8 @@ export default function SitePhotoStampClient() {
           currentTemplate={resolvedTemplate}
           currentVariant={resolvedVariant}
           onTemplateChange={pickTemplate}
-          lockedTemplate={settings.lockedTemplate}
-          lockedVariant={settings.lockedVariant}
+          lockedTemplate={liveLockedTemplate}
+          lockedVariant={liveLockedVariant}
           onToggleLock={toggleLock}
           lockActive={lockOnCurrent}
           recentlyUsed={recentlyUsed}
@@ -501,8 +528,8 @@ export default function SitePhotoStampClient() {
           onRetake={discardCaptured}
           onApply={applyStamp}
           onTemplateChange={pickTemplate}
-          lockedTemplate={settings.lockedTemplate}
-          lockedVariant={settings.lockedVariant}
+          lockedTemplate={liveLockedTemplate}
+          lockedVariant={liveLockedVariant}
           onToggleLock={toggleLock}
           lockActive={lockOnCurrent}
           recentlyUsed={recentlyUsed}
@@ -621,8 +648,8 @@ export default function SitePhotoStampClient() {
           selectedTemplate={selectedTemplate}
           selectedVariant={selectedVariant}
           onSelect={pickTemplate}
-          lockedTemplate={settings.lockedTemplate}
-          lockedVariant={settings.lockedVariant}
+          lockedTemplate={liveLockedTemplate}
+          lockedVariant={liveLockedVariant}
           onToggleLock={toggleLock}
           recentlyUsed={recentlyUsed}
         />
