@@ -107,6 +107,31 @@ function LockIcon({ locked }: { locked: boolean }) {
   );
 }
 
+// ─── Auto-contrast outline ─────────────────────────────────────
+
+/**
+ * Picks a contrasting outline colour for transparent-variant titles, so
+ * white/pale fills get a dark outline and dark fills get a white outline —
+ * matching the canvas renderer's logic so the preview matches the stamp.
+ * Templates use hex baseColors, so a hex-only parser is sufficient here.
+ */
+function contrastingOutline(hex: string): "#FFFFFF" | "#1F2937" {
+  const h = hex.trim().replace(/^#/, "");
+  let r = 255, g = 255, b = 255;
+  if (h.length === 3) {
+    r = parseInt(h[0] + h[0], 16);
+    g = parseInt(h[1] + h[1], 16);
+    b = parseInt(h[2] + h[2], 16);
+  } else if (h.length === 6 || h.length === 8) {
+    r = parseInt(h.slice(0, 2), 16);
+    g = parseInt(h.slice(2, 4), 16);
+    b = parseInt(h.slice(4, 6), 16);
+  }
+  if ([r, g, b].some((n) => Number.isNaN(n))) return "#FFFFFF";
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return luminance > 0.6 ? "#1F2937" : "#FFFFFF";
+}
+
 // ─── Card ───────────────────────────────────────────────────────
 
 export default function TemplatePreviewCard({
@@ -179,10 +204,17 @@ export default function TemplatePreviewCard({
               className="text-[11px] font-bold uppercase tracking-wide truncate"
               style={{
                 color: template.baseColor,
-                // Thin white outline mimics the canvas stroke applied by the
-                // real stamp renderer for the transparent variant.
-                textShadow:
-                  "-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 2px rgba(255,255,255,0.9)",
+                // Thin outline mimics the canvas stroke applied by the real
+                // stamp renderer. Outline colour auto-contrasts against the
+                // fill so white/pale titles don't become an invisible
+                // white-on-white blob.
+                textShadow: (() => {
+                  const o = contrastingOutline(template.baseColor);
+                  const oDim = o === "#FFFFFF"
+                    ? "rgba(255,255,255,0.9)"
+                    : "rgba(31,41,55,0.9)";
+                  return `-1px -1px 0 ${o}, 1px -1px 0 ${o}, -1px 1px 0 ${o}, 1px 1px 0 ${o}, 0 0 2px ${oDim}`;
+                })(),
               }}
             >
               {template.title}
