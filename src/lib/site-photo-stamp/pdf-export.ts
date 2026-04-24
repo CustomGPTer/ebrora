@@ -8,7 +8,7 @@
 //
 // Uses jsPDF (already a repo dependency). All work is client-side.
 
-import type { StampedRecord, Settings, Tier } from "./types";
+import type { StampedRecord, StampMeta, Settings, Tier } from "./types";
 import { formatCoordsDecimal } from "./geolocation";
 
 const PAID_TIERS = new Set<Tier>(["STARTER", "STANDARD", "PROFESSIONAL", "UNLIMITED"]);
@@ -337,7 +337,9 @@ function fitContain(
 
 // ─── Filename helper ───────────────────────────────────────────
 
-export function buildPdfFilename(records: StampedRecord[]): string {
+export function buildPdfFilename(
+  records: ReadonlyArray<{ meta: StampMeta }>
+): string {
   const d = new Date();
   const dateStr = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
   if (records.length === 1) {

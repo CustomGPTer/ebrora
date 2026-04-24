@@ -701,15 +701,36 @@ async function loadBitmap(blob: Blob): Promise<LoadedBitmap> {
   }
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.onload = () => resolve({
-      source: img,
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-      close: () => URL.revokeObjectURL(url),
-    });
+    let img: HTMLImageElement | null = new Image();
+    img.onload = () => {
+      const loaded = img!;
+      resolve({
+        source: loaded,
+        width: loaded.naturalWidth,
+        height: loaded.naturalHeight,
+        close: () => {
+          // Revoke the object URL and actively drop the decoded bitmap.
+          // Clearing src + removing handlers lets the browser free the
+          // underlying pixel buffer on the next GC cycle rather than
+          // waiting for the closure scope to become unreachable — matters
+          // on low-RAM Android WebViews where bulk processing otherwise
+          // accumulates decoded bitmaps faster than GC reclaims them.
+          URL.revokeObjectURL(url);
+          loaded.onload = null;
+          loaded.onerror = null;
+          loaded.src = "";
+          img = null;
+        },
+      });
+    };
     img.onerror = () => {
       URL.revokeObjectURL(url);
+      if (img) {
+        img.onload = null;
+        img.onerror = null;
+        img.src = "";
+        img = null;
+      }
       reject(new Error("Could not decode photo for stamping."));
     };
     img.src = url;

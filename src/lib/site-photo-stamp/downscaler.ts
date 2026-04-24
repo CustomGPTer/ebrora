@@ -143,17 +143,34 @@ async function decodeImage(file: File | Blob): Promise<DecodedImage> {
 function decodeViaImageElement(file: File | Blob): Promise<DecodedImage> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
-    const img = new Image();
+    let img: HTMLImageElement | null = new Image();
     img.onload = () => {
+      const loaded = img!;
       resolve({
-        source: img,
-        naturalWidth: img.naturalWidth,
-        naturalHeight: img.naturalHeight,
-        close: () => URL.revokeObjectURL(url),
+        source: loaded,
+        naturalWidth: loaded.naturalWidth,
+        naturalHeight: loaded.naturalHeight,
+        close: () => {
+          // Revoke the URL and drop the decoded bitmap. Clearing src +
+          // handlers lets the browser free the pixel buffer on the next
+          // GC cycle rather than waiting for the closure to go out of
+          // scope — important on low-RAM devices processing many photos.
+          URL.revokeObjectURL(url);
+          loaded.onload = null;
+          loaded.onerror = null;
+          loaded.src = "";
+          img = null;
+        },
       });
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
+      if (img) {
+        img.onload = null;
+        img.onerror = null;
+        img.src = "";
+        img = null;
+      }
       reject(new Error("Could not decode image — format may be unsupported."));
     };
     img.decoding = "async";
