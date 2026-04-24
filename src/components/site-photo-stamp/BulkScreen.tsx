@@ -51,7 +51,7 @@ import { generatePdf, buildPdfFilename } from "@/lib/site-photo-stamp/pdf-export
 import { sharePdf } from "@/lib/site-photo-stamp/share";
 
 const BULK_LIMIT = 30;
-const MAX_BYTES = 25 * 1024 * 1024;
+const MAX_BYTES = 15 * 1024 * 1024;
 /** Character ceiling for notes — must match CapturedPreview's NOTE_MAX. */
 const NOTE_MAX = 200;
 /** Text edits hit IDB at most once per this interval. */

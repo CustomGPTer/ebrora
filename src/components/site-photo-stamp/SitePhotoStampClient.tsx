@@ -117,7 +117,7 @@ type View =
   | { kind: "bulk" }
   | { kind: "settings" };
 
-const MAX_BYTES = 25 * 1024 * 1024;
+const MAX_BYTES = 15 * 1024 * 1024;
 
 export default function SitePhotoStampClient() {
   const isMobile = useIsMobile();
@@ -291,7 +291,7 @@ export default function SitePhotoStampClient() {
   const runCapture = useCallback(async (file: File) => {
     if (file.size > MAX_BYTES) {
       setToast(
-        `Photo is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Please use an image under 25 MB.`
+        `Photo is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Please use an image under 15 MB.`
       );
       return;
     }
