@@ -399,11 +399,11 @@ async function drawWatermark(
 
   if (isPaid) return; // Paid users without a logo get no watermark.
 
-  // ── FREE tier: Ebrora "E" mark + "Photo by Ebrora" ──
+  // ── FREE tier: Ebrora "E" mark + "ebrora.com" ──
   const fs = Math.round(base * 0.022);
   const markSize = Math.round(fs * 1.5);
   const gap = Math.round(base * 0.008);
-  const label = "Photo by Ebrora";
+  const label = "ebrora.com";
 
   ctx.font = weightFont(fs, "600");
   const labelW = ctx.measureText(label).width;
