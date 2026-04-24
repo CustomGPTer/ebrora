@@ -245,12 +245,17 @@ export default function TemplatePreviewCard({
         )}
       </div>
 
-      {/* Card label row */}
-      <div className="px-2.5 py-2 bg-white border-t border-gray-100">
-        <p className="text-[11px] font-semibold text-gray-900 truncate">
+      {/* Card label row.
+          `leading-tight` + `mb-0` scope away the global `p { margin-bottom: 1rem }`
+          and `body { line-height: 1.6 }` rules in globals.css that would
+          otherwise inflate this row by ~33 px per tile. `mt-0.5` puts a tiny
+          2 px gap between the title and subtitle lines. py-1 keeps vertical
+          padding tight. */}
+      <div className="px-2.5 py-1 bg-white border-t border-gray-100">
+        <p className="text-[11px] font-semibold text-gray-900 truncate leading-tight mb-0">
           {template.title}
         </p>
-        <p className="text-[10px] truncate">
+        <p className="text-[10px] truncate leading-tight mb-0 mt-0.5">
           {locked ? (
             <span className="text-amber-600 font-semibold flex items-center gap-1">
               <span aria-hidden>
