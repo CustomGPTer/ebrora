@@ -128,7 +128,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("WORKING AT HEIGHT RISK ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("WAHR 2005 / CDM 2015 Sched 3 / BS 8437 / BS EN 361 / INDG401 / GEIS6 / INDG455", M, 19);
+  doc.text("WAHR 2005 / CDM 2015 Sched 3 / BS 8437 / BS EN 361 / INDG401 / GEIS6 / LA455", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34; doc.setTextColor(0, 0, 0);
@@ -666,7 +666,7 @@ export default function WorkingAtHeightCalculatorClient() {
       {/* ── Footer ──────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-          Based on WAHR 2005, CDM 2015 Schedule 3, BS 8437, and HSE guidance (INDG401, GEIS6, INDG455).
+          Based on WAHR 2005, CDM 2015 Schedule 3, BS 8437, and HSE / Ladder Association guidance (INDG401, GEIS6, LA455).
           This is a screening tool - it does not replace a site-specific risk assessment by a competent person.
           Always implement controls per the WAHR 2005 hierarchy: avoid, prevent (collective then personal), minimise.
         </p>
