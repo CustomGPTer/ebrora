@@ -328,11 +328,20 @@ async function exportPDF(
     doc.setFillColor(brgb[0], brgb[1], brgb[2]);
     doc.roundedRect(M, y, CW, 12, 2, 2, "F");
     doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-    const statusText = pass === true ? "PASS" : pass === false ? "FAIL" : hasEv1Only ? "Ev1 ONLY — RELOAD DATA REQUIRED" : "INSUFFICIENT DATA";
+    let statusText: string;
+    if (pass === true) statusText = "PASS";
+    else if (pass === false) {
+      if (res.meetsRatio === false && res.meetsMinEv2 === false) statusText = "FAIL (ratio AND min Ev2)";
+      else if (res.meetsRatio === false) statusText = "FAIL (ratio)";
+      else if (res.meetsMinEv2 === false) statusText = "FAIL (min Ev2)";
+      else statusText = "FAIL";
+    } else if (hasEv1Only) statusText = "Ev1 ONLY -- RELOAD DATA REQUIRED";
+    else statusText = "INSUFFICIENT DATA";
     doc.text(statusText, M + 5, y + 5.5);
     doc.setFontSize(7); doc.setFont("helvetica", "normal");
+    const minEv2Str = res.minEv2Required !== null ? ` | Min Ev2: >= ${res.minEv2Required} MPa` : "";
     const summaryText = res.ratio !== null
-      ? `Ev1: ${fmtMPa(res.ev1)} | Ev2: ${fmtMPa(res.ev2)} | Ratio: ${res.ratio.toFixed(2)} | Target: <= ${res.targetRatio.toFixed(1)} | CBR: ${res.cbrEquivalent?.toFixed(1) ?? "--"}%`
+      ? `Ev1: ${fmtMPa(res.ev1)} | Ev2: ${fmtMPa(res.ev2)} | Ratio: ${res.ratio.toFixed(2)} | Target: <= ${res.targetRatio.toFixed(1)}${minEv2Str} | CBR: ${res.cbrEquivalent?.toFixed(1) ?? "--"}%`
       : hasEv1Only
         ? `Ev1: ${fmtMPa(res.ev1)} | Ev2: -- (enter reload cycle data to calculate Ev2 and Ev2/Ev1 ratio)`
         : "Insufficient data to calculate Ev values";
@@ -342,15 +351,20 @@ async function exportPDF(
     // Summary panel
     if (res.ev1 !== null || res.ev2 !== null) {
       checkPage(45);
-      const panelItems = [
+      const panelItems: [string, string][] = [
         ["Ev1 (First Load Modulus)", fmtMPa(res.ev1)],
-        ["Ev2 (Reload Modulus)", fmtMPa(res.ev2)],
-        ["Ev2/Ev1 Ratio", fmtRatio(res.ratio)],
+        ["Ev2 (Reload Modulus)", fmtMPa(res.ev2) + (res.minEv2Required !== null && res.meetsMinEv2 !== null ? (res.meetsMinEv2 ? " (meets min)" : " (below min)") : "")],
+        ["Ev2/Ev1 Ratio", fmtRatio(res.ratio) + (res.meetsRatio === true ? " (within)" : res.meetsRatio === false ? " (exceeds)" : "")],
         ["Target Ratio", `<= ${res.targetRatio.toFixed(1)}`],
-        ["Result", pass === true ? "PASS" : pass === false ? "FAIL" : "--"],
+      ];
+      if (res.minEv2Required !== null) {
+        panelItems.push(["Minimum Ev2", `>= ${res.minEv2Required} MPa`]);
+      }
+      panelItems.push(
+        ["Overall Result", pass === true ? "PASS" : pass === false ? "FAIL" : "--"],
         ["Equivalent CBR (DIN)", res.cbrEquivalent !== null ? `${res.cbrEquivalent.toFixed(1)}%` : "--"],
         ["Equivalent CBR (TRL)", res.cbrTRL !== null ? `${res.cbrTRL.toFixed(1)}%` : "--"],
-      ];
+      );
       const panelH = panelItems.length * 3.8 + 10;
       doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
       doc.roundedRect(M, y - 2, CW, panelH, 1.5, 1.5, "FD");
@@ -591,13 +605,21 @@ async function exportPDF(
       const res = results[ti];
       cx2 = M;
       const isPass = res.pass;
+      let resultText: string;
+      if (isPass === true) resultText = "PASS";
+      else if (isPass === false) {
+        if (res.meetsRatio === false && res.meetsMinEv2 === false) resultText = "FAIL (both)";
+        else if (res.meetsRatio === false) resultText = "FAIL (ratio)";
+        else if (res.meetsMinEv2 === false) resultText = "FAIL (Ev2)";
+        else resultText = "FAIL";
+      } else resultText = "--";
       const cells = [
         test.name,
         res.ev1 !== null ? res.ev1.toFixed(1) : "--",
         res.ev2 !== null ? res.ev2.toFixed(1) : "--",
         fmtRatio(res.ratio),
-        `<= ${res.targetRatio.toFixed(1)}`,
-        isPass === true ? "PASS" : isPass === false ? "FAIL" : "--",
+        `<= ${res.targetRatio.toFixed(1)}` + (res.minEv2Required !== null ? `, >= ${res.minEv2Required}` : ""),
+        resultText,
       ];
       cells.forEach((t, i) => {
         if (i === 5 && isPass === true) { doc.setFillColor(220, 252, 231); doc.rect(cx2, y, compCols[i], 5.5, "FD"); }
@@ -773,9 +795,23 @@ export default function PlateBearingTestClient() {
         <div className="bg-red-50 border-2 border-red-400 rounded-xl p-4 flex gap-3 items-start">
           <span className="text-lg font-bold text-red-600">!</span>
           <div>
-            <div className="text-sm font-bold text-red-900">Compaction Does Not Meet Target</div>
-            <div className="text-xs text-red-800 mt-1">
-              Ev2/Ev1 ratio of {activeResult.ratio?.toFixed(2)} exceeds the target of {targetRatio.toFixed(1)}. The layer should be re-rolled and retested. High ratios indicate excessive plastic deformation on first loading, meaning the material was not adequately compacted.
+            <div className="text-sm font-bold text-red-900">
+              {activeResult.meetsRatio === false && activeResult.meetsMinEv2 === false
+                ? "Compaction Fails Both Criteria"
+                : activeResult.meetsRatio === false
+                  ? "Compaction Does Not Meet Ratio Target"
+                  : activeResult.meetsMinEv2 === false
+                    ? "Compaction Does Not Meet Minimum Ev2"
+                    : "Compaction Does Not Meet Target"}
+            </div>
+            <div className="text-xs text-red-800 mt-1 space-y-1">
+              {activeResult.meetsRatio === false && (
+                <div>Ev2/Ev1 ratio of {activeResult.ratio?.toFixed(2)} exceeds the target of {targetRatio.toFixed(1)}. High ratios indicate excessive plastic deformation on first loading -- the material was not adequately compacted.</div>
+              )}
+              {activeResult.meetsMinEv2 === false && activeResult.minEv2Required !== null && (
+                <div>Ev2 of {activeResult.ev2?.toFixed(1)} MPa is below the minimum {activeResult.minEv2Required} MPa required for this material class. The layer is too soft for the design loading -- additional compaction or material substitution is required.</div>
+              )}
+              <div className="pt-1">The layer should be re-rolled and retested, or the material reviewed for suitability.</div>
             </div>
           </div>
         </div>
@@ -786,7 +822,11 @@ export default function PlateBearingTestClient() {
           <div>
             <div className="text-sm font-bold text-emerald-900">Compaction Meets Target</div>
             <div className="text-xs text-emerald-800 mt-1">
-              Ev2/Ev1 ratio of {activeResult.ratio?.toFixed(2)} is within the target of {targetRatio.toFixed(1)}. Compaction quality is acceptable.
+              Ev2/Ev1 ratio of {activeResult.ratio?.toFixed(2)} is within the target of {targetRatio.toFixed(1)}
+              {activeResult.minEv2Required !== null && activeResult.ev2 !== null && (
+                <> and Ev2 of {activeResult.ev2.toFixed(1)} MPa meets the minimum {activeResult.minEv2Required} MPa</>
+              )}
+              . Compaction quality is acceptable.
             </div>
           </div>
         </div>
@@ -962,18 +1002,33 @@ export default function PlateBearingTestClient() {
           <div className="px-4 py-3 space-y-2 text-sm">
             <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
               <div className="text-gray-500">Ev1 (First Load Modulus)</div><div className="font-bold text-gray-800">{fmtMPa(activeResult.ev1)}</div>
-              <div className="text-gray-500">Ev2 (Reload Modulus)</div><div className="font-bold text-gray-800">{fmtMPa(activeResult.ev2)}</div>
+              <div className="text-gray-500">Ev2 (Reload Modulus)</div>
+              <div className={`font-bold ${activeResult.meetsMinEv2 === true ? "text-emerald-700" : activeResult.meetsMinEv2 === false ? "text-red-700" : "text-gray-800"}`}>
+                {fmtMPa(activeResult.ev2)}
+                {activeResult.minEv2Required !== null && activeResult.meetsMinEv2 !== null && (
+                  <> {activeResult.meetsMinEv2 ? "(meets min)" : "(below min)"}</>
+                )}
+              </div>
               <div className="text-gray-500">Ev2/Ev1 Ratio</div>
-              <div className={`font-bold ${activeResult.pass === true ? "text-emerald-700" : activeResult.pass === false ? "text-red-700" : "text-gray-800"}`}>
-                {fmtRatio(activeResult.ratio)} {activeResult.pass === true ? "(PASS)" : activeResult.pass === false ? "(FAIL)" : ""}
+              <div className={`font-bold ${activeResult.meetsRatio === true ? "text-emerald-700" : activeResult.meetsRatio === false ? "text-red-700" : "text-gray-800"}`}>
+                {fmtRatio(activeResult.ratio)} {activeResult.meetsRatio === true ? "(within)" : activeResult.meetsRatio === false ? "(exceeds)" : ""}
               </div>
               <div className="text-gray-500">Target Ratio</div><div className="font-bold text-gray-800">{"\u2264"} {targetRatio.toFixed(1)}</div>
+              {activeResult.minEv2Required !== null && (
+                <>
+                  <div className="text-gray-500">Minimum Ev2</div><div className="font-bold text-gray-800">{"\u2265"} {activeResult.minEv2Required} MPa</div>
+                </>
+              )}
+              <div className="text-gray-500">Overall Result</div>
+              <div className={`font-bold ${activeResult.pass === true ? "text-emerald-700" : activeResult.pass === false ? "text-red-700" : "text-gray-800"}`}>
+                {activeResult.pass === true ? "PASS" : activeResult.pass === false ? "FAIL" : "--"}
+              </div>
               <div className="text-gray-500">Equivalent CBR (DIN)</div><div className="font-bold text-gray-800">{activeResult.cbrEquivalent !== null ? `${activeResult.cbrEquivalent.toFixed(1)}%` : "--"}</div>
               <div className="text-gray-500">Equivalent CBR (TRL)</div><div className="font-bold text-gray-800">{activeResult.cbrTRL !== null ? `${activeResult.cbrTRL.toFixed(1)}%` : "--"}</div>
               <div className="text-gray-500">Plate Radius</div><div className="font-bold text-gray-800">{(activeTest.plateDiameter / 2).toFixed(0)} mm</div>
             </div>
             <div className="text-[11px] text-gray-400 mt-2">
-              CBR (DIN): Ev2 (MPa) = 10 x CBR^0.5, so CBR = (Ev2/10)^2. CBR (TRL alternative): Ev2 (MPa) = 17.6 x CBR^0.64. The TRL correlation is shown for reference; the DIN formula is the primary method used in UK earthworks practice.
+              Pass criteria: Ev2/Ev1 ratio {"\u2264"} target {activeResult.minEv2Required !== null ? `AND Ev2 \u2265 ${activeResult.minEv2Required} MPa` : ""}. CBR (DIN): Ev2 (MPa) = 10 x CBR^0.5, so CBR = (Ev2/10)^2. CBR (TRL alternative): Ev2 (MPa) = 17.6 x CBR^0.64. The TRL correlation is shown for reference; the DIN formula is the primary method used in UK earthworks practice.
             </div>
           </div>
         </div>
@@ -1001,17 +1056,25 @@ export default function PlateBearingTestClient() {
               <tbody>
                 {tests.map((t, i) => {
                   const r = results[i];
+                  let resultLabel: string;
+                  if (r.pass === true) resultLabel = "Pass";
+                  else if (r.pass === false) {
+                    if (r.meetsRatio === false && r.meetsMinEv2 === false) resultLabel = "Fail (both)";
+                    else if (r.meetsRatio === false) resultLabel = "Fail (ratio)";
+                    else if (r.meetsMinEv2 === false) resultLabel = "Fail (Ev2)";
+                    else resultLabel = "Fail";
+                  } else resultLabel = "--";
                   return (
                     <tr key={t.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer" onClick={() => setActiveTab(i)}>
                       <td className="px-3 py-2 font-medium text-gray-800">{t.name}</td>
                       <td className="px-3 py-2 text-gray-600">{r.ev1?.toFixed(1) ?? "--"}</td>
                       <td className="px-3 py-2 text-gray-600">{r.ev2?.toFixed(1) ?? "--"}</td>
                       <td className="px-3 py-2 text-gray-600">{fmtRatio(r.ratio)}</td>
-                      <td className="px-3 py-2 text-gray-600">{"\u2264"} {r.targetRatio.toFixed(1)}</td>
+                      <td className="px-3 py-2 text-gray-600">{"\u2264"} {r.targetRatio.toFixed(1)}{r.minEv2Required !== null ? `, \u2265 ${r.minEv2Required} MPa` : ""}</td>
                       <td className="px-3 py-2 text-gray-600">{r.cbrEquivalent?.toFixed(1) ?? "--"}</td>
                       <td className="px-3 py-2">
-                        {r.pass === true && <span className="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Pass</span>}
-                        {r.pass === false && <span className="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-red-50 text-red-700 border border-red-200">Fail</span>}
+                        {r.pass === true && <span className="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">{resultLabel}</span>}
+                        {r.pass === false && <span className="inline-flex px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-red-50 text-red-700 border border-red-200">{resultLabel}</span>}
                         {r.pass === null && <span className="text-gray-400">--</span>}
                       </td>
                     </tr>
