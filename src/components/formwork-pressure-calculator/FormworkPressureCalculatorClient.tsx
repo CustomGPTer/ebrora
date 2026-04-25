@@ -4,9 +4,11 @@
 import { useState, useMemo, useCallback } from "react";
 import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 import {
-  CONCRETE_TYPES, FORMWORK_FINISHES, calculateFormworkPressure,
+  SECTION_TYPES, CEMENT_CLASSES, CONSISTENCY_CLASSES, calculateFormworkPressure,
 } from "@/data/formwork-pressure-calculator";
-import type { ConcreteType, FormworkFinish, FormworkResult, PressurePoint } from "@/data/formwork-pressure-calculator";
+import type {
+  SectionType, CementClass, ConsistencyClass, FormworkResult, PressurePoint,
+} from "@/data/formwork-pressure-calculator";
 
 function todayISO() { return new Date().toISOString().slice(0, 10); }
 
@@ -50,11 +52,11 @@ function PressureProfileChart({ profile, maxCIRIA, maxHydro, maxDIN }: { profile
       <line x1={W - PAD.right - 160} y1={PAD.top + 5} x2={W - PAD.right - 140} y2={PAD.top + 5} stroke="#3B82F6" strokeWidth={2.5} />
       <text x={W - PAD.right - 136} y={PAD.top + 8} fontSize={9} fill="#6B7280">CIRIA R108</text>
       <line x1={W - PAD.right - 160} y1={PAD.top + 18} x2={W - PAD.right - 140} y2={PAD.top + 18} stroke="#F97316" strokeWidth={2} strokeDasharray="4,2" />
-      <text x={W - PAD.right - 136} y={PAD.top + 21} fontSize={9} fill="#6B7280">DIN 18218</text>
+      <text x={W - PAD.right - 136} y={PAD.top + 21} fontSize={9} fill="#6B7280">DIN 18218:2010</text>
       <line x1={W - PAD.right - 160} y1={PAD.top + 31} x2={W - PAD.right - 140} y2={PAD.top + 31} stroke="#9CA3AF" strokeWidth={1.5} strokeDasharray="6,3" />
       <text x={W - PAD.right - 136} y={PAD.top + 34} fontSize={9} fill="#6B7280">Hydrostatic</text>
       {/* Labels */}
-      <text x={W / 2} y={PAD.top - 12} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151">Lateral Pressure (kN/m2)</text>
+      <text x={W / 2} y={PAD.top - 12} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151">Lateral Pressure (kN/m²)</text>
       <text x={12} y={H / 2} textAnchor="middle" fontSize={10} fontWeight={600} fill="#374151" transform={`rotate(-90, 12, ${H / 2})`}>Depth (m)</text>
     </svg>
   );
@@ -89,7 +91,7 @@ function SensitivityChart({ data, xLabel, yLabel, colour }: { data: { x: number;
 // ─── PDF Export (PAID) ───────────────────────────────────────
 async function exportPDF(
   header: { site: string; company: string; manager: string; assessedBy: string; date: string },
-  inputs: { pourRate: number; temperature: number; headHeight: number; concreteType: ConcreteType; formworkFinish: FormworkFinish; vibrated: boolean; tieCapacity: number },
+  inputs: { pourRate: number; temperature: number; headHeight: number; sectionType: SectionType; cementClass: CementClass; consistencyClass: ConsistencyClass; tieCapacity: number },
   result: FormworkResult,
 ) {
   const { default: jsPDF } = await import("jspdf");
@@ -102,13 +104,13 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("FORMWORK LATERAL PRESSURE ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("CIRIA Report 108 / DIN 18218:2010 / BS 5975:2019 / BS EN 13670", M, 19);
+  doc.text("CIRIA Report 108 (1985) / DIN 18218:2010 / BS 5975:2019 / BS EN 13670", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34; doc.setTextColor(0, 0, 0);
 
   doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
-  doc.roundedRect(M, y - 3, CW, 35, 1, 1, "FD"); doc.setFontSize(8);
+  doc.roundedRect(M, y - 3, CW, 40, 1, 1, "FD"); doc.setFontSize(8);
   const halfW = CW / 2;
   const drawFld = (label: string, value: string, x: number, fy: number, lineW: number) => {
     doc.setFont("helvetica", "bold"); doc.text(label, x, fy);
@@ -121,15 +123,15 @@ async function exportPDF(
   drawFld("Site Manager:", header.manager, M + 3, y, 50);
   drawFld("Assessed By:", header.assessedBy, M + halfW, y, 40); y += 5;
   drawFld("Date:", header.date, M + 3, y, 30);
-  drawFld("Pour Rate:", `${inputs.pourRate} m/hr`, M + halfW, y, 0); y += 5;
+  drawFld("Pour Rate:", `${inputs.pourRate} m/h`, M + halfW, y, 0); y += 5;
   drawFld("Temperature:", `${inputs.temperature}\u00B0C`, M + 3, y, 0);
-  drawFld("Head Height:", `${inputs.headHeight}m`, M + halfW, y, 0); y += 5;
-  const ctData = CONCRETE_TYPES.find(c => c.type === inputs.concreteType)!;
-  const finishData = FORMWORK_FINISHES.find(f => f.finish === inputs.formworkFinish)!;
-  drawFld("Concrete:", ctData.label, M + 3, y, 0);
-  drawFld("Vibrated:", inputs.vibrated ? "Yes" : "No", M + halfW, y, 0);
-  y += 5;
-  drawFld("Formwork Finish:", finishData.label, M + 3, y, 0);
+  drawFld("Head Height:", `${inputs.headHeight} m`, M + halfW, y, 0); y += 5;
+  const sectionData = SECTION_TYPES.find(s => s.type === inputs.sectionType)!;
+  const cementData  = CEMENT_CLASSES.find(c => c.type === inputs.cementClass)!;
+  const consistencyData = CONSISTENCY_CLASSES.find(c => c.type === inputs.consistencyClass)!;
+  drawFld("Section:", sectionData.label, M + 3, y, 0); y += 5;
+  drawFld("Cement:", cementData.label, M + 3, y, 0); y += 5;
+  drawFld("Consistency:", consistencyData.label, M + 3, y, 0);
   drawFld("Tie Capacity:", `${inputs.tieCapacity} kN`, M + halfW, y, 0);
   y += 8;
 
@@ -144,18 +146,20 @@ async function exportPDF(
   }
 
   // Results (coloured panel)
-  checkPage(45);
+  checkPage(50);
   doc.setFillColor(248, 250, 252); doc.setDrawColor(200, 210, 220);
-  doc.roundedRect(M, y - 2, CW, 38, 1.5, 1.5, "FD");
+  doc.roundedRect(M, y - 2, CW, 46, 1.5, 1.5, "FD");
   doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Pressure Results", M + 4, y + 2); y += 6;
   const resultItems: [string, string, number[]][] = [
-    ["CIRIA R108 Max Pressure", `${result.maxPressureCIRIA} kN/m2`, [59, 130, 246]],
-    ["DIN 18218 Max Pressure", `${result.maxPressureDIN} kN/m2`, [100, 116, 139]],
-    ["Full Hydrostatic Pressure", `${result.maxPressureHydro} kN/m2`, [234, 88, 12]],
-    ["Effective Head (CIRIA)", `${result.effectiveHead}m`, [17, 24, 39]],
+    ["CIRIA R108 Max Pressure", `${result.maxPressureCIRIA} kN/m²`, [59, 130, 246]],
+    ["DIN 18218:2010 Max Pressure", `${result.maxPressureDIN} kN/m²`, [100, 116, 139]],
+    ["Full Hydrostatic Pressure", `${result.maxPressureHydro} kN/m²`, [234, 88, 12]],
+    ["Effective Head (CIRIA)", `${result.effectiveHead} m`, [17, 24, 39]],
     ["Saving vs Hydrostatic", `${result.savingPercent}%`, [22, 163, 74]],
-    ["Tie Spacing (H x V)", `${result.tieSpacing.hSpacing}m x ${result.tieSpacing.vSpacing}m`, [17, 24, 39]],
-    ["Ties per m2", `${result.tieSpacing.tiesPerM2}`, [17, 24, 39]],
+    ["CIRIA C1 / C2", `${result.c1.toFixed(1)} / ${result.c2.toFixed(2)}`, [17, 24, 39]],
+    ["DIN tE / K1", `${result.tE.toFixed(1)} h / ${result.k1.toFixed(2)}`, [17, 24, 39]],
+    ["Tie Spacing (H × V)", `${result.tieSpacing.hSpacing} m × ${result.tieSpacing.vSpacing} m${result.tieSpacing.capped ? " (capped)" : ""}`, [17, 24, 39]],
+    ["Ties per m²", `${result.tieSpacing.tiesPerM2}`, [17, 24, 39]],
     ["Tie Capacity Used", `${inputs.tieCapacity} kN`, [17, 24, 39]],
   ];
   resultItems.forEach(([l, v, c]) => {
@@ -172,7 +176,7 @@ async function exportPDF(
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
   doc.text("Lateral Pressure vs Depth", M, y);
   doc.setFontSize(6); doc.setFont("helvetica", "italic"); doc.setTextColor(100, 100, 100);
-  doc.text("CIRIA R108 bilinear envelope (blue) vs full hydrostatic (orange). Difference shows formwork design saving.", M, y + 4);
+  doc.text("CIRIA R108 envelope (blue) vs DIN 18218 (orange) vs full hydrostatic (grey). Difference shows formwork design saving.", M, y + 4);
   doc.setTextColor(0, 0, 0); y += 8;
 
   {
@@ -196,8 +200,8 @@ async function exportPDF(
       doc.text(`${d.toFixed(1)}m`, chartX - 10, yp + 1.5);
     }
 
-    // Hydrostatic line (orange)
-    doc.setDrawColor(234, 88, 12); doc.setLineWidth(0.5);
+    // Hydrostatic line (grey)
+    doc.setDrawColor(150, 150, 150); doc.setLineWidth(0.4);
     doc.line(chartX, chartY3, chartX + (result.maxPressureHydro / maxP) * chartW3, chartY3 + chartH3);
 
     // CIRIA line (blue bilinear)
@@ -208,18 +212,21 @@ async function exportPDF(
     doc.line(chartX, chartY3, ciriaX, effY); // hydrostatic portion
     doc.line(ciriaX, effY, ciriaX, chartY3 + chartH3); // constant portion
 
-    // Saving area fill (simplified)
-    doc.setFillColor(220, 252, 231);
-    // Triangle approximation of saving area
-    const hydroEndX = chartX + (result.maxPressureHydro / maxP) * chartW3;
+    // DIN line (orange bilinear)
+    doc.setDrawColor(234, 88, 12); doc.setLineWidth(0.5);
+    const dinEffDepth = Math.min(result.maxPressureDIN / 25, maxD);
+    const dinX = chartX + (result.maxPressureDIN / maxP) * chartW3;
+    const dinY = chartY3 + (dinEffDepth / maxD) * chartH3;
+    doc.line(chartX, chartY3, dinX, dinY);
+    doc.line(dinX, dinY, dinX, chartY3 + chartH3);
+
     const botY = chartY3 + chartH3;
-    // small green indicator at bottom right
     doc.setFontSize(6); doc.setTextColor(22, 163, 74); doc.setFont("helvetica", "bold");
     doc.text(`${result.savingPercent}% saving`, ciriaX + 3, botY - 3);
 
     // Labels
     doc.setTextColor(80, 80, 80); doc.setFontSize(5);
-    doc.text("Pressure (kN/m2)", chartX + chartW3 / 2 - 10, chartY3 + chartH3 + 7);
+    doc.text("Pressure (kN/m²)", chartX + chartW3 / 2 - 10, chartY3 + chartH3 + 7);
     doc.text("Depth", chartX - 12, chartY3 - 2);
 
     // Legend
@@ -227,7 +234,9 @@ async function exportPDF(
     doc.setFillColor(59, 130, 246); doc.rect(legX, legY2, 5, 2, "F");
     doc.setFontSize(5); doc.setTextColor(80, 80, 80); doc.text("CIRIA R108", legX + 7, legY2 + 1.8);
     doc.setFillColor(234, 88, 12); doc.rect(legX, legY2 + 5, 5, 2, "F");
-    doc.text("Hydrostatic", legX + 7, legY2 + 6.8);
+    doc.text("DIN 18218", legX + 7, legY2 + 6.8);
+    doc.setFillColor(150, 150, 150); doc.rect(legX, legY2 + 10, 5, 2, "F");
+    doc.text("Hydrostatic", legX + 7, legY2 + 11.8);
 
     doc.setLineWidth(0.2); doc.setDrawColor(220, 220, 220); doc.setTextColor(0, 0, 0);
     y = chartY3 + chartH3 + 12;
@@ -259,7 +268,7 @@ async function exportPDF(
   const pageCount = doc.getNumberOfPages();
   for (let p = 1; p <= pageCount; p++) {
     doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Formwork pressure per CIRIA Report 108 and DIN 18218:2010. This is a screening tool -- it does not replace a structural design by a competent temporary works engineer.", M, 290);
+    doc.text("Formwork pressure per CIRIA Report 108 (1985) and DIN 18218:2010. This is a screening tool — it does not replace a structural design by a competent temporary works engineer.", M, 290);
     doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 290);
   }
   doc.save(`formwork-pressure-assessment-${todayISO()}.pdf`);
@@ -275,13 +284,13 @@ export default function FormworkPressureCalculatorClient() {
   const [pourRate, setPourRate] = useState<number>(2);
   const [temperature, setTemperature] = useState<number>(15);
   const [headHeight, setHeadHeight] = useState<number>(4);
-  const [concreteType, setConcreteType] = useState<ConcreteType>("opc");
-  const [formworkFinish, setFormworkFinish] = useState<FormworkFinish>("plywood");
-  const [vibrated, setVibrated] = useState(true);
+  const [sectionType, setSectionType] = useState<SectionType>("wall");
+  const [cementClass, setCementClass] = useState<CementClass>("opc-plain");
+  const [consistencyClass, setConsistencyClass] = useState<ConsistencyClass>("F3");
   const [tieCapacity, setTieCapacity] = useState<number>(90);
 
-  const inputs = { pourRate, temperature, headHeight, concreteType, formworkFinish, vibrated, tieCapacity };
-  const result = useMemo(() => calculateFormworkPressure(inputs), [pourRate, temperature, headHeight, concreteType, formworkFinish, vibrated, tieCapacity]);
+  const inputs = { pourRate, temperature, headHeight, sectionType, cementClass, consistencyClass, tieCapacity };
+  const result = useMemo(() => calculateFormworkPressure(inputs), [pourRate, temperature, headHeight, sectionType, cementClass, consistencyClass, tieCapacity]);
 
   const handleExport = useCallback(async () => {
     setExporting(true);
@@ -290,8 +299,9 @@ export default function FormworkPressureCalculatorClient() {
   }, [site, company, manager, assessedBy, assessDate, inputs, result]);
 
   const clearAll = useCallback(() => {
-    setPourRate(2); setTemperature(15); setHeadHeight(4); setConcreteType("opc");
-    setFormworkFinish("plywood"); setVibrated(true); setTieCapacity(90);
+    setPourRate(2); setTemperature(15); setHeadHeight(4);
+    setSectionType("wall"); setCementClass("opc-plain"); setConsistencyClass("F3");
+    setTieCapacity(90);
     setSite(""); setCompany(""); setManager(""); setAssessedBy(""); setAssessDate(todayISO());
   }, []);
 
@@ -300,10 +310,10 @@ export default function FormworkPressureCalculatorClient() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "CIRIA R108 Max", value: `${result.maxPressureCIRIA} kN/m2`, sub: `Effective head: ${result.effectiveHead}m`, bgClass: "bg-blue-50", textClass: "text-blue-800", borderClass: "border-blue-200", dotClass: "bg-blue-500" },
-          { label: "DIN 18218 Max", value: `${result.maxPressureDIN} kN/m2`, sub: "For comparison", bgClass: "bg-orange-50", textClass: "text-orange-800", borderClass: "border-orange-200", dotClass: "bg-orange-500" },
-          { label: "Saving vs Hydrostatic", value: `${result.savingPercent}%`, sub: `Hydrostatic: ${result.maxPressureHydro} kN/m2`, bgClass: result.savingPercent > 10 ? "bg-emerald-50" : "bg-amber-50", textClass: result.savingPercent > 10 ? "text-emerald-800" : "text-amber-800", borderClass: result.savingPercent > 10 ? "border-emerald-200" : "border-amber-200", dotClass: result.savingPercent > 10 ? "bg-emerald-500" : "bg-amber-500" },
-          { label: "Tie Spacing", value: `${result.tieSpacing.hSpacing}m`, sub: `${result.tieSpacing.tiesPerM2} ties/m2 @ ${tieCapacity} kN`, bgClass: "bg-purple-50", textClass: "text-purple-800", borderClass: "border-purple-200", dotClass: "bg-purple-500" },
+          { label: "CIRIA R108 Max", value: `${result.maxPressureCIRIA} kN/m²`, sub: `Effective head: ${result.effectiveHead}m`, bgClass: "bg-blue-50", textClass: "text-blue-800", borderClass: "border-blue-200", dotClass: "bg-blue-500" },
+          { label: "DIN 18218 Max", value: `${result.maxPressureDIN} kN/m²`, sub: `Class ${consistencyClass}, K1 = ${result.k1}`, bgClass: "bg-orange-50", textClass: "text-orange-800", borderClass: "border-orange-200", dotClass: "bg-orange-500" },
+          { label: "Saving vs Hydrostatic", value: `${result.savingPercent}%`, sub: `Hydrostatic: ${result.maxPressureHydro} kN/m²`, bgClass: result.savingPercent > 10 ? "bg-emerald-50" : "bg-amber-50", textClass: result.savingPercent > 10 ? "text-emerald-800" : "text-amber-800", borderClass: result.savingPercent > 10 ? "border-emerald-200" : "border-amber-200", dotClass: result.savingPercent > 10 ? "bg-emerald-500" : "bg-amber-500" },
+          { label: "Tie Spacing", value: `${result.tieSpacing.hSpacing}m${result.tieSpacing.capped ? "*" : ""}`, sub: `${result.tieSpacing.tiesPerM2} ties/m² @ ${tieCapacity} kN${result.tieSpacing.capped ? " (capped)" : ""}`, bgClass: "bg-purple-50", textClass: "text-purple-800", borderClass: "border-purple-200", dotClass: "bg-purple-500" },
         ].map(c => (
           <div key={c.label} className={`border rounded-xl p-4 ${c.bgClass} ${c.borderClass}`}>
             <div className="flex items-center gap-2 mb-2"><span className={`w-2.5 h-2.5 rounded-full ${c.dotClass}`} /><span className={`text-[11px] font-bold uppercase tracking-wide ${c.textClass}`}>{c.label}</span></div>
@@ -343,35 +353,37 @@ export default function FormworkPressureCalculatorClient() {
       <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-4">
         <h3 className="text-sm font-bold text-gray-700">Pour Parameters</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Pour Rate (m/hr)</label>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Pour Rate (m/h)</label>
             <input type="number" value={pourRate} onChange={e => setPourRate(Math.max(0.1, parseFloat(e.target.value) || 1))} step={0.5} min={0.1} max={10}
               className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Concrete Temperature (C)</label>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Concrete Temperature (°C)</label>
             <input type="number" value={temperature} onChange={e => setTemperature(Math.max(0, parseInt(e.target.value) || 15))} min={0} max={40}
               className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Total Pour Height (m)</label>
             <input type="number" value={headHeight} onChange={e => setHeadHeight(Math.max(0.5, parseFloat(e.target.value) || 3))} step={0.5} min={0.5} max={20}
               className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Concrete Type</label>
-            <select value={concreteType} onChange={e => setConcreteType(e.target.value as ConcreteType)}
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Section Type (CIRIA C1)</label>
+            <select value={sectionType} onChange={e => setSectionType(e.target.value as SectionType)}
               className="w-full px-2.5 py-1.5 text-sm border border-ebrora/30 bg-ebrora-light/40 rounded-lg focus:border-ebrora outline-none">
-              {CONCRETE_TYPES.map(c => <option key={c.type} value={c.type}>{c.label}</option>)}
+              {SECTION_TYPES.map(s => <option key={s.type} value={s.type}>{s.label} (C1 = {s.c1.toFixed(1)})</option>)}
             </select></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Formwork Finish</label>
-            <select value={formworkFinish} onChange={e => setFormworkFinish(e.target.value as FormworkFinish)}
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Cement / Admixture (CIRIA C2)</label>
+            <select value={cementClass} onChange={e => setCementClass(e.target.value as CementClass)}
               className="w-full px-2.5 py-1.5 text-sm border border-ebrora/30 bg-ebrora-light/40 rounded-lg focus:border-ebrora outline-none">
-              {FORMWORK_FINISHES.map(f => <option key={f.finish} value={f.finish}>{f.label}</option>)}
+              {CEMENT_CLASSES.map(c => <option key={c.type} value={c.type}>{c.label} (C2 = {c.c2.toFixed(2)})</option>)}
             </select></div>
-          <div className="flex flex-col gap-2">
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Options</label>
-            <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-              <button onClick={() => setVibrated(!vibrated)} className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors ${vibrated ? "bg-ebrora" : "bg-gray-300"}`}>
-                <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${vibrated ? "translate-x-4" : "translate-x-0.5"}`} />
-              </button>Vibrated
-            </label>
-            <div><label className="block text-[10px] text-gray-400 mb-1">Tie Capacity (kN)</label>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Consistency (DIN 18218)</label>
+            <select value={consistencyClass} onChange={e => setConsistencyClass(e.target.value as ConsistencyClass)}
+              className="w-full px-2.5 py-1.5 text-sm border border-ebrora/30 bg-ebrora-light/40 rounded-lg focus:border-ebrora outline-none">
+              {CONSISTENCY_CLASSES.map(c => <option key={c.type} value={c.type}>{c.label}</option>)}
+            </select></div>
+          <div className="sm:col-span-2 lg:col-span-3 flex items-end gap-3 flex-wrap">
+            <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Tie Capacity (kN)</label>
               <input type="number" value={tieCapacity} onChange={e => setTieCapacity(Math.max(10, parseInt(e.target.value) || 90))} min={10} max={200}
-                className="w-20 px-2 py-1 text-xs border border-gray-200 rounded-lg bg-blue-50/40 focus:border-ebrora outline-none" /></div>
+                className="w-24 px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
+            <div className="text-[11px] text-gray-500 leading-snug max-w-md">
+              Derived: K = {result.k.toFixed(2)} (CIRIA temperature factor) | tE ≈ {result.tE.toFixed(1)} h (DIN end-of-setting estimate from temperature + cement) | K1 = {result.k1.toFixed(2)} (DIN setting factor)
+            </div>
           </div>
         </div>
       </div>
@@ -379,21 +391,21 @@ export default function FormworkPressureCalculatorClient() {
       {/* Pressure Profile Chart */}
       <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
         <h3 className="text-sm font-bold text-gray-700">Lateral Pressure vs Depth</h3>
-        <p className="text-[11px] text-gray-400">Blue = CIRIA R108 bilinear envelope. Orange dashed = DIN 18218. Grey dashed = full hydrostatic. Green shaded area = saving.</p>
+        <p className="text-[11px] text-gray-400">Blue = CIRIA R108 envelope. Orange dashed = DIN 18218:2010 (class {consistencyClass}). Grey dashed = full hydrostatic. Green shaded area = saving.</p>
         <PressureProfileChart profile={result.pressureProfile} maxCIRIA={result.maxPressureCIRIA} maxHydro={result.maxPressureHydro} maxDIN={result.maxPressureDIN} />
       </div>
 
       {/* Sensitivity Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
-          <h3 className="text-sm font-bold text-gray-700">Pour Rate Sensitivity</h3>
-          <p className="text-[11px] text-gray-400">How max pressure changes with pour rate at {temperature}C</p>
-          <SensitivityChart data={result.pourRateSensitivity.map(d => ({ x: d.rate, y: d.pressure }))} xLabel="Pour Rate (m/hr)" yLabel="kN/m2" colour="#3B82F6" />
+          <h3 className="text-sm font-bold text-gray-700">Pour Rate Sensitivity (CIRIA)</h3>
+          <p className="text-[11px] text-gray-400">How max pressure changes with pour rate at {temperature}°C</p>
+          <SensitivityChart data={result.pourRateSensitivity.map(d => ({ x: d.rate, y: d.pressure }))} xLabel="Pour Rate (m/h)" yLabel="kN/m²" colour="#3B82F6" />
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
-          <h3 className="text-sm font-bold text-gray-700">Temperature Sensitivity</h3>
-          <p className="text-[11px] text-gray-400">How max pressure changes with temperature at {pourRate} m/hr</p>
-          <SensitivityChart data={result.tempSensitivity.map(d => ({ x: d.temp, y: d.pressure }))} xLabel="Temperature (C)" yLabel="kN/m2" colour="#F97316" />
+          <h3 className="text-sm font-bold text-gray-700">Temperature Sensitivity (CIRIA)</h3>
+          <p className="text-[11px] text-gray-400">How max pressure changes with temperature at {pourRate} m/h</p>
+          <SensitivityChart data={result.tempSensitivity.map(d => ({ x: d.temp, y: d.pressure }))} xLabel="Temperature (°C)" yLabel="kN/m²" colour="#F97316" />
         </div>
       </div>
 
@@ -403,9 +415,12 @@ export default function FormworkPressureCalculatorClient() {
         <div className="grid grid-cols-3 gap-4 text-center">
           <div className="bg-gray-50 rounded-lg p-3"><div className="text-[11px] font-semibold text-gray-500 uppercase">Horizontal</div><div className="text-lg font-bold text-gray-800">{result.tieSpacing.hSpacing}m</div></div>
           <div className="bg-gray-50 rounded-lg p-3"><div className="text-[11px] font-semibold text-gray-500 uppercase">Vertical</div><div className="text-lg font-bold text-gray-800">{result.tieSpacing.vSpacing}m</div></div>
-          <div className="bg-gray-50 rounded-lg p-3"><div className="text-[11px] font-semibold text-gray-500 uppercase">Ties/m2</div><div className="text-lg font-bold text-gray-800">{result.tieSpacing.tiesPerM2}</div></div>
+          <div className="bg-gray-50 rounded-lg p-3"><div className="text-[11px] font-semibold text-gray-500 uppercase">Ties/m²</div><div className="text-lg font-bold text-gray-800">{result.tieSpacing.tiesPerM2}</div></div>
         </div>
-        <p className="text-[11px] text-gray-400">Based on {tieCapacity} kN tie capacity against {result.maxPressureCIRIA} kN/m2 max pressure (CIRIA R108).</p>
+        <p className="text-[11px] text-gray-400">
+          Based on {tieCapacity} kN tie capacity against {result.maxPressureCIRIA} kN/m² max pressure (CIRIA R108).
+          {result.tieSpacing.capped && <span className="text-amber-600 font-medium"> Spacing capped at 0.9 m maximum practical centres.</span>}
+        </p>
       </div>
 
       {/* Recommendations */}
@@ -419,8 +434,8 @@ export default function FormworkPressureCalculatorClient() {
       {/* Footer */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-          Based on CIRIA Report 108 (Concrete pressure on formwork) and DIN 18218:2010 for comparison.
-          This is a screening tool - it does not replace a structural design calculation by a competent temporary works engineer.
+          Based on CIRIA Report 108 (1985) and DIN 18218:2010 for placement from above with internal vibration.
+          This is a screening tool — it does not replace a structural design calculation by a competent temporary works engineer.
         </p>
       </div>
     </div>
