@@ -70,7 +70,7 @@ async function exportPDF(
   doc.setFillColor(232, 240, 236); doc.setDrawColor(27, 87, 69);
   doc.roundedRect(M, y, CW, 12, 1, 1, "FD");
   doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(27, 87, 69);
-  doc.text(`Topsoil Grade: ${grade.name} (${grade.standard})`, M + 4, y + 5);
+  doc.text(`Classification: ${grade.name} (${grade.standard})`, M + 4, y + 5);
   doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.setTextColor(0, 0, 0);
   doc.text(`Density: ${grade.densityLow}-${grade.densityHigh} t/m3 (mid ${grade.densityMid}) | Settlement: ${settings.settlementPercent}%`, M + 4, y + 10);
   y += 17;
@@ -130,7 +130,7 @@ async function exportPDF(
   // BS 3882 grade reference
   checkPage(35);
   doc.setFontSize(9); doc.setFont("helvetica", "bold");
-  doc.text("BS 3882:2015 Topsoil Grade Specifications", M, y); y += 5;
+  doc.text("BS 3882:2015 Topsoil Classification", M, y); y += 5;
 
   const gCols = [32, 35, 32, 87];
   doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
@@ -344,7 +344,7 @@ export default function TopsoilCalculatorClient() {
 
       {/* Grade selector */}
       <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Topsoil Grade (BS 3882:2015)</label>
+        <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Topsoil Classification (BS 3882:2015)</label>
         <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
           {TOPSOIL_GRADES.map(g => (
             <button key={g.id} onClick={() => setGradeId(g.id)} className={`text-left px-3 py-2.5 rounded-lg border transition-colors ${gradeId === g.id ? "bg-ebrora-light border-ebrora/30" : "bg-gray-50 border-gray-200 hover:border-gray-300"}`}>
@@ -464,7 +464,7 @@ export default function TopsoilCalculatorClient() {
       <details className="bg-white border border-gray-200 rounded-xl overflow-hidden group">
         <summary className="px-4 py-3 cursor-pointer text-sm font-bold text-gray-900 flex items-center gap-1.5 select-none">
           <svg className="w-3.5 h-3.5 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-          BS 3882:2015 Grade Specifications
+          BS 3882:2015 Classification
         </summary>
         <div className="px-4 pb-4 space-y-2">
           {TOPSOIL_GRADES.map(g => (
@@ -480,7 +480,7 @@ export default function TopsoilCalculatorClient() {
 
       {/* Footer */}
       <div className="text-[11px] text-gray-400 leading-relaxed px-1 space-y-1">
-        <p>Topsoil grades per BS 3882:2015 (Specification for topsoil). Soil handling per Defra Construction Code of Practice for the Sustainable Use of Soils on Construction Sites (2009). Densities are typical loose-tipped values and vary with moisture content, compaction, and organic matter.</p>
+        <p>Topsoil classification per BS 3882:2015 (Specification for topsoil). Soil handling per Defra Construction Code of Practice for the Sustainable Use of Soils on Construction Sites (2009). Densities are typical loose-tipped values and vary with moisture content, compaction, and organic matter.</p>
         <p>Settlement factor accounts for consolidation after placement. Actual settlement depends on placement method, moisture, and compaction. Costs are indicative - obtain supplier quotations. This tool provides volume and tonnage estimates. A soils specialist should verify grade suitability for the intended use.</p>
       </div>
     </div>
