@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import type { TrenchRow, TrenchZoneResult } from "@/data/trench-backfill-calculator";
-import { BACKFILL_MATERIALS, createEmptyTrenchRow, calculateTrenchZones, DEFAULT_BEDDING_DEPTH_MM, DEFAULT_SIDEFILL_ABOVE_CROWN_MM } from "@/data/trench-backfill-calculator";
+import { BACKFILL_MATERIALS, createEmptyTrenchRow, calculateTrenchZones, DEFAULT_BEDDING_DEPTH_MM, DEFAULT_SIDEFILL_ABOVE_CROWN_MM, DEFAULT_EXCAVATED_DENSITY_T_PER_M3 } from "@/data/trench-backfill-calculator";
 import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 
 function fmtNum(v: number, dp = 2): string { if (!Number.isFinite(v) || v === 0) return "—"; return v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
@@ -22,7 +22,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.setFont("helvetica", "bold");
   doc.text("TRENCH BACKFILL & PIPE BEDDING CALCULATION", M, 11);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text(`Ref: ${docRef} | Rev 0 | Per HAUC/SROH — ${new Date().toLocaleDateString("en-GB")}`, M, 18);
+  doc.text(`Ref: ${docRef} | Rev 0 | Per BS EN 1610 — ${new Date().toLocaleDateString("en-GB")}`, M, 18);
   y = 30; doc.setTextColor(0, 0, 0);
 
   doc.setFillColor(248, 248, 248); doc.setDrawColor(220, 220, 220);
@@ -140,7 +140,7 @@ async function exportPDF(
 
   const pc = doc.getNumberOfPages();
   for (let p = 1; p <= pc; p++) { doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Zone depths per HAUC/SROH. Verify with project specification. Densities are typical UK values.", M, 290);
+    doc.text("Zone depths per BS EN 1610. Verify with project specification. Densities are typical UK values.", M, 290);
     doc.text(`Ref: ${docRef} | Page ${p} of ${pc}`, W - M - 50, 290);
   }
   doc.save(`trench-backfill-${todayISO()}.pdf`);
@@ -269,6 +269,12 @@ export default function TrenchBackfillClient() {
                     onChange={e => updateRow(row.id, { overrideSideFillHeight: e.target.value === "" ? null : parseFloat(e.target.value) })}
                     className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:border-ebrora outline-none tabular-nums" />
                 </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Excavated Density (t/m³)</label>
+                  <input type="number" step={0.05} min={0.5} max={3} value={row.overrideExcavatedDensity ?? ""} placeholder={String(DEFAULT_EXCAVATED_DENSITY_T_PER_M3)}
+                    onChange={e => updateRow(row.id, { overrideExcavatedDensity: e.target.value === "" ? null : parseFloat(e.target.value) })}
+                    className="w-full px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:border-ebrora outline-none tabular-nums" />
+                </div>
                 <div className="flex items-center gap-2 pt-5">
                   <input type="checkbox" checked={row.backfillReuse} onChange={e => updateRow(row.id, { backfillReuse: e.target.checked })}
                     className="w-4 h-4 rounded border-gray-300 text-ebrora focus:ring-ebrora" />
@@ -306,7 +312,7 @@ export default function TrenchBackfillClient() {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>Add Trench Run</button>
 
       <div className="pt-4 border-t border-gray-100"><p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-        Zone depths per HAUC/SROH specification. Bedding default: {DEFAULT_BEDDING_DEPTH_MM}mm below invert. Side fill default: {DEFAULT_SIDEFILL_ABOVE_CROWN_MM}mm above pipe crown. All dimensions and material densities overridable. White-label PDF.</p></div>
+        Zone depths per BS EN 1610 (Construction and testing of drains and sewers). Bedding default: {DEFAULT_BEDDING_DEPTH_MM}mm below invert. Side fill default: {DEFAULT_SIDEFILL_ABOVE_CROWN_MM}mm above pipe crown. All dimensions and material densities overridable. White-label PDF.</p></div>
     </div>
   );
 }
