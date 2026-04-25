@@ -5,7 +5,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Sunrise & Sunset Times — 12 UK Cities | Free Construction Tool | Ebrora",
-  description: "Calculate sunrise, sunset, civil twilight, and recommended working hours for 12 major UK cities. Day, week, and month views with NOAA solar algorithm. CDM 2015 Reg 34 compliant. Free professional PDF export.",
+  description: "Calculate sunrise, sunset, civil twilight, and recommended working hours for 12 major UK cities. Day, week, and month views with NOAA solar algorithm. CDM 2015 Reg 35 compliant. Free professional PDF export.",
   alternates: { canonical: "https://www.ebrora.com/tools/sunrise-sunset-times" },
   openGraph: { title: "Sunrise & Sunset Times — 12 UK Cities | Ebrora", description: "Calculate sunrise, sunset, civil twilight, and recommended construction working hours for 12 major UK cities. Free professional PDF export.", url: "https://www.ebrora.com/tools/sunrise-sunset-times", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
 };
@@ -37,7 +37,7 @@ export default function SunriseSunsetTimesPage() {
             <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">Free</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Sunrise & Sunset Times</h1>
-          <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">Calculate sunrise, sunset, civil twilight, and recommended working hours for 12 major UK cities. Day, week, and month views with professional PDF export. CDM 2015 Reg 34 compliant.</p>
+          <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">Calculate sunrise, sunset, civil twilight, and recommended working hours for 12 major UK cities. Day, week, and month views with professional PDF export. CDM 2015 Reg 35 compliant.</p>
         </div>
         <SunriseSunsetTimesClient />
       </div>
