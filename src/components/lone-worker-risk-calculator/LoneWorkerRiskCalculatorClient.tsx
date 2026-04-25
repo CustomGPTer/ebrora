@@ -135,7 +135,7 @@ async function exportPDF(
   doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("LONE WORKER RISK SCORE ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("HSE INDG73 / BS 8484:2016 / Confined Spaces Regulations 1997", M, 19);
+  doc.text("HSE INDG73 / BS 8484:2022 / Confined Spaces Regulations 1997", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34;
@@ -165,7 +165,7 @@ async function exportPDF(
 
   // ── Scope
   doc.setFontSize(7); doc.setFont("helvetica", "italic"); doc.setTextColor(80, 80, 80);
-  const scopeText = `Lone worker risk assessment for ${header.site || "the above site"} as at ${header.date || new Date().toLocaleDateString("en-GB")}. Scoring methodology based on HSE INDG73 guidance with multiplicative risk model. Lone worker device requirements per BS 8484:2016.`;
+  const scopeText = `Lone worker risk assessment for ${header.site || "the above site"} as at ${header.date || new Date().toLocaleDateString("en-GB")}. Scoring methodology based on HSE INDG73 guidance with multiplicative risk model. Lone worker device requirements per BS 8484:2022.`;
   const scopeLines = doc.splitTextToSize(scopeText, CW);
   doc.text(scopeLines, M, y);
   y += scopeLines.length * 3 + 3;
@@ -296,7 +296,7 @@ async function exportPDF(
     doc.setPage(p);
     doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
     doc.text(
-      "Lone worker risk assessment per HSE INDG73 and BS 8484:2016. Multiplicative scoring model. This is a screening tool -- it does not replace a formal risk assessment.",
+      "Lone worker risk assessment per HSE INDG73 and BS 8484:2022. Multiplicative scoring model. This is a screening tool -- it does not replace a formal risk assessment.",
       M, 290
     );
     doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 290);
@@ -552,7 +552,7 @@ export default function LoneWorkerRiskCalculatorClient() {
       {/* ── Footer ──────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-          Based on HSE INDG73 (Working alone: Health and safety guidance on the risks of lone working) and BS 8484:2016
+          Based on HSE INDG73 (Working alone: Health and safety guidance on the risks of lone working) and BS 8484:2022
           (Code of practice for the provision of lone worker services). Multiplicative scoring model reflects the
           compounding nature of risk factors. This is a screening tool - it does not replace a formal risk assessment.
         </p>
