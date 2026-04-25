@@ -210,12 +210,12 @@ export const HIERARCHY_OPTIONS: HierarchyOption[] = [
     shortName: "Tower",
     category: "working-platform",
     description: "Prefabricated mobile aluminium tower with guardrails, outriggers/stabilisers, and a platform. Quick to erect, relocatable, good for medium-duration work.",
-    regulation: "BS EN 1004 / PASMA / WAH Reg 8",
+    regulation: "BS EN 1004-1:2020 / PASMA / WAH Reg 8",
     question: "Can a mobile aluminium tower (PASMA-trained assembly) be erected and used for this task?",
     noReasons: [
       { id: "tower-1", label: "Task area inaccessible to tower base footprint (too tight, obstructed)" },
       { id: "tower-2", label: "Floor loading insufficient for tower weight + load class" },
-      { id: "tower-3", label: "Height required exceeds mobile tower range (>12m outdoor / >8m indoor standard)" },
+      { id: "tower-3", label: "Height required exceeds mobile tower range (>12m indoor / >8m outdoor standard)" },
       { id: "tower-4", label: "Tower components cannot be moved to work area (doorway/lift too small)" },
       { id: "tower-5", label: "No PASMA-trained operative available on site for assembly/dismantle" },
     ],
@@ -324,7 +324,7 @@ export const HIERARCHY_OPTIONS: HierarchyOption[] = [
     shortName: "Stepladder",
     category: "ladder",
     description: "Free-standing A-frame ladder with flat steps. Must be Class 1 (Industrial) or BS EN 131 Professional for construction use. Max 30 min short-duration use.",
-    regulation: "BS EN 131 Professional / Ladder Association / HSE INDG455",
+    regulation: "BS EN 131 Professional / LA455 (Ladder Association)",
     question: "Is a stepladder the most suitable option? (Only use if ALL safer options have been rejected)",
     noReasons: [
       { id: "stepladder-1", label: "Height required exceeds stepladder range (Class 1 / EN 131 Pro: ~3m platform max)" },
@@ -367,7 +367,7 @@ export const HIERARCHY_OPTIONS: HierarchyOption[] = [
     shortName: "Leaning Ladder",
     category: "ladder",
     description: "Leaning ladder used for access or short-duration work at height. Must be Class 1 (Industrial) or BS EN 131 Professional. Max 30 min short-duration. Requires 1:4 angle, 1m overhang, and footing/tying.",
-    regulation: "BS EN 131 Professional / Ladder Association / HSE INDG455",
+    regulation: "BS EN 131 Professional / LA455 (Ladder Association)",
     question: "Is a leaning ladder the ONLY viable option? (Highest-risk access method -- only if all other options are impossible)",
     noReasons: [
       { id: "leaning-1", label: "No suitable structure to lean ladder against" },

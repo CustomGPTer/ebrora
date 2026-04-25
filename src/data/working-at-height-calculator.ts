@@ -1,6 +1,6 @@
 // src/data/working-at-height-calculator.ts
 // Working at Height Risk Score Calculator
-// WAHR 2005, CDM 2015 Schedule 3, BS 8437, INDG401, HSE GEIS6, HSE INDG367, HSE INDG455
+// WAHR 2005, CDM 2015 Schedule 3, BS 8437, INDG401, HSE GEIS6, HSE INDG367, LA455
 
 // ─── Task Types ─────────────────────────────────────────────────
 export type TaskType =

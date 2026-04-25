@@ -1,5 +1,5 @@
 // src/data/lone-worker-risk-calculator.ts
-// Lone Worker Risk Score Calculator — INDG73 + BS 8484, multiplicative scoring
+// Lone Worker Risk Score Calculator — INDG73 + BS 8484:2022, multiplicative scoring
 
 // ─── Types ──────────────────────────────────────────────────────
 export type RiskBand = "low" | "medium" | "high" | "unacceptable";
@@ -237,7 +237,7 @@ export function whatIfScore(
   };
 }
 
-// ─── Recommendations (INDG73 + BS 8484) ─────────────────────
+// ─── Recommendations (INDG73 + BS 8484:2022) ─────────────────────
 function getRecommendations(band: RiskBand, selections: Record<string, number>, score: number): string[] {
   const recs: string[] = [];
 
@@ -253,7 +253,7 @@ function getRecommendations(band: RiskBand, selections: Record<string, number>, 
     recs.push("Implement regular check-in calls -- every 2 hours minimum");
     recs.push("Carry a charged mobile phone and a portable power bank");
     recs.push("Supervisor to be briefed on the lone working activity before it starts");
-    recs.push("Consider a BS 8484 compliant lone worker monitoring device for enhanced protection");
+    recs.push("Consider a BS 8484:2022 compliant lone worker monitoring device for enhanced protection");
     if (selections.communication >= 3) {
       recs.push("Communication is limited -- carry a satellite communicator or PLB (Personal Locator Beacon) as backup");
     }
@@ -261,7 +261,7 @@ function getRecommendations(band: RiskBand, selections: Record<string, number>, 
 
   if (band === "high") {
     recs.push("15-minute welfare check-in intervals with a named supervisor");
-    recs.push("GPS tracking device mandatory -- consider a BS 8484:2016 compliant lone worker device with automatic man-down detection");
+    recs.push("GPS tracking device mandatory -- consider a BS 8484:2022 compliant lone worker device with automatic man-down detection");
     recs.push("Site-specific emergency procedure documented and briefed to the operative");
     recs.push("Site manager to be informed of exact location and task before starting");
     recs.push("Dynamic risk assessment to be completed by the operative on arrival");
