@@ -39,18 +39,20 @@ export function getFuelRate(machine: PlantMachine, duty: DutyCycle): number {
   }
 }
 
-// UK Gov GHG Conversion Factors 2024 — diesel (average biofuel blend)
+// UK Gov GHG Conversion Factors 2024 (Scope 1 / direct combustion, fossil CO₂ only).
+// Both diesel and HVO factors are on the same basis ("in-scope") so the comparison is consistent.
+// Users wanting WTW totals (Scope 1+3, lifecycle) should refer to GOV.UK: diesel ≈ 3.13, HVO ≈ 0.50 kgCO₂e/L.
 export const FUEL_CARBON_FACTORS: Record<string, number> = {
-  'Diesel': 2.68, // kgCO₂e per litre
+  'Diesel': 2.68, // 100% mineral diesel direct combustion (2024 GOV.UK = 2.66; rounded)
   'Electric': 0,
   'Diesel (Hybrid)': 2.68,
-  'HVO': 0.195, // Hydrotreated Vegetable Oil (renewable diesel)
+  'HVO': 0.036, // Biodiesel HVO direct combustion, in-scope (2024 GOV.UK)
 };
 
 export const DEFAULT_FUEL_PRICE = 1.30; // £/litre diesel (UK approx 2025)
 
 
-export const EQUIPMENT_TYPES: string[] = ["Air Compressor", "Backhoe Loader", "Compressor", "Compressor / Generator", "Dozer", "Dumper - Articulated", "Dumper - Mini", "Dumper - Site", "Dumper - Site 4WD", "Dumper - Site Swivel Skip 4WD", "Dumper - Tracked", "Excavator - Large", "Excavator - Medium", "Excavator - Midi", "Excavator - Mini", "Excavator - Tracked", "Excavator - Wheeled", "Forklift", "Generator", "Heater - Direct", "Heater - Indirect", "Hydraulic Power Pack", "Lighting Tower", "MEWP - Boom Lift", "MEWP - MEWP - Boom Lift (Articulating)", "MEWP - MEWP - Boom Lift (Telescopic)", "MEWP - MEWP - Boom Lift (Tracked)", "MEWP - Scissor Lift", "MEWP - Truck Mount", "MEWP - Van Mount", "Mini Crane", "Motor Grader", "Power Float", "Pressure Washer", "Pump - Chopper", "Pump - Drainer", "Pump - High Head", "Pump - Hydraulic Submersible", "Pump - Positive Displacement", "Pump - Solids Handling", "Roller - Pedestrian", "Roller - Tandem", "Roller - Tandem Ride On", "Roller - Trench", "Roller - Vibratory", "Roller - Vibratory (Single Drum)", "Skid Steer Loader", "Telehandler", "Telehandler - Rotary", "Track Loader", "Vibratory Plate", "Welder Generator", "Wheel Loader"];
+export const EQUIPMENT_TYPES: string[] = ["Air Compressor", "Backhoe Loader", "Compressor", "Compressor / Generator", "Dozer", "Dumper - Articulated", "Dumper - Mini", "Dumper - Site", "Dumper - Site 4WD", "Dumper - Site Swivel Skip 4WD", "Dumper - Tracked", "Excavator - Large", "Excavator - Medium", "Excavator - Midi", "Excavator - Mini", "Excavator - Tracked", "Excavator - Wheeled", "Forklift", "Generator", "Heater - Direct", "Heater - Indirect", "Hydraulic Power Pack", "Lighting Tower", "MEWP - Boom Lift", "MEWP - Boom Lift (Articulating)", "MEWP - Boom Lift (Telescopic)", "MEWP - Boom Lift (Tracked)", "MEWP - Scissor Lift", "MEWP - Truck Mount", "MEWP - Van Mount", "Mini Crane", "Motor Grader", "Power Float", "Pressure Washer", "Pump - Chopper", "Pump - Drainer", "Pump - High Head", "Pump - Hydraulic Submersible", "Pump - Positive Displacement", "Pump - Solids Handling", "Roller - Pedestrian", "Roller - Tandem", "Roller - Tandem Ride On", "Roller - Trench", "Roller - Vibratory", "Roller - Vibratory (Single Drum)", "Skid Steer Loader", "Telehandler", "Telehandler - Rotary", "Track Loader", "Vibratory Plate", "Welder Generator", "Wheel Loader"];
 
 export const PLANT_DATABASE: PlantMachine[] = [
   {id:1,make:"Wacker Neuson",model:"803",type:"Excavator - Mini",size:1.0,engineKw:9.9,fuel100:2.7,fuel75:2.1,fuel50:1.5,fuel25:0.9,idle:0.6,fuelType:"Diesel",emissionStage:"Stage V"},
@@ -295,12 +297,12 @@ export const PLANT_DATABASE: PlantMachine[] = [
   {id:259,make:"Bobcat",model:"S450",type:"Skid Steer Loader",size:1.3,engineKw:36.0,fuel100:9.0,fuel75:7.0,fuel50:5.0,fuel25:3.2,idle:1.0,fuelType:"Diesel",emissionStage:"Tier 4"},
   {id:260,make:"Caterpillar",model:"226D",type:"Skid Steer Loader",size:2.0,engineKw:50.0,fuel100:12.5,fuel75:9.8,fuel50:6.9,fuel25:4.4,idle:1.2,fuelType:"Diesel",emissionStage:"Tier 4 Final"},
   {id:261,make:"Bobcat",model:"S650",type:"Skid Steer Loader",size:3.0,engineKw:55.0,fuel100:13.8,fuel75:10.8,fuel50:7.6,fuel25:4.8,idle:1.5,fuelType:"Diesel",emissionStage:"Tier 4"},
-  {id:262,make:"JLG",model:"450AJ",type:"MEWP - MEWP - Boom Lift (Articulating)",size:15.8,engineKw:36.5,fuel100:9.1,fuel75:7.1,fuel50:5.0,fuel25:3.2,idle:1.5,fuelType:"Diesel",emissionStage:"Tier 4 Final"},
-  {id:263,make:"Genie",model:"Z62/40",type:"MEWP - MEWP - Boom Lift (Articulating)",size:20.9,engineKw:36.0,fuel100:9.0,fuel75:7.0,fuel50:4.9,fuel25:3.1,idle:1.5,fuelType:"Diesel",emissionStage:"Stage IIIA"},
-  {id:264,make:"JLG",model:"800AJ",type:"MEWP - MEWP - Boom Lift (Articulating)",size:26.5,engineKw:74.0,fuel100:18.5,fuel75:14.4,fuel50:10.2,fuel25:6.5,idle:2.5,fuelType:"Diesel",emissionStage:"Stage IIIA"},
-  {id:265,make:"JLG",model:"600AJ",type:"MEWP - MEWP - Boom Lift (Articulating)",size:20.5,engineKw:36.4,fuel100:9.1,fuel75:7.1,fuel50:5.0,fuel25:3.2,idle:1.5,fuelType:"Diesel",emissionStage:"Tier 4 Final"},
-  {id:266,make:"Genie",model:"Z-60/34",type:"MEWP - MEWP - Boom Lift (Articulating)",size:20.4,engineKw:36.0,fuel100:9.0,fuel75:7.0,fuel50:4.9,fuel25:3.1,idle:1.5,fuelType:"Diesel",emissionStage:"Stage IIIA"},
-  {id:267,make:"JLG",model:"860SJ",type:"MEWP - MEWP - Boom Lift (Telescopic)",size:25.5,engineKw:74.0,fuel100:18.5,fuel75:14.4,fuel50:10.2,fuel25:6.5,idle:2.5,fuelType:"Diesel",emissionStage:"Tier 4 Final"},
+  {id:262,make:"JLG",model:"450AJ",type:"MEWP - Boom Lift (Articulating)",size:15.8,engineKw:36.5,fuel100:9.1,fuel75:7.1,fuel50:5.0,fuel25:3.2,idle:1.5,fuelType:"Diesel",emissionStage:"Tier 4 Final"},
+  {id:263,make:"Genie",model:"Z62/40",type:"MEWP - Boom Lift (Articulating)",size:20.9,engineKw:36.0,fuel100:9.0,fuel75:7.0,fuel50:4.9,fuel25:3.1,idle:1.5,fuelType:"Diesel",emissionStage:"Stage IIIA"},
+  {id:264,make:"JLG",model:"800AJ",type:"MEWP - Boom Lift (Articulating)",size:26.5,engineKw:74.0,fuel100:18.5,fuel75:14.4,fuel50:10.2,fuel25:6.5,idle:2.5,fuelType:"Diesel",emissionStage:"Stage IIIA"},
+  {id:265,make:"JLG",model:"600AJ",type:"MEWP - Boom Lift (Articulating)",size:20.5,engineKw:36.4,fuel100:9.1,fuel75:7.1,fuel50:5.0,fuel25:3.2,idle:1.5,fuelType:"Diesel",emissionStage:"Tier 4 Final"},
+  {id:266,make:"Genie",model:"Z-60/34",type:"MEWP - Boom Lift (Articulating)",size:20.4,engineKw:36.0,fuel100:9.0,fuel75:7.0,fuel50:4.9,fuel25:3.1,idle:1.5,fuelType:"Diesel",emissionStage:"Stage IIIA"},
+  {id:267,make:"JLG",model:"860SJ",type:"MEWP - Boom Lift (Telescopic)",size:25.5,engineKw:74.0,fuel100:18.5,fuel75:14.4,fuel50:10.2,fuel25:6.5,idle:2.5,fuelType:"Diesel",emissionStage:"Tier 4 Final"},
   {id:268,make:"Sunbelt",model:"6kVA",type:"Generator",size:6.0,engineKw:5.0,fuel100:1.3,fuel75:1.0,fuel50:0.7,fuel25:0.4,idle:0.5,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:269,make:"Sunbelt",model:"20kVA",type:"Generator",size:20.0,engineKw:16.0,fuel100:4.0,fuel75:3.1,fuel50:2.2,fuel25:1.4,idle:0.8,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:270,make:"Sunbelt",model:"30kVA",type:"Generator",size:30.0,engineKw:24.0,fuel100:6.0,fuel75:4.7,fuel50:3.3,fuel25:2.1,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
@@ -376,15 +378,15 @@ export const PLANT_DATABASE: PlantMachine[] = [
   {id:362,make:"Haulotte",model:"HA26 RTJ PRO",type:"MEWP - Boom Lift",size:26.4,engineKw:55.0,fuel100:14.4,fuel75:11.2,fuel50:7.9,fuel25:5.0,idle:1.5,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:363,make:"Haulotte",model:"HA32 RTJ PRO",type:"MEWP - Boom Lift",size:31.8,engineKw:74.0,fuel100:19.4,fuel75:15.1,fuel50:10.7,fuel25:6.8,idle:2.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:364,make:"Haulotte",model:"HA41 RTJ PRO",type:"MEWP - Boom Lift",size:41.6,engineKw:74.0,fuel100:19.4,fuel75:15.1,fuel50:10.7,fuel25:6.8,idle:2.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:365,make:"Niftylift",model:"HR12D",type:"MEWP - MEWP - Boom Lift (Tracked)",size:12.2,engineKw:21.0,fuel100:5.5,fuel75:4.3,fuel50:3.0,fuel25:1.9,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:366,make:"Niftylift",model:"HR15D",type:"MEWP - MEWP - Boom Lift (Tracked)",size:15.7,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:367,make:"Niftylift",model:"HR17D",type:"MEWP - MEWP - Boom Lift (Tracked)",size:17.2,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:368,make:"Niftylift",model:"HR21D",type:"MEWP - MEWP - Boom Lift (Tracked)",size:20.8,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:369,make:"Teupen",model:"Leo 18GT",type:"MEWP - MEWP - Boom Lift (Tracked)",size:18.3,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:370,make:"Teupen",model:"Leo 23GT",type:"MEWP - MEWP - Boom Lift (Tracked)",size:23.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:371,make:"Teupen",model:"Leo 31GT",type:"MEWP - MEWP - Boom Lift (Tracked)",size:31.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:372,make:"CTE",model:"TRACCESS 160",type:"MEWP - MEWP - Boom Lift (Tracked)",size:16.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:373,make:"CTE",model:"TRACCESS 230",type:"MEWP - MEWP - Boom Lift (Tracked)",size:23.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:365,make:"Niftylift",model:"HR12D",type:"MEWP - Boom Lift (Tracked)",size:12.2,engineKw:21.0,fuel100:5.5,fuel75:4.3,fuel50:3.0,fuel25:1.9,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:366,make:"Niftylift",model:"HR15D",type:"MEWP - Boom Lift (Tracked)",size:15.7,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:367,make:"Niftylift",model:"HR17D",type:"MEWP - Boom Lift (Tracked)",size:17.2,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:368,make:"Niftylift",model:"HR21D",type:"MEWP - Boom Lift (Tracked)",size:20.8,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:369,make:"Teupen",model:"Leo 18GT",type:"MEWP - Boom Lift (Tracked)",size:18.3,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:370,make:"Teupen",model:"Leo 23GT",type:"MEWP - Boom Lift (Tracked)",size:23.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:371,make:"Teupen",model:"Leo 31GT",type:"MEWP - Boom Lift (Tracked)",size:31.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:372,make:"CTE",model:"TRACCESS 160",type:"MEWP - Boom Lift (Tracked)",size:16.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:373,make:"CTE",model:"TRACCESS 230",type:"MEWP - Boom Lift (Tracked)",size:23.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:374,make:"Palfinger",model:"P200A",type:"MEWP - Truck Mount",size:20.0,engineKw:90.0,fuel100:23.6,fuel75:18.4,fuel50:13.0,fuel25:8.3,idle:2.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:375,make:"Palfinger",model:"P280",type:"MEWP - Truck Mount",size:28.0,engineKw:120.0,fuel100:31.5,fuel75:24.6,fuel50:17.3,fuel25:11.0,idle:3.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:376,make:"Palfinger",model:"P480",type:"MEWP - Truck Mount",size:48.0,engineKw:175.0,fuel100:45.9,fuel75:35.8,fuel50:25.2,fuel25:16.0,idle:4.0,fuelType:"Diesel",emissionStage:"Stage V"},
@@ -480,8 +482,8 @@ export const PLANT_DATABASE: PlantMachine[] = [
   {id:474,make:"CTE",model:"ZED 25",type:"MEWP - Truck Mount",size:25.0,engineKw:100.0,fuel100:26.3,fuel75:20.5,fuel50:14.4,fuel25:9.2,idle:2.5,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:475,make:"Ruthmann",model:"TBR 220",type:"MEWP - Truck Mount",size:22.0,engineKw:90.0,fuel100:23.6,fuel75:18.4,fuel50:13.0,fuel25:8.3,idle:2.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:476,make:"Bronto",model:"T61B",type:"MEWP - Truck Mount",size:61.0,engineKw:175.0,fuel100:45.9,fuel75:35.8,fuel50:25.2,fuel25:16.0,idle:4.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:477,make:"Niftylift",model:"HR28D",type:"MEWP - MEWP - Boom Lift (Tracked)",size:28.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:478,make:"Teupen",model:"Leo 15GT",type:"MEWP - MEWP - Boom Lift (Tracked)",size:15.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:477,make:"Niftylift",model:"HR28D",type:"MEWP - Boom Lift (Tracked)",size:28.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:478,make:"Teupen",model:"Leo 15GT",type:"MEWP - Boom Lift (Tracked)",size:15.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:479,make:"Haulotte",model:"HA12 CJ",type:"MEWP - Boom Lift",size:11.8,engineKw:21.0,fuel100:5.5,fuel75:4.3,fuel50:3.0,fuel25:1.9,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:480,make:"JLG",model:"M400AJP",type:"MEWP - Boom Lift",size:13.7,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:481,make:"Skyjack",model:"SJ60 AJ",type:"MEWP - Boom Lift",size:20.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
@@ -498,8 +500,8 @@ export const PLANT_DATABASE: PlantMachine[] = [
   {id:492,make:"Ruthmann",model:"TBR 260",type:"MEWP - Truck Mount",size:26.0,engineKw:100.0,fuel100:26.3,fuel75:20.5,fuel50:14.4,fuel25:9.2,idle:2.5,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:493,make:"Bronto",model:"T70B",type:"MEWP - Truck Mount",size:70.0,engineKw:200.0,fuel100:52.5,fuel75:41.0,fuel50:28.9,fuel25:18.4,idle:4.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:494,make:"CTE",model:"ZED 23.3 JH",type:"MEWP - Truck Mount",size:23.0,engineKw:100.0,fuel100:26.3,fuel75:20.5,fuel50:14.4,fuel25:9.2,idle:2.5,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:495,make:"Niftylift",model:"HR18D",type:"MEWP - MEWP - Boom Lift (Tracked)",size:18.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:496,make:"Teupen",model:"Leo 26GT",type:"MEWP - MEWP - Boom Lift (Tracked)",size:26.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:495,make:"Niftylift",model:"HR18D",type:"MEWP - Boom Lift (Tracked)",size:18.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:496,make:"Teupen",model:"Leo 26GT",type:"MEWP - Boom Lift (Tracked)",size:26.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:497,make:"Haulotte",model:"HA15 IP",type:"MEWP - Boom Lift",size:15.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:498,make:"Skyjack",model:"SJ46 AJ",type:"MEWP - Boom Lift",size:16.1,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:499,make:"Genie",model:"Z-33/18",type:"MEWP - Boom Lift",size:12.0,engineKw:21.0,fuel100:5.5,fuel75:4.3,fuel50:3.0,fuel25:1.9,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
@@ -518,8 +520,8 @@ export const PLANT_DATABASE: PlantMachine[] = [
   {id:512,make:"Ruthmann",model:"TBR 300",type:"MEWP - Truck Mount",size:30.0,engineKw:120.0,fuel100:31.5,fuel75:24.6,fuel50:17.3,fuel25:11.0,idle:3.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:513,make:"Bronto",model:"T28B",type:"MEWP - Truck Mount",size:28.0,engineKw:100.0,fuel100:26.3,fuel75:20.5,fuel50:14.4,fuel25:9.2,idle:2.5,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:514,make:"CTE",model:"ZED 20.2",type:"MEWP - Truck Mount",size:20.0,engineKw:90.0,fuel100:23.6,fuel75:18.4,fuel50:13.0,fuel25:8.3,idle:2.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:515,make:"Niftylift",model:"HR15 4x4",type:"MEWP - MEWP - Boom Lift (Tracked)",size:15.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:516,make:"Teupen",model:"Leo 21GT",type:"MEWP - MEWP - Boom Lift (Tracked)",size:21.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:515,make:"Niftylift",model:"HR15 4x4",type:"MEWP - Boom Lift (Tracked)",size:15.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:516,make:"Teupen",model:"Leo 21GT",type:"MEWP - Boom Lift (Tracked)",size:21.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:517,make:"Skyjack",model:"SJ30 AJE",type:"MEWP - Boom Lift",size:11.0,engineKw:21.0,fuel100:5.5,fuel75:4.3,fuel50:3.0,fuel25:1.9,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:519,make:"Haulotte",model:"HA18 SPX",type:"MEWP - Boom Lift",size:18.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:520,make:"Genie",model:"Z-30/20N RJ",type:"MEWP - Boom Lift",size:11.1,engineKw:21.0,fuel100:5.5,fuel75:4.3,fuel50:3.0,fuel25:1.9,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
@@ -534,8 +536,8 @@ export const PLANT_DATABASE: PlantMachine[] = [
   {id:532,make:"Ruthmann",model:"TBR 300",type:"MEWP - Truck Mount",size:30.0,engineKw:120.0,fuel100:31.5,fuel75:24.6,fuel50:17.3,fuel25:11.0,idle:3.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:533,make:"Bronto",model:"T28B",type:"MEWP - Truck Mount",size:28.0,engineKw:100.0,fuel100:26.3,fuel75:20.5,fuel50:14.4,fuel25:9.2,idle:2.5,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:534,make:"CTE",model:"ZED 20.2",type:"MEWP - Truck Mount",size:20.0,engineKw:90.0,fuel100:23.6,fuel75:18.4,fuel50:13.0,fuel25:8.3,idle:2.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:535,make:"Niftylift",model:"HR15 4x4",type:"MEWP - MEWP - Boom Lift (Tracked)",size:15.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
-  {id:536,make:"Teupen",model:"Leo 21GT",type:"MEWP - MEWP - Boom Lift (Tracked)",size:21.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:535,make:"Niftylift",model:"HR15 4x4",type:"MEWP - Boom Lift (Tracked)",size:15.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
+  {id:536,make:"Teupen",model:"Leo 21GT",type:"MEWP - Boom Lift (Tracked)",size:21.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:537,make:"Skyjack",model:"SJ30 AJE",type:"MEWP - Boom Lift",size:11.0,engineKw:21.0,fuel100:5.5,fuel75:4.3,fuel50:3.0,fuel25:1.9,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:538,make:"JLG",model:"340AJ",type:"MEWP - Boom Lift",size:12.0,engineKw:26.0,fuel100:6.8,fuel75:5.3,fuel50:3.7,fuel25:2.4,idle:1.0,fuelType:"Diesel",emissionStage:"Stage V"},
   {id:539,make:"Haulotte",model:"HA18 SPX",type:"MEWP - Boom Lift",size:18.0,engineKw:36.0,fuel100:9.5,fuel75:7.4,fuel50:5.2,fuel25:3.3,idle:1.2,fuelType:"Diesel",emissionStage:"Stage V"},

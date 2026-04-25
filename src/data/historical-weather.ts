@@ -513,13 +513,13 @@ export function getDateRange(date: string, view: ViewMode): [string, string] {
   if (view === "week") {
     const start = new Date(d); start.setDate(d.getDate() - 3);
     const end = new Date(d); end.setDate(d.getDate() + 3);
-    return [start.toISOString().slice(0, 10), clamp(end.toISOString().slice(0, 10))];
+    return [clamp(start.toISOString().slice(0, 10)), clamp(end.toISOString().slice(0, 10))];
   }
   // Month
   const yr = d.getFullYear(), mo = d.getMonth();
   const start = new Date(yr, mo, 1);
   const end = new Date(yr, mo + 1, 0);
-  return [start.toISOString().slice(0, 10), clamp(end.toISOString().slice(0, 10))];
+  return [clamp(start.toISOString().slice(0, 10)), clamp(end.toISOString().slice(0, 10))];
 }
 
 export function computeSummary(days: DayWeather[]): WeatherResult["summary"] {
@@ -565,7 +565,7 @@ export function computeSummary(days: DayWeather[]): WeatherResult["summary"] {
 
 export const WIND_THRESHOLDS_KMH = [
   { kmh: 40.2, mph: 25, label: "Crane operations", colour: "#EAB308" },
-  { kmh: 56.3, mph: 35, label: "MEWP limit", colour: "#F97316" },
+  { kmh: 45.0, mph: 28, label: "MEWP limit", colour: "#F97316" },
   { kmh: 72.4, mph: 45, label: "Site closure", colour: "#EF4444" },
 ];
 
@@ -875,7 +875,7 @@ export function planningToCSV(days: PlanningDay[], windUnit: WindUnit): string {
   const rows = days.map(d => {
     const dayName = new Date(d.date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short" });
     const crane = d.windExceedance.find(w => w.mph === 25)?.percent ?? 0;
-    const mewp = d.windExceedance.find(w => w.mph === 35)?.percent ?? 0;
+    const mewp = d.windExceedance.find(w => w.mph === 28)?.percent ?? 0;
     const closure = d.windExceedance.find(w => w.mph === 45)?.percent ?? 0;
     return [
       d.date, dayName, d.isWorkingDay ? "Yes" : "No",
