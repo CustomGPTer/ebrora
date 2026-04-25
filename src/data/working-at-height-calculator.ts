@@ -1,6 +1,6 @@
 // src/data/working-at-height-calculator.ts
 // Working at Height Risk Score Calculator
-// WAHR 2005, CDM 2015 Schedule 3, BS 8437, INDG401, HSE GEIS6, HSE INDG367, LA455
+// WAHR 2005, CDM 2015 Schedule 3, BS 8437, INDG401, HSE GEIS6 (MEWPs), HSE INDG367 (fall arrest inspection), LA455 (ladders), HSE GEIS5/HSG33 (fragile roofs)
 
 // ─── Task Types ─────────────────────────────────────────────────
 export type TaskType =
@@ -32,7 +32,7 @@ export const TASK_TYPES: TaskTypeDefinition[] = [
   { id: "demolition-at-height", label: "Demolition at Height", short: "Demolition", baseScore: 5, suggestedEquipment: ["scaffold", "harness", "safety-net", "exclusion-zone"], notes: "CDM 2015 Part 4 and BS 6187. Risk of structural instability. Exclusion zone mandatory." },
   { id: "tree-work", label: "Tree Work / Arboriculture", short: "Tree Work", baseScore: 3, suggestedEquipment: ["harness", "climbing-line"], notes: "BS 3998. Qualified arborists only. Specific PPE (chainsaw trousers, climbing harness)." },
   { id: "confined-overhead", label: "Work Above Confined Space / Water", short: "Above Confined/Water", baseScore: 4, suggestedEquipment: ["harness", "safety-net", "scaffold"], notes: "Additional drowning/asphyxiation risk. Combined WAH and confined space assessment required." },
-  { id: "fragile-roof", label: "Work On/Near Fragile Surface", short: "Fragile Surface", baseScore: 5, suggestedEquipment: ["crawling-board", "safety-net", "harness", "staging"], notes: "HSE ACM/1 Fragile Roofs. Assume fragile unless proven otherwise. Warning notices mandatory." },
+  { id: "fragile-roof", label: "Work On/Near Fragile Surface", short: "Fragile Surface", baseScore: 5, suggestedEquipment: ["crawling-board", "safety-net", "harness", "staging"], notes: "HSE GEIS5 / HSG33. Assume fragile unless proven otherwise. Warning notices mandatory." },
   { id: "inspection-access", label: "Inspection / Survey Access", short: "Inspection", baseScore: 2, suggestedEquipment: ["mewp-scissor", "tower-scaffold", "ladder"], notes: "Short duration but may involve unfamiliar structures. Assess structural integrity first." },
 ];
 
@@ -226,18 +226,18 @@ export const CONTROL_HIERARCHY: ControlMeasure[] = [
   { id: "mewp-use", label: "Use MEWP with guardrails", tier: "prevent", tierLabel: "2. Prevent Falls (Collective)", tierOrder: 2, description: "Scissor lift or boom lift with platform guardrails. IPAF-trained operator. Ground conditions check. Harness as secondary for boom lifts.", reductionPoints: 3, applicableTaskTypes: ["mewp-work", "inspection-access", "cladding", "ceiling-work"], regulatoryRef: "WAHR 2005 Reg 6(3), PUWER 1998" },
   { id: "tower-scaffold-use", label: "PASMA tower scaffold", tier: "prevent", tierLabel: "2. Prevent Falls (Collective)", tierOrder: 2, description: "Mobile aluminium tower scaffold. PASMA-trained erector. Outriggers on all 4 legs. Max height per manufacturer instruction.", reductionPoints: 3, applicableTaskTypes: ["tower-scaffold", "ceiling-work", "inspection-access", "ladder-work"], regulatoryRef: "WAHR 2005 Sched 2" },
   { id: "safety-net", label: "Safety nets (BS EN 1263-1)", tier: "prevent", tierLabel: "2. Prevent Falls (Collective)", tierOrder: 2, description: "Installed below working area. Max 6m fall distance. Weekly inspection. Debris clearance schedule.", reductionPoints: 3, applicableTaskTypes: ["roof-work", "steel-erection", "fragile-roof", "demolition-at-height"], regulatoryRef: "WAHR 2005 Sched 4" },
-  { id: "covers", label: "Fragile surface covers / crawling boards", tier: "prevent", tierLabel: "2. Prevent Falls (Collective)", tierOrder: 2, description: "Secured covers clearly marked 'FRAGILE SURFACE - DO NOT REMOVE'. Crawling boards per BS 8437.", reductionPoints: 3, applicableTaskTypes: ["fragile-roof", "roof-work"], regulatoryRef: "WAHR 2005 Sched 5, HSE ACM/1" },
+  { id: "covers", label: "Fragile surface covers / crawling boards", tier: "prevent", tierLabel: "2. Prevent Falls (Collective)", tierOrder: 2, description: "Secured covers clearly marked 'FRAGILE SURFACE - DO NOT REMOVE'. Crawling boards per BS 8437.", reductionPoints: 3, applicableTaskTypes: ["fragile-roof", "roof-work"], regulatoryRef: "WAHR 2005 Reg 9, HSE GEIS5/HSG33" },
   { id: "podium-use", label: "Podium steps (below 2m)", tier: "prevent", tierLabel: "2. Prevent Falls (Collective)", tierOrder: 2, description: "Self-supporting podium with guardrails, self-closing gate, and anti-surf castors. Suitable for low-level work.", reductionPoints: 2, applicableTaskTypes: ["podium-steps", "ladder-work", "ceiling-work"], regulatoryRef: "WAHR 2005 Reg 6(3)" },
 
   // Tier 2b: Prevent falls (personal protection — only if collective impracticable)
-  { id: "harness-restraint", label: "Work restraint harness (prevents reaching edge)", tier: "prevent", tierLabel: "2. Prevent Falls (Personal)", tierOrder: 3, description: "Lanyard length prevents reaching fall edge. Preferred over fall arrest. Anchorage per BS EN 795.", reductionPoints: 2, applicableTaskTypes: ["roof-work", "edge-work", "mewp-work", "steel-erection", "cladding"], regulatoryRef: "WAHR 2005 Reg 6(4), BS EN 358" },
+  { id: "harness-restraint", label: "Work restraint harness (prevents reaching edge)", tier: "prevent", tierLabel: "2. Prevent Falls (Personal)", tierOrder: 3, description: "Lanyard length prevents reaching fall edge. Preferred over fall arrest. Anchorage per BS EN 795.", reductionPoints: 2, applicableTaskTypes: ["roof-work", "edge-work", "mewp-work", "steel-erection", "cladding"], regulatoryRef: "WAHR 2005 Reg 6(3), BS EN 358" },
   { id: "harness-arrest", label: "Fall arrest harness with energy absorber", tier: "prevent", tierLabel: "2. Prevent Falls (Personal)", tierOrder: 3, description: "BS EN 361 harness with BS EN 355 energy absorber. Max 6m total fall distance. Anchorage must withstand 12 kN. Rescue plan mandatory.", reductionPoints: 2, applicableTaskTypes: ["steel-erection", "mewp-work", "roof-work", "tree-work", "confined-overhead"], regulatoryRef: "WAHR 2005 Reg 6(4), BS 8437, BS EN 361/355" },
 
   // Tier 3: Minimise distance and consequence of fall
-  { id: "airbag", label: "Inflatable fall arrest (air bags)", tier: "minimise", tierLabel: "3. Minimise Fall Consequence", tierOrder: 4, description: "Inflatable landing systems for specific applications. Regular inflation checks. Clearance zone required.", reductionPoints: 2, applicableTaskTypes: ["roof-work", "fragile-roof", "steel-erection"], regulatoryRef: "WAHR 2005 Reg 6(5)" },
-  { id: "exclusion-zone", label: "Exclusion zone below work area", tier: "minimise", tierLabel: "3. Minimise Fall Consequence", tierOrder: 4, description: "Barrier fencing or banksman-controlled zone preventing access below work at height. Signage per HSG15.", reductionPoints: 1, applicableTaskTypes: "all", regulatoryRef: "WAHR 2005 Reg 10" },
+  { id: "airbag", label: "Inflatable fall arrest (air bags)", tier: "minimise", tierLabel: "3. Minimise Fall Consequence", tierOrder: 4, description: "Inflatable landing systems for specific applications. Regular inflation checks. Clearance zone required.", reductionPoints: 2, applicableTaskTypes: ["roof-work", "fragile-roof", "steel-erection"], regulatoryRef: "WAHR 2005 Reg 6(4)" },
+  { id: "exclusion-zone", label: "Exclusion zone below work area", tier: "minimise", tierLabel: "3. Minimise Fall Consequence", tierOrder: 4, description: "Barrier fencing or banksman-controlled zone preventing access below work at height. Signage per HSE L64 (Safety Signs and Signals Regulations 1996 ACOP).", reductionPoints: 1, applicableTaskTypes: "all", regulatoryRef: "WAHR 2005 Reg 10" },
   { id: "rescue-plan", label: "Written rescue plan with equipment", tier: "minimise", tierLabel: "3. Minimise Fall Consequence", tierOrder: 4, description: "Documented plan covering: method, equipment, personnel, communication, emergency services contact. Drills conducted.", reductionPoints: 2, applicableTaskTypes: "all", regulatoryRef: "WAHR 2005 Reg 4(1)" },
-  { id: "soft-landing", label: "Soft landing system / bund protection", tier: "minimise", tierLabel: "3. Minimise Fall Consequence", tierOrder: 4, description: "Reduce impact severity at lower levels. Protective bunding around hazards below.", reductionPoints: 1, applicableTaskTypes: ["confined-overhead", "edge-work", "roof-work"], regulatoryRef: "WAHR 2005 Reg 6(5)" },
+  { id: "soft-landing", label: "Soft landing system / bund protection", tier: "minimise", tierLabel: "3. Minimise Fall Consequence", tierOrder: 4, description: "Reduce impact severity at lower levels. Protective bunding around hazards below.", reductionPoints: 1, applicableTaskTypes: ["confined-overhead", "edge-work", "roof-work"], regulatoryRef: "WAHR 2005 Reg 6(4)" },
 ];
 
 // ─── Equipment Recommendations ──────────────────────────────────
@@ -319,10 +319,11 @@ export const REGULATORY_REFERENCES: RegulatoryReference[] = [
   { code: "BS EN 12811-1", title: "BS EN 12811-1: Scaffolding -- Performance requirements", relevance: "Scaffold loading classes, platform dimensions, guardrail heights." },
   { code: "BS EN 1263-1", title: "BS EN 1263-1: Safety nets", relevance: "Net mesh, energy absorption, border rope, test loads." },
   { code: "INDG401", title: "HSE INDG401: The Work at Height Regulations -- A brief guide", relevance: "Simplified guidance on WAHR 2005 duties." },
-  { code: "GEIS6", title: "HSE GEIS6: The selection of suitable access equipment", relevance: "Decision matrix for equipment selection." },
-  { code: "INDG367", title: "HSE INDG367: Safe use of ladders and stepladders", relevance: "Conditions for acceptable ladder use." },
-  { code: "INDG455", title: "HSE INDG455: Health and safety in roof work", relevance: "Specific guidance for roof work, fragile surfaces, edge protection." },
-  { code: "HSE ACM/1", title: "HSE ACM/1: Working on fragile roofs", relevance: "Assume fragile unless confirmed otherwise. Protection measures." },
+  { code: "GEIS6", title: "HSE GEIS6: The selection, management and use of mobile elevating work platforms (MEWPs)", relevance: "MEWP selection criteria, ground conditions, risk assessment, and operational management." },
+  { code: "INDG367", title: "HSE INDG367: Inspecting fall arrest equipment made from webbing or rope", relevance: "Inspection intervals (max 6 months / 3 months arduous), competent person requirements, retention of inspection records." },
+  { code: "LA455", title: "LA455: Safe use of ladders and stepladders -- A brief guide", relevance: "Joint Ladder Association/HSE guidance (July 2021, supersedes HSE INDG455). Conditions for acceptable ladder use, training, telescopic and combination ladders." },
+  { code: "HSE GEIS5", title: "HSE GEIS5: Fragile roofs -- Safe working practices", relevance: "Assume fragile unless confirmed otherwise; protection hierarchy (avoid, control via stagings/nets/edge protection)." },
+  { code: "HSE HSG33", title: "HSE HSG33: Health and safety in roof work", relevance: "Comprehensive HSE guidance covering roof work hazards including fragile surfaces (paras 170-202)." },
   { code: "SG4:22", title: "NASC SG4:22 -- Preventing Falls in Scaffolding Operations", relevance: "Advance guardrail and scaffold erection sequence safety." },
 ];
 
@@ -398,7 +399,7 @@ export function calculateRiskScore(
   if (weatherScore >= 3) recommendations.push("Adverse weather conditions -- implement wind speed monitoring and establish stop-work criteria.");
   if (competenceScore >= 2) recommendations.push("Competence gap identified -- provide WAHR 2005 awareness training and task-specific instruction before work commences.");
   if (rescuePlanScore >= 2) recommendations.push("Rescue plan inadequate -- prepare a written rescue plan with equipment, personnel, and practice drills.");
-  if (fragileSurfaceScore > 0) recommendations.push("Fragile surface risk -- assume fragile unless confirmed otherwise (HSE ACM/1). Provide crawling boards, safety nets, and warning notices.");
+  if (fragileSurfaceScore > 0) recommendations.push("Fragile surface risk -- assume fragile unless confirmed otherwise (HSE GEIS5 / HSG33). Provide crawling boards, safety nets, and warning notices.");
   if (publicBelowScore >= 2) recommendations.push("Risk to others below -- establish exclusion zone with physical barriers and signage.");
   if (totalScore >= 15) recommendations.push("Score exceeds 15 -- senior management review required before work commences.");
   if (totalScore >= 20) recommendations.push("Score exceeds 20 -- STOP. Eliminate work at height or fundamentally redesign the method.");

@@ -346,7 +346,7 @@ function generateRecommendations(peakUV: number, totalSED: number, risk: RiskCat
   }
 
   if (totalSED > 2.0 && !ppe.enabled) {
-    recs.push("Daily SED exceeds HSE guidance threshold of 2 SED for unprotected skin - implement UV controls");
+    recs.push("Daily SED exceeds ICNIRP-derived threshold of 2 SED for unprotected skin - implement UV controls");
   }
 
   if (totalSED > 2.0 && ppe.enabled && ppe.sunscreen) {

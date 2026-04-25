@@ -127,10 +127,12 @@ function generateBankHolidays(year: number, region: BHRegion): BankHoliday[] {
     add(new Date(year, 2, 17), "St Patrick's Day", true);
   }
 
-  // ── Good Friday & Easter Monday
+  // ── Good Friday (all regions) & Easter Monday (England & Wales, NI — NOT Scotland)
   const easter = easterSunday(year);
   add(addDays(easter, -2), "Good Friday", false);
-  add(addDays(easter, 1), "Easter Monday", false);
+  if (region !== "scotland") {
+    add(addDays(easter, 1), "Easter Monday", false);
+  }
 
   // ── Early May Bank Holiday (first Monday in May)
   const mayFirst = new Date(year, 4, 1);
@@ -158,6 +160,12 @@ function generateBankHolidays(year: number, region: BHRegion): BankHoliday[] {
     const aug31 = new Date(year, 7, 31);
     const augLastOffset = (aug31.getDay() + 6) % 7;
     add(addDays(aug31, -augLastOffset), "Summer Bank Holiday", false);
+  }
+
+  // ── St Andrew's Day (Scotland only — 30 Nov, substitute if weekend)
+  // Established by St Andrew's Day Bank Holiday (Scotland) Act 2007
+  if (region === "scotland") {
+    add(new Date(year, 10, 30), "St Andrew's Day", true);
   }
 
   // ── Christmas Day (25 Dec — substitute if weekend)
