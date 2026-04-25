@@ -5,7 +5,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Topsoil Volume & Tonnage Calculator | Construction Tool | Ebrora",
-  description: "Calculate topsoil volumes, tonnage, wagon loads, and costs for landscaping and reinstatement. BS 3882:2015 grade specifications, multi-area take-off, settlement factor, depth guidance, and PDF export.",
+  description: "Calculate topsoil volumes, tonnage, wagon loads, and costs for landscaping and reinstatement. BS 3882:2015 classification (multipurpose + specific purpose types), multi-area take-off, settlement factor, depth guidance, and PDF export.",
   alternates: { canonical: "https://www.ebrora.com/tools/topsoil-calculator" },
   openGraph: { title: "Topsoil Volume & Tonnage Calculator | Ebrora", url: "https://www.ebrora.com/tools/topsoil-calculator", type: "website" },
 };
@@ -28,7 +28,7 @@ export default function TopsoilCalculatorPage() {
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Topsoil Volume &amp; Tonnage Calculator</h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Calculate topsoil volumes, tonnage, wagon loads, and costs for landscaping and reinstatement. BS 3882:2015 grade specifications, multi-area take-off, settlement factor, depth guidance, and PDF export.
+            Calculate topsoil volumes, tonnage, wagon loads, and costs for landscaping and reinstatement. BS 3882:2015 classification (multipurpose + specific purpose types), multi-area take-off, settlement factor, depth guidance, and PDF export.
           </p>
         </div>
         <TopsoilClient />
