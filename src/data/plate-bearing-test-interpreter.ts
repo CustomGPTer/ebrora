@@ -28,7 +28,10 @@ export interface EvResult {
   ev2: number | null;         // MPa
   ratio: number | null;       // Ev2/Ev1
   targetRatio: number;
-  pass: boolean | null;       // null if can't calculate
+  minEv2Required: number | null; // MPa — the absolute Ev2 floor from the preset (if any)
+  meetsRatio: boolean | null;     // ratio <= targetRatio (null if can't calculate)
+  meetsMinEv2: boolean | null;    // Ev2 >= minEv2Required (null if no minEv2 set or Ev2 unknown)
+  pass: boolean | null;       // null if can't calculate; pass = meetsRatio AND meetsMinEv2
   cbrEquivalent: number | null; // from Ev2
   cbrTRL: number | null;       // TRL alternative
   ev1DeltaSigma: number | null; // kPa
@@ -177,10 +180,22 @@ export function ev2ToCBR_TRL(ev2MPa: number): number {
 
 /**
  * Full result for one test location.
+ *
+ * Pass logic combines TWO criteria:
+ *   1. Ev2/Ev1 ratio <= targetRatio (compaction quality)
+ *   2. Ev2 >= minEv2Required (absolute stiffness floor, if the preset specifies one)
+ * Both must be satisfied for an overall PASS. Where the preset has no minEv2 floor,
+ * only the ratio criterion applies.
+ *
+ * A custom target (test.customTarget) is treated as a ratio-only override and does
+ * not carry a minEv2 — users selecting "Custom target..." are deemed to be testing
+ * to a contract-specific spec they will check separately.
  */
 export function calculateTestResult(test: TestLocation): EvResult {
   const preset = TARGET_PRESETS.find(p => p.id === test.targetPreset);
   const targetRatio = test.customTarget ?? preset?.ratio ?? 2.5;
+  // Custom target overrides the preset entirely (incl. its minEv2). Otherwise inherit from preset.
+  const minEv2Required = test.customTarget !== null ? null : (preset?.minEv2 ?? null);
 
   const ev1Res = calculateEv(test.firstLoad, test.plateDiameter, test.stressRangeLow, test.stressRangeHigh);
   const ev2Res = calculateEv(test.reload, test.plateDiameter, test.stressRangeLow, test.stressRangeHigh);
@@ -188,12 +203,33 @@ export function calculateTestResult(test: TestLocation): EvResult {
   const ev1 = ev1Res.ev;
   const ev2 = ev2Res.ev;
   const ratio = (ev1 !== null && ev2 !== null && ev1 > 0) ? Math.round((ev2 / ev1) * 100) / 100 : null;
-  const pass = ratio !== null ? ratio <= targetRatio : null;
+
+  const meetsRatio: boolean | null = ratio !== null ? ratio <= targetRatio : null;
+  const meetsMinEv2: boolean | null = (minEv2Required === null)
+    ? null // no Ev2 floor specified for this preset — criterion does not apply
+    : (ev2 !== null ? ev2 >= minEv2Required : null);
+
+  // Overall pass: both criteria must hold (where applicable).
+  // - If ratio is null we can't decide → null
+  // - If minEv2 applies and we don't have Ev2 yet we can't decide → null
+  // - If minEv2 doesn't apply, pass = meetsRatio
+  let pass: boolean | null = null;
+  if (meetsRatio === null) {
+    pass = null;
+  } else if (minEv2Required === null) {
+    pass = meetsRatio;
+  } else if (meetsMinEv2 === null) {
+    pass = null;
+  } else {
+    pass = meetsRatio && meetsMinEv2;
+  }
+
   const cbrEquivalent = ev2 !== null ? ev2ToCBR_DIN(ev2) : null;
   const cbrTRL = ev2 !== null ? ev2ToCBR_TRL(ev2) : null;
 
   return {
-    ev1, ev2, ratio, targetRatio, pass,
+    ev1, ev2, ratio, targetRatio, minEv2Required,
+    meetsRatio, meetsMinEv2, pass,
     cbrEquivalent, cbrTRL,
     ev1DeltaSigma: ev1Res.deltaSigma, ev1DeltaS: ev1Res.deltaS,
     ev2DeltaSigma: ev2Res.deltaSigma, ev2DeltaS: ev2Res.deltaS,

@@ -21,7 +21,7 @@ export interface TaskTypeDefinition {
 export const TASK_TYPES: TaskTypeDefinition[] = [
   { id: "roof-work", label: "Roof Work (flat or pitched)", short: "Roof Work", baseScore: 3, suggestedEquipment: ["scaffold", "edge-protection", "safety-net", "harness"], notes: "Consider fragile surface risk separately. Edge protection mandatory per WAHR 2005 Sched 2." },
   { id: "ladder-work", label: "Ladder Access / Short Duration", short: "Ladder", baseScore: 2, suggestedEquipment: ["ladder", "podium-steps", "tower-scaffold"], notes: "Ladders only for short-duration, light work per WAHR 2005 Sched 6. Max 30 min in one position." },
-  { id: "scaffold-access", label: "Scaffold Working Platform", short: "Scaffold", baseScore: 2, suggestedEquipment: ["scaffold", "loading-bay"], notes: "Must comply with NASC SG4:10 and BS EN 12811-1. Scaffold to be erected by CISRS-carded operatives." },
+  { id: "scaffold-access", label: "Scaffold Working Platform", short: "Scaffold", baseScore: 2, suggestedEquipment: ["scaffold", "loading-bay"], notes: "Must comply with NASC SG4:22 and BS EN 12811-1. Scaffold to be erected by CISRS-carded operatives." },
   { id: "mewp-work", label: "MEWP / Cherry Picker", short: "MEWP", baseScore: 2, suggestedEquipment: ["mewp-scissor", "mewp-boom", "harness"], notes: "IPAF trained operators only. Pre-use check per PUWER 1998 Reg 6. Ground conditions assessment required." },
   { id: "edge-work", label: "Work at Unprotected Edge", short: "Edge Work", baseScore: 4, suggestedEquipment: ["edge-protection", "harness", "safety-net"], notes: "Highest priority for collective protection per WAHR 2005. Edge protection per BS EN 13374." },
   { id: "steel-erection", label: "Structural Steel Erection", short: "Steel Erection", baseScore: 4, suggestedEquipment: ["harness", "safety-net", "mewp-boom", "scaffold"], notes: "BCSA guidance. Fall arrest as secondary to collective protection. Consider erection sequence." },
@@ -323,7 +323,7 @@ export const REGULATORY_REFERENCES: RegulatoryReference[] = [
   { code: "INDG367", title: "HSE INDG367: Safe use of ladders and stepladders", relevance: "Conditions for acceptable ladder use." },
   { code: "INDG455", title: "HSE INDG455: Health and safety in roof work", relevance: "Specific guidance for roof work, fragile surfaces, edge protection." },
   { code: "HSE ACM/1", title: "HSE ACM/1: Working on fragile roofs", relevance: "Assume fragile unless confirmed otherwise. Protection measures." },
-  { code: "SG4:10", title: "NASC SG4:10 -- Preventing Falls in Scaffolding Operations", relevance: "Advance guardrail and scaffold erection sequence safety." },
+  { code: "SG4:22", title: "NASC SG4:22 -- Preventing Falls in Scaffolding Operations", relevance: "Advance guardrail and scaffold erection sequence safety." },
 ];
 
 // ─── Scoring Calculation ────────────────────────────────────────
