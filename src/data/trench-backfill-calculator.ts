@@ -1,6 +1,6 @@
 // src/data/trench-backfill-calculator.ts
 // Trench Backfill & Pipe Bedding Calculator — PAID, white-label
-// Zone calculations per HAUC/SROH specification
+// Zone calculations per BS EN 1610 (Construction and testing of drains and sewers)
 
 export interface BackfillMaterial {
   id: string;
@@ -21,6 +21,7 @@ export interface TrenchRow {
   backfillReuse: boolean; // re-use excavated material for backfill
   overrideBeddingDepth: number | null; // mm
   overrideSideFillHeight: number | null; // mm above pipe crown
+  overrideExcavatedDensity: number | null; // t/m3 loose-tipped (default 1.65)
 }
 
 export interface TrenchZoneResult {
@@ -47,9 +48,11 @@ export const BACKFILL_MATERIALS: BackfillMaterial[] = [
   { id: "foamed-concrete", name: "Foamed Concrete", densityTPerM3: 1.20 },
 ];
 
-// HAUC/SROH default zone depths
+// BS EN 1610 default zone depths (typical practice; project specification governs)
 export const DEFAULT_BEDDING_DEPTH_MM = 100; // below pipe invert
 export const DEFAULT_SIDEFILL_ABOVE_CROWN_MM = 100; // above pipe crown
+// Typical loose-tipped density of mixed UK ground (sandy/clay/granular blend) — overridable per row
+export const DEFAULT_EXCAVATED_DENSITY_T_PER_M3 = 1.65;
 
 export function genId() { return Math.random().toString(36).slice(2, 10); }
 
@@ -59,6 +62,7 @@ export function createEmptyTrenchRow(): TrenchRow {
     pipeOD: null, beddingMaterialId: "pea-gravel", sideFillMaterialId: "pea-gravel",
     backfillMaterialId: "as-dug", backfillReuse: true,
     overrideBeddingDepth: null, overrideSideFillHeight: null,
+    overrideExcavatedDensity: null,
   };
 }
 
@@ -111,9 +115,8 @@ export function calculateTrenchZones(row: TrenchRow): TrenchZoneResult {
     : beddingTonnes + sideFillTonnes + backfillTonnes;
 
   // Export: total excavated minus what's re-used as backfill
-  // Excavated material density assumption (typical mixed ground)
-  // TODO: Could be made configurable per row in future
-  const EXCAVATED_DENSITY = 1.65;
+  // Excavated density: per-row override if set, else typical mixed-ground default
+  const EXCAVATED_DENSITY = row.overrideExcavatedDensity ?? DEFAULT_EXCAVATED_DENSITY_T_PER_M3;
   const totalExcavatedTonnes = totalTrenchM3 * EXCAVATED_DENSITY;
   const exportTonnes = row.backfillReuse
     ? totalExcavatedTonnes - backfillM3 * EXCAVATED_DENSITY

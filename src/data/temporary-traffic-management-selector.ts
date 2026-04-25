@@ -1,7 +1,9 @@
 // src/data/temporary-traffic-management-selector.ts
 // Temporary Traffic Management Selector
-// Chapter 8 Traffic Signs Manual (2009), Safety at Street Works & Road Works Code of Practice (2013),
-// NRSWA 1991, Traffic Management Act 2004, GG 104, CD 122
+// Traffic Signs Manual Chapter 8 Parts 1 & 2 (2009) and Part 3 Update (2020),
+// Safety at Street Works & Road Works Code of Practice (2013, in force 1 Oct 2014),
+// NRSWA 1991, Traffic Management Act 2004, GG 117 (Temporary Traffic Management),
+// GG 104 (Requirements for safety risk assessment)
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -159,12 +161,16 @@ export const WORKS_DURATIONS: WorksDuration[] = [
   { id: "immediate-minor", label: "Immediate Activities (up to 3 days)", description: "Minor routine maintenance that cannot reasonably give advance notice. Max 3 working days.", maxDays: 3, nrswaCategory: "minor", noticePeriod: "None (notify before starting)", noticeRef: "NRSWA 1991 s.55(1)(b)" },
   { id: "minor", label: "Minor Works (up to 3 days)", description: "Planned works lasting no more than 3 working days. Requires 3 working days advance notice.", maxDays: 3, nrswaCategory: "minor", noticePeriod: "3 working days advance", noticeRef: "NRSWA 1991 s.55(1)(a)" },
   { id: "standard", label: "Standard Works (4 to 10 days)", description: "Planned works lasting between 4 and 10 working days. Requires 7 working days advance notice.", maxDays: 10, nrswaCategory: "standard", noticePeriod: "7 working days advance", noticeRef: "NRSWA 1991 s.55" },
-  { id: "major-short", label: "Major Works - Short (11 to 21 days)", description: "Planned major works lasting 11-21 working days. Requires 10 working days advance notice plus coordination under TMA 2004.", maxDays: 21, nrswaCategory: "major", noticePeriod: "10 working days advance + 3 month S.54 notice", noticeRef: "NRSWA 1991 s.54, s.55, TMA 2004" },
-  { id: "major-long", label: "Major Works - Long (over 21 days)", description: "Large-scale planned works exceeding 21 working days. Full coordination and advance notice required.", maxDays: 999, nrswaCategory: "major", noticePeriod: "10 working days advance + 3 month S.54 notice", noticeRef: "NRSWA 1991 s.54, s.55, TMA 2004" },
+  { id: "major-short", label: "Major Works - Short (11 to 21 days)", description: "Planned major works lasting 11-21 working days. Requires 10 working days advance notice plus 1 month s.54 advance notice and coordination under TMA 2004.", maxDays: 21, nrswaCategory: "major", noticePeriod: "10 working days advance + 1 month S.54 notice", noticeRef: "NRSWA 1991 s.54, s.55, TMA 2004; SI 1992/2985 reg 6" },
+  { id: "major-long", label: "Major Works - Long (over 21 days)", description: "Large-scale planned works exceeding 21 working days. Full coordination and advance notice required.", maxDays: 999, nrswaCategory: "major", noticePeriod: "10 working days advance + 1 month S.54 notice", noticeRef: "NRSWA 1991 s.54, s.55, TMA 2004; SI 1992/2985 reg 6" },
   { id: "permit", label: "Permit Scheme Area", description: "Works within a permit scheme area (most English highway authorities). Permit required in addition to NRSWA notice.", maxDays: 999, nrswaCategory: "major", noticePeriod: "Per permit scheme conditions", noticeRef: "TMA 2004 Part 3, Permit Scheme Conditions" },
 ];
 
-// ─── Signing Distances (Safety at Street Works Code of Practice 2013, Table A1) ──
+// ─── Signing Distances ─────────────────────────────────────────
+// 5–40 mph (single carriageway and dual carriageway ≤40 mph): Safety at Street Works
+//   and Road Works CoP (2013, in force 1 Oct 2014) — table inside back cover.
+// 50–70 mph (motorways and high-speed dual carriageways): Traffic Signs Manual
+//   Chapter 8 Part 1 (2009) Table A1, as updated by Chapter 8 Part 3 Update (2020).
 
 export const SIGNING_DISTANCES: SigningDistance[] = [
   { speedMph: 5, advanceSignM: 0, leadInTaperM: 5, safetyZoneM: 0, exitTaperM: 3, coneSpacingM: 1.5, totalLeadInM: 5 },
@@ -467,9 +473,9 @@ export const RISK_BANDS: RiskBand[] = [
 
 export const NHSS_REQUIREMENTS: NHSSRequirement[] = [
   { level: "none", label: "No NHSS Required", description: "Works on private roads or where no public highway is affected. Standard site traffic management applies.", qualification: "N/A", trainingProvider: "N/A", renewalYears: 0 },
-  { level: "12a", label: "NHSS 12D Required", description: "Works on urban/rural roads and low-speed dual carriageways (40 mph and below) require NHSS 12D qualified operatives. NHSS 12D (Sector Scheme 12D) covers installing, maintaining and removing temporary traffic management on these roads. Module M1/M2 for single carriageway, M3 for low-speed duals, M5 for multiphase signals, M7 for designers.", qualification: "NHSS Sector Scheme 12D - Installing, Maintaining and Removing TTM on Rural and Urban Roads", trainingProvider: "Lantra Awards, NHSS accredited providers (e.g. HSCT)", renewalYears: 5 },
-  { level: "12b", label: "NHSS 12A/B + 12D M7 Required", description: "Works requiring both 12A/B qualified operatives (for installation on high-speed roads) and a 12D M7 or 12B qualified designer/planner. Required for complex schemes on any road type where the TM design requires professional input.", qualification: "NHSS 12A/B for operatives + 12D M7 or 12B for design/planning", trainingProvider: "Lantra Awards, NHSS accredited providers (e.g. HSCT)", renewalYears: 5 },
-  { level: "both", label: "NHSS 12A + 12B Required", description: "Works on motorways and high-speed dual carriageways (50 mph and above) require NHSS 12A/B qualified operatives and designers. NHSS 12A covers installation, maintenance and removal. NHSS 12B covers planning and design of TM schemes on these roads. All operatives must hold 12A minimum; the scheme must be designed by a 12B qualified person.", qualification: "NHSS 12A (installation operatives) + NHSS 12B (design/planning)", trainingProvider: "Lantra Awards, NHSS accredited providers (e.g. HSCT)", renewalYears: 5 },
+  { level: "12a", label: "NHSS 12D Required", description: "Works on urban/rural single carriageways and low-speed dual carriageways (40 mph and below) require NHSS 12D qualified operatives. Sector Scheme 12D covers installing, maintaining and removing temporary traffic management on these roads. Operative modules: T1/T2 (trainee), M1/M2 (RTMO single carriageway), M3 (low-speed dual carriageways), M4 (convoy operations), M5 (multiphase portable signals), M6 (RLTMO supervisor). Designers and client officers require M7. M1/M2 must remain in date for any of M3–M5 to remain valid.", qualification: "NHSS Sector Scheme 12D — Installing, Maintaining and Removing TTM on Rural and Urban Roads", trainingProvider: "Lantra Awards, NHSS accredited providers (e.g. HSCT)", renewalYears: 5 },
+  { level: "12b", label: "NHSS 12A/B + 12D M7 Required", description: "Works requiring both 12A/B qualified operatives (for installation on high-speed roads) and a 12D M7 or 12B qualified designer/planner. Required for complex schemes on any road type where the TM design requires professional input. NHSS 12A/B has been a single combined sector scheme since 2009.", qualification: "NHSS 12A/B for operatives + 12D M7 or 12B for design/planning", trainingProvider: "Lantra Awards, NHSS accredited providers (e.g. HSCT)", renewalYears: 5 },
+  { level: "both", label: "NHSS 12A + 12B Required", description: "Works on motorways and high-speed dual carriageways (50 mph and above) require NHSS 12A/B qualified operatives and designers. NHSS 12A/B is a single combined sector scheme covering installation, maintenance, removal, planning and design of static TM on these roads (including on-line widening and contraflow). For mobile lane closure traffic management on motorways and other dual carriageways, NHSS 12C applies separately.", qualification: "NHSS 12A/B (static TM on motorways/high-speed duals); NHSS 12C (mobile lane closure)", trainingProvider: "Lantra Awards, NHSS accredited providers (e.g. HSCT)", renewalYears: 5 },
 ];
 
 // ─── Signing Schedule Templates ─────────────────────────────────
@@ -579,10 +585,10 @@ export const DEPLOYMENT_CHECKLIST: DeploymentCheckItem[] = [
   { id: "dc-13", category: "Equipment Check", item: "Portable traffic signals tested (if used)", regulation: "Safety at Street Works CoP" },
   { id: "dc-14", category: "Equipment Check", item: "Barriers, pedestrian guard rails, and ramps available (if pedestrian diversion)", regulation: "Chapter 8, Equality Act 2010" },
   { id: "dc-15", category: "Equipment Check", item: "Vehicle amber beacons operational", regulation: "RVLR 1989" },
-  { id: "dc-16", category: "Equipment Check", item: "IPV available and operational (if high-speed road)", regulation: "Chapter 8 Part 2, CD 122" },
+  { id: "dc-16", category: "Equipment Check", item: "IPV available and operational (if high-speed road)", regulation: "Chapter 8 Part 2, GG 117" },
   // Installation
   { id: "dc-17", category: "Installation", item: "Signs installed from furthest upstream point working back towards works", regulation: "Safety at Street Works CoP" },
-  { id: "dc-18", category: "Installation", item: "Taper installed at correct angle and spacing for speed limit", regulation: "Chapter 8 Table A1" },
+  { id: "dc-18", category: "Installation", item: "Taper installed at correct angle and spacing for speed limit", regulation: "Safety at Street Works CoP / Chapter 8 Part 1 Table A1" },
   { id: "dc-19", category: "Installation", item: "Safety zone clear of all personnel, plant and materials", regulation: "Chapter 8 Part 2" },
   { id: "dc-20", category: "Installation", item: "Cones/signs weighted or stabilised (not blown over)", regulation: "Safety at Street Works CoP" },
   { id: "dc-21", category: "Installation", item: "Pedestrian route signed and barriers continuous (if applicable)", regulation: "Chapter 8, Equality Act 2010" },
@@ -904,14 +910,17 @@ export function getNRSWANote(roadType: RoadType): string {
 // ─── PDF Regulatory References ──────────────────────────────────
 
 export const REGULATORY_REFERENCES = [
-  "Traffic Signs Manual Chapter 8 Part 1 (Design) and Part 2 (Operations) - 2009 Edition",
-  "Safety at Street Works and Road Works - A Code of Practice (2013)",
-  "New Roads and Street Works Act 1991 (NRSWA) - s.54, s.55, s.74",
-  "Traffic Management Act 2004 - Part 3 (Permit Schemes)",
+  "Traffic Signs Manual Chapter 8 Part 1 (Design) and Part 2 (Operations) — 2009 Edition",
+  "Traffic Signs Manual Chapter 8 Part 3 — Update (2020)",
+  "Safety at Street Works and Road Works — A Code of Practice (October 2013, in force 1 October 2014)",
+  "New Roads and Street Works Act 1991 (NRSWA) — s.52 (emergency), s.54 (advance notice), s.55 (starting date), s.74 (overrun charges)",
+  "Street Works (Registers, Notices, Directions and Designations) Regulations 1992 (SI 1992/2985) — reg 6 (s.54 advance notice period: 1 month), reg 7 (s.55 notice periods)",
+  "Traffic Management Act 2004 — Part 3 (Permit Schemes), Network Management Duty",
   "Traffic Signs Regulations and General Directions (TSRGD) 2016",
-  "GG 104 - Requirements for safety at roadworks on motorways and high speed dual carriageways",
-  "NHSS Sector Schemes 12A/B (motorways/high-speed duals) and 12D (urban/rural roads)",
-  "MHSWR 1999 - Management of Health and Safety at Work Regulations",
-  "Highways Act 1980 - s.148 (penalty for depositing things on highway)",
-  "Equality Act 2010 - accessibility requirements for pedestrian diversions",
+  "GG 117 — Temporary Traffic Management (DMRB)",
+  "GG 104 — Requirements for safety risk assessment (DMRB)",
+  "NHSS Sector Schemes 12A/B (motorways/high-speed duals — static), 12C (mobile lane closure on motorways/dual carriageways), and 12D (rural and urban roads)",
+  "MHSWR 1999 — Management of Health and Safety at Work Regulations",
+  "Highways Act 1980 — s.148 (penalty for depositing things on highway)",
+  "Equality Act 2010 — accessibility requirements for pedestrian diversions",
 ];

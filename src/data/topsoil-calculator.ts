@@ -1,6 +1,13 @@
 // src/data/topsoil-calculator.ts
 
-// ─── BS 3882:2015 Topsoil Grades ─────────────────────────────
+// ─── BS 3882:2015 Topsoil Classification ─────────────────────
+// Per BS 3882:2015 Clause 4.1, topsoil shall be classified as either:
+//   (a) multipurpose topsoil; or
+//   (b) specific purpose topsoil (further classified as: acidic; calcareous;
+//       low fertility; low fertility acidic; low fertility calcareous).
+// The standard does NOT define density per type — density depends on soil
+// texture and moisture. Typical loose-tipped values for UK topsoils are
+// 1.1–1.5 t/m³; this is applied as the default range for all types.
 export interface TopsoilGrade {
   id: string;
   name: string;
@@ -14,11 +21,18 @@ export interface TopsoilGrade {
   organicContent: string;
 }
 
+// Default density range applied to all BS 3882:2015 types (texture-driven, not type-driven)
+const TS_DENSITY_LOW = 1.1;
+const TS_DENSITY_MID = 1.3;
+const TS_DENSITY_HIGH = 1.5;
+
 export const TOPSOIL_GRADES: TopsoilGrade[] = [
-  { id: "multipurpose", name: "Multipurpose Grade", standard: "BS 3882:2015 Clause 4.2", densityLow: 1.3, densityHigh: 1.5, densityMid: 1.4, description: "General-purpose topsoil suitable for a wide range of landscape and amenity uses. Must be free from contaminants and deleterious materials.", suitableFor: "General landscaping, garden beds, lawns, amenity areas, shrub planting", phRange: "5.5 - 8.0", organicContent: "3 - 10% (mass)" },
-  { id: "general", name: "General Purpose Grade", standard: "BS 3882:2015 Clause 4.3", densityLow: 1.2, densityHigh: 1.4, densityMid: 1.3, description: "Suitable for amenity planting where a lower specification is acceptable. Wider tolerance on stone content and organic matter.", suitableFor: "Amenity grassland, general planting, roadside verges, reinstatement", phRange: "5.5 - 8.5", organicContent: "2 - 10% (mass)" },
-  { id: "economy", name: "Economy Grade", standard: "BS 3882:2015 Clause 4.4", densityLow: 1.1, densityHigh: 1.3, densityMid: 1.2, description: "Lower specification topsoil for low-maintenance areas. Higher stone content permitted. May require amelioration for specialist planting.", suitableFor: "Low-maintenance areas, rough grass, ecological areas, capping", phRange: "5.0 - 9.0", organicContent: "1 - 10% (mass)" },
-  { id: "premium", name: "Premium Grade", standard: "BS 3882:2015 Clause 4.5", densityLow: 1.4, densityHigh: 1.6, densityMid: 1.5, description: "Highest specification topsoil for specialist planting and high-quality amenity. Strict controls on stone content, texture, and contaminants.", suitableFor: "Specialist planting, sports turf, high-quality gardens, green roofs", phRange: "5.5 - 7.5", organicContent: "5 - 15% (mass)" },
+  { id: "multipurpose", name: "Multipurpose Topsoil", standard: "BS 3882:2015 Clause 4.1(a)", densityLow: TS_DENSITY_LOW, densityHigh: TS_DENSITY_HIGH, densityMid: TS_DENSITY_MID, description: "The grade suited to most situations where topsoil is required. Meets defined criteria for general landscape and amenity use, with controls on texture, pH, organic matter, soluble salts, and contaminants.", suitableFor: "General landscaping, garden beds, lawns, amenity grass, shrub planting, sports turf, reinstatement, highway verges", phRange: "5.5 - 8.5", organicContent: "3 - 20% (mass loss on ignition)" },
+  { id: "sp-acidic", name: "Specific Purpose — Acidic", standard: "BS 3882:2015 Clause 4.1(b)(1)", densityLow: TS_DENSITY_LOW, densityHigh: TS_DENSITY_HIGH, densityMid: TS_DENSITY_MID, description: "Specific purpose topsoil with acidic soil profile. Suitable for ericaceous and calcifuge plants requiring low pH conditions.", suitableFor: "Ericaceous beds, heathland reinstatement, rhododendrons, azaleas, blueberries, conifer planting", phRange: "3.5 - 5.5", organicContent: "5 - 30% (mass loss on ignition)" },
+  { id: "sp-calcareous", name: "Specific Purpose — Calcareous", standard: "BS 3882:2015 Clause 4.1(b)(2)", densityLow: TS_DENSITY_LOW, densityHigh: TS_DENSITY_HIGH, densityMid: TS_DENSITY_MID, description: "Specific purpose topsoil with high pH and free carbonate. Suitable for calcicole plants and chalk grassland habitat creation.", suitableFor: "Calcareous grassland, chalk habitat creation, calcicole planting, lime-loving species", phRange: "7.5 - 9.0", organicContent: "5 - 20% (mass loss on ignition)" },
+  { id: "sp-low-fert", name: "Specific Purpose — Low Fertility", standard: "BS 3882:2015 Clause 4.1(b)(3)", densityLow: TS_DENSITY_LOW, densityHigh: TS_DENSITY_HIGH, densityMid: TS_DENSITY_MID, description: "Specific purpose topsoil of low fertility (low extractable phosphate). Used to support biodiverse habitats such as species-rich grassland and wildflower meadows.", suitableFor: "Wildflower meadows, species-rich grassland, biodiversity habitats, ecological reinstatement", phRange: "3.5 - 9.0", organicContent: "2 - 20% (mass loss on ignition)" },
+  { id: "sp-lf-acidic", name: "Specific Purpose — Low Fertility Acidic", standard: "BS 3882:2015 Clause 4.1(b)(4)", densityLow: TS_DENSITY_LOW, densityHigh: TS_DENSITY_HIGH, densityMid: TS_DENSITY_MID, description: "Specific purpose topsoil combining low fertility and acidic profile. Supports acid heathland and acid grassland habitats.", suitableFor: "Acid heathland, acid grassland, lowland heath habitat creation", phRange: "3.5 - 5.5", organicContent: "2 - 30% (mass loss on ignition)" },
+  { id: "sp-lf-calcareous", name: "Specific Purpose — Low Fertility Calcareous", standard: "BS 3882:2015 Clause 4.1(b)(5)", densityLow: TS_DENSITY_LOW, densityHigh: TS_DENSITY_HIGH, densityMid: TS_DENSITY_MID, description: "Specific purpose topsoil combining low fertility and calcareous profile. Supports chalk grassland and calcareous wildflower habitats.", suitableFor: "Chalk wildflower grassland, calcareous biodiversity habitats, downland reinstatement", phRange: "7.5 - 9.0", organicContent: "2 - 20% (mass loss on ignition)" },
 ];
 
 // ─── Depth Guidance ──────────────────────────────────────────
