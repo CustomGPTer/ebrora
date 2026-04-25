@@ -8,8 +8,10 @@ import {
   ENVIRONMENT_FACTORS, HUMAN_FACTORS,
   CONTROL_MEASURES,
   RISK_COLOURS,
-  calculateSlipScore, getRiskLevel, getApplicableControls,
-  type SurfaceType, type RiskLevel,
+  calculateSlipScore, getApplicableControls,
+  calculatePTVResult, ptvBandToRiskLevel, PTV_BAND_CONFIG,
+  surfaceTypicalWetPTV, ptvBand,
+  type SurfaceType, type RiskLevel, type PTVResult, type PTVBand,
 } from "@/data/slip-risk-calculator";
 import { PaidDownloadButton } from "@/components/shared/PaidToolGate";
 
@@ -26,10 +28,11 @@ interface Zone {
   envFactors: string[];
   humanFactors: string[];
   additionalNotes: string;
+  measuredPTV: number | null; // optional measured PTV from pendulum test
 }
 
 function createZone(idx: number): Zone {
-  return { id: genId(), name: `Zone ${String.fromCharCode(65 + idx)}`, surfaceId: null, contaminationId: "dry", footwearId: "safety_src", envFactors: [], humanFactors: [], additionalNotes: "" };
+  return { id: genId(), name: `Zone ${String.fromCharCode(65 + idx)}`, surfaceId: null, contaminationId: "dry", footwearId: "safety_src", envFactors: [], humanFactors: [], additionalNotes: "", measuredPTV: null };
 }
 
 interface ZoneResult {
@@ -42,6 +45,14 @@ interface ZoneResult {
   risk: RiskLevel;
   envNames: string[];
   humanNames: string[];
+  ptv: number;
+  ptvSource: "measured" | "derived";
+  surfacePTV: number;
+  contaminationDelta: number;
+  ptvBand: PTVBand;
+  ptvFinalBand: PTVBand;
+  aggravatingCount: number;
+  ptvEscalated: boolean;
 }
 
 // ─── PDF Export ──────────────────────────────────────────────
@@ -116,7 +127,7 @@ async function exportPDF(
   const zCols = [30, 40, 32, 30, 22, 32];
   doc.setFontSize(6.5); doc.setFont("helvetica", "bold");
   let cx = M;
-  ["Zone", "Surface", "Contamination", "Footwear", "Score", "Risk Level"].forEach((h, i) => {
+  ["Zone", "Surface", "Contamination", "Footwear", "PTV", "Slip Potential"].forEach((h, i) => {
     doc.setFillColor(30, 30, 30); doc.rect(cx, y, zCols[i], 6, "F");
     doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += zCols[i];
   });
@@ -125,7 +136,8 @@ async function exportPDF(
   doc.setFontSize(5.5); doc.setDrawColor(200, 200, 200);
   for (const zr of zoneResults) {
     const rowH = 5.5; checkPage(rowH); cx = M;
-    const cells = [zr.name, zr.surfaceName, zr.contaminationName, zr.footwearName, `${zr.score}`];
+    const ptvCell = `${zr.ptv.toFixed(0)}${zr.ptvSource === "measured" ? " (measured)" : ""}${zr.ptvEscalated ? " ↑" : ""}`;
+    const cells = [zr.name, zr.surfaceName, zr.contaminationName, zr.footwearName, ptvCell];
     cells.forEach((t, i) => {
       doc.rect(cx, y, zCols[i], rowH, "D");
       doc.setFont("helvetica", i === 0 ? "bold" : "normal");
@@ -150,12 +162,18 @@ async function exportPDF(
     doc.text(`${zr.name}: ${zr.surfaceName}`, M, y); y += 5;
 
     doc.setFontSize(6.5); doc.setFont("helvetica", "normal");
+    const ptvLine = zr.ptvSource === "measured"
+      ? `PTV (measured): ${zr.ptv.toFixed(0)} - ${PTV_BAND_CONFIG[zr.ptvBand].label} (${PTV_BAND_CONFIG[zr.ptvBand].rangeText})`
+      : `PTV (derived): surface ${zr.surfacePTV} ${zr.contaminationDelta < 0 ? zr.contaminationDelta : "+0"} contamination = ${zr.ptv.toFixed(0)} - ${PTV_BAND_CONFIG[zr.ptvBand].label} (${PTV_BAND_CONFIG[zr.ptvBand].rangeText})`;
     const details = [
       `Surface: ${zr.surfaceName}`,
       `Contamination: ${zr.contaminationName}`,
       `Footwear: ${zr.footwearName}`,
       `Environment: ${zr.envNames.length > 0 ? zr.envNames.join(", ") : "None selected"}`,
       `Human factors: ${zr.humanNames.length > 0 ? zr.humanNames.join(", ") : "None selected"}`,
+      ptvLine,
+      ...(zr.ptvEscalated ? [`Aggravating-factor escalation: ${zr.aggravatingCount} factors -> band escalated from ${PTV_BAND_CONFIG[zr.ptvBand].label} to ${PTV_BAND_CONFIG[zr.ptvFinalBand].label}`] : []),
+      `Legacy aggravating-factor index: ${zr.score} / 15 (informational)`,
     ];
     for (const d of details) {
       checkPage(4);
@@ -260,13 +278,14 @@ function SurfaceSelector({ value, onChange }: { value: string | null; onChange: 
           <div className="px-3 py-4 text-sm text-gray-400 text-center">No surfaces found</div>
         ) : (
           filtered.map(s => {
-            const risk = getRiskLevel(s.baseScore);
-            const rc = RISK_COLOURS[risk];
+            const wetPTV = surfaceTypicalWetPTV(s);
+            const band = ptvBand(wetPTV);
+            const rc = PTV_BAND_CONFIG[band];
             return (
               <button key={s.id} onClick={() => onChange(s.id)} className={`w-full text-left px-3 py-2 text-sm hover:bg-ebrora-light transition-colors ${value === s.id ? "bg-ebrora-light/60 font-medium" : ""}`}>
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium text-gray-800">{s.name}</span>
-                  <span className={`shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${rc.bg} ${rc.border} ${rc.text}`}>Base: {s.baseScore}/5</span>
+                  <span className={`shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${rc.bg} ${rc.border} ${rc.text}`}>Wet PTV ~{wetPTV}</span>
                 </div>
                 <div className="text-[11px] text-gray-400 mt-0.5">{s.notes}</div>
               </button>
@@ -335,14 +354,32 @@ export default function SlipRiskCalculatorClient() {
       const fw = FOOTWEAR_TYPES.find(f => f.id === z.footwearId);
       const envMods = z.envFactors.map(eid => ENVIRONMENT_FACTORS.find(e => e.id === eid)?.scoreMod || 0);
       const humanMods = z.humanFactors.map(hid => HUMAN_FACTORS.find(h => h.id === hid)?.scoreMod || 0);
+      // Legacy 1-15 score retained as secondary indicator
       const score = calculateSlipScore(surface.baseScore, contam?.scoreMod || 0, fw?.scoreMod || 0, envMods, humanMods);
-      const risk = getRiskLevel(score);
+      // PRIMARY classification: PTV-driven per HSE GEIS2
+      const ptvResult: PTVResult = calculatePTVResult(
+        surface,
+        z.contaminationId,
+        fw?.scoreMod || 0,
+        envMods,
+        humanMods,
+        z.measuredPTV ?? undefined,
+      );
+      const risk = ptvBandToRiskLevel(ptvResult.finalBand);
       results.push({
         id: z.id, name: z.name, surfaceName: surface.name,
         contaminationName: contam?.name || "Dry", footwearName: fw?.name || "Unknown",
         score, risk,
         envNames: z.envFactors.map(eid => ENVIRONMENT_FACTORS.find(e => e.id === eid)?.name || ""),
         humanNames: z.humanFactors.map(hid => HUMAN_FACTORS.find(h => h.id === hid)?.name || ""),
+        ptv: ptvResult.ptv,
+        ptvSource: ptvResult.source,
+        surfacePTV: ptvResult.surfacePTV,
+        contaminationDelta: ptvResult.contaminationDelta,
+        ptvBand: ptvResult.band,
+        ptvFinalBand: ptvResult.finalBand,
+        aggravatingCount: ptvResult.aggravatingFactorCount,
+        ptvEscalated: ptvResult.escalated,
       });
     }
     const worst: RiskLevel = results.reduce<RiskLevel>((w, r) => {
@@ -384,8 +421,8 @@ export default function SlipRiskCalculatorClient() {
           <div className="text-xl font-bold mt-1 text-gray-800">{zoneResults.length}</div>
         </div>
         <div className="rounded-xl border p-3.5 bg-gray-50 border-gray-200">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Highest Score</div>
-          <div className="text-xl font-bold mt-1 text-gray-800">{hasData ? Math.max(...zoneResults.map(z => z.score)) : "--"}<span className="text-xs font-normal text-gray-400"> /15</span></div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Lowest PTV</div>
+          <div className="text-xl font-bold mt-1 text-gray-800">{hasData ? Math.min(...zoneResults.map(z => z.ptv)).toFixed(0) : "--"}<span className="text-xs font-normal text-gray-400"> per HSE GEIS2</span></div>
         </div>
         <div className="rounded-xl border p-3.5 bg-gray-50 border-gray-200">
           <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Surfaces</div>
@@ -441,16 +478,15 @@ export default function SlipRiskCalculatorClient() {
       <div className="space-y-4">
         {zones.map((zone, idx) => {
           const result = zoneResults.find(r => r.id === zone.id);
-          const riskSt = result ? RISK_COLOURS[result.risk] : null;
 
           return (
             <div key={zone.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <input type="text" value={zone.name} onChange={e => updateZone(zone.id, { name: e.target.value })} className="text-xs font-bold text-gray-700 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-ebrora outline-none w-32" />
-                  {result && riskSt && (
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${riskSt.bg} ${riskSt.border} ${riskSt.text}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${riskSt.dot}`} />Score: {result.score} - {riskSt.label}
+                  {result && (
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${PTV_BAND_CONFIG[result.ptvFinalBand].bg} ${PTV_BAND_CONFIG[result.ptvFinalBand].border} ${PTV_BAND_CONFIG[result.ptvFinalBand].text}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${PTV_BAND_CONFIG[result.ptvFinalBand].dot}`} />PTV {result.ptv.toFixed(0)} - {PTV_BAND_CONFIG[result.ptvFinalBand].label}
                     </span>
                   )}
                 </div>
@@ -496,6 +532,55 @@ export default function SlipRiskCalculatorClient() {
                     <ToggleList items={HUMAN_FACTORS} selected={zone.humanFactors} onChange={ids => updateZone(zone.id, { humanFactors: ids })} label="Human Factors" />
                   </div>
                 </details>
+
+                {/* Measured PTV (optional) — overrides the derived value */}
+                <div>
+                  <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
+                    Measured PTV (optional)
+                    <span className="text-[9px] font-normal text-gray-400 normal-case">From pendulum test (BS 7976) — leave blank to use typical wet PTV</span>
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={120}
+                    step={1}
+                    value={zone.measuredPTV ?? ""}
+                    onChange={e => {
+                      const v = e.target.value.trim();
+                      updateZone(zone.id, { measuredPTV: v === "" ? null : Math.max(0, Math.min(120, parseFloat(v) || 0)) });
+                    }}
+                    placeholder="e.g. 36"
+                    className="w-full mt-1 px-2.5 py-2 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora focus:ring-1 focus:ring-ebrora/20 outline-none transition-colors"
+                  />
+                </div>
+
+                {/* PTV result panel */}
+                {result && (
+                  <div className={`px-3 py-2.5 rounded-lg border ${PTV_BAND_CONFIG[result.ptvFinalBand].bg} ${PTV_BAND_CONFIG[result.ptvFinalBand].border}`}>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${PTV_BAND_CONFIG[result.ptvFinalBand].dot}`} />
+                        <span className={`text-[11px] font-bold uppercase tracking-wide ${PTV_BAND_CONFIG[result.ptvFinalBand].text}`}>
+                          {PTV_BAND_CONFIG[result.ptvFinalBand].label}
+                        </span>
+                      </div>
+                      <span className={`text-base font-bold tabular-nums ${PTV_BAND_CONFIG[result.ptvFinalBand].text}`}>
+                        PTV {result.ptv.toFixed(0)}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-gray-600 leading-snug">
+                      {result.ptvSource === "measured"
+                        ? <>Measured PTV from pendulum test. Band: {PTV_BAND_CONFIG[result.ptvBand].rangeText}.</>
+                        : <>Derived: surface typical wet PTV {result.surfacePTV} {result.contaminationDelta < 0 ? `${result.contaminationDelta}` : "+0"} contamination = {result.ptv}. Band: {PTV_BAND_CONFIG[result.ptvBand].rangeText}.</>
+                      }
+                      {result.ptvEscalated && (
+                        <span className="block mt-1 font-semibold text-amber-700">
+                          ⚠ Escalated from {PTV_BAND_CONFIG[result.ptvBand].label.toLowerCase()} to {PTV_BAND_CONFIG[result.ptvFinalBand].label.toLowerCase()} — {result.aggravatingCount} aggravating factors present.
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Notes */}
                 <div>
