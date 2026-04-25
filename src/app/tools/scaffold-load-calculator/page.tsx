@@ -5,7 +5,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Scaffold Load Calculator | Construction Tool | Ebrora",
-  description: "Calculate scaffold standard loads per BS EN 12811-1, BS 5975, and SG4:10. Dead, imposed, and wind load breakdown, utilisation gauge, duty class comparison, tie load calculation, sheeted vs unsheeted wind comparison, and white-label PDF export.",
+  description: "Calculate scaffold standard loads per BS EN 12811-1, BS 5975, and SG4:22. Dead, imposed, and wind load breakdown, utilisation gauge, duty class comparison, tie load calculation, sheeted vs unsheeted wind comparison, and white-label PDF export.",
   alternates: { canonical: "https://www.ebrora.com/tools/scaffold-load-calculator" },
   openGraph: { title: "Scaffold Load Calculator | Ebrora", description: "BS EN 12811-1 scaffold loading calculator with utilisation check, tie loads, and white-label PDF.", url: "https://www.ebrora.com/tools/scaffold-load-calculator", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
 };
@@ -19,7 +19,7 @@ const ScaffoldLoadCalculatorClient = dynamic(() => import("@/components/scaffold
   ),
 });
 
-const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Scaffold Load Calculator", description: "Calculate scaffold loads per BS EN 12811-1, BS 5975, SG4:10 with utilisation check, tie loads, and white-label PDF.", url: "https://www.ebrora.com/tools/scaffold-load-calculator", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
+const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Scaffold Load Calculator", description: "Calculate scaffold loads per BS EN 12811-1, BS 5975, SG4:22 with utilisation check, tie loads, and white-label PDF.", url: "https://www.ebrora.com/tools/scaffold-load-calculator", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
 
 export default function ScaffoldLoadCalculatorPage() {
   return (
@@ -34,7 +34,7 @@ export default function ScaffoldLoadCalculatorPage() {
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Scaffold Load Calculator</h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Calculate scaffold standard loads per BS EN 12811-1, BS 5975, and SG4:10. Dead, imposed, and wind load breakdown with stacked bar chart, utilisation gauge, 6-class duty comparison, tie load back-calculation, sheeted vs unsheeted wind comparison, and white-label PDF export.
+            Calculate scaffold standard loads per BS EN 12811-1, BS 5975, and SG4:22. Dead, imposed, and wind load breakdown with stacked bar chart, utilisation gauge, 6-class duty comparison, tie load back-calculation, sheeted vs unsheeted wind comparison, and white-label PDF export.
           </p>
         </div>
         <ScaffoldLoadCalculatorClient />
