@@ -333,7 +333,7 @@ export default function HistoricalWeatherClient(){
     {/* Info */}
     <div className="bg-gray-50 border border-gray-200 rounded-xl p-4"><div className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-2">Data Source</div><div className="text-xs text-gray-600 space-y-1">
       <p>Weather data from the <strong>Open-Meteo Archive API</strong> (ERA5 reanalysis, 1940-present). Temperature shows daily high (max) and daily low (min) across all 24 hours. Rainfall is the 24-hour total. Wind, humidity, cloud cover, and conditions are <strong>12:00 PM snapshots</strong>.</p>
-      {toolMode==="planning"&&<p><strong>Planning mode</strong> averages the same calendar dates across your baseline period to estimate expected conditions. This is not a weather forecast. Wind thresholds: 25mph (crane), 35mph (MEWP), 45mph (site closure).</p>}
+      {toolMode==="planning"&&<p><strong>Planning mode</strong> averages the same calendar dates across your baseline period to estimate expected conditions. This is not a weather forecast. Wind thresholds: 25mph (crane), 28mph (MEWP, BS EN 280), 45mph (site closure).</p>}
       {toolMode==="historical"&&<p>The baseline comparison averages the same calendar date(s) across your selected averaging period (default 2005-2025).</p>}
     </div></div>
   </div>);
