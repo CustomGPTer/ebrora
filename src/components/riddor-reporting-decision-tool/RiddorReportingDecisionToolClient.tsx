@@ -282,12 +282,29 @@ async function exportPDF(
   if (isReport) {
     checkPage(26);
     const isImmediate = !!terminal.deadlineImmediate;
-    const urgRGB: [number, number, number] = isImmediate ? [185, 28, 28] : terminal.deadlineDays && terminal.deadlineDays <= 10 ? [194, 65, 12] : [161, 98, 7];
-    const urgBgRGB: [number, number, number] = isImmediate ? [254, 226, 226] : terminal.deadlineDays && terminal.deadlineDays <= 10 ? [255, 237, 213] : [254, 249, 195];
-    const urgLabel = isImmediate ? "IMMEDIATE ACTION REQUIRED" : `ACTION WITHIN ${terminal.deadlineDays} DAYS`;
+    const hasDays = typeof terminal.deadlineDays === "number" && terminal.deadlineDays > 0;
+    // Three-state styling: immediate (red), short-window (orange ≤10d), longer (amber).
+    // Disease-style "without delay" terminals (no day-count) use the amber treatment.
+    const urgRGB: [number, number, number] = isImmediate
+      ? [185, 28, 28]
+      : hasDays && terminal.deadlineDays! <= 10
+        ? [194, 65, 12]
+        : [161, 98, 7];
+    const urgBgRGB: [number, number, number] = isImmediate
+      ? [254, 226, 226]
+      : hasDays && terminal.deadlineDays! <= 10
+        ? [255, 237, 213]
+        : [254, 249, 195];
+    const urgLabel = isImmediate
+      ? "IMMEDIATE ACTION REQUIRED"
+      : hasDays
+        ? `ACTION WITHIN ${terminal.deadlineDays} DAYS`
+        : "ACTION WITHOUT DELAY";
     const urgDesc = isImmediate
-      ? "This incident requires IMMEDIATE telephone notification to HSE followed by an online report within 10 days."
-      : `This incident must be reported online within ${terminal.deadlineDays} days of the incident date.`;
+      ? "This incident requires telephone notification to HSE without delay (0345 300 9923) followed by an online F2508 report within 10 days."
+      : hasDays
+        ? `This incident must be reported online within ${terminal.deadlineDays} days of the incident date.`
+        : (terminal.deadline || "This incident must be reported online to HSE without delay upon receipt of a written diagnosis.");
     doc.setFillColor(urgBgRGB[0], urgBgRGB[1], urgBgRGB[2]);
     doc.setDrawColor(urgRGB[0], urgRGB[1], urgRGB[2]);
     doc.setLineWidth(0.8);
@@ -916,7 +933,13 @@ export default function RiddorReportingDecisionToolClient() {
           },
           {
             label: "Deadline",
-            value: terminalResult ? (terminalResult.deadlineImmediate ? "IMMEDIATE" : `${terminalResult.deadlineDays || "N/A"} days`) : "--",
+            value: terminalResult
+              ? (terminalResult.deadlineImmediate
+                  ? "IMMEDIATE"
+                  : (terminalResult.deadlineDays && terminalResult.deadlineDays > 0
+                      ? `${terminalResult.deadlineDays} days`
+                      : (terminalResult.reportable ? "Without delay" : "N/A")))
+              : "--",
             sub: deadline ? (deadline.isOverdue ? `OVERDUE by ${Math.abs(deadline.daysRemaining)} days` : `${deadline.daysRemaining} days remaining`) : (terminalResult?.deadline || "Complete assessment"),
             bgClass: deadline?.isOverdue ? "bg-red-50" : "bg-orange-50",
             textClass: deadline?.isOverdue ? "text-red-800" : "text-orange-800",
