@@ -6,7 +6,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 export const metadata: Metadata = {
   title: "Lone Worker Risk Score Calculator | Construction Tool | Ebrora",
   description:
-    "Score lone worker risk using HSE INDG73 methodology with multiplicative risk model. 8 weighted risk factors, radar chart, risk gauge, what-if comparison, pre-start checklist, BS 8484 device recommendations, and white-label PDF export.",
+    "Score lone worker risk using HSE INDG73 methodology with multiplicative risk model. 8 weighted risk factors, radar chart, risk gauge, what-if comparison, pre-start checklist, BS 8484:2022 device recommendations, and white-label PDF export.",
   alternates: { canonical: "https://www.ebrora.com/tools/lone-worker-risk-calculator" },
   openGraph: {
     title: "Lone Worker Risk Score Calculator | Ebrora",
@@ -41,7 +41,7 @@ const pageSchema = {
   "@type": "SoftwareApplication",
   name: "Lone Worker Risk Score Calculator",
   description:
-    "Score lone worker risk using HSE INDG73 methodology with multiplicative risk model. 8 weighted factors, radar chart, risk gauge, what-if comparison, BS 8484 recommendations, and white-label PDF.",
+    "Score lone worker risk using HSE INDG73 methodology with multiplicative risk model. 8 weighted factors, radar chart, risk gauge, what-if comparison, BS 8484:2022 recommendations, and white-label PDF.",
   url: "https://www.ebrora.com/tools/lone-worker-risk-calculator",
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Web",
@@ -67,7 +67,7 @@ export default function LoneWorkerRiskCalculatorPage() {
             Lone Worker Risk Score Calculator
           </h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Score lone worker risk using HSE INDG73 methodology with a multiplicative risk model. 8 weighted risk factors covering activity type, remoteness, communication, duration, and more. Radar chart, risk gauge, what-if comparison, BS 8484 device recommendations, pre-start checklist, and white-label PDF export.
+            Score lone worker risk using HSE INDG73 methodology with a multiplicative risk model. 8 weighted risk factors covering activity type, remoteness, communication, duration, and more. Radar chart, risk gauge, what-if comparison, BS 8484:2022 device recommendations, pre-start checklist, and white-label PDF export.
           </p>
         </div>
 
