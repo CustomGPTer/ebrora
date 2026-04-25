@@ -6,11 +6,11 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 export const metadata: Metadata = {
   title: "Sling / Lifting Gear SWL Calculator | Free Construction Tool | Ebrora",
   description:
-    "Calculate the effective Safe Working Load (SWL) of multi-leg sling sets. Mode factors, angle reduction per LEEA guidance, capacity curve chart, utilisation gauge, and professional PDF export. Free for UK construction site teams.",
+    "Calculate the effective Safe Working Load (SWL) of multi-leg sling sets. BS EN 13414 / 818-4 / 1492 combined mode factors, capacity curve chart, utilisation gauge, and professional PDF export. Free for UK construction site teams.",
   alternates: { canonical: "https://www.ebrora.com/tools/sling-swl-calculator" },
   openGraph: {
     title: "Sling / Lifting Gear SWL Calculator | Ebrora",
-    description: "Free sling SWL calculator. Chain, wire rope, and textile slings. LEEA angle factors, capacity curve, utilisation gauge, and PDF export.",
+    description: "Free sling SWL calculator. Chain, wire rope, and textile slings. BS EN 13414 / 818-4 / 1492 combined mode factors, capacity curve, utilisation gauge, and PDF export.",
     url: "https://www.ebrora.com/tools/sling-swl-calculator",
     type: "website",
     images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }],
@@ -30,7 +30,7 @@ const SlingSWLCalculatorClient = dynamic(
   }
 );
 
-const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Sling / Lifting Gear SWL Calculator", description: "Calculate the effective Safe Working Load (SWL) of multi-leg sling sets per LEEA guidance. Chain, wire rope, and textile slings. Mode factors, angle reduction, capacity curve chart, utilisation gauge, risk banding, and professional PDF export.", url: "https://www.ebrora.com/tools/sling-swl-calculator", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
+const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Sling / Lifting Gear SWL Calculator", description: "Calculate the effective Safe Working Load (SWL) of multi-leg sling sets per BS EN 13414 / 818-4 / 1492 combined mode factors. Chain, wire rope, and textile slings. Capacity curve chart, utilisation gauge, risk banding, and professional PDF export.", url: "https://www.ebrora.com/tools/sling-swl-calculator", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
 
 export default function SlingSWLCalculatorPage() {
   return (
