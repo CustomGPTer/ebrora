@@ -5,9 +5,9 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Site Induction Duration Calculator | Free Construction Tool | Ebrora",
-  description: "Calculate recommended site induction duration based on project type, site hazards, CDM status, and client requirements. Generates a professional agenda breakdown, refresher schedule, and comprehension test recommendation per CDM 2015, HSWA 1974, and MHSWR 1999.",
+  description: "Calculate recommended site induction duration based on project type, site hazards, CDM status, and client requirements. Generates a professional agenda breakdown, refresher schedule, and comprehension test recommendation per CDM 2015 reg 13(4)(a), HSWA 1974, and MHSWR 1999.",
   alternates: { canonical: "https://www.ebrora.com/tools/site-induction-duration-calculator" },
-  openGraph: { title: "Site Induction Duration Calculator | Ebrora", description: "Calculate recommended site induction duration with professional PDF export. CDM 2015, HSWA 1974, MHSWR 1999, CIS 36.", url: "https://www.ebrora.com/tools/site-induction-duration-calculator", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
+  openGraph: { title: "Site Induction Duration Calculator | Ebrora", description: "Calculate recommended site induction duration with professional PDF export. CDM 2015 reg 13(4)(a), HSWA 1974, MHSWR 1999, HSE L153.", url: "https://www.ebrora.com/tools/site-induction-duration-calculator", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
 };
 
 const SiteInductionDurationCalculatorClient = dynamic(
@@ -23,7 +23,7 @@ const SiteInductionDurationCalculatorClient = dynamic(
   }
 );
 
-const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Site Induction Duration Calculator", description: "Calculate recommended site induction duration based on project type, site hazards, CDM status, and client requirements. Generates agenda breakdown, refresher schedule, and comprehension test recommendation per CDM 2015, HSWA 1974, MHSWR 1999, and CIS 36.", url: "https://www.ebrora.com/tools/site-induction-duration-calculator", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
+const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Site Induction Duration Calculator", description: "Calculate recommended site induction duration based on project type, site hazards, CDM status, and client requirements. Generates agenda breakdown, refresher schedule, and comprehension test recommendation per CDM 2015 reg 13(4)(a), HSWA 1974, MHSWR 1999, and HSE L153.", url: "https://www.ebrora.com/tools/site-induction-duration-calculator", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
 
 export default function SiteInductionDurationCalculatorPage() {
   return (
