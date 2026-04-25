@@ -5,7 +5,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Slip Risk Assessment Calculator | Construction Tool | Ebrora",
-  description: "Score slip risk for floor surfaces, walkways, and access routes using the HSE slip assessment methodology (GEIS2). 80+ surface types, multi-zone assessment, contamination and human factor scoring, control measure recommendations, and white-label PDF export.",
+  description: "Score slip risk for floor surfaces, walkways, and access routes per the HSE GEIS2 methodology. Pendulum Test Value (PTV) classification (≤24 high / 25-35 moderate / ≥36 low), 80+ surface types, multi-zone assessment, optional measured PTV input, contamination and aggravating-factor escalation, control measure recommendations, and white-label PDF export.",
   alternates: { canonical: "https://www.ebrora.com/tools/slip-risk-calculator" },
   openGraph: { title: "Slip Risk Assessment Calculator | Ebrora", url: "https://www.ebrora.com/tools/slip-risk-calculator", type: "website" },
 };
@@ -28,7 +28,7 @@ export default function SlipRiskCalculatorPage() {
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Slip Risk Assessment Calculator</h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Score slip risk for floor surfaces, walkways, and access routes per the HSE slip assessment methodology. 80+ surface types, multi-zone assessment, contamination and human factor scoring, control measure recommendations, and white-label PDF assessment export.
+            Score slip risk for floor surfaces, walkways, and access routes per the HSE GEIS2 methodology. Pendulum Test Value (PTV) bands (≤24 high / 25-35 moderate / ≥36 low), 80+ surface types, multi-zone assessment, optional measured PTV input, control measure recommendations, and white-label PDF assessment export.
           </p>
         </div>
         <SlipRiskClient />
