@@ -5,7 +5,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Trench Backfill & Pipe Bedding Calculator | Construction Tool | Ebrora",
-  description: "Calculate bedding, side fill, and backfill volumes per HAUC/SROH. Material selectors per zone, import/export tonnage, and white-label PDF.",
+  description: "Calculate bedding, side fill, and backfill volumes per BS EN 1610. Material selectors per zone, import/export tonnage, and white-label PDF.",
   alternates: { canonical: "https://www.ebrora.com/tools/trench-backfill-calculator" },
 };
 
@@ -26,7 +26,7 @@ export default function TrenchBackfillCalculatorPage() {
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Trench Backfill &amp; Pipe Bedding Calculator</h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Calculate bedding, side fill (haunch), and backfill volumes per HAUC/SROH specification. Separate material selectors per zone, re-use toggle for excavated material, net import/export tonnage, and white-label PDF with full sign-off.
+            Calculate bedding, side fill (haunch), and backfill volumes per BS EN 1610 (Construction and testing of drains and sewers). Separate material selectors per zone, re-use toggle for excavated material, net import/export tonnage, and white-label PDF with full sign-off.
           </p>
         </div>
         <TrenchBackfillClient />
