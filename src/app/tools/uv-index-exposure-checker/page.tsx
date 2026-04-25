@@ -70,7 +70,7 @@ export default function UVIndexExposureCheckerPage() {
             UV Index Exposure Checker
           </h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Calculate UV index exposure for outdoor construction workers using solar position equations and WHO/WMO data. Hourly UV chart, cumulative SED tracking against the HSE 2 SED/day threshold, Fitzpatrick skin type burn time estimates, PPE protection comparison, and professional PDF export.
+            Calculate UV index exposure for outdoor construction workers using solar position equations and WHO/WMO data. Hourly UV chart, cumulative SED tracking against the ICNIRP-derived 2 SED/day threshold, Fitzpatrick skin type burn time estimates, PPE protection comparison, and professional PDF export.
           </p>
         </div>
 
