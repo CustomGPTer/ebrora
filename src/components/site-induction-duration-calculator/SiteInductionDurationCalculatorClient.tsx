@@ -128,7 +128,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("SITE INDUCTION DURATION ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("Industry best practice | CDM 2015 / HSWA 1974 / MHSWR 1999 / CIS 36 (guidance only -- no legislation specifies duration)", M, 19);
+  doc.text("Industry best practice | CDM 2015 reg 13(4)(a) / HSWA 1974 / MHSWR 1999 / HSE L153 (guidance only -- no legislation specifies duration)", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34; doc.setTextColor(0, 0, 0);
