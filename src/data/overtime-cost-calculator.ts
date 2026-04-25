@@ -20,7 +20,7 @@ export interface OperativeGroup {
 
 export interface EmployerOnCosts {
   enabled: boolean;
-  nicPercent: number;       // Employer NIC — default 13.8%
+  nicPercent: number;       // Employer NIC — default 15%
   pensionPercent: number;   // Employer pension — default 3%
   citbLevyPercent: number;  // CITB levy — default 0.35%
 }
@@ -388,9 +388,9 @@ export function calculateOvertime(inputs: OvertimeInputs): CalculationResult {
 // ─── Regulation References ───────────────────────────────────
 export const REGULATIONS = [
   { ref: "Working Time Regulations 1998", detail: "Maximum 48-hour average working week (opt-out available). Night workers max 8 hours average. 11 consecutive hours rest per 24-hour period. 24 hours uninterrupted rest per 7-day period (or 48 hours per 14 days)." },
-  { ref: "HMRC Employer NIC", detail: "Employer National Insurance Contributions at 13.8% on earnings above the secondary threshold (currently £175/week). Applies to all overtime payments." },
+  { ref: "HMRC Employer NIC", detail: "Employer National Insurance Contributions at 15% on earnings above the secondary threshold (£5,000/year). Applies to all overtime payments." },
   { ref: "Auto-Enrolment Pensions", detail: "Employer minimum contribution of 3% of qualifying earnings (currently £6,240 to £50,270 per year). Overtime pay counts as qualifying earnings." },
-  { ref: "CITB Levy", detail: "Construction Industry Training Board levy of 0.35% of gross wages for employers with PAYE wage bills over £120,000." },
+  { ref: "CITB Levy", detail: "CITB levy under the 2026 Levy Order: 0.35% of PAYE wages plus 1.25% of net CIS subcontractor payments. Small Business Exemption if total wage bill is under £150,000; 50% Small Business Reduction between £150,000 and £499,999. Labour agency payments are exempt from the 2026 Levy assessment (Spring 2027 onwards)." },
   { ref: "CIJC Working Rule Agreement", detail: "Standard working week of 39 hours (Mon-Fri). Overtime rates: time-and-a-half for weekday overtime and Saturdays, double time for Sundays and bank holidays." },
   { ref: "NAECI Agreement", detail: "National Agreement for the Engineering Construction Industry. Standard 45-hour week. Enhanced overtime rates apply." },
   { ref: "CDM 2015 Reg 4(5)", detail: "Duty to ensure sufficient time and resources are allocated. Excessive overtime can indicate insufficient resources and is a leading indicator of fatigue-related incidents." },
