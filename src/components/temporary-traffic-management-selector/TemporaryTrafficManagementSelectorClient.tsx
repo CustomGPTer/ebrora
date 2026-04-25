@@ -207,7 +207,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.setFont("helvetica", "bold");
   doc.text("TEMPORARY TRAFFIC MANAGEMENT ASSESSMENT", M, 12);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text("Chapter 8 Traffic Signs Manual | Safety at Street Works CoP 2013 | NRSWA 1991 | TMA 2004", M, 19);
+  doc.text("Chapter 8 Traffic Signs Manual (Parts 1-2: 2009; Part 3 Update: 2020) | Safety at Street Works CoP 2013 | NRSWA 1991 | TMA 2004", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34; doc.setTextColor(0, 0, 0);
@@ -344,7 +344,7 @@ async function exportPDF(
   // ── Signing Dimensions Table
   checkPage(35);
   doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-  doc.text("Signing Dimensions (Safety at Street Works CoP Table A1)", M, y); y += 5;
+  doc.text("Signing Dimensions (Safety at Street Works CoP 2013, ≤40 mph; Chapter 8 Part 1 Table A1, ≥50 mph)", M, y); y += 5;
 
   const dimCols = [48, 28, 28, 28, CW - 132];
   let cx = M;
@@ -605,7 +605,7 @@ async function exportPDF(
     doc.setPage(p);
     doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
     doc.text(
-      "TTM assessment per Chapter 8 Traffic Signs Manual and Safety at Street Works CoP 2013. This tool is an aid to planning -- site-specific conditions must be verified by a competent person.",
+      "TTM assessment per Chapter 8 Traffic Signs Manual (Parts 1-2: 2009; Part 3 Update: 2020) and Safety at Street Works CoP 2013. This tool is an aid to planning -- site-specific conditions must be verified by a competent person.",
       M, 290
     );
     doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 290);
@@ -897,9 +897,10 @@ export default function TemporaryTrafficManagementSelectorClient() {
         )}
         <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600 space-y-1.5">
           <div className="font-bold text-gray-700 text-[10px] uppercase">NHSS Scheme Differences</div>
-          <div><span className="font-bold">NHSS 12A/B (Motorways &amp; High-Speed Duals):</span> For works on motorways and dual carriageways with speed limits of 50 mph and above. 12A covers the physical installation, maintenance, and removal of TM. 12B covers the planning, design, and management of TM schemes. Both required on these roads.</div>
-          <div><span className="font-bold">NHSS 12D (Urban, Rural &amp; Low-Speed Duals):</span> For works on single carriageways, urban/rural roads, and dual carriageways at 40 mph and below. Modules: M1/M2 (operative), M3 (low-speed duals), M5 (multiphase signals), M7 (designers &amp; client officers).</div>
-          <div><span className="font-bold">Key threshold:</span> 50 mph on a dual carriageway or any motorway triggers 12A/B. Everything below that on public highway uses 12D. Complex schemes on any road may also require a 12D M7 or 12B qualified designer.</div>
+          <div><span className="font-bold">NHSS 12A/B (Static TM on motorways &amp; high-speed duals):</span> For static temporary traffic management on motorways and dual carriageways with speed limits of 50 mph and above (including on-line widening and contraflow). Combined sector scheme since 2009 covering installation, maintenance, removal, planning and design.</div>
+          <div><span className="font-bold">NHSS 12C (Mobile lane closure):</span> Separate sector scheme for mobile lane closure traffic management on motorways and other dual carriageways. Required where works move continuously or stop only at very close intervals.</div>
+          <div><span className="font-bold">NHSS 12D (Urban, rural &amp; low-speed duals):</span> For works on single carriageways, urban/rural roads, and dual carriageways at 40 mph and below. Modules: T1/T2 (trainee), M1/M2 (RTMO single carriageway — base qualification), M3 (low-speed dual carriageways), M4 (convoy operations), M5 (multiphase portable signals), M6 (RLTMO supervisor), M7 (designers &amp; client officers). M1/M2 must remain in date for any of M3–M5 to remain valid.</div>
+          <div><span className="font-bold">Key threshold:</span> 50 mph on a dual carriageway or any motorway triggers 12A/B (or 12C for mobile lane closures). Everything below that on public highway uses 12D. Complex schemes on any road may also require a 12D M7 or 12B qualified designer.</div>
         </div>
       </div>
 
@@ -994,8 +995,8 @@ export default function TemporaryTrafficManagementSelectorClient() {
 
       {/* ── Regulatory References ─────────────────────────── */}
       <div className="text-[10px] text-gray-400 space-y-0.5 px-1">
-        <div>Chapter 8 Traffic Signs Manual (2009) | Safety at Street Works and Road Works Code of Practice (2013)</div>
-        <div>NRSWA 1991 | TMA 2004 | TSRGD 2016 | GG 104 | NHSS 12A/B &amp; 12D | MHSWR 1999</div>
+        <div>Chapter 8 Traffic Signs Manual Parts 1-2 (2009) &amp; Part 3 Update (2020) | Safety at Street Works and Road Works Code of Practice (2013, in force 1 Oct 2014)</div>
+        <div>NRSWA 1991 (s.52, s.54, s.55, s.74; SI 1992/2985 reg 6) | TMA 2004 | TSRGD 2016 | GG 117 (Temporary Traffic Management) | GG 104 (Safety risk assessment) | NHSS 12A/B, 12C &amp; 12D | MHSWR 1999</div>
       </div>
     </div>
   );
