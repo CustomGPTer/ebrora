@@ -37,12 +37,12 @@ function buildFacilityRows(req: FullRequirements, provided: Record<string, numbe
     { id: "male_wc", label: "Male WCs", category: "Sanitary", required: req.maleWCs, provided: provided.male_wc ?? 0, status: "compliant", regulation: "BS 6465 / HSG150", unit: "nr" },
     { id: "male_urinal", label: "Male Urinals", category: "Sanitary", required: req.maleUrinals, provided: provided.male_urinal ?? 0, status: "compliant", regulation: "BS 6465", unit: "nr" },
     { id: "female_wc", label: "Female WCs", category: "Sanitary", required: req.femaleWCs, provided: provided.female_wc ?? 0, status: "compliant", regulation: "BS 6465 / CDM Sch.2", unit: "nr" },
-    { id: "wash", label: "Wash Stations", category: "Hygiene", required: req.washStations, provided: provided.wash ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.3", unit: "nr" },
-    { id: "drinking", label: "Drinking Water Points", category: "Hygiene", required: req.drinkingWaterPoints, provided: provided.drinking ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.4", unit: "nr" },
-    { id: "changing", label: "Changing/Drying Seats", category: "Changing", required: req.changingSeats, provided: provided.changing ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.5", unit: "seats" },
-    { id: "rest", label: "Rest/Eating Seats", category: "Rest", required: req.restSeats, provided: provided.rest ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.6", unit: "seats" },
+    { id: "wash", label: "Wash Stations", category: "Hygiene", required: req.washStations, provided: provided.wash ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.2", unit: "nr" },
+    { id: "drinking", label: "Drinking Water Points", category: "Hygiene", required: req.drinkingWaterPoints, provided: provided.drinking ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.3", unit: "nr" },
+    { id: "changing", label: "Changing/Drying Seats", category: "Changing", required: req.changingSeats, provided: provided.changing ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.4", unit: "seats" },
+    { id: "rest", label: "Rest/Eating Seats", category: "Rest", required: req.restSeats, provided: provided.rest ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.5", unit: "seats" },
     { id: "first_aid", label: "First Aid Rooms", category: "First Aid", required: req.firstAidRooms, provided: provided.first_aid ?? 0, status: "compliant", regulation: "H&S (First Aid) Regs 1981", unit: "nr" },
-    { id: "ppe", label: "PPE Lockers/Storage", category: "Storage", required: req.ppeLockers, provided: provided.ppe ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.5(2)", unit: "nr" },
+    { id: "ppe", label: "PPE Lockers/Storage", category: "Storage", required: req.ppeLockers, provided: provided.ppe ?? 0, status: "compliant", regulation: "CDM 2015 Sch.2 Para.4(4)", unit: "nr" },
   ];
   for (const r of rows) {
     r.status = getComplianceStatus(r.required, r.provided);
