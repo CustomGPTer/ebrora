@@ -389,7 +389,7 @@ async function exportPDF(
       doc.setFillColor(254, 226, 226); doc.setDrawColor(220, 38, 38);
       doc.roundedRect(M, y - 2, CW, 12, 1.5, 1.5, "FD");
       doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(153, 27, 27);
-      doc.text("! Maximum 30-minute short-duration rule (HSE INDG455)", M + 4, y + 2);
+      doc.text("! Maximum 30-minute short-duration rule (LA455 / Ladder Association)", M + 4, y + 2);
       doc.setFontSize(7); doc.setFont("helvetica", "normal");
       doc.text("If the task cannot be completed within 30 minutes at one location, a working platform is required instead.", M + 4, y + 6);
       doc.setTextColor(0, 0, 0); y += 16;
@@ -938,7 +938,7 @@ export default function LadderStepladderJustificationToolClient() {
       {/* ── Footer ──────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-          Decision-support tool for Work at Height Regulations 2005 hierarchy (Reg 6). Based on HSE INDG455, Ladder Association, PASMA, IPAF, and CISRS guidance.
+          Decision-support tool for Work at Height Regulations 2005 hierarchy (Reg 6). Based on LA455 (Ladder Association), PASMA, IPAF, and CISRS guidance.
           This tool records a justification trail -- it does not replace competent risk assessment or site-specific design.
         </p>
         <a href="https://ebrora.gumroad.com/" target="_blank" rel="noopener noreferrer"
