@@ -30,7 +30,8 @@ export function calculateDirectWBGT(inputs: DirectInputs): number | null {
 
 /**
  * Mode B: Simplified estimation from air temp, humidity, wind, sun exposure
- * Uses Lemke & Kjellstrom (2012) simplified outdoor WBGT approximation:
+ * Uses the Australian Bureau of Meteorology (ABoM) simplified outdoor WBGT approximation,
+ * validated for occupational use by Lemke & Kjellstrom (2012):
  *   WBGT ≈ 0.567×Ta + 0.393×e + 3.94 + solar adjustment
  * where e = water vapour pressure = (RH/100) × 6.105 × exp(17.27×Ta / (237.7+Ta))
  * Solar and wind adjustments applied as empirical offsets.
