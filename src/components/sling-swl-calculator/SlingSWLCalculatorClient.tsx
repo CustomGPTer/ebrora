@@ -6,11 +6,12 @@ import {
   calculateSling,
   generateCapacityCurve,
   calcAngleFromGeometry,
+  getModeFactor,
   SLING_TYPE_LABELS,
   SLING_TYPE_SHORT,
   LEG_OPTIONS,
-  MODE_FACTORS,
   ANGLE_TABLE,
+  MAX_PERMITTED_ANGLE,
   RISK_BAND_CONFIG,
   REGULATIONS,
   type SlingType,
@@ -34,32 +35,51 @@ function CapacityCurve({ singleLegSWL, legs, currentAngle, loadWeight }: { singl
   if (legs === 1 || data.length < 2) return null;
   const W = 560; const H = 300; const pad = { top: 20, right: 20, bottom: 45, left: 60 };
   const cW = W - pad.left - pad.right; const cH = H - pad.top - pad.bottom;
+  const X_MAX = 90; // chart range (60 is BS EN hard cap; show 30 deg of "not permitted" zone)
   const maxSWL = data[0].swl * 1.05;
-  const xScale = (a: number) => pad.left + (a / 120) * cW;
+  const xScale = (a: number) => pad.left + (a / X_MAX) * cW;
   const yScale = (s: number) => pad.top + cH - (s / maxSWL) * cH;
-  const pathD = data.map((d, i) => `${i === 0 ? "M" : "L"}${xScale(d.angle).toFixed(1)},${yScale(d.swl).toFixed(1)}`).join(" ");
-  const xTicks = [0, 15, 30, 45, 60, 75, 90, 105, 120];
+  // For step-function rendering: emit horizontal-then-vertical segments at band boundaries
+  const stepSegments: string[] = [];
+  data.forEach((d, i) => {
+    if (i === 0) { stepSegments.push(`M${xScale(d.angle).toFixed(1)},${yScale(d.swl).toFixed(1)}`); return; }
+    const prev = data[i - 1];
+    if (prev.swl !== d.swl) {
+      // vertical drop at the band edge, then horizontal at new level
+      stepSegments.push(`L${xScale(d.angle).toFixed(1)},${yScale(prev.swl).toFixed(1)}`);
+      stepSegments.push(`L${xScale(d.angle).toFixed(1)},${yScale(d.swl).toFixed(1)}`);
+    } else {
+      stepSegments.push(`L${xScale(d.angle).toFixed(1)},${yScale(d.swl).toFixed(1)}`);
+    }
+  });
+  const pathD = stepSegments.join(" ");
+  const xTicks = [0, 15, 30, 45, 60, 75, 90];
   const yMax = Math.ceil(maxSWL);
   const yStep = yMax <= 5 ? 0.5 : yMax <= 20 ? 2 : yMax <= 50 ? 5 : 10;
   const yTicks: number[] = []; for (let v = 0; v <= maxSWL; v += yStep) yTicks.push(v);
-  const safeX = xScale(90); const dangerX = xScale(120);
-  const cAngle = Math.min(currentAngle, 120);
-  const cSWL = data.find(d => d.angle >= cAngle)?.swl ?? 0;
+  const cautionX = xScale(45); const dangerX = xScale(60);
+  const cAngle = Math.min(currentAngle, X_MAX);
+  // Find SWL at the current angle using the same band logic
+  const cSWL = (() => {
+    if (cAngle > 60) return 0;
+    if (cAngle <= 45) return legs === 2 ? singleLegSWL * 1.4 : singleLegSWL * 2.1;
+    return legs === 2 ? singleLegSWL * 1.0 : singleLegSWL * 1.5;
+  })();
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 340 }}>
       <rect x={pad.left} y={pad.top} width={cW} height={cH} fill="#fafafa" stroke="#e5e7eb" strokeWidth={1} rx={3} />
-      <rect x={pad.left} y={pad.top} width={safeX - pad.left} height={cH} fill="rgba(22,163,74,0.04)" />
-      <rect x={safeX} y={pad.top} width={dangerX - safeX} height={cH} fill="rgba(245,158,11,0.06)" />
-      <rect x={dangerX} y={pad.top} width={pad.left + cW - dangerX} height={cH} fill="rgba(220,38,38,0.06)" />
-      <line x1={safeX} y1={pad.top} x2={safeX} y2={pad.top + cH} stroke="#D97706" strokeWidth={1} strokeDasharray="4,3" opacity={0.5} />
-      <text x={safeX + 3} y={pad.top + 12} fontSize={8} fill="#D97706" fontFamily="system-ui">90deg</text>
-      <line x1={dangerX} y1={pad.top} x2={dangerX} y2={pad.top + cH} stroke="#DC2626" strokeWidth={1} strokeDasharray="4,3" opacity={0.5} />
-      <text x={dangerX + 3} y={pad.top + 12} fontSize={8} fill="#DC2626" fontFamily="system-ui">120deg MAX</text>
+      <rect x={pad.left} y={pad.top} width={cautionX - pad.left} height={cH} fill="rgba(22,163,74,0.06)" />
+      <rect x={cautionX} y={pad.top} width={dangerX - cautionX} height={cH} fill="rgba(245,158,11,0.08)" />
+      <rect x={dangerX} y={pad.top} width={pad.left + cW - dangerX} height={cH} fill="rgba(220,38,38,0.10)" />
+      <line x1={cautionX} y1={pad.top} x2={cautionX} y2={pad.top + cH} stroke="#D97706" strokeWidth={1} strokeDasharray="4,3" opacity={0.6} />
+      <text x={cautionX + 3} y={pad.top + 12} fontSize={8} fill="#D97706" fontFamily="system-ui">45deg band edge</text>
+      <line x1={dangerX} y1={pad.top} x2={dangerX} y2={pad.top + cH} stroke="#DC2626" strokeWidth={1.5} strokeDasharray="4,3" opacity={0.7} />
+      <text x={dangerX + 3} y={pad.top + 12} fontSize={8} fill="#DC2626" fontFamily="system-ui">60deg BS EN MAX</text>
       {xTicks.map(t => <line key={`xg${t}`} x1={xScale(t)} y1={pad.top} x2={xScale(t)} y2={pad.top + cH} stroke="#e5e7eb" strokeWidth={0.5} strokeDasharray="2,3" />)}
       {yTicks.map(t => <line key={`yg${t}`} x1={pad.left} y1={yScale(t)} x2={pad.left + cW} y2={yScale(t)} stroke="#e5e7eb" strokeWidth={0.5} strokeDasharray="2,3" />)}
       {loadWeight > 0 && loadWeight <= maxSWL && (<><line x1={pad.left} y1={yScale(loadWeight)} x2={pad.left + cW} y2={yScale(loadWeight)} stroke="#6366F1" strokeWidth={1.5} strokeDasharray="6,3" opacity={0.7} /><text x={pad.left + cW - 2} y={yScale(loadWeight) - 4} textAnchor="end" fontSize={9} fill="#6366F1" fontWeight={600} fontFamily="system-ui">{fmtNum(loadWeight, 1)}t load</text></>)}
       <path d={pathD} fill="none" stroke="#1B5745" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-      {cAngle >= 0 && cAngle <= 120 && (<><line x1={xScale(cAngle)} y1={pad.top} x2={xScale(cAngle)} y2={pad.top + cH} stroke="#1B5745" strokeWidth={1.5} strokeDasharray="4,2" opacity={0.5} /><circle cx={xScale(cAngle)} cy={yScale(cSWL)} r={6} fill="#1B5745" stroke="#fff" strokeWidth={2.5} /></>)}
+      {cAngle >= 0 && cAngle <= X_MAX && (<><line x1={xScale(cAngle)} y1={pad.top} x2={xScale(cAngle)} y2={pad.top + cH} stroke="#1B5745" strokeWidth={1.5} strokeDasharray="4,2" opacity={0.5} /><circle cx={xScale(cAngle)} cy={yScale(cSWL)} r={6} fill="#1B5745" stroke="#fff" strokeWidth={2.5} /></>)}
       <line x1={pad.left} y1={pad.top + cH} x2={pad.left + cW} y2={pad.top + cH} stroke="#374151" strokeWidth={1.5} />
       <line x1={pad.left} y1={pad.top} x2={pad.left} y2={pad.top + cH} stroke="#374151" strokeWidth={1.5} />
       {xTicks.map(t => <text key={`xl${t}`} x={xScale(t)} y={pad.top + cH + 15} textAnchor="middle" fontSize={10} fill="#6b7280" fontFamily="system-ui">{t}deg</text>)}
@@ -79,7 +99,7 @@ function SlingDiagram({ legs, angleDeg }: { legs: LegCount; angleDeg: number }) 
   const spreadX = Math.sin(halfAngleRad) * legLen;
   const dropY = Math.cos(halfAngleRad) * legLen;
   const attachY = hookY + dropY;
-  const legColour = angleDeg > 120 ? "#DC2626" : angleDeg > 90 ? "#D97706" : "#374151";
+  const legColour = angleDeg > 60 ? "#DC2626" : angleDeg > 45 ? "#D97706" : "#374151";
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 220 }}>
       <circle cx={hookX} cy={hookY} r={8} fill="none" stroke="#374151" strokeWidth={2} />
@@ -203,40 +223,41 @@ export default function SlingSWLCalculatorClient() {
       doc.text(`Single Leg SWL: ${fmtNum(singleLegSWL, 1)} tonnes`, M + 4, y + 17);
       doc.text(`Included Angle: ${fmtNum(effectiveAngle, 1)} degrees${angleMode === "geometry" ? ` (from H=${fmtNum(verticalHeight, 1)}m, S=${fmtNum(horizontalSpread, 1)}m)` : ""}`, M + CW / 2, y + 17);
       doc.text(`Load Weight: ${fmtNum(loadWeight, 1)} tonnes`, M + 4, y + 22);
-      doc.text(`Mode Factor: ${MODE_FACTORS[legs]} | Angle Factor: ${fmtNum(result.angleReductionFactor, 3)}`, M + CW / 2, y + 22);
+      doc.text(`Mode Factor (BS EN): ${fmtNum(result.modeFactor, 2)} | Band: ${effectiveAngle <= 45 ? "≤45°" : effectiveAngle <= MAX_PERMITTED_ANGLE ? "45-60°" : ">60° NOT PERMITTED"}`, M + CW / 2, y + 22);
       doc.setFont("helvetica", "bold");
       doc.text(`Effective SWL: ${fmtNum(result.effectiveSWL, 2)} tonnes | Utilisation: ${fmtNum(result.utilisation, 1)}% | Status: ${cfg.label}`, M + 4, y + 28);
       y += 36;
 
-      // Angle table
-      checkPage(40);
+      // BS EN combined mode factor table
+      checkPage(30);
       doc.setFontSize(9); doc.setFont("helvetica", "bold");
-      doc.text("Angle Reduction Factor Table (LEEA)", M, y); y += 5;
-      const aCols = [30, 30, 30, 30, 30, 36];
-      doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); let cx = M;
-      ["Angle (deg)", "Factor", "Angle (deg)", "Factor", "Angle (deg)", "Factor"].forEach((h, i) => {
-        doc.setFillColor(27, 87, 69); doc.rect(cx, y, aCols[i], 6, "F");
-        doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += aCols[i];
+      doc.text("BS EN Combined Mode Factor Table", M, y); y += 5;
+      doc.setFontSize(6.5); doc.setFont("helvetica", "italic");
+      doc.text("Per BS EN 13414 / 818-4 / 1492. Includes load-sharing + angle. Above 60° not permitted.", M, y); y += 5;
+      const bCols = [60, 40, 50];
+      doc.setFontSize(7); doc.setFont("helvetica", "bold"); let bx = M;
+      ["Angle Band", "2-leg", "3 or 4-leg"].forEach((h, i) => {
+        doc.setFillColor(27, 87, 69); doc.rect(bx, y, bCols[i], 6, "F");
+        doc.setTextColor(255, 255, 255); doc.text(h, bx + 2, y + 4); bx += bCols[i];
       });
       doc.setTextColor(0, 0, 0); y += 6;
-      const pairs = ANGLE_TABLE; const rowCount = Math.ceil(pairs.length / 3);
-      doc.setFontSize(6); doc.setDrawColor(200, 200, 200);
-      for (let r = 0; r < rowCount; r++) {
-        cx = M;
-        for (let c = 0; c < 3; c++) {
-          const idx = r + c * rowCount; const p = pairs[idx];
-          const aW = aCols[c * 2]; const fW = aCols[c * 2 + 1];
-          const isCurrent = p && Math.abs(p.angle - effectiveAngle) < 8;
-          if (p) {
-            if (isCurrent) { doc.setFillColor(232, 240, 236); doc.rect(cx, y, aW, 5.5, "FD"); doc.setFillColor(232, 240, 236); doc.rect(cx + aW, y, fW, 5.5, "FD"); }
-            else { doc.rect(cx, y, aW, 5.5, "D"); doc.rect(cx + aW, y, fW, 5.5, "D"); }
-            doc.setTextColor(0, 0, 0); doc.setFont("helvetica", isCurrent ? "bold" : "normal");
-            doc.text(`${p.angle}`, cx + 2, y + 3.5); doc.text(`${p.factor.toFixed(2)}`, cx + aW + 2, y + 3.5);
-          } else { doc.rect(cx, y, aW, 5.5, "D"); doc.rect(cx + aW, y, fW, 5.5, "D"); }
-          cx += aW + fW;
-        }
-        y += 5.5;
-      }
+      const bandRows: { band: string; legs2: string; legs3or4: string; matches: boolean }[] = [
+        { band: "0° - 45°", legs2: "1.4", legs3or4: "2.1", matches: legs > 1 && effectiveAngle <= 45 },
+        { band: ">45° - 60°", legs2: "1.0", legs3or4: "1.5", matches: legs > 1 && effectiveAngle > 45 && effectiveAngle <= MAX_PERMITTED_ANGLE },
+        { band: ">60° (NOT PERMITTED)", legs2: "—", legs3or4: "—", matches: legs > 1 && effectiveAngle > MAX_PERMITTED_ANGLE },
+      ];
+      doc.setFontSize(7); doc.setDrawColor(200, 200, 200);
+      bandRows.forEach(row => {
+        bx = M;
+        const cells = [row.band, row.legs2, row.legs3or4];
+        cells.forEach((cell, i) => {
+          if (row.matches) { doc.setFillColor(232, 240, 236); doc.rect(bx, y, bCols[i], 6, "FD"); }
+          else { doc.rect(bx, y, bCols[i], 6, "D"); }
+          doc.setTextColor(0, 0, 0); doc.setFont("helvetica", row.matches ? "bold" : "normal");
+          doc.text(cell, bx + 2, y + 4); bx += bCols[i];
+        });
+        y += 6;
+      });
       y += 6;
 
       // Results summary
@@ -251,7 +272,7 @@ export default function SlingSWLCalculatorClient() {
         ["Max safe angle for this load", `${fmtNum(result.maxSafeAngle, 1)} degrees`],
         ["Max safe load at this angle", `${fmtNum(result.maxSafeLoad, 2)} tonnes`],
       ];
-      doc.setFontSize(6.5); cx = M;
+      doc.setFontSize(6.5); let cx = M;
       ["Parameter", "Value"].forEach((h, i) => {
         doc.setFillColor(27, 87, 69); doc.rect(cx, y, rCols[i], 6, "F");
         doc.setTextColor(255, 255, 255); doc.text(h, cx + 2, y + 4); cx += rCols[i];
@@ -270,7 +291,7 @@ export default function SlingSWLCalculatorClient() {
       if (result.riskBand === "angle_exceeded") {
         doc.setFillColor(254, 226, 226); doc.setDrawColor(220, 38, 38); doc.roundedRect(M, y, CW, 10, 1, 1, "FD");
         doc.setTextColor(220, 38, 38); doc.setFontSize(8); doc.setFont("helvetica", "bold");
-        doc.text("WARNING: Included angle exceeds 120 degrees -- DO NOT LIFT. Reduce spread or increase hook height.", M + 4, y + 6);
+        doc.text("WARNING: Included angle exceeds 60 degrees -- NOT PERMITTED under BS EN. DO NOT LIFT. Reduce spread or increase hook height.", M + 4, y + 6);
         doc.setTextColor(0, 0, 0); y += 14;
       } else if (result.riskBand === "overloaded") {
         doc.setFillColor(254, 226, 226); doc.setDrawColor(220, 38, 38); doc.roundedRect(M, y, CW, 10, 1, 1, "FD");
@@ -399,7 +420,7 @@ export default function SlingSWLCalculatorClient() {
             {angleMode === "direct" ? (
               <div className="max-w-xs"><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Included Angle (degrees)</label>
                 <input type="number" min={0} max={180} step={1} value={angleDeg} onChange={e => setAngleDeg(parseFloat(e.target.value) || 0)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-ebrora outline-none" />
-                <p className="text-[10px] text-gray-400 mt-1">Included angle between opposite legs. Max 120 degrees.</p></div>
+                <p className="text-[10px] text-gray-400 mt-1">Included angle between opposite legs. Max 60 degrees per BS EN 13414/818-4/1492.</p></div>
             ) : (
               <div className="grid grid-cols-2 gap-3 max-w-md">
                 <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Vertical Height to Hook (m)</label>
@@ -417,8 +438,8 @@ export default function SlingSWLCalculatorClient() {
       {result.riskBand === "angle_exceeded" && (
         <div className="bg-red-50 border-2 border-red-400 rounded-xl p-4 flex gap-3 items-start">
           <span className="text-lg font-bold text-red-600">!</span>
-          <div><div className="text-sm font-bold text-red-900">Included angle exceeds 120 degrees - DO NOT LIFT</div>
-            <div className="text-xs text-red-800 mt-1">Reduce the horizontal spread or increase the hook height to bring the included angle below 120 degrees.</div></div>
+          <div><div className="text-sm font-bold text-red-900">Included angle exceeds 60 degrees - NOT PERMITTED (BS EN) - DO NOT LIFT</div>
+            <div className="text-xs text-red-800 mt-1">Reduce the horizontal spread or increase the hook height to bring the included angle to 60 degrees or below. BS EN 13414/818-4/1492 do not permit lifting at angles above 60 degrees.</div></div>
         </div>
       )}
       {result.riskBand === "overloaded" && (
@@ -444,8 +465,8 @@ export default function SlingSWLCalculatorClient() {
         <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
           <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Calculation Summary</h3>
           {[
-            { label: "Mode Factor", value: `${MODE_FACTORS[legs]}` },
-            { label: "Angle Reduction Factor", value: `${fmtNum(result.angleReductionFactor, 3)}` },
+            { label: "Mode Factor (BS EN)", value: `${fmtNum(result.modeFactor, 2)}` },
+            { label: "Angle Band", value: legs === 1 ? "n/a (1 leg)" : effectiveAngle <= 45 ? "≤45°" : effectiveAngle <= MAX_PERMITTED_ANGLE ? "45-60°" : ">60° (NOT PERMITTED)" },
             { label: "Effective SWL", value: `${fmtNum(result.effectiveSWL, 2)} t`, bold: true },
             { label: "Max Safe Angle", value: `${fmtNum(result.maxSafeAngle, 1)} deg` },
             { label: "Max Safe Load", value: `${fmtNum(result.maxSafeLoad, 2)} t` },
@@ -466,32 +487,38 @@ export default function SlingSWLCalculatorClient() {
         </div>
       )}
 
-      {/* Angle reduction reference table */}
+      {/* BS EN combined mode factor reference table */}
       <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-3">Angle Reduction Factor Table (LEEA)</h3>
+        <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-3">BS EN Combined Mode Factor Table</h3>
+        <p className="text-[11px] text-gray-500 mb-2">Per BS EN 13414 / 818-4 / 1492. Combined factor includes load-sharing and angle of loading. Above 60° not permitted.</p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="bg-gray-50">
-              <th className="text-left px-3 py-2 text-[11px] font-semibold text-gray-500 uppercase">Angle (deg)</th>
-              <th className="text-left px-3 py-2 text-[11px] font-semibold text-gray-500 uppercase">Factor</th>
-              <th className="text-left px-3 py-2 text-[11px] font-semibold text-gray-500 uppercase">% of Vertical SWL</th>
+              <th className="text-left px-3 py-2 text-[11px] font-semibold text-gray-500 uppercase">Angle Band</th>
+              <th className="text-left px-3 py-2 text-[11px] font-semibold text-gray-500 uppercase">2-leg</th>
+              <th className="text-left px-3 py-2 text-[11px] font-semibold text-gray-500 uppercase">3 or 4-leg</th>
             </tr></thead>
-            <tbody>{ANGLE_TABLE.map(a => {
-              const isCurrent = legs > 1 && Math.abs(a.angle - effectiveAngle) < 8;
-              return (
-                <tr key={a.angle} className={isCurrent ? "bg-ebrora-light/40 font-bold" : "hover:bg-gray-50"}>
-                  <td className="px-3 py-1.5 border-t border-gray-100">{a.angle}</td>
-                  <td className="px-3 py-1.5 border-t border-gray-100">{a.factor.toFixed(2)}</td>
-                  <td className="px-3 py-1.5 border-t border-gray-100">{(a.factor * 100).toFixed(0)}%</td>
-                </tr>);
-            })}</tbody>
+            <tbody>
+              {[
+                { band: "0° - 45°", legs2: 1.4, legs3or4: 2.1, currentMatch: legs > 1 && effectiveAngle <= 45 },
+                { band: ">45° - 60°", legs2: 1.0, legs3or4: 1.5, currentMatch: legs > 1 && effectiveAngle > 45 && effectiveAngle <= MAX_PERMITTED_ANGLE },
+                { band: ">60° (not permitted)", legs2: 0, legs3or4: 0, currentMatch: legs > 1 && effectiveAngle > MAX_PERMITTED_ANGLE },
+              ].map(row => (
+                <tr key={row.band} className={row.currentMatch ? "bg-ebrora-light/40 font-bold" : "hover:bg-gray-50"}>
+                  <td className="px-3 py-1.5 border-t border-gray-100">{row.band}</td>
+                  <td className="px-3 py-1.5 border-t border-gray-100">{row.legs2 === 0 ? "—" : row.legs2.toFixed(1)}</td>
+                  <td className="px-3 py-1.5 border-t border-gray-100">{row.legs3or4 === 0 ? "—" : row.legs3or4.toFixed(1)}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
+        <p className="text-[10px] text-gray-400 mt-2">For 1-leg straight slings the factor is 1.0 (single-leg vertical lift, no angle).</p>
       </div>
 
       {/* Footer disclaimer */}
       <div className="text-[10px] text-gray-400 leading-relaxed space-y-1 px-1">
-        <p>This calculator provides indicative SWL values based on LEEA guidance, BS 8437, and standard angle reduction factors. It does not replace a competent person&apos;s assessment. Always verify sling markings, inspect condition before every lift, and comply with LOLER 1998 Regulation 8.</p>
+        <p>This calculator provides indicative SWL values based on BS EN 13414 / 818-4 / 1492 combined mode factors and LEEA / LOLER guidance. It does not replace a competent person&apos;s assessment. Always verify sling markings, inspect condition before every lift, and comply with LOLER 1998 Regulation 8.</p>
         <p>References: {REGULATIONS.join("; ")}.</p>
       </div>
     </div>
