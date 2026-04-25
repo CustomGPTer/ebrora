@@ -5,7 +5,7 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Temporary Traffic Management Selector | Construction Tool | Ebrora",
-  description: "Select and design temporary traffic management layouts per Chapter 8 Traffic Signs Manual, Safety at Street Works Code of Practice 2013, NRSWA 1991, and TMA 2004. Signing distances, taper lengths, cone spacing, NHSS 12A/12B requirements, NRSWA notice calculator, complexity scoring, deployment checklist, and white-label PDF export.",
+  description: "Select and design temporary traffic management layouts per Traffic Signs Manual Chapter 8 Parts 1-2 (2009) and Part 3 Update (2020), Safety at Street Works Code of Practice 2013, NRSWA 1991, and TMA 2004. Signing distances, taper lengths, cone spacing, NHSS 12A/B, 12C and 12D requirements, NRSWA notice calculator, complexity scoring, deployment checklist, and white-label PDF export.",
   alternates: { canonical: "https://www.ebrora.com/tools/temporary-traffic-management-selector" },
   openGraph: { title: "Temporary Traffic Management Selector | Ebrora", description: "Chapter 8 TTM selector with signing dimensions, NHSS requirements, NRSWA notice calculator, complexity scoring, and white-label PDF.", url: "https://www.ebrora.com/tools/temporary-traffic-management-selector", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
 };
@@ -38,7 +38,7 @@ export default function TemporaryTrafficManagementSelectorPage() {
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Temporary Traffic Management Selector</h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Select and configure temporary traffic management layouts per Chapter 8 Traffic Signs Manual and Safety at Street Works Code of Practice (2013). 9 road types, 14 works locations, 19 TM layouts, signing dimensions, taper lengths, cone spacing, NHSS 12A/12B qualification guidance, NRSWA notice calculator, 7-factor complexity scoring with radar chart, 32-point deployment checklist, and white-label PDF export.
+            Select and configure temporary traffic management layouts per Traffic Signs Manual Chapter 8 Parts 1-2 (2009) and Part 3 Update (2020) and the Safety at Street Works and Road Works Code of Practice (2013). 9 road types, 14 works locations, 19 TM layouts, signing dimensions, taper lengths, cone spacing, NHSS 12A/B, 12C and 12D qualification guidance, NRSWA notice calculator, 7-factor complexity scoring with radar chart, 32-point deployment checklist, and white-label PDF export.
           </p>
         </div>
         <TemporaryTrafficManagementSelectorClient />
