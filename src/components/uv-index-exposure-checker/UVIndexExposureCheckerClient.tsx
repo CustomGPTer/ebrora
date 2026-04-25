@@ -63,7 +63,7 @@ function UVLineChart({ hourly, showProtected }: { hourly: HourlyUV[]; showProtec
           <text x={PAD.left - 6} y={yScale(v) + 3} textAnchor="end" fontSize={10} fill="#9CA3AF">{v}</text>
         </g>
       ))}
-      {/* HSE 2 SED threshold label at UV 3 */}
+      {/* ICNIRP 2 SED threshold label at UV 3 */}
       <line x1={PAD.left} y1={yScale(3)} x2={W - PAD.right} y2={yScale(3)} stroke="#EAB308" strokeWidth={1} strokeDasharray="4,3" />
       <text x={W - PAD.right - 2} y={yScale(3) - 4} textAnchor="end" fontSize={9} fill="#CA8A04">Moderate (UV 3+)</text>
       {/* UV line */}
@@ -127,7 +127,7 @@ function SEDAreaChart({ hourly, showProtected }: { hourly: HourlyUV[]; showProte
       {maxSED >= 2 && (
         <>
           <line x1={PAD.left} y1={yScale(2)} x2={W - PAD.right} y2={yScale(2)} stroke="#DC2626" strokeWidth={1} strokeDasharray="4,3" />
-          <text x={W - PAD.right - 2} y={yScale(2) - 4} textAnchor="end" fontSize={9} fill="#DC2626" fontWeight={600}>HSE 2 SED limit</text>
+          <text x={W - PAD.right - 2} y={yScale(2) - 4} textAnchor="end" fontSize={9} fill="#DC2626" fontWeight={600}>ICNIRP 2 SED threshold</text>
         </>
       )}
       {/* Grid */}
@@ -186,7 +186,7 @@ async function exportPDF(
   doc.text("UV INDEX EXPOSURE ASSESSMENT", M, 12);
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
-  doc.text("HSE UV Guidance / WHO UV Index / HSE INDG147 / EN 172 -- ebrora.com/tools/uv-index-exposure-checker", M, 19);
+  doc.text("HSE UV Guidance / WHO UV Index / HSE INDG147+INDG337 / ICNIRP / EN 172 -- ebrora.com/tools/uv-index-exposure-checker", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34;
@@ -269,7 +269,7 @@ async function exportPDF(
   doc.text(`PEAK UV RISK: ${riskBand.label.toUpperCase()} (UV ${formatUV(assessment.peakUV)})`, M + 5, y + 6);
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
-  doc.text(`Peak at ${assessment.peakTime} | Total SED: ${formatSED(assessment.totalSED)} | HSE limit: 2 SED/day`, M + 5, y + 11);
+  doc.text(`Peak at ${assessment.peakTime} | Total SED: ${formatSED(assessment.totalSED)} | ICNIRP threshold: 2 SED/day`, M + 5, y + 11);
   doc.setTextColor(0, 0, 0);
   y += 20;
 
@@ -287,7 +287,7 @@ async function exportPDF(
     ["Peak Time", assessment.peakTime],
     ["Total SED (unprotected)", formatSED(assessment.totalSED)],
     ["Total SED (with PPE)", ppe.enabled ? formatSED(assessment.protectedSED) : "N/A"],
-    ["HSE SED Threshold", "2.0 SED/day"],
+    ["ICNIRP SED Threshold", "2.0 SED/day"],
     ["Exceeds Threshold?", assessment.totalSED > 2 ? "YES" : "NO"],
     ["Skin Type", skinType ? skinType.label : "Not specified"],
     ["Est. Burn Time (peak UV)", assessment.burnTimeMinutes !== null ? fmtMins(assessment.burnTimeMinutes) : "N/A"],
@@ -623,7 +623,7 @@ export default function UVIndexExposureCheckerClient() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { label: "Peak UV Index", value: formatUV(assessment.peakUV), sub: `at ${assessment.peakTime}`, ...riskBand },
-            { label: "Total SED", value: formatSED(assessment.totalSED), sub: assessment.totalSED > 2 ? "Exceeds HSE 2 SED limit" : "Within HSE 2 SED limit", bgClass: assessment.totalSED > 2 ? "bg-red-50" : "bg-emerald-50", textClass: assessment.totalSED > 2 ? "text-red-800" : "text-emerald-800", borderClass: assessment.totalSED > 2 ? "border-red-200" : "border-emerald-200", dotClass: assessment.totalSED > 2 ? "bg-red-500" : "bg-emerald-500" },
+            { label: "Total SED", value: formatSED(assessment.totalSED), sub: assessment.totalSED > 2 ? "Exceeds ICNIRP 2 SED threshold" : "Within ICNIRP 2 SED threshold", bgClass: assessment.totalSED > 2 ? "bg-red-50" : "bg-emerald-50", textClass: assessment.totalSED > 2 ? "text-red-800" : "text-emerald-800", borderClass: assessment.totalSED > 2 ? "border-red-200" : "border-emerald-200", dotClass: assessment.totalSED > 2 ? "bg-red-500" : "bg-emerald-500" },
             { label: "Est. Burn Time", value: assessment.burnTimeMinutes !== null ? fmtMins(assessment.burnTimeMinutes) : "--", sub: skinType ? skinType.label : "No skin type set", bgClass: "bg-blue-50", textClass: "text-blue-800", borderClass: "border-blue-200", dotClass: "bg-blue-500" },
             { label: "Daylight", value: `${daylightHrs}h`, sub: `${srStr} -- ${ssStr} (${isBST(dateObj) ? "BST" : "GMT"})`, bgClass: "bg-purple-50", textClass: "text-purple-800", borderClass: "border-purple-200", dotClass: "bg-purple-500" },
           ].map(c => (
@@ -644,9 +644,9 @@ export default function UVIndexExposureCheckerClient() {
         <div className="bg-red-50 border-2 border-red-400 rounded-xl p-4 flex gap-3 items-start">
           <span className="text-lg font-bold text-red-600">!</span>
           <div>
-            <div className="text-sm font-bold text-red-900">Daily SED Exceeds HSE Guidance Threshold</div>
+            <div className="text-sm font-bold text-red-900">Daily SED Exceeds ICNIRP Sunburn Risk Threshold</div>
             <div className="text-xs text-red-800 mt-1">
-              Total unprotected SED of {formatSED(assessment.totalSED)} exceeds the HSE recommended limit of approximately 2 SED per day for unprotected skin. Enable PPE controls below to see the effect of sun protection measures.
+              Total unprotected SED of {formatSED(assessment.totalSED)} exceeds the ICNIRP-derived threshold of approximately 2 SED per day for unprotected fair skin (sunburn risk). Enable PPE controls below to see the effect of sun protection measures.
             </div>
           </div>
         </div>
@@ -854,7 +854,7 @@ export default function UVIndexExposureCheckerClient() {
       {hasData && (
         <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-2">
           <h3 className="text-sm font-bold text-gray-700">Cumulative Standard Erythemal Dose (SED)</h3>
-          <p className="text-[11px] text-gray-400">Red dashed line = HSE guidance threshold of 2 SED/day for unprotected skin.</p>
+          <p className="text-[11px] text-gray-400">Red dashed line = ICNIRP-derived threshold of 2 SED/day for unprotected fair skin.</p>
           <SEDAreaChart hourly={assessment.hourly} showProtected={ppe.enabled} />
         </div>
       )}
@@ -964,7 +964,7 @@ export default function UVIndexExposureCheckerClient() {
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
           Based on solar position calculations, WHO/WMO UV index data for mid-latitudes, and HSE UV at work guidance.
           This is a screening tool - it does not replace a formal UV risk assessment. Actual UV conditions may vary due to
-          local factors including reflected UV, atmospheric conditions, and ozone levels. SED threshold per HSE INDG147.
+          local factors including reflected UV, atmospheric conditions, and ozone levels. SED threshold per ICNIRP guidance; outdoor worker sun protection per HSE INDG147 (workers) and HSE INDG337 (employers).
         </p>
         <a href="https://ebrora.gumroad.com/" target="_blank" rel="noopener noreferrer"
           className="text-[11px] font-medium text-ebrora hover:text-ebrora-dark transition-colors">
