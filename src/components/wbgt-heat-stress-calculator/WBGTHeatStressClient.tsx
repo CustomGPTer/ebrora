@@ -99,7 +99,7 @@ async function exportPDF(
   doc.setFontSize(7);
   doc.setFont("helvetica", "italic");
   doc.setTextColor(80, 80, 80);
-  const scopeText = `This heat stress assessment covers ${header.site || "the above site"} as at ${header.date || new Date().toLocaleDateString("en-GB")}. It uses the ISO 7243:2017 WBGT methodology with the Lemke & Kjellstrom (2012) simplified estimation. Work/rest ratios assume acclimatised workers. This is a planning aid and does not replace site-specific monitoring with calibrated instruments.`;
+  const scopeText = `This heat stress assessment covers ${header.site || "the above site"} as at ${header.date || new Date().toLocaleDateString("en-GB")}. It uses the ISO 7243:2017 WBGT methodology with the Australian Bureau of Meteorology (ABoM) simplified estimation, validated for occupational use by Lemke & Kjellstrom (2012). Work/rest ratios assume acclimatised workers. This is a planning aid and does not replace site-specific monitoring with calibrated instruments.`;
   const scopeLines = doc.splitTextToSize(scopeText, CW);
   doc.text(scopeLines, M, y);
   y += scopeLines.length * 3 + 3;
@@ -292,7 +292,7 @@ async function exportPDF(
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(130, 130, 130);
-    doc.text("This assessment uses the Lemke & Kjellstrom (2012) WBGT estimation and ISO 7243 work/rest reference values. Planning tool only.", M, 287);
+    doc.text("This assessment uses the ABoM simplified WBGT estimation (validated by Lemke & Kjellstrom 2012) and ISO 7243 work/rest reference values. Planning tool only.", M, 287);
     doc.text(`Ref: ${docRef} | ebrora.com | Page ${p} of ${pageCount}`, W - M - 65, 287);
   }
 
@@ -734,8 +734,8 @@ export default function WBGTHeatStressClient() {
       {/* ── Footer ──────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-          Based on ISO 7243:2017 and HSE guidance on thermal comfort. Mode B uses the Lemke &amp; Kjellstrom (2012)
-          simplified outdoor WBGT approximation. For definitive assessments, use calibrated WBGT monitoring equipment.
+          Based on ISO 7243:2017 and HSE guidance on thermal comfort. Mode B uses the Australian Bureau of Meteorology (ABoM)
+          simplified outdoor WBGT approximation, validated for occupational use by Lemke &amp; Kjellstrom (2012). For definitive assessments, use calibrated WBGT monitoring equipment.
           Work/rest ratios assume acclimatised workers. This tool is a planning aid — it does not replace a site-specific risk assessment.
         </p>
         <a href="https://ebrora.gumroad.com/" target="_blank" rel="noopener noreferrer"
