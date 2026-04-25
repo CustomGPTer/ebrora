@@ -1,4 +1,18 @@
 // src/data/slip-risk-calculator.ts
+//
+// METHODOLOGY (post Batch 11 rebuild):
+//   Primary classification per HSE GEIS2 + UKSRG TOP01:21 — Pendulum Test
+//   Value (PTV) bands:
+//     PTV >= 36 : LOW slip potential
+//     PTV 25-35 : MODERATE
+//     PTV <= 24 : HIGH
+//   PTV is calculated from typicalWetPTV(surface) + contaminationDelta,
+//   then aggravating factors (poor footwear, gradient, rushing, etc.)
+//   escalate the band when 3 or more are present.
+//
+//   The legacy 1-15 baseScore + scoreMod model is retained as a secondary
+//   "aggravating factor count" — it does not directly drive risk band but
+//   informs the escalation logic.
 
 // ─── Surface Types ───────────────────────────────────────────
 export interface SurfaceType {
@@ -151,7 +165,7 @@ export interface FootwearType {
 }
 
 export const FOOTWEAR_TYPES: FootwearType[] = [
-  { id: "safety_src", name: "Safety boots (SRC rated - slip resistant)", scoreMod: -2 },
+  { id: "safety_src", name: "Safety boots (SRC / SR rated - slip resistant)", scoreMod: -2 },
   { id: "safety_s3", name: "Safety boots (S3 / S5 rated)", scoreMod: -2 },
   { id: "safety_basic", name: "Safety boots (basic / SB rated)", scoreMod: -1 },
   { id: "wellington", name: "Wellington boots (steel toe)", scoreMod: -1 },
@@ -256,7 +270,7 @@ export const CONTROL_MEASURES: ControlMeasure[] = [
 
   // Administrative
   { id: "signage", name: "Slip hazard warning signage", applicableRisk: ["low", "medium", "high", "very_high"], category: "Administrative", notes: "Yellow triangle slip signs. Temporary signs for wet cleaning." },
-  { id: "footwear_policy", name: "Mandate slip-resistant footwear (SRC)", applicableRisk: ["medium", "high", "very_high"], category: "Administrative", notes: "PPE policy requiring SRC-rated safety footwear." },
+  { id: "footwear_policy", name: "Mandate slip-resistant footwear (SRC / SR)", applicableRisk: ["medium", "high", "very_high"], category: "Administrative", notes: "PPE policy requiring slip-resistant safety footwear. SRC marking under EN ISO 20345:2011 (legacy); under EN ISO 20345:2022 slip resistance is mandatory baseline with optional 'SR' marking for enhanced resistance." },
   { id: "briefing", name: "Toolbox talk / briefing on slip hazards", applicableRisk: ["low", "medium", "high", "very_high"], category: "Administrative", notes: "Team briefing on specific hazards and precautions." },
   { id: "speed_restrict", name: "Restrict speed / no-run policy", applicableRisk: ["medium", "high"], category: "Administrative", notes: "Slow down signage. No running on site." },
   { id: "temp_closure", name: "Temporary closure of area", applicableRisk: ["very_high"], category: "Administrative", notes: "Close area until surface is treated or conditions improve." },
@@ -279,4 +293,145 @@ export function calculateSlipScore(
 
 export function getApplicableControls(risk: RiskLevel): ControlMeasure[] {
   return CONTROL_MEASURES.filter(c => c.applicableRisk.includes(risk));
+}
+
+// ─── PTV (Pendulum Test Value) — HSE GEIS2 methodology ────────
+// Typical wet PTV mapped from baseScore. Anchored to UKSRG TOP01:21
+// and HSE GEIS2 typical-range guidance:
+//   baseScore 1 (low slip risk surface)  -> wet PTV ~50 (LOW band)
+//   baseScore 2 (good)                   -> wet PTV ~38 (LOW boundary)
+//   baseScore 3 (moderate)               -> wet PTV ~28 (MODERATE band)
+//   baseScore 4 (high)                   -> wet PTV ~18 (HIGH band)
+//   baseScore 5 (very high)              -> wet PTV ~10 (HIGH severe)
+//
+// These are central values for typical clean+wet pendulum results on each
+// surface family. Actual measured PTV will vary with age, polish,
+// installation quality, and slider type — when a measured PTV is
+// available, it should be used in preference (the calculator accepts an
+// optional measured PTV input that overrides the derived value).
+export const BASE_SCORE_TO_WET_PTV: Record<number, number> = {
+  1: 50,
+  2: 38,
+  3: 28,
+  4: 18,
+  5: 10,
+};
+
+export function surfaceTypicalWetPTV(s: SurfaceType): number {
+  return BASE_SCORE_TO_WET_PTV[s.baseScore] ?? 28;
+}
+
+// PTV deltas per contamination type. Negative values reduce PTV (more
+// slippery). Anchored to HSE pendulum test data and UKSRG guidance.
+// "dry" is 0 (no change from baseline; baseline is wet, so dry would
+// typically INCREASE PTV but for assessment purposes the wet value is
+// the prudent design value). "wet_clean" is also 0 because the surface
+// PTV map is already a clean+wet baseline.
+export const CONTAMINATION_PTV_DELTA: Record<string, number> = {
+  dry: 0,
+  wet_clean: 0,
+  wet_soapy: -10,
+  wet_oily: -22,
+  mud: -15,
+  ice_frost: -40,
+  snow: -22,
+  dust_sand: -5,
+  leaves: -10,
+  algae_moss: -18,
+  construction_debris: -5,
+  paint_spill: -10,
+  food_grease: -15,
+  cement_slurry: -10,
+  bentonite: -25,
+};
+
+export type PTVBand = "low" | "moderate" | "high";
+
+export function ptvBand(ptv: number): PTVBand {
+  if (ptv <= 24) return "high";
+  if (ptv <= 35) return "moderate";
+  return "low";
+}
+
+export const PTV_BAND_CONFIG: Record<PTVBand, { label: string; bg: string; text: string; dot: string; border: string; rangeText: string }> = {
+  low: { label: "Low Slip Potential", bg: "bg-green-50", text: "text-green-700", dot: "bg-green-500", border: "border-green-200", rangeText: "PTV ≥ 36" },
+  moderate: { label: "Moderate Slip Potential", bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500", border: "border-amber-200", rangeText: "PTV 25-35" },
+  high: { label: "High Slip Potential", bg: "bg-red-50", text: "text-red-700", dot: "bg-red-500", border: "border-red-200", rangeText: "PTV ≤ 24" },
+};
+
+export interface PTVResult {
+  // Effective PTV used for classification (measured if provided, otherwise derived)
+  ptv: number;
+  // Source of the PTV: "measured" (user-entered pendulum result) or "derived" (from surface + contamination)
+  source: "measured" | "derived";
+  // Components if derived (for transparency in the UI)
+  surfacePTV: number;
+  contaminationDelta: number;
+  // Initial band from PTV alone
+  band: PTVBand;
+  // Final band after aggravating-factor escalation
+  finalBand: PTVBand;
+  // Number of aggravating factors counted (positive scoreMods minus protective ones)
+  aggravatingFactorCount: number;
+  // Whether escalation was applied
+  escalated: boolean;
+}
+
+// Aggravating factor count: net positive scoreMods from footwear + env + human.
+// Footwear: positive scoreMod = poor footwear policy = aggravating.
+// Env: positive scoreMod (e.g. steep slope, poor drainage) = aggravating; negative
+// scoreMod (e.g. good drainage, regular cleaning) = ameliorating.
+// Human factors: all listed are positive scoreMod = aggravating.
+function countAggravatingFactors(footwearMod: number, envMods: number[], humanMods: number[]): number {
+  const fw = footwearMod > 0 ? footwearMod : 0;
+  const env = envMods.reduce((sum, m) => sum + (m > 0 ? m : -1), 0); // positives count up, negatives net down by 1 each
+  const hum = humanMods.reduce((sum, m) => sum + (m > 0 ? m : 0), 0);
+  return Math.max(0, fw + env + hum);
+}
+
+export function calculatePTVResult(
+  surface: SurfaceType,
+  contaminationId: string,
+  footwearMod: number,
+  envMods: number[],
+  humanMods: number[],
+  measuredPTV?: number,
+): PTVResult {
+  const surfacePTV = surfaceTypicalWetPTV(surface);
+  const contaminationDelta = CONTAMINATION_PTV_DELTA[contaminationId] ?? 0;
+  const derivedPTV = Math.max(0, Math.min(80, surfacePTV + contaminationDelta));
+
+  const usingMeasured = typeof measuredPTV === "number" && Number.isFinite(measuredPTV) && measuredPTV >= 0;
+  const ptv = usingMeasured ? Math.max(0, Math.min(120, measuredPTV!)) : derivedPTV;
+  const band = ptvBand(ptv);
+
+  // Escalation: 3+ net aggravating factors push the band up one step (low -> moderate -> high)
+  const aggCount = countAggravatingFactors(footwearMod, envMods, humanMods);
+  const escalated = aggCount >= 3;
+  let finalBand: PTVBand = band;
+  if (escalated) {
+    if (band === "low") finalBand = "moderate";
+    else if (band === "moderate") finalBand = "high";
+    // already high stays high
+  }
+
+  return {
+    ptv,
+    source: usingMeasured ? "measured" : "derived",
+    surfacePTV,
+    contaminationDelta,
+    band,
+    finalBand,
+    aggravatingFactorCount: aggCount,
+    escalated,
+  };
+}
+
+// Map PTV band to legacy RiskLevel for the existing CONTROL_MEASURES filter.
+// The legacy "very_high" bucket is unused by the PTV model but kept for
+// backwards compat — when escalated HIGH is reached we stay on "high".
+export function ptvBandToRiskLevel(b: PTVBand): RiskLevel {
+  if (b === "high") return "high";
+  if (b === "moderate") return "medium";
+  return "low";
 }

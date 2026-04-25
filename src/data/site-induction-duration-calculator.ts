@@ -130,11 +130,11 @@ export const AGENDA_COLOURS: Record<string, string> = {
 // These regulations require that induction is provided — they do NOT specify duration.
 // The duration recommendations in this tool are based on UK construction industry best practice.
 export const GUIDANCE_REFERENCES = [
-  { ref: "CDM 2015 reg 4", title: "Duties relating to health and safety — competence", description: "Requires that workers have the necessary skills, knowledge, training, and experience. Does not specify induction duration." },
-  { ref: "CDM 2015 reg 8(7)", title: "General duties — induction", description: "Requires principal contractors to ensure suitable site inductions are provided to every worker. Does not prescribe duration or content." },
+  { ref: "CDM 2015 reg 13(4)(a)", title: "Principal contractor duty — site induction", description: "The principal contractor must ensure that a suitable site induction is provided. This is the statutory anchor for site induction in UK construction. Does not prescribe duration or content." },
+  { ref: "CDM 2015 reg 8", title: "General duties — competence", description: "Requires that workers have the necessary skills, knowledge, training, and experience for the work, and that information and instruction is comprehensible. Underpins induction content but does not prescribe duration." },
   { ref: "HSWA 1974 s2(2)(c)", title: "General duties of employers", description: "Duty to provide such information, instruction, training, and supervision as is necessary. Duration is a matter of professional judgement." },
   { ref: "MHSWR 1999 reg 13", title: "Capabilities and training", description: "Requires adequate health and safety training on recruitment and when exposed to new or increased risks. No prescribed duration." },
-  { ref: "CIS 36 (rev2)", title: "HSE Construction information sheet", description: "HSE guidance on construction site induction content and delivery. Provides suggested topics but does not specify duration." },
+  { ref: "HSE L153", title: "Managing health and safety in construction (CDM 2015 guidance)", description: "HSE guidance on the legal requirements for CDM 2015. Discusses induction content and proportionality but does not specify duration." },
   { ref: "Industry best practice", title: "Duration recommendations", description: "The time allocations in this tool are based on UK construction industry best practice and professional experience. They are not mandated by any regulation. The person delivering the induction should use professional judgement to adjust duration to suit the audience and site conditions." },
 ];
 
@@ -352,7 +352,7 @@ function buildRecommendations(
   }
 
   if (cdmNotifiable) {
-    recs.push("As a CDM 2015 notifiable project, the Principal Contractor must ensure the F10 is displayed on site and that all workers receive induction before starting work (CDM 2015 reg 8(7)).");
+    recs.push("As a CDM 2015 notifiable project, the Principal Contractor must ensure the F10 is displayed on site and that all workers receive induction before starting work (CDM 2015 reg 13(4)(a)).");
   }
 
   if (riskLevel === "high") {

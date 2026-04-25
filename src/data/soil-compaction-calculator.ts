@@ -96,12 +96,12 @@ export interface EquipmentComparison {
 export const MATERIALS: MaterialDef[] = [
   { id: "well_graded_granular", label: "Well-Graded Granular", shwClass: "1A/1B", description: "Gravel, sand-gravel, crushed rock (SHW Class 1A/1B). Cu > 10, well distributed PSD.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_700_1300", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000", "vibrating_plate_500_1100", "vibrating_plate_over_1100"], endProductTargetMDD: 95, endProductAirVoids: 10 },
   { id: "uniform_granular", label: "Uniformly-Graded Granular", shwClass: "1C", description: "Sand, fine gravel, uniform PSD (SHW Class 1C). Cu < 10.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_700_1300", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000", "vibrating_plate_500_1100", "vibrating_plate_over_1100"], endProductTargetMDD: 95, endProductAirVoids: 10 },
-  { id: "cohesive_dry", label: "Cohesive - Dry of Optimum", shwClass: "2A/2B", description: "Clay, silt, sandy clay placed at or below OMC (SHW Class 2A/2B).", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000", "vibro_tamper_50_75", "vibro_tamper_over_75"], endProductTargetMDD: 95, endProductAirVoids: 5 },
-  { id: "cohesive_wet", label: "Cohesive - Wet of Optimum", shwClass: "2C/2D", description: "Clay, silt placed above OMC (SHW Class 2C/2D). Requires careful handling.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_over_5000"], endProductTargetMDD: 90, endProductAirVoids: 10 },
+  { id: "cohesive_dry", label: "Cohesive - Dry of Optimum", shwClass: "2B/2E", description: "Clay, silt, sandy clay placed at or below OMC. Class 2B (dry cohesive, MCV 12-16) per SHW Series 600 Table 6/1, with Class 2E for low-plasticity cohesive. References BS 6031:2009 §8.2.3.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000", "vibro_tamper_50_75", "vibro_tamper_over_75"], endProductTargetMDD: 95, endProductAirVoids: 5 },
+  { id: "cohesive_wet", label: "Cohesive - Wet of Optimum", shwClass: "2A/2D", description: "Clay, silt placed above OMC. Class 2A (wet cohesive, MCV 8-12) per SHW Series 600 Table 6/1; Class 2D for silty cohesive. Requires careful handling to avoid pumping.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_over_5000"], endProductTargetMDD: 90, endProductAirVoids: 10 },
   { id: "chalk", label: "Chalk", shwClass: "3", description: "Chalk fill (SHW Class 3). Breaks down during compaction, avoid over-compaction.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000"], endProductTargetMDD: 95, endProductAirVoids: 10 },
-  { id: "rock_fill", label: "Rock Fill", shwClass: "6", description: "Rock fill > 125mm max size (SHW Class 6). Large vibratory rollers required.", suitableEquipment: ["vibratory_roller_over_5000"], endProductTargetMDD: 0, endProductAirVoids: 0 },
-  { id: "recycled_aggregate", label: "Recycled Aggregate", shwClass: "7", description: "Recycled concrete, brick, asphalt (SHW Class 7). Similar to well-graded granular.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000", "vibrating_plate_500_1100", "vibrating_plate_over_1100"], endProductTargetMDD: 95, endProductAirVoids: 10 },
-  { id: "pfa", label: "PFA / Pulverised Fuel Ash", shwClass: "4", description: "Pulverised fuel ash, GGBS, stabilised material (SHW Class 4).", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000", "vibrating_plate_over_1100"], endProductTargetMDD: 95, endProductAirVoids: 10 },
+  { id: "rock_fill", label: "Rock Fill", shwClass: "6P", description: "Rockfill embankment per SHW Series 600 Table 6/1 Class 6P. Particle size > 125mm typical. Heavy vibratory compaction required; max particle size limited to 2/3 of compacted layer thickness.", suitableEquipment: ["vibratory_roller_over_5000"], endProductTargetMDD: 0, endProductAirVoids: 0 },
+  { id: "recycled_aggregate", label: "Recycled Aggregate", shwClass: "1A/1B or 6F/6N", description: "Recycled aggregate (crushed concrete, brick, asphalt) classified into existing SHW classes per its tested grading: Class 1A/1B (general granular fill) or 6F/6N (capping / fill to structures) per SHW Series 600 cl. 14 and BS EN 13242.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000", "vibrating_plate_500_1100", "vibrating_plate_over_1100"], endProductTargetMDD: 95, endProductAirVoids: 10 },
+  { id: "pfa", label: "PFA / Pulverised Fuel Ash", shwClass: "7B", description: "Pulverised fuel ash per SHW Series 600 Table 6/1 Class 7B (selected cohesive — PFA for fill to structures). Light compaction; avoid over-working.", suitableEquipment: ["smooth_wheeled_over_2100", "pneumatic_tyred_over_4000", "vibratory_roller_1300_2300", "vibratory_roller_2300_5000", "vibratory_roller_over_5000", "vibrating_plate_over_1100"], endProductTargetMDD: 95, endProductAirVoids: 10 },
 ];
 
 // ─── Equipment Database ──────────────────────────────────────
@@ -148,7 +148,7 @@ export const COMPACTION_SPECS: CompactionSpec[] = [
   { material: "uniform_granular", equipment: "vibro_tamper_50_75", maxLayerMm: 75, minPasses: 4, suitable: false, notes: "Not recommended." },
   { material: "uniform_granular", equipment: "vibro_tamper_over_75", maxLayerMm: 100, minPasses: 4, suitable: false, notes: "Not recommended." },
 
-  // Cohesive dry of optimum (Class 2A/2B)
+  // Cohesive dry of optimum (Class 2B/2E)
   { material: "cohesive_dry", equipment: "smooth_wheeled_over_2100", maxLayerMm: 200, minPasses: 6, suitable: true, notes: "Suitable. Smooth action avoids over-working." },
   { material: "cohesive_dry", equipment: "pneumatic_tyred_over_4000", maxLayerMm: 225, minPasses: 6, suitable: true, notes: "Good. Kneading action effective for cohesive soils." },
   { material: "cohesive_dry", equipment: "vibratory_roller_700_1300", maxLayerMm: 100, minPasses: 8, suitable: false, notes: "Not recommended -- vibration ineffective on cohesive soils at this mass." },
@@ -161,7 +161,7 @@ export const COMPACTION_SPECS: CompactionSpec[] = [
   { material: "cohesive_dry", equipment: "vibro_tamper_50_75", maxLayerMm: 100, minPasses: 4, suitable: true, notes: "Suitable for trench backfill and confined areas." },
   { material: "cohesive_dry", equipment: "vibro_tamper_over_75", maxLayerMm: 150, minPasses: 3, suitable: true, notes: "Suitable for trench backfill and confined areas." },
 
-  // Cohesive wet of optimum (Class 2C/2D)
+  // Cohesive wet of optimum (Class 2A/2D)
   { material: "cohesive_wet", equipment: "smooth_wheeled_over_2100", maxLayerMm: 175, minPasses: 4, suitable: true, notes: "Best option. Minimal disturbance to wet material." },
   { material: "cohesive_wet", equipment: "pneumatic_tyred_over_4000", maxLayerMm: 200, minPasses: 6, suitable: true, notes: "Suitable with care. Avoid rutting." },
   { material: "cohesive_wet", equipment: "vibratory_roller_700_1300", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not suitable -- vibration causes pumping in wet cohesive." },
@@ -187,7 +187,7 @@ export const COMPACTION_SPECS: CompactionSpec[] = [
   { material: "chalk", equipment: "vibro_tamper_50_75", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not suitable for chalk." },
   { material: "chalk", equipment: "vibro_tamper_over_75", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not suitable for chalk." },
 
-  // Rock fill (Class 6)
+  // Rock fill (Class 6P)
   { material: "rock_fill", equipment: "smooth_wheeled_over_2100", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not suitable for rock fill -- insufficient energy." },
   { material: "rock_fill", equipment: "pneumatic_tyred_over_4000", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not suitable for rock fill." },
   { material: "rock_fill", equipment: "vibratory_roller_700_1300", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not suitable -- too light." },
@@ -200,7 +200,7 @@ export const COMPACTION_SPECS: CompactionSpec[] = [
   { material: "rock_fill", equipment: "vibro_tamper_50_75", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not suitable." },
   { material: "rock_fill", equipment: "vibro_tamper_over_75", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not suitable." },
 
-  // Recycled aggregate (Class 7) — similar to well-graded granular
+  // Recycled aggregate (Class 1A/1B or 6F/6N depending on grading) — similar to well-graded granular
   { material: "recycled_aggregate", equipment: "smooth_wheeled_over_2100", maxLayerMm: 200, minPasses: 8, suitable: true, notes: "Suitable. Monitor for breakdown of weaker particles." },
   { material: "recycled_aggregate", equipment: "pneumatic_tyred_over_4000", maxLayerMm: 225, minPasses: 6, suitable: true, notes: "Suitable." },
   { material: "recycled_aggregate", equipment: "vibratory_roller_700_1300", maxLayerMm: 125, minPasses: 8, suitable: true, notes: "Suitable for thin lifts." },
@@ -213,7 +213,7 @@ export const COMPACTION_SPECS: CompactionSpec[] = [
   { material: "recycled_aggregate", equipment: "vibro_tamper_50_75", maxLayerMm: 75, minPasses: 4, suitable: false, notes: "Not recommended." },
   { material: "recycled_aggregate", equipment: "vibro_tamper_over_75", maxLayerMm: 100, minPasses: 4, suitable: false, notes: "Not recommended." },
 
-  // PFA (Class 4)
+  // PFA (Class 7B)
   { material: "pfa", equipment: "smooth_wheeled_over_2100", maxLayerMm: 200, minPasses: 8, suitable: true, notes: "Suitable. Light compaction, avoid over-working." },
   { material: "pfa", equipment: "pneumatic_tyred_over_4000", maxLayerMm: 225, minPasses: 6, suitable: true, notes: "Suitable." },
   { material: "pfa", equipment: "vibratory_roller_700_1300", maxLayerMm: 0, minPasses: 0, suitable: false, notes: "Not recommended." },
