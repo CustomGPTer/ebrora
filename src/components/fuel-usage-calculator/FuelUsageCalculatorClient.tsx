@@ -114,7 +114,6 @@ async function exportPDF(
   header: { project: string; site: string; assessedBy: string; date: string },
   rows: PlantRow[],
   costPerLitre: number,
-  shiftHours: number,
 ) {
   const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF("l", "mm", "a4"); // landscape for wide table
@@ -265,7 +264,6 @@ async function exportPDF(
 export default function FuelUsageCalculatorClient() {
   const [rows, setRows] = useState<PlantRow[]>([createRow()]);
   const [costPerLitre, setCostPerLitre] = useState(DEFAULT_FUEL_COST);
-  const [shiftHours, setShiftHours] = useState(10);
   const [typeFilter, setTypeFilter] = useState("");
   const [project, setProject] = useState("");
   const [site, setSite] = useState("");
@@ -329,9 +327,9 @@ export default function FuelUsageCalculatorClient() {
   }, []);
   const handleExport = useCallback(async () => {
     setExporting(true);
-    try { await exportPDF({ project, site, assessedBy, date: assessDate }, rows, costPerLitre, shiftHours); }
+    try { await exportPDF({ project, site, assessedBy, date: assessDate }, rows, costPerLitre); }
     finally { setExporting(false); }
-  }, [project, site, assessedBy, assessDate, rows, costPerLitre, shiftHours]);
+  }, [project, site, assessedBy, assessDate, rows, costPerLitre]);
 
   const hasData = totals.machines > 0;
 
@@ -549,7 +547,7 @@ export default function FuelUsageCalculatorClient() {
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
           Fuel rates are planning estimates based on OEM data. Real-world usage varies with load factor, idling, ambient temperature, and operator behaviour.
-          Carbon factors: UK Gov GHG Conversion Factors 2024 (Diesel 2.68, HVO 0.195 kgCO₂e/L). Weekly figures assume 5 working days.
+          Carbon factors: UK Gov GHG Conversion Factors 2024, Scope 1 direct (Diesel 2.68, HVO 0.036 kgCO₂e/L). Weekly figures assume 5 working days.
         </p>
         <a href="https://ebrora.gumroad.com/l/fuel-usage-calculator" target="_blank" rel="noopener noreferrer"
           className="text-[11px] font-medium text-ebrora hover:text-ebrora-dark transition-colors">Download the offline Excel version →</a>
