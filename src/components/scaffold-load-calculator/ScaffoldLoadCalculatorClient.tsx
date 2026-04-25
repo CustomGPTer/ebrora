@@ -148,7 +148,7 @@ async function exportPDF(
   doc.setTextColor(255, 255, 255); doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("SCAFFOLD LOAD ASSESSMENT", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text("BS EN 12811-1 / BS 5975 / SG4:10 / NASC TG20 / BS EN 12810-1", M, 19);
+  doc.text("BS EN 12811-1 / BS 5975 / SG4:22 / NASC TG20 / BS EN 12810-1", M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34; doc.setTextColor(0, 0, 0);
@@ -183,7 +183,7 @@ async function exportPDF(
   drawFld("Debris Net:", inputs.debrisNet ? "Yes" : "No", M + 50, y, 0);
   drawFld("Freestanding:", inputs.freestanding ? "Yes" : "No", M + halfW, y, 0);
   y += 5;
-  drawFld("Loaded Bays:", String(inputs.loadedBays), M + 3, y, 0);
+  drawFld("Bays in scaffold:", String(inputs.loadedBays), M + 3, y, 0);
   y += 8;
 
   function checkPage(need: number) {
@@ -320,7 +320,7 @@ async function exportPDF(
   const pageCount = doc.getNumberOfPages();
   for (let p = 1; p <= pageCount; p++) {
     doc.setPage(p); doc.setFontSize(5.5); doc.setTextColor(130, 130, 130);
-    doc.text("Scaffold load assessment per BS EN 12811-1, BS 5975, and SG4:10. This is a screening tool -- it does not replace a structural design calculation by a competent scaffold designer.", M, 290);
+    doc.text("Scaffold load assessment per BS EN 12811-1, BS 5975, and SG4:22. This is a screening tool -- it does not replace a structural design calculation by a competent scaffold designer.", M, 290);
     doc.text(`Ref: ${docRef} | Page ${p} of ${pageCount}`, W - M - 50, 290);
   }
   doc.save(`scaffold-load-assessment-${todayISO()}.pdf`);
@@ -444,7 +444,7 @@ export default function ScaffoldLoadCalculatorClient() {
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Bay Length (m)</label>
             <input type="number" value={bayLength} onChange={e => setBayLength(Math.max(0.5, parseFloat(e.target.value) || 2.4))} step={0.1} min={0.5} max={4}
               className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
-          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Loaded Bays (simultaneously)</label>
+          <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Bays in scaffold (along length)</label>
             <input type="number" value={loadedBays} onChange={e => setLoadedBays(Math.max(1, parseInt(e.target.value) || 1))} min={1} max={10}
               className="w-full px-2.5 py-1.5 text-sm border border-gray-200 rounded-lg bg-blue-50/40 focus:bg-white focus:border-ebrora outline-none" /></div>
           <div><label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Wind Zone</label>
@@ -501,7 +501,7 @@ export default function ScaffoldLoadCalculatorClient() {
       {/* Footer */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
         <p className="text-[11px] text-gray-400 leading-relaxed max-w-lg">
-          Based on BS EN 12811-1 (Loading classes), BS 5975 (Scaffolding code of practice), and SG4:10 (NASC guidance).
+          Based on BS EN 12811-1 (Loading classes), BS 5975 (Scaffolding code of practice), and SG4:22 (NASC guidance).
           Wind loads simplified from BS EN 1991-1-4. This is a screening tool - it does not replace a structural design
           calculation by a competent scaffolding engineer. Always obtain a full design check for complex configurations.
         </p>
