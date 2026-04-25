@@ -5,9 +5,9 @@ import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
 
 export const metadata: Metadata = {
   title: "Formwork Lateral Pressure Calculator | Construction Tool | Ebrora",
-  description: "Calculate formwork lateral pressure using CIRIA Report 108 and DIN 18218. Pressure vs depth profile, pour rate and temperature sensitivity charts, form tie spacing back-calculation, and white-label PDF export.",
+  description: "Calculate formwork lateral pressure using CIRIA Report 108 (1985) and DIN 18218:2010. Pressure vs depth profile, pour rate and temperature sensitivity charts, form tie spacing back-calculation, 7 cement classes, 7 DIN consistency classes, and white-label PDF export.",
   alternates: { canonical: "https://www.ebrora.com/tools/formwork-pressure-calculator" },
-  openGraph: { title: "Formwork Lateral Pressure Calculator | Ebrora", description: "CIRIA R108 + DIN 18218 formwork pressure calculator with sensitivity charts and white-label PDF.", url: "https://www.ebrora.com/tools/formwork-pressure-calculator", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
+  openGraph: { title: "Formwork Lateral Pressure Calculator | Ebrora", description: "CIRIA R108 + DIN 18218:2010 formwork pressure calculator with sensitivity charts and white-label PDF.", url: "https://www.ebrora.com/tools/formwork-pressure-calculator", type: "website", images: [{ url: "https://www.ebrora.com/og-image.jpg", width: 1200, height: 630 }] },
 };
 
 const FormworkPressureCalculatorClient = dynamic(() => import("@/components/formwork-pressure-calculator/FormworkPressureCalculatorClient"), {
@@ -19,7 +19,7 @@ const FormworkPressureCalculatorClient = dynamic(() => import("@/components/form
   ),
 });
 
-const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Formwork Lateral Pressure Calculator", description: "CIRIA R108 + DIN 18218 formwork pressure with sensitivity charts, tie spacing, and white-label PDF.", url: "https://www.ebrora.com/tools/formwork-pressure-calculator", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
+const pageSchema = { "@context": "https://schema.org", "@type": "SoftwareApplication", name: "Formwork Lateral Pressure Calculator", description: "CIRIA R108 (1985) + DIN 18218:2010 formwork pressure with sensitivity charts, tie spacing, and white-label PDF.", url: "https://www.ebrora.com/tools/formwork-pressure-calculator", applicationCategory: "UtilitiesApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" }, publisher: { "@type": "Organization", name: "Ebrora", url: "https://www.ebrora.com" } };
 
 export default function FormworkPressureCalculatorPage() {
   return (
@@ -34,7 +34,7 @@ export default function FormworkPressureCalculatorPage() {
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Formwork Lateral Pressure Calculator</h1>
           <p className="text-base text-gray-500 mt-2 max-w-2xl mx-auto leading-relaxed">
-            Calculate formwork lateral pressure using CIRIA Report 108 with DIN 18218 comparison. Pressure vs depth profile chart, pour rate and temperature sensitivity analysis, form tie spacing back-calculation, 4 concrete types, 3 formwork finishes, and white-label PDF export.
+            Calculate formwork lateral pressure using CIRIA Report 108 (1985) with DIN 18218:2010 comparison. Pressure vs depth profile chart, pour rate and temperature sensitivity analysis, form tie spacing back-calculation with 0.9 m practical cap, 7 cement classes, 7 DIN consistency classes, and white-label PDF export.
           </p>
         </div>
         <FormworkPressureCalculatorClient />
