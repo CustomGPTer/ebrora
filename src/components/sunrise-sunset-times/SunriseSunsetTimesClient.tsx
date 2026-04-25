@@ -318,7 +318,7 @@ async function exportPDF(
   doc.setFontSize(15); doc.setFont("helvetica", "bold");
   doc.text("SUNRISE & SUNSET TIMES", M, 12);
   doc.setFontSize(8); doc.setFont("helvetica", "normal");
-  doc.text(`${city.name}, ${city.region} — CDM 2015 Reg 34 / BS EN 12464-2 — ebrora.com/tools/sunrise-sunset-times`, M, 19);
+  doc.text(`${city.name}, ${city.region} — CDM 2015 Reg 35 / BS EN 12464-2 — ebrora.com/tools/sunrise-sunset-times`, M, 19);
   doc.setFontSize(7);
   doc.text(`Ref: ${docRef} | Rev 0 | ${new Date().toLocaleDateString("en-GB")}`, W - M - 75, 19);
   y = 34;
@@ -530,7 +530,7 @@ async function exportPDF(
 
   doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(60, 60, 60);
   const whyLines = doc.splitTextToSize(
-    "Knowing exact sunrise, sunset, and civil twilight times is critical for construction site planning. CDM 2015 Regulation 34 requires workplaces to have suitable lighting. Civil twilight provides enough ambient light for outdoor work without artificial lighting. Planning shift patterns around daylight hours improves safety, reduces energy costs, and ensures compliance.",
+    WHY_IT_MATTERS,
     CW
   );
   doc.text(whyLines, M, y);
