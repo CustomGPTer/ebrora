@@ -718,7 +718,7 @@ export default function OvertimeCostCalculatorClient() {
   }]);
   const [weeks, setWeeks] = useState<number>(12);
   const [onCosts, setOnCosts] = useState<EmployerOnCosts>({
-    enabled: false, nicPercent: 13.8, pensionPercent: 3, citbLevyPercent: 0.35,
+    enabled: false, nicPercent: 15, pensionPercent: 3, citbLevyPercent: 0.35,
   });
 
   const inputs: OvertimeInputs = useMemo(() => ({ groups, weeks, onCosts }), [groups, weeks, onCosts]);
@@ -751,7 +751,7 @@ export default function OvertimeCostCalculatorClient() {
     const p = OVERTIME_PRESETS[0];
     setGroups([{ id: generateId(), label: "General Operatives", baseRate: 16.50, standardHoursPerWeek: p.standardHours, operativeCount: 6, tiers: p.tiers.map(t => ({ ...t, id: generateId() })) }]);
     setWeeks(12);
-    setOnCosts({ enabled: false, nicPercent: 13.8, pensionPercent: 3, citbLevyPercent: 0.35 });
+    setOnCosts({ enabled: false, nicPercent: 15, pensionPercent: 3, citbLevyPercent: 0.35 });
     setSite(""); setManager(""); setPreparedBy(""); setAssessDate(todayISO());
   }, []);
 
