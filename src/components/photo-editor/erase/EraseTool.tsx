@@ -350,7 +350,6 @@ function EraseToolImpl({
                   draggable={false}
                   editing={false}
                   onSelect={() => undefined}
-                  onDoubleClick={() => undefined}
                   onDragEnd={() => undefined}
                   onTransformEnd={() => undefined}
                 />
