@@ -9,6 +9,12 @@
 // Batch 6 — Effects modal (filters), wired to the previously-stubbed
 //           Effects button in the dock. Mounted as the fourth slot in
 //           the `backgroundTool` state machine.
+// Batch 7 — Save and Share page. The top-bar arrow no longer triggers
+//           the IndexedDB save directly; instead it opens the new
+//           SaveAndSharePage (Project / Image / PDF / Share To). The
+//           existing handleSaveClick is reused as the page's Project
+//           handler, and Cmd/Ctrl-S still triggers it directly so
+//           keyboard users keep their fast-save path.
 //
 // What's preserved:
 //   • activePanel discriminator + every right-side drawer
@@ -48,6 +54,7 @@ import { EraseTool } from "./erase/EraseTool";
 import { ExportPanel } from "./export/ExportPanel";
 import { ProjectsModal } from "./projects/ProjectsModal";
 import { SaveProjectDialog } from "./projects/SaveProjectDialog";
+import { SaveAndSharePage } from "./save-and-share/SaveAndSharePage";
 import { useEditor } from "./context/EditorContext";
 import {
   MobileEditProvider,
@@ -127,6 +134,12 @@ function EditorShellInner({
   );
 
   const [addSheetOpen, setAddSheetOpen] = useState(false);
+
+  // Batch 7 — Save and Share full-screen page (destination of the
+  // top-bar arrow). Mounted at the modal layer, z-[290]; sits above
+  // the panels (210) and AddLayerSheet (221), below EraseTool (300)
+  // and the toast (400).
+  const [saveAndShareOpen, setSaveAndShareOpen] = useState(false);
 
   const [toast, setToast] = useState<string | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
@@ -390,8 +403,7 @@ function EditorShellInner({
         onOpenAddSheet={() => setAddSheetOpen(true)}
         onToggleLayers={toggleLayersPanel}
         layersOpen={activePanel === "layers"}
-        onSave={handleSaveClick}
-        saving={savingInFlight}
+        onOpenSaveAndShare={() => setSaveAndShareOpen(true)}
         saved={savedProjectId !== null}
       />
 
@@ -486,6 +498,15 @@ function EditorShellInner({
       <EffectsTool
         open={backgroundTool === "effects"}
         onClose={() => setBackgroundTool(null)}
+      />
+
+      <SaveAndSharePage
+        open={saveAndShareOpen}
+        onClose={() => setSaveAndShareOpen(false)}
+        onProjectSave={handleSaveClick}
+        savedProjectId={savedProjectId}
+        projectSaving={savingInFlight}
+        onToast={showToast}
       />
 
       <ProjectsModal
