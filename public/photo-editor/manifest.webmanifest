@@ -1,0 +1,39 @@
+{
+  "name": "Ebrora Photo Editor",
+  "short_name": "Photo Editor",
+  "description": "Add text, stickers, shapes and stamps to photos. Free online editor — 1,800 fonts, layers, batch mode, PDF export.",
+  "start_url": "/photo-editor/",
+  "scope": "/photo-editor/",
+  "id": "ebrora-photo-editor",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "theme_color": "#1B5B50",
+  "background_color": "#FFFFFF",
+  "lang": "en-GB",
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "icons": [
+    {
+      "src": "/photo-editor/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/photo-editor/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/photo-editor/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["graphics", "photo", "productivity"],
+  "prefer_related_applications": false
+}
