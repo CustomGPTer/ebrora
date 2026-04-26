@@ -1,21 +1,37 @@
 // src/components/photo-editor/toolbar/BottomDock.tsx
 //
-// The mobile bottom dock — two stacked sections (Add Layer + Background)
-// mirroring the reference Add Text app's layout.
+// The mobile bottom dock — two stacked sections that change behaviour
+// based on whether anything is selected.
 //
-// Add Layer row:
-//   • Add Text   → creates an empty TextLayer and opens BottomEditDrawer
-//   • Photo      → file picker → ADD_LAYER (image)
-//   • Shape      → activePanel = "shapes"
-//   • Sticker    → activePanel = "stickers"
-//   • Style      → stub (Saved Styles is a future batch)
+// Top section:
+//   • No selection / multi-select  → "Add Layer"
+//       Add Text / Photo / Shape / Sticker / Style
+//   • Single text selected         → "Edit Text"
+//       Edit / Font / Format / Color / Stroke / Shadow / Erase
+//   • Single image selected        → "Edit Image"
+//       Effects / Position / Erase / Replace
+//   • Single sticker selected      → "Edit Sticker"
+//       Color / Position
+//   • Single shape selected        → "Edit Shape"
+//       Color / Stroke / Position
 //
-// Background row (all real as of Batch 6):
-//   • Replace    → file picker → SET_BACKGROUND (photo)
-//   • Effects    → opens EffectsTool modal (Batch 6)
-//   • Crop       → opens CropTool modal (Batch 5)
-//   • Resize     → opens ResizeTool modal (Batch 5)
-//   • Flip/Rotate → opens FlipRotateTool modal (Batch 5)
+// Bottom section: always "Background"
+//   Replace / Effects / Crop / Resize / Flip-Rotate
+//
+// Why swap rather than add a third section? Vertical real estate on
+// mobile is precious — adding a section means scrolling, which hides
+// the canvas. The reference Add Text app swaps the top section.
+//
+// Type-specific options surface the existing right-side panels:
+//   FormatPanel / ColorPanel / StrokePanel / HighlightPanel /
+//   ShadowPanel / PositionPanel / FontPanel — those panels were
+//   built for text but ColorPanel + PositionPanel work for any layer
+//   kind. The other text-only panels are gated by layer kind.
+//
+// Edit (text) re-opens the BottomEditDrawer for the selected text
+// layer — same path as tap-on-text and as the SelectionTools
+// floating toolbar's pencil icon. Three ways to enter edit mode is
+// fine; users discover whichever one they reach for first.
 
 "use client";
 
@@ -25,10 +41,15 @@ import {
   FilePlus,
   Image as ImageIcon,
   Maximize as ResizeIcon,
+  Move,
+  Palette,
+  PenLine,
+  Pencil,
   RotateCw,
   Smile,
   Sparkles,
   Square,
+  TextCursor,
   Type,
   Wand2,
 } from "lucide-react";
@@ -40,7 +61,7 @@ import { createTextLayer } from "@/lib/photo-editor/rich-text/factory";
 import { createImageLayer } from "@/lib/photo-editor/canvas/factories";
 import { centreLayerOnCanvas } from "@/lib/photo-editor/canvas/selection";
 import { MAX_CANVAS_DIMENSION } from "@/lib/photo-editor/types";
-import type { Background } from "@/lib/photo-editor/types";
+import type { AnyLayer, Background } from "@/lib/photo-editor/types";
 import type { ActivePanel } from "../EditorShell";
 
 type TogglePanel = (panel: Exclude<ActivePanel, null>) => () => void;
@@ -48,17 +69,21 @@ type TogglePanel = (panel: Exclude<ActivePanel, null>) => () => void;
 interface BottomDockProps {
   activePanel: ActivePanel;
   onTogglePanel: TogglePanel;
+  /** Open a panel without toggling (used for "switch to font panel"
+   *  type buttons that should always end up showing the panel
+   *  rather than closing it if it happened to already be open). */
+  onOpenPanel: (panel: Exclude<ActivePanel, null>) => void;
   onStub: (label: string) => void;
   onOpenCrop: () => void;
   onOpenResize: () => void;
   onOpenFlipRotate: () => void;
-  /** Open the Effects modal (Batch 6). */
   onOpenEffects: () => void;
 }
 
 export function BottomDock({
   activePanel,
   onTogglePanel,
+  onOpenPanel,
   onStub,
   onOpenCrop,
   onOpenResize,
@@ -72,6 +97,15 @@ export function BottomDock({
   const replaceBgInputRef = useRef<HTMLInputElement>(null);
 
   const [adding, setAdding] = useState(false);
+
+  // Resolve the single-selected layer (if any) so we know which
+  // top-section variant to render.
+  const selectedLayer: AnyLayer | null =
+    state.selection.length === 1
+      ? state.project.layers.find((l) => l.id === state.selection[0]) ?? null
+      : null;
+
+  // ── Add Layer handlers ─────────────────────────────────────────
 
   function handleAddText() {
     const project = state.project;
@@ -160,42 +194,26 @@ export function BottomDock({
         background: "var(--pe-toolbar-bg)",
       }}
     >
-      <DockSectionHeader title="Add Layer" trailing={<SubscribeChip compact />} />
-      <DockRow>
-        <DockButton
-          icon={<Type className="w-6 h-6" strokeWidth={2} />}
-          label="Add Text"
-          onClick={handleAddText}
-          accent={{
-            from: "#3FB6E6",
-            to: "#1B5B50",
-            iconColor: "#FFFFFF",
-          }}
+      {/* ── Top section — varies by selection ─────────────────── */}
+      {selectedLayer === null ? (
+        <AddLayerSection
+          activePanel={activePanel}
+          onTogglePanel={onTogglePanel}
+          onAddText={handleAddText}
+          onPickPhoto={() => photoLayerInputRef.current?.click()}
+          onStub={onStub}
         />
-        <DockButton
-          icon={<ImageIcon className="w-6 h-6" strokeWidth={1.75} />}
-          label="Photo"
-          onClick={() => photoLayerInputRef.current?.click()}
+      ) : (
+        <SelectedLayerSection
+          layer={selectedLayer}
+          activePanel={activePanel}
+          onOpenPanel={onOpenPanel}
+          onEditText={(id) => beginEditing(id)}
+          onStub={onStub}
         />
-        <DockButton
-          icon={<Square className="w-6 h-6" strokeWidth={1.75} />}
-          label="Shape"
-          onClick={onTogglePanel("shapes")}
-          active={activePanel === "shapes"}
-        />
-        <DockButton
-          icon={<Smile className="w-6 h-6" strokeWidth={1.75} />}
-          label="Sticker"
-          onClick={onTogglePanel("stickers")}
-          active={activePanel === "stickers"}
-        />
-        <DockButton
-          icon={<Sparkles className="w-6 h-6" strokeWidth={1.75} />}
-          label="Style"
-          onClick={() => onStub("Saved Styles — coming soon")}
-        />
-      </DockRow>
+      )}
 
+      {/* ── Background section — always present ───────────────── */}
       <DockSectionHeader title="Background" />
       <DockRow>
         <DockButton
@@ -253,6 +271,220 @@ export function BottomDock({
   );
 }
 
+// ─── Top section — Add Layer (no selection) ─────────────────────
+
+function AddLayerSection({
+  activePanel,
+  onTogglePanel,
+  onAddText,
+  onPickPhoto,
+  onStub,
+}: {
+  activePanel: ActivePanel;
+  onTogglePanel: TogglePanel;
+  onAddText: () => void;
+  onPickPhoto: () => void;
+  onStub: (label: string) => void;
+}) {
+  return (
+    <>
+      <DockSectionHeader title="Add Layer" trailing={<SubscribeChip compact />} />
+      <DockRow>
+        <DockButton
+          icon={<Type className="w-6 h-6" strokeWidth={2} />}
+          label="Add Text"
+          onClick={onAddText}
+          accent={{
+            from: "#3FB6E6",
+            to: "#1B5B50",
+            iconColor: "#FFFFFF",
+          }}
+        />
+        <DockButton
+          icon={<ImageIcon className="w-6 h-6" strokeWidth={1.75} />}
+          label="Photo"
+          onClick={onPickPhoto}
+        />
+        <DockButton
+          icon={<Square className="w-6 h-6" strokeWidth={1.75} />}
+          label="Shape"
+          onClick={onTogglePanel("shapes")}
+          active={activePanel === "shapes"}
+        />
+        <DockButton
+          icon={<Smile className="w-6 h-6" strokeWidth={1.75} />}
+          label="Sticker"
+          onClick={onTogglePanel("stickers")}
+          active={activePanel === "stickers"}
+        />
+        <DockButton
+          icon={<Sparkles className="w-6 h-6" strokeWidth={1.75} />}
+          label="Style"
+          onClick={() => onStub("Saved Styles — coming soon")}
+        />
+      </DockRow>
+    </>
+  );
+}
+
+// ─── Top section — Selected Layer (single-selection) ────────────
+
+function SelectedLayerSection({
+  layer,
+  activePanel,
+  onOpenPanel,
+  onEditText,
+  onStub,
+}: {
+  layer: AnyLayer;
+  activePanel: ActivePanel;
+  onOpenPanel: (panel: Exclude<ActivePanel, null>) => void;
+  onEditText: (id: string) => void;
+  onStub: (label: string) => void;
+}) {
+  const title = sectionTitleForLayer(layer);
+
+  return (
+    <>
+      <DockSectionHeader title={title} />
+      <DockRow>
+        {layer.kind === "text" && (
+          <>
+            <DockButton
+              icon={<Pencil className="w-6 h-6" strokeWidth={2} />}
+              label="Edit"
+              onClick={() => onEditText(layer.id)}
+              accent={{
+                from: "#3FB6E6",
+                to: "#1B5B50",
+                iconColor: "#FFFFFF",
+              }}
+            />
+            <DockButton
+              icon={<TextCursor className="w-6 h-6" strokeWidth={1.75} />}
+              label="Font"
+              onClick={() => onOpenPanel("fonts")}
+              active={activePanel === "fonts"}
+            />
+            <DockButton
+              icon={<PenLine className="w-6 h-6" strokeWidth={1.75} />}
+              label="Format"
+              onClick={() => onOpenPanel("format")}
+              active={activePanel === "format"}
+            />
+            <DockButton
+              icon={<Palette className="w-6 h-6" strokeWidth={1.75} />}
+              label="Color"
+              onClick={() => onOpenPanel("color")}
+              active={activePanel === "color"}
+            />
+            <DockButton
+              icon={<Square className="w-6 h-6" strokeWidth={1.75} />}
+              label="Stroke"
+              onClick={() => onOpenPanel("stroke")}
+              active={activePanel === "stroke"}
+            />
+            <DockButton
+              icon={<Sparkles className="w-6 h-6" strokeWidth={1.75} />}
+              label="Shadow"
+              onClick={() => onOpenPanel("shadow")}
+              active={activePanel === "shadow"}
+            />
+            <DockButton
+              icon={<Move className="w-6 h-6" strokeWidth={1.75} />}
+              label="Position"
+              onClick={() => onOpenPanel("position")}
+              active={activePanel === "position"}
+            />
+          </>
+        )}
+
+        {layer.kind === "image" && (
+          <>
+            <DockButton
+              icon={<Wand2 className="w-6 h-6" strokeWidth={1.75} />}
+              label="Effects"
+              onClick={() => onStub("Per-layer effects — coming soon")}
+            />
+            <DockButton
+              icon={<Move className="w-6 h-6" strokeWidth={1.75} />}
+              label="Position"
+              onClick={() => onOpenPanel("position")}
+              active={activePanel === "position"}
+            />
+            <DockButton
+              icon={<Sparkles className="w-6 h-6" strokeWidth={1.75} />}
+              label="Erase"
+              onClick={() => onOpenPanel("erase")}
+              active={activePanel === "erase"}
+            />
+            <DockButton
+              icon={<FilePlus className="w-6 h-6" strokeWidth={1.75} />}
+              label="Replace"
+              onClick={() => onStub("Replace layer image — coming soon")}
+            />
+          </>
+        )}
+
+        {layer.kind === "shape" && (
+          <>
+            <DockButton
+              icon={<Palette className="w-6 h-6" strokeWidth={1.75} />}
+              label="Color"
+              onClick={() => onOpenPanel("color")}
+              active={activePanel === "color"}
+            />
+            <DockButton
+              icon={<Square className="w-6 h-6" strokeWidth={1.75} />}
+              label="Stroke"
+              onClick={() => onOpenPanel("stroke")}
+              active={activePanel === "stroke"}
+            />
+            <DockButton
+              icon={<Move className="w-6 h-6" strokeWidth={1.75} />}
+              label="Position"
+              onClick={() => onOpenPanel("position")}
+              active={activePanel === "position"}
+            />
+          </>
+        )}
+
+        {layer.kind === "sticker" && (
+          <>
+            <DockButton
+              icon={<Palette className="w-6 h-6" strokeWidth={1.75} />}
+              label="Color"
+              onClick={() => onOpenPanel("color")}
+              active={activePanel === "color"}
+            />
+            <DockButton
+              icon={<Move className="w-6 h-6" strokeWidth={1.75} />}
+              label="Position"
+              onClick={() => onOpenPanel("position")}
+              active={activePanel === "position"}
+            />
+          </>
+        )}
+      </DockRow>
+    </>
+  );
+}
+
+function sectionTitleForLayer(layer: AnyLayer): string {
+  switch (layer.kind) {
+    case "text":
+      return "Edit Text";
+    case "image":
+      return "Edit Image";
+    case "sticker":
+      return "Edit Sticker";
+    case "shape":
+      return "Edit Shape";
+  }
+}
+
+// ─── Section header ─────────────────────────────────────────────
+
 function DockSectionHeader({
   title,
   trailing,
@@ -275,6 +507,8 @@ function DockSectionHeader({
     </div>
   );
 }
+
+// ─── Horizontal scroll row ──────────────────────────────────────
 
 function DockRow({ children }: { children: React.ReactNode }) {
   return (
