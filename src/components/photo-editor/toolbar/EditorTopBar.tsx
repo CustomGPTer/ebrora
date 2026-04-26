@@ -1,28 +1,27 @@
 // src/components/photo-editor/toolbar/EditorTopBar.tsx
 //
-// The new mobile editor top bar. Mirrors the reference Add Text app's
+// The mobile editor top bar. Mirrors the reference Add Text app's
 // 7-icon strip exactly:
 //
 //   ⟨   ⊞   ↶   +   ↷   ⊟   →
 //   Back Grid Undo Plus Redo Lyr Next
 //
-// Behaviour map (Batch 1):
+// Behaviour map:
 //   ⟨    Back            → onExit() (returns to the home / EmptyState)
 //   ⊞    Grid             → toggles state.gridVisible (existing TOGGLE_GRID)
 //   ↶    Undo             → undo() from EditorContext
-//   +    Plus             → onOpenAddSheet() — opens AddLayerSheet (Batch 1)
+//   +    Plus             → onOpenAddSheet() — opens AddLayerSheet
 //   ↷    Redo             → redo() from EditorContext
 //   ⊟    Layers           → toggles activePanel = "layers"
-//   →    Next             → onSave() — runs the existing Save flow (the
-//                           reference uses the arrow as "save and move
-//                           on"; mapping to Save is the closest fit and
-//                           keeps existing autosave / SavedProject wiring)
+//   →    Next             → onOpenSaveAndShare() — opens the full-screen
+//                           Save and Share page (Project / Image / PDF /
+//                           Share To). Previously this directly triggered
+//                           Save-to-IndexedDB; users had no way to download
+//                           because the ExportPanel was orphaned.
 //
 // Save As / Open Project / Reset Zoom / Theme / Install live behind
-// keyboard shortcuts in this batch (Cmd+Shift+S, Cmd+0). The hamburger
-// drawer that owned them previously is intentionally removed from the
-// editor view to match the reference; the home-screen rebuild in
-// Batch 2 brings them back as a settings page.
+// keyboard shortcuts; the hamburger drawer that owned them previously
+// is intentionally removed from the editor view to match the reference.
 //
 // Visual contract:
 //   • Single 52px-tall row, items spread evenly across the width
@@ -52,12 +51,11 @@ interface EditorTopBarProps {
   onOpenAddSheet: () => void;
   onToggleLayers: () => void;
   layersOpen: boolean;
-  onSave: () => void;
-  /** True while an explicit save (not autosave) is in flight — used to
-   *  visually disable the Next arrow so users don't double-tap. */
-  saving: boolean;
+  /** Open the full-screen Save and Share page. */
+  onOpenSaveAndShare: () => void;
   /** Whether the project has been written to IndexedDB at least once.
-   *  Drives the "filled vs outline" Next-arrow visual. */
+   *  Drives the "filled vs outline" Next-arrow visual — mirrors the
+   *  reference's "completed step" treatment. */
   saved: boolean;
 }
 
@@ -66,8 +64,7 @@ export function EditorTopBar({
   onOpenAddSheet,
   onToggleLayers,
   layersOpen,
-  onSave,
-  saving,
+  onOpenSaveAndShare,
   saved,
 }: EditorTopBarProps) {
   const { state, dispatch, undo, redo, canUndo, canRedo } = useEditor();
@@ -134,7 +131,7 @@ export function EditorTopBar({
         icon={<LayersIcon className="w-5 h-5" strokeWidth={1.75} />}
         active={layersOpen}
       />
-      <NextArrowButton onClick={onSave} saving={saving} saved={saved} />
+      <NextArrowButton onClick={onOpenSaveAndShare} saved={saved} />
     </div>
   );
 }
@@ -181,7 +178,7 @@ function ChromeIconButton({
   );
 }
 
-// ─── Next-arrow button — distinct visual ────────────────────────
+// ─── Next-arrow button — opens Save and Share ───────────────────
 //
 // The reference renders this as a filled dark circle with a white
 // arrow when there's a "next step" available. We mirror that with
@@ -190,11 +187,9 @@ function ChromeIconButton({
 
 function NextArrowButton({
   onClick,
-  saving,
   saved,
 }: {
   onClick: () => void;
-  saving: boolean;
   saved: boolean;
 }) {
   const filled = !saved; // unsaved = prominent CTA
@@ -203,20 +198,15 @@ function NextArrowButton({
     <button
       type="button"
       onClick={onClick}
-      disabled={saving}
-      aria-label={saving ? "Saving…" : saved ? "Saved" : "Save project"}
-      className="w-10 h-10 inline-flex items-center justify-center rounded-full transition-opacity disabled:opacity-60"
+      aria-label="Save and Share"
+      className="w-10 h-10 inline-flex items-center justify-center rounded-full transition-opacity"
       style={{
         background: filled ? "#1B5B50" : "transparent",
         color: filled ? "#FFFFFF" : "var(--pe-tool-icon)",
         border: filled ? "none" : "1px solid var(--pe-border-strong)",
       }}
     >
-      <ArrowRight
-        className="w-5 h-5"
-        strokeWidth={2}
-        aria-hidden
-      />
+      <ArrowRight className="w-5 h-5" strokeWidth={2} aria-hidden />
     </button>
   );
 }
