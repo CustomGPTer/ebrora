@@ -1,33 +1,20 @@
 // src/components/photo-editor/EditorShell.tsx
 //
-// The editor view: top chrome, canvas area, and bottom toolbar.
+// The editor view: top chrome, canvas area, and bottom dock.
 //
-// Top chrome (Session 8 — HANDOVER-7 §6.5 Q1 default a):
-//   • Hamburger drawer (left)        ← editor commands live here now
-//   • Project name (centred)
-//   • Right cluster: Undo / Redo / Save / Export
+// Batch 1 — Mobile editor rebuild (top bar, dock, +, Subscribe).
+// Batch 3 — MobileEditProvider + BottomEditDrawer (tap text → edit).
+// Batch 4 — SelectionTools overlay (mounted inside CanvasShell).
+// Batch 5 — Crop / FlipRotate / Resize background-tool modals.
+// Batch 6 — Effects modal (filters), wired to the previously-stubbed
+//           Effects button in the dock. Mounted as the fourth slot in
+//           the `backgroundTool` state machine.
 //
-// All other commands (Save-As, Open project, Reset zoom, Layers,
-// Theme, Install) moved into the hamburger drawer — see
-// HamburgerCorner. Keeps the chrome calm at 360 px.
-//
-// Right-side overlays share a single activePanel discriminator owned
-// here. Adding "export" extends the union; the union is *not* forked.
-//
-// Session 8 wiring summary:
-//   • activePanel union now includes "export"; ExportPanel mounts the
-//     same as every other right-drawer
-//   • Cmd/Ctrl-S triggers Save (Cmd/Ctrl-Shift-S already handled
-//     Save-As in Session 7)
-//   • The Konva stage ref now lives on EditorContext rather than
-//     being fished out of Konva.stages[0] — both thumbnail generation
-//     and the export pipeline read it from there
-//   • StorageQuotaError on save surfaces a "browser storage is full"
-//     message rather than a generic failure
-//
-// Custom-font bring-up: as soon as the editor mounts we enumerate
-// IndexedDB and re-register every previously-uploaded custom font with
-// document.fonts so the canvas engine can paint with them immediately.
+// What's preserved:
+//   • activePanel discriminator + every right-side drawer
+//   • Erase modal + ProjectsModal + SaveProjectDialog
+//   • Custom-font bring-up, autosave, keyboard shortcuts, beforeunload
+//     thumbnail flush
 
 "use client";
 
@@ -38,15 +25,15 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  Download as DownloadIcon,
-  Redo2,
-  Save as SaveIcon,
-  Undo2,
-} from "lucide-react";
 import { CanvasShell } from "./canvas/CanvasShell";
-import { HamburgerCorner, type HamburgerCommands } from "./mobile/HamburgerCorner";
-import { BottomToolbar } from "./toolbar/BottomToolbar";
+import { BottomEditDrawer } from "./canvas/BottomEditDrawer";
+import { EditorTopBar } from "./toolbar/EditorTopBar";
+import { BottomDock } from "./toolbar/BottomDock";
+import { AddLayerSheet } from "./toolbar/AddLayerSheet";
+import { CropTool } from "./tools/CropTool";
+import { FlipRotateTool } from "./tools/FlipRotateTool";
+import { ResizeTool } from "./tools/ResizeTool";
+import { EffectsTool } from "./tools/EffectsTool";
 import { LayersPanel } from "./layers/LayersPanel";
 import { FontPanel } from "./fonts/FontPanel";
 import { StickerPanel } from "./stickers/StickerPanel";
@@ -62,7 +49,10 @@ import { ExportPanel } from "./export/ExportPanel";
 import { ProjectsModal } from "./projects/ProjectsModal";
 import { SaveProjectDialog } from "./projects/SaveProjectDialog";
 import { useEditor } from "./context/EditorContext";
-import { useTheme } from "./context/ThemeContext";
+import {
+  MobileEditProvider,
+  useMobileEdit,
+} from "./context/MobileEditContext";
 import { loadAllCustomFonts } from "@/lib/photo-editor/fonts/custom-fonts-db";
 import {
   loadProject as loadProjectRecord,
@@ -75,15 +65,10 @@ import {
 } from "@/lib/photo-editor/saved-projects/serialize";
 import { generateThumbnail } from "@/lib/photo-editor/saved-projects/thumbnail";
 import { createAutosaver } from "@/lib/photo-editor/saved-projects/autosave";
-import { useInstallPrompt } from "@/lib/photo-editor/pwa/install-prompt";
-import { DEFAULT_VIEWPORT, type SavedProject } from "@/lib/photo-editor/types";
+import type { SavedProject } from "@/lib/photo-editor/types";
 
 /** Every right-side panel the editor can show. Single-slot — only one
- *  may be open at a time. The text-tool panels (format..position) are
- *  reachable only when a text layer is selected; stickers / shapes are
- *  always available. The "erase" entry opens a full-screen modal rather
- *  than a side drawer but lives on the same discriminator (Session 6).
- *  Session 8 adds "export" — extend, don't fork. */
+ *  may be open at a time. */
 export type ActivePanel =
   | "layers"
   | "fonts"
@@ -99,23 +84,34 @@ export type ActivePanel =
   | "export"
   | null;
 
+/** Background-tool modals — mutually exclusive single-slot state.
+ *  Separate from `activePanel` because these are full-screen modals
+ *  rather than side-drawer panels. Batch 6 adds "effects" to the
+ *  Batch 5 set. */
+type BackgroundTool = "crop" | "flip-rotate" | "resize" | "effects" | null;
+
 interface EditorShellProps {
   onExit: () => void;
-  /** SavedProject id passed in from PhotoEditorClient when the editor
-   *  was entered via Recent / Projects modal. null = fresh project. */
   initialSavedProjectId?: string | null;
 }
 
-export function EditorShell({
+export function EditorShell(props: EditorShellProps) {
+  return (
+    <MobileEditProvider>
+      <EditorShellInner {...props} />
+    </MobileEditProvider>
+  );
+}
+
+function EditorShellInner({
   onExit,
   initialSavedProjectId = null,
 }: EditorShellProps) {
-  const { state, dispatch, undo, redo, canUndo, canRedo, stageRef } =
-    useEditor();
-  const { theme, toggle: toggleTheme } = useTheme();
-  const { canInstall, install } = useInstallPrompt();
+  const { state, dispatch, stageRef } = useEditor();
+  const { state: mobileEdit, endEditing } = useMobileEdit();
 
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+  const [backgroundTool, setBackgroundTool] = useState<BackgroundTool>(null);
   const [savedProjectId, setSavedProjectId] = useState<string | null>(
     initialSavedProjectId,
   );
@@ -130,12 +126,52 @@ export function EditorShell({
     null,
   );
 
+  const [addSheetOpen, setAddSheetOpen] = useState(false);
+
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<number | null>(null);
+
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    if (toastTimeoutRef.current !== null) {
+      window.clearTimeout(toastTimeoutRef.current);
+    }
+    toastTimeoutRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimeoutRef.current = null;
+    }, 2400);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current !== null) {
+        window.clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const togglePanel = useCallback(
     (panel: Exclude<ActivePanel, null>) => () =>
       setActivePanel((p) => (p === panel ? null : panel)),
     [],
   );
   const closePanel = useCallback(() => setActivePanel(null), []);
+  const openPanel = useCallback(
+    (panel: Exclude<ActivePanel, null>) => setActivePanel(panel),
+    [],
+  );
+  const toggleLayersPanel = useCallback(
+    () => setActivePanel((p) => (p === "layers" ? null : "layers")),
+    [],
+  );
+
+  // Auto-commit BottomEditDrawer when selection clears.
+  useEffect(() => {
+    if (mobileEdit.editingLayerId === null) return;
+    if (!state.selection.includes(mobileEdit.editingLayerId)) {
+      endEditing(true);
+    }
+  }, [state.selection, mobileEdit.editingLayerId, endEditing]);
 
   // ── Custom-font bring-up ──────────────────────────────────────
   useEffect(() => {
@@ -260,6 +296,7 @@ export function EditorShell({
     void (async () => {
       try {
         await persist(null, true);
+        showToast("Saved");
       } catch (err) {
         if (err instanceof StorageQuotaError) {
           setSaveErrorMessage(
@@ -272,7 +309,7 @@ export function EditorShell({
         setSavingInFlight(false);
       }
     })();
-  }, [persist]);
+  }, [persist, showToast]);
 
   const handleSaveAsClick = useCallback(() => {
     setSaveDialogMode("save-as");
@@ -292,6 +329,7 @@ export function EditorShell({
         setSavedCreatedAt(null);
       }
       await persist(name, true);
+      showToast("Saved");
     } catch (err) {
       if (err instanceof StorageQuotaError) {
         setSaveErrorMessage(
@@ -322,7 +360,13 @@ export function EditorShell({
       if (target && isEditableTarget(target)) return;
       const mod = e.metaKey || e.ctrlKey;
       if (!mod) return;
-      if (e.shiftKey) return; // Save-As listener handles this case.
+      if (e.shiftKey) {
+        if (e.key.toLowerCase() === "s") {
+          e.preventDefault();
+          handleSaveAsClick();
+        }
+        return;
+      }
       if (e.key.toLowerCase() === "s") {
         e.preventDefault();
         handleSaveClick();
@@ -330,49 +374,7 @@ export function EditorShell({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [handleSaveClick]);
-
-  // ── Hamburger commands ────────────────────────────────────────
-  const handleResetZoom = useCallback(() => {
-    dispatch({ type: "SET_VIEWPORT", viewport: DEFAULT_VIEWPORT });
-  }, [dispatch]);
-
-  const handleInstall = useCallback(() => {
-    void install();
-  }, [install]);
-
-  const hamburgerCommands = useMemo<HamburgerCommands>(
-    () => ({
-      onSave: handleSaveClick,
-      onSaveAs: handleSaveAsClick,
-      onOpenProjects: () => setProjectsModalOpen(true),
-      onOpenExport: () => setActivePanel("export"),
-      onResetZoom: handleResetZoom,
-      onToggleLayers: () =>
-        setActivePanel((p) => (p === "layers" ? null : "layers")),
-      layersOpen: activePanel === "layers",
-      onToggleTheme: toggleTheme,
-      currentTheme: theme,
-      canInstall,
-      onInstall: handleInstall,
-    }),
-    [
-      handleSaveClick,
-      handleSaveAsClick,
-      handleResetZoom,
-      activePanel,
-      toggleTheme,
-      theme,
-      canInstall,
-      handleInstall,
-    ],
-  );
-
-  const saveButtonLabel = useMemo(() => {
-    if (savingInFlight) return "Saving…";
-    if (savedProjectId === null) return "Save";
-    return "Saved";
-  }, [savingInFlight, savedProjectId]);
+  }, [handleSaveClick, handleSaveAsClick]);
 
   return (
     <div
@@ -383,49 +385,16 @@ export function EditorShell({
         height: "100vh",
       }}
     >
-      {/* ── Top chrome ─────────────────────────────────────────── */}
-      <div
-        className="flex-none flex items-center justify-between px-3"
-        style={{
-          height: 52,
-          borderBottom: "1px solid var(--pe-border)",
-          background: "var(--pe-toolbar-bg)",
-        }}
-      >
-        <HamburgerCorner onExit={onExit} commands={hamburgerCommands} />
-        <ProjectNameDisplay />
-        <div className="flex items-center gap-1">
-          <ChromeIconButton
-            onClick={undo}
-            disabled={!canUndo}
-            ariaLabel="Undo"
-            icon={<Undo2 className="w-5 h-5" strokeWidth={1.75} />}
-          />
-          <ChromeIconButton
-            onClick={redo}
-            disabled={!canRedo}
-            ariaLabel="Redo"
-            icon={<Redo2 className="w-5 h-5" strokeWidth={1.75} />}
-          />
-          <ChromeIconButton
-            onClick={handleSaveClick}
-            ariaLabel={saveButtonLabel}
-            icon={<SaveIcon className="w-5 h-5" strokeWidth={1.75} />}
-            active={savedProjectId !== null}
-          />
-          <ChromeIconButton
-            onClick={togglePanel("export")}
-            ariaLabel={
-              activePanel === "export" ? "Close export panel" : "Open export panel"
-            }
-            icon={<DownloadIcon className="w-5 h-5" strokeWidth={1.75} />}
-            active={activePanel === "export"}
-            ariaPressed={activePanel === "export"}
-          />
-        </div>
-      </div>
+      <EditorTopBar
+        onExit={onExit}
+        onOpenAddSheet={() => setAddSheetOpen(true)}
+        onToggleLayers={toggleLayersPanel}
+        layersOpen={activePanel === "layers"}
+        onSave={handleSaveClick}
+        saving={savingInFlight}
+        saved={savedProjectId !== null}
+      />
 
-      {/* Save error banner (StorageQuotaError, etc) ──────────── */}
       {saveErrorMessage && (
         <div
           role="alert"
@@ -448,39 +417,75 @@ export function EditorShell({
         </div>
       )}
 
-      {/* ── Canvas area ────────────────────────────────────────── */}
       <CanvasShell />
 
-      {/* ── Bottom toolbar ─────────────────────────────────────── */}
-      <BottomToolbar
+      <BottomDock
         activePanel={activePanel}
         onTogglePanel={togglePanel}
+        onStub={showToast}
+        onOpenCrop={() => setBackgroundTool("crop")}
+        onOpenResize={() => setBackgroundTool("resize")}
+        onOpenFlipRotate={() => setBackgroundTool("flip-rotate")}
+        onOpenEffects={() => setBackgroundTool("effects")}
       />
 
-      {/* ── Right-side overlays (mutually exclusive via activePanel) ── */}
-      <LayersPanel
-        open={activePanel === "layers"}
-        onClose={closePanel}
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed left-1/2 -translate-x-1/2 z-[400] px-4 py-2 rounded-full text-sm pointer-events-none"
+          style={{
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+            background: "rgba(17, 24, 39, 0.92)",
+            color: "#FFFFFF",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+          }}
+        >
+          {toast}
+        </div>
+      )}
+
+      <AddLayerSheet
+        open={addSheetOpen}
+        onClose={() => setAddSheetOpen(false)}
+        onOpenPanel={openPanel}
+        onStub={showToast}
       />
+
+      <BottomEditDrawer />
+
+      {/* Right-side overlays */}
+      <LayersPanel open={activePanel === "layers"} onClose={closePanel} />
       <FontPanel open={activePanel === "fonts"} onClose={closePanel} />
       <StickerPanel open={activePanel === "stickers"} onClose={closePanel} />
       <ShapePanel open={activePanel === "shapes"} onClose={closePanel} />
       <FormatPanel open={activePanel === "format"} onClose={closePanel} />
       <ColorPanel open={activePanel === "color"} onClose={closePanel} />
       <StrokePanel open={activePanel === "stroke"} onClose={closePanel} />
-      <HighlightPanel
-        open={activePanel === "highlight"}
-        onClose={closePanel}
-      />
+      <HighlightPanel open={activePanel === "highlight"} onClose={closePanel} />
       <ShadowPanel open={activePanel === "shadow"} onClose={closePanel} />
-      <PositionPanel
-        open={activePanel === "position"}
-        onClose={closePanel}
-      />
+      <PositionPanel open={activePanel === "position"} onClose={closePanel} />
       <ExportPanel open={activePanel === "export"} onClose={closePanel} />
 
-      {/* ── Full-screen modals ─────────────────────────────────── */}
+      {/* Full-screen modals */}
       <EraseTool open={activePanel === "erase"} onClose={closePanel} />
+
+      <CropTool
+        open={backgroundTool === "crop"}
+        onClose={() => setBackgroundTool(null)}
+      />
+      <FlipRotateTool
+        open={backgroundTool === "flip-rotate"}
+        onClose={() => setBackgroundTool(null)}
+      />
+      <ResizeTool
+        open={backgroundTool === "resize"}
+        onClose={() => setBackgroundTool(null)}
+      />
+      <EffectsTool
+        open={backgroundTool === "effects"}
+        onClose={() => setBackgroundTool(null)}
+      />
 
       <ProjectsModal
         open={projectsModalOpen}
@@ -501,88 +506,11 @@ export function EditorShell({
         onCancel={() => setSaveDialogMode(null)}
         onSubmit={(name) => void handleSaveDialogSubmit(name)}
       />
-
-      <SaveAsKeyboardListener onTrigger={handleSaveAsClick} />
     </div>
   );
 }
 
-// ─── Top-chrome helpers ──────────────────────────────────────────
-
-function ProjectNameDisplay() {
-  const { state } = useEditor();
-  return (
-    <div
-      className="text-sm font-medium truncate max-w-[30vw] sm:max-w-[40vw]"
-      style={{ color: "var(--pe-text-muted)" }}
-    >
-      {state.project.name}
-    </div>
-  );
-}
-
-function ChromeIconButton({
-  onClick,
-  ariaLabel,
-  icon,
-  active = false,
-  disabled = false,
-  ariaPressed,
-}: {
-  onClick: () => void;
-  ariaLabel: string;
-  icon: React.ReactNode;
-  active?: boolean;
-  disabled?: boolean;
-  ariaPressed?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={ariaLabel}
-      aria-pressed={ariaPressed}
-      className="w-9 h-9 inline-flex items-center justify-center rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-      style={{
-        color: active ? "var(--pe-tool-icon-active)" : "var(--pe-tool-icon)",
-        background: active ? "var(--pe-tool-icon-active-bg)" : "transparent",
-      }}
-      onMouseEnter={(e) => {
-        if (active || disabled) return;
-        (e.currentTarget as HTMLButtonElement).style.background =
-          "var(--pe-surface-2)";
-      }}
-      onMouseLeave={(e) => {
-        if (active) return;
-        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-      }}
-    >
-      {icon}
-    </button>
-  );
-}
-
-// ─── Save-As keyboard listener ──────────────────────────────────
-
-function SaveAsKeyboardListener({ onTrigger }: { onTrigger: () => void }) {
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const target = e.target as HTMLElement | null;
-      if (target && isEditableTarget(target)) return;
-      const mod = e.metaKey || e.ctrlKey;
-      if (!mod) return;
-      const k = e.key.toLowerCase();
-      if (k === "s" && e.shiftKey) {
-        e.preventDefault();
-        onTrigger();
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onTrigger]);
-  return null;
-}
+// ─── Helpers ────────────────────────────────────────────────────
 
 function isEditableTarget(el: HTMLElement): boolean {
   if (el.isContentEditable) return true;
@@ -590,8 +518,6 @@ function isEditableTarget(el: HTMLElement): boolean {
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
   return false;
 }
-
-// ─── Reusable thumbnail helper (autosave path) ──────────────────
 
 async function getReusableThumbnail(id: string | null): Promise<string> {
   if (!id) return "";

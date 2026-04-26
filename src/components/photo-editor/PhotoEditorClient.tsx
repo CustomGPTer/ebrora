@@ -8,16 +8,16 @@
 //     ThemeRoot            ← div with data-pe-theme that scopes the variables
 //       ViewportShell      ← positions the editor (fixed inset-0 on small screens,
 //                            normal page flow on lg+)
-//         EmptyState       ← home view: Upload photo / Start blank / Recents
+//         EmptyState       ← home view: Background swatches / Gallery / Projects
+//                            (Batch 2 rebuild — replaces the previous
+//                            "Upload photo / Start blank" two-button hero)
 //         EditorProvider   ← editor reducer + history (only mounted in editor view)
-//           EditorShell    ← top chrome + canvas + bottom toolbar
+//           EditorShell    ← top chrome + canvas + bottom dock
 //
-// Session 7: ViewportShell now also tracks the SavedProject id when
-// the user enters the editor by tapping a Recent project (or by
-// loading from the Projects modal — that path runs while EditorShell
-// is mounted, so it's owned there). The id is passed to EditorShell
-// as initialSavedProjectId so autosave knows whether the project is
-// already named.
+// Batch 2 (April 2026): the EmptyState API simplifies — `onStartBlank`
+// is gone because the new Background row covers "start with a colour /
+// gradient." All entries into the editor now go through the single
+// `onProjectLoaded(project, savedProjectId | null)` channel.
 
 "use client";
 
@@ -27,7 +27,6 @@ import { ThemeRoot, ThemeStyles } from "./theme/ThemeStyles";
 import { EditorProvider } from "./context/EditorContext";
 import { EmptyState } from "./home/EmptyState";
 import { EditorShell } from "./EditorShell";
-import { createBlankProject } from "@/lib/photo-editor/canvas/state";
 import type { Project } from "@/lib/photo-editor/types";
 
 type View = { kind: "home" } | { kind: "editor" };
@@ -49,12 +48,6 @@ function ViewportShell() {
     undefined,
   );
   const [seedSavedId, setSeedSavedId] = useState<string | null>(null);
-
-  function startBlank() {
-    setSeedProject(createBlankProject({ name: "Untitled" }));
-    setSeedSavedId(null);
-    setView({ kind: "editor" });
-  }
 
   function openWithProject(project: Project, savedProjectId: string | null) {
     setSeedProject(project);
@@ -78,10 +71,7 @@ function ViewportShell() {
       style={{ background: "var(--pe-bg)", minHeight: "100vh" }}
     >
       {view.kind === "home" ? (
-        <EmptyState
-          onStartBlank={startBlank}
-          onProjectLoaded={openWithProject}
-        />
+        <EmptyState onProjectLoaded={openWithProject} />
       ) : (
         <EditorProvider initialProject={seedProject}>
           <EditorShell
