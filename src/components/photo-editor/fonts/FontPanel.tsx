@@ -324,7 +324,7 @@ export function FontPanel({ open, onClose }: FontPanelProps) {
         style={{
           background: "var(--pe-surface)",
           borderLeft: "1px solid var(--pe-border)",
-          boxShadow: "var(--pe-shadow-lg)",
+          boxShadow: open ? "var(--pe-shadow-lg)" : "none",
         }}
         role="dialog"
         aria-modal="true"
