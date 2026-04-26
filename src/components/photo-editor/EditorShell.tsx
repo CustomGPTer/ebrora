@@ -422,6 +422,7 @@ function EditorShellInner({
       <BottomDock
         activePanel={activePanel}
         onTogglePanel={togglePanel}
+        onOpenPanel={openPanel}
         onStub={showToast}
         onOpenCrop={() => setBackgroundTool("crop")}
         onOpenResize={() => setBackgroundTool("resize")}
