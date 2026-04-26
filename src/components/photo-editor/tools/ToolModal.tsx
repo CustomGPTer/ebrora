@@ -1,30 +1,26 @@
 // src/components/photo-editor/tools/ToolModal.tsx
 //
 // Shared primitive for full-screen tool modals (Crop, Flip/Rotate,
-// Resize, future Effects) — the X / title / ✓ top bar plus a working
-// area below it. Mirrors the visual contract of the existing EraseTool
-// modal but extracted because the Batch 5 tools all share the same
-// chrome and we don't want four copies of the same 30 lines.
-//
-// Usage:
-//   <ToolModal
-//     open={open}
-//     title="Crop"
-//     onCancel={onCancel}
-//     onApply={handleApply}
-//     applyDisabled={!hasValidCrop}
-//     bottom={<CropAspectButtons />}
-//   >
-//     {/* Working area — Konva stage / form / etc */}
-//   </ToolModal>
+// Resize, Effects). Mirrors the visual contract of the EraseTool
+// modal but extracted so we don't keep four copies of the same
+// 30 lines.
 //
 // Chrome contract:
-//   • Backdrop: opaque dark (#000 at 95%) — same as EraseTool, gives the
-//     working area maximum contrast against the photo.
-//   • Top bar: X button (left), title (centre), ✓ apply (right). The X
-//     button always cancels and dismisses; the ✓ button calls onApply.
+//   • Backdrop: opaque dark (#000 at 92%) — gives the working area
+//     maximum contrast against the photo.
+//   • Top bar: X button (left), title (centre), ✓ apply (right). The
+//     X button always cancels and dismisses; the ✓ button calls
+//     onApply.
 //   • Bottom bar: optional `bottom` slot for tool-specific controls.
-//   • Z-index: 300, same as EraseTool. Above the panel drawers (200/210).
+//
+// Z-index — Batch 7:
+//   The Batch 5 implementation used z-[300]. The site's NavBar is
+//   z-[500] and the Batch 7 editor wrapper is z-[1000], so 300 was
+//   actually behind both. Modals were having their X / ✓ chrome
+//   chopped off by the site's fixed nav at the top of the viewport.
+//   z-[1100] now sits cleanly above everything: site chrome, the
+//   editor wrapper, the bottom dock, and the BottomEditDrawer
+//   (z-[231]).
 
 "use client";
 
@@ -37,7 +33,6 @@ interface ToolModalProps {
   onCancel: () => void;
   onApply: () => void;
   applyDisabled?: boolean;
-  /** Optional bottom-bar content (aspect-ratio buttons, sliders, etc). */
   bottom?: ReactNode;
   children: ReactNode;
 }
@@ -53,7 +48,6 @@ export function ToolModal({
   bottom,
   children,
 }: ToolModalProps) {
-  // Close on Escape — same convention as PanelDrawer / EraseTool.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -70,13 +64,13 @@ export function ToolModal({
       role="dialog"
       aria-modal="true"
       aria-label={title}
-      className="fixed inset-0 z-[300] flex flex-col"
+      className="fixed inset-0 z-[1100] flex flex-col"
       style={{
         background: "rgba(0,0,0,0.92)",
+        paddingTop: "env(safe-area-inset-top, 0px)",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
-      {/* ── Top bar ───────────────────────────────────────────── */}
       <div
         className="flex-none flex items-center justify-between px-3"
         style={{ height: TOP_BAR }}
@@ -116,10 +110,8 @@ export function ToolModal({
         </button>
       </div>
 
-      {/* ── Working area (children) ───────────────────────────── */}
       <div className="flex-1 relative overflow-hidden">{children}</div>
 
-      {/* ── Bottom bar (optional) ─────────────────────────────── */}
       {bottom && (
         <div
           className="flex-none"
