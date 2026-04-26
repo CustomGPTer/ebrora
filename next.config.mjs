@@ -136,6 +136,22 @@ const nextConfig = {
 
     // Disable static optimization for dynamic pages if needed
     staticPageGenerationTimeout: 120,
+
+    // Konva ships an optional Node-only `canvas` import in lib/index-node.js
+    // for headless server-side rendering with the native cairo backend.
+    // We never use that — the photo editor is browser-only behind
+    // dynamic({ ssr: false }) — but webpack still resolves the server graph
+    // at build time and fails because `canvas` isn't installed on Vercel.
+    // Aliasing it to `false` tells webpack "don't try to resolve this".
+    // See: https://konvajs.org/docs/react/Native_Konva.html
+    webpack: (config) => {
+          config.resolve = config.resolve || {};
+          config.resolve.alias = {
+                  ...(config.resolve.alias || {}),
+                  canvas: false,
+          };
+          return config;
+    },
 };
 
 export default mdxConfig(nextConfig);
