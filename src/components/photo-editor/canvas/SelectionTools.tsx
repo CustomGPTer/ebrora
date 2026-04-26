@@ -2,11 +2,6 @@
 //
 // Per-selection contextual toolbar — DOM overlay above the canvas that
 // floats over the currently-selected layer with quick-action icons.
-// Mirrors the "icons around the selected box" pattern from the design
-// brief (Image 1, the "h dad ghh" Samsung text-box reference) but
-// adapted to the conventions of canvas editors (Canva / PicsArt /
-// Figma): a single horizontal toolbar pinned above the bbox, holding
-// 4–6 icons depending on the selected layer's type.
 //
 // Why a horizontal toolbar rather than the literal "icons-around-the-
 // box" pattern? Three reasons:
@@ -18,10 +13,10 @@
 //   3. Simplicity — one absolute position to compute, one stack to
 //      manage, one pointer-events surface.
 //
-// The Konva.Transformer (SelectionFrame.tsx) already paints scale +
-// rotate handles on the bbox itself. This DOM toolbar is a layer
-// above that, exposing actions that Konva doesn't (Edit, Duplicate,
-// Delete, layer order, Flip).
+// Konva.Transformer (SelectionFrame.tsx) paints scale + rotate handles
+// on the bbox itself. This DOM toolbar is a layer above that, exposing
+// actions that Konva doesn't (Edit, Duplicate, Delete, layer order,
+// Flip).
 //
 // Icons surfaced (per layer kind):
 //   • Text:        Edit • Duplicate • Up • Down • Delete   (5)
@@ -29,27 +24,29 @@
 //   • Sticker:     Duplicate • Up • Down • Flip-H • Delete (5)
 //   • Shape:       Duplicate • Up • Down • Delete          (4)
 //
-// Hide rules:
-//   • No selection                       → nothing to show
-//   • Multi-selection                    → toolbar suppressed (multi-
-//                                          select editing is a Layers
-//                                          panel job, not a contextual
-//                                          quick-action job)
-//   • Selection is locked / hidden       → don't surface destructive
-//                                          actions on a layer the user
-//                                          can't directly interact
-//                                          with anyway
-//   • BottomEditDrawer is open for that  → don't double up on tools
-//     layer                                while the keyboard is up
-//   • viewport.rotation !== 0            → bbox math gets involved
-//                                          with rotation; we ship a
-//                                          simpler v1 and revisit if
-//                                          users find the gap
+// ─── Batch 7 fix — bbox scale math ──────────────────────────────
 //
-// Live tracking — Konva fires `dragmove` on every drag tick and
-// `transform` on every Transformer interaction. We listen on the
-// stage and force a re-render so the toolbar follows the bbox at
-// 60 fps while the user is interacting.
+// The Batch 4 implementation was placing this toolbar off-screen on
+// every mobile session. The bug: `node.getClientRect({ relativeTo:
+// stage })` returns a rect in stage's LOCAL coordinate space — i.e.
+// the unscaled drawing space (a 1080×1080 canvas's native pixels) —
+// NOT the rendered DOM-pixel space inside the stage div. On mobile
+// the stage typically renders at scale ~0.4 (a 1080 canvas fits in a
+// ~432-px-wide viewport), so the toolbar was being positioned
+// 1 / 0.4 = 2.5× too far from stageLeft/stageTop. For a layer near
+// the centre of a tall canvas the toolbar landed several hundred
+// pixels below the bottom of the visible viewport — invisible but
+// technically rendered.
+//
+// The fix: multiply the bbox by stage.scaleX() / scaleY() before
+// adding the stage's container offset. We receive the scale from
+// CanvasShell as a prop (it already computes effectiveScale for the
+// stage size) so we don't have to call into the Konva node twice.
+//
+// The hide rules now also include "stage scale not yet known" (scale
+// === 0, which happens on the first render before ResizeObserver
+// fires) — without this the toolbar would briefly render at an
+// undefined position before the canvas has measured itself.
 
 "use client";
 
@@ -67,15 +64,17 @@ import { useMobileEdit } from "../context/MobileEditContext";
 import type { AnyLayer, Id, Project } from "@/lib/photo-editor/types";
 
 interface SelectionToolsProps {
-  /** Stage div's left offset within the canvas-area container.
-   *  Computed by CanvasShell from centreX − stageW/2 + viewport.translateX. */
+  /** Stage div's left offset within the canvas-area container. */
   stageLeft: number;
   /** Stage div's top offset within the canvas-area container. */
   stageTop: number;
-  /** Width of the un-rotated stage div in CSS pixels (== project.width × effectiveScale). */
+  /** Width of the un-rotated stage div in CSS pixels. */
   stageWidth: number;
   /** Height of the un-rotated stage div in CSS pixels. */
   stageHeight: number;
+  /** Stage's effective scale (fitScale × viewportZoom). Used to
+   *  convert un-scaled drawing-space bboxes into DOM pixels. */
+  stageScale: number;
 }
 
 const TOOLBAR_HEIGHT = 40;
@@ -87,14 +86,13 @@ export function SelectionTools({
   stageTop,
   stageWidth,
   stageHeight,
+  stageScale,
 }: SelectionToolsProps) {
   const { state, dispatch, stageRef } = useEditor();
   const { state: mobileEdit, beginEditing } = useMobileEdit();
 
-  // Force re-render counter — bumped by drag / transform listeners.
   const [tick, setTick] = useState(0);
 
-  // Resolve the single selected layer (multi-select hides the toolbar).
   const selectedLayer = useMemo<AnyLayer | null>(() => {
     if (state.selection.length !== 1) return null;
     return (
@@ -102,18 +100,14 @@ export function SelectionTools({
     );
   }, [state.selection, state.project.layers]);
 
-  // Resolve the hide rules — see file header for rationale.
   const hidden =
     selectedLayer === null ||
     selectedLayer.locked ||
     !selectedLayer.visible ||
     mobileEdit.editingLayerId === selectedLayer.id ||
-    state.viewport.rotation !== 0;
+    state.viewport.rotation !== 0 ||
+    stageScale <= 0;
 
-  // Subscribe to Konva's live drag / transform events so the toolbar
-  // tracks the bbox during interaction, not just after dragEnd /
-  // transformEnd dispatches an UPDATE_LAYER. Without this the toolbar
-  // would lag behind the layer all through a drag.
   useEffect(() => {
     if (hidden) return;
     const stage = stageRef.current;
@@ -127,15 +121,10 @@ export function SelectionTools({
     };
   }, [hidden, stageRef]);
 
-  // Resolve the bbox in stage-local CSS-pixel coordinates. We pull it
-  // from Konva because:
-  //   1. Konva already has the layer's full transform (translate / scale
-  //      / rotate / skew) applied, computing the pixel-perfect bbox.
-  //   2. Doing the math ourselves would mean re-implementing the same
-  //      logic the Transformer relies on — duplication risk.
-  // We deliberately depend on `tick` here so the memo invalidates when
-  // a drag / transform event fires.
-  const bbox = useMemo(() => {
+  // Resolve the bbox in DOM-pixel coordinates within the canvas
+  // container. Konva returns the rect in stage-local (unscaled)
+  // coords; we scale + offset to land in DOM space.
+  const bboxDom = useMemo(() => {
     if (hidden) return null;
     const stage = stageRef.current;
     if (!stage) return null;
@@ -150,13 +139,19 @@ export function SelectionTools({
     ) {
       return null;
     }
-    return rect;
+    return {
+      x: rect.x * stageScale,
+      y: rect.y * stageScale,
+      width: rect.width * stageScale,
+      height: rect.height * stageScale,
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     hidden,
     selectedLayer,
     stageRef,
     tick,
+    stageScale,
     state.project.layers,
     state.viewport.translateX,
     state.viewport.translateY,
@@ -165,39 +160,38 @@ export function SelectionTools({
     stageHeight,
   ]);
 
-  if (!bbox || !selectedLayer) return null;
+  if (!bboxDom || !selectedLayer) return null;
 
-  // ── Position the toolbar ─────────────────────────────────────
-  //
-  // Above the bbox if there's room; otherwise below. Centred
-  // horizontally over the bbox, then clamped to the stage's
-  // horizontal extent so the toolbar doesn't drift off the
-  // visible canvas area at the edges.
-  const screenX = stageLeft + bbox.x;
-  const screenY = stageTop + bbox.y;
+  // Position the toolbar — above the bbox if there's room, else
+  // below. Centred horizontally over the bbox, then clamped to the
+  // stage's horizontal extent so it can't drift off-canvas at the
+  // edges.
+  const screenX = stageLeft + bboxDom.x;
+  const screenY = stageTop + bboxDom.y;
   const aboveTop = screenY - TOOLBAR_HEIGHT - TOOLBAR_GAP;
   const placeAbove = aboveTop > TOP_MIN_PAD;
   const toolbarTop = placeAbove
     ? aboveTop
-    : screenY + bbox.height + TOOLBAR_GAP;
-  // Clamp toolbar centre so it doesn't escape the stage box horizontally.
-  const desiredCentre = screenX + bbox.width / 2;
-  const minCentre = stageLeft + 60; // half of widest toolbar approx
+    : screenY + bboxDom.height + TOOLBAR_GAP;
+  const desiredCentre = screenX + bboxDom.width / 2;
+  const minCentre = stageLeft + 60;
   const maxCentre = stageLeft + stageWidth - 60;
   const toolbarLeft = Math.max(minCentre, Math.min(maxCentre, desiredCentre));
 
-  // ── Action handlers ─────────────────────────────────────────
   const onEdit = () => beginEditing(selectedLayer.id);
   const onDuplicate = () =>
     dispatch({ type: "DUPLICATE_LAYER", id: selectedLayer.id });
-  const onUp = () => moveLayerInOrder(state.project, dispatch, selectedLayer.id, +1);
+  const onUp = () =>
+    moveLayerInOrder(state.project, dispatch, selectedLayer.id, +1);
   const onDown = () =>
     moveLayerInOrder(state.project, dispatch, selectedLayer.id, -1);
   const onFlipH = () => flipLayer(selectedLayer, dispatch, "h");
-  const onDelete = () => dispatch({ type: "REMOVE_LAYER", id: selectedLayer.id });
+  const onDelete = () =>
+    dispatch({ type: "REMOVE_LAYER", id: selectedLayer.id });
 
   const orderIndex = state.project.layerOrder.indexOf(selectedLayer.id);
-  const canMoveUp = orderIndex !== -1 && orderIndex < state.project.layerOrder.length - 1;
+  const canMoveUp =
+    orderIndex !== -1 && orderIndex < state.project.layerOrder.length - 1;
   const canMoveDown = orderIndex > 0;
 
   return (
@@ -208,8 +202,6 @@ export function SelectionTools({
         top: toolbarTop,
         height: TOOLBAR_HEIGHT,
       }}
-      // Stop pointer events bleeding through to Konva when the user
-      // interacts with the toolbar.
       onMouseDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
     >
@@ -229,35 +221,31 @@ export function SelectionTools({
             onClick={onEdit}
           />
         )}
-
         <ToolBtn
           icon={<Copy className="w-4 h-4" strokeWidth={1.75} />}
           label="Duplicate"
           onClick={onDuplicate}
         />
-
         <ToolBtn
           icon={<ChevronUp className="w-4 h-4" strokeWidth={2} />}
           label="Bring forward"
           onClick={onUp}
           disabled={!canMoveUp}
         />
-
         <ToolBtn
           icon={<ChevronDown className="w-4 h-4" strokeWidth={2} />}
           label="Send backward"
           onClick={onDown}
           disabled={!canMoveDown}
         />
-
-        {(selectedLayer.kind === "image" || selectedLayer.kind === "sticker") && (
+        {(selectedLayer.kind === "image" ||
+          selectedLayer.kind === "sticker") && (
           <ToolBtn
             icon={<FlipHorizontal className="w-4 h-4" strokeWidth={1.75} />}
             label="Flip horizontally"
             onClick={onFlipH}
           />
         )}
-
         <ToolBtn
           icon={<Trash2 className="w-4 h-4" strokeWidth={1.75} />}
           label="Delete"
@@ -268,8 +256,6 @@ export function SelectionTools({
     </div>
   );
 }
-
-// ─── Single tool button ─────────────────────────────────────────
 
 function ToolBtn({
   icon,
@@ -309,11 +295,6 @@ function ToolBtn({
   );
 }
 
-// ─── Helpers ────────────────────────────────────────────────────
-
-/** Swap the layer's position in `layerOrder` by `delta` slots. delta=+1
- *  brings the layer one slot up (toward the top of the z-stack);
- *  delta=-1 sends it one slot down. */
 function moveLayerInOrder(
   project: Project,
   dispatch: ReturnType<typeof useEditor>["dispatch"],
@@ -325,16 +306,10 @@ function moveLayerInOrder(
   if (idx === -1) return;
   const newIdx = Math.max(0, Math.min(order.length - 1, idx + delta));
   if (newIdx === idx) return;
-  // Swap rather than splice-and-insert so a click only moves the layer
-  // by exactly one position — predictable for repeated taps.
   [order[idx], order[newIdx]] = [order[newIdx], order[idx]];
   dispatch({ type: "REORDER_LAYERS", order });
 }
 
-/** Flip an image / sticker layer by negating one axis of its scale.
- *  A layer with scaleX = -1 renders as a mirror image of scaleX = 1.
- *  We don't change x/y because Konva applies the transform around
- *  offsetX / offsetY — flipping in place is the natural visual. */
 function flipLayer(
   layer: AnyLayer,
   dispatch: ReturnType<typeof useEditor>["dispatch"],

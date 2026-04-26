@@ -2,32 +2,17 @@
 //
 // Wraps the Konva Stage with the visible canvas frame.
 //
-// Session 7: the CanvasShell now also reads `state.viewport` and
-// composes it with the fit-to-viewport scale so user pan / zoom /
-// rotate are visible. The arithmetic:
+// Computes the stage placement and effective scale from the project
+// dimensions, the available container size, and the editor viewport
+// (pan / zoom / rotate). Stage size is scaled so the canvas fits
+// inside the available area; scale is then applied as a Konva
+// scale on the Stage so layers render at the right pixel size.
 //
-//     effectiveScale = fitScale × viewport.zoom
-//     stageWidth     = round(project.width × effectiveScale)
-//     stageHeight    = round(project.height × effectiveScale)
-//     left           = round(centreX − stageW/2 + viewport.translateX)
-//     top            = round(centreY − stageH/2 + viewport.translateY)
-//     rotation (rad) = viewport.rotation, applied via CSS transform on
-//                      the wrapper div with origin at the wrapper centre
-//
-// Rotation is applied at the DOM level (CSS transform) rather than as
-// Konva.Stage rotation because the Stage's rotation rotates the
-// drawing-space, but the Stage itself is still a fixed-size canvas
-// element — rotated content gets cropped at the canvas bounds. Doing
-// the rotation in CSS rotates the bounding canvas too, which is what
-// the user expects.
-//
-// Batch 4 (April 2026): the SelectionTools DOM overlay mounts as a
-// sibling of the stage div inside the same canvas-area container. It
-// reads the bbox of the selected layer in stage-local coordinates and
-// is positioned in container-local coordinates, so it needs the same
-// stage-placement values (stageLeft / stageTop / stageWidth / stageHeight)
-// that we use for placing the stage itself. We pass them down as props
-// rather than fishing them back out of CSS.
+// Batch 4 mounted SelectionTools alongside the stage div as a DOM
+// overlay above the canvas. Batch 7 fixes the bug where it was
+// rendering off-screen on mobile by also passing through `stageScale`
+// (= effectiveScale) — SelectionTools needs it to convert un-scaled
+// drawing-space bboxes into DOM pixels for absolute positioning.
 
 "use client";
 
@@ -67,15 +52,11 @@ export function CanvasShell() {
   const availW = Math.max(0, containerSize.w - PADDING * 2);
   const availH = Math.max(0, containerSize.h - PADDING * 2);
 
-  // Cap fit at 1:1 so a small canvas doesn't get blown up; otherwise
-  // shrink to fit the smaller of width / height ratios.
   const fitScale =
     availW > 0 && availH > 0
       ? Math.min(availW / project.width, availH / project.height, 1)
       : 1;
 
-  // Defensive clamp on viewport.zoom so a malformed dispatch can't
-  // blow up the math.
   const viewportZoom = Math.min(
     VIEWPORT_MAX_ZOOM,
     Math.max(VIEWPORT_MIN_ZOOM, viewport.zoom)
@@ -112,8 +93,6 @@ export function CanvasShell() {
               boxShadow: "var(--pe-shadow-lg)",
               background: "#FFFFFF",
               borderRadius: 2,
-              // Ensure pinch / wheel events don't trigger native page
-              // zoom or scroll.
               touchAction: "none",
             }}
           >
@@ -125,15 +104,12 @@ export function CanvasShell() {
             />
           </div>
 
-          {/* Selection action toolbar — DOM layer above the canvas.
-              Lives in container coords (un-rotated); we hide it when
-              viewport rotation is non-zero (handled inside the
-              component) so the math stays simple. */}
           <SelectionTools
             stageLeft={stageLeft}
             stageTop={stageTop}
             stageWidth={stageW}
             stageHeight={stageH}
+            stageScale={effectiveScale}
           />
         </>
       )}
