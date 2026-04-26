@@ -8,6 +8,18 @@
 // primitive plus the two stickers / shapes stubs in Batch A would
 // otherwise duplicate ~30 lines of shell code apiece.
 //
+// Batch 7 — fix for the persistent grey edge running down the right
+// side of the editor. The closed-state panel sits at translate-x-full
+// (its left edge parked exactly at the viewport's right edge). A
+// box-shadow on that panel extends LEFTWARD from its left edge, so
+// every applied shadow leaks back into the visible viewport. With
+// nine PanelDrawer-based panels stacked off-screen plus LayersPanel
+// and FontPanel doing the same trick inline, the leaked shadows
+// multiply into the multi-band grey strip Jon was seeing. Fix is one
+// line per file: gate the box-shadow on `open`. The shadow appears
+// when the panel slides in and disappears when it slides out, which
+// matches every other modal in the editor.
+//
 // LayersPanel and FontPanel are NOT migrated to this primitive in
 // Session 5 — they ship as-is from Sessions 3 + 4 to keep the diff
 // surface minimal. New panels use this; existing panels stay put.
@@ -87,7 +99,7 @@ export function PanelDrawer({
         style={{
           background: "var(--pe-surface)",
           borderLeft: "1px solid var(--pe-border)",
-          boxShadow: "var(--pe-shadow-lg)",
+          boxShadow: open ? "var(--pe-shadow-lg)" : "none",
         }}
         role="dialog"
         aria-modal="true"
