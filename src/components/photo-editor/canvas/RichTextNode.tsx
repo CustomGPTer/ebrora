@@ -23,20 +23,18 @@
 // outer ctx.translate(RENDER_PADDING, ...) puts them at the right
 // position in the bitmap. (Gotcha #11.)
 //
-// Session 5 / Batch B additions:
-//   • `editing` prop — true while this layer is in inline-edit mode.
-//     When editing, the layer is NOT draggable (TextEditOverlay sits on
-//     top and intercepts pointer events anyway, but disabling drag here
-//     is belt-and-braces against the bitmap accidentally responding).
-//   • `onDoubleClick` prop — fires on dblclick / dbltap with the caret
-//     offset computed from the pointer position. LayerRenderer wires
-//     this to dispatch SET_RUN_SELECTION which puts the layer into edit
-//     mode at the tapped offset.
-//
-// Single-tap behaviour is unchanged: onSelect fires, LayerRenderer
-// dispatches SET_SELECTION. Edit mode is entered ONLY via double-tap —
-// matches the Add Text app convention and avoids accidentally entering
-// edit mode on every selection tap.
+// Batch 3 (Mobile text editing rebuild — April 2026):
+//   • Double-tap inline-edit handlers removed. Mobile users tap once
+//     to open the BottomEditDrawer (wired by LayerRenderer via
+//     useMobileEdit().beginEditing); the in-canvas caret + selection-
+//     range UX provided by TextEditOverlay is no longer reachable from
+//     this component's events.
+//   • The `editing` prop is preserved because callers still pass it,
+//     but the only behavioural effect now is "draggable && !editing"
+//     which acts as belt-and-braces against drag-while-keyboard-up.
+//   • The `onDoubleClick` prop is removed from the interface entirely.
+//     Any caller that was passing it should drop the prop — only
+//     LayerRenderer used it and that's been updated in this same batch.
 
 "use client";
 
@@ -45,7 +43,6 @@ import { Image as KonvaImage } from "react-konva";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { layoutText, renderTextToCanvas } from "@/lib/photo-editor/rich-text/engine";
-import { caretOffsetFromPoint } from "@/lib/photo-editor/rich-text/hit-test";
 import { applyEraseStrokes } from "@/lib/photo-editor/canvas/erase-render";
 import type { Transform } from "@/lib/photo-editor/types";
 import type { TextLayer } from "@/lib/photo-editor/types";
@@ -62,18 +59,17 @@ interface RichTextNodeProps {
   /** Whether the user can drag this layer. Mirrors !layer.locked AND
    *  !editing (we don't want to drag-move while inline-editing). */
   draggable: boolean;
-  /** True while this layer is in inline-edit mode. When true, drag is
-   *  suppressed and pointer events on the bitmap are still hooked but
-   *  TextEditOverlay (mounted by LayerRenderer above us) sits on top
-   *  and intercepts taps — so onSelect won't typically fire. */
+  /** True while this layer is in inline-edit mode (legacy desktop
+   *  power-mode reachable only via direct SET_RUN_SELECTION dispatch).
+   *  Suppresses drag while true. Mobile tap-to-edit (Batch 3) does NOT
+   *  set this — it routes through MobileEditContext + BottomEditDrawer
+   *  instead. */
   editing: boolean;
-  /** Selection click — fires on tap / click anywhere on the rendered text
-   *  (when not covered by TextEditOverlay). */
+  /** Selection click — fires on tap / click anywhere on the rendered text.
+   *  LayerRenderer wires this to dispatch SET_SELECTION and (for text
+   *  layers) to also call useMobileEdit().beginEditing so the bottom
+   *  editing drawer opens. */
   onSelect: (additive: boolean) => void;
-  /** Double-tap to enter edit mode. Receives the code-point offset where
-   *  the caret should land based on where the user tapped. Wired by
-   *  LayerRenderer to dispatch SET_SELECTION + SET_RUN_SELECTION. */
-  onDoubleClick: (caretOffset: number) => void;
   /** Drag end — receives the new canvas-local x, y of the layer's origin. */
   onDragEnd: (x: number, y: number) => void;
   /** Transform end — receives the new transform values (Konva-modified). */
@@ -85,7 +81,6 @@ export function RichTextNode({
   draggable,
   editing,
   onSelect,
-  onDoubleClick,
   onDragEnd,
   onTransformEnd,
 }: RichTextNodeProps) {
@@ -175,19 +170,13 @@ export function RichTextNode({
       skewY={layer.transform.skewY}
       visible={layer.visible}
       opacity={layer.opacity}
-      // Suppress drag while inline-editing. The user is selecting text,
-      // not moving the layer.
+      // Suppress drag while inline-editing (legacy desktop runSelection
+      // path). Mobile tap-to-edit doesn't set `editing`, so drag stays
+      // available while the BottomEditDrawer is open — the user can
+      // reposition the layer with one finger while the keyboard is up.
       draggable={draggable && !editing}
       onMouseDown={(e) => onSelect(isAdditive(e))}
       onTouchStart={(e) => onSelect(isAdditive(e))}
-      onDblClick={(e) => {
-        const offset = caretOffsetForEvent(e, layer);
-        onDoubleClick(offset);
-      }}
-      onDblTap={(e) => {
-        const offset = caretOffsetForEvent(e, layer);
-        onDoubleClick(offset);
-      }}
       onDragEnd={(e) => onDragEnd(e.target.x(), e.target.y())}
       onTransformEnd={(e) => {
         const node = e.target;
@@ -203,38 +192,6 @@ export function RichTextNode({
       }}
     />
   );
-}
-
-/** Resolve the layer-local caret offset for a Konva pointer event.
- *  Uses the event target's absolute transform (which includes stage
- *  scale + the layer's transform) to map the stage pointer position
- *  into bitmap pixel coords, then subtracts RENDER_PADDING to get
- *  layer-local coords for hit-test.
- *
- *  The event type is left wide — Konva's onDblClick / onDblTap deliver
- *  `KonvaEventObject<Event>` rather than narrowed mouse / touch types,
- *  and we don't read anything off the underlying event anyway. */
-function caretOffsetForEvent(
-  e: KonvaEventObject<Event>,
-  layer: TextLayer,
-): number {
-  const node = e.target;
-  const stage = node.getStage();
-  if (!stage) return 0;
-  const pos = stage.getPointerPosition();
-  if (!pos) return 0;
-  const matrix = node.getAbsoluteTransform().copy();
-  matrix.invert();
-  const bitmapLocal = matrix.point(pos);
-  const layerLocal = {
-    x: bitmapLocal.x - RENDER_PADDING,
-    y: bitmapLocal.y - RENDER_PADDING,
-  };
-  // Layout is recomputed here rather than threaded through the prop —
-  // double-clicks are infrequent and recomputing once on each is cheap.
-  // Avoids needing to plumb the LayoutResult back out of the render
-  // closure.
-  return caretOffsetFromPoint(layoutText(layer), layerLocal);
 }
 
 /** Cmd/Ctrl held = additive selection (multi-select). */

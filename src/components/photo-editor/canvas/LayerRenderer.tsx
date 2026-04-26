@@ -9,18 +9,27 @@
 // rather than being filtered out, so toggling visibility doesn't remount
 // the underlying Konva node and lose its place in the selection.
 //
-// Session 5 / Batch B addition:
-//   • For text layers in inline-edit mode (state.runSelection set on
-//     them), render TextEditOverlay alongside the RichTextNode, AFTER it
-//     in the JSX so it sits above in z-order. The overlay handles caret
-//     + selection rendering and intercepts pointer events.
-//   • Double-tap on a text layer dispatches SET_SELECTION + SET_RUN_
-//     SELECTION at the tapped offset, putting the layer into edit mode.
+// Batch 3 (Mobile text editing rebuild — April 2026):
+//   • Tapping a text layer now ALSO calls useMobileEdit().beginEditing
+//     so the BottomEditDrawer opens for that layer. The "double-tap to
+//     edit, single-tap to select" behaviour from earlier sessions is
+//     replaced by "single-tap = select + edit." This matches the
+//     reference Add Text app and makes multi-text layers tap-switchable:
+//     tapping any text layer opens the drawer pre-filled with that
+//     layer's content, auto-committing whichever layer was previously
+//     open (committed-by-being-already-live, since the drawer dispatches
+//     UPDATE_LAYER on every keystroke).
+//   • The `onDoubleClick` prop / wiring on RichTextNode is gone. The
+//     legacy inline TextEditOverlay still mounts when state.runSelection
+//     is set on a text layer, but no UI in the editor dispatches
+//     SET_RUN_SELECTION any more — it stays as engine plumbing for any
+//     future desktop power-mode (per-letter selection-range styling).
 
 "use client";
 
 import { Fragment } from "react";
 import { useEditor } from "../context/EditorContext";
+import { useMobileEdit } from "../context/MobileEditContext";
 import { RichTextNode } from "./RichTextNode";
 import { ImageNode } from "./ImageNode";
 import { ShapeNode } from "./ShapeNode";
@@ -34,6 +43,7 @@ import type {
 
 export function LayerRenderer() {
   const { state, dispatch } = useEditor();
+  const { beginEditing } = useMobileEdit();
   const { project } = state;
 
   const orderedLayers = orderLayers(project.layers, project.layerOrder);
@@ -61,6 +71,13 @@ export function LayerRenderer() {
           } else {
             dispatch({ type: "SET_SELECTION", ids: [layer.id] });
           }
+
+          // Text layers: tap also opens the BottomEditDrawer for this
+          // layer. We only do this for non-additive taps because Cmd/
+          // Ctrl-click on desktop is meant for multi-select, not edit.
+          if (!additive && layer.kind === "text") {
+            beginEditing(layer.id);
+          }
         };
 
         const onDragEnd = (x: number, y: number) => {
@@ -84,21 +101,7 @@ export function LayerRenderer() {
         };
 
         switch (layer.kind) {
-          case "text": {
-            // Double-tap → enter edit mode at the tapped caret offset.
-            // SET_SELECTION first ensures the layer is the sole
-            // selection (also clears any previous runSelection on a
-            // different layer); SET_RUN_SELECTION puts the caret in.
-            const onDoubleClick = (caretOffset: number) => {
-              dispatch({ type: "SET_SELECTION", ids: [layer.id] });
-              dispatch({
-                type: "SET_RUN_SELECTION",
-                layerId: layer.id,
-                start: caretOffset,
-                end: caretOffset,
-              });
-            };
-
+          case "text":
             return (
               <Fragment key={layer.id}>
                 <RichTextNode
@@ -106,7 +109,6 @@ export function LayerRenderer() {
                   draggable={draggable}
                   editing={isEditingThisText}
                   onSelect={onSelect}
-                  onDoubleClick={onDoubleClick}
                   onDragEnd={onDragEnd}
                   onTransformEnd={onTransformEnd}
                 />
@@ -115,7 +117,6 @@ export function LayerRenderer() {
                 ) : null}
               </Fragment>
             );
-          }
 
           case "image":
             return (

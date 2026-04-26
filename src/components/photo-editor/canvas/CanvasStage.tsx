@@ -5,37 +5,45 @@
 // transformer sit in a second Layer that *does* listen for hit-testing
 // so taps on layers select them.
 //
-// New in Session 3:
-//   • LayerRenderer paints every layer in z-order via the per-kind nodes
-//   • SelectionFrame attaches a Konva Transformer to selected layer ids
-//   • GestureLayer is mounted next to the Stage as a placeholder for
-//     Session 7's gesture handlers (pinch zoom, two-finger rotate,
-//     long-press for context menu, pan-mode toggle)
+// Background rendering:
+//   • "transparent" → soft checkerboard
+//   • "solid"       → filled Rect
+//   • "gradient"    → linear gradient Rect
+//   • "photo"       → the photo, with bg.crop / bg.flip / bg.rotation
+//                     (Batch 5) AND state.filters applied via the Konva
+//                     filter chain (Batch 6).
 //
-// Tapping the stage *outside* any layer clears the selection — we detect
-// that via Konva's native event target (e.target === stage means the tap
-// landed on the empty area, not a node).
+// Filter chain (Batch 6):
+//   The PhotoRect node is `cache()`-ed once per image-load so Konva
+//   captures unfiltered pixel data. Filter attrs (brightness, contrast,
+//   saturation, etc) are then changed via setters; Konva's Factory
+//   wires `afterSetFilter` on every filter attr to mark `_filterUpToDate
+//   = false`, so the next batchDraw re-runs filters from the cached
+//   pixels. We don't need to re-cache on every slider tick.
+//
+// Tapping the stage *outside* any layer clears the selection.
 
 "use client";
 
 import { useEffect, useRef, type RefObject } from "react";
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
 import useImage from "use-image";
-import type Konva from "konva";
-import type { KonvaEventObject } from "konva/lib/Node";
+import Konva from "konva";
+import type { Filter as KonvaFilter, KonvaEventObject } from "konva/lib/Node";
 import { useEditor } from "../context/EditorContext";
 import { LayerRenderer } from "./LayerRenderer";
 import { SelectionFrame } from "./SelectionFrame";
 import { GestureLayer } from "./GestureLayer";
-import type { Background, GradientFill } from "@/lib/photo-editor/types";
+import type {
+  Background,
+  BackgroundFilters,
+  GradientFill,
+} from "@/lib/photo-editor/types";
 
 interface CanvasStageProps {
   stageWidth: number;
   stageHeight: number;
   scale: number;
-  /** Ref to the un-rotated canvas-area container in CanvasShell.
-   *  GestureLayer uses it as the stable reference frame for computing
-   *  centre-relative anchor coordinates for pinch / wheel gestures. */
   canvasAreaRef: RefObject<HTMLDivElement>;
 }
 
@@ -48,26 +56,16 @@ export function CanvasStage({
   const stageRef = useRef<Konva.Stage>(null);
   const { state, dispatch, stageRef: contextStageRef } = useEditor();
 
-  // Mirror the local stage ref into the EditorContext so callers
-  // (EditorShell thumbnail generation, ExportPanel) can find the stage
-  // without relying on the Konva.stages[0] global. Synced via effect
-  // because the ref is populated after the Stage component mounts.
   useEffect(() => {
     contextStageRef.current = stageRef.current;
     return () => {
-      // Only clear if we still own the reference — defensive against
-      // out-of-order unmounts during fast route changes.
       if (contextStageRef.current === stageRef.current) {
         contextStageRef.current = null;
       }
     };
   }, [contextStageRef]);
 
-  function handleStageClick(
-    e: KonvaEventObject<MouseEvent | TouchEvent>
-  ) {
-    // If the tap landed on the Stage itself (empty area), clear selection.
-    // Hits on layer nodes have `e.target` set to that node, not the stage.
+  function handleStageClick(e: KonvaEventObject<MouseEvent | TouchEvent>) {
     const stage = stageRef.current;
     if (!stage) return;
     if (e.target === stage) {
@@ -141,37 +139,173 @@ function BackgroundNode() {
     case "photo":
       return (
         <PhotoRect
-          src={bg.src}
-          width={project.width}
-          height={project.height}
+          bg={bg}
+          projectWidth={project.width}
+          projectHeight={project.height}
+          filters={project.filters}
         />
       );
   }
 }
 
-// ─── Photo ──────────────────────────────────────────────────────
+// ─── Photo background — Batch 5 + 6 ─────────────────────────────
+//
+// Batch 5 added crop / flip / rotation rendering.
+// Batch 6 adds the filter chain.
+//
+// Konva.Image fields used:
+//   • image                                          → the loaded HTMLImage
+//   • x, y                                           → destination origin
+//   • width, height                                  → destination size
+//   • offsetX, offsetY (when transforms are needed)  → rotate around centre
+//   • cropX, cropY, cropWidth, cropHeight            → source crop rect
+//   • scaleX, scaleY                                 → flip
+//   • rotation                                       → degrees
+//   • filters[]                                      → Konva filter chain
+//   • brightness / contrast / saturation / hue / luminance / blurRadius
+//                                                    → filter attrs
+//
+// Cache lifecycle:
+//   • cache() is called once when an image is first loaded into Konva,
+//     so the node holds an offscreen canvas of the un-filtered pixels.
+//   • Every slider change updates a filter attr — Konva's Factory
+//     `afterSetFilter` callback flags the cache as stale, and the next
+//     batchDraw re-runs filters against the cached pixels.
+//   • When `image` itself changes (user replaced the photo), we
+//     clearCache() and re-cache against the new image.
+//   • If the filter chain becomes empty (no effects, no adjustments)
+//     we clearCache() so the node renders directly without the cache
+//     hop — slightly cheaper for the no-filter common case.
 
 function PhotoRect({
-  src,
-  width,
-  height,
+  bg,
+  projectWidth,
+  projectHeight,
+  filters,
 }: {
-  src: string;
-  width: number;
-  height: number;
+  bg: Extract<Background, { kind: "photo" }>;
+  projectWidth: number;
+  projectHeight: number;
+  filters: BackgroundFilters;
 }) {
-  const [img] = useImage(src, "anonymous");
+  const [img] = useImage(bg.src, "anonymous");
+  const imageNodeRef = useRef<Konva.Image>(null);
+
+  // Apply / refresh the Konva filter chain. We resolve the chain
+  // every time `filters` changes; setters fire `afterSetFilter` so a
+  // simple batchDraw refreshes the rendered output.
+  useEffect(() => {
+    const node = imageNodeRef.current;
+    if (!node || !img) return;
+
+    const chain = resolveFilterChain(filters);
+
+    // Update attrs first, then assign the chain. (Order matters when
+    // the chain is empty — we want to set the attrs before clearing
+    // the cache so the next render picks the new identity values.)
+    node.brightness((filters.adjust.brightness + filters.adjust.exposure / 2) / 100);
+    node.contrast(filters.adjust.contrast);
+    node.saturation(filters.adjust.saturation / 100);
+    node.hue(0);
+    node.luminance(0);
+    if (filters.blur.enabled && filters.blur.radius > 0) {
+      node.blurRadius(filters.blur.radius);
+    } else {
+      node.blurRadius(0);
+    }
+
+    node.filters(chain);
+
+    if (chain.length > 0) {
+      // Cache the node so filters apply. Cache once; Konva's
+      // afterSetFilter mechanism handles re-application on attr change.
+      // We re-cache only when the chain transitions from empty → non-
+      // empty or when we have a new image source (covered by the
+      // `img` dep).
+      if (!node.isCached()) {
+        node.cache();
+      }
+    } else if (node.isCached()) {
+      node.clearCache();
+    }
+
+    node.getLayer()?.batchDraw();
+  }, [img, filters, projectWidth, projectHeight]);
+
   if (!img) return null;
+
+  const cropAttrs = bg.crop
+    ? {
+        cropX: bg.crop.x,
+        cropY: bg.crop.y,
+        cropWidth: bg.crop.width,
+        cropHeight: bg.crop.height,
+      }
+    : {};
+
+  const flipScaleX = bg.flip.horizontal ? -1 : 1;
+  const flipScaleY = bg.flip.vertical ? -1 : 1;
+  const hasRotation = bg.rotation !== 0;
+  const hasFlip = flipScaleX !== 1 || flipScaleY !== 1;
+
+  if (!hasRotation && !hasFlip) {
+    return (
+      <KonvaImage
+        ref={imageNodeRef}
+        image={img}
+        x={0}
+        y={0}
+        width={projectWidth}
+        height={projectHeight}
+        {...cropAttrs}
+      />
+    );
+  }
+
   return (
-    <KonvaImage image={img} x={0} y={0} width={width} height={height} />
+    <KonvaImage
+      ref={imageNodeRef}
+      image={img}
+      x={projectWidth / 2}
+      y={projectHeight / 2}
+      offsetX={projectWidth / 2}
+      offsetY={projectHeight / 2}
+      width={projectWidth}
+      height={projectHeight}
+      scaleX={flipScaleX}
+      scaleY={flipScaleY}
+      rotation={bg.rotation}
+      {...cropAttrs}
+    />
   );
 }
 
+/** Resolve the BackgroundFilters object to an ordered Konva filter
+ *  chain. Empty array means "no filters" — the caller should
+ *  clearCache() in that case to skip the offscreen-canvas hop. */
+function resolveFilterChain(f: BackgroundFilters): Array<KonvaFilter> {
+  const chain: Array<KonvaFilter> = [];
+  const a = f.adjust;
+  if (a.brightness !== 0 || a.exposure !== 0) {
+    chain.push(Konva.Filters.Brighten);
+  }
+  if (a.contrast !== 0) {
+    chain.push(Konva.Filters.Contrast);
+  }
+  if (a.saturation !== 0) {
+    // HSL covers saturation/hue/luminance — we only use saturation here.
+    chain.push(Konva.Filters.HSL);
+  }
+  if (f.effect === "mono") chain.push(Konva.Filters.Grayscale);
+  else if (f.effect === "sepia") chain.push(Konva.Filters.Sepia);
+  else if (f.effect === "invert") chain.push(Konva.Filters.Invert);
+  if (f.blur.enabled && f.blur.radius > 0) {
+    chain.push(Konva.Filters.Blur);
+  }
+  return chain;
+}
+
 // ─── Gradient ───────────────────────────────────────────────────
-//
-// Linear gradient applied as a fill on a single Rect. We translate the
-// editor's angle (0° = left → right) into Konva's startPoint / endPoint
-// vector pair.
 
 function GradientRect({
   width,
@@ -220,10 +354,6 @@ const DEFAULT_STOPS = [
 ];
 
 // ─── Transparent (checkerboard) ─────────────────────────────────
-//
-// Show a soft checkerboard so users can tell at a glance the canvas is
-// transparent. The pattern is drawn at canvas coordinates so it scales
-// correctly with the fit-to-viewport stage scale.
 
 function CheckerboardRect({
   width,

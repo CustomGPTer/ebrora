@@ -20,11 +20,20 @@
 // element — rotated content gets cropped at the canvas bounds. Doing
 // the rotation in CSS rotates the bounding canvas too, which is what
 // the user expects.
+//
+// Batch 4 (April 2026): the SelectionTools DOM overlay mounts as a
+// sibling of the stage div inside the same canvas-area container. It
+// reads the bbox of the selected layer in stage-local coordinates and
+// is positioned in container-local coordinates, so it needs the same
+// stage-placement values (stageLeft / stageTop / stageWidth / stageHeight)
+// that we use for placing the stage itself. We pass them down as props
+// rather than fishing them back out of CSS.
 
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import { CanvasStage } from "./CanvasStage";
+import { SelectionTools } from "./SelectionTools";
 import { useEditor } from "../context/EditorContext";
 import {
   VIEWPORT_MIN_ZOOM,
@@ -80,6 +89,9 @@ export function CanvasShell() {
   const centreX = containerSize.w / 2;
   const centreY = containerSize.h / 2;
 
+  const stageLeft = Math.round(centreX - stageW / 2 + viewport.translateX);
+  const stageTop = Math.round(centreY - stageH / 2 + viewport.translateY);
+
   return (
     <div
       ref={containerRef}
@@ -87,30 +99,43 @@ export function CanvasShell() {
       style={{ background: "var(--pe-canvas-bg)" }}
     >
       {containerSize.w > 0 && stageW > 0 && stageH > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: Math.round(centreX - stageW / 2 + viewport.translateX),
-            top: Math.round(centreY - stageH / 2 + viewport.translateY),
-            width: stageW,
-            height: stageH,
-            transform: `rotate(${viewport.rotation}rad)`,
-            transformOrigin: "center center",
-            boxShadow: "var(--pe-shadow-lg)",
-            background: "#FFFFFF",
-            borderRadius: 2,
-            // Ensure pinch / wheel events don't trigger native page
-            // zoom or scroll.
-            touchAction: "none",
-          }}
-        >
-          <CanvasStage
+        <>
+          <div
+            style={{
+              position: "absolute",
+              left: stageLeft,
+              top: stageTop,
+              width: stageW,
+              height: stageH,
+              transform: `rotate(${viewport.rotation}rad)`,
+              transformOrigin: "center center",
+              boxShadow: "var(--pe-shadow-lg)",
+              background: "#FFFFFF",
+              borderRadius: 2,
+              // Ensure pinch / wheel events don't trigger native page
+              // zoom or scroll.
+              touchAction: "none",
+            }}
+          >
+            <CanvasStage
+              stageWidth={stageW}
+              stageHeight={stageH}
+              scale={effectiveScale}
+              canvasAreaRef={containerRef}
+            />
+          </div>
+
+          {/* Selection action toolbar — DOM layer above the canvas.
+              Lives in container coords (un-rotated); we hide it when
+              viewport rotation is non-zero (handled inside the
+              component) so the math stays simple. */}
+          <SelectionTools
+            stageLeft={stageLeft}
+            stageTop={stageTop}
             stageWidth={stageW}
             stageHeight={stageH}
-            scale={effectiveScale}
-            canvasAreaRef={containerRef}
           />
-        </div>
+        </>
       )}
     </div>
   );
