@@ -55,7 +55,26 @@ export function serializeSavedProject(
  *  editor. Deep-clones so the editor's mutations don't leak back into
  *  the in-memory list of saved records. */
 export function deserializeSavedProject(saved: SavedProject): Project {
-  return deepClone(saved.snapshot);
+  const project = deepClone(saved.snapshot);
+  // Phase 1 compatibility shim: ImageLayer.stroke is new. Backfill the
+  // default on legacy saved projects so the renderer doesn't crash
+  // reading layer.stroke on a layer that doesn't have it.
+  for (const layer of project.layers) {
+    if (
+      layer.kind === "image" &&
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (layer as any).stroke === undefined
+    ) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (layer as any).stroke = {
+        enabled: false,
+        color: "#000000",
+        width: 4,
+        opacity: 1,
+      };
+    }
+  }
+  return project;
 }
 
 /** Use the structured clone algorithm where available; fall back to a
