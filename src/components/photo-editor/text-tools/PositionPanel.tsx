@@ -1,21 +1,13 @@
 // src/components/photo-editor/text-tools/PositionPanel.tsx
 //
-// Position panel — LAYER-LEVEL controls for the selected text layer.
-// Per §6.6 the panel has four sections (NOT tabs): Translate, Rotate,
-// Scale, Z-order.
-//
-// Z-order is editable from two places (handover §6.5): drag-to-reorder
-// in the Layers panel, and the four buttons here. Both routes dispatch
-// REORDER_LAYERS with the full new id array — there's no conflict
-// because both compute the same end-state array.
-//
-// The panel reads transform from `tool.layer.transform` and patches
-// via `tool.patchLayer({ transform: { ...layer.transform, ... } })` so
-// no field is ever lost on a partial patch.
+// Position panel — LAYER-LEVEL controls for whichever single layer is
+// selected (text / image / sticker / shape). Phase 1 generalisation.
+// Sections: Translate, Rotate, Scale, Z-order. Z-order also reachable
+// via the Layers panel; both routes dispatch REORDER_LAYERS.
 
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ChevronsDown,
   ChevronsUp,
@@ -26,7 +18,6 @@ import {
   Move,
 } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
-import { useTextTool } from "./use-text-tool";
 import { useEditor } from "../context/EditorContext";
 import {
   ActionButton,
@@ -36,7 +27,7 @@ import {
   Slider,
   NumberInput,
 } from "./controls";
-import type { Id, Transform } from "@/lib/photo-editor/types";
+import type { AnyLayer, Id, Transform } from "@/lib/photo-editor/types";
 
 interface PositionPanelProps {
   open: boolean;
@@ -44,11 +35,16 @@ interface PositionPanelProps {
 }
 
 export function PositionPanel({ open, onClose }: PositionPanelProps) {
-  const tool = useTextTool();
   const { state, dispatch } = useEditor();
   const [uniformScale, setUniformScale] = useState(true);
 
-  const layer = tool.layer;
+  // Phase 1: any single-selected layer (was text-only).
+  const layer = useMemo<AnyLayer | null>(() => {
+    if (state.selection.length !== 1) return null;
+    const id = state.selection[0];
+    return state.project.layers.find((l) => l.id === id) ?? null;
+  }, [state.selection, state.project.layers]);
+
   const transform: Transform = layer?.transform ?? {
     x: 0,
     y: 0,
@@ -61,8 +57,12 @@ export function PositionPanel({ open, onClose }: PositionPanelProps) {
 
   function patchTransform(next: Partial<Transform>) {
     if (!layer) return;
-    tool.patchLayer({
-      transform: { ...layer.transform, ...next },
+    dispatch({
+      type: "UPDATE_LAYER",
+      id: layer.id,
+      patch: {
+        transform: { ...layer.transform, ...next },
+      } as Partial<AnyLayer>,
     });
   }
 
@@ -277,7 +277,7 @@ function EmptyState() {
       className="px-4 py-6 text-xs"
       style={{ color: "var(--pe-text-subtle)" }}
     >
-      Select a text layer to access position controls.
+      Select a layer to access position controls.
     </div>
   );
 }
