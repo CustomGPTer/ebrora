@@ -223,6 +223,8 @@ export interface ImageLayer extends BaseLayer {
   crop: Rect | null;
   /** 4-point perspective warp (Free Transform). null = unwarped. */
   perspective: [Point, Point, Point, Point] | null;
+  /** Optional outer stroke around the image (Phase 1). */
+  stroke: Stroke;
 }
 
 export interface ShapeLayer extends BaseLayer {
