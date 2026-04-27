@@ -121,3 +121,60 @@ export function createTextLayer(opts: CreateTextLayerOptions = {}): TextLayer {
     erase: [],
   };
 }
+
+/** Fraction of the canvas width that a freshly-added text layer should
+ *  span, before the user resizes it. 40% lands big enough to read on a
+ *  phone preview but leaves obvious room either side, so it's clearly
+ *  a movable / resizable layer rather than the whole canvas. The cap
+ *  is a SOFT default — the user can drag-scale beyond 40% afterwards. */
+export const NEW_TEXT_WIDTH_FRACTION = 0.4;
+
+/** Heuristic font-size to text-box-width ratio. Picked empirically to
+ *  fit the placeholder string "your text here" on one line at the
+ *  default sans-serif weight. Used by createDefaultTextForCanvas to
+ *  derive a fontSize from the target box width. */
+const FONT_SIZE_PER_BOX_WIDTH = 0.18;
+
+/** Lower / upper bounds for the auto-sized fontSize so tiny canvases
+ *  (e.g. 200×200 stickers) don't render text at sub-readable size, and
+ *  huge canvases (e.g. 8000×8000 print) don't blow up to 1000+ px. */
+const MIN_AUTO_FONT_SIZE = 24;
+const MAX_AUTO_FONT_SIZE = 200;
+
+/** Build a TextLayer pre-sized for a canvas of the given dimensions.
+ *  Used by every Add Text entry-point so the new layer lands at a
+ *  consistent ~40% of canvas width and proportional font size,
+ *  regardless of whether the canvas is 1080² square, a portrait crop,
+ *  or a wide banner.
+ *
+ *  Soft cap only — once the layer exists the user is free to drag-
+ *  resize it beyond the 40%. */
+export function createDefaultTextForCanvas(
+  canvasWidth: number,
+  canvasHeight: number,
+  opts: Omit<CreateTextLayerOptions, "width" | "fontSize"> = {},
+): TextLayer {
+  const targetWidth = Math.max(40, canvasWidth * NEW_TEXT_WIDTH_FRACTION);
+  const rawFontSize = targetWidth * FONT_SIZE_PER_BOX_WIDTH;
+  const fontSize = clamp(
+    Math.round(rawFontSize),
+    MIN_AUTO_FONT_SIZE,
+    MAX_AUTO_FONT_SIZE,
+  );
+  // Don't let the box exceed the canvas height either — important on
+  // very wide / very short banners where 40% of width could still
+  // dominate vertically.
+  const widthCappedByHeight = Math.min(
+    targetWidth,
+    canvasHeight * 0.9,
+  );
+  return createTextLayer({
+    ...opts,
+    width: Math.round(widthCappedByHeight),
+    fontSize,
+  });
+}
+
+function clamp(n: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, n));
+}
