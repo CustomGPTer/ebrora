@@ -49,7 +49,7 @@ import {
 } from "react";
 import { ToolModal } from "./ToolModal";
 import { useEditor } from "../context/EditorContext";
-import type { Background, Rect } from "@/lib/photo-editor/types";
+import type { Rect } from "@/lib/photo-editor/types";
 
 interface CropToolProps {
   open: boolean;
@@ -114,13 +114,57 @@ export function CropTool({ open, onClose }: CropToolProps) {
       crop.y === 0 &&
       crop.width === photoBg.naturalWidth &&
       crop.height === photoBg.naturalHeight;
-    const next: Background = {
-      ...photoBg,
-      crop: isFull ? null : { ...crop },
-    };
-    dispatch({ type: "SET_BACKGROUND", background: next });
+    const nextCrop: typeof crop | null = isFull ? null : { ...crop };
+
+    // True crop: the project canvas must take the crop's aspect ratio,
+    // otherwise PhotoRect (which always renders the photo into a
+    // projectWidth × projectHeight destination) stretches the cropped
+    // source rect back to fill the original canvas. Pre-fix this would
+    // turn a portrait crop on a square canvas into a horizontally-
+    // squashed mess.
+    //
+    // Sizing strategy: keep the project's CURRENT longest side, then
+    // derive the other dimension from the crop's aspect ratio. This
+    // avoids surprising the user with a tiny canvas when they crop a
+    // small region of a high-resolution photo, and avoids creating a
+    // gigantic canvas when they crop a high-megapixel source. If they
+    // un-crop (nextCrop === null) we fall back to the photo's natural
+    // dimensions, scaled to the same longest-side budget.
+    const project = state.project;
+    let nextProjectW = project.width;
+    let nextProjectH = project.height;
+    if (nextCrop) {
+      const longest = Math.max(project.width, project.height);
+      const cropAspect = nextCrop.width / nextCrop.height;
+      if (cropAspect >= 1) {
+        nextProjectW = longest;
+        nextProjectH = Math.max(1, Math.round(longest / cropAspect));
+      } else {
+        nextProjectH = longest;
+        nextProjectW = Math.max(1, Math.round(longest * cropAspect));
+      }
+    } else {
+      // Restoring the un-cropped photo — fit the photo's natural
+      // aspect ratio into the same longest-side budget.
+      const longest = Math.max(project.width, project.height);
+      const naturalAspect = photoBg.naturalWidth / photoBg.naturalHeight;
+      if (naturalAspect >= 1) {
+        nextProjectW = longest;
+        nextProjectH = Math.max(1, Math.round(longest / naturalAspect));
+      } else {
+        nextProjectH = longest;
+        nextProjectW = Math.max(1, Math.round(longest * naturalAspect));
+      }
+    }
+
+    dispatch({
+      type: "APPLY_CROP",
+      crop: nextCrop,
+      projectWidth: nextProjectW,
+      projectHeight: nextProjectH,
+    });
     onClose();
-  }, [crop, dispatch, onClose, photoBg]);
+  }, [crop, dispatch, onClose, photoBg, state.project]);
 
   if (!open) return null;
   if (!photoBg) {
