@@ -50,7 +50,7 @@ export function AddLayerSheet({
   onStub,
 }: AddLayerSheetProps) {
   const { state, dispatch } = useEditor();
-  const { beginEditing } = useMobileEdit();
+  const { beginEditing, focusForKeyboardPop } = useMobileEdit();
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -64,6 +64,10 @@ export function AddLayerSheet({
 
   function handleAddText() {
     const project = state.project;
+    // Phase 1 keyboard-pop fix — see MobileEditContext.focusForKeyboardPop.
+    // Must run synchronously inside the user-gesture handler (this
+    // onClick) before the dispatch so iOS / Android pop the keyboard.
+    focusForKeyboardPop();
     // Size to ~40% of canvas width (soft default — user can drag-
     // scale beyond after). Empty text content; the BottomEditDrawer
     // shows "your text here" as a placeholder until the user types.

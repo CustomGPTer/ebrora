@@ -37,7 +37,9 @@
 
 import { useRef, useState } from "react";
 import {
+  Box,
   Crop as CropIcon,
+  Droplet,
   FilePlus,
   Image as ImageIcon,
   Maximize as ResizeIcon,
@@ -91,7 +93,7 @@ export function BottomDock({
   onOpenEffects,
 }: BottomDockProps) {
   const { state, dispatch } = useEditor();
-  const { beginEditing } = useMobileEdit();
+  const { beginEditing, focusForKeyboardPop } = useMobileEdit();
 
   const photoLayerInputRef = useRef<HTMLInputElement>(null);
   const replaceBgInputRef = useRef<HTMLInputElement>(null);
@@ -109,6 +111,14 @@ export function BottomDock({
 
   function handleAddText() {
     const project = state.project;
+    // ── Phase 1 keyboard-pop fix ─────────────────────────────────
+    // Focus the always-mounted BottomEditDrawer textarea SYNCHRONOUSLY
+    // inside this click handler, before any state dispatch. iOS Safari
+    // and Android Chrome only honour the focus request when it sits
+    // inside a user-gesture event handler — the previous implementation
+    // focused inside a useEffect after the drawer mounted, which fires
+    // after the gesture has completed and the keyboard refused to open.
+    focusForKeyboardPop();
     // Size to ~40% of canvas width (soft default — user can drag-
     // scale beyond after). Empty text content; the BottomEditDrawer
     // shows "your text here" as a placeholder until the user types.
@@ -409,15 +419,39 @@ function SelectedLayerSection({
         {layer.kind === "image" && (
           <>
             <DockButton
-              icon={<Wand2 className="w-6 h-6" strokeWidth={1.75} />}
-              label="Effects"
-              onClick={() => onStub("Per-layer effects — coming soon")}
+              icon={<Palette className="w-6 h-6" strokeWidth={1.75} />}
+              label="Color"
+              onClick={() => onOpenPanel("color")}
+              active={activePanel === "color"}
+            />
+            <DockButton
+              icon={<Square className="w-6 h-6" strokeWidth={1.75} />}
+              label="Stroke"
+              onClick={() => onOpenPanel("image-stroke")}
+              active={activePanel === "image-stroke"}
             />
             <DockButton
               icon={<Move className="w-6 h-6" strokeWidth={1.75} />}
               label="Position"
               onClick={() => onOpenPanel("position")}
               active={activePanel === "position"}
+            />
+            <DockButton
+              icon={<Box className="w-6 h-6" strokeWidth={1.75} />}
+              label="Perspective"
+              onClick={() => onOpenPanel("perspective")}
+              active={activePanel === "perspective"}
+            />
+            <DockButton
+              icon={<Droplet className="w-6 h-6" strokeWidth={1.75} />}
+              label="Opacity"
+              onClick={() => onOpenPanel("opacity")}
+              active={activePanel === "opacity"}
+            />
+            <DockButton
+              icon={<Wand2 className="w-6 h-6" strokeWidth={1.75} />}
+              label="Effects"
+              onClick={() => onStub("Per-layer effects — coming soon")}
             />
             <DockButton
               icon={<Sparkles className="w-6 h-6" strokeWidth={1.75} />}
