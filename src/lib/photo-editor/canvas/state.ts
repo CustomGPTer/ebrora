@@ -23,6 +23,7 @@ import type {
   EditorState,
   Id,
   Project,
+  Rect,
   Tool,
   Viewport,
 } from "../types";
@@ -105,7 +106,20 @@ export type EditorAction =
   | { type: "TOGGLE_GRID" }
   | { type: "TOGGLE_SNAP" }
   | { type: "RENAME_PROJECT"; name: string }
-  | { type: "RESIZE_CANVAS"; width: number; height: number };
+  | { type: "RESIZE_CANVAS"; width: number; height: number }
+  // True-crop apply: atomically updates the photo background's crop
+  // rect AND resizes the project canvas to match the crop's aspect
+  // ratio. Done in a single action so it produces ONE history entry
+  // (Cmd-Z undoes the whole crop in one step) and so the canvas /
+  // background stay aspect-aligned at all times — preventing the
+  // PhotoRect distortion bug where a portrait crop into a square
+  // canvas gets stretched. crop=null clears any existing crop.
+  | {
+      type: "APPLY_CROP";
+      crop: Rect | null;
+      projectWidth: number;
+      projectHeight: number;
+    };
 
 // ─── Reducer ────────────────────────────────────────────────────
 
@@ -221,6 +235,22 @@ export function editorReducer(
         height: action.height,
       });
 
+    case "APPLY_CROP": {
+      // Atomic: resize the project AND swap the background's crop in
+      // one shot. We require a photo background — for any other kind
+      // (solid / gradient / transparent) crop is a no-op so we just
+      // resize the canvas.
+      const project = state.project;
+      const bg = project.background;
+      const nextBg: Background =
+        bg.kind === "photo" ? { ...bg, crop: action.crop } : bg;
+      return withProjectPatch(state, {
+        width: action.projectWidth,
+        height: action.projectHeight,
+        background: nextBg,
+      });
+    }
+
     default:
       return state;
   }
@@ -268,6 +298,8 @@ export function describeAction(action: EditorAction): string {
       return "Rename project";
     case "RESIZE_CANVAS":
       return "Resize canvas";
+    case "APPLY_CROP":
+      return "Crop";
 
     // Non-undoable: viewport, selection, tool, panel state.
     case "SET_SELECTION":
