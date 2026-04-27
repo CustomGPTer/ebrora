@@ -59,6 +59,7 @@ export function createImageLayer(opts: CreateImageLayerOptions): ImageLayer {
     naturalHeight: opts.naturalHeight,
     crop: null,
     perspective: null,
+    stroke: { enabled: false, color: "#000000", width: 4, opacity: 1 },
   };
 }
 
