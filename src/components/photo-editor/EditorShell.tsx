@@ -72,6 +72,10 @@ import {
 } from "@/lib/photo-editor/saved-projects/serialize";
 import { generateThumbnail } from "@/lib/photo-editor/saved-projects/thumbnail";
 import { createAutosaver } from "@/lib/photo-editor/saved-projects/autosave";
+import {
+  saveDraft,
+  deleteDraft,
+} from "@/lib/photo-editor/saved-projects/draft";
 import type { SavedProject } from "@/lib/photo-editor/types";
 
 /** Every right-side panel the editor can show. Single-slot — only one
@@ -273,8 +277,63 @@ function EditorShellInner({
     };
   }, []);
 
+  // ── Draft autosave (always-armed) ─────────────────────────────
+  // The Autosaver above only fires for projects that have been
+  // explicitly saved (savedProjectId !== null). That left a hole: a
+  // user could spend ten minutes editing a fresh, never-named project,
+  // hit refresh, and lose everything. The draft autosaver fills it —
+  // it persists the current project to a single reserved IndexedDB
+  // record (DRAFT_PROJECT_ID, see saved-projects/draft.ts) on every
+  // edit, debounced. EmptyState picks it up on next page load and
+  // shows the Restore prompt.
+  //
+  // Whenever the project is explicitly saved (savedProjectId becomes
+  // non-null) we delete the draft — the project now lives under a
+  // real id in the projects list, so keeping a duplicate draft would
+  // be confusing and waste storage.
+  const draftAutosaverRef = useRef(
+    createAutosaver(async () => {
+      await saveDraft(projectRef.current);
+    }, 1500),
+  );
+
+  useEffect(() => {
+    // Draft autosave runs for ALL projects including unnamed ones — no
+    // armed gate. We arm it once and leave it on for the editor's
+    // lifetime.
+    draftAutosaverRef.current.setArmed(true);
+  }, []);
+
+  useEffect(() => {
+    draftAutosaverRef.current.schedule();
+  }, [state.project]);
+
+  useEffect(() => {
+    if (savedProjectId !== null) {
+      // Project is now persisted under a real id — the draft is
+      // redundant and would re-trigger the Restore dialog after a
+      // refresh even though the user already has the work in their
+      // Projects list.
+      void deleteDraft();
+    }
+  }, [savedProjectId]);
+
+  useEffect(() => {
+    const autosaver = draftAutosaverRef.current;
+    return () => {
+      autosaver.destroy();
+    };
+  }, []);
+
   useEffect(() => {
     function onBeforeUnload() {
+      // Best-effort draft flush so even edits made within the 1.5s
+      // debounce window get a chance to persist before unload. flush()
+      // is async; modern browsers run a little JS during unload but
+      // don't await promises, so this isn't a hard guarantee — the
+      // regular debounced save remains the primary protection.
+      void saveDraft(projectRef.current);
+
       if (savedIdRef.current === null) return;
       const stage = stageRef.current;
       void (async () => {
