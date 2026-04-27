@@ -47,6 +47,7 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -77,6 +78,15 @@ interface MobileEditApi {
    *  commit=false rolls back: either restore originalRuns (existing
    *  layer) or REMOVE_LAYER (fresh layer). */
   endEditing: (commit: boolean) => void;
+  /** Phase 1 keyboard-pop fix:
+   *  Focuses a permanently-mounted off-screen shadow textarea so iOS /
+   *  Android pop the keyboard. Must be called synchronously inside a
+   *  user-gesture handler (e.g. the Add Text button's onClick) BEFORE
+   *  any state dispatch that would mount the real drawer. The drawer's
+   *  own useEffect then transfers focus to its real textarea on the
+   *  next render — focus moves between two inputs in the same task,
+   *  so the OS keyboard stays open through the handover. */
+  focusForKeyboardPop: () => void;
 }
 
 const MobileEditContext = createContext<MobileEditApi | null>(null);
@@ -88,6 +98,19 @@ export function MobileEditProvider({ children }: { children: ReactNode }) {
     isFresh: false,
     originalRuns: null,
   });
+  // Permanent shadow textarea ref — only the shim binds to this. The
+  // real BottomEditDrawer textarea uses its own local ref so unmounting
+  // the drawer doesn't null this one out.
+  const shadowRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const focusForKeyboardPop = useCallback(() => {
+    const el = shadowRef.current;
+    if (!el) return;
+    // Synchronous focus inside a user gesture — pops the OS keyboard
+    // on iOS Safari and Android Chrome. Async focus (setTimeout, ref
+    // callback in a useEffect) is silently ignored by both browsers.
+    el.focus();
+  }, []);
 
   const beginEditing = useCallback(
     (layerId: Id, opts?: { isFresh?: boolean }) => {
@@ -167,12 +190,45 @@ export function MobileEditProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<MobileEditApi>(
-    () => ({ state, beginEditing, endEditing }),
-    [state, beginEditing, endEditing],
+    () => ({
+      state,
+      beginEditing,
+      endEditing,
+      focusForKeyboardPop,
+    }),
+    [state, beginEditing, endEditing, focusForKeyboardPop],
   );
 
   return (
     <MobileEditContext.Provider value={value}>
+      {/*
+        Phase 1 keyboard-pop shim:
+        A permanently-mounted, off-screen <textarea>. focusForKeyboardPop
+        focuses this when the user taps "Add Text", popping the OS
+        keyboard. The real BottomEditDrawer textarea isn't in the DOM at
+        that moment (drawer is conditionally rendered). When the drawer
+        mounts a tick later, its existing useEffect focuses its real
+        textarea — focus transfers between two inputs in the same task,
+        so the keyboard stays open through the handover.
+      */}
+      <textarea
+        ref={shadowRef}
+        aria-hidden="true"
+        tabIndex={-1}
+        // No readOnly — iOS may suppress the on-screen keyboard for
+        // read-only inputs, which would defeat the whole shim. The
+        // pointer-events: none + off-screen positioning prevent the
+        // user from typing into it accidentally.
+        style={{
+          position: "fixed",
+          left: -10000,
+          top: -10000,
+          width: 1,
+          height: 1,
+          opacity: 0,
+          pointerEvents: "none",
+        }}
+      />
       {children}
     </MobileEditContext.Provider>
   );
