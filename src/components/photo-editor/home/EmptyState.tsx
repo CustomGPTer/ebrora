@@ -37,14 +37,19 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HomeHeader } from "./HomeHeader";
 import { BackgroundQuickPick } from "./BackgroundQuickPick";
 import { GalleryCard } from "./GalleryCard";
 import { ProjectsGrid } from "./ProjectsGrid";
 import { SettingsMenu } from "./SettingsMenu";
+import { RestoreDraftDialog } from "./RestoreDraftDialog";
 import { ProjectsModal } from "../projects/ProjectsModal";
 import { deserializeSavedProject } from "@/lib/photo-editor/saved-projects/serialize";
+import {
+  loadDraft,
+  deleteDraft,
+} from "@/lib/photo-editor/saved-projects/draft";
 import { useInstallPrompt } from "@/lib/photo-editor/pwa/install-prompt";
 import type { Project } from "@/lib/photo-editor/types";
 
@@ -60,6 +65,52 @@ export function EmptyState({ onProjectLoaded }: EmptyStateProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [projectsModalOpen, setProjectsModalOpen] = useState(false);
   const { canInstall, install } = useInstallPrompt();
+
+  // ── Draft-restore prompt ──────────────────────────────────────
+  // On home mount, look for an autosaved draft (saved by the editor's
+  // always-on draft autosaver in EditorShell). If one exists, hold the
+  // deserialized Project in state and show the RestoreDraftDialog.
+  // The user must explicitly choose Yes (load it) or No (delete it) —
+  // the dialog has no backdrop-dismiss so a draft can't be lost
+  // accidentally.
+  //
+  // Race with explicit project loads: if the user picks a saved
+  // project from ProjectsGrid before the loadDraft() promise resolves,
+  // the editor takes over and EmptyState unmounts — the draft prompt
+  // never appears, which is the desired outcome.
+  const [pendingDraft, setPendingDraft] = useState<Project | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const saved = await loadDraft();
+      if (cancelled || !saved) return;
+      try {
+        setPendingDraft(deserializeSavedProject(saved));
+      } catch {
+        // Corrupted draft snapshot — wipe it so we don't loop on every
+        // home visit, and continue silently.
+        await deleteDraft();
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleRestoreDraft = () => {
+    const draft = pendingDraft;
+    setPendingDraft(null);
+    if (!draft) return;
+    // savedProjectId = null because the draft is not a "saved
+    // project". The editor's draft autosaver will continue persisting
+    // changes; if the user explicitly Saves, the draft gets cleared.
+    onProjectLoaded(draft, null);
+  };
+
+  const handleDiscardDraft = () => {
+    setPendingDraft(null);
+    void deleteDraft();
+  };
 
   return (
     <div className="flex flex-col" style={{ minHeight: "100vh" }}>
@@ -102,6 +153,13 @@ export function EmptyState({ onProjectLoaded }: EmptyStateProps) {
           const project = deserializeSavedProject(saved);
           onProjectLoaded(project, saved.id);
         }}
+      />
+
+      {/* ── Restore-draft prompt (after refresh) ───────────────── */}
+      <RestoreDraftDialog
+        open={pendingDraft !== null}
+        onRestore={handleRestoreDraft}
+        onDiscard={handleDiscardDraft}
       />
     </div>
   );
