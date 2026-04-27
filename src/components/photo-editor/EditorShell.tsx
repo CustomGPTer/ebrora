@@ -60,6 +60,10 @@ import {
   MobileEditProvider,
   useMobileEdit,
 } from "./context/MobileEditContext";
+import { SmartGuidesProvider } from "./canvas/SmartGuidesContext";
+import { ImageStrokePanel } from "./text-tools/ImageStrokePanel";
+import { OpacityPanel } from "./text-tools/OpacityPanel";
+import { PerspectivePanel } from "./text-tools/PerspectivePanel";
 import { loadAllCustomFonts } from "@/lib/photo-editor/fonts/custom-fonts-db";
 import {
   loadProject as loadProjectRecord,
@@ -88,9 +92,12 @@ export type ActivePanel =
   | "format"
   | "color"
   | "stroke"
+  | "image-stroke"
   | "highlight"
   | "shadow"
   | "position"
+  | "perspective"
+  | "opacity"
   | "erase"
   | "export"
   | null;
@@ -109,7 +116,9 @@ interface EditorShellProps {
 export function EditorShell(props: EditorShellProps) {
   return (
     <MobileEditProvider>
-      <EditorShellInner {...props} />
+      <SmartGuidesProvider>
+        <EditorShellInner {...props} />
+      </SmartGuidesProvider>
     </MobileEditProvider>
   );
 }
@@ -537,6 +546,15 @@ function EditorShellInner({
       <HighlightPanel open={activePanel === "highlight"} onClose={closePanel} />
       <ShadowPanel open={activePanel === "shadow"} onClose={closePanel} />
       <PositionPanel open={activePanel === "position"} onClose={closePanel} />
+      <ImageStrokePanel
+        open={activePanel === "image-stroke"}
+        onClose={closePanel}
+      />
+      <PerspectivePanel
+        open={activePanel === "perspective"}
+        onClose={closePanel}
+      />
+      <OpacityPanel open={activePanel === "opacity"} onClose={closePanel} />
       <ExportPanel open={activePanel === "export"} onClose={closePanel} />
 
       {/* Full-screen modals */}
