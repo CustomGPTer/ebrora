@@ -188,12 +188,12 @@ export function BottomEditDrawer() {
             ref={textareaRef}
             value={draft}
             onChange={(e) => handleChange(e.target.value)}
-            placeholder="Enter text here"
-            rows={1}
+            placeholder="your text here"
+            rows={3}
             className="w-full resize-none outline-none bg-transparent text-base leading-snug"
             style={{
               color: "var(--pe-text)",
-              minHeight: 32,
+              minHeight: 80,
               maxHeight: 200,
             }}
           />
