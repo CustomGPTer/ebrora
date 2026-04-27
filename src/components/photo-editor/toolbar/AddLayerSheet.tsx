@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { useEditor } from "../context/EditorContext";
 import { useMobileEdit } from "../context/MobileEditContext";
-import { createTextLayer } from "@/lib/photo-editor/rich-text/factory";
+import { createDefaultTextForCanvas } from "@/lib/photo-editor/rich-text/factory";
 import { createImageLayer } from "@/lib/photo-editor/canvas/factories";
 import { centreLayerOnCanvas } from "@/lib/photo-editor/canvas/selection";
 import { MAX_CANVAS_DIMENSION } from "@/lib/photo-editor/types";
@@ -64,7 +64,14 @@ export function AddLayerSheet({
 
   function handleAddText() {
     const project = state.project;
-    const baseLayer = createTextLayer({ width: 800, text: "" });
+    // Size to ~40% of canvas width (soft default — user can drag-
+    // scale beyond after). Empty text content; the BottomEditDrawer
+    // shows "your text here" as a placeholder until the user types.
+    const baseLayer = createDefaultTextForCanvas(
+      project.width,
+      project.height,
+      { text: "" },
+    );
     const positioned = centreLayerOnCanvas(
       baseLayer,
       project.width,

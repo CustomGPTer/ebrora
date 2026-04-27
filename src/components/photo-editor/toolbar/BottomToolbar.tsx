@@ -50,7 +50,7 @@ import {
 import { useEditor } from "../context/EditorContext";
 import { ToolButton } from "./ToolButton";
 import { ToolDivider } from "./ToolDivider";
-import { createTextLayer } from "@/lib/photo-editor/rich-text/factory";
+import { createDefaultTextForCanvas } from "@/lib/photo-editor/rich-text/factory";
 import { createImageLayer } from "@/lib/photo-editor/canvas/factories";
 import { centreLayerOnCanvas } from "@/lib/photo-editor/canvas/selection";
 import { MAX_CANVAS_DIMENSION } from "@/lib/photo-editor/types";
@@ -85,10 +85,14 @@ export function BottomToolbar({
   function handleAddText() {
     const project = state.project;
 
-    // Default text layer — black sans-serif 96px word "Text", text box
-    // width 800px (matches the engine sandbox defaults). Then centred
-    // on the canvas via the layout's natural dimensions.
-    const baseLayer = createTextLayer({ width: 800 });
+    // Size the new text layer to ~40% of canvas width with a
+    // proportional fontSize, so the same Add Text action looks right
+    // on a 320-px sticker, a 1080-px square, or a 4000-px banner. Soft
+    // default — user can drag-resize beyond 40% after creation.
+    const baseLayer = createDefaultTextForCanvas(
+      project.width,
+      project.height,
+    );
     const positioned = centreLayerOnCanvas(
       baseLayer,
       project.width,
