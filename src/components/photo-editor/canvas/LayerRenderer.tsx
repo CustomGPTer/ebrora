@@ -30,23 +30,39 @@
 import { Fragment } from "react";
 import { useEditor } from "../context/EditorContext";
 import { useMobileEdit } from "../context/MobileEditContext";
+import { useSmartGuides } from "./SmartGuidesContext";
 import { RichTextNode } from "./RichTextNode";
 import { ImageNode } from "./ImageNode";
 import { ShapeNode } from "./ShapeNode";
 import { StickerNode } from "./StickerNode";
 import { TextEditOverlay } from "./TextEditOverlay";
+import { computeSnap, type Box } from "@/lib/photo-editor/canvas/snap";
 import type {
   AnyLayer,
   Id,
   Transform,
 } from "@/lib/photo-editor/types";
+import type Konva from "konva";
 
 export function LayerRenderer() {
-  const { state, dispatch } = useEditor();
+  const { state, dispatch, stageRef } = useEditor();
   const { beginEditing } = useMobileEdit();
+  const { setGuides, clearGuides } = useSmartGuides();
   const { project } = state;
 
   const orderedLayers = orderLayers(project.layers, project.layerOrder);
+
+  /** Resolve a layer's current bbox in canvas-pixel coords. */
+  function getBboxOnStage(id: Id): Box | null {
+    const stage = stageRef.current;
+    if (!stage) return null;
+    const node = stage.findOne(`#${id}`);
+    if (!node) return null;
+    const r = node.getClientRect({ relativeTo: stage });
+    if (!Number.isFinite(r.x) || !Number.isFinite(r.y)) return null;
+    if (r.width <= 0 || r.height <= 0) return null;
+    return { x: r.x, y: r.y, width: r.width, height: r.height };
+  }
 
   return (
     <>
@@ -80,7 +96,45 @@ export function LayerRenderer() {
           }
         };
 
+        const onDragMove = (x: number, y: number, node: Konva.Node) => {
+          // Build the dragged box from the Konva node's bbox in canvas
+          // coords (snap.ts works in canvas pixels).
+          const stage = stageRef.current;
+          if (!stage) return;
+          const draggedRect = node.getClientRect({ relativeTo: stage });
+          if (!Number.isFinite(draggedRect.x)) return;
+          const draggedBox: Box = {
+            x: draggedRect.x,
+            y: draggedRect.y,
+            width: draggedRect.width,
+            height: draggedRect.height,
+          };
+          const otherBoxes: Box[] = [];
+          for (const other of project.layers) {
+            if (other.id === layer.id) continue;
+            if (!other.visible) continue;
+            const box = getBboxOnStage(other.id);
+            if (box) otherBoxes.push(box);
+          }
+          const result = computeSnap({
+            draggedBox,
+            otherBoxes,
+            canvasWidth: project.width,
+            canvasHeight: project.height,
+          });
+          // Apply snap delta to the Konva node directly so subsequent
+          // dragmove ticks build on the snapped position.
+          const dx = result.x - draggedBox.x;
+          const dy = result.y - draggedBox.y;
+          if (dx !== 0 || dy !== 0) {
+            node.x(x + dx);
+            node.y(y + dy);
+          }
+          setGuides(result.verticalGuides, result.horizontalGuides);
+        };
+
         const onDragEnd = (x: number, y: number) => {
+          clearGuides();
           dispatch({
             type: "UPDATE_LAYER",
             id: layer.id,
@@ -109,6 +163,7 @@ export function LayerRenderer() {
                   draggable={draggable}
                   editing={isEditingThisText}
                   onSelect={onSelect}
+                  onDragMove={onDragMove}
                   onDragEnd={onDragEnd}
                   onTransformEnd={onTransformEnd}
                 />
@@ -125,6 +180,7 @@ export function LayerRenderer() {
                 layer={layer}
                 draggable={draggable}
                 onSelect={onSelect}
+                onDragMove={onDragMove}
                 onDragEnd={onDragEnd}
                 onTransformEnd={onTransformEnd}
               />
@@ -137,6 +193,7 @@ export function LayerRenderer() {
                 layer={layer}
                 draggable={draggable}
                 onSelect={onSelect}
+                onDragMove={onDragMove}
                 onDragEnd={onDragEnd}
                 onTransformEnd={onTransformEnd}
               />
@@ -149,6 +206,7 @@ export function LayerRenderer() {
                 layer={layer}
                 draggable={draggable}
                 onSelect={onSelect}
+                onDragMove={onDragMove}
                 onDragEnd={onDragEnd}
                 onTransformEnd={onTransformEnd}
               />

@@ -24,6 +24,7 @@ interface StickerNodeProps {
   layer: StickerLayer;
   draggable: boolean;
   onSelect: (additive: boolean) => void;
+  onDragMove?: (x: number, y: number, node: Konva.Node) => void;
   onDragEnd: (x: number, y: number) => void;
   onTransformEnd: (next: Partial<Transform>) => void;
 }
@@ -32,6 +33,7 @@ export function StickerNode({
   layer,
   draggable,
   onSelect,
+  onDragMove,
   onDragEnd,
   onTransformEnd,
 }: StickerNodeProps) {
@@ -60,6 +62,11 @@ export function StickerNode({
       draggable={draggable}
       onMouseDown={(e) => onSelect(isAdditive(e))}
       onTouchStart={(e) => onSelect(isAdditive(e))}
+      onDragMove={(e) => {
+        if (!onDragMove) return;
+        const node = e.target;
+        onDragMove(node.x(), node.y(), node);
+      }}
       onDragEnd={(e) => onDragEnd(e.target.x(), e.target.y())}
       onTransformEnd={(e) => {
         const node = e.target;

@@ -70,6 +70,9 @@ interface RichTextNodeProps {
    *  layers) to also call useMobileEdit().beginEditing so the bottom
    *  editing drawer opens. */
   onSelect: (additive: boolean) => void;
+  /** Drag move — fires on every pointer move while dragging. Used by
+   *  smart-guides snap (Phase 1). */
+  onDragMove?: (x: number, y: number, node: import("konva").default.Node) => void;
   /** Drag end — receives the new canvas-local x, y of the layer's origin. */
   onDragEnd: (x: number, y: number) => void;
   /** Transform end — receives the new transform values (Konva-modified). */
@@ -81,6 +84,7 @@ export function RichTextNode({
   draggable,
   editing,
   onSelect,
+  onDragMove,
   onDragEnd,
   onTransformEnd,
 }: RichTextNodeProps) {
@@ -177,6 +181,11 @@ export function RichTextNode({
       draggable={draggable && !editing}
       onMouseDown={(e) => onSelect(isAdditive(e))}
       onTouchStart={(e) => onSelect(isAdditive(e))}
+      onDragMove={(e) => {
+        if (!onDragMove) return;
+        const node = e.target;
+        onDragMove(node.x(), node.y(), node);
+      }}
       onDragEnd={(e) => onDragEnd(e.target.x(), e.target.y())}
       onTransformEnd={(e) => {
         const node = e.target;

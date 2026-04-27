@@ -35,7 +35,6 @@ import type Konva from "konva";
 import { useEditor } from "../context/EditorContext";
 import { useMobileEdit } from "../context/MobileEditContext";
 
-const ANCHOR_FILL = "#FFFFFF";
 const ACCENT = "#1B5B50";
 
 export function SelectionFrame() {
@@ -95,32 +94,24 @@ export function SelectionFrame() {
   return (
     <Transformer
       ref={transformerRef}
-      // Hide the transformer entirely when nothing usable is selected. The
-      // useEffect already calls .nodes([]) in that case; this prop just
-      // keeps the visual chrome out of the way.
       shouldOverdrawWholeArea
-      anchorSize={10}
-      anchorCornerRadius={5}
-      anchorStroke={ACCENT}
-      anchorFill={ANCHOR_FILL}
-      anchorStrokeWidth={1.5}
+      // ── Phase 1: corner-icon overlay owns transform handles ──
+      // The visible chrome is reduced to a dashed border. Resize and
+      // rotate are driven by the DOM CornerIcons overlay
+      // (SelectionTools.tsx), which dispatches transform updates
+      // directly. We keep the Transformer mounted because its bbox
+      // visibility logic is already managed cleanly through it; the
+      // anchors are simply hidden.
+      resizeEnabled={false}
+      rotateEnabled={false}
+      enabledAnchors={[]}
+      anchorSize={0}
+      anchorStroke="rgba(0,0,0,0)"
+      anchorFill="rgba(0,0,0,0)"
+      anchorStrokeWidth={0}
       borderStroke={ACCENT}
       borderStrokeWidth={1.5}
       borderDash={[4, 3]}
-      rotateEnabled
-      rotationSnaps={[0, 90, 180, 270]}
-      rotationSnapTolerance={5}
-      enabledAnchors={[
-        "top-left",
-        "top-center",
-        "top-right",
-        "middle-left",
-        "middle-right",
-        "bottom-left",
-        "bottom-center",
-        "bottom-right",
-      ]}
-      // Don't shrink to nothing on drag — clamp the visual minimum.
       boundBoxFunc={(oldBox, newBox) => {
         if (Math.abs(newBox.width) < 10 || Math.abs(newBox.height) < 10) {
           return oldBox;

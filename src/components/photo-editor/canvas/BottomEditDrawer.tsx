@@ -92,6 +92,10 @@ export function BottomEditDrawer() {
   // We sync from layer.runs whenever the editing layer changes.
   const [draft, setDraft] = useState<string>("");
   const lastLayerIdRef = useRef<string | null>(null);
+  // Local ref. The "keyboard pop on Add Text" path uses a separate
+  // permanent shim in MobileEditProvider — once this drawer mounts and
+  // its useEffect fires, focus transfers from the shim to here in the
+  // same task and the OS keyboard stays open through the handover.
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {

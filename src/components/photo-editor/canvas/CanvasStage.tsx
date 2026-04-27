@@ -34,6 +34,7 @@ import { useEditor } from "../context/EditorContext";
 import { LayerRenderer } from "./LayerRenderer";
 import { SelectionFrame } from "./SelectionFrame";
 import { GestureLayer } from "./GestureLayer";
+import { SmartGuides } from "./SmartGuides";
 import type {
   Background,
   BackgroundFilters,
@@ -91,6 +92,10 @@ export function CanvasStage({
         </Layer>
         <Layer>
           <LayerRenderer />
+          <SmartGuides
+            canvasWidth={state.project.width}
+            canvasHeight={state.project.height}
+          />
           <SelectionFrame />
         </Layer>
       </Stage>
