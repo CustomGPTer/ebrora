@@ -13,6 +13,7 @@
 
 import type { SavedProject } from "../types";
 import { openEditorDb, STORE_PROJECTS } from "./idb";
+import { DRAFT_PROJECT_ID } from "./draft";
 
 /** Thrown by saveProject when the browser's storage quota is exceeded.
  *  Caller should surface a dialog prompting the user to delete saved
@@ -92,7 +93,13 @@ export async function listProjects(): Promise<SavedProject[]> {
     req.onsuccess = () => {
       const cursor = req.result;
       if (cursor) {
-        out.push(cursor.value as SavedProject);
+        // Skip the reserved draft record — it has its own restore flow
+        // (RestoreDraftDialog on home mount) and must never appear in
+        // user-facing project lists.
+        const value = cursor.value as SavedProject;
+        if (value.id !== DRAFT_PROJECT_ID) {
+          out.push(value);
+        }
         cursor.continue();
       } else {
         resolve(out);
@@ -120,14 +127,24 @@ export async function deleteProject(id: string): Promise<boolean> {
 }
 
 /** Count saved projects. Used to drive the soft-cap warning in the
- *  Projects modal. */
+ *  Projects modal. The reserved draft record is excluded so it doesn't
+ *  inflate the user-visible count. */
 export async function countProjects(): Promise<number> {
   const db = await openEditorDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_PROJECTS, "readonly");
     const store = tx.objectStore(STORE_PROJECTS);
     const req = store.count();
-    req.onsuccess = () => resolve(req.result);
+    req.onsuccess = () => {
+      // Subtract the draft if present. We can't filter at the count
+      // level, so check existence with a separate get() — cheap because
+      // it's keyed by primary id.
+      const draftReq = store.get(DRAFT_PROJECT_ID);
+      draftReq.onsuccess = () => {
+        resolve(req.result - (draftReq.result ? 1 : 0));
+      };
+      draftReq.onerror = () => resolve(req.result);
+    };
     req.onerror = () =>
       reject(req.error ?? new Error("countProjects failed"));
   });
