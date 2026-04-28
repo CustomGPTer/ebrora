@@ -74,7 +74,6 @@ export function SelectionTools({
     selectedLayer.locked ||
     !selectedLayer.visible ||
     mobileEdit.editingLayerId === selectedLayer.id ||
-    state.viewport.rotation !== 0 ||
     stageScale <= 0;
 
   useEffect(() => {
@@ -90,26 +89,94 @@ export function SelectionTools({
     };
   }, [hidden, stageRef]);
 
-  const bboxDom = useMemo(() => {
+  // Box geometry — four corner points in DOM-pixel space (within the
+  // canvas-area container). Handles non-zero viewport rotation.
+  //
+  // Approach: get the layer's four local-rect corners in stage-local
+  // (canvas-pixel) space via the layer node's absolute transform.
+  // Then convert each stage-local point to DOM space by applying the
+  // stage's (stageScale, viewport.rotation) transform around its
+  // pivot. The stage-pivot in DOM space is (stageLeft + stageWidth/2,
+  // stageTop + stageHeight/2) because CanvasStage centres the stage
+  // div within the canvas area.
+  const geom = useMemo(() => {
     if (hidden) return null;
     const stage = stageRef.current;
     if (!stage) return null;
     const node = stage.findOne(`#${selectedLayer!.id}`);
     if (!node) return null;
-    const rect = node.getClientRect({ relativeTo: stage });
+    // Layer's local rect (pre-transform). For text/image/shape/sticker
+    // this is roughly (0, 0, width, height).
+    const selfRect = (
+      node as unknown as {
+        getSelfRect: () => {
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+        };
+      }
+    ).getSelfRect();
     if (
-      !Number.isFinite(rect.x) ||
-      !Number.isFinite(rect.y) ||
-      rect.width <= 0 ||
-      rect.height <= 0
+      !selfRect ||
+      !Number.isFinite(selfRect.width) ||
+      !Number.isFinite(selfRect.height) ||
+      selfRect.width <= 0 ||
+      selfRect.height <= 0
     ) {
       return null;
     }
+    // Layer's transform up to (but excluding) the stage. This gives
+    // points in PROJECT-pixel space — we then multiply by stageScale
+    // and rotate by viewport.rotation to land in DOM coords.
+    // Calling getAbsoluteTransform() WITHOUT a top arg would include
+    // the stage's scale, double-applying stageScale below.
+    const layerTr = node.getAbsoluteTransform(stage);
+    const stageLocal = {
+      tl: layerTr.point({ x: selfRect.x, y: selfRect.y }),
+      tr: layerTr.point({
+        x: selfRect.x + selfRect.width,
+        y: selfRect.y,
+      }),
+      br: layerTr.point({
+        x: selfRect.x + selfRect.width,
+        y: selfRect.y + selfRect.height,
+      }),
+      bl: layerTr.point({
+        x: selfRect.x,
+        y: selfRect.y + selfRect.height,
+      }),
+    };
+    // Stage-local coords from Konva are in PROJECT-pixel space (the
+    // Konva Stage has no rotation; only stage scale = stageScale is
+    // applied at render time when Konva paints). To get DOM coords:
+    //   1. The pivot in stage-local (project-pixel) space is
+    //      (projectWidth/2, projectHeight/2) — equivalently
+    //      (stageWidth / stageScale / 2, stageHeight / stageScale / 2).
+    //   2. Translate so pivot is at origin.
+    //   3. Scale by stageScale → rotate by viewport.rotation. (Order
+    //      matters: the CSS rotate is on the OUTER stage div, AFTER
+    //      Konva's scale, so in math-space: rotate(scale(point))).
+    //   4. Re-translate to the centre of the DOM stage box.
+    const cosR = Math.cos(state.viewport.rotation);
+    const sinR = Math.sin(state.viewport.rotation);
+    const pivotX = stageWidth / stageScale / 2;
+    const pivotY = stageHeight / stageScale / 2;
+    const toDom = (p: { x: number; y: number }) => {
+      const lx = (p.x - pivotX) * stageScale;
+      const ly = (p.y - pivotY) * stageScale;
+      const rotX = lx * cosR - ly * sinR;
+      const rotY = lx * sinR + ly * cosR;
+      return {
+        x: stageLeft + stageWidth / 2 + rotX,
+        y: stageTop + stageHeight / 2 + rotY,
+      };
+    };
     return {
-      x: rect.x * stageScale,
-      y: rect.y * stageScale,
-      width: rect.width * stageScale,
-      height: rect.height * stageScale,
+      tl: toDom(stageLocal.tl),
+      tr: toDom(stageLocal.tr),
+      br: toDom(stageLocal.br),
+      bl: toDom(stageLocal.bl),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -122,6 +189,9 @@ export function SelectionTools({
     state.viewport.translateX,
     state.viewport.translateY,
     state.viewport.zoom,
+    state.viewport.rotation,
+    stageLeft,
+    stageTop,
     stageWidth,
     stageHeight,
   ]);
@@ -142,10 +212,12 @@ export function SelectionTools({
     pointerId: number;
   } | null>(null);
 
-  if (!bboxDom || !selectedLayer) return null;
+  if (!geom || !selectedLayer) return null;
 
-  const centreXDom = stageLeft + bboxDom.x + bboxDom.width / 2;
-  const centreYDom = stageTop + bboxDom.y + bboxDom.height / 2;
+  // Geometric centre = average of the four corners. Works for any
+  // rotation / aspect ratio.
+  const centreXDom = (geom.tl.x + geom.tr.x + geom.br.x + geom.bl.x) / 4;
+  const centreYDom = (geom.tl.y + geom.tr.y + geom.br.y + geom.bl.y) / 4;
 
   const onDelete = () =>
     dispatch({ type: "REMOVE_LAYER", id: selectedLayer.id });
@@ -282,22 +354,31 @@ export function SelectionTools({
     }
   };
 
-  const left = stageLeft + bboxDom.x;
-  const top = stageTop + bboxDom.y;
-  const right = left + bboxDom.width;
-  const bottom = top + bboxDom.height;
-  const midX = left + bboxDom.width / 2;
-  const midY = top + bboxDom.height / 2;
+  // Position icons at the actual rotated corner positions and edge
+  // midpoints — not at AABB corners. This makes the icons sit
+  // visually on the layer's edges at any rotation.
+  const topMidX = (geom.tl.x + geom.tr.x) / 2;
+  const topMidY = (geom.tl.y + geom.tr.y) / 2;
+  const leftMidX = (geom.tl.x + geom.bl.x) / 2;
+  const leftMidY = (geom.tl.y + geom.bl.y) / 2;
+  const bottomMidX = (geom.bl.x + geom.br.x) / 2;
+  const bottomMidY = (geom.bl.y + geom.br.y) / 2;
 
   return (
     <>
-      <CornerBtn x={left} y={top} ariaLabel="Delete" onClick={onDelete} danger>
+      <CornerBtn
+        x={geom.tl.x}
+        y={geom.tl.y}
+        ariaLabel="Delete"
+        onClick={onDelete}
+        danger
+      >
         <X className="w-4 h-4" strokeWidth={2.25} />
       </CornerBtn>
 
       <CornerBtn
-        x={midX}
-        y={top}
+        x={topMidX}
+        y={topMidY}
         ariaLabel="Flip vertically"
         onClick={onFlipV}
       >
@@ -305,8 +386,8 @@ export function SelectionTools({
       </CornerBtn>
 
       <CornerBtn
-        x={right}
-        y={top}
+        x={geom.tr.x}
+        y={geom.tr.y}
         ariaLabel="Rotate"
         drag
         onPointerDown={onRotatePointerDown}
@@ -318,8 +399,8 @@ export function SelectionTools({
       </CornerBtn>
 
       <CornerBtn
-        x={left}
-        y={midY}
+        x={leftMidX}
+        y={leftMidY}
         ariaLabel="Flip horizontally"
         onClick={onFlipH}
       >
@@ -327,8 +408,8 @@ export function SelectionTools({
       </CornerBtn>
 
       <CornerBtn
-        x={midX}
-        y={bottom}
+        x={bottomMidX}
+        y={bottomMidY}
         ariaLabel="Duplicate"
         onClick={onDuplicate}
       >
@@ -336,8 +417,8 @@ export function SelectionTools({
       </CornerBtn>
 
       <CornerBtn
-        x={right}
-        y={bottom}
+        x={geom.br.x}
+        y={geom.br.y}
         ariaLabel="Resize"
         drag
         onPointerDown={onResizePointerDown}

@@ -22,13 +22,17 @@
 
 import { Image as KonvaImage, Shape as KonvaShape } from "react-konva";
 import useImage from "use-image";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import {
   isIdentityPerspective,
   renderPerspectiveImage,
 } from "@/lib/photo-editor/canvas/perspective-render";
+import {
+  applyImageFilterAttrs,
+  resolveImageFilterChain,
+} from "@/lib/photo-editor/canvas/image-filters";
 import type { ImageLayer, Transform } from "@/lib/photo-editor/types";
 
 interface ImageNodeProps {
@@ -57,34 +61,128 @@ export function ImageNode({
   const width = layer.crop ? layer.crop.width : layer.naturalWidth;
   const height = layer.crop ? layer.crop.height : layer.naturalHeight;
 
-  // Pre-build a cropped offscreen canvas for the perspective path so
-  // the sceneFunc draws from "source = the cropped sub-rectangle"
-  // every tick without re-cropping. Only built when perspective +
-  // crop are BOTH set; in all other cases the original image is used
-  // directly.
-  const croppedCanvas = useMemo<HTMLCanvasElement | null>(() => {
+  // Apply per-layer filter chain (adjust + effect + blur) to the flat
+  // KonvaImage path. Mirrors PhotoRect's behaviour for the project
+  // background: cache the un-filtered pixels once, then update filter
+  // attrs on each spec change so Konva's afterSetFilter re-runs the
+  // chain against the cached canvas.
+  useEffect(() => {
+    const node = imageRef.current;
+    if (!node || !img) return;
+    const spec = {
+      adjust: layer.adjust,
+      effect: layer.filterEffect,
+      blur: layer.blur,
+    };
+    const chain = resolveImageFilterChain(spec);
+    applyImageFilterAttrs(node, spec);
+    node.filters(chain);
+    if (chain.length > 0) {
+      if (!node.isCached()) {
+        node.cache();
+      }
+    } else if (node.isCached()) {
+      node.clearCache();
+    }
+    node.getLayer()?.batchDraw();
+  }, [
+    img,
+    layer.adjust,
+    layer.filterEffect,
+    layer.blur,
+    width,
+    height,
+  ]);
+
+  // Pre-build a source canvas for the perspective path. When perspective
+  // is active, the warp engine samples from this canvas. Two extra
+  // responsibilities vs the plain path:
+  //   • Crop: extract the visible sub-rectangle so the warp engine
+  //     samples from "the cropped image" not "the cropped image padded
+  //     with the full source".
+  //   • Filters: apply adjust + filterEffect + blur to the source
+  //     pixels via Canvas2D's ctx.filter before warping. This is a
+  //     CLOSE-ENOUGH approximation of Konva's filter chain — the maths
+  //     differ slightly (CSS uses multiplicative brightness, Konva uses
+  //     additive, etc.) so the warped result and a flat-rendered same
+  //     image with same filters won't be pixel-identical, but they
+  //     match well enough for typical use. Documented for future
+  //     polish.
+  // Only built when perspective is active; the flat path uses Konva's
+  // native filter chain via the useEffect above.
+  const perspectiveSourceCanvas = useMemo<HTMLCanvasElement | null>(() => {
     if (!img) return null;
-    if (!layer.crop) return null;
     if (!layer.perspective) return null;
+    const sw = layer.crop ? layer.crop.width : img.width;
+    const sh = layer.crop ? layer.crop.height : img.height;
     const c = document.createElement("canvas");
-    c.width = Math.max(1, Math.floor(layer.crop.width));
-    c.height = Math.max(1, Math.floor(layer.crop.height));
+    c.width = Math.max(1, Math.floor(sw));
+    c.height = Math.max(1, Math.floor(sh));
     const ctx = c.getContext("2d");
     if (!ctx) return null;
-    ctx.drawImage(
-      img,
-      layer.crop.x,
-      layer.crop.y,
-      layer.crop.width,
-      layer.crop.height,
-      0,
-      0,
-      layer.crop.width,
-      layer.crop.height,
-    );
+    // Build a CSS filter string from the layer's adjust + effect + blur.
+    const filterParts: string[] = [];
+    const a = layer.adjust;
+    // Brightness: CSS brightness(1) = no change. Konva additive [-1, 1]
+    // → CSS multiplicative roughly via 1 + value.
+    const bri = (a.brightness + a.exposure / 2) / 100;
+    if (bri !== 0) filterParts.push(`brightness(${1 + bri})`);
+    if (a.contrast !== 0) {
+      // CSS contrast(1) = no change. Konva contrast is in [-100, 100];
+      // map to roughly [0.5, 1.5].
+      filterParts.push(`contrast(${1 + a.contrast / 100})`);
+    }
+    if (a.saturation !== 0) {
+      filterParts.push(`saturate(${1 + a.saturation / 100})`);
+    }
+    if (layer.filterEffect === "mono") filterParts.push("grayscale(1)");
+    else if (layer.filterEffect === "sepia") filterParts.push("sepia(1)");
+    else if (layer.filterEffect === "invert") filterParts.push("invert(1)");
+    if (layer.blur.enabled && layer.blur.radius > 0) {
+      filterParts.push(`blur(${layer.blur.radius}px)`);
+    }
+    if (filterParts.length > 0) {
+      // ctx.filter is supported in all modern browsers + Node Canvas.
+      ctx.filter = filterParts.join(" ");
+    }
+    if (layer.crop) {
+      ctx.drawImage(
+        img,
+        layer.crop.x,
+        layer.crop.y,
+        layer.crop.width,
+        layer.crop.height,
+        0,
+        0,
+        layer.crop.width,
+        layer.crop.height,
+      );
+    } else {
+      ctx.drawImage(img, 0, 0);
+    }
     return c;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [img, layer.crop?.x, layer.crop?.y, layer.crop?.width, layer.crop?.height, !!layer.perspective]);
+  }, [
+    img,
+    layer.crop?.x,
+    layer.crop?.y,
+    layer.crop?.width,
+    layer.crop?.height,
+    !!layer.perspective,
+    layer.adjust,
+    layer.filterEffect,
+    layer.blur,
+  ]);
+
+  // Trigger a Konva redraw of the perspective Shape whenever the
+  // pre-baked source canvas changes (e.g. on filter changes). The
+  // Shape's sceneFunc closes over `sourceImage`; we still need an
+  // explicit batchDraw to flush.
+  useEffect(() => {
+    const node = shapeRef.current;
+    if (!node) return;
+    node.getLayer()?.batchDraw();
+  }, [perspectiveSourceCanvas]);
 
   if (!img) return null;
 
@@ -175,7 +273,7 @@ export function ImageNode({
   // warp itself still renders correctly. A future polish pass can
   // override Shape.getSelfRect to track the perspective bbox exactly.
   const corners = layer.perspective!;
-  const sourceImage: CanvasImageSource = croppedCanvas ?? img;
+  const sourceImage: CanvasImageSource = perspectiveSourceCanvas ?? img;
   const sourceWidth = layer.crop ? layer.crop.width : img.width;
   const sourceHeight = layer.crop ? layer.crop.height : img.height;
 
