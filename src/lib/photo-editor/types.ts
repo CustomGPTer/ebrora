@@ -225,6 +225,23 @@ export interface ImageLayer extends BaseLayer {
   perspective: [Point, Point, Point, Point] | null;
   /** Optional outer stroke around the image (Phase 1). */
   stroke: Stroke;
+  /** Per-layer image adjust (brightness/contrast/saturation/exposure).
+   *  All values -100..100; 0 = no change. Apr 2026 — parity with the
+   *  project background's BackgroundFilters.adjust. */
+  adjust: {
+    brightness: number;
+    contrast: number;
+    saturation: number;
+    exposure: number;
+  };
+  /** Per-layer preset filter id (vintage, mono, etc.) — null = none. */
+  filterEffect: string | null;
+  /** Per-layer blur. */
+  blur: {
+    enabled: boolean;
+    radius: number; // 0..50
+    kind: "gaussian" | "radial";
+  };
 }
 
 export interface ShapeLayer extends BaseLayer {
