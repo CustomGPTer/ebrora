@@ -37,6 +37,7 @@ import { EditorTopBar } from "./toolbar/EditorTopBar";
 import { BottomDock } from "./toolbar/BottomDock";
 import { AddLayerSheet } from "./toolbar/AddLayerSheet";
 import { CropTool } from "./tools/CropTool";
+import { LayerCropTool } from "./tools/LayerCropTool";
 import { FlipRotateTool } from "./tools/FlipRotateTool";
 import { ResizeTool } from "./tools/ResizeTool";
 import { EffectsTool } from "./tools/EffectsTool";
@@ -62,6 +63,9 @@ import {
 } from "./context/MobileEditContext";
 import { SmartGuidesProvider } from "./canvas/SmartGuidesContext";
 import { ImageStrokePanel } from "./text-tools/ImageStrokePanel";
+import { ImageAdjustPanel } from "./text-tools/ImageAdjustPanel";
+import { ImageFilterPanel } from "./text-tools/ImageFilterPanel";
+import { ImageBlurPanel } from "./text-tools/ImageBlurPanel";
 import { OpacityPanel } from "./text-tools/OpacityPanel";
 import { PerspectivePanel } from "./text-tools/PerspectivePanel";
 import { loadAllCustomFonts } from "@/lib/photo-editor/fonts/custom-fonts-db";
@@ -93,6 +97,9 @@ export type ActivePanel =
   | "color"
   | "stroke"
   | "image-stroke"
+  | "image-adjust"
+  | "image-filter"
+  | "image-blur"
   | "highlight"
   | "shadow"
   | "position"
@@ -102,11 +109,15 @@ export type ActivePanel =
   | "export"
   | null;
 
-/** Background-tool modals — mutually exclusive single-slot state.
- *  Separate from `activePanel` because these are full-screen modals
- *  rather than side-drawer panels. Batch 6 adds "effects" to the
- *  Batch 5 set. */
-type BackgroundTool = "crop" | "flip-rotate" | "resize" | "effects" | null;
+/** Full-screen modals. Includes layer-crop (the per-image-layer crop
+ *  tool, distinct from the project-background crop). */
+type BackgroundTool =
+  | "crop"
+  | "flip-rotate"
+  | "resize"
+  | "effects"
+  | "layer-crop"
+  | null;
 
 interface EditorShellProps {
   onExit: () => void;
@@ -505,6 +516,7 @@ function EditorShellInner({
         onOpenPanel={openPanel}
         onStub={showToast}
         onOpenCrop={() => setBackgroundTool("crop")}
+        onOpenLayerCrop={() => setBackgroundTool("layer-crop")}
         onOpenResize={() => setBackgroundTool("resize")}
         onOpenFlipRotate={() => setBackgroundTool("flip-rotate")}
         onOpenEffects={() => setBackgroundTool("effects")}
@@ -550,6 +562,18 @@ function EditorShellInner({
         open={activePanel === "image-stroke"}
         onClose={closePanel}
       />
+      <ImageAdjustPanel
+        open={activePanel === "image-adjust"}
+        onClose={closePanel}
+      />
+      <ImageFilterPanel
+        open={activePanel === "image-filter"}
+        onClose={closePanel}
+      />
+      <ImageBlurPanel
+        open={activePanel === "image-blur"}
+        onClose={closePanel}
+      />
       <PerspectivePanel
         open={activePanel === "perspective"}
         onClose={closePanel}
@@ -562,6 +586,10 @@ function EditorShellInner({
 
       <CropTool
         open={backgroundTool === "crop"}
+        onClose={() => setBackgroundTool(null)}
+      />
+      <LayerCropTool
+        open={backgroundTool === "layer-crop"}
         onClose={() => setBackgroundTool(null)}
       />
       <FlipRotateTool
