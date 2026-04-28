@@ -399,7 +399,11 @@ export function FontPanel({ open, onClose }: FontPanelProps) {
         ) : null}
 
         {/* Tabs */}
-        <FontCategoryTabs active={activeTab} onChange={setActiveTab} />
+        <FontCategoryTabs
+          active={activeTab}
+          onChange={setActiveTab}
+          catalogue={catalogue}
+        />
 
         {/* Hint when no text layer is selected */}
         {selectedTextLayer === null && isGoogleTab ? (

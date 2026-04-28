@@ -43,15 +43,39 @@ export function VirtualFontList({
 
   // Track the scroll viewport height so the visible-range calculation
   // shrinks gracefully on short panels.
+  //
+  // We measure on mount, then again on the next animation frame, and
+  // also subscribe to a ResizeObserver. The next-frame remeasure
+  // matters in practice: the panel slides in from off-screen via a
+  // CSS transform, and on first mount inside a flex column some
+  // browsers (notably iOS Safari) report clientHeight of 0 until
+  // layout has fully settled — without the rAF retry the list would
+  // start empty and only fix itself on the first scroll/resize.
   useEffect(() => {
     const node = scrollRef.current;
     if (!node) return;
     const measure = () => setViewportHeight(node.clientHeight);
     measure();
-    if (typeof ResizeObserver === "undefined") return;
+
+    let raf: number | null = null;
+    if (typeof requestAnimationFrame !== "undefined") {
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        measure();
+      });
+    }
+
+    if (typeof ResizeObserver === "undefined") {
+      return () => {
+        if (raf !== null) cancelAnimationFrame(raf);
+      };
+    }
     const ro = new ResizeObserver(measure);
     ro.observe(node);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      if (raf !== null) cancelAnimationFrame(raf);
+    };
   }, []);
 
   const onScroll = useCallback(() => {
@@ -74,13 +98,19 @@ export function VirtualFontList({
   const totalHeight = items.length * ROW_HEIGHT;
 
   const { firstIndex, lastIndex } = useMemo(() => {
-    if (viewportHeight <= 0 || items.length === 0) {
+    if (items.length === 0) {
       return { firstIndex: 0, lastIndex: -1 };
     }
+    // Fallback visible window when measurement hasn't landed yet
+    // (clientHeight can read as 0 inside a still-laying-out flex
+    // column on first paint). 1024px covers any phone screen with
+    // headroom, so we render a generous initial slice rather than
+    // showing a blank list until the next frame.
+    const effectiveHeight = viewportHeight > 0 ? viewportHeight : 1024;
     const first = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - BUFFER);
     const last = Math.min(
       items.length - 1,
-      Math.ceil((scrollTop + viewportHeight) / ROW_HEIGHT) + BUFFER,
+      Math.ceil((scrollTop + effectiveHeight) / ROW_HEIGHT) + BUFFER,
     );
     return { firstIndex: first, lastIndex: last };
   }, [scrollTop, viewportHeight, items.length]);
