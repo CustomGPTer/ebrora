@@ -3,11 +3,15 @@
 // Gesture handling for the canvas (Session 7).
 //
 // Wires:
-//   • Single pointer in empty area (or outside the stage rect, but
-//     inside the canvas-area container) → pan
 //   • Single pointer on a layer → leave for Konva's native drag
+//   • Single pointer on the underlay (empty canvas / canvas
+//     background) → no-op. One-finger viewport panning is
+//     deliberately disabled so the underlay can't be dragged.
 //   • Two pointers → pinch zoom + rotate around midpoint, with a 5°
-//     rotation dead-zone to prevent accidental rotate during pinch
+//     rotation dead-zone to prevent accidental rotate during pinch.
+//     Rotation snaps to the four cardinal angles (0°, 90°, 180°,
+//     270°) within a 5° lock zone, with an 8° release zone for
+//     hysteresis (so finger jitter doesn't unsnap).
 //   • Wheel without ctrl/meta → pan vertically; shift+wheel → pan
 //     horizontally
 //   • Wheel with ctrl or meta (also fires on macOS trackpad pinch
@@ -16,7 +20,7 @@
 // Listeners attach to the un-rotated canvas-area container so two-
 // pointer gestures and wheel events work even when the user's cursor
 // is just outside the rotated stage div. Single-pointer gestures use
-// Konva's hit-testing to decide pan-vs-drag-layer.
+// Konva's hit-testing to decide drag-layer-vs-no-op.
 //
 // All gesture-driven state changes go through SET_VIEWPORT, which is
 // non-undoable (HANDOVER §8.4 — viewport is ephemeral). preventDefault
@@ -75,7 +79,23 @@ interface PinchState {
    *  Once crossed, the cumulative rotation is committed to the viewport
    *  on every move; before crossing, only zoom + translate move. */
   rotationActive: boolean;
+  /** Currently locked to a cardinal angle (in radians, expressed as
+   *  the absolute target rotation including the gesture-start
+   *  rotation). null = not snapped. While snapped the viewport's
+   *  rotation is forced to this exact value; finger movement past
+   *  the release zone clears it back to free rotation. */
+  snappedToCardinal: number | null;
 }
+
+// ─── Cardinal-angle snap thresholds ─────────────────────────────
+// Lock when finger angle gets within ±5° of a cardinal (0°, 90°, 180°,
+// 270°). Once snapped, hold until the user clearly rotates more than
+// ±8° from the cardinal — the wider release window provides hysteresis
+// so finger jitter on a touchscreen doesn't constantly toggle the snap.
+
+const CARDINAL_SNAP_LOCK = (5 * Math.PI) / 180; // 5°
+const CARDINAL_SNAP_RELEASE = (8 * Math.PI) / 180; // 8°
+const HALF_PI = Math.PI / 2;
 
 const WHEEL_ZOOM_FACTOR = 0.0015; // sensitivity for ctrl-wheel zoom
 const WHEEL_PAN_FACTOR = 1.0; // 1 wheel-pixel = 1 screen-pixel of pan
@@ -93,8 +113,11 @@ export function GestureLayer({
 
   useEffect(() => {
     const container = canvasAreaRef.current;
-    const stage = stageRef.current;
-    if (!container || !stage) return;
+    // stageRef is kept on props for backward compatibility with the
+    // Session 7 wiring but is no longer read here — single-pointer
+    // hit-testing was removed when one-finger panning was disabled.
+    void stageRef;
+    if (!container) return;
 
     const pointers = new Map<number, PointerState>();
     let pan: PanState | null = null;
@@ -124,19 +147,6 @@ export function GestureLayer({
       };
     }
 
-    function pointerLandedOnLayer(e: PointerEvent): boolean {
-      // Use Konva's hit-test against the current pointer position.
-      // setPointersPositions translates the DOM event into stage-local
-      // coords for Konva.
-      stage!.setPointersPositions(e);
-      const pos = stage!.getPointerPosition();
-      if (!pos) return false;
-      const intersection = stage!.getIntersection(pos);
-      // The Konva Stage itself is NOT considered a layer hit — only
-      // hits on actual nodes count.
-      return intersection !== null && intersection !== undefined;
-    }
-
     function startPinchFromPointers() {
       const arr = Array.from(pointers.values());
       if (arr.length < 2) return;
@@ -154,6 +164,7 @@ export function GestureLayer({
         anchor,
         startViewport: getViewport(),
         rotationActive: false,
+        snappedToCardinal: null,
       };
       // A pinch always cancels any in-flight pan.
       pan = null;
@@ -163,28 +174,18 @@ export function GestureLayer({
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
       if (pointers.size === 1) {
-        // Decide single-pointer behaviour based on hit-testing. If the
-        // pointer landed on a layer, leave it to Konva's native drag.
-        // If it landed on the empty stage or outside the stage rect,
-        // start a pan.
-        if (pointerLandedOnLayer(e)) {
-          // Single pointer on a layer — don't track for pan, don't
-          // capture, don't preventDefault. Konva owns this gesture.
-          return;
-        }
-        pan = {
-          lastX: e.clientX,
-          lastY: e.clientY,
-          pointerId: e.pointerId,
-        };
-        // Capture so we keep getting move events even if the pointer
-        // briefly leaves the container (e.g. user drags off the edge).
-        try {
-          container!.setPointerCapture(e.pointerId);
-        } catch {
-          // Capture can fail in some pen scenarios — non-fatal.
-        }
-        e.preventDefault();
+        // Single pointer: leave it for Konva's native handling.
+        // Hits on a layer become Konva drags; hits on the empty
+        // canvas / underlay are intentionally a no-op — one-finger
+        // viewport panning is disabled so the underlay can't be
+        // dragged. Two-finger gestures still pinch + rotate.
+        //
+        // We deliberately do NOT setPointerCapture or preventDefault
+        // here, so events flow through to Konva (for layer drags)
+        // and the page (for normal click handling on overlay UI).
+        // Tracking this pointer in `pointers` is still useful so we
+        // can promote to a pinch when a second finger lands.
+        return;
       } else if (pointers.size === 2) {
         // Promote to pinch+rotate. Capture both pointers so we keep
         // getting moves even if a finger slides off-screen.
@@ -231,7 +232,47 @@ export function GestureLayer({
         if (!pinch.rotationActive && Math.abs(dRot) > ROTATION_DEAD_ZONE) {
           pinch.rotationActive = true;
         }
-        const effectiveDRot = pinch.rotationActive ? dRot : 0;
+        let effectiveDRot = pinch.rotationActive ? dRot : 0;
+
+        // Cardinal-angle snap. Once the user is actively rotating,
+        // check the would-be absolute viewport rotation against the
+        // four cardinal angles (multiples of π/2). Within the lock
+        // zone (±5°) we force the rotation to the exact cardinal;
+        // once locked, we stay locked until the finger movement
+        // crosses the release zone (±8°), giving a hysteresis band
+        // that absorbs touchscreen jitter.
+        if (pinch.rotationActive) {
+          const rawAbsRotation =
+            pinch.startViewport.rotation + effectiveDRot;
+          const nearestCardinal =
+            Math.round(rawAbsRotation / HALF_PI) * HALF_PI;
+
+          if (pinch.snappedToCardinal !== null) {
+            // Currently locked. Release if the user has clearly
+            // rotated past the cardinal we're locked to.
+            const distFromSnap = Math.abs(
+              rawAbsRotation - pinch.snappedToCardinal,
+            );
+            if (distFromSnap > CARDINAL_SNAP_RELEASE) {
+              pinch.snappedToCardinal = null;
+              // Fall through and use the raw rotation.
+            } else {
+              // Force rotation to exactly the cardinal target.
+              effectiveDRot =
+                pinch.snappedToCardinal - pinch.startViewport.rotation;
+            }
+          } else {
+            // Not currently locked. Lock in if we're close enough.
+            const distFromCardinal = Math.abs(
+              rawAbsRotation - nearestCardinal,
+            );
+            if (distFromCardinal <= CARDINAL_SNAP_LOCK) {
+              pinch.snappedToCardinal = nearestCardinal;
+              effectiveDRot =
+                nearestCardinal - pinch.startViewport.rotation;
+            }
+          }
+        }
 
         // Pinch midpoint in clientX/Y — pan along with the midpoint.
         const midClient = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };

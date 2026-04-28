@@ -193,11 +193,10 @@ export function BottomEditDrawer() {
             value={draft}
             onChange={(e) => handleChange(e.target.value)}
             placeholder="your text here"
-            rows={3}
+            rows={1}
             className="w-full resize-none outline-none bg-transparent text-base leading-snug"
             style={{
               color: "var(--pe-text)",
-              minHeight: 80,
               maxHeight: 200,
             }}
           />
