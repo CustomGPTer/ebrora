@@ -75,8 +75,24 @@ export async function downloadBlob(
   }
 
   // Anchor download path — Android, desktop, and iOS fallback.
+  //
+  // We deliberately re-wrap the blob with `application/octet-stream`
+  // before creating the object URL. Samsung Internet (and the Samsung
+  // PWA framework on Galaxy devices) inspects the content type of
+  // image downloads and routes them through its "Save and Share"
+  // Quick Share UI — which both saves the file AND pops a share sheet
+  // listing every messaging app on the device. By presenting the data
+  // as a generic binary stream, Samsung's image-detector no longer
+  // fires and the download proceeds silently. The OS still saves the
+  // file as a valid PNG/JPG/PDF because the file extension in
+  // `filename` is what determines how the file is treated on disk
+  // and when later opened.
+  //
+  // No effect on Chrome / Firefox / desktop browsers — they ignore the
+  // override and still save the file to /Downloads/ as before.
   try {
-    const url = URL.createObjectURL(blob);
+    const genericBlob = new Blob([blob], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(genericBlob);
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
