@@ -60,6 +60,9 @@ export function createImageLayer(opts: CreateImageLayerOptions): ImageLayer {
     crop: null,
     perspective: null,
     stroke: { enabled: false, color: "#000000", width: 4, opacity: 1 },
+    adjust: { brightness: 0, contrast: 0, saturation: 0, exposure: 0 },
+    filterEffect: null,
+    blur: { enabled: false, radius: 0, kind: "gaussian" },
   };
 }
 
