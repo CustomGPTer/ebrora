@@ -56,23 +56,36 @@ export function serializeSavedProject(
  *  the in-memory list of saved records. */
 export function deserializeSavedProject(saved: SavedProject): Project {
   const project = deepClone(saved.snapshot);
-  // Phase 1 compatibility shim: ImageLayer.stroke is new. Backfill the
-  // default on legacy saved projects so the renderer doesn't crash
-  // reading layer.stroke on a layer that doesn't have it.
+  // Compatibility shim: backfill ImageLayer fields that were added in
+  // later patches (Phase 1 stroke, Phase 3 adjust/filterEffect/blur)
+  // so the renderer doesn't crash on legacy saved projects.
   for (const layer of project.layers) {
-    if (
-      layer.kind === "image" &&
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (layer as any).stroke === undefined
-    ) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (layer as any).stroke = {
+    if (layer.kind !== "image") continue;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const anyLayer = layer as any;
+    if (anyLayer.stroke === undefined) {
+      anyLayer.stroke = {
         enabled: false,
         color: "#000000",
         width: 4,
         opacity: 1,
       };
     }
+    if (anyLayer.adjust === undefined) {
+      anyLayer.adjust = {
+        brightness: 0,
+        contrast: 0,
+        saturation: 0,
+        exposure: 0,
+      };
+    }
+    if (anyLayer.filterEffect === undefined) {
+      anyLayer.filterEffect = null;
+    }
+    if (anyLayer.blur === undefined) {
+      anyLayer.blur = { enabled: false, radius: 0, kind: "gaussian" };
+    }
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }
   return project;
 }
