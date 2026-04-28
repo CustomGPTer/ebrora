@@ -89,6 +89,21 @@ export function SelectionTools({
     };
   }, [hidden, stageRef]);
 
+  // Force the geom useMemo to re-evaluate AFTER the React commit phase
+  // when selection or the layer list changes. The geom computation runs
+  // during render (it's a useMemo) and calls stage.findOne() to locate
+  // the selected layer's Konva node — but on the same render that adds
+  // a brand-new layer, react-konva hasn't yet committed the new node
+  // to the Konva tree, so findOne returns null and geom resolves to
+  // null (no icons). SelectionFrame works around this by doing its
+  // findOne in a useEffect (post-commit); we get the same behaviour by
+  // bumping `tick` here, which causes one extra render after commit
+  // with the node now present. Negligible cost and cures the "icons
+  // missing on freshly-added shape" symptom.
+  useEffect(() => {
+    setTick((t) => t + 1);
+  }, [state.selection, state.project.layers]);
+
   // Box geometry — four corner points in DOM-pixel space (within the
   // canvas-area container). Handles non-zero viewport rotation.
   //
