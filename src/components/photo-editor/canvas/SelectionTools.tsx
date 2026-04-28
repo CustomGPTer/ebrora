@@ -105,18 +105,21 @@ export function SelectionTools({
     if (!stage) return null;
     const node = stage.findOne(`#${selectedLayer!.id}`);
     if (!node) return null;
-    // Layer's local rect (pre-transform). For text/image/shape/sticker
-    // this is roughly (0, 0, width, height).
-    const selfRect = (
-      node as unknown as {
-        getSelfRect: () => {
-          x: number;
-          y: number;
-          width: number;
-          height: number;
-        };
-      }
-    ).getSelfRect();
+    // Layer's local rect (pre-transform). For text/image/sticker the
+    // outermost node is a Konva.Image (Shape) — getClientRect with
+    // skipTransform returns the same {x: 0, y: 0, width, height} as
+    // getSelfRect would. For shape layers the outermost node is a
+    // Konva.Group (see ShapeNode.tsx) which does NOT define
+    // getSelfRect() in Konva 9.x; getClientRect works on any node and
+    // returns the union of children's bounds in group-local space —
+    // i.e. the visible Path's bbox, which is what we want here.
+    // skipStroke=true keeps the rect tight to the geometry (matching
+    // the old getSelfRect behaviour for Shapes).
+    let selfRect = node.getClientRect({
+      skipTransform: true,
+      skipShadow: true,
+      skipStroke: true,
+    });
     if (
       !selfRect ||
       !Number.isFinite(selfRect.width) ||
@@ -124,7 +127,24 @@ export function SelectionTools({
       selfRect.width <= 0 ||
       selfRect.height <= 0
     ) {
-      return null;
+      // Fallback: if the node has no rendered children yet (e.g. an
+      // image still loading or a shape catalogue path that hasn't
+      // mounted), derive from the layer's own width/height so the
+      // selection UI doesn't disappear.
+      const w = (selectedLayer as { width?: number }).width;
+      const h = (selectedLayer as { height?: number }).height;
+      if (
+        typeof w === "number" &&
+        typeof h === "number" &&
+        Number.isFinite(w) &&
+        Number.isFinite(h) &&
+        w > 0 &&
+        h > 0
+      ) {
+        selfRect = { x: 0, y: 0, width: w, height: h };
+      } else {
+        return null;
+      }
     }
     // Layer's transform up to (but excluding) the stage. This gives
     // points in PROJECT-pixel space — we then multiply by stageScale
