@@ -40,6 +40,7 @@ import {
   Box,
   Crop as CropIcon,
   Droplet,
+  Droplets,
   FilePlus,
   Image as ImageIcon,
   Maximize as ResizeIcon,
@@ -48,6 +49,7 @@ import {
   PenLine,
   Pencil,
   RotateCw,
+  Sliders,
   Smile,
   Sparkles,
   Square,
@@ -77,6 +79,7 @@ interface BottomDockProps {
   onOpenPanel: (panel: Exclude<ActivePanel, null>) => void;
   onStub: (label: string) => void;
   onOpenCrop: () => void;
+  onOpenLayerCrop: () => void;
   onOpenResize: () => void;
   onOpenFlipRotate: () => void;
   onOpenEffects: () => void;
@@ -88,6 +91,7 @@ export function BottomDock({
   onOpenPanel,
   onStub,
   onOpenCrop,
+  onOpenLayerCrop,
   onOpenResize,
   onOpenFlipRotate,
   onOpenEffects,
@@ -227,6 +231,7 @@ export function BottomDock({
           onOpenPanel={onOpenPanel}
           onEditText={(id) => beginEditing(id)}
           onStub={onStub}
+          onOpenLayerCrop={onOpenLayerCrop}
         />
       )}
 
@@ -352,12 +357,14 @@ function SelectedLayerSection({
   onOpenPanel,
   onEditText,
   onStub,
+  onOpenLayerCrop,
 }: {
   layer: AnyLayer;
   activePanel: ActivePanel;
   onOpenPanel: (panel: Exclude<ActivePanel, null>) => void;
   onEditText: (id: string) => void;
   onStub: (label: string) => void;
+  onOpenLayerCrop: () => void;
 }) {
   const title = sectionTitleForLayer(layer);
 
@@ -419,10 +426,27 @@ function SelectedLayerSection({
         {layer.kind === "image" && (
           <>
             <DockButton
-              icon={<Palette className="w-6 h-6" strokeWidth={1.75} />}
-              label="Color"
-              onClick={() => onOpenPanel("color")}
-              active={activePanel === "color"}
+              icon={<CropIcon className="w-6 h-6" strokeWidth={1.75} />}
+              label="Crop"
+              onClick={onOpenLayerCrop}
+            />
+            <DockButton
+              icon={<Sliders className="w-6 h-6" strokeWidth={1.75} />}
+              label="Adjust"
+              onClick={() => onOpenPanel("image-adjust")}
+              active={activePanel === "image-adjust"}
+            />
+            <DockButton
+              icon={<Wand2 className="w-6 h-6" strokeWidth={1.75} />}
+              label="Filters"
+              onClick={() => onOpenPanel("image-filter")}
+              active={activePanel === "image-filter"}
+            />
+            <DockButton
+              icon={<Droplets className="w-6 h-6" strokeWidth={1.75} />}
+              label="Blur"
+              onClick={() => onOpenPanel("image-blur")}
+              active={activePanel === "image-blur"}
             />
             <DockButton
               icon={<Square className="w-6 h-6" strokeWidth={1.75} />}
@@ -447,11 +471,6 @@ function SelectedLayerSection({
               label="Opacity"
               onClick={() => onOpenPanel("opacity")}
               active={activePanel === "opacity"}
-            />
-            <DockButton
-              icon={<Wand2 className="w-6 h-6" strokeWidth={1.75} />}
-              label="Effects"
-              onClick={() => onStub("Per-layer effects — coming soon")}
             />
             <DockButton
               icon={<Sparkles className="w-6 h-6" strokeWidth={1.75} />}
