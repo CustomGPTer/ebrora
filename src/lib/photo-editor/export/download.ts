@@ -1,21 +1,34 @@
 // src/lib/photo-editor/export/download.ts
 //
-// Trigger a Blob download. Two paths:
+// Trigger a Blob download (the "Save" path — distinct from explicit
+// "Share" UI which lives in SaveAndSharePage.handleShare and calls
+// navigator.share directly).
 //
-//   • Mobile Safari: <a download> opens the file inline rather than
-//     saving — a long-standing iOS quirk. We use Web Share API
-//     (`navigator.share({ files })`) when available, which presents
-//     the native share sheet so the user can save to Files / Photos /
-//     send to another app.
+// The historical issue: an earlier version of this file defaulted to
+// Web Share whenever `navigator.canShare({ files })` returned true,
+// reasoning that iOS Safari needs Web Share because <a download>
+// doesn't reliably save the file there. That's correct for iOS — but
+// modern Android Chrome ALSO returns true for canShare({ files }),
+// and on Android the user tapping "Save" expects a silent download
+// to /Downloads/, not a system share sheet listing every messaging
+// app on their device. Same goes for desktop Chrome on Android-style
+// share-API-enabled builds.
 //
-//   • Desktop / Android: classic anchor + URL.createObjectURL flow.
-//     The blob URL is revoked after a short delay so the browser has
-//     time to start the download.
+// Corrected routing:
 //
-// "Web Share is available" is sniffed via `navigator.canShare` because
-// `navigator.share` exists in non-mobile contexts but won't accept
-// files. canShare with the actual files we want to share is the only
-// reliable feature-detect.
+//   • iOS Safari (and all iOS browsers, since they're all WebKit):
+//       prefer navigator.share({ files }). Anchor download is
+//       unreliable here.
+//
+//   • Everything else (Android, desktop, etc.):
+//       use the anchor + URL.createObjectURL flow. The blob URL is
+//       revoked after a short delay so the browser has time to start
+//       the download.
+//
+// The anchor path is always available as a fallback when Web Share is
+// preferred but fails (other than user-cancel, which we treat as a
+// final state — re-triggering a download the user just declined would
+// be hostile).
 
 const REVOKE_DELAY_MS = 60_000;
 
@@ -36,8 +49,10 @@ export async function downloadBlob(
 ): Promise<"share" | "download" | "fallback"> {
   const { blob, filename, shareTitle } = options;
 
-  // Web Share with files — preferred on iOS Safari.
-  if (canShareFiles(blob, filename)) {
+  // iOS-only: prefer Web Share. Anchor downloads on iOS Safari
+  // typically navigate to the blob URL inline rather than saving it,
+  // so the share sheet is the only reliable user-facing save path.
+  if (isIOS() && canShareFiles(blob, filename)) {
     try {
       const file = new File([blob], filename, { type: blob.type });
       await (navigator as Navigator & {
@@ -48,17 +63,18 @@ export async function downloadBlob(
       } as ShareData);
       return "share";
     } catch (err) {
-      // User cancelled the share sheet, or share failed. Fall through
-      // to the anchor path so the export is never silently lost.
       if (isAbortError(err)) {
-        // User explicitly cancelled — don't fall back, that would
+        // User explicitly cancelled the share sheet — treat as final
+        // state. Falling through to the anchor path here would
         // re-trigger a download the user just declined.
         return "share";
       }
+      // Any other failure falls through to the anchor path so the
+      // export is never silently lost.
     }
   }
 
-  // Anchor download path.
+  // Anchor download path — Android, desktop, and iOS fallback.
   try {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -74,6 +90,24 @@ export async function downloadBlob(
   } catch {
     return "fallback";
   }
+}
+
+/** True when running in any iOS browser (all of which are WebKit and
+ *  share the same <a download> limitations). Catches iPadOS 13+ which
+ *  reports as "MacIntel" but has touch points. */
+function isIOS(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  if (/iPad|iPhone|iPod/i.test(ua)) return true;
+  // iPadOS 13+ desktop-class UA workaround.
+  if (
+    navigator.platform === "MacIntel" &&
+    typeof navigator.maxTouchPoints === "number" &&
+    navigator.maxTouchPoints > 1
+  ) {
+    return true;
+  }
+  return false;
 }
 
 function canShareFiles(blob: Blob, filename: string): boolean {
