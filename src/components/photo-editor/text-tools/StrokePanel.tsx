@@ -49,8 +49,13 @@ import { HsvPicker } from "./HsvPicker";
 import type { AnyLayer, ShapeLayer, Stroke } from "@/lib/photo-editor/types";
 
 interface StrokePanelProps {
-  open: boolean;
-  onClose: () => void;
+  /** Drawer open state — ignored when `inline` is set. */
+  open?: boolean;
+  /** Drawer close handler — ignored when `inline` is set. */
+  onClose?: () => void;
+  /** When true, render body without PanelDrawer chrome (used by the
+   *  bottom tab strip in BottomDock). Defaults to false. */
+  inline?: boolean;
 }
 
 const DEFAULT_STROKE: Stroke = {
@@ -60,7 +65,11 @@ const DEFAULT_STROKE: Stroke = {
   opacity: 1,
 };
 
-export function StrokePanel({ open, onClose }: StrokePanelProps) {
+export function StrokePanel({
+  open = false,
+  onClose,
+  inline = false,
+}: StrokePanelProps) {
   const { state, dispatch } = useEditor();
   const tool = useTextTool();
   const [showHsv, setShowHsv] = useState(false);
@@ -107,86 +116,94 @@ export function StrokePanel({ open, onClose }: StrokePanelProps) {
     <span>Applied to the whole layer.</span>
   );
 
-  return (
-    <PanelDrawer
-      open={open}
-      onClose={onClose}
-      icon={<Pencil className="w-5 h-5" strokeWidth={1.75} />}
-      title="Stroke"
-      footer={footerNode}
-    >
-      <div className="flex-1 overflow-y-auto">
-        {!hasEditableLayer ? (
-          <EmptyState kind={selectedLayer?.kind} />
-        ) : (
-          <>
-            <Section
-              title="Stroke"
-              right={mixed ? <MixedHint /> : null}
-            >
-              <Toggle
-                checked={stroke.enabled}
-                onChange={(next) => patchStroke({ enabled: next })}
-                label="Enable stroke"
+  const body = (
+    <div className="flex-1 overflow-y-auto">
+      {!hasEditableLayer ? (
+        <EmptyState kind={selectedLayer?.kind} />
+      ) : (
+        <>
+          <Section
+            title="Stroke"
+            right={mixed ? <MixedHint /> : null}
+          >
+            <Toggle
+              checked={stroke.enabled}
+              onChange={(next) => patchStroke({ enabled: next })}
+              label="Enable stroke"
+            />
+          </Section>
+
+          <SectionDivider />
+
+          <DimmedWhen disabled={!stroke.enabled}>
+            <Section title="Colour">
+              <ColorSwatches
+                value={stroke.color}
+                onPick={(c) => patchStroke({ color: c })}
               />
+              <Row>
+                <button
+                  type="button"
+                  onClick={() => setShowHsv((s) => !s)}
+                  className="text-xs underline self-start"
+                  style={{ color: "var(--pe-text-muted)" }}
+                >
+                  {showHsv ? "Hide custom picker" : "Custom colour…"}
+                </button>
+              </Row>
+              {showHsv ? (
+                <HsvPicker
+                  value={stroke.color}
+                  onChange={(c) => patchStroke({ color: c })}
+                />
+              ) : null}
             </Section>
 
             <SectionDivider />
 
-            <DimmedWhen disabled={!stroke.enabled}>
-              <Section title="Colour">
-                <ColorSwatches
-                  value={stroke.color}
-                  onPick={(c) => patchStroke({ color: c })}
+            <Section title="Geometry">
+              <Row label="Width">
+                <Slider
+                  ariaLabel="Stroke width"
+                  value={stroke.width}
+                  min={0}
+                  max={20}
+                  step={0.5}
+                  onChange={(v) => patchStroke({ width: v })}
+                  format={(n) => `${n.toFixed(1)} px`}
                 />
-                <Row>
-                  <button
-                    type="button"
-                    onClick={() => setShowHsv((s) => !s)}
-                    className="text-xs underline self-start"
-                    style={{ color: "var(--pe-text-muted)" }}
-                  >
-                    {showHsv ? "Hide custom picker" : "Custom colour…"}
-                  </button>
-                </Row>
-                {showHsv ? (
-                  <HsvPicker
-                    value={stroke.color}
-                    onChange={(c) => patchStroke({ color: c })}
-                  />
-                ) : null}
-              </Section>
+              </Row>
+              <Row label="Opacity">
+                <Slider
+                  ariaLabel="Stroke opacity"
+                  value={stroke.opacity}
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  onChange={(v) => patchStroke({ opacity: v })}
+                  format={(n) => `${Math.round(n * 100)}%`}
+                />
+              </Row>
+            </Section>
+          </DimmedWhen>
+        </>
+      )}
+    </div>
+  );
 
-              <SectionDivider />
+  if (inline) {
+    return body;
+  }
 
-              <Section title="Geometry">
-                <Row label="Width">
-                  <Slider
-                    ariaLabel="Stroke width"
-                    value={stroke.width}
-                    min={0}
-                    max={20}
-                    step={0.5}
-                    onChange={(v) => patchStroke({ width: v })}
-                    format={(n) => `${n.toFixed(1)} px`}
-                  />
-                </Row>
-                <Row label="Opacity">
-                  <Slider
-                    ariaLabel="Stroke opacity"
-                    value={stroke.opacity}
-                    min={0}
-                    max={1}
-                    step={0.05}
-                    onChange={(v) => patchStroke({ opacity: v })}
-                    format={(n) => `${Math.round(n * 100)}%`}
-                  />
-                </Row>
-              </Section>
-            </DimmedWhen>
-          </>
-        )}
-      </div>
+  return (
+    <PanelDrawer
+      open={open}
+      onClose={onClose ?? (() => {})}
+      icon={<Pencil className="w-5 h-5" strokeWidth={1.75} />}
+      title="Stroke"
+      footer={footerNode}
+    >
+      {body}
     </PanelDrawer>
   );
 }

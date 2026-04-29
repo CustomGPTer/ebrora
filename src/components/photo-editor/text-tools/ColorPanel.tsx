@@ -46,8 +46,13 @@ import { HsvPicker } from "./HsvPicker";
 import type { AnyLayer, ShapeLayer } from "@/lib/photo-editor/types";
 
 interface ColorPanelProps {
-  open: boolean;
-  onClose: () => void;
+  /** Drawer open state — ignored when `inline` is set. */
+  open?: boolean;
+  /** Drawer close handler — ignored when `inline` is set. */
+  onClose?: () => void;
+  /** When true, render body without PanelDrawer chrome (used by the
+   *  bottom tab strip in BottomDock). Defaults to false. */
+  inline?: boolean;
 }
 
 type ColorTab = "swatches" | "picker" | "eyedropper";
@@ -58,7 +63,11 @@ const TABS = [
   { value: "eyedropper" as const, label: "Pick", ariaLabel: "Eyedropper" },
 ] as const;
 
-export function ColorPanel({ open, onClose }: ColorPanelProps) {
+export function ColorPanel({
+  open = false,
+  onClose,
+  inline = false,
+}: ColorPanelProps) {
   const { state, dispatch } = useEditor();
   const tool = useTextTool();
   const [tab, setTab] = useState<ColorTab>("swatches");
@@ -111,55 +120,63 @@ export function ColorPanel({ open, onClose }: ColorPanelProps) {
     <span>Applied to the whole layer.</span>
   );
 
+  const body = (
+    <div className="flex-1 overflow-y-auto">
+      {!hasEditableLayer ? (
+        <EmptyState kind={selectedLayer?.kind} />
+      ) : (
+        <>
+          <Section title="Mode">
+            <Segmented<ColorTab>
+              ariaLabel="Color picker mode"
+              value={tab}
+              options={TABS}
+              onChange={setTab}
+            />
+          </Section>
+          <SectionDivider />
+
+          {tab === "swatches" ? (
+            <Section
+              title="Swatches"
+              right={fillNorm === null ? <MixedHint /> : <CurrentSwatch hex={fillNorm} />}
+            >
+              <ColorSwatches value={fillNorm} onPick={applyColor} />
+            </Section>
+          ) : null}
+
+          {tab === "picker" ? (
+            <Section
+              title="Picker"
+              right={fillNorm === null ? <MixedHint /> : null}
+            >
+              <HsvPicker value={fillNorm ?? "#000000"} onChange={applyColor} />
+            </Section>
+          ) : null}
+
+          {tab === "eyedropper" ? (
+            <Section title="Eyedropper">
+              <EyedropperRow onPick={applyColor} />
+            </Section>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+
+  if (inline) {
+    return body;
+  }
+
   return (
     <PanelDrawer
       open={open}
-      onClose={onClose}
+      onClose={onClose ?? (() => {})}
       icon={<Palette className="w-5 h-5" strokeWidth={1.75} />}
       title="Color"
       footer={footerNode}
     >
-      <div className="flex-1 overflow-y-auto">
-        {!hasEditableLayer ? (
-          <EmptyState kind={selectedLayer?.kind} />
-        ) : (
-          <>
-            <Section title="Mode">
-              <Segmented<ColorTab>
-                ariaLabel="Color picker mode"
-                value={tab}
-                options={TABS}
-                onChange={setTab}
-              />
-            </Section>
-            <SectionDivider />
-
-            {tab === "swatches" ? (
-              <Section
-                title="Swatches"
-                right={fillNorm === null ? <MixedHint /> : <CurrentSwatch hex={fillNorm} />}
-              >
-                <ColorSwatches value={fillNorm} onPick={applyColor} />
-              </Section>
-            ) : null}
-
-            {tab === "picker" ? (
-              <Section
-                title="Picker"
-                right={fillNorm === null ? <MixedHint /> : null}
-              >
-                <HsvPicker value={fillNorm ?? "#000000"} onChange={applyColor} />
-              </Section>
-            ) : null}
-
-            {tab === "eyedropper" ? (
-              <Section title="Eyedropper">
-                <EyedropperRow onPick={applyColor} />
-              </Section>
-            ) : null}
-          </>
-        )}
-      </div>
+      {body}
     </PanelDrawer>
   );
 }

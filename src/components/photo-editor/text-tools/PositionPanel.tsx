@@ -30,11 +30,20 @@ import {
 import type { AnyLayer, Id, Transform } from "@/lib/photo-editor/types";
 
 interface PositionPanelProps {
-  open: boolean;
-  onClose: () => void;
+  /** Drawer open state — ignored when `inline` is set. */
+  open?: boolean;
+  /** Drawer close handler — ignored when `inline` is set. */
+  onClose?: () => void;
+  /** When true, render body without PanelDrawer chrome (used by the
+   *  bottom tab strip in BottomDock). Defaults to false. */
+  inline?: boolean;
 }
 
-export function PositionPanel({ open, onClose }: PositionPanelProps) {
+export function PositionPanel({
+  open = false,
+  onClose,
+  inline = false,
+}: PositionPanelProps) {
   const { state, dispatch } = useEditor();
   const [uniformScale, setUniformScale] = useState(true);
 
@@ -109,157 +118,165 @@ export function PositionPanel({ open, onClose }: PositionPanelProps) {
     dispatch({ type: "REORDER_LAYERS", order: next });
   }
 
+  const body = (
+    <div className="flex-1 overflow-y-auto">
+      {!layer ? (
+        <EmptyState />
+      ) : (
+        <>
+          <Section title="Translate">
+            <div className="grid grid-cols-2 gap-3">
+              <Row label="X">
+                <NumberInput
+                  ariaLabel="Translate X"
+                  value={transform.x}
+                  step={1}
+                  onChange={(v) => patchTransform({ x: v })}
+                />
+              </Row>
+              <Row label="Y">
+                <NumberInput
+                  ariaLabel="Translate Y"
+                  value={transform.y}
+                  step={1}
+                  onChange={(v) => patchTransform({ y: v })}
+                />
+              </Row>
+            </div>
+          </Section>
+
+          <SectionDivider />
+
+          <Section title="Rotate">
+            <Row label="Angle">
+              <Slider
+                ariaLabel="Rotation"
+                value={normaliseDeg(transform.rotation)}
+                min={0}
+                max={360}
+                step={1}
+                onChange={(v) => patchTransform({ rotation: v })}
+                format={(n) => `${n.toFixed(0)}°`}
+              />
+            </Row>
+            <Row label="Snap">
+              <div className="flex flex-wrap gap-2">
+                {[0, 90, 180, 270].map((deg) => (
+                  <ActionButton
+                    key={deg}
+                    ariaLabel={`Snap to ${deg} degrees`}
+                    onClick={() => snapRotation(deg)}
+                  >
+                    {deg}°
+                  </ActionButton>
+                ))}
+              </div>
+            </Row>
+          </Section>
+
+          <SectionDivider />
+
+          <Section
+            title="Scale"
+            right={
+              <button
+                type="button"
+                onClick={() => setUniformScale((s) => !s)}
+                className="inline-flex items-center gap-1 text-[11px]"
+                style={{ color: "var(--pe-text-muted)" }}
+                aria-pressed={uniformScale}
+                aria-label="Lock uniform scale"
+                title="Lock uniform scale"
+              >
+                {uniformScale ? (
+                  <Lock className="w-3 h-3" />
+                ) : (
+                  <Unlock className="w-3 h-3" />
+                )}
+                <span>{uniformScale ? "Uniform" : "Free"}</span>
+              </button>
+            }
+          >
+            <Row label="Scale X">
+              <Slider
+                ariaLabel="Scale X"
+                value={transform.scaleX}
+                min={0.1}
+                max={5}
+                step={0.05}
+                onChange={(v) => setScale("x", v)}
+                format={(n) => `${n.toFixed(2)}×`}
+              />
+            </Row>
+            <Row label="Scale Y">
+              <Slider
+                ariaLabel="Scale Y"
+                value={transform.scaleY}
+                min={0.1}
+                max={5}
+                step={0.05}
+                onChange={(v) => setScale("y", v)}
+                format={(n) => `${n.toFixed(2)}×`}
+              />
+            </Row>
+          </Section>
+
+          <SectionDivider />
+
+          <Section title="Z-order">
+            <div className="grid grid-cols-2 gap-2">
+              <ActionButton
+                ariaLabel="Send to back"
+                onClick={() => moveZ("back-all")}
+                fullWidth
+              >
+                <ChevronsDown className="w-4 h-4" />
+                <span>To back</span>
+              </ActionButton>
+              <ActionButton
+                ariaLabel="Send backward"
+                onClick={() => moveZ("back-1")}
+                fullWidth
+              >
+                <ArrowDown className="w-4 h-4" />
+                <span>Backward</span>
+              </ActionButton>
+              <ActionButton
+                ariaLabel="Bring forward"
+                onClick={() => moveZ("front-1")}
+                fullWidth
+              >
+                <ArrowUp className="w-4 h-4" />
+                <span>Forward</span>
+              </ActionButton>
+              <ActionButton
+                ariaLabel="Bring to front"
+                onClick={() => moveZ("front-all")}
+                fullWidth
+              >
+                <ChevronsUp className="w-4 h-4" />
+                <span>To front</span>
+              </ActionButton>
+            </div>
+          </Section>
+        </>
+      )}
+    </div>
+  );
+
+  if (inline) {
+    return body;
+  }
+
   return (
     <PanelDrawer
       open={open}
-      onClose={onClose}
+      onClose={onClose ?? (() => {})}
       icon={<Move className="w-5 h-5" strokeWidth={1.75} />}
       title="Position"
       footer={<span>Applied to the whole layer.</span>}
     >
-      <div className="flex-1 overflow-y-auto">
-        {!layer ? (
-          <EmptyState />
-        ) : (
-          <>
-            <Section title="Translate">
-              <div className="grid grid-cols-2 gap-3">
-                <Row label="X">
-                  <NumberInput
-                    ariaLabel="Translate X"
-                    value={transform.x}
-                    step={1}
-                    onChange={(v) => patchTransform({ x: v })}
-                  />
-                </Row>
-                <Row label="Y">
-                  <NumberInput
-                    ariaLabel="Translate Y"
-                    value={transform.y}
-                    step={1}
-                    onChange={(v) => patchTransform({ y: v })}
-                  />
-                </Row>
-              </div>
-            </Section>
-
-            <SectionDivider />
-
-            <Section title="Rotate">
-              <Row label="Angle">
-                <Slider
-                  ariaLabel="Rotation"
-                  value={normaliseDeg(transform.rotation)}
-                  min={0}
-                  max={360}
-                  step={1}
-                  onChange={(v) => patchTransform({ rotation: v })}
-                  format={(n) => `${n.toFixed(0)}°`}
-                />
-              </Row>
-              <Row label="Snap">
-                <div className="flex flex-wrap gap-2">
-                  {[0, 90, 180, 270].map((deg) => (
-                    <ActionButton
-                      key={deg}
-                      ariaLabel={`Snap to ${deg} degrees`}
-                      onClick={() => snapRotation(deg)}
-                    >
-                      {deg}°
-                    </ActionButton>
-                  ))}
-                </div>
-              </Row>
-            </Section>
-
-            <SectionDivider />
-
-            <Section
-              title="Scale"
-              right={
-                <button
-                  type="button"
-                  onClick={() => setUniformScale((s) => !s)}
-                  className="inline-flex items-center gap-1 text-[11px]"
-                  style={{ color: "var(--pe-text-muted)" }}
-                  aria-pressed={uniformScale}
-                  aria-label="Lock uniform scale"
-                  title="Lock uniform scale"
-                >
-                  {uniformScale ? (
-                    <Lock className="w-3 h-3" />
-                  ) : (
-                    <Unlock className="w-3 h-3" />
-                  )}
-                  <span>{uniformScale ? "Uniform" : "Free"}</span>
-                </button>
-              }
-            >
-              <Row label="Scale X">
-                <Slider
-                  ariaLabel="Scale X"
-                  value={transform.scaleX}
-                  min={0.1}
-                  max={5}
-                  step={0.05}
-                  onChange={(v) => setScale("x", v)}
-                  format={(n) => `${n.toFixed(2)}×`}
-                />
-              </Row>
-              <Row label="Scale Y">
-                <Slider
-                  ariaLabel="Scale Y"
-                  value={transform.scaleY}
-                  min={0.1}
-                  max={5}
-                  step={0.05}
-                  onChange={(v) => setScale("y", v)}
-                  format={(n) => `${n.toFixed(2)}×`}
-                />
-              </Row>
-            </Section>
-
-            <SectionDivider />
-
-            <Section title="Z-order">
-              <div className="grid grid-cols-2 gap-2">
-                <ActionButton
-                  ariaLabel="Send to back"
-                  onClick={() => moveZ("back-all")}
-                  fullWidth
-                >
-                  <ChevronsDown className="w-4 h-4" />
-                  <span>To back</span>
-                </ActionButton>
-                <ActionButton
-                  ariaLabel="Send backward"
-                  onClick={() => moveZ("back-1")}
-                  fullWidth
-                >
-                  <ArrowDown className="w-4 h-4" />
-                  <span>Backward</span>
-                </ActionButton>
-                <ActionButton
-                  ariaLabel="Bring forward"
-                  onClick={() => moveZ("front-1")}
-                  fullWidth
-                >
-                  <ArrowUp className="w-4 h-4" />
-                  <span>Forward</span>
-                </ActionButton>
-                <ActionButton
-                  ariaLabel="Bring to front"
-                  onClick={() => moveZ("front-all")}
-                  fullWidth
-                >
-                  <ChevronsUp className="w-4 h-4" />
-                  <span>To front</span>
-                </ActionButton>
-              </div>
-            </Section>
-          </>
-        )}
-      </div>
+      {body}
     </PanelDrawer>
   );
 }

@@ -48,8 +48,17 @@ import {
 import { loadGoogleFont } from "@/lib/photo-editor/fonts/load-google-font";
 
 interface FormatPanelProps {
-  open: boolean;
-  onClose: () => void;
+  /** Drawer open state — ignored when `inline` is set. */
+  open?: boolean;
+  /** Drawer close handler — ignored when `inline` is set. */
+  onClose?: () => void;
+  /** When true, render body without PanelDrawer chrome (used by the
+   *  bottom tab strip in BottomDock). The Spacing section is omitted
+   *  in inline mode because the new tab strip surfaces letter-spacing
+   *  and line-height through a dedicated Spacing tab. Defaults to
+   *  false (legacy drawer renders the full content including
+   *  Spacing). */
+  inline?: boolean;
 }
 
 const ALIGN_OPTIONS = [
@@ -59,14 +68,22 @@ const ALIGN_OPTIONS = [
   { value: "justify" as const, label: <AlignJustify className="w-4 h-4" />, ariaLabel: "Justify" },
 ] as const;
 
-export function FormatPanel({ open, onClose }: FormatPanelProps) {
+export function FormatPanel({
+  open = false,
+  onClose,
+  inline = false,
+}: FormatPanelProps) {
   const tool = useTextTool();
   // Lazy-load the Google catalogue when the panel first opens so the
   // Bold / Italic toggles can resolve a variant. Stays cached for the
-  // session via loadCatalogue's own memoisation.
+  // session via loadCatalogue's own memoisation. In inline mode the
+  // panel is mounted as soon as Format becomes the active tab — same
+  // loader trigger; we just substitute `inline` for `open` because the
+  // drawer's `open` prop isn't supplied in that context.
   const [catalogue, setCatalogue] = useState<FontCatalogue | null>(null);
   useEffect(() => {
-    if (!open || catalogue !== null) return;
+    const shouldLoad = open || inline;
+    if (!shouldLoad || catalogue !== null) return;
     let cancelled = false;
     loadCatalogue()
       .then((c) => {
@@ -79,7 +96,7 @@ export function FormatPanel({ open, onClose }: FormatPanelProps) {
     return () => {
       cancelled = true;
     };
-  }, [open, catalogue]);
+  }, [open, inline, catalogue]);
 
   const layer = tool.layer;
   const align = layer?.styling.align ?? "left";
@@ -143,10 +160,111 @@ export function FormatPanel({ open, onClose }: FormatPanelProps) {
     tool.patchRuns({ decoration: composeDecoration(hasUnderline, nextS) });
   }
 
+  const body = (
+    <div className="flex-1 overflow-y-auto">
+      {!layer ? (
+        <EmptyState />
+      ) : (
+        <>
+          <Section title="Alignment">
+            <Segmented
+              ariaLabel="Text alignment"
+              value={align}
+              options={ALIGN_OPTIONS}
+              onChange={(next) => tool.patchStyling({ align: next })}
+            />
+          </Section>
+
+          <SectionDivider />
+
+          <Section title="Style">
+            <div className="flex items-center gap-2">
+              <ToggleButton
+                active={isBold}
+                onClick={() => void toggleBold()}
+                label="Bold"
+              >
+                <span style={{ fontWeight: 700 }}>B</span>
+              </ToggleButton>
+              <ToggleButton
+                active={isItalic}
+                onClick={() => void toggleItalic()}
+                label="Italic"
+              >
+                <span style={{ fontStyle: "italic", fontWeight: 600 }}>I</span>
+              </ToggleButton>
+              <ToggleButton
+                active={hasUnderline}
+                onClick={toggleUnderline}
+                label="Underline"
+              >
+                <span style={{ textDecoration: "underline", fontWeight: 600 }}>
+                  U
+                </span>
+              </ToggleButton>
+              <ToggleButton
+                active={hasStrike}
+                onClick={toggleStrike}
+                label="Strikethrough"
+              >
+                <span
+                  style={{ textDecoration: "line-through", fontWeight: 600 }}
+                >
+                  S
+                </span>
+              </ToggleButton>
+            </div>
+          </Section>
+
+          {/* Spacing section — only in legacy drawer mode. The inline
+              tab strip surfaces letter-spacing + line-height through a
+              dedicated Spacing tab (see SpacingPanel.tsx), so showing
+              the controls here too would be redundant. */}
+          {!inline ? (
+            <>
+              <SectionDivider />
+
+              <Section title="Spacing">
+                <DimmedWhen disabled={false}>
+                  <Row label="Letter spacing">
+                    <Slider
+                      ariaLabel="Letter spacing"
+                      value={letterSpacing}
+                      min={-5}
+                      max={30}
+                      step={0.5}
+                      onChange={(v) => tool.patchStyling({ letterSpacing: v })}
+                      format={(n) => `${n.toFixed(1)} px`}
+                    />
+                  </Row>
+                  <Row label="Line height">
+                    <Slider
+                      ariaLabel="Line height"
+                      value={lineHeight}
+                      min={0.8}
+                      max={3}
+                      step={0.05}
+                      onChange={(v) => tool.patchStyling({ lineHeight: v })}
+                      format={(n) => `${n.toFixed(2)}×`}
+                    />
+                  </Row>
+                </DimmedWhen>
+              </Section>
+            </>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+
+  if (inline) {
+    return body;
+  }
+
   return (
     <PanelDrawer
       open={open}
-      onClose={onClose}
+      onClose={onClose ?? (() => {})}
       icon={<FormatIcon className="w-5 h-5" strokeWidth={1.75} />}
       title="Format"
       footer={
@@ -157,92 +275,7 @@ export function FormatPanel({ open, onClose }: FormatPanelProps) {
         )
       }
     >
-      <div className="flex-1 overflow-y-auto">
-        {!layer ? (
-          <EmptyState />
-        ) : (
-          <>
-            <Section title="Alignment">
-              <Segmented
-                ariaLabel="Text alignment"
-                value={align}
-                options={ALIGN_OPTIONS}
-                onChange={(next) => tool.patchStyling({ align: next })}
-              />
-            </Section>
-
-            <SectionDivider />
-
-            <Section title="Style">
-              <div className="flex items-center gap-2">
-                <ToggleButton
-                  active={isBold}
-                  onClick={() => void toggleBold()}
-                  label="Bold"
-                >
-                  <span style={{ fontWeight: 700 }}>B</span>
-                </ToggleButton>
-                <ToggleButton
-                  active={isItalic}
-                  onClick={() => void toggleItalic()}
-                  label="Italic"
-                >
-                  <span style={{ fontStyle: "italic", fontWeight: 600 }}>I</span>
-                </ToggleButton>
-                <ToggleButton
-                  active={hasUnderline}
-                  onClick={toggleUnderline}
-                  label="Underline"
-                >
-                  <span style={{ textDecoration: "underline", fontWeight: 600 }}>
-                    U
-                  </span>
-                </ToggleButton>
-                <ToggleButton
-                  active={hasStrike}
-                  onClick={toggleStrike}
-                  label="Strikethrough"
-                >
-                  <span
-                    style={{ textDecoration: "line-through", fontWeight: 600 }}
-                  >
-                    S
-                  </span>
-                </ToggleButton>
-              </div>
-            </Section>
-
-            <SectionDivider />
-
-            <Section title="Spacing">
-              <DimmedWhen disabled={false}>
-                <Row label="Letter spacing">
-                  <Slider
-                    ariaLabel="Letter spacing"
-                    value={letterSpacing}
-                    min={-5}
-                    max={30}
-                    step={0.5}
-                    onChange={(v) => tool.patchStyling({ letterSpacing: v })}
-                    format={(n) => `${n.toFixed(1)} px`}
-                  />
-                </Row>
-                <Row label="Line height">
-                  <Slider
-                    ariaLabel="Line height"
-                    value={lineHeight}
-                    min={0.8}
-                    max={3}
-                    step={0.05}
-                    onChange={(v) => tool.patchStyling({ lineHeight: v })}
-                    format={(n) => `${n.toFixed(2)}×`}
-                  />
-                </Row>
-              </DimmedWhen>
-            </Section>
-          </>
-        )}
-      </div>
+      {body}
     </PanelDrawer>
   );
 }
