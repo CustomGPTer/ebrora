@@ -42,17 +42,9 @@ import { FlipRotateTool } from "./tools/FlipRotateTool";
 import { ResizeTool } from "./tools/ResizeTool";
 import { EffectsTool } from "./tools/EffectsTool";
 import { LayersPanel } from "./layers/LayersPanel";
-import { FontPanel } from "./fonts/FontPanel";
 import { StickerPanel } from "./stickers/StickerPanel";
 import { ShapePanel } from "./shapes/ShapePanel";
-import { FormatPanel } from "./text-tools/FormatPanel";
-import { ColorPanel } from "./text-tools/ColorPanel";
-import { StrokePanel } from "./text-tools/StrokePanel";
-import { HighlightPanel } from "./text-tools/HighlightPanel";
-import { ShadowPanel } from "./text-tools/ShadowPanel";
-import { PositionPanel } from "./text-tools/PositionPanel";
 import { EraseTool } from "./erase/EraseTool";
-import { ExportPanel } from "./export/ExportPanel";
 import { ProjectsModal } from "./projects/ProjectsModal";
 import { SaveProjectDialog } from "./projects/SaveProjectDialog";
 import { SaveAndSharePage } from "./save-and-share/SaveAndSharePage";
@@ -62,12 +54,7 @@ import {
   useMobileEdit,
 } from "./context/MobileEditContext";
 import { SmartGuidesProvider } from "./canvas/SmartGuidesContext";
-import { ImageStrokePanel } from "./text-tools/ImageStrokePanel";
-import { ImageAdjustPanel } from "./text-tools/ImageAdjustPanel";
-import { ImageFilterPanel } from "./text-tools/ImageFilterPanel";
-import { ImageBlurPanel } from "./text-tools/ImageBlurPanel";
-import { OpacityPanel } from "./text-tools/OpacityPanel";
-import { PerspectivePanel } from "./text-tools/PerspectivePanel";
+import { LayerEffectsTool } from "./tools/LayerEffectsTool";
 import { loadAllCustomFonts } from "@/lib/photo-editor/fonts/custom-fonts-db";
 import {
   loadProject as loadProjectRecord,
@@ -87,26 +74,32 @@ import {
 import type { SavedProject } from "@/lib/photo-editor/types";
 
 /** Every right-side panel the editor can show. Single-slot — only one
- *  may be open at a time. */
+ *  may be open at a time.
+ *
+ *  Membership is driven by what UI elements actually dispatch a value
+ *  to this slot. Post-I (FontPanel inline migration):
+ *    layers   — toggleLayersPanel (top bar / nav)
+ *    stickers — AddLayerSheet + bg dock
+ *    shapes   — AddLayerSheet + bg dock
+ *    erase    — text Erase tab launcher
+ *    effects  — image Effects tab launcher (Batch E)
+ *
+ *  Earlier batches' members removed in D3 (text/shape/image now use
+ *  inline TabStrip + PropertyPanelHost): format, stroke, image-stroke,
+ *  highlight, shadow, perspective, opacity. Plus "export" — the
+ *  ExportPanel.tsx file became orphaned when SaveAndSharePage replaced
+ *  the legacy drawer flow in Batch A.
+ *
+ *  Removed in H (sticker migrated to inline strip): color, position.
+ *
+ *  Removed in I (FontPanel grew an inline? prop, text Font tab no
+ *  longer launches a drawer): fonts. */
 export type ActivePanel =
   | "layers"
-  | "fonts"
   | "stickers"
   | "shapes"
-  | "format"
-  | "color"
-  | "stroke"
-  | "image-stroke"
-  | "image-adjust"
-  | "image-filter"
-  | "image-blur"
-  | "highlight"
-  | "shadow"
-  | "position"
-  | "perspective"
-  | "opacity"
   | "erase"
-  | "export"
+  | "effects"
   | null;
 
 /** Full-screen modals. Includes layer-crop (the per-image-layer crop
@@ -158,6 +151,9 @@ function EditorShellInner({
   );
 
   const [addSheetOpen, setAddSheetOpen] = useState(false);
+  // Batch A — shared ref to the "+" button in the top bar so the
+  // AddLayerSheet popover can anchor itself directly underneath it.
+  const addAnchorRef = useRef<HTMLButtonElement>(null);
 
   // Batch 7 — Save and Share full-screen page (destination of the
   // top-bar arrow). Mounted at the modal layer, z-[290]; sits above
@@ -484,6 +480,7 @@ function EditorShellInner({
         layersOpen={activePanel === "layers"}
         onOpenSaveAndShare={() => setSaveAndShareOpen(true)}
         saved={savedProjectId !== null}
+        addAnchorRef={addAnchorRef}
       />
 
       {saveErrorMessage && (
@@ -543,46 +540,27 @@ function EditorShellInner({
         onClose={() => setAddSheetOpen(false)}
         onOpenPanel={openPanel}
         onStub={showToast}
+        anchorRef={addAnchorRef}
       />
 
       <BottomEditDrawer />
 
-      {/* Right-side overlays */}
+      {/* Right-side overlays — only kinds still dispatched by UI
+          live here post-I. Color/position migrated to inline in H,
+          fonts migrated in I. The format/stroke/image-stroke/highlight/
+          shadow/perspective/opacity panels migrated to inline mounts
+          inside BottomDock (Batches C/D1/D2c/E2). ExportPanel was
+          orphaned by Batch A's SaveAndSharePage. */}
       <LayersPanel open={activePanel === "layers"} onClose={closePanel} />
-      <FontPanel open={activePanel === "fonts"} onClose={closePanel} />
       <StickerPanel open={activePanel === "stickers"} onClose={closePanel} />
       <ShapePanel open={activePanel === "shapes"} onClose={closePanel} />
-      <FormatPanel open={activePanel === "format"} onClose={closePanel} />
-      <ColorPanel open={activePanel === "color"} onClose={closePanel} />
-      <StrokePanel open={activePanel === "stroke"} onClose={closePanel} />
-      <HighlightPanel open={activePanel === "highlight"} onClose={closePanel} />
-      <ShadowPanel open={activePanel === "shadow"} onClose={closePanel} />
-      <PositionPanel open={activePanel === "position"} onClose={closePanel} />
-      <ImageStrokePanel
-        open={activePanel === "image-stroke"}
-        onClose={closePanel}
-      />
-      <ImageAdjustPanel
-        open={activePanel === "image-adjust"}
-        onClose={closePanel}
-      />
-      <ImageFilterPanel
-        open={activePanel === "image-filter"}
-        onClose={closePanel}
-      />
-      <ImageBlurPanel
-        open={activePanel === "image-blur"}
-        onClose={closePanel}
-      />
-      <PerspectivePanel
-        open={activePanel === "perspective"}
-        onClose={closePanel}
-      />
-      <OpacityPanel open={activePanel === "opacity"} onClose={closePanel} />
-      <ExportPanel open={activePanel === "export"} onClose={closePanel} />
 
       {/* Full-screen modals */}
       <EraseTool open={activePanel === "erase"} onClose={closePanel} />
+      <LayerEffectsTool
+        open={activePanel === "effects"}
+        onClose={closePanel}
+      />
 
       <CropTool
         open={backgroundTool === "crop"}
