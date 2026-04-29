@@ -39,11 +39,20 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Image as KonvaImage } from "react-konva";
+import { Image as KonvaImage, Shape as KonvaShape } from "react-konva";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { layoutText, renderTextToCanvas } from "@/lib/photo-editor/rich-text/engine";
 import { applyEraseStrokes } from "@/lib/photo-editor/canvas/erase-render";
+import {
+  computeBentBounds,
+  createBendContext,
+} from "@/lib/photo-editor/rich-text/bend";
+import { getTextureMap } from "@/lib/photo-editor/rich-text/textures";
+import {
+  isIdentityPerspective,
+  renderPerspectiveImage,
+} from "@/lib/photo-editor/canvas/perspective-render";
 import type { Transform } from "@/lib/photo-editor/types";
 import type { TextLayer } from "@/lib/photo-editor/types";
 
@@ -89,6 +98,7 @@ export function RichTextNode({
   onTransformEnd,
 }: RichTextNodeProps) {
   const imageRef = useRef<Konva.Image>(null);
+  const shapeRef = useRef<Konva.Shape>(null);
 
   // Lazy off-screen canvas — created once on mount, reused for every
   // repaint of this layer. We keep it in state so the Konva Image's
@@ -107,10 +117,60 @@ export function RichTextNode({
     // editorReducer creates a new layer object on every UPDATE_LAYER.
   }, [layer]);
 
+  // Extent of the painted area in layer-local coords. Without bend or
+  // background this is just (0, 0)→(layout.width, layout.height). With
+  // bend, the text arcs above the baseline (∩) or below it (∪) and its
+  // chord narrows from the wrap width. With background enabled, the
+  // underlay rectangle extends padding beyond the text bbox. We union
+  // every contributing region so the bitmap always fits everything,
+  // while still including layer-local (0, 0) so the transform anchor
+  // stays correct (offsetX/offsetY below depend on this).
+  const extent = useMemo(() => {
+    let minX = 0;
+    let minY = 0;
+    let maxX = layout.width;
+    let maxY = layout.height;
+
+    const bend = createBendContext(
+      layer.styling.bend?.amount ?? 0,
+      layer.width
+    );
+    if (bend) {
+      const b = computeBentBounds(bend, layout);
+      minX = Math.min(minX, b.minX);
+      minY = Math.min(minY, b.minY);
+      maxX = Math.max(maxX, b.maxX);
+      maxY = Math.max(maxY, b.maxY);
+    }
+
+    const bg = layer.background;
+    if (bg?.enabled) {
+      minX = Math.min(minX, -bg.widthDelta);
+      minY = Math.min(minY, -bg.heightDelta);
+      maxX = Math.max(maxX, layout.width + bg.widthDelta);
+      maxY = Math.max(maxY, layout.height + bg.heightDelta);
+    }
+
+    return { minX, minY, maxX, maxY };
+  }, [layer, layout]);
+
   // Logical (CSS-pixel) dimensions of the off-screen canvas, including
   // padding so heavy strokes / shadows / italic overhang don't clip.
-  const logicalW = Math.max(1, Math.ceil(layout.width + RENDER_PADDING * 2));
-  const logicalH = Math.max(1, Math.ceil(layout.height + RENDER_PADDING * 2));
+  const logicalW = Math.max(
+    1,
+    Math.ceil(extent.maxX - extent.minX + RENDER_PADDING * 2)
+  );
+  const logicalH = Math.max(
+    1,
+    Math.ceil(extent.maxY - extent.minY + RENDER_PADDING * 2)
+  );
+
+  // Where layer-local (0, 0) sits inside the bitmap. For the flat case
+  // this is (PAD, PAD) — same as before. For bent text where the apex
+  // pokes above y=0 or the chord starts left of x=0, this shifts so the
+  // entire bent extent fits with PAD on every side.
+  const anchorX = RENDER_PADDING - extent.minX;
+  const anchorY = RENDER_PADDING - extent.minY;
 
   // Paint the off-screen canvas. Runs whenever the layer changes (which
   // means the layout changed too, since layout is derived from layer).
@@ -125,13 +185,37 @@ export function RichTextNode({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, logicalW, logicalH);
 
-    // Translate into the padding region so layer-local (0,0) sits at
-    // (PAD, PAD) on the bitmap. The Konva Image is then offset by -PAD
-    // so the layer's transform.x/y still corresponds to the layer's
-    // logical top-left, not the bitmap's top-left.
+    // Translate so layer-local (0, 0) lands at the anchor pixel. Bent
+    // text painted at negative layer-local y still lands inside the
+    // bitmap because anchorY accounts for that.
     ctx.save();
-    ctx.translate(RENDER_PADDING, RENDER_PADDING);
-    renderTextToCanvas(ctx, layer, layout);
+    ctx.translate(anchorX, anchorY);
+
+    // Background rect underlay — paints first so glyphs sit on top.
+    // Sized to (layout.width × layout.height) expanded by the deltas
+    // on each side. Round corners are layer-level (one rounded rect
+    // around the whole text), not glyph-accurate (decision per Q3 in
+    // D2a notes). When bend is active, this rect is around the FLAT
+    // layout — bent glyphs may extend outside the rect at the apex.
+    const bg = layer.background;
+    if (bg?.enabled) {
+      const x = -bg.widthDelta;
+      const y = -bg.heightDelta;
+      const w = layout.width + bg.widthDelta * 2;
+      const h = layout.height + bg.heightDelta * 2;
+      const rad = Math.max(
+        0,
+        Math.min(bg.roundCorner, Math.min(w, h) / 2)
+      );
+      ctx.save();
+      ctx.globalAlpha = clamp01Local(bg.opacity);
+      ctx.fillStyle = bg.color;
+      paintRoundedRect(ctx, x, y, w, h, rad);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    renderTextToCanvas(ctx, layer, layout, { textures: getTextureMap() });
     // Erase pass — destination-out paint of every stroke in the layer's
     // `erase` array. Stored points are in layer-local space (no padding),
     // and we're already inside the padding-translated context, so the
@@ -143,30 +227,110 @@ export function RichTextNode({
 
     // Force Konva to re-read the canvas pixels. Without this, mutating
     // the existing canvas in place doesn't trigger a redraw because the
-    // `image` prop reference is unchanged.
-    imageRef.current?.getLayer()?.batchDraw();
-  }, [offscreen, layer, layout, logicalW, logicalH]);
+    // `image` prop reference is unchanged. Either node may be the
+    // active one depending on whether perspective is set.
+    (imageRef.current ?? shapeRef.current)?.getLayer()?.batchDraw();
+  }, [offscreen, layer, layout, logicalW, logicalH, anchorX, anchorY]);
 
   if (!offscreen) return null;
 
+  // Shared event handler props — identical between the plain and
+  // perspective branches. Lifted into a single object so the two JSX
+  // returns don't drift.
+  const sharedHandlers = {
+    onMouseDown: (e: KonvaEventObject<MouseEvent>) => onSelect(isAdditive(e)),
+    onTouchStart: (e: KonvaEventObject<TouchEvent>) => onSelect(isAdditive(e)),
+    onDragMove: (e: KonvaEventObject<DragEvent>) => {
+      if (!onDragMove) return;
+      const node = e.target;
+      onDragMove(node.x(), node.y(), node);
+    },
+    onDragEnd: (e: KonvaEventObject<DragEvent>) =>
+      onDragEnd(e.target.x(), e.target.y()),
+    onTransformEnd: (e: KonvaEventObject<Event>) => {
+      const node = e.target;
+      onTransformEnd({
+        x: node.x(),
+        y: node.y(),
+        scaleX: node.scaleX(),
+        scaleY: node.scaleY(),
+        rotation: node.rotation(),
+        skewX: node.skewX(),
+        skewY: node.skewY(),
+      });
+    },
+  };
+
+  // Decide which path to render via. Identity perspective short-circuits
+  // to the plain KonvaImage (cheaper, no triangle subdivision). null also
+  // takes that path.
+  const W = layout.width;
+  const H = layout.height;
+  const usePerspective =
+    layer.perspective !== null &&
+    !isIdentityPerspective(layer.perspective, W, H);
+
+  // ── Plain (un-warped) path ──────────────────────────────────────
+  if (!usePerspective) {
+    return (
+      <KonvaImage
+        ref={imageRef}
+        // The id matches the layer id so SelectionFrame.findOne(`#<id>`)
+        // resolves to this Konva node.
+        id={layer.id}
+        name="pe-layer pe-layer-text"
+        image={offscreen}
+        // Transform.x/y is the layer's logical top-left on the canvas.
+        // The bitmap is logicalW × logicalH (text extent + padding), and
+        // (anchorX, anchorY) inside the bitmap is layer-local (0, 0), so
+        // we offset by (anchorX, anchorY) to keep the visible text
+        // anchored at the layer's transform.x / transform.y.
+        x={layer.transform.x}
+        y={layer.transform.y}
+        offsetX={anchorX}
+        offsetY={anchorY}
+        width={logicalW}
+        height={logicalH}
+        scaleX={layer.transform.scaleX}
+        scaleY={layer.transform.scaleY}
+        rotation={layer.transform.rotation}
+        skewX={layer.transform.skewX}
+        skewY={layer.transform.skewY}
+        visible={layer.visible}
+        opacity={layer.opacity}
+        // Suppress drag while inline-editing (legacy desktop runSelection
+        // path). Mobile tap-to-edit doesn't set `editing`, so drag stays
+        // available while the BottomEditDrawer is open — the user can
+        // reposition the layer with one finger while the keyboard is up.
+        draggable={draggable && !editing}
+        {...sharedHandlers}
+      />
+    );
+  }
+
+  // ── Perspective path ────────────────────────────────────────────
+  // Destination corners are in layer-local coords ((0, 0) → (W, H) is
+  // the flat layout bbox). The sceneFunc warps the layer-local sub-
+  // region of the off-screen bitmap (offset by anchorX/anchorY in
+  // bitmap coords) onto those four corners. Layer-local (0, 0) lands
+  // at the shape's local origin, so layer.transform.x / .y still
+  // anchors where the layer top-left sits on the stage — no offsetX /
+  // offsetY needed on the shape.
+  //
+  // KNOWN LIMITATION: bend's apex outside the layer-local bbox + the
+  // background rect's padding outside that bbox both clip during the
+  // perspective phase. We pull from (anchorX, anchorY, W, H) — anything
+  // beyond is not warped. Documented in BATCH-D2C-NOTES.md gotchas.
+  const corners = layer.perspective!;
   return (
-    <KonvaImage
-      ref={imageRef}
-      // The id matches the layer id so SelectionFrame.findOne(`#<id>`)
-      // resolves to this Konva node.
+    <KonvaShape
+      ref={shapeRef}
       id={layer.id}
       name="pe-layer pe-layer-text"
-      image={offscreen}
-      // Transform.x/y is the layer's logical top-left on the canvas. The
-      // bitmap is logicalW × logicalH (text + padding), so we offset by
-      // -RENDER_PADDING in image coords to keep the visible text
-      // anchored at the layer's transform.x / transform.y.
       x={layer.transform.x}
       y={layer.transform.y}
-      offsetX={RENDER_PADDING}
-      offsetY={RENDER_PADDING}
-      width={logicalW}
-      height={logicalH}
+      width={W}
+      height={H}
       scaleX={layer.transform.scaleX}
       scaleY={layer.transform.scaleY}
       rotation={layer.transform.rotation}
@@ -174,31 +338,22 @@ export function RichTextNode({
       skewY={layer.transform.skewY}
       visible={layer.visible}
       opacity={layer.opacity}
-      // Suppress drag while inline-editing (legacy desktop runSelection
-      // path). Mobile tap-to-edit doesn't set `editing`, so drag stays
-      // available while the BottomEditDrawer is open — the user can
-      // reposition the layer with one finger while the keyboard is up.
       draggable={draggable && !editing}
-      onMouseDown={(e) => onSelect(isAdditive(e))}
-      onTouchStart={(e) => onSelect(isAdditive(e))}
-      onDragMove={(e) => {
-        if (!onDragMove) return;
-        const node = e.target;
-        onDragMove(node.x(), node.y(), node);
+      sceneFunc={(konvaCtx) => {
+        const ctx = (konvaCtx as unknown as { _context: CanvasRenderingContext2D })
+          ._context;
+        renderPerspectiveImage(
+          ctx,
+          offscreen,
+          W,
+          H,
+          corners,
+          undefined,
+          anchorX,
+          anchorY,
+        );
       }}
-      onDragEnd={(e) => onDragEnd(e.target.x(), e.target.y())}
-      onTransformEnd={(e) => {
-        const node = e.target;
-        onTransformEnd({
-          x: node.x(),
-          y: node.y(),
-          scaleX: node.scaleX(),
-          scaleY: node.scaleY(),
-          rotation: node.rotation(),
-          skewX: node.skewX(),
-          skewY: node.skewY(),
-        });
-      }}
+      {...sharedHandlers}
     />
   );
 }
@@ -211,4 +366,42 @@ function isAdditive(e: KonvaEventObject<MouseEvent | TouchEvent>): boolean {
   // long-press for context menu.
   if ("touches" in evt) return false;
   return evt.metaKey || evt.ctrlKey || evt.shiftKey;
+}
+
+/** Path a rounded rectangle. Falls back to ctx.roundRect when available
+ *  (Chromium / iOS 16+); otherwise hand-paths arc corners. Doesn't fill
+ *  or stroke — caller picks the paint operation. */
+function paintRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+): void {
+  if (typeof (ctx as unknown as { roundRect?: unknown }).roundRect === "function") {
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & {
+      roundRect(x: number, y: number, w: number, h: number, r: number): void;
+    }).roundRect(x, y, w, h, r);
+    return;
+  }
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function clamp01Local(n: number): number {
+  if (!Number.isFinite(n)) return 0;
+  if (n < 0) return 0;
+  if (n > 1) return 1;
+  return n;
 }

@@ -1,7 +1,7 @@
 // src/components/photo-editor/canvas/SelectionTools.tsx
 //
 // Per-selection contextual UI — DOM overlay above the canvas. Renders
-// six action icons positioned at the corners and edges of the selected
+// action icons positioned at the corners and edges of the selected
 // layer's bbox:
 //
 //     [✕]            [↕]            [⟳]
@@ -10,14 +10,20 @@
 //     [⇄]            ‹bbox›
 //      │                             │
 //      └─────────────────────────────┘
-//                   [⧉]            [⤡]
+//     [⌨ ]*          [⧉]            [⤡]
 //
-//   • ✕  top-left      Delete            (tap)
-//   • ↕  top-centre    Flip vertical     (tap)
-//   • ⟳  top-right     Rotate            (drag — pointer rotates the layer)
-//   • ⇄  middle-left   Flip horizontal   (tap)
-//   • ⧉  bottom-centre Duplicate         (tap)
-//   • ⤡  bottom-right  Resize            (drag — locked aspect ratio)
+//   • ✕   top-left      Delete            (tap)
+//   • ↕   top-centre    Flip vertical     (tap)
+//   • ⟳   top-right     Rotate            (drag — pointer rotates the layer)
+//   • ⇄   middle-left   Flip horizontal   (tap)
+//   • ⌨   bottom-left   Edit text         (tap — text layers only)
+//   • ⧉   bottom-centre Duplicate         (tap)
+//   • ⤡   bottom-right  Resize            (drag — locked aspect ratio)
+//
+// The keyboard handle (bottom-left) is text-only and opens the
+// BottomEditDrawer for the selected layer in non-fresh mode (existing
+// runs preserved). Added in Batch A — Apr 2026 — to match the
+// reference Add-Text-on-Photo app's selection chrome.
 //
 // Drag math runs in DOM-pixel space because we receive pointer client
 // coords directly. The layer's geometric centre (in DOM coords) is the
@@ -32,6 +38,7 @@ import {
   Copy,
   FlipHorizontal,
   FlipVertical,
+  Keyboard,
   Maximize2 as ResizeIcon,
   RotateCw,
   X,
@@ -58,7 +65,8 @@ export function SelectionTools({
   stageScale,
 }: SelectionToolsProps) {
   const { state, dispatch, stageRef } = useEditor();
-  const { state: mobileEdit } = useMobileEdit();
+  const { state: mobileEdit, beginEditing, focusForKeyboardPop } =
+    useMobileEdit();
 
   const [tick, setTick] = useState(0);
 
@@ -399,6 +407,16 @@ export function SelectionTools({
   const bottomMidX = (geom.bl.x + geom.br.x) / 2;
   const bottomMidY = (geom.bl.y + geom.br.y) / 2;
 
+  // Batch A — text layers get a keyboard handle at bottom-left that
+  // opens the BottomEditDrawer for inline typing. Matches the
+  // reference Add-Text-on-Photo app's selection chrome.
+  const isText = selectedLayer.kind === "text";
+  const onOpenKeyboard = () => {
+    if (!selectedLayer) return;
+    focusForKeyboardPop();
+    beginEditing(selectedLayer.id, { isFresh: false });
+  };
+
   return (
     <>
       <CornerBtn
@@ -441,6 +459,17 @@ export function SelectionTools({
       >
         <FlipHorizontal className="w-4 h-4" strokeWidth={2.25} />
       </CornerBtn>
+
+      {isText && (
+        <CornerBtn
+          x={geom.bl.x}
+          y={geom.bl.y}
+          ariaLabel="Edit text"
+          onClick={onOpenKeyboard}
+        >
+          <Keyboard className="w-4 h-4" strokeWidth={2.25} />
+        </CornerBtn>
+      )}
 
       <CornerBtn
         x={bottomMidX}
