@@ -1,13 +1,26 @@
 // src/components/photo-editor/fonts/FontPanel.tsx
 //
-// Slide-in font picker panel — same right-side overlay pattern as
-// LayersPanel, full-bleed sheet on mobile, 360px max on lg+. The
-// EditorShell owns open/close state via its `activePanel` discriminator
-// so opening the Font panel automatically closes the Layers panel and
-// vice-versa.
+// Font picker — supports two modes:
 //
-// Layout (top → bottom):
-//   • Header: title + close button
+//   1. Inline mode (`inline` prop) — used by BottomDock's TextEditPanel
+//      from Batch I (Apr 2026) onward. Renders just the inner stack
+//      (search + tabs + body + footer) inside a flex-col container
+//      with bounded height. The component still owns its open-state-
+//      independent logic (lazy catalogue load, font selection, etc.);
+//      it just doesn't render its own slide-in chrome.
+//
+//   2. Drawer mode (default) — slide-in right-side overlay matching
+//      LayersPanel's chrome, full-bleed sheet on mobile, 360px max
+//      on lg+. Used when EditorShell mounted FontPanel via the
+//      `activePanel === "fonts"` discriminator. Post-Batch I no UI
+//      surface dispatches "fonts" anymore (the text Font tab went
+//      inline), so the drawer mode is effectively orphaned in
+//      practice — kept for API safety in case Jon re-uses it later
+//      and so this batch doesn't have to also delete the drawer
+//      mount in a single sweep.
+//
+// Layout (top → bottom, both modes):
+//   • Header (drawer mode only): title + close button
 //   • Search input
 //   • Category tabs
 //   • Body — depends on the active tab:
@@ -62,11 +75,20 @@ import {
 import type { AnyLayer, TextLayer } from "@/lib/photo-editor/types";
 
 interface FontPanelProps {
-  open: boolean;
-  onClose: () => void;
+  /** Drawer open state — ignored when `inline` is set. */
+  open?: boolean;
+  /** Drawer close handler — ignored when `inline` is set. */
+  onClose?: () => void;
+  /** Render the inner content directly, without slide-in drawer chrome.
+   *  Used by BottomDock's TextEditPanel for the Font tab body. */
+  inline?: boolean;
 }
 
-export function FontPanel({ open, onClose }: FontPanelProps) {
+export function FontPanel({
+  open = false,
+  onClose,
+  inline = false,
+}: FontPanelProps) {
   const { state, dispatch } = useEditor();
   const [activeTab, setActiveTab] = useState<FontPanelTab>("all");
   const [query, setQuery] = useState("");
@@ -74,10 +96,16 @@ export function FontPanel({ open, onClose }: FontPanelProps) {
   const [catalogueError, setCatalogueError] = useState<string | null>(null);
   const [loadingFamily, setLoadingFamily] = useState<string | null>(null);
 
-  // Lazy catalogue fetch — runs the first time the panel opens, then
-  // memoised by loadCatalogue itself for the rest of the session.
+  // In inline mode the panel renders unconditionally inside the dock,
+  // so the catalogue should fetch on mount. In drawer mode it should
+  // only fetch when the panel is opened (lazy first-open).
+  const shouldFetchCatalogue = inline || open;
+
+  // Lazy catalogue fetch — runs the first time the panel opens (or on
+  // mount in inline mode), then memoised by loadCatalogue itself for
+  // the rest of the session.
   useEffect(() => {
-    if (!open) return;
+    if (!shouldFetchCatalogue) return;
     if (catalogue !== null) return;
     if (catalogueError !== null) return;
     let cancelled = false;
@@ -94,17 +122,20 @@ export function FontPanel({ open, onClose }: FontPanelProps) {
     return () => {
       cancelled = true;
     };
-  }, [open, catalogue, catalogueError]);
+  }, [shouldFetchCatalogue, catalogue, catalogueError]);
 
-  // Close on Escape.
+  // Close on Escape — drawer mode only; inline has no close action.
   useEffect(() => {
+    if (inline) return;
     if (!open) return;
+    if (!onClose) return;
+    const handler = onClose;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handler();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [inline, open, onClose]);
 
   // Resolve the selected text layer (if exactly one is selected and is
   // a text layer). Drives the active-row checkmark + whether selection
@@ -304,6 +335,102 @@ export function FontPanel({ open, onClose }: FontPanelProps) {
     }`;
   }
 
+  // Inner content stack shared by both modes — search input (Google
+  // tabs only) + category tabs + selection hint + body + footer.
+  const innerStack = (
+    <>
+      {/* Search — visible on Google catalogue tabs only */}
+      {isGoogleTab ? (
+        <div
+          className="flex-none px-3 py-2"
+          style={{ borderBottom: "1px solid var(--pe-border)" }}
+        >
+          <div
+            className="flex items-center gap-2 px-3 rounded-full"
+            style={{
+              height: 36,
+              background: "var(--pe-surface-2)",
+              border: "1px solid var(--pe-border)",
+            }}
+          >
+            <Search
+              className="w-4 h-4 flex-none"
+              strokeWidth={2}
+              style={{ color: "var(--pe-text-subtle)" }}
+            />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search fonts"
+              aria-label="Search fonts"
+              className="flex-1 bg-transparent border-0 outline-none text-sm"
+              style={{
+                color: "var(--pe-text)",
+              }}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {/* Tabs */}
+      <FontCategoryTabs
+        active={activeTab}
+        onChange={setActiveTab}
+        catalogue={catalogue}
+      />
+
+      {/* Hint when no text layer is selected */}
+      {selectedTextLayer === null && isGoogleTab ? (
+        <div
+          className="flex-none px-4 py-2 text-xs text-center"
+          style={{
+            background: "var(--pe-surface-2)",
+            color: "var(--pe-text-muted)",
+            borderBottom: "1px solid var(--pe-border)",
+          }}
+        >
+          Select a text layer to apply a font.
+        </div>
+      ) : null}
+
+      {/* Body */}
+      {body}
+
+      {/* Footer */}
+      <div
+        className="flex-none px-4 py-3 text-xs"
+        style={{
+          borderTop: "1px solid var(--pe-border)",
+          color: "var(--pe-text-subtle)",
+        }}
+      >
+        {footerText}
+      </div>
+    </>
+  );
+
+  // ─── Inline mode ─────────────────────────────────────────────────
+  // Renders the inner stack inside a bounded flex-col container so
+  // VirtualFontList's `flex-1 overflow-y-auto` has a height reference.
+  // 55vh is enough for ~8 font rows with comfortable scroll headroom
+  // while leaving the canvas visible above the dock.
+  if (inline) {
+    return (
+      <div
+        className="flex flex-col rounded-lg overflow-hidden"
+        style={{
+          height: "55vh",
+          background: "var(--pe-surface)",
+          border: "1px solid var(--pe-border)",
+        }}
+      >
+        {innerStack}
+      </div>
+    );
+  }
+
+  // ─── Drawer mode ─────────────────────────────────────────────────
   return (
     <>
       {/* Backdrop */}
@@ -364,74 +491,7 @@ export function FontPanel({ open, onClose }: FontPanelProps) {
           </button>
         </div>
 
-        {/* Search — visible on Google catalogue tabs only */}
-        {isGoogleTab ? (
-          <div
-            className="flex-none px-3 py-2"
-            style={{ borderBottom: "1px solid var(--pe-border)" }}
-          >
-            <div
-              className="flex items-center gap-2 px-3 rounded-full"
-              style={{
-                height: 36,
-                background: "var(--pe-surface-2)",
-                border: "1px solid var(--pe-border)",
-              }}
-            >
-              <Search
-                className="w-4 h-4 flex-none"
-                strokeWidth={2}
-                style={{ color: "var(--pe-text-subtle)" }}
-              />
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search fonts"
-                aria-label="Search fonts"
-                className="flex-1 bg-transparent border-0 outline-none text-sm"
-                style={{
-                  color: "var(--pe-text)",
-                }}
-              />
-            </div>
-          </div>
-        ) : null}
-
-        {/* Tabs */}
-        <FontCategoryTabs
-          active={activeTab}
-          onChange={setActiveTab}
-          catalogue={catalogue}
-        />
-
-        {/* Hint when no text layer is selected */}
-        {selectedTextLayer === null && isGoogleTab ? (
-          <div
-            className="flex-none px-4 py-2 text-xs text-center"
-            style={{
-              background: "var(--pe-surface-2)",
-              color: "var(--pe-text-muted)",
-              borderBottom: "1px solid var(--pe-border)",
-            }}
-          >
-            Select a text layer to apply a font.
-          </div>
-        ) : null}
-
-        {/* Body */}
-        {body}
-
-        {/* Footer */}
-        <div
-          className="flex-none px-4 py-3 text-xs"
-          style={{
-            borderTop: "1px solid var(--pe-border)",
-            color: "var(--pe-text-subtle)",
-          }}
-        >
-          {footerText}
-        </div>
+        {innerStack}
       </aside>
     </>
   );

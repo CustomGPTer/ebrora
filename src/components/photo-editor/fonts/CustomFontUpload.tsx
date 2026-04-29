@@ -1,12 +1,11 @@
 // src/components/photo-editor/fonts/CustomFontUpload.tsx
 //
-// Custom-fonts tab body. Three states:
+// Custom-fonts tab body. Two states:
 //
-//   • Loading the session — spinner.
-//   • Free user — Upgrade CTA pointing at /pricing. No upload UI.
-//   • Paid user — Upload control, list of previously-uploaded fonts,
-//     each with a Delete button. Tapping a row applies that font to the
-//     active layer (same dispatch path as the Google catalogue rows).
+//   • Empty — friendly hint plus the upload control.
+//   • Has uploads — list of previously-uploaded fonts, each with a
+//     Delete button. Tapping a row applies that font to the active
+//     layer (same dispatch path as the Google catalogue rows).
 //
 // Upload pipeline:
 //   1. User picks a .ttf / .otf via <input type="file">.
@@ -20,12 +19,15 @@
 // Variant defaults to "regular" — Session 4 doesn't surface an upload-
 // time variant chooser; the user can re-upload the same family with a
 // different filename if they want different weights.
+//
+// Batch A — Apr 2026: removed the paid-tier paywall. Custom font
+// upload is now available to every user (no PRO features inside the
+// editor).
 
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Sparkles, Trash2, Upload } from "lucide-react";
-import { usePaidToolAccess } from "@/hooks/usePaidToolAccess";
+import { Loader2, Trash2, Upload } from "lucide-react";
 import {
   addCustomFont,
   customFontId,
@@ -60,7 +62,6 @@ export function CustomFontUpload({
   canApplyToLayer,
   onApply,
 }: CustomFontUploadProps) {
-  const { isPaid, isLoading: sessionLoading } = usePaidToolAccess();
   const customFonts = useCustomFonts();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [bringUpDone, setBringUpDone] = useState(false);
@@ -129,70 +130,6 @@ export function CustomFontUpload({
     } catch (err) {
       console.warn("[photo-editor] custom font removal failed", err);
     }
-  }
-
-  if (sessionLoading) {
-    return (
-      <div
-        className="flex-1 flex items-center justify-center"
-        style={{ color: "var(--pe-text-subtle)" }}
-      >
-        <Loader2 className="w-5 h-5 animate-spin" strokeWidth={2} />
-      </div>
-    );
-  }
-
-  if (!isPaid) {
-    return (
-      <div className="flex-1 flex items-center justify-center px-6">
-        <div
-          className="w-full max-w-sm flex flex-col items-center text-center gap-3 py-8"
-        >
-          <div
-            className="w-14 h-14 rounded-full inline-flex items-center justify-center"
-            style={{ background: "var(--pe-tool-icon-active-bg)" }}
-          >
-            <Sparkles
-              className="w-6 h-6"
-              strokeWidth={1.75}
-              style={{ color: "var(--pe-accent)" }}
-            />
-          </div>
-          <div
-            className="text-base font-semibold"
-            style={{ color: "var(--pe-text)" }}
-          >
-            Upload your own fonts
-          </div>
-          <div
-            className="text-sm"
-            style={{ color: "var(--pe-text-muted)" }}
-          >
-            Custom <span className="font-medium">.ttf</span> /{" "}
-            <span className="font-medium">.otf</span> upload is included with
-            any paid plan, alongside watermark-free exports.
-          </div>
-          <a
-            href="/pricing"
-            className="mt-2 inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-semibold transition-colors"
-            style={{
-              background: "var(--pe-accent)",
-              color: "var(--pe-accent-fg)",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background =
-                "var(--pe-accent-hover)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background =
-                "var(--pe-accent)";
-            }}
-          >
-            See plans
-          </a>
-        </div>
-      </div>
-    );
   }
 
   return (
