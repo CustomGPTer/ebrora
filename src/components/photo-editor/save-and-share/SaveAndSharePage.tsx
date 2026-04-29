@@ -5,7 +5,7 @@
 // reference Add Text app's Save and Share view:
 //
 //   ┌──────────────────────────────────────┐
-//   │  ←   Save and Share        [Try PRO] │
+//   │  ←   Save and Share                  │
 //   ├──────────────────────────────────────┤
 //   │           ┌──────────┐                │
 //   │           │ preview  │                │
@@ -19,7 +19,7 @@
 //   │   └──────────────────────────────┘    │
 //   │                                       │
 //   │   Save                                │
-//   │   ┌─Project─┐ ┌─Image─┐ ┌─PDF (PRO)─┐ │
+//   │   ┌─Project─┐ ┌─Image─┐ ┌──PDF──┐    │
 //   └──────────────────────────────────────┘
 //
 // Behaviour:
@@ -34,13 +34,16 @@
 //     download in the same session.
 //   • Image tap renders the project at 1× through the existing
 //     /lib/photo-editor/export pipeline and downloads via downloadBlob.
-//   • PDF tap is gated behind any active paid tier (matches the "PRO"
-//     badge on the reference). Free users see the badge and tapping
-//     navigates to /pricing.
+//   • PDF tap renders the canvas to a PDF via canvasToPdfBlob and
+//     downloads it. Available to all users — Batch A removed the paid
+//     gate (no PRO features inside the editor).
 //   • Share To uses navigator.share({ files: [pngFile] }) where the
 //     Web Share API supports it, with a download fallback otherwise.
-//   • The "Try PRO" chip in the top-right reuses the existing
-//     SubscribeChip (label override), so it auto-hides for paid users.
+//
+// Batch A — Apr 2026: stripped all PRO gating from this page. The
+// SubscribeChip (Try PRO) chip in the header is gone, the paid-only
+// PDF lock is gone, and PdfUpgradeTile / usePaidToolAccess are no
+// longer used here.
 //
 // Keep this file self-contained (no new lib functions) — every
 // rendering / encoding step delegates to the export pipeline that the
@@ -56,14 +59,10 @@ import {
   FileText,
   Image as ImageIcon,
   Loader2,
-  Lock,
   Save,
   Share2,
 } from "lucide-react";
-import Link from "next/link";
 import { useEditor } from "../context/EditorContext";
-import { SubscribeChip } from "../toolbar/SubscribeChip";
-import { usePaidToolAccess } from "@/hooks/usePaidToolAccess";
 import {
   collectImageSources,
   loadExportImages,
@@ -104,7 +103,6 @@ export function SaveAndSharePage({
 }: SaveAndSharePageProps) {
   const { state } = useEditor();
   const { project } = state;
-  const { isPaid } = usePaidToolAccess();
 
   const isTransparent = project.background.kind === "transparent";
 
@@ -261,7 +259,6 @@ export function SaveAndSharePage({
   }
 
   async function handlePdfDownload() {
-    if (!isPaid) return; // Free users use the Link variant; programmatic taps no-op.
     if (pdfBusy) return;
     setPdfBusy(true);
     try {
@@ -350,9 +347,10 @@ export function SaveAndSharePage({
         >
           Save and Share
         </span>
-        <div className="min-w-10 h-10 flex items-center justify-end pr-1">
-          <SubscribeChip label="Try PRO" compact />
-        </div>
+        {/* Empty spacer to keep the title visually centred against
+         *  the back button on the left. Previously held a Try PRO
+         *  chip — removed in Batch A. */}
+        <div className="w-10 h-10" aria-hidden />
       </div>
 
       {/* Body — scrolls if it overflows on short viewports */}
@@ -478,22 +476,18 @@ export function SaveAndSharePage({
             onClick={handleImageDownload}
             busy={imageBusy}
           />
-          {isPaid ? (
-            <SaveTile
-              icon={
-                <FileText
-                  className="w-5 h-5"
-                  strokeWidth={1.75}
-                  aria-hidden
-                />
-              }
-              label="PDF"
-              onClick={handlePdfDownload}
-              busy={pdfBusy}
-            />
-          ) : (
-            <PdfUpgradeTile />
-          )}
+          <SaveTile
+            icon={
+              <FileText
+                className="w-5 h-5"
+                strokeWidth={1.75}
+                aria-hidden
+              />
+            }
+            label="PDF"
+            onClick={handlePdfDownload}
+            busy={pdfBusy}
+          />
         </div>
       </div>
     </div>
@@ -623,33 +617,5 @@ function SaveTile({
       )}
       <span className="text-[13px] font-medium">{label}</span>
     </button>
-  );
-}
-
-function PdfUpgradeTile() {
-  return (
-    <Link
-      href="/pricing"
-      className="relative flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-2xl transition-opacity"
-      style={{
-        background: "var(--pe-surface)",
-        border: "1px solid var(--pe-border)",
-        color: "var(--pe-text-subtle)",
-      }}
-      aria-label="PDF export — paid plan required. Tap to upgrade."
-    >
-      <span
-        className="absolute top-1.5 right-1.5 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide"
-        style={{
-          background: "#1B5B50",
-          color: "#FFFFFF",
-        }}
-      >
-        <Lock className="w-2.5 h-2.5" strokeWidth={3} aria-hidden />
-        PRO
-      </span>
-      <FileText className="w-5 h-5" strokeWidth={1.75} aria-hidden />
-      <span className="text-[13px] font-medium">PDF</span>
-    </Link>
   );
 }
