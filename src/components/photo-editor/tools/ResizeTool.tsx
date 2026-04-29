@@ -1,18 +1,34 @@
 // src/components/photo-editor/tools/ResizeTool.tsx
 //
-// Full-screen modal for resizing the project canvas. Provides:
-//   • Live preview of current canvas dimensions
-//   • Preset buttons for common social-media aspect ratios
+// Compact dialog for resizing the project canvas. Provides:
+//   • Live preview rectangle of current draft dimensions
+//   • Aspect-ratio lock toggle (default ON — V3 §13 G/Q3)
 //   • Custom W × H inputs
-//   • Apply on ✓ dispatches RESIZE_CANVAS (existing reducer action)
+//   • Preset buttons for common social-media aspect ratios
+//   • Apply on the green button dispatches RESIZE_CANVAS
+//   • Cancel / X / Escape / backdrop-tap revert
+//
+// Batch G — Apr 2026:
+//   Refactored from a full-screen ToolModal takeover to the new
+//   Dialog primitive (centred card with semi-transparent backdrop).
+//   The reasoning: resize is a low-density action — a dozen-ish
+//   widgets — that doesn't need full-screen real estate. The smaller
+//   modal lets the user see the canvas behind the dialog as they
+//   adjust dimensions, which is the right UX for "what aspect ratio
+//   do I want my canvas to be?".
+//
+//   Also added the aspect-lock toggle. When on (the default),
+//   editing one dimension auto-adjusts the other to preserve the
+//   current draft ratio. When off, both dimensions edit independently.
+//   Tapping a preset always sets both at once and bypasses the lock.
 //
 // What "resize" does in this engine: changes project.width and
 // project.height. The background photo (if any) re-fits to the new
 // dimensions on the next render — no scaling of layer transforms.
 // That matches the reference Add Text app's behaviour: resizing the
 // canvas leaves layers in place, so a 1080×1080 layer at (200, 200)
-// stays at (200, 200) after resizing to 1080×1920 (now closer to
-// the top of the canvas instead of centred).
+// stays at (200, 200) after resizing to 1080×1920 (now closer to the
+// top of the canvas instead of centred).
 //
 // Aspect ratio presets (matching common Instagram / TikTok / story
 // formats most Ebrora users will recognise):
@@ -20,16 +36,17 @@
 //   • Portrait      1080 × 1350   (Instagram portrait, 4:5)
 //   • Story         1080 × 1920   (Instagram story, 9:16)
 //   • Landscape     1920 × 1080   (16:9)
-//   • Site board    1080 × 1080   default for blank canvases
-//   • Custom        user-entered
+//   • Post 4:3      1200 × 900
+//   • Wide 16:9     1600 × 900
 //
-// Custom WxH inputs are clamped to MAX_CANVAS_DIMENSION (8000) and
+// Custom W×H inputs are clamped to MAX_CANVAS_DIMENSION (8000) and
 // minimum 100 px to keep history snapshots sane.
 
 "use client";
 
 import { useEffect, useState } from "react";
-import { ToolModal } from "./ToolModal";
+import { Lock, Unlock } from "lucide-react";
+import { Dialog, DialogCancelButton, DialogApplyButton } from "./Dialog";
 import { useEditor } from "../context/EditorContext";
 import { MAX_CANVAS_DIMENSION } from "@/lib/photo-editor/types";
 
@@ -60,17 +77,28 @@ export function ResizeTool({ open, onClose }: ResizeToolProps) {
   const { state, dispatch } = useEditor();
   const project = state.project;
 
-  // Local draft — only committed on Apply (✓). Cancel reverts.
+  // Local draft — only committed on Apply. Cancel / backdrop reverts.
   const [draftW, setDraftW] = useState<number>(project.width);
   const [draftH, setDraftH] = useState<number>(project.height);
 
-  // Sync the draft from the project whenever the modal opens. Without
+  // Aspect-lock toggle. Per V3 §13 G/Q3 the default is ON — most
+  // common use is proportional resize. The user can toggle off to
+  // change aspect ratio manually, or tap a preset (which always
+  // bypasses the lock).
+  const [aspectLocked, setAspectLocked] = useState<boolean>(true);
+
+  // Sync the draft from the project whenever the dialog opens. Without
   // this the previous editing session's draft would leak into a fresh
   // open after the user switched projects.
   useEffect(() => {
     if (!open) return;
     setDraftW(project.width);
     setDraftH(project.height);
+    // Re-default the lock to ON each open. If the user opens a 1080x1080
+    // canvas, the lock starts on (proportional resizing). If they
+    // unlock to change ratio, that unlocks state isn't remembered
+    // across opens — opinionated default that's safer for quick edits.
+    setAspectLocked(true);
   }, [open, project.width, project.height]);
 
   if (!open) return null;
@@ -86,7 +114,31 @@ export function ResizeTool({ open, onClose }: ResizeToolProps) {
     onClose();
   }
 
+  function handleWidthChange(next: number) {
+    if (aspectLocked && draftW > 0 && draftH > 0) {
+      const ratio = draftH / draftW;
+      const newH = clampDim(Math.round(next * ratio));
+      setDraftW(next);
+      setDraftH(newH);
+    } else {
+      setDraftW(next);
+    }
+  }
+
+  function handleHeightChange(next: number) {
+    if (aspectLocked && draftW > 0 && draftH > 0) {
+      const ratio = draftW / draftH;
+      const newW = clampDim(Math.round(next * ratio));
+      setDraftH(next);
+      setDraftW(newW);
+    } else {
+      setDraftH(next);
+    }
+  }
+
   function applyPreset(p: Preset) {
+    // Presets always set both dimensions atomically — bypasses the
+    // aspect lock since the user explicitly chose a target shape.
     setDraftW(p.width);
     setDraftH(p.height);
   }
@@ -97,97 +149,138 @@ export function ResizeTool({ open, onClose }: ResizeToolProps) {
   )?.id;
 
   return (
-    <ToolModal
+    <Dialog
       open={open}
-      title="Resize"
+      title="Resize canvas"
       onCancel={onClose}
-      onApply={handleApply}
+      maxWidthClass="max-w-md"
+      footer={
+        <>
+          <DialogCancelButton onClick={onClose}>Cancel</DialogCancelButton>
+          <DialogApplyButton onClick={handleApply}>Apply</DialogApplyButton>
+        </>
+      }
     >
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-6 overflow-y-auto">
-        {/* Live preview rectangle — visualises the new aspect ratio */}
-        <div
-          className="rounded-lg flex items-center justify-center mb-6"
-          style={{
-            width: previewWidth(draftW, draftH),
-            height: previewHeight(draftW, draftH),
-            background: "rgba(255,255,255,0.06)",
-            border: "2px dashed rgba(255,255,255,0.30)",
-            transition: "width 0.15s, height 0.15s",
-          }}
-        >
-          <span
-            className="text-sm tabular-nums"
-            style={{ color: "rgba(255,255,255,0.7)" }}
+      <div className="px-4 py-4 space-y-5">
+        {/* Live preview rectangle ─────────────────────────────── */}
+        <div className="flex items-center justify-center">
+          <div
+            className="rounded-lg flex items-center justify-center"
+            style={{
+              width: previewWidth(draftW, draftH),
+              height: previewHeight(draftW, draftH),
+              background: "var(--pe-surface-2)",
+              border: "2px dashed var(--pe-border-strong)",
+              transition: "width 0.15s, height 0.15s",
+            }}
           >
-            {draftW} × {draftH}
-          </span>
+            <span
+              className="text-sm tabular-nums"
+              style={{ color: "var(--pe-text-muted)" }}
+            >
+              {draftW} × {draftH}
+            </span>
+          </div>
         </div>
 
-        <div className="w-full max-w-md space-y-5">
-          {/* Custom W × H inputs ───────────────────────────── */}
-          <div>
-            <div
-              className="text-xs uppercase tracking-wider font-semibold mb-2"
-              style={{ color: "rgba(255,255,255,0.5)" }}
+        {/* Custom W × H inputs + aspect lock ───────────────────── */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span
+              className="text-xs uppercase tracking-wider font-semibold"
+              style={{ color: "var(--pe-text-muted)" }}
             >
               Custom size
-            </div>
-            <div className="flex items-center gap-2">
-              <DimensionInput
-                label="W"
-                value={draftW}
-                onChange={setDraftW}
-              />
-              <span style={{ color: "rgba(255,255,255,0.5)" }}>×</span>
-              <DimensionInput
-                label="H"
-                value={draftH}
-                onChange={setDraftH}
-              />
-            </div>
-          </div>
-
-          {/* Preset buttons ──────────────────────────────────── */}
-          <div>
-            <div
-              className="text-xs uppercase tracking-wider font-semibold mb-2"
-              style={{ color: "rgba(255,255,255,0.5)" }}
+            </span>
+            <button
+              type="button"
+              onClick={() => setAspectLocked((v) => !v)}
+              aria-pressed={aspectLocked}
+              aria-label={
+                aspectLocked
+                  ? "Unlock aspect ratio"
+                  : "Lock aspect ratio"
+              }
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
+              style={{
+                background: aspectLocked
+                  ? "var(--pe-accent)"
+                  : "var(--pe-surface-2)",
+                color: aspectLocked ? "#FFFFFF" : "var(--pe-text-muted)",
+                border: aspectLocked
+                  ? "1px solid var(--pe-accent)"
+                  : "1px solid var(--pe-border-strong)",
+              }}
             >
-              Presets
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {PRESETS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => applyPreset(p)}
-                  className="text-left px-3 py-2.5 rounded-lg transition-colors"
+              {aspectLocked ? (
+                <Lock className="w-3 h-3" strokeWidth={2} />
+              ) : (
+                <Unlock className="w-3 h-3" strokeWidth={2} />
+              )}
+              <span>{aspectLocked ? "Locked" : "Free"}</span>
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <DimensionInput
+              label="W"
+              value={draftW}
+              onChange={handleWidthChange}
+            />
+            <span style={{ color: "var(--pe-text-muted)" }}>×</span>
+            <DimensionInput
+              label="H"
+              value={draftH}
+              onChange={handleHeightChange}
+            />
+          </div>
+        </div>
+
+        {/* Preset buttons ───────────────────────────────────────── */}
+        <div>
+          <div
+            className="text-xs uppercase tracking-wider font-semibold mb-2"
+            style={{ color: "var(--pe-text-muted)" }}
+          >
+            Presets
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {PRESETS.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => applyPreset(p)}
+                className="text-left px-3 py-2 rounded-lg transition-colors"
+                style={{
+                  background:
+                    activePresetId === p.id
+                      ? "var(--pe-accent)"
+                      : "var(--pe-surface-2)",
+                  border:
+                    activePresetId === p.id
+                      ? "1px solid var(--pe-accent)"
+                      : "1px solid var(--pe-border-strong)",
+                  color:
+                    activePresetId === p.id ? "#FFFFFF" : "var(--pe-text)",
+                }}
+              >
+                <div className="text-sm font-medium">{p.label}</div>
+                <div
+                  className="text-[11px] tabular-nums mt-0.5"
                   style={{
-                    background:
+                    color:
                       activePresetId === p.id
-                        ? "rgba(27, 91, 80, 0.40)"
-                        : "rgba(255,255,255,0.06)",
-                    border:
-                      activePresetId === p.id
-                        ? "1px solid #4ECDC4"
-                        : "1px solid rgba(255,255,255,0.10)",
-                    color: "#FFFFFF",
+                        ? "rgba(255,255,255,0.85)"
+                        : "var(--pe-text-muted)",
                   }}
                 >
-                  <div className="text-sm font-medium">{p.label}</div>
-                  <div
-                    className="text-[11px] tabular-nums mt-0.5"
-                    style={{ color: "rgba(255,255,255,0.6)" }}
-                  >
-                    {p.width} × {p.height}
-                  </div>
-                </button>
-              ))}
-            </div>
+                  {p.width} × {p.height}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       </div>
-    </ToolModal>
+    </Dialog>
   );
 }
 
@@ -203,15 +296,16 @@ function DimensionInput({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg"
+    <div
+      className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg"
       style={{
-        background: "rgba(255,255,255,0.08)",
-        border: "1px solid rgba(255,255,255,0.12)",
+        background: "var(--pe-surface-2)",
+        border: "1px solid var(--pe-border-strong)",
       }}
     >
       <span
         className="text-xs font-semibold"
-        style={{ color: "rgba(255,255,255,0.6)" }}
+        style={{ color: "var(--pe-text-muted)" }}
       >
         {label}
       </span>
@@ -232,7 +326,7 @@ function DimensionInput({
           onChange(next);
         }}
         className="flex-1 bg-transparent outline-none text-base tabular-nums"
-        style={{ color: "#FFFFFF" }}
+        style={{ color: "var(--pe-text)" }}
       />
     </div>
   );
@@ -246,15 +340,16 @@ function clampDim(n: number): number {
 }
 
 /** Width of the preview rect — scales to fit a max envelope while
- *  preserving the draft aspect ratio. */
+ *  preserving the draft aspect ratio. Smaller envelope (140 vs the
+ *  pre-G 200) suits the more compact dialog. */
 function previewWidth(w: number, h: number): number {
-  const max = 200;
+  const max = 140;
   if (w >= h) return max;
   return Math.round((max * w) / h);
 }
 
 function previewHeight(w: number, h: number): number {
-  const max = 200;
+  const max = 140;
   if (h >= w) return max;
   return Math.round((max * h) / w);
 }
