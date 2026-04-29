@@ -103,13 +103,19 @@ function bilinear(
 
 /** Render an image with a 4-point perspective warp into the given
  *  Canvas2D context. The image is treated as occupying the rectangle
- *  (0, 0, srcWidth, srcHeight) in source space; that rectangle is
+ *  (srcX, srcY, srcWidth, srcHeight) in source space; that rectangle is
  *  warped to the four destination points (in the context's current
  *  coordinate system). The function does NOT save / restore the
  *  context — caller is responsible for ctx.save() before and
  *  ctx.restore() after.
  *
  *  Destination corners must be in TL, TR, BR, BL order.
+ *
+ *  `srcX` / `srcY` default to 0 — backward compatible with the legacy
+ *  ImageNode usage which always warps the whole image. RichTextNode
+ *  passes (anchorX, anchorY) so the warp pulls from the layer-local
+ *  sub-region of its anchor-padded off-screen canvas instead of the
+ *  whole bitmap (which includes RENDER_PADDING / bend-extent / etc).
  *
  *  resolution defaults to MESH_RESOLUTION (16). Pass a smaller value
  *  during interactive drags for cheaper redraws. */
@@ -120,6 +126,8 @@ export function renderPerspectiveImage(
   srcHeight: number,
   destCorners: readonly [Point, Point, Point, Point],
   resolution: number = MESH_RESOLUTION,
+  srcX: number = 0,
+  srcY: number = 0,
 ): void {
   if (srcWidth <= 0 || srcHeight <= 0) return;
   const N = Math.max(2, Math.floor(resolution));
@@ -147,15 +155,13 @@ export function renderPerspectiveImage(
 
   for (let row = 0; row < N; row++) {
     for (let col = 0; col < N; col++) {
-      // Source rectangle for this cell:
-      //   sTL = (col*cellW,        row*cellH)
-      //   sTR = ((col+1)*cellW,    row*cellH)
-      //   sBR = ((col+1)*cellW,    (row+1)*cellH)
-      //   sBL = (col*cellW,        (row+1)*cellH)
-      const sx0 = col * cellW;
-      const sy0 = row * cellH;
-      const sx1 = (col + 1) * cellW;
-      const sy1 = (row + 1) * cellH;
+      // Source rectangle for this cell — origin is (srcX, srcY) so the
+      // warp pulls from a sub-region of the source bitmap when the
+      // caller asks for one (RichTextNode does; ImageNode doesn't).
+      const sx0 = srcX + col * cellW;
+      const sy0 = srcY + row * cellH;
+      const sx1 = srcX + (col + 1) * cellW;
+      const sy1 = srcY + (row + 1) * cellH;
 
       // Destination quad corners for this cell (from precomputed grid).
       const dTL = grid[row][col];
