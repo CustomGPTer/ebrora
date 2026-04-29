@@ -1,10 +1,18 @@
 // src/components/photo-editor/text-tools/ColorSwatches.tsx
 //
-// Curated palette grid. The 24 colours below are tuned for the kind of
+// Curated palette row. The 24 colours below are tuned for the kind of
 // stamps a site / construction-marketing user typically reaches for —
 // strong primaries, an Ebrora green family, a few neutrals, and the
 // extremes (pure black, pure white). When a swatch matches the current
 // `value` we paint the active ring around it.
+//
+// Layout: a single horizontally-scrollable row. Previously this was
+// rendered as a 6-column × 4-row grid, which on a phone took up a lot
+// of vertical real estate inside the property panel (Color, Stroke,
+// Highlight, Shadow, etc.) and pushed the rest of the panel — and the
+// bottom tab strip — off-screen. A single scroll row keeps the panel
+// compact and lets the user flick through the full palette without
+// losing their place in the editor.
 //
 // Used standalone in ColorPanel's Swatches sub-view AND inline by the
 // Stroke / Highlight / Shadow panels for their colour rows.
@@ -16,28 +24,28 @@ import { ColorButton } from "./controls";
 /** 24 curated colours. Order is row-by-row visually pleasant, not
  *  alphabetical or hue-sorted. */
 export const PALETTE: readonly string[] = [
-  // Row 1 — neutrals + Ebrora accent
+  // Neutrals + Ebrora accent
   "#000000",
   "#444444",
   "#888888",
   "#CCCCCC",
   "#FFFFFF",
   "#1B5B50",
-  // Row 2 — warm
+  // Warm
   "#E63946",
   "#F4A261",
   "#FFB703",
   "#FB7185",
   "#D62828",
   "#9D0208",
-  // Row 3 — cool
+  // Cool
   "#1D4ED8",
   "#0EA5E9",
   "#06B6D4",
   "#10B981",
   "#22C55E",
   "#84CC16",
-  // Row 4 — accents
+  // Accents
   "#7C3AED",
   "#A855F7",
   "#EC4899",
@@ -58,16 +66,27 @@ export function ColorSwatches({ value, onPick, size = 28 }: ColorSwatchesProps) 
   const normalised = value ? value.toLowerCase() : null;
   return (
     <div
-      className="grid"
+      className="pe-swatch-row flex items-center gap-2 overflow-x-auto py-1"
       style={{
-        gridTemplateColumns: `repeat(6, minmax(0, 1fr))`,
-        gap: 8,
+        // Hide the scrollbar — Firefox / IE / Edge legacy. Webkit is
+        // handled by the .pe-swatch-row::-webkit-scrollbar rule below.
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+        // Keep horizontal swipes inside this row from triggering page-
+        // level pull / overscroll behaviour on iOS / Android.
+        overscrollBehavior: "contain",
+        WebkitOverflowScrolling: "touch",
       }}
     >
+      <style jsx>{`
+        .pe-swatch-row::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
       {PALETTE.map((c) => {
         const active = normalised === c.toLowerCase();
         return (
-          <div key={c} className="flex items-center justify-center">
+          <div key={c} className="flex-none">
             <ColorButton
               color={c}
               active={active}
