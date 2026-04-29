@@ -15,8 +15,12 @@
 //   • Single shape selected        → "Edit Shape"
 //       Color / Stroke / Position
 //
-// Bottom section: always "Background"
-//   Replace / Effects / Crop / Resize / Flip-Rotate
+// Bottom section: "Background" — only shown when nothing is
+// selected. These actions (Replace / Effects / Crop / Resize /
+// Flip-Rotate) operate on the canvas background image rather than
+// on any layer, so they're hidden the moment the user has a
+// selection (single or multi). To reach them again, the user taps
+// empty canvas / the grey area around it to deselect.
 //
 // Why swap rather than add a third section? Vertical real estate on
 // mobile is precious — adding a section means scrolling, which hides
@@ -269,40 +273,55 @@ export function BottomDock({
         />
       )}
 
-      {/* ── Background section — always present ───────────────── */}
-      <DockSectionHeader title="Background" />
-      <DockRow mode="spread">
-        <DockButton
-          fluid
-          icon={<FilePlus className="w-6 h-6" strokeWidth={1.75} />}
-          label="Replace"
-          onClick={() => replaceBgInputRef.current?.click()}
-        />
-        <DockButton
-          fluid
-          icon={<Wand2 className="w-6 h-6" strokeWidth={1.75} />}
-          label="Effects"
-          onClick={onOpenEffects}
-        />
-        <DockButton
-          fluid
-          icon={<CropIcon className="w-6 h-6" strokeWidth={1.75} />}
-          label="Crop"
-          onClick={onOpenCrop}
-        />
-        <DockButton
-          fluid
-          icon={<ResizeIcon className="w-6 h-6" strokeWidth={1.75} />}
-          label="Resize"
-          onClick={onOpenResize}
-        />
-        <DockButton
-          fluid
-          icon={<RotateCw className="w-6 h-6" strokeWidth={1.75} />}
-          label="Flip/Rotate"
-          onClick={onOpenFlipRotate}
-        />
-      </DockRow>
+      {/* ── Background section — canvas-level tools, only shown
+              when nothing is selected ─────────────────────────────
+          Background actions (Replace / Effects / Crop / Resize /
+          Flip-Rotate) operate on the *canvas background image*, not
+          on any layer, so they're contextually unrelated whenever
+          the user is editing a layer. We hide this whole block —
+          header + row — for both single-selection and multi-select.
+          To reach Background again, the user taps empty canvas (or
+          the grey area around it) to deselect.
+
+          Note: the file <input> below stays mounted unconditionally
+          so the React ref is stable regardless of selection state. */}
+      {state.selection.length === 0 ? (
+        <>
+          <DockSectionHeader title="Background" />
+          <DockRow mode="spread">
+            <DockButton
+              fluid
+              icon={<FilePlus className="w-6 h-6" strokeWidth={1.75} />}
+              label="Replace"
+              onClick={() => replaceBgInputRef.current?.click()}
+            />
+            <DockButton
+              fluid
+              icon={<Wand2 className="w-6 h-6" strokeWidth={1.75} />}
+              label="Effects"
+              onClick={onOpenEffects}
+            />
+            <DockButton
+              fluid
+              icon={<CropIcon className="w-6 h-6" strokeWidth={1.75} />}
+              label="Crop"
+              onClick={onOpenCrop}
+            />
+            <DockButton
+              fluid
+              icon={<ResizeIcon className="w-6 h-6" strokeWidth={1.75} />}
+              label="Resize"
+              onClick={onOpenResize}
+            />
+            <DockButton
+              fluid
+              icon={<RotateCw className="w-6 h-6" strokeWidth={1.75} />}
+              label="Flip/Rotate"
+              onClick={onOpenFlipRotate}
+            />
+          </DockRow>
+        </>
+      ) : null}
 
       <input
         ref={photoLayerInputRef}
