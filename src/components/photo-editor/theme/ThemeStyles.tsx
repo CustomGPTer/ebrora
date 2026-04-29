@@ -18,7 +18,9 @@
 //   --pe-text             primary text colour
 //   --pe-text-muted       secondary text
 //   --pe-text-subtle      tertiary / placeholder text
-//   --pe-accent           brand colour (Ebrora green in light, teal in dark)
+//   --pe-accent           brand colour (Ebrora green — same hue in
+//                         light and dark, just a brighter shade in
+//                         dark mode for readability)
 //   --pe-accent-hover     hover state for accent buttons
 //   --pe-accent-fg        foreground colour to use on accent backgrounds
 //   --pe-toolbar-bg       toolbar surface
@@ -70,14 +72,14 @@ const STYLES = `
   --pe-text: #F3F4F6;
   --pe-text-muted: #9CA3AF;
   --pe-text-subtle: #6B7280;
-  --pe-accent: #4ECDC4;
-  --pe-accent-hover: #6FE3DA;
+  --pe-accent: #4FB89E;
+  --pe-accent-hover: #6FCDB6;
   --pe-accent-fg: #0F1115;
   --pe-toolbar-bg: #181B21;
   --pe-toolbar-border: #2A2F38;
   --pe-tool-icon: #9CA3AF;
-  --pe-tool-icon-active: #4ECDC4;
-  --pe-tool-icon-active-bg: rgba(78, 205, 196, 0.12);
+  --pe-tool-icon-active: #4FB89E;
+  --pe-tool-icon-active-bg: rgba(79, 184, 158, 0.14);
   --pe-shadow: 0 4px 16px rgba(0, 0, 0, 0.40);
   --pe-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.50);
   --pe-overlay: rgba(0, 0, 0, 0.60);
