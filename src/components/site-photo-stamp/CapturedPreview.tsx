@@ -4,8 +4,13 @@
 // downscaled photo with the metadata we extracted (timestamp, location,
 // unique ID) plus the template/variant the user had selected.
 //
-// "Apply stamp" is stubbed here — the real stamp compositor ships in Batch 3.
-// "Retake" discards the capture and returns to the landing screen.
+// Footer actions:
+//   • "Retake"        — discards the capture and returns to landing.
+//   • "Stamp & Next"  — renders + saves to gallery + downloads to device,
+//                       then returns to landing for the next photo.
+//                       Lock state on the template is preserved.
+//   • "Stamp & Share" — renders + saves to gallery, then opens the result
+//                       screen so the user can share / export PDF / etc.
 "use client";
 
 import { useEffect, useState } from "react";
@@ -27,8 +32,13 @@ interface Props {
   template: Template;
   variant: TemplateVariant;
   onRetake: () => void;
-  /** Called with the optional note text when the user taps Apply stamp. */
+  /** Called with the optional note text when the user taps Stamp & Share.
+   *  Renders + saves to gallery, then routes the user to the result screen. */
   onApply: (note: string) => void;
+  /** Called with the optional note text when the user taps Stamp & Next.
+   *  Renders + saves to gallery + triggers a device download, then bounces
+   *  the user back to landing so they can take the next photo. */
+  onApplyAndNext: (note: string) => void;
 
   // ── Sticky-template wiring (Batch 7) ──
   onTemplateChange?: (templateId: TemplateId, variantId: VariantId) => void;
@@ -64,6 +74,7 @@ export default function CapturedPreview({
   variant,
   onRetake,
   onApply,
+  onApplyAndNext,
   onTemplateChange,
   lockedTemplate,
   lockedVariant,
@@ -230,20 +241,27 @@ export default function CapturedPreview({
 
       {/* Action row */}
       <section className="px-4">
-        <div className="flex gap-2.5">
+        <div className="flex gap-2">
           <button
             type="button"
             onClick={onRetake}
-            className="flex-1 py-3.5 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors active:scale-[0.98]"
+            className="flex-1 py-3 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors active:scale-[0.98] whitespace-nowrap"
           >
             Retake
           </button>
           <button
             type="button"
-            onClick={() => onApply(note.trim())}
-            className="flex-1 py-3.5 rounded-xl bg-[#1B5B50] text-white text-sm font-semibold hover:bg-[#144540] transition-colors active:scale-[0.98] shadow-sm"
+            onClick={() => onApplyAndNext(note.trim())}
+            className="flex-1 py-3 rounded-xl bg-white border border-[#1B5B50] text-sm font-semibold text-[#1B5B50] hover:bg-[#1B5B50]/5 transition-colors active:scale-[0.98] whitespace-nowrap"
           >
-            Apply stamp
+            Stamp &amp; Next
+          </button>
+          <button
+            type="button"
+            onClick={() => onApply(note.trim())}
+            className="flex-1 py-3 rounded-xl bg-[#1B5B50] text-white text-sm font-semibold hover:bg-[#144540] transition-colors active:scale-[0.98] shadow-sm whitespace-nowrap"
+          >
+            Stamp &amp; Share
           </button>
         </div>
         <p className="mt-4 text-[11px] text-gray-400 text-center leading-relaxed">

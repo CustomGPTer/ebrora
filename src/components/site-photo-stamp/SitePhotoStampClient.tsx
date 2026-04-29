@@ -31,6 +31,8 @@ import {
   type CaptureStage,
 } from "@/lib/site-photo-stamp/capture";
 import { renderStamp } from "@/lib/site-photo-stamp/stamp-renderer";
+import { reverseGeocode } from "@/lib/site-photo-stamp/geolocation";
+import { buildRecordFilename } from "@/lib/site-photo-stamp/share";
 import {
   saveRecord,
   countRecords,
@@ -323,79 +325,146 @@ export default function SitePhotoStampClient() {
   }, [view]);
 
   // ── Apply stamp ──────────────────────────────────────────────
+  //
+  // Both footer buttons on the captured screen funnel through here:
+  //   • mode "share" — render + save to gallery, route to result screen.
+  //   • mode "next"  — render + save to gallery + download to device, then
+  //                    bounce back to landing for the next photo.
+  //
+  // Either way we give the address one final 1-second window to resolve
+  // before composing the stamp, in case the original geocode failure was
+  // transient and a retry would land an address.
 
-  const applyStamp = useCallback(async (note?: string) => {
-    if (view.kind !== "captured" || rendering) return;
-    const captured = view.captured;
+  const applyStamp = useCallback(
+    async (note?: string, mode: "share" | "next" = "share") => {
+      if (view.kind !== "captured" || rendering) return;
+      const captured = view.captured;
 
-    setRendering(true);
-    try {
-      // Merge user-details settings into the stamp metadata so Project / Site
-      // / Contractor / Operative appear on the stamp when configured.
-      const fullMeta: StampMeta = {
-        templateTitle: resolvedTemplate.title,
-        ...captured.meta,
-        note: note && note.length > 0 ? note : undefined,
-        projectName: settings.projectName || undefined,
-        siteName: settings.siteName || undefined,
-        contractor: settings.contractor || undefined,
-        operative: settings.operative || undefined,
-      };
-      const result = await renderStamp({
-        photoBlob: captured.blob,
-        template: resolvedTemplate,
-        variant: resolvedVariant,
-        meta: fullMeta,
-        settings,
-        tier,
-      });
-      const record: StampedRecord = {
-        id: captured.meta.uniqueId,
-        templateId: resolvedTemplate.id,
-        variantId: resolvedVariant.id,
-        imageBlob: result.blob,
-        thumbnailBlob: result.thumbnailBlob,
-        meta: fullMeta,
-        createdAt: Date.now(),
-      };
-
+      setRendering(true);
       try {
-        await saveRecord(record);
-        setToast("Saved to gallery");
-      } catch (err) {
-        if (err instanceof GalleryFullError) {
-          setToast("Stamped — but gallery is full. Delete old records to auto-save new ones.");
-        } else if (err instanceof QuotaExceededError) {
-          setToast("Stamped — but device storage is full. Save to your camera roll instead.");
-        } else if (err instanceof Error) {
-          setToast(`Stamped, but couldn't save to gallery: ${err.message}`);
-        } else {
-          setToast("Stamped, but couldn't save to gallery.");
+        // ── Late-address grace window ─────────────────────────────
+        // The captured screen only renders after the original geocode has
+        // either succeeded or completely given up, so most of the time
+        // captured.meta.address is already set. When it isn't and we have
+        // coords, race a fresh reverseGeocode against a 1s ceiling so the
+        // user is never made to wait longer than that on a button press.
+        let resolvedAddress = captured.meta.address;
+        if (
+          !resolvedAddress &&
+          captured.meta.lat != null &&
+          captured.meta.lon != null
+        ) {
+          const lateAddress = await Promise.race<string | null>([
+            reverseGeocode(captured.meta.lat, captured.meta.lon).catch(() => null),
+            new Promise<null>((r) => setTimeout(() => r(null), 1000)),
+          ]);
+          if (lateAddress) resolvedAddress = lateAddress;
         }
-      }
 
-      // Refresh the sticky soft-memory and (if live) the lock window, so a
-      // rapid sequence of captures doesn't age out mid-walk.
-      const stickyPatch: Partial<typeof settings> = {
-        ...markUsed(resolvedTemplate.id, resolvedVariant.id),
-      };
-      if (isLockActive(settings)) {
-        Object.assign(
-          stickyPatch,
-          engageLock(resolvedTemplate.id, resolvedVariant.id)
+        // Merge user-details settings into the stamp metadata so Project / Site
+        // / Contractor / Operative appear on the stamp when configured.
+        const fullMeta: StampMeta = {
+          templateTitle: resolvedTemplate.title,
+          ...captured.meta,
+          address: resolvedAddress,
+          note: note && note.length > 0 ? note : undefined,
+          projectName: settings.projectName || undefined,
+          siteName: settings.siteName || undefined,
+          contractor: settings.contractor || undefined,
+          operative: settings.operative || undefined,
+        };
+        const result = await renderStamp({
+          photoBlob: captured.blob,
+          template: resolvedTemplate,
+          variant: resolvedVariant,
+          meta: fullMeta,
+          settings,
+          tier,
+        });
+        const record: StampedRecord = {
+          id: captured.meta.uniqueId,
+          templateId: resolvedTemplate.id,
+          variantId: resolvedVariant.id,
+          imageBlob: result.blob,
+          thumbnailBlob: result.thumbnailBlob,
+          meta: fullMeta,
+          createdAt: Date.now(),
+        };
+
+        // Persist to the in-app gallery. Track the failure separately from
+        // the success path so the mode-specific toasts at the bottom can
+        // reflect either outcome correctly.
+        let saveError: string | null = null;
+        try {
+          await saveRecord(record);
+        } catch (err) {
+          if (err instanceof GalleryFullError) {
+            saveError =
+              "Stamped — but gallery is full. Delete old records to auto-save new ones.";
+          } else if (err instanceof QuotaExceededError) {
+            saveError =
+              "Stamped — but device storage is full. Save to your camera roll instead.";
+          } else if (err instanceof Error) {
+            saveError = `Stamped, but couldn't save to gallery: ${err.message}`;
+          } else {
+            saveError = "Stamped, but couldn't save to gallery.";
+          }
+        }
+
+        // Refresh the sticky soft-memory and (if live) the lock window, so a
+        // rapid sequence of captures doesn't age out mid-walk. This also
+        // preserves the lock when "Stamp & Next" returns to landing.
+        const stickyPatch: Partial<typeof settings> = {
+          ...markUsed(resolvedTemplate.id, resolvedVariant.id),
+        };
+        if (isLockActive(settings)) {
+          Object.assign(
+            stickyPatch,
+            engageLock(resolvedTemplate.id, resolvedVariant.id)
+          );
+        }
+        updateSettings(stickyPatch);
+
+        URL.revokeObjectURL(captured.previewUrl);
+        setGalleryRefresh((n) => n + 1);
+
+        if (mode === "next") {
+          // Trigger a device download of the stamped JPEG, then bounce back
+          // to landing. We swallow any download failure silently — the
+          // gallery save (if it succeeded) is the source of truth.
+          try {
+            const url = URL.createObjectURL(record.imageBlob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = buildRecordFilename(record, "jpg");
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+          } catch {
+            // Download failures are non-fatal here.
+          }
+          setView({ kind: "landing" });
+          setToast(saveError ?? "Stamped & saved");
+        } else {
+          setToast(saveError ?? "Saved to gallery");
+          setView({ kind: "result", stamped: record });
+        }
+      } catch (err) {
+        setToast(
+          err instanceof Error
+            ? err.message
+            : "Stamp rendering failed. Please try again."
         );
+      } finally {
+        setRendering(false);
       }
-      updateSettings(stickyPatch);
+    },
+    [view, rendering, resolvedTemplate, resolvedVariant, tier, settings, updateSettings]
+  );
 
-      URL.revokeObjectURL(captured.previewUrl);
-      setView({ kind: "result", stamped: record });
-      setGalleryRefresh((n) => n + 1);
-    } catch (err) {
-      setToast(err instanceof Error ? err.message : "Stamp rendering failed. Please try again.");
-    } finally {
-      setRendering(false);
-    }
-  }, [view, rendering, resolvedTemplate, resolvedVariant, tier, settings, updateSettings]);
+  const applyAndNext = useCallback(
+    (note: string) => applyStamp(note, "next"),
+    [applyStamp]
+  );
 
   // ── Navigation ───────────────────────────────────────────────
 
@@ -539,6 +608,7 @@ export default function SitePhotoStampClient() {
           variant={resolvedVariant}
           onRetake={discardCaptured}
           onApply={applyStamp}
+          onApplyAndNext={applyAndNext}
           onTemplateChange={pickTemplate}
           lockedTemplate={liveLockedTemplate}
           lockedVariant={liveLockedVariant}
