@@ -120,7 +120,13 @@ export interface GradientFill {
 
 export interface TextureFill {
   enabled: boolean;
-  /** Source image as data URL or remote URL. */
+  /** Texture source identifier. Post-D2b this is a synthetic ID
+   *  (e.g. "brushed-metal", "paper", "noise") that keys into the
+   *  `Map<string, CanvasImageSource>` returned by `getTextureMap()`
+   *  in `rich-text/textures.ts`. The map is built lazily on first
+   *  call. Custom data URLs / remote URLs are not currently
+   *  supported by the engine — the resolver looks up `src` in the
+   *  texture map and falls back to plain fill if absent. */
   src: string;
   /** Texture transform within the glyph mask. */
   scale: number;
@@ -169,6 +175,11 @@ export interface TextLayerStyling {
   letterSpacing: number;
   /** Line height multiplier (1 = font default). */
   lineHeight: number;
+  /** Bend (arc warp) of the text. amount in [-100, 100] where 0 = flat,
+   *  +100 = full upward arch (∩, rainbow), -100 = full downward arch (∪,
+   *  smile). Engine renders each glyph rotated to the arc tangent when
+   *  amount !== 0. New for Batch D2a. */
+  bend: { amount: number };
 }
 
 // ─── Layers ─────────────────────────────────────────────────────
@@ -210,6 +221,34 @@ export interface TextLayer extends BaseLayer {
   runs: GlyphRun[];
   /** Erase brush strokes applied to this text layer (Q4 — Text Behind). */
   erase: EraseStroke[];
+  /** Optional underlay rectangle painted behind the text. Layer-level
+   *  (one rect per text layer, not per glyph — for per-glyph fill behind
+   *  characters use `GlyphRun.highlight` instead). New for Batch D2b. */
+  background: TextBackground;
+  /** Optional 4-point perspective warp applied at render time. null = no
+   *  warp. The corners are in layer-local coords where (0,0) → (W,H) is
+   *  the flat layout bbox. When non-null, RichTextNode renders via a
+   *  KonvaShape sceneFunc that warps the layer-local sub-region of the
+   *  off-screen text bitmap to the four destination points. New for
+   *  Batch D2c. */
+  perspective: [Point, Point, Point, Point] | null;
+}
+
+/** Layer-level rectangle painted behind a TextLayer's glyphs. Sized as
+ *  the flat layout bbox expanded by `widthDelta` / `heightDelta` on each
+ *  side, with `roundCorner` rounded corners. Painted into the same
+ *  off-screen canvas as the glyphs (before them in z-order), so the
+ *  layer's transform applies uniformly to both. */
+export interface TextBackground {
+  enabled: boolean;
+  color: ColorString;
+  opacity: number;
+  /** Corner radius in canvas pixels. */
+  roundCorner: number;
+  /** Padding on the left/right of the text bbox, in canvas pixels. */
+  widthDelta: number;
+  /** Padding on the top/bottom of the text bbox, in canvas pixels. */
+  heightDelta: number;
 }
 
 export interface ImageLayer extends BaseLayer {
