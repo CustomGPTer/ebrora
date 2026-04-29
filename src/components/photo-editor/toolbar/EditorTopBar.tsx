@@ -10,14 +10,12 @@
 //   ⟨    Back            → onExit() (returns to the home / EmptyState)
 //   ⊞    Grid             → toggles state.gridVisible (existing TOGGLE_GRID)
 //   ↶    Undo             → undo() from EditorContext
-//   +    Plus             → onOpenAddSheet() — opens AddLayerSheet
+//   +    Plus             → onOpenAddSheet() — opens the AddLayerSheet
+//                           popover (anchored under this button)
 //   ↷    Redo             → redo() from EditorContext
 //   ⊟    Layers           → toggles activePanel = "layers"
 //   →    Next             → onOpenSaveAndShare() — opens the full-screen
-//                           Save and Share page (Project / Image / PDF /
-//                           Share To). Previously this directly triggered
-//                           Save-to-IndexedDB; users had no way to download
-//                           because the ExportPanel was orphaned.
+//                           Save and Share page
 //
 // Save As / Open Project / Reset Zoom / Theme / Install live behind
 // keyboard shortcuts; the hamburger drawer that owned them previously
@@ -31,10 +29,14 @@
 //   • Saved-state for the Next arrow: the icon flips to a filled circle
 //     when the project is saved (mirrors the reference's filled-state
 //     trailing arrow once a step is "complete")
+//
+// Batch A — Apr 2026: the `+` button now exposes its DOM node via
+// `addAnchorRef` so the AddLayerSheet popover can position itself
+// directly under it (no more full-width modal sheet).
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type RefObject } from "react";
 import {
   ArrowRight,
   ChevronLeft,
@@ -54,9 +56,13 @@ interface EditorTopBarProps {
   /** Open the full-screen Save and Share page. */
   onOpenSaveAndShare: () => void;
   /** Whether the project has been written to IndexedDB at least once.
-   *  Drives the "filled vs outline" Next-arrow visual — mirrors the
-   *  reference's "completed step" treatment. */
+   *  Drives the "filled vs outline" Next-arrow visual. */
   saved: boolean;
+  /** Ref forwarded onto the `+` button so the AddLayerSheet popover
+   *  can anchor itself directly underneath the trigger. Owned by
+   *  EditorShell so both this component and AddLayerSheet receive
+   *  the same ref. */
+  addAnchorRef: RefObject<HTMLButtonElement>;
 }
 
 export function EditorTopBar({
@@ -66,6 +72,7 @@ export function EditorTopBar({
   layersOpen,
   onOpenSaveAndShare,
   saved,
+  addAnchorRef,
 }: EditorTopBarProps) {
   const { state, dispatch, undo, redo, canUndo, canRedo } = useEditor();
 
@@ -115,6 +122,7 @@ export function EditorTopBar({
         icon={<Undo2 className="w-5 h-5" strokeWidth={1.75} />}
       />
       <ChromeIconButton
+        buttonRef={addAnchorRef}
         onClick={onOpenAddSheet}
         ariaLabel="Add new layer"
         icon={<Plus className="w-6 h-6" strokeWidth={2} />}
@@ -138,21 +146,26 @@ export function EditorTopBar({
 
 // ─── Standard top-bar icon button ───────────────────────────────
 
+interface ChromeIconButtonProps {
+  onClick: () => void;
+  ariaLabel: string;
+  icon: React.ReactNode;
+  active?: boolean;
+  disabled?: boolean;
+  buttonRef?: RefObject<HTMLButtonElement | null>;
+}
+
 function ChromeIconButton({
   onClick,
   ariaLabel,
   icon,
   active = false,
   disabled = false,
-}: {
-  onClick: () => void;
-  ariaLabel: string;
-  icon: React.ReactNode;
-  active?: boolean;
-  disabled?: boolean;
-}) {
+  buttonRef,
+}: ChromeIconButtonProps) {
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={onClick}
       disabled={disabled}

@@ -1,32 +1,54 @@
 // src/components/photo-editor/toolbar/AddLayerSheet.tsx
 //
-// Bottom-sheet modal triggered by the "+" button in the editor top bar.
-// Mirrors the dock's Add Layer row — Add Text / Photo / Shape / Sticker
-// / Style — so the action is one tap away regardless of how the user is
-// scrolled or which panel is open.
+// Dropdown popover triggered by the "+" button in the editor top bar.
+// Mirrors the reference Add-Text-on-Photo app's Add Layer popover —
+// a small white card anchored under the trigger with a vertical list
+// of six items:
+//
+//      ┌──────────────────────────┐
+//      │  T  Text                  │
+//      │  ⫷  Style                 │
+//      │  📷+ Photo                │
+//      │  △○ Shape                 │
+//      │  😀 Sticker               │
+//      │  🖼 Background            │
+//      └──────────────────────────┘
 //
 // Behaviour:
-//   • Backdrop tap or Cancel button closes the sheet
-//   • Any action button performs its action AND closes the sheet
-//   • Slides up from the bottom edge with a 200ms transform transition
-//   • Z-index sits above all panel drawers (220) and above the canvas
-//     but below the EraseTool / future Crop modal (which use 300)
+//   • Backdrop tap, Escape key, scroll, or any item tap closes the
+//     popover.
+//   • Any action button performs its action AND closes the popover.
+//   • The card is positioned via `getBoundingClientRect()` on the
+//     anchor ref — top edge sits 8px below the anchor's bottom edge,
+//     right edge aligned with the anchor's right edge so the card
+//     visually "drops out" of the + icon. If the card would overflow
+//     the right viewport edge, we clamp the right edge to 8px from
+//     the viewport edge.
+//   • Z-index 220 — above all panel drawers, below EraseTool / future
+//     Crop modal (which use 300).
 //
-// Batch 3: Add Text now also opens the BottomEditDrawer (via
+// Batch A — Apr 2026: replaced the previous full-width bottom sheet
+// (drag handle, "Try PRO" trailing chip, four-cell tile grid) with
+// this anchored dropdown to match the reference exactly. The five-
+// tile add-layer grid still exists in the BottomDock when no layer
+// is selected — that's the primary entry point. This popover is
+// the secondary, top-bar-anchored entry point.
+//
+// On "Add Text" the popover also opens the BottomEditDrawer (via
 // useMobileEdit().beginEditing) for the new layer in `isFresh` mode,
 // so users land in the keyboard ready to type. Cancelling the drawer
 // before typing tidies up the empty layer.
 
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import {
   Image as ImageIcon,
+  ImagePlus,
+  Layers as StyleIcon,
+  Shapes,
   Smile,
-  Sparkles,
-  Square,
   Type,
-  X,
 } from "lucide-react";
 import { useEditor } from "../context/EditorContext";
 import { useMobileEdit } from "../context/MobileEditContext";
@@ -41,18 +63,65 @@ interface AddLayerSheetProps {
   onClose: () => void;
   onOpenPanel: (panel: Exclude<ActivePanel, null>) => void;
   onStub: (label: string) => void;
+  /** Ref to the trigger button (the "+" in the editor top bar). The
+   *  popover positions itself under this element. */
+  anchorRef: RefObject<HTMLButtonElement | null>;
 }
+
+interface PopoverPosition {
+  top: number;
+  right: number;
+}
+
+const POPOVER_WIDTH = 240;
+const POPOVER_OFFSET_Y = 8; // gap between anchor bottom edge and card top
+const VIEWPORT_PADDING = 8;
 
 export function AddLayerSheet({
   open,
   onClose,
   onOpenPanel,
   onStub,
+  anchorRef,
 }: AddLayerSheetProps) {
   const { state, dispatch } = useEditor();
   const { beginEditing, focusForKeyboardPop } = useMobileEdit();
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<PopoverPosition | null>(null);
 
+  // Compute popover position whenever it opens or the viewport changes.
+  useLayoutEffect(() => {
+    if (!open) {
+      setPosition(null);
+      return;
+    }
+    function compute() {
+      const anchor = anchorRef.current;
+      if (!anchor) return;
+      const rect = anchor.getBoundingClientRect();
+      // Right-align with the anchor by default — the popover's right
+      // edge sits at the anchor's right edge.
+      let right = window.innerWidth - rect.right;
+      // Clamp so the popover never overflows the viewport.
+      if (right < VIEWPORT_PADDING) right = VIEWPORT_PADDING;
+      const maxRight = window.innerWidth - POPOVER_WIDTH - VIEWPORT_PADDING;
+      if (right > maxRight) right = Math.max(VIEWPORT_PADDING, maxRight);
+      setPosition({
+        top: rect.bottom + POPOVER_OFFSET_Y,
+        right,
+      });
+    }
+    compute();
+    window.addEventListener("resize", compute);
+    window.addEventListener("scroll", compute, true);
+    return () => {
+      window.removeEventListener("resize", compute);
+      window.removeEventListener("scroll", compute, true);
+    };
+  }, [open, anchorRef]);
+
+  // Close on Escape.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -65,12 +134,9 @@ export function AddLayerSheet({
   function handleAddText() {
     const project = state.project;
     // Phase 1 keyboard-pop fix — see MobileEditContext.focusForKeyboardPop.
-    // Must run synchronously inside the user-gesture handler (this
-    // onClick) before the dispatch so iOS / Android pop the keyboard.
+    // Must run synchronously inside the user-gesture handler before
+    // the dispatch so iOS / Android pop the keyboard.
     focusForKeyboardPop();
-    // Size to ~40% of canvas width (soft default — user can drag-
-    // scale beyond after). Empty text content; the BottomEditDrawer
-    // shows "your text here" as a placeholder until the user types.
     const baseLayer = createDefaultTextForCanvas(
       project.width,
       project.height,
@@ -128,163 +194,145 @@ export function AddLayerSheet({
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 z-[220] transition-opacity duration-200 ${
-          open ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        style={{ background: "var(--pe-overlay)" }}
-        onClick={onClose}
+      {/* Always-mounted file input so the ref is stable across
+       *  open/close cycles. The photo flow triggers it
+       *  programmatically via photoInputRef.current.click(). */}
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
         aria-hidden
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (file) void handlePickPhoto(file);
+        }}
       />
 
-      {/* Sheet */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Add layer"
-        className={`fixed left-0 right-0 bottom-0 z-[221] transition-transform duration-200 ease-out ${
-          open ? "translate-y-0" : "translate-y-full"
-        }`}
-        style={{
-          background: "var(--pe-toolbar-bg)",
-          borderTop: "1px solid var(--pe-toolbar-border)",
-          boxShadow: "var(--pe-shadow-lg)",
-          borderTopLeftRadius: 18,
-          borderTopRightRadius: 18,
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
-        }}
-      >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-2 pb-1">
-          <span
-            className="block rounded-full"
-            style={{
-              width: 36,
-              height: 4,
-              background: "var(--pe-border-strong)",
-            }}
-          />
-        </div>
-
-        <div className="flex items-center justify-between px-4 pt-1 pb-2">
-          <span
-            className="text-[15px] font-semibold"
-            style={{ color: "var(--pe-text)" }}
-          >
-            Add Layer
-          </span>
-          <button
-            type="button"
+      {open && position && (
+        <>
+          {/* Invisible backdrop — captures outside taps to close. No
+           *  visible dimming, matches the reference's lightweight
+           *  popover. */}
+          <div
+            className="fixed inset-0 z-[219]"
             onClick={onClose}
-            aria-label="Close add layer sheet"
-            className="w-8 h-8 inline-flex items-center justify-center rounded-full transition-colors"
-            style={{ color: "var(--pe-tool-icon)" }}
+            aria-hidden
+          />
+
+          {/* Popover card */}
+          <div
+            ref={cardRef}
+            role="menu"
+            aria-label="Add layer"
+            className="fixed z-[220] overflow-hidden"
+            style={{
+              top: position.top,
+              right: position.right,
+              width: POPOVER_WIDTH,
+              background: "var(--pe-toolbar-bg)",
+              border: "1px solid var(--pe-border)",
+              borderRadius: 12,
+              boxShadow: "var(--pe-shadow-lg)",
+              paddingTop: 6,
+              paddingBottom: 6,
+            }}
           >
-            <X className="w-5 h-5" strokeWidth={1.75} />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-4 gap-2 px-4 pt-1 pb-4">
-          <SheetButton
-            icon={<Type className="w-6 h-6" strokeWidth={2} />}
-            label="Text"
-            onClick={handleAddText}
-            accent={{ from: "#3FB6E6", to: "#1B5B50", iconColor: "#FFFFFF" }}
-          />
-          <SheetButton
-            icon={<ImageIcon className="w-6 h-6" strokeWidth={1.75} />}
-            label="Photo"
-            onClick={() => photoInputRef.current?.click()}
-          />
-          <SheetButton
-            icon={<Square className="w-6 h-6" strokeWidth={1.75} />}
-            label="Shape"
-            onClick={() => {
-              onOpenPanel("shapes");
-              onClose();
-            }}
-          />
-          <SheetButton
-            icon={<Smile className="w-6 h-6" strokeWidth={1.75} />}
-            label="Sticker"
-            onClick={() => {
-              onOpenPanel("stickers");
-              onClose();
-            }}
-          />
-          {/* Second row */}
-          <SheetButton
-            icon={<Sparkles className="w-6 h-6" strokeWidth={1.75} />}
-            label="Style"
-            onClick={() => {
-              onClose();
-              onStub("Saved Styles — coming soon");
-            }}
-          />
-        </div>
-
-        <input
-          ref={photoInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          aria-hidden
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            e.target.value = "";
-            if (file) void handlePickPhoto(file);
-          }}
-        />
-      </div>
+            <PopoverItem
+              icon={<Type className="w-5 h-5" strokeWidth={2} />}
+              label="Text"
+              onClick={handleAddText}
+            />
+            <PopoverItem
+              icon={<StyleIcon className="w-5 h-5" strokeWidth={1.75} />}
+              label="Style"
+              onClick={() => {
+                onClose();
+                onStub("Saved Styles — coming soon");
+              }}
+            />
+            <PopoverItem
+              icon={<ImagePlus className="w-5 h-5" strokeWidth={1.75} />}
+              label="Photo"
+              onClick={() => photoInputRef.current?.click()}
+            />
+            <PopoverItem
+              icon={<Shapes className="w-5 h-5" strokeWidth={1.75} />}
+              label="Shape"
+              onClick={() => {
+                onOpenPanel("shapes");
+                onClose();
+              }}
+            />
+            <PopoverItem
+              icon={<Smile className="w-5 h-5" strokeWidth={1.75} />}
+              label="Sticker"
+              onClick={() => {
+                onOpenPanel("stickers");
+                onClose();
+              }}
+            />
+            <PopoverItem
+              icon={<ImageIcon className="w-5 h-5" strokeWidth={1.75} />}
+              label="Background"
+              onClick={() => {
+                // Background editing lives in the no-selection
+                // BottomDock. Clearing the selection surfaces the
+                // Background section — the closest analogue to
+                // "open background tools" without a dedicated panel.
+                dispatch({ type: "SET_SELECTION", ids: [] });
+                onClose();
+              }}
+            />
+          </div>
+        </>
+      )}
     </>
   );
 }
 
-// ─── Sheet button ───────────────────────────────────────────────
+// ─── Popover item ──────────────────────────────────────────────
 
-function SheetButton({
+function PopoverItem({
   icon,
   label,
   onClick,
-  accent,
 }: {
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
-  accent?: { from: string; to: string; iconColor: string };
 }) {
   return (
     <button
       type="button"
+      role="menuitem"
       onClick={onClick}
-      aria-label={label}
-      className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl transition-colors"
+      className="w-full flex items-center gap-3 px-4 py-3 transition-colors text-left"
       style={{
-        background: "var(--pe-surface)",
-        border: "1px solid var(--pe-border)",
+        color: "var(--pe-text)",
+        background: "transparent",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.background =
+          "var(--pe-surface-2)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.background =
+          "transparent";
       }}
     >
       <span
-        className="inline-flex items-center justify-center rounded-2xl"
+        className="inline-flex items-center justify-center shrink-0"
         style={{
-          width: 44,
-          height: 44,
-          background: accent
-            ? `linear-gradient(135deg, ${accent.from}, ${accent.to})`
-            : "var(--pe-surface-2)",
-          color: accent ? accent.iconColor : "var(--pe-tool-icon)",
-          boxShadow: accent ? "0 2px 6px rgba(0,0,0,0.10)" : "none",
+          width: 24,
+          height: 24,
+          color: "var(--pe-tool-icon)",
         }}
       >
         {icon}
       </span>
-      <span
-        className="text-[12px] font-medium"
-        style={{ color: "var(--pe-text)" }}
-      >
-        {label}
-      </span>
+      <span className="text-[15px] font-medium">{label}</span>
     </button>
   );
 }
