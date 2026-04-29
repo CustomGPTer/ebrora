@@ -35,6 +35,7 @@ import type {
 } from "@/lib/site-photo-stamp/types";
 import { capturePhoto, UnsupportedImageError } from "@/lib/site-photo-stamp/capture";
 import { renderStamp } from "@/lib/site-photo-stamp/stamp-renderer";
+import { injectExif } from "@/lib/site-photo-stamp/exif-write";
 import {
   saveRecord,
   getRecord,
@@ -472,11 +473,28 @@ export default function BulkScreen({
           settings,
           tier,
         });
+
+        // Embed EXIF metadata into the stamped JPEG when the user has
+        // it enabled (default on). Same fallback as the single-capture
+        // path — a writer failure must never block the bulk run.
+        let finalImageBlob: Blob = rendered.blob;
+        if (settings.embedExif) {
+          try {
+            finalImageBlob = await injectExif(rendered.blob, {
+              timestamp: fullMeta.timestamp,
+              lat: fullMeta.lat,
+              lon: fullMeta.lon,
+            });
+          } catch {
+            finalImageBlob = rendered.blob;
+          }
+        }
+
         const record: StampedRecord = {
           id: captured.meta.uniqueId,
           templateId: template.id,
           variantId: variant.id,
-          imageBlob: rendered.blob,
+          imageBlob: finalImageBlob,
           thumbnailBlob: rendered.thumbnailBlob,
           meta: fullMeta,
           createdAt: Date.now(),

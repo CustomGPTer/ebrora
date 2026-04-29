@@ -33,6 +33,7 @@ import {
 import { renderStamp } from "@/lib/site-photo-stamp/stamp-renderer";
 import { reverseGeocode } from "@/lib/site-photo-stamp/geolocation";
 import { buildRecordFilename } from "@/lib/site-photo-stamp/share";
+import { injectExif } from "@/lib/site-photo-stamp/exif-write";
 import {
   saveRecord,
   countRecords,
@@ -381,11 +382,29 @@ export default function SitePhotoStampClient() {
           settings,
           tier,
         });
+
+        // Embed EXIF metadata into the stamped JPEG when the user has
+        // it enabled (default on). Skipped when toggled off in settings,
+        // and silently skipped if the writer fails — the burned-in
+        // pixel stamp is always the canonical record either way.
+        let finalImageBlob: Blob = result.blob;
+        if (settings.embedExif) {
+          try {
+            finalImageBlob = await injectExif(result.blob, {
+              timestamp: fullMeta.timestamp,
+              lat: fullMeta.lat,
+              lon: fullMeta.lon,
+            });
+          } catch {
+            finalImageBlob = result.blob;
+          }
+        }
+
         const record: StampedRecord = {
           id: captured.meta.uniqueId,
           templateId: resolvedTemplate.id,
           variantId: resolvedVariant.id,
-          imageBlob: result.blob,
+          imageBlob: finalImageBlob,
           thumbnailBlob: result.thumbnailBlob,
           meta: fullMeta,
           createdAt: Date.now(),

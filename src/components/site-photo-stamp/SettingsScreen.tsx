@@ -425,6 +425,13 @@ export default function SettingsScreen({
           onChange={(v) => onChange({ showCoords: v })}
         />
 
+        <ToggleRow
+          label="Embed photo metadata"
+          hint="Adds GPS, timestamp and a software tag to the saved JPEG so it appears on the map in your gallery alongside normal camera photos. The visible stamp is unaffected."
+          checked={settings.embedExif}
+          onChange={(v) => onChange({ embedExif: v })}
+        />
+
         <Row label="Coordinate format">
           <RadioGroup<"decimal" | "dms">
             value={settings.coordFormat}
