@@ -1,36 +1,31 @@
 // src/components/photo-editor/home/HomeHeader.tsx
 //
-// Top-of-home header matching the reference Add Text app's home screen:
+// Home-screen top bar — Batch A redesign.
 //
-//   ┌───────────────────────────────────────────────────────────┐
-//   │  Dark mode  ⚪──○                  [Subscribe] [⚙]        │
-//   └───────────────────────────────────────────────────────────┘
+// Reference layout (matches the Add-Text-on-Photo app exactly):
 //
-// On mobile the global Ebrora NavBar is hidden behind PhotoEditorClient's
-// fixed z-60 wrapper, so we surface Ebrora branding here directly: an
-// "E" logo + "Ebrora" wordmark on the left, dark-mode toggle + Subscribe
-// chip + Settings cog on the right. On desktop the global NavBar is
-// visible above this so there's slight branding duplication — matches
-// the reference design and keeps the home screen self-contained.
+//   ┌──────────────────────────────────────────────────────────────┐
+//   │  Dark mode  ⚪──○                                       [⚙]  │
+//   └──────────────────────────────────────────────────────────────┘
 //
-// Behaviour:
-//   • Logo/wordmark: links to "/" (full Ebrora homepage exit)
-//   • Dark mode toggle: cycles light ↔ dark via ThemeContext (instant)
-//   • Subscribe chip: SubscribeChip from /toolbar (suppressed for paid)
-//   • Settings cog: opens the SettingsMenu sheet
+// Changes from prior version:
+//   • Removed the Ebrora logo + wordmark from this bar. The brand sits
+//     in the global site nav above this view; inside the editor we
+//     match the reference's chrome-light treatment so the Background
+//     colour strip below has all the visual focus.
+//   • Removed the "Subscribe" / "Try PRO" chip. All editor features
+//     are now free — there are no PRO-only features inside the editor.
+//   • The dark-mode toggle is rendered as a labelled pill switch (was
+//     a sun/moon icon button) so it reads "Dark mode ⚪──○" exactly
+//     like the reference rather than as a generic theme button.
 //
-// Why a Link to "/" on the logo? The user is inside a PWA-installable
-// scope (/photo-editor/manifest.webmanifest) — tapping the logo should
-// take them out of the editor scope to the marketing site. If they
-// install the editor as a standalone PWA, the link behaves like any
-// external nav (opens a browser tab depending on display-mode).
+// The settings cog opens the SettingsMenu sheet (existing component).
 
 "use client";
 
-import Link from "next/link";
-import { Moon, Settings, Sun } from "lucide-react";
+import { useId } from "react";
+import { Settings } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
-import { SubscribeChip } from "../toolbar/SubscribeChip";
 
 interface HomeHeaderProps {
   onOpenSettings: () => void;
@@ -39,6 +34,8 @@ interface HomeHeaderProps {
 export function HomeHeader({ onOpenSettings }: HomeHeaderProps) {
   const { theme, toggle } = useTheme();
   const isDark = theme === "dark";
+
+  const toggleId = useId();
 
   return (
     <header
@@ -49,73 +46,63 @@ export function HomeHeader({ onOpenSettings }: HomeHeaderProps) {
         background: "var(--pe-toolbar-bg)",
       }}
     >
-      {/* ── Logo + wordmark ────────────────────────────────────── */}
-      <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Ebrora home">
-        <span
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
-          style={{
-            background: "#1B5B50",
-            fontFamily: "'Playfair Display', serif",
-          }}
+      {/* ── Dark mode pill switch ─────────────────────────────── */}
+      <div className="flex items-center gap-2">
+        <label
+          htmlFor={toggleId}
+          className="text-[15px] font-medium select-none cursor-pointer"
+          style={{ color: "var(--pe-text)" }}
         >
-          E
-        </span>
-        <span
-          className="text-lg font-bold tracking-tight"
-          style={{
-            color: "#1B5B50",
-            fontFamily: "'Playfair Display', serif",
-          }}
-        >
-          Ebrora
-        </span>
-      </Link>
-
-      {/* ── Right cluster ─────────────────────────────────────── */}
-      <div className="flex items-center gap-1.5">
+          Dark mode
+        </label>
         <button
+          id={toggleId}
           type="button"
-          onClick={toggle}
+          role="switch"
+          aria-checked={isDark}
           aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          aria-pressed={isDark}
-          className="w-9 h-9 inline-flex items-center justify-center rounded-full transition-colors"
-          style={{ color: "var(--pe-tool-icon)" }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background =
-              "var(--pe-surface-2)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background =
-              "transparent";
+          onClick={toggle}
+          className="relative inline-flex items-center transition-colors"
+          style={{
+            width: 44,
+            height: 24,
+            borderRadius: 999,
+            background: isDark ? "var(--pe-accent)" : "#D1D5DB",
+            padding: 2,
           }}
         >
-          {isDark ? (
-            <Sun className="w-5 h-5" strokeWidth={1.75} />
-          ) : (
-            <Moon className="w-5 h-5" strokeWidth={1.75} />
-          )}
-        </button>
-
-        <SubscribeChip compact />
-
-        <button
-          type="button"
-          onClick={onOpenSettings}
-          aria-label="Open settings menu"
-          className="w-9 h-9 inline-flex items-center justify-center rounded-full transition-colors"
-          style={{ color: "var(--pe-tool-icon)" }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background =
-              "var(--pe-surface-2)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background =
-              "transparent";
-          }}
-        >
-          <Settings className="w-5 h-5" strokeWidth={1.75} />
+          <span
+            aria-hidden
+            className="inline-block transition-transform"
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              background: "#FFFFFF",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+              transform: isDark ? "translateX(20px)" : "translateX(0)",
+            }}
+          />
         </button>
       </div>
+
+      {/* ── Settings cog ──────────────────────────────────────── */}
+      <button
+        type="button"
+        onClick={onOpenSettings}
+        aria-label="Open settings menu"
+        className="w-10 h-10 inline-flex items-center justify-center rounded-full transition-colors"
+        style={{ color: "var(--pe-tool-icon)" }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.background =
+            "var(--pe-surface-2)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+        }}
+      >
+        <Settings className="w-5 h-5" strokeWidth={1.75} />
+      </button>
     </header>
   );
 }

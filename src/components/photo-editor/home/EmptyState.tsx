@@ -8,7 +8,8 @@
 //   ├────────────────────────────────────────────┤
 //   │ Background (solid swatches + gradients)    │
 //   │ Gallery (large upload card)                │
-//   │ Projects (horizontal-scroll cards)         │
+//   │ Style presets (4-card row — Batch F)       │
+//   │ Projects (3-col grid — Batch F)            │
 //   └────────────────────────────────────────────┘
 //
 // Versus the previous EmptyState — gone:
@@ -41,6 +42,7 @@ import { useEffect, useState } from "react";
 import { HomeHeader } from "./HomeHeader";
 import { BackgroundQuickPick } from "./BackgroundQuickPick";
 import { GalleryCard } from "./GalleryCard";
+import { HomePresets } from "./HomePresets";
 import { ProjectsGrid } from "./ProjectsGrid";
 import { SettingsMenu } from "./SettingsMenu";
 import { RestoreDraftDialog } from "./RestoreDraftDialog";
@@ -124,6 +126,10 @@ export function EmptyState({ onProjectLoaded }: EmptyStateProps) {
         />
 
         <GalleryCard
+          onProjectReady={(project) => onProjectLoaded(project, null)}
+        />
+
+        <HomePresets
           onProjectReady={(project) => onProjectLoaded(project, null)}
         />
 

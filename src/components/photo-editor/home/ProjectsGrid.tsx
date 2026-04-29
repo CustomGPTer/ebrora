@@ -1,9 +1,16 @@
 // src/components/photo-editor/home/ProjectsGrid.tsx
 //
-// "Projects" section of the home screen — a horizontal-scrolling row of
-// SavedProject cards. Replaces RecentProjects.tsx visually while keeping
-// its data-flow contract intact (listProjects via IndexedDB, deserialize
-// via unwrap, hand the Project + savedProjectId up to PhotoEditorClient).
+// "Projects" section of the home screen — a 3-col grid of SavedProject
+// cards (2-col on narrow viewports). Replaces RecentProjects.tsx
+// visually while keeping its data-flow contract intact (listProjects
+// via IndexedDB, deserialize via unwrap, hand the Project +
+// savedProjectId up to PhotoEditorClient).
+//
+// Batch F (Apr 2026): converted from a horizontal-scrolling strip to
+// a 2x3 / 3x2 vertical grid (`grid grid-cols-2 sm:grid-cols-3`) with
+// MAX_VISIBLE lowered from 12 to 6 — matches V3 §13 Q1's "3-col grid,
+// 2 rows visible without scroll" guidance. Saved projects beyond the
+// 6 most-recent are still reachable via SettingsMenu → Projects modal.
 //
 // Each card:
 //   ┌────────────────┐
@@ -22,7 +29,7 @@
 // Empty state: when listProjects returns nothing (or fails), the entire
 // section is hidden — same behaviour as the previous RecentProjects.tsx.
 // We don't fabricate a CTA card here because the BackgroundQuickPick +
-// GalleryCard sections already cover "start a new project."
+// GalleryCard + HomePresets sections already cover "start a new project."
 
 "use client";
 
@@ -35,7 +42,7 @@ import {
 import { FALLBACK_THUMBNAIL_DATA_URL } from "@/lib/photo-editor/saved-projects/thumbnail";
 import type { Project, SavedProject } from "@/lib/photo-editor/types";
 
-const MAX_VISIBLE = 12;
+const MAX_VISIBLE = 6;
 
 interface ProjectsGridProps {
   /** Called when the user taps a card. Receives the unwrapped Project
@@ -120,21 +127,14 @@ export function ProjectsGrid({ onProjectLoaded }: ProjectsGridProps) {
         </span>
       </div>
 
-      <div
-        className="flex items-stretch gap-3 overflow-x-auto pb-2 px-1"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          WebkitOverflowScrolling: "touch",
-        }}
-      >
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 px-1">
         {items.map((p) => {
           const menuOpen = openMenuFor === p.id;
           const isDeleting = deleting === p.id;
           return (
             <div
               key={p.id}
-              className="flex-none w-44 rounded-xl overflow-hidden flex flex-col relative"
+              className="w-full rounded-xl overflow-hidden flex flex-col relative"
               style={{
                 border: "1px solid var(--pe-border-strong)",
                 background: "var(--pe-surface)",
