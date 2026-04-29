@@ -105,6 +105,15 @@ export interface Settings {
   showCoords: boolean;
   coordFormat: "decimal" | "dms";
   timestampFormat: "24h" | "12h";
+  /**
+   * When true, the stamped JPEG carries embedded EXIF (GPS coordinates,
+   * timestamp, software tag). This makes the file behave like a normal
+   * camera photo — Samsung Gallery / Google Photos will pin it on a map
+   * and sort it chronologically with the rest of the camera roll.
+   * When false, the saved JPEG carries no EXIF whatsoever and the
+   * pixel-burned stamp is the sole source of metadata.
+   */
+  embedExif: boolean;
   projectName: string;
   siteName: string;
   contractor: string;
@@ -139,6 +148,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showCoords: true,
   coordFormat: "decimal",
   timestampFormat: "24h",
+  embedExif: true,
   projectName: "",
   siteName: "",
   contractor: "",

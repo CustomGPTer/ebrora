@@ -129,20 +129,42 @@ async function fetchNominatim(lat: number, lon: number): Promise<string | null> 
   }
 }
 
+// ─── Provider 3: Photon (Komoot, OSM-backed) ─────────────────
+//
+// Independent OSM-derived index from BDC and Nominatim — when both of
+// those drop a request (rate limiting, regional outage), Photon often
+// still resolves. Free, key-less, GeoJSON response shape.
+
+async function fetchPhoton(lat: number, lon: number): Promise<string | null> {
+  const url = `https://photon.komoot.io/reverse?lat=${lat}&lon=${lon}&lang=en`;
+  const resp = await fetchWithTimeout(url, {
+    headers: { Accept: "application/json" },
+  });
+  if (!resp || !resp.ok) return null;
+  try {
+    const data = (await resp.json()) as Record<string, unknown>;
+    return formatPhotonAddress(data);
+  } catch {
+    return null;
+  }
+}
+
 // ─── Public entry point ──────────────────────────────────────
 
 /**
  * Reverse-geocode a lat/lon into a human-readable address.
- * Cascades BigDataCloud → Nominatim with a retry on each. Returns null
- * only if all four attempts fail, at which point the UI will show a
- * generic "Address unavailable" message and the stamp will render with
- * coords only.
+ * Cascades BigDataCloud → Nominatim → Photon with a retry on each.
+ * Returns null only if all six attempts fail, at which point the UI
+ * will show a generic "Address unavailable" message and the stamp
+ * will render with coords only.
  */
 export async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
   const fromBdc = await tryProvider(fetchBigDataCloud, lat, lon);
   if (fromBdc) return fromBdc;
   const fromNominatim = await tryProvider(fetchNominatim, lat, lon);
   if (fromNominatim) return fromNominatim;
+  const fromPhoton = await tryProvider(fetchPhoton, lat, lon);
+  if (fromPhoton) return fromPhoton;
   return null;
 }
 
@@ -213,6 +235,47 @@ function formatNominatimAddress(d: Record<string, unknown>): string | null {
   // better than nothing when no structured fields came back.
   const display = str(d, "display_name");
   return display.length > 0 ? display : null;
+}
+
+/**
+ * Compose a concise address line from Photon's GeoJSON response.
+ * Photon returns a FeatureCollection — we use the first feature's
+ * `properties` block. Field names mirror OSM (street, housenumber,
+ * postcode, city, country, countrycode), so the structure parallels
+ * Nominatim's `address` block but lives one level shallower.
+ */
+function formatPhotonAddress(d: Record<string, unknown>): string | null {
+  const features = Array.isArray(d.features) ? (d.features as unknown[]) : [];
+  const first = features[0];
+  if (!first || typeof first !== "object") return null;
+  const props =
+    (first as Record<string, unknown>).properties &&
+    typeof (first as Record<string, unknown>).properties === "object"
+      ? ((first as Record<string, unknown>).properties as Record<string, unknown>)
+      : {};
+
+  const number = str(props, "housenumber");
+  const street = str(props, "street") || str(props, "name") || "";
+  const locality = str(props, "district") || str(props, "suburb") || "";
+  const city =
+    str(props, "city") ||
+    str(props, "town") ||
+    str(props, "village") ||
+    str(props, "county") ||
+    str(props, "state") ||
+    "";
+  const postcode = str(props, "postcode") || "";
+  const country = (str(props, "countrycode") || "").toUpperCase();
+
+  const streetLine = [number, street].filter(Boolean).join(" ");
+  const parts = [streetLine, locality, city]
+    .filter(Boolean)
+    .filter((v, i, a) => a.indexOf(v) === i);
+  const head = parts.join(", ");
+  const tail = [postcode, country !== "GB" ? country : ""].filter(Boolean).join(" ").trim();
+
+  const out = [head, tail].filter(Boolean).join(" ").trim();
+  return out.length > 0 ? out : null;
 }
 
 // ─── helpers ────────────────────────────────────────────────────
