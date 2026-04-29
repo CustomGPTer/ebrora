@@ -35,7 +35,7 @@ import type Konva from "konva";
 import { useEditor } from "../context/EditorContext";
 import { useMobileEdit } from "../context/MobileEditContext";
 
-const ACCENT = "#1B5B50";
+const ACCENT = "#FFFFFF";
 
 export function SelectionFrame() {
   const { state } = useEditor();

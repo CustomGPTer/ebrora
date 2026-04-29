@@ -55,7 +55,64 @@ interface SelectionToolsProps {
   stageScale: number;
 }
 
-const ICON_SIZE = 32;
+// Phase 2 (Apr 2026) — bare-icon selection chrome (no white circle
+// backing). The tap target is the icon itself; we keep a small inner
+// padding so the lucide stroke doesn't sit on the absolute pixel edge.
+const ICON_SIZE = 24;
+
+// Adaptive contrast colours for the corner icons. We pick by the
+// relative luminance of the selected layer's primary visible colour
+// (shape fill / outlined-shape stroke / text glyph fill). For layers
+// without a parseable colour (images, stickers) we fall back to white,
+// which is the most common case over photo content.
+const ICON_LIGHT = "#FFFFFF"; // for dark shapes
+const ICON_DARK = "#1F2937"; // for light shapes (slate-800)
+const DANGER_LIGHT = "#FCA5A5"; // delete-on-dark (red-300)
+const DANGER_DARK = "#B91C1C"; // delete-on-light (red-700)
+
+function parseHexLuminance(color: string): number | null {
+  if (typeof color !== "string") return null;
+  const m = color.trim().match(/^#([0-9a-fA-F]{3,8})$/);
+  if (!m) return null;
+  const hex = m[1];
+  let r: number, g: number, b: number;
+  if (hex.length === 3) {
+    r = parseInt(hex[0] + hex[0], 16);
+    g = parseInt(hex[1] + hex[1], 16);
+    b = parseInt(hex[2] + hex[2], 16);
+  } else if (hex.length === 6 || hex.length === 8) {
+    r = parseInt(hex.slice(0, 2), 16);
+    g = parseInt(hex.slice(2, 4), 16);
+    b = parseInt(hex.slice(4, 6), 16);
+  } else {
+    return null;
+  }
+  // sRGB → relative luminance (WCAG 2.1)
+  const toLin = (c: number) => {
+    const cs = c / 255;
+    return cs <= 0.03928 ? cs / 12.92 : Math.pow((cs + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * toLin(r) + 0.7152 * toLin(g) + 0.0722 * toLin(b);
+}
+
+/**
+ * Return the layer's primary visible colour for contrast judgement, or
+ * null when no colour is decidable from the layer model alone (image /
+ * sticker layers — pixel sampling would be required, which is overkill
+ * for the corner-icon overlay). Caller defaults to ICON_LIGHT for null.
+ */
+function pickLayerColor(layer: AnyLayer): string | null {
+  if (layer.kind === "shape") {
+    if (layer.variant === "outlined" && layer.stroke?.enabled) {
+      return layer.stroke.color;
+    }
+    return layer.fill;
+  }
+  if (layer.kind === "text") {
+    return layer.runs?.[0]?.fill ?? null;
+  }
+  return null;
+}
 
 export function SelectionTools({
   stageLeft,
@@ -407,6 +464,17 @@ export function SelectionTools({
   const bottomMidX = (geom.bl.x + geom.br.x) / 2;
   const bottomMidY = (geom.bl.y + geom.br.y) / 2;
 
+  // Adaptive icon colour — sample the selected layer's primary visible
+  // colour and decide on dark vs light icons based on its relative
+  // luminance. Threshold 0.5 is the pragmatic mid-point; if the colour
+  // can't be parsed (or the layer is an image / sticker) we default to
+  // white, which works on photo content and the dark editor canvas.
+  const layerColor = pickLayerColor(selectedLayer);
+  const lum = layerColor !== null ? parseHexLuminance(layerColor) : null;
+  const isLightLayer = lum !== null && lum > 0.5;
+  const iconColor = isLightLayer ? ICON_DARK : ICON_LIGHT;
+  const dangerColor = isLightLayer ? DANGER_DARK : DANGER_LIGHT;
+
   // Batch A — text layers get a keyboard handle at bottom-left that
   // opens the BottomEditDrawer for inline typing. Matches the
   // reference Add-Text-on-Photo app's selection chrome.
@@ -424,9 +492,9 @@ export function SelectionTools({
         y={geom.tl.y}
         ariaLabel="Delete"
         onClick={onDelete}
-        danger
+        color={dangerColor}
       >
-        <X className="w-4 h-4" strokeWidth={2.25} />
+        <X className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
 
       <CornerBtn
@@ -434,8 +502,9 @@ export function SelectionTools({
         y={topMidY}
         ariaLabel="Flip vertically"
         onClick={onFlipV}
+        color={iconColor}
       >
-        <FlipVertical className="w-4 h-4" strokeWidth={2.25} />
+        <FlipVertical className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
 
       <CornerBtn
@@ -443,12 +512,13 @@ export function SelectionTools({
         y={geom.tr.y}
         ariaLabel="Rotate"
         drag
+        color={iconColor}
         onPointerDown={onRotatePointerDown}
         onPointerMove={onRotatePointerMove}
         onPointerUp={onRotatePointerUp}
         onPointerCancel={onRotatePointerUp}
       >
-        <RotateCw className="w-4 h-4" strokeWidth={2.25} />
+        <RotateCw className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
 
       <CornerBtn
@@ -456,8 +526,9 @@ export function SelectionTools({
         y={leftMidY}
         ariaLabel="Flip horizontally"
         onClick={onFlipH}
+        color={iconColor}
       >
-        <FlipHorizontal className="w-4 h-4" strokeWidth={2.25} />
+        <FlipHorizontal className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
 
       {isText && (
@@ -466,8 +537,9 @@ export function SelectionTools({
           y={geom.bl.y}
           ariaLabel="Edit text"
           onClick={onOpenKeyboard}
+          color={iconColor}
         >
-          <Keyboard className="w-4 h-4" strokeWidth={2.25} />
+          <Keyboard className="w-5 h-5" strokeWidth={2.25} />
         </CornerBtn>
       )}
 
@@ -476,8 +548,9 @@ export function SelectionTools({
         y={bottomMidY}
         ariaLabel="Duplicate"
         onClick={onDuplicate}
+        color={iconColor}
       >
-        <Copy className="w-4 h-4" strokeWidth={2.25} />
+        <Copy className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
 
       <CornerBtn
@@ -485,12 +558,13 @@ export function SelectionTools({
         y={geom.br.y}
         ariaLabel="Resize"
         drag
+        color={iconColor}
         onPointerDown={onResizePointerDown}
         onPointerMove={onResizePointerMove}
         onPointerUp={onResizePointerUp}
         onPointerCancel={onResizePointerUp}
       >
-        <ResizeIcon className="w-4 h-4" strokeWidth={2.25} />
+        <ResizeIcon className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
     </>
   );
@@ -507,7 +581,8 @@ interface CornerBtnProps {
   onPointerUp?: (e: React.PointerEvent<HTMLButtonElement>) => void;
   onPointerCancel?: (e: React.PointerEvent<HTMLButtonElement>) => void;
   children: React.ReactNode;
-  danger?: boolean;
+  /** Resolved icon stroke colour (caller picks via adaptive contrast). */
+  color: string;
 }
 
 function CornerBtn({
@@ -521,7 +596,7 @@ function CornerBtn({
   onPointerUp,
   onPointerCancel,
   children,
-  danger = false,
+  color,
 }: CornerBtnProps) {
   return (
     <button
@@ -535,18 +610,28 @@ function CornerBtn({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
-      className="absolute z-30 inline-flex items-center justify-center rounded-full"
+      className="absolute z-30 inline-flex items-center justify-center"
       style={{
         left: x,
         top: y,
         width: ICON_SIZE,
         height: ICON_SIZE,
         transform: "translate(-50%, -50%)",
-        background: "rgba(255, 255, 255, 0.96)",
-        color: danger ? "#B91C1C" : "#1B5B50",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08)",
+        background: "transparent",
+        border: "none",
+        padding: 0,
+        color,
         cursor: drag ? "grab" : "pointer",
         touchAction: drag ? "none" : "auto",
+        // No backdrop, no shadow — icon-only chrome (Apr 2026 redesign).
+        // The inner lucide stroke carries all the visual weight; tap
+        // target is the bounding box of the icon itself. A thin grey
+        // outline halo (4-direction sharp drop-shadows) ensures the
+        // icon stays legible against any layer fill or photo region —
+        // grey reads as a neutral edge whether the icon is white-on-
+        // dark or dark-on-light.
+        filter:
+          "drop-shadow(0.6px 0 0 #9CA3AF) drop-shadow(-0.6px 0 0 #9CA3AF) drop-shadow(0 0.6px 0 #9CA3AF) drop-shadow(0 -0.6px 0 #9CA3AF)",
       }}
     >
       {children}
