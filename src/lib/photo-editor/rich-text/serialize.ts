@@ -5,8 +5,18 @@
 // and schema migration. Bumps will land here when the run shape
 // changes incompatibly.
 
-import type { GlyphRun, TextLayer, TextLayerStyling } from "../types";
-import { defaultGlyphRun, defaultTextStyling } from "./factory";
+import type {
+  GlyphRun,
+  Point,
+  TextBackground,
+  TextLayer,
+  TextLayerStyling,
+} from "../types";
+import {
+  defaultGlyphRun,
+  defaultTextBackground,
+  defaultTextStyling,
+} from "./factory";
 
 /** Current schema version for serialised TextLayers. Independent of the
  *  Project schema version because rich-text shape may evolve more
@@ -53,6 +63,18 @@ export function validateLayer(raw: unknown): TextLayer | null {
     ...(isObject(raw.styling) ? (raw.styling as Partial<TextLayerStyling>) : {}),
   };
 
+  const background: TextBackground = {
+    ...defaultTextBackground(),
+    ...(isObject(raw.background)
+      ? (raw.background as Partial<TextBackground>)
+      : {}),
+  };
+
+  // Perspective: only accept a strict 4-point array shape; anything else
+  // (missing, null, malformed) becomes null = no warp. Avoids inheriting
+  // half-broken corners from older payloads.
+  const perspective = parsePerspective(raw.perspective);
+
   const runs: GlyphRun[] = (raw.runs as unknown[])
     .map((r) => validateRun(r))
     .filter((r): r is GlyphRun => r !== null);
@@ -63,8 +85,28 @@ export function validateLayer(raw: unknown): TextLayer | null {
     ...(raw as object),
     runs,
     styling,
+    background,
+    perspective,
     erase: Array.isArray(raw.erase) ? raw.erase : [],
   } as TextLayer;
+}
+
+function parsePerspective(
+  raw: unknown,
+): [Point, Point, Point, Point] | null {
+  if (!Array.isArray(raw) || raw.length !== 4) return null;
+  const out: Point[] = [];
+  for (const p of raw) {
+    if (
+      !isObject(p) ||
+      typeof p.x !== "number" ||
+      typeof p.y !== "number"
+    ) {
+      return null;
+    }
+    out.push({ x: p.x, y: p.y });
+  }
+  return [out[0], out[1], out[2], out[3]];
 }
 
 function validateRun(raw: unknown): GlyphRun | null {

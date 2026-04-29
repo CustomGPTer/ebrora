@@ -19,6 +19,7 @@ import {
   type LaidLine,
   type LayoutResult,
 } from "./layout";
+import { bendPoint, createBendContext, type BendContext } from "./bend";
 
 export type { LaidGlyph, LaidLine, LayoutResult };
 
@@ -55,21 +56,41 @@ export function renderTextToCanvas(
   ctx.textBaseline = "alphabetic";
   ctx.textAlign = "left";
 
+  // Build the bend context once. Null means flat — the fast path that
+  // skips all per-glyph transform work and uses the existing line-level
+  // grouping for highlights and decorations.
+  const bend = createBendContext(
+    layer.styling.bend?.amount ?? 0,
+    layer.width
+  );
+
   // Pass 1: highlights.
   for (const line of layout.lines) {
-    drawHighlightsForLine(ctx, line);
+    if (bend) {
+      drawHighlightsForLineBent(ctx, line, bend);
+    } else {
+      drawHighlightsForLine(ctx, line);
+    }
   }
 
   // Pass 2: glyphs.
   for (const line of layout.lines) {
     for (const glyph of line.glyphs) {
-      drawGlyph(ctx, glyph, options);
+      if (bend) {
+        drawGlyphBent(ctx, glyph, options, bend);
+      } else {
+        drawGlyph(ctx, glyph, options, glyph.x, glyph.y);
+      }
     }
   }
 
   // Pass 3: decorations.
   for (const line of layout.lines) {
-    drawDecorationsForLine(ctx, line);
+    if (bend) {
+      drawDecorationsForLineBent(ctx, line, bend);
+    } else {
+      drawDecorationsForLine(ctx, line);
+    }
   }
 
   if (options.debug) {
@@ -131,12 +152,46 @@ function sameHighlight(a: GlyphRun, b: GlyphRun): boolean {
   );
 }
 
+/** Bent highlight pass — paints a small rotated rect per highlighted
+ *  glyph instead of one merged rect per group. The line-level grouping
+ *  optimisation in {@link drawHighlightsForLine} is bypassed because
+ *  consecutive glyphs along an arc no longer share an axis-aligned
+ *  bounding box. Visually the per-glyph rects abut tightly enough that
+ *  the merge isn't missed. */
+function drawHighlightsForLineBent(
+  ctx: CanvasRenderingContext2D,
+  line: LaidLine,
+  bend: BendContext
+): void {
+  for (const g of line.glyphs) {
+    if (!g.run.highlight.enabled) continue;
+    const cx = g.x + g.width / 2;
+    const bp = bendPoint(bend, cx, g.y);
+    ctx.save();
+    ctx.translate(bp.x, bp.y);
+    ctx.rotate(bp.angle);
+    ctx.globalAlpha = clamp01(g.run.highlight.opacity);
+    ctx.fillStyle = g.run.highlight.color;
+    // Per-glyph rect spans the full line height so multiple lines stack
+    // correctly. Width-wise we use the glyph's advance to keep adjacent
+    // rects flush.
+    ctx.fillRect(-g.width / 2, -line.ascent, g.width, line.height);
+    ctx.restore();
+  }
+}
+
 // ─── Glyph (stroke + fill + shadow) ─────────────────────────────
 
 function drawGlyph(
   ctx: CanvasRenderingContext2D,
   glyph: LaidGlyph,
-  options: RenderTextOptions
+  options: RenderTextOptions,
+  /** Where to paint the glyph in the current ctx frame. The canvas's
+   *  fillText / strokeText draw the glyph with its left edge at x and
+   *  baseline at y. Flat-mode callers pass (glyph.x, glyph.y); bent-mode
+   *  callers translate+rotate the ctx and pass (-glyph.width/2, 0). */
+  localX: number,
+  localY: number
 ): void {
   const run = glyph.run;
 
@@ -161,14 +216,35 @@ function drawGlyph(
     ctx.lineJoin = "round";
     ctx.miterLimit = 2;
     ctx.strokeStyle = withAlpha(run.stroke.color, run.stroke.opacity);
-    ctx.strokeText(glyph.char, glyph.x, glyph.y);
+    ctx.strokeText(glyph.char, localX, localY);
     ctx.restore();
   }
 
   // Fill — solid, gradient, or texture (mutually exclusive).
-  ctx.fillStyle = resolveFillStyle(ctx, run, glyph, options);
-  ctx.fillText(glyph.char, glyph.x, glyph.y);
+  ctx.fillStyle = resolveFillStyle(ctx, run, glyph, options, localX, localY);
+  ctx.fillText(glyph.char, localX, localY);
 
+  ctx.restore();
+}
+
+/** Paint a glyph in bent mode. The ctx is transformed so the glyph's
+ *  bent-baseline-centre sits at the origin and its baseline is rotated
+ *  to follow the arc tangent; we then draw at local (-w/2, 0). Shadows,
+ *  gradients, and patterns inherit the rotation, which is what we want
+ *  visually — they're "stuck to" the glyph as it warps. */
+function drawGlyphBent(
+  ctx: CanvasRenderingContext2D,
+  glyph: LaidGlyph,
+  options: RenderTextOptions,
+  bend: BendContext
+): void {
+  const cx = glyph.x + glyph.width / 2;
+  const bp = bendPoint(bend, cx, glyph.y);
+
+  ctx.save();
+  ctx.translate(bp.x, bp.y);
+  ctx.rotate(bp.angle);
+  drawGlyph(ctx, glyph, options, -glyph.width / 2, 0);
   ctx.restore();
 }
 
@@ -176,7 +252,13 @@ function resolveFillStyle(
   ctx: CanvasRenderingContext2D,
   run: GlyphRun,
   glyph: LaidGlyph,
-  options: RenderTextOptions
+  options: RenderTextOptions,
+  /** Local-frame anchor — same (x, y) the caller will pass to fillText.
+   *  Gradient endpoints are computed in this frame so they sit correctly
+   *  inside whatever transform (translate+rotate, in bend mode) is on the
+   *  ctx when the fill is committed. */
+  localX: number,
+  localY: number
 ): string | CanvasGradient | CanvasPattern {
   // Texture takes precedence when both gradient and texture are enabled.
   if (run.texture.enabled && run.texture.src) {
@@ -203,8 +285,8 @@ function resolveFillStyle(
     // across its bounding box. (For "gradient across whole text" we'd
     // need a different mode; defer until the Gradient tool defines it.)
     const angleRad = ((run.gradient.angle - 90) * Math.PI) / 180;
-    const cx = glyph.x + glyph.width / 2;
-    const cy = glyph.y - glyph.ascent / 2;
+    const cx = localX + glyph.width / 2;
+    const cy = localY - glyph.ascent / 2;
     const radius = Math.max(glyph.width, glyph.ascent + glyph.descent) / 2;
     const sx = cx - Math.cos(angleRad) * radius;
     const sy = cy - Math.sin(angleRad) * radius;
@@ -295,6 +377,53 @@ function sameDecoration(a: GlyphRun, b: GlyphRun): boolean {
     a.fill === b.fill &&
     a.opacity === b.opacity
   );
+}
+
+/** Bent decoration pass — paints a per-glyph short underline /
+ *  strikethrough segment in the rotated local frame instead of one long
+ *  segment per group. Trade-off matches {@link drawHighlightsForLineBent}:
+ *  the line-level group merge is bypassed because the segments are no
+ *  longer collinear along an arc, but adjacent glyph segments abut
+ *  tightly enough that the result reads as continuous. */
+function drawDecorationsForLineBent(
+  ctx: CanvasRenderingContext2D,
+  line: LaidLine,
+  bend: BendContext
+): void {
+  for (const g of line.glyphs) {
+    const decoration = g.run.decoration;
+    if (decoration === "none") continue;
+
+    const cx = g.x + g.width / 2;
+    const bp = bendPoint(bend, cx, g.y);
+    const fontSize = g.run.fontSize;
+    const thickness = Math.max(1, fontSize * 0.06);
+
+    ctx.save();
+    ctx.translate(bp.x, bp.y);
+    ctx.rotate(bp.angle);
+    ctx.globalAlpha = clamp01(g.run.opacity);
+    ctx.strokeStyle = g.run.fill;
+    ctx.lineWidth = thickness;
+    ctx.lineCap = "butt";
+
+    if (decoration === "underline" || decoration === "underline-strikethrough") {
+      const y = fontSize * 0.12;
+      ctx.beginPath();
+      ctx.moveTo(-g.width / 2, y);
+      ctx.lineTo(g.width / 2, y);
+      ctx.stroke();
+    }
+    if (decoration === "strikethrough" || decoration === "underline-strikethrough") {
+      const y = -fontSize * 0.3;
+      ctx.beginPath();
+      ctx.moveTo(-g.width / 2, y);
+      ctx.lineTo(g.width / 2, y);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
 }
 
 // ─── Debug overlay ──────────────────────────────────────────────

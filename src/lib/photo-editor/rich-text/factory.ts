@@ -6,6 +6,7 @@
 
 import type {
   GlyphRun,
+  TextBackground,
   TextLayer,
   TextLayerStyling,
   Transform,
@@ -13,12 +14,27 @@ import type {
 import { IDENTITY_TRANSFORM } from "../types";
 import { newId } from "../util/id";
 
-/** Default text styling — left-aligned, no extra spacing, line-height 1.2. */
+/** Default text styling — left-aligned, no extra spacing, line-height 1.2,
+ *  no bend. */
 export function defaultTextStyling(): TextLayerStyling {
   return {
     align: "left",
     letterSpacing: 0,
     lineHeight: 1.2,
+    bend: { amount: 0 },
+  };
+}
+
+/** Default TextLayer background — disabled, semi-transparent black with
+ *  modest padding and no rounded corners. New for Batch D2b. */
+export function defaultTextBackground(): TextBackground {
+  return {
+    enabled: false,
+    color: "#000000",
+    opacity: 0.5,
+    roundCorner: 0,
+    widthDelta: 16,
+    heightDelta: 12,
   };
 }
 
@@ -119,6 +135,8 @@ export function createTextLayer(opts: CreateTextLayerOptions = {}): TextLayer {
     styling,
     runs,
     erase: [],
+    background: defaultTextBackground(),
+    perspective: null,
   };
 }
 
