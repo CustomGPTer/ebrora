@@ -114,8 +114,21 @@ export function EmptyState({ onProjectLoaded }: EmptyStateProps) {
     void deleteDraft();
   };
 
+  // ── Scroll container behaviour ──────────────────────────────
+  // On mobile (≤ lg breakpoint) the photo editor is wrapped in a
+  // `fixed inset-0` container in PhotoEditorClient and the document
+  // body has `overflow: hidden` applied. That means the page document
+  // can't scroll, so anything taller than the viewport (notably the
+  // Projects grid at the bottom of this view) is clipped and
+  // unreachable. To fix that, on mobile this outer div becomes its
+  // own scroll container — height is pinned to the viewport and
+  // overflow-y is auto. On desktop the page document scrolls
+  // naturally, so we keep min-height: 100vh and leave overflow alone.
   return (
-    <div className="flex flex-col" style={{ minHeight: "100vh" }}>
+    <div
+      className="flex flex-col min-h-screen max-lg:h-screen max-lg:overflow-y-auto"
+      style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}
+    >
       <HomeHeader onOpenSettings={() => setSettingsOpen(true)} />
 
       <main
