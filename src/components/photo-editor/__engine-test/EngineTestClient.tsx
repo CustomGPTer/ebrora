@@ -151,7 +151,7 @@ function makeStrokeDemo(): TextLayer {
         fontWeight: 800,
         fontSize: 96,
         fill: "#FFFFFF",
-        stroke: { enabled: true, color: "#111827", width: 6, opacity: 1 },
+        stroke: { color: "#111827", width: 6, opacity: 1 },
       }),
     ],
     width: 600,
@@ -167,7 +167,6 @@ function makeShadowDemo(): TextLayer {
         fontSize: 96,
         fill: "#1B5B50",
         shadow: {
-          enabled: true,
           color: "#000000",
           opacity: 0.4,
           blur: 12,
@@ -210,7 +209,7 @@ function makeHighlightDemo(): TextLayer {
   const layer = createTextLayer({ runs: [base], width: 720 });
   // "Highlight middle word" — "middle" starts at offset 10, length 6.
   layer.runs = applyStylePatch(layer.runs, 10, 16, {
-    highlight: { enabled: true, color: "#FACC15", opacity: 1 },
+    highlight: { color: "#FACC15", opacity: 1 },
   });
   return layer;
 }
