@@ -97,7 +97,6 @@ function fillsEqual(a: GlyphRun, b: GlyphRun): boolean {
 
 function strokesEqual(a: GlyphRun, b: GlyphRun): boolean {
   return (
-    a.stroke.enabled === b.stroke.enabled &&
     a.stroke.color === b.stroke.color &&
     a.stroke.width === b.stroke.width &&
     a.stroke.opacity === b.stroke.opacity
@@ -106,7 +105,6 @@ function strokesEqual(a: GlyphRun, b: GlyphRun): boolean {
 
 function shadowsEqual(a: GlyphRun, b: GlyphRun): boolean {
   return (
-    a.shadow.enabled === b.shadow.enabled &&
     a.shadow.color === b.shadow.color &&
     a.shadow.opacity === b.shadow.opacity &&
     a.shadow.blur === b.shadow.blur &&
@@ -117,7 +115,6 @@ function shadowsEqual(a: GlyphRun, b: GlyphRun): boolean {
 
 function highlightsEqual(a: GlyphRun, b: GlyphRun): boolean {
   return (
-    a.highlight.enabled === b.highlight.enabled &&
     a.highlight.color === b.highlight.color &&
     a.highlight.opacity === b.highlight.opacity
   );

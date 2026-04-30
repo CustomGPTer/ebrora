@@ -25,20 +25,25 @@ export function defaultTextStyling(): TextLayerStyling {
   };
 }
 
-/** Default TextLayer background — disabled, semi-transparent black with
- *  modest padding and no rounded corners. New for Batch D2b. */
+/** Default TextLayer background — opacity 0 (invisible) so it renders as
+ *  a no-op until the user dials opacity up. Padding kept at sensible
+ *  defaults so dragging opacity > 0 immediately shows a usable rect. */
 export function defaultTextBackground(): TextBackground {
   return {
-    enabled: false,
     color: "#000000",
-    opacity: 0.5,
+    opacity: 0,
     roundCorner: 0,
     widthDelta: 16,
     heightDelta: 12,
   };
 }
 
-/** Default GlyphRun — black, sans-serif 96px, no stroke / shadow / highlight. */
+/** Default GlyphRun — black, sans-serif 96px. Stroke width 0, shadow
+ *  opacity 0, highlight opacity 0 — every effect renders as a no-op
+ *  until the user dials its primary value up. Gradient + texture keep
+ *  their `enabled` flags because the three fill modes (solid / gradient
+ *  / texture) are mutually exclusive — the toggle is the user's mode
+ *  selector. */
 export function defaultGlyphRun(overrides: Partial<GlyphRun> = {}): GlyphRun {
   const base: GlyphRun = {
     text: "",
@@ -66,20 +71,17 @@ export function defaultGlyphRun(overrides: Partial<GlyphRun> = {}): GlyphRun {
       rotation: 0,
     },
     stroke: {
-      enabled: false,
       color: "#000000",
-      width: 4,
+      width: 0,
       opacity: 1,
     },
     highlight: {
-      enabled: false,
       color: "#FACC15",
-      opacity: 1,
+      opacity: 0,
     },
     shadow: {
-      enabled: false,
       color: "#000000",
-      opacity: 0.5,
+      opacity: 0,
       blur: 8,
       offsetX: 4,
       offsetY: 4,

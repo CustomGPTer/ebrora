@@ -130,7 +130,7 @@ function drawHighlightsForLine(
 
   for (let i = 0; i < line.glyphs.length; i++) {
     const g = line.glyphs[i];
-    if (g.run.highlight.enabled) {
+    if (g.run.highlight.opacity > 0) {
       if (groupRun && sameHighlight(g.run, groupRun)) {
         // continue group
       } else {
@@ -164,7 +164,7 @@ function drawHighlightsForLineBent(
   bend: BendContext
 ): void {
   for (const g of line.glyphs) {
-    if (!g.run.highlight.enabled) continue;
+    if (g.run.highlight.opacity <= 0) continue;
     const cx = g.x + g.width / 2;
     const bp = bendPoint(bend, cx, g.y);
     ctx.save();
@@ -199,8 +199,10 @@ function drawGlyph(
   ctx.font = fontStringForRun(run);
   ctx.globalAlpha = clamp01(run.opacity);
 
-  // Shadow — applies to whatever we draw next (stroke + fill).
-  if (run.shadow.enabled) {
+  // Shadow — applies to whatever we draw next (stroke + fill). Skip the
+  // setup work entirely when opacity is 0 so a no-op shadow doesn't pay
+  // the canvas-shadow render cost on every glyph.
+  if (run.shadow.opacity > 0) {
     ctx.shadowColor = withAlpha(run.shadow.color, run.shadow.opacity);
     ctx.shadowBlur = run.shadow.blur;
     ctx.shadowOffsetX = run.shadow.offsetX;
@@ -209,8 +211,9 @@ function drawGlyph(
 
   // Stroke first — we double the stroke width so the visible outline is
   // exactly half stroke-width wide once the fill paints over the inner
-  // half. Matches Add Text's "outlined" look.
-  if (run.stroke.enabled && run.stroke.width > 0) {
+  // half. Matches Add Text's "outlined" look. Skip when width or opacity
+  // is 0 (no visible outline either way).
+  if (run.stroke.width > 0 && run.stroke.opacity > 0) {
     ctx.save();
     ctx.lineWidth = run.stroke.width * 2;
     ctx.lineJoin = "round";
