@@ -65,9 +65,8 @@ export function deserializeSavedProject(saved: SavedProject): Project {
     const anyLayer = layer as any;
     if (anyLayer.stroke === undefined) {
       anyLayer.stroke = {
-        enabled: false,
         color: "#000000",
-        width: 4,
+        width: 0,
         opacity: 1,
       };
     }
@@ -83,7 +82,7 @@ export function deserializeSavedProject(saved: SavedProject): Project {
       anyLayer.filterEffect = null;
     }
     if (anyLayer.blur === undefined) {
-      anyLayer.blur = { enabled: false, radius: 0, kind: "gaussian" };
+      anyLayer.blur = { radius: 0, kind: "gaussian" };
     }
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }
