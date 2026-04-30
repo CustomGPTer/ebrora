@@ -56,6 +56,20 @@
 // can't get lost into a void. The drawer chrome (controls row,
 // backdrop, visible padding) is still rendered conditionally.
 //
+// CRITICAL: the outer drawer container MUST NOT use `visibility:
+// hidden` when not editing. iOS Safari and Android Chrome silently
+// refuse to pop the on-screen keyboard for inputs whose computed
+// `visibility` is `hidden` — even when focus() is called inside a
+// user gesture. Because focusForKeyboardPop runs BEFORE the
+// `editing` state flips (React batches the dispatch asynchronously),
+// the textarea would still be in the offscreen state at the moment
+// of focus, and any visibility:hidden ancestor would suppress the
+// keyboard. We hide the chrome with conditional `background` /
+// `borderTop` / `boxShadow` (so nothing is visually drawn) and
+// disable interaction with `pointerEvents: none`. The 1×1 inner
+// wrapper around the textarea handles invisibility — the textarea
+// itself stays a real, focusable, in-viewport element at all times.
+//
 // We deliberately do NOT trigger the existing TextEditOverlay
 // (caret + selection rectangles in canvas-local coords). That UI was
 // the previous double-tap inline-editing path and clashes visually
@@ -237,17 +251,27 @@ export function BottomEditDrawer() {
           paddingBottom: editing
             ? "env(safe-area-inset-bottom, 0px)"
             : "0px",
-          // When not editing, slide the visual chrome out of view but
-          // leave the textarea reachable as a 1×1 transparent target.
-          visibility: editing ? "visible" : "hidden",
+          // When not editing we hide the chrome via transparent
+          // background / no border / no shadow above, but we DO NOT
+          // set `visibility: hidden` here. iOS Safari and Android
+          // Chrome refuse to pop the on-screen keyboard for inputs
+          // whose computed visibility is `hidden`, and the outer
+          // container's visibility is inherited by the textarea.
+          // The 1×1 inner wrapper below collapses the textarea to
+          // an invisible focusable target. pointerEvents: none means
+          // the (now visually empty) drawer doesn't block taps on
+          // the canvas / dock when no edit session is active.
           pointerEvents: editing ? "auto" : "none",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Textarea — ALWAYS mounted. Visibility/size are toggled
-            via the parent container's `visibility`. When the parent
-            is hidden the textarea is still in the DOM so focus()
-            works. */}
+        {/* Textarea — ALWAYS mounted. Size and visible chrome are
+            toggled via the inner wrapper below and the textarea's
+            own style. The textarea remains a real, focusable, in-
+            viewport element at all times so focusForKeyboardPop
+            (called synchronously inside the Add Text user gesture)
+            can pop the OS keyboard before the drawer chrome
+            renders. */}
         <div
           className={editing ? "px-4 pt-3 pb-2" : ""}
           style={
@@ -255,8 +279,10 @@ export function BottomEditDrawer() {
               ? undefined
               : {
                   // Collapse to a 1×1 transparent box when no edit
-                  // session is active. visibility: hidden on the
-                  // parent already hides it; this keeps it focusable.
+                  // session is active. The textarea inside stays
+                  // focusable (and keyboard-poppable on mobile)
+                  // because no ancestor sets visibility: hidden or
+                  // display: none.
                   position: "absolute",
                   left: 0,
                   bottom: 0,
