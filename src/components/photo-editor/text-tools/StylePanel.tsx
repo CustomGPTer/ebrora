@@ -64,7 +64,6 @@ const PRESETS: StylePreset[] = [
     },
     apply: (tool) => {
       const shadow: Shadow = {
-        enabled: true,
         color: "#000000",
         opacity: 0.5,
         blur: 8,
@@ -83,7 +82,6 @@ const PRESETS: StylePreset[] = [
     },
     apply: (tool) => {
       const stroke: Stroke = {
-        enabled: true,
         color: "#000000",
         width: 2,
         opacity: 1,
@@ -100,7 +98,6 @@ const PRESETS: StylePreset[] = [
     },
     apply: (tool) => {
       const stroke: Stroke = {
-        enabled: true,
         color: "#1F2937",
         width: 4,
         opacity: 1,
@@ -121,7 +118,6 @@ const PRESETS: StylePreset[] = [
     },
     apply: (tool) => {
       const shadow: Shadow = {
-        enabled: true,
         color: "#1B5B50",
         opacity: 0.85,
         blur: 16,
@@ -186,7 +182,6 @@ const PRESETS: StylePreset[] = [
         ],
       };
       const shadow: Shadow = {
-        enabled: true,
         color: "#00e5ff",
         opacity: 0.85,
         blur: 18,
@@ -226,7 +221,6 @@ const PRESETS: StylePreset[] = [
         rotation: 0,
       };
       const shadow: Shadow = {
-        enabled: true,
         color: "#3a2a10",
         opacity: 0.4,
         blur: 4,

@@ -22,12 +22,10 @@ import { Pencil } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useEditor } from "../context/EditorContext";
 import {
-  DimmedWhen,
   Row,
   Section,
   SectionDivider,
   Slider,
-  Toggle,
 } from "./controls";
 import { ColorSwatches } from "./ColorSwatches";
 import { HsvPicker } from "./HsvPicker";
@@ -44,9 +42,8 @@ interface ImageStrokePanelProps {
 }
 
 const DEFAULT_STROKE: Stroke = {
-  enabled: false,
   color: "#000000",
-  width: 4,
+  width: 0,
   opacity: 1,
 };
 
@@ -85,66 +82,54 @@ export function ImageStrokePanel({
       ) : (
         <>
           <Section title="Stroke">
-            <Toggle
-              checked={stroke.enabled}
-              onChange={(next) => patchStroke({ enabled: next })}
-              label="Enable stroke"
-            />
+            <Row label="Width">
+              <Slider
+                ariaLabel="Stroke width"
+                value={stroke.width}
+                min={0}
+                max={40}
+                step={1}
+                onChange={(v) => patchStroke({ width: v })}
+                format={(n) => `${n.toFixed(0)} px`}
+              />
+            </Row>
+            <Row label="Opacity">
+              <Slider
+                ariaLabel="Stroke opacity"
+                value={stroke.opacity}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(v) => patchStroke({ opacity: v })}
+                format={(n) => `${Math.round(n * 100)}%`}
+              />
+            </Row>
           </Section>
 
           <SectionDivider />
 
-          <DimmedWhen disabled={!stroke.enabled}>
-            <Section title="Colour">
-              <ColorSwatches
+          <Section title="Colour">
+            <ColorSwatches
+              value={stroke.color}
+              onPick={(c) => patchStroke({ color: c })}
+            />
+            <Row>
+              <button
+                type="button"
+                onClick={() => setShowHsv((s) => !s)}
+                className="text-xs underline self-start"
+                style={{ color: "var(--pe-text-muted)" }}
+              >
+                {showHsv ? "Hide custom picker" : "Custom colour…"}
+              </button>
+            </Row>
+            {showHsv ? (
+              <HsvPicker
                 value={stroke.color}
-                onPick={(c) => patchStroke({ color: c })}
+                onChange={(c) => patchStroke({ color: c })}
               />
-              <Row>
-                <button
-                  type="button"
-                  onClick={() => setShowHsv((s) => !s)}
-                  className="text-xs underline self-start"
-                  style={{ color: "var(--pe-text-muted)" }}
-                >
-                  {showHsv ? "Hide custom picker" : "Custom colour…"}
-                </button>
-              </Row>
-              {showHsv ? (
-                <HsvPicker
-                  value={stroke.color}
-                  onChange={(c) => patchStroke({ color: c })}
-                />
-              ) : null}
-            </Section>
-
-            <SectionDivider />
-
-            <Section title="Geometry">
-              <Row label="Width">
-                <Slider
-                  ariaLabel="Stroke width"
-                  value={stroke.width}
-                  min={0}
-                  max={40}
-                  step={1}
-                  onChange={(v) => patchStroke({ width: v })}
-                  format={(n) => `${n.toFixed(0)} px`}
-                />
-              </Row>
-              <Row label="Opacity">
-                <Slider
-                  ariaLabel="Stroke opacity"
-                  value={stroke.opacity}
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  onChange={(v) => patchStroke({ opacity: v })}
-                  format={(n) => `${Math.round(n * 100)}%`}
-                />
-              </Row>
-            </Section>
-          </DimmedWhen>
+            ) : null}
+          </Section>
         </>
       )}
     </div>

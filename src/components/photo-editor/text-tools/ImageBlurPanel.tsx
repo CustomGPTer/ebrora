@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { Droplets } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useEditor } from "../context/EditorContext";
-import { Row, Section, SectionDivider, Slider, Toggle } from "./controls";
+import { Row, Section, Slider } from "./controls";
 import type { AnyLayer, ImageLayer } from "@/lib/photo-editor/types";
 
 interface ImageBlurPanelProps {
@@ -28,9 +28,7 @@ export function ImageBlurPanel({ open, onClose }: ImageBlurPanelProps) {
     return found as ImageLayer;
   }, [state.selection, state.project.layers]);
 
-  const blur =
-    layer?.blur ??
-    ({ enabled: false, radius: 0, kind: "gaussian" } as const);
+  const blur = layer?.blur ?? ({ radius: 0, kind: "gaussian" } as const);
 
   function patchBlur(patch: Partial<ImageLayer["blur"]>) {
     if (!layer) return;
@@ -58,31 +56,19 @@ export function ImageBlurPanel({ open, onClose }: ImageBlurPanelProps) {
             Select an image to access blur controls.
           </div>
         ) : (
-          <>
-            <Section title="Blur">
-              <Toggle
-                checked={blur.enabled}
-                onChange={(next) => patchBlur({ enabled: next })}
-                label="Enable blur"
+          <Section title="Blur">
+            <Row label="Radius">
+              <Slider
+                ariaLabel="Blur radius"
+                value={blur.radius}
+                min={0}
+                max={50}
+                step={1}
+                onChange={(v) => patchBlur({ radius: v })}
+                format={(n) => `${Math.round(n)} px`}
               />
-            </Section>
-
-            <SectionDivider />
-
-            <Section title="Radius">
-              <Row label="Amount">
-                <Slider
-                  ariaLabel="Blur radius"
-                  value={blur.radius}
-                  min={0}
-                  max={50}
-                  step={1}
-                  onChange={(v) => patchBlur({ radius: v })}
-                  format={(n) => `${Math.round(n)} px`}
-                />
-              </Row>
-            </Section>
-          </>
+            </Row>
+          </Section>
         )}
       </div>
     </PanelDrawer>

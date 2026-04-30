@@ -33,12 +33,10 @@ import { PanelDrawer } from "../panels/PanelDrawer";
 import { useEditor } from "../context/EditorContext";
 import {
   ActionButton,
-  DimmedWhen,
   Row,
   Section,
   SectionDivider,
   Slider,
-  Toggle,
 } from "./controls";
 import { identityPerspective } from "@/lib/photo-editor/canvas/perspective-render";
 import { layoutText } from "@/lib/photo-editor/rich-text/engine";
@@ -183,10 +181,6 @@ export function PerspectivePanel({
     patchPerspective(identityPerspective(w, h));
   }
 
-  function setEnabled(on: boolean) {
-    patchPerspective(on ? identityPerspective(w, h) : null);
-  }
-
   const body = (
     <div className="flex-1 overflow-y-auto">
       {!target ? (
@@ -198,103 +192,91 @@ export function PerspectivePanel({
         </div>
       ) : (
         <>
-          <Section title="Warp">
-            <Toggle
-              checked={enabled}
-              onChange={setEnabled}
-              label="Enable perspective warp"
-            />
+          <Section title="Presets">
+            <div className="grid grid-cols-2 gap-2">
+              <ActionButton
+                ariaLabel="Tilt forward"
+                onClick={() => applyPreset("forward")}
+                fullWidth
+              >
+                Tilt forward
+              </ActionButton>
+              <ActionButton
+                ariaLabel="Tilt back"
+                onClick={() => applyPreset("back")}
+                fullWidth
+              >
+                Tilt back
+              </ActionButton>
+              <ActionButton
+                ariaLabel="Tilt left"
+                onClick={() => applyPreset("left")}
+                fullWidth
+              >
+                Tilt left
+              </ActionButton>
+              <ActionButton
+                ariaLabel="Tilt right"
+                onClick={() => applyPreset("right")}
+                fullWidth
+              >
+                Tilt right
+              </ActionButton>
+            </div>
           </Section>
 
           <SectionDivider />
 
-          <DimmedWhen disabled={!enabled}>
-            <Section title="Presets">
-              <div className="grid grid-cols-2 gap-2">
-                <ActionButton
-                  ariaLabel="Tilt forward"
-                  onClick={() => applyPreset("forward")}
-                  fullWidth
-                >
-                  Tilt forward
-                </ActionButton>
-                <ActionButton
-                  ariaLabel="Tilt back"
-                  onClick={() => applyPreset("back")}
-                  fullWidth
-                >
-                  Tilt back
-                </ActionButton>
-                <ActionButton
-                  ariaLabel="Tilt left"
-                  onClick={() => applyPreset("left")}
-                  fullWidth
-                >
-                  Tilt left
-                </ActionButton>
-                <ActionButton
-                  ariaLabel="Tilt right"
-                  onClick={() => applyPreset("right")}
-                  fullWidth
-                >
-                  Tilt right
-                </ActionButton>
-              </div>
-            </Section>
+          <CornerEditor
+            label="Top-left"
+            point={corners[0]}
+            width={w}
+            height={h}
+            onChange={(axis, v) => setCorner(0, axis, v)}
+          />
 
-            <SectionDivider />
+          <SectionDivider />
 
-            <CornerEditor
-              label="Top-left"
-              point={corners[0]}
-              width={w}
-              height={h}
-              onChange={(axis, v) => setCorner(0, axis, v)}
-            />
+          <CornerEditor
+            label="Top-right"
+            point={corners[1]}
+            width={w}
+            height={h}
+            onChange={(axis, v) => setCorner(1, axis, v)}
+          />
 
-            <SectionDivider />
+          <SectionDivider />
 
-            <CornerEditor
-              label="Top-right"
-              point={corners[1]}
-              width={w}
-              height={h}
-              onChange={(axis, v) => setCorner(1, axis, v)}
-            />
+          <CornerEditor
+            label="Bottom-right"
+            point={corners[2]}
+            width={w}
+            height={h}
+            onChange={(axis, v) => setCorner(2, axis, v)}
+          />
 
-            <SectionDivider />
+          <SectionDivider />
 
-            <CornerEditor
-              label="Bottom-right"
-              point={corners[2]}
-              width={w}
-              height={h}
-              onChange={(axis, v) => setCorner(2, axis, v)}
-            />
+          <CornerEditor
+            label="Bottom-left"
+            point={corners[3]}
+            width={w}
+            height={h}
+            onChange={(axis, v) => setCorner(3, axis, v)}
+          />
 
-            <SectionDivider />
+          <SectionDivider />
 
-            <CornerEditor
-              label="Bottom-left"
-              point={corners[3]}
-              width={w}
-              height={h}
-              onChange={(axis, v) => setCorner(3, axis, v)}
-            />
-
-            <SectionDivider />
-
-            <Section title="Reset">
-              <ActionButton
-                ariaLabel="Reset to flat rectangle"
-                onClick={resetIdentity}
-                fullWidth
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>Back to flat</span>
-              </ActionButton>
-            </Section>
-          </DimmedWhen>
+          <Section title="Reset">
+            <ActionButton
+              ariaLabel="Reset to flat rectangle"
+              onClick={resetIdentity}
+              fullWidth
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Back to flat</span>
+            </ActionButton>
+          </Section>
         </>
       )}
     </div>

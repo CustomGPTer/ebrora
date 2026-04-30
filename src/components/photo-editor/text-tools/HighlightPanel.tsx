@@ -12,13 +12,11 @@ import { Highlighter } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useTextTool } from "./use-text-tool";
 import {
-  DimmedWhen,
   MixedHint,
   Row,
   Section,
   SectionDivider,
   Slider,
-  Toggle,
 } from "./controls";
 import { ColorSwatches } from "./ColorSwatches";
 import { HsvPicker } from "./HsvPicker";
@@ -35,9 +33,8 @@ interface HighlightPanelProps {
 }
 
 const DEFAULT_HIGHLIGHT: Highlight = {
-  enabled: false,
   color: "#FFEB3B",
-  opacity: 0.5,
+  opacity: 0,
 };
 
 export function HighlightPanel({
@@ -66,55 +63,43 @@ export function HighlightPanel({
             title="Highlight"
             right={mixed ? <MixedHint /> : null}
           >
-            <Toggle
-              checked={highlight.enabled}
-              onChange={(next) => patchHighlight({ enabled: next })}
-              label="Enable highlight"
-            />
+            <Row label="Opacity">
+              <Slider
+                ariaLabel="Highlight opacity"
+                value={highlight.opacity}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(v) => patchHighlight({ opacity: v })}
+                format={(n) => `${Math.round(n * 100)}%`}
+              />
+            </Row>
           </Section>
 
           <SectionDivider />
 
-          <DimmedWhen disabled={!highlight.enabled}>
-            <Section title="Colour">
-              <ColorSwatches
+          <Section title="Colour">
+            <ColorSwatches
+              value={highlight.color}
+              onPick={(c) => patchHighlight({ color: c })}
+            />
+            <Row>
+              <button
+                type="button"
+                onClick={() => setShowHsv((s) => !s)}
+                className="text-xs underline self-start"
+                style={{ color: "var(--pe-text-muted)" }}
+              >
+                {showHsv ? "Hide custom picker" : "Custom colour…"}
+              </button>
+            </Row>
+            {showHsv ? (
+              <HsvPicker
                 value={highlight.color}
-                onPick={(c) => patchHighlight({ color: c })}
+                onChange={(c) => patchHighlight({ color: c })}
               />
-              <Row>
-                <button
-                  type="button"
-                  onClick={() => setShowHsv((s) => !s)}
-                  className="text-xs underline self-start"
-                  style={{ color: "var(--pe-text-muted)" }}
-                >
-                  {showHsv ? "Hide custom picker" : "Custom colour…"}
-                </button>
-              </Row>
-              {showHsv ? (
-                <HsvPicker
-                  value={highlight.color}
-                  onChange={(c) => patchHighlight({ color: c })}
-                />
-              ) : null}
-            </Section>
-
-            <SectionDivider />
-
-            <Section title="Opacity">
-              <Row label="Opacity">
-                <Slider
-                  ariaLabel="Highlight opacity"
-                  value={highlight.opacity}
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  onChange={(v) => patchHighlight({ opacity: v })}
-                  format={(n) => `${Math.round(n * 100)}%`}
-                />
-              </Row>
-            </Section>
-          </DimmedWhen>
+            ) : null}
+          </Section>
         </>
       )}
     </div>

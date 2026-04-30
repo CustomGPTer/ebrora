@@ -22,12 +22,10 @@
 import { useState } from "react";
 import { useTextTool } from "./use-text-tool";
 import {
-  DimmedWhen,
   Row,
   Section,
   SectionDivider,
   Slider,
-  Toggle,
 } from "./controls";
 import { ColorSwatches } from "./ColorSwatches";
 import { HsvPicker } from "./HsvPicker";
@@ -66,98 +64,86 @@ export function BackgroundPanel(_props: BackgroundPanelProps = {}) {
   return (
     <div className="flex-1 overflow-y-auto">
       <Section title="Background">
-        <Toggle
-          checked={background.enabled}
-          onChange={(v) => patchBackground({ enabled: v })}
-          label="Enable background"
-        />
+        <Row label="Opacity">
+          <Slider
+            ariaLabel="Background opacity"
+            value={background.opacity}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={(v) => patchBackground({ opacity: v })}
+            format={(n) => `${Math.round(n * 100)}%`}
+          />
+        </Row>
       </Section>
 
       <SectionDivider />
 
-      <DimmedWhen disabled={!background.enabled}>
-        <Section title="Colour">
-          <ColorSwatches
+      <Section title="Colour">
+        <ColorSwatches
+          value={background.color}
+          onPick={(c) => patchBackground({ color: c })}
+        />
+        <Row>
+          <button
+            type="button"
+            onClick={() => setShowHsv((s) => !s)}
+            className="text-xs underline self-start"
+            style={{ color: "var(--pe-text-muted)" }}
+          >
+            {showHsv ? "Hide custom picker" : "Custom colour…"}
+          </button>
+        </Row>
+        {showHsv ? (
+          <HsvPicker
             value={background.color}
-            onPick={(c) => patchBackground({ color: c })}
+            onChange={(c) => patchBackground({ color: c })}
           />
-          <Row>
-            <button
-              type="button"
-              onClick={() => setShowHsv((s) => !s)}
-              className="text-xs underline self-start"
-              style={{ color: "var(--pe-text-muted)" }}
-            >
-              {showHsv ? "Hide custom picker" : "Custom colour…"}
-            </button>
-          </Row>
-          {showHsv ? (
-            <HsvPicker
-              value={background.color}
-              onChange={(c) => patchBackground({ color: c })}
-            />
-          ) : null}
-        </Section>
+        ) : null}
+      </Section>
 
-        <SectionDivider />
+      <SectionDivider />
 
-        <Section title="Padding">
-          <Row label="Horizontal">
-            <Slider
-              ariaLabel="Background horizontal padding"
-              value={background.widthDelta}
-              min={0}
-              max={80}
-              step={1}
-              onChange={(v) => patchBackground({ widthDelta: Math.round(v) })}
-              format={(n) => `${Math.round(n)} px`}
-            />
-          </Row>
-          <Row label="Vertical">
-            <Slider
-              ariaLabel="Background vertical padding"
-              value={background.heightDelta}
-              min={0}
-              max={80}
-              step={1}
-              onChange={(v) => patchBackground({ heightDelta: Math.round(v) })}
-              format={(n) => `${Math.round(n)} px`}
-            />
-          </Row>
-        </Section>
+      <Section title="Padding">
+        <Row label="Horizontal">
+          <Slider
+            ariaLabel="Background horizontal padding"
+            value={background.widthDelta}
+            min={0}
+            max={80}
+            step={1}
+            onChange={(v) => patchBackground({ widthDelta: Math.round(v) })}
+            format={(n) => `${Math.round(n)} px`}
+          />
+        </Row>
+        <Row label="Vertical">
+          <Slider
+            ariaLabel="Background vertical padding"
+            value={background.heightDelta}
+            min={0}
+            max={80}
+            step={1}
+            onChange={(v) => patchBackground({ heightDelta: Math.round(v) })}
+            format={(n) => `${Math.round(n)} px`}
+          />
+        </Row>
+      </Section>
 
-        <SectionDivider />
+      <SectionDivider />
 
-        <Section title="Corner">
-          <Row label="Round corner">
-            <Slider
-              ariaLabel="Background corner radius"
-              value={background.roundCorner}
-              min={0}
-              max={64}
-              step={1}
-              onChange={(v) => patchBackground({ roundCorner: Math.round(v) })}
-              format={(n) => `${Math.round(n)} px`}
-            />
-          </Row>
-        </Section>
-
-        <SectionDivider />
-
-        <Section title="Opacity">
-          <Row label="Opacity">
-            <Slider
-              ariaLabel="Background opacity"
-              value={background.opacity}
-              min={0}
-              max={1}
-              step={0.05}
-              onChange={(v) => patchBackground({ opacity: v })}
-              format={(n) => `${Math.round(n * 100)}%`}
-            />
-          </Row>
-        </Section>
-      </DimmedWhen>
+      <Section title="Corner">
+        <Row label="Round corner">
+          <Slider
+            ariaLabel="Background corner radius"
+            value={background.roundCorner}
+            min={0}
+            max={64}
+            step={1}
+            onChange={(v) => patchBackground({ roundCorner: Math.round(v) })}
+            format={(n) => `${Math.round(n)} px`}
+          />
+        </Row>
+      </Section>
     </div>
   );
 }

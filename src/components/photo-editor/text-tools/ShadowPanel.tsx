@@ -12,13 +12,11 @@ import { Cloud } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useTextTool } from "./use-text-tool";
 import {
-  DimmedWhen,
   MixedHint,
   Row,
   Section,
   SectionDivider,
   Slider,
-  Toggle,
 } from "./controls";
 import { ColorSwatches } from "./ColorSwatches";
 import { HsvPicker } from "./HsvPicker";
@@ -35,9 +33,8 @@ interface ShadowPanelProps {
 }
 
 const DEFAULT_SHADOW: Shadow = {
-  enabled: false,
   color: "#000000",
-  opacity: 0.5,
+  opacity: 0,
   blur: 8,
   offsetX: 4,
   offsetY: 4,
@@ -69,93 +66,86 @@ export function ShadowPanel({
             title="Shadow"
             right={mixed ? <MixedHint /> : null}
           >
-            <Toggle
-              checked={shadow.enabled}
-              onChange={(next) => patchShadow({ enabled: next })}
-              label="Enable shadow"
-            />
+            <Row label="Opacity">
+              <Slider
+                ariaLabel="Shadow opacity"
+                value={shadow.opacity}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(v) => patchShadow({ opacity: v })}
+                format={(n) => `${Math.round(n * 100)}%`}
+              />
+            </Row>
           </Section>
 
           <SectionDivider />
 
-          <DimmedWhen disabled={!shadow.enabled}>
-            <Section title="Colour">
-              <ColorSwatches
+          <Section title="Colour">
+            <ColorSwatches
+              value={shadow.color}
+              onPick={(c) => patchShadow({ color: c })}
+            />
+            <Row>
+              <button
+                type="button"
+                onClick={() => setShowHsv((s) => !s)}
+                className="text-xs underline self-start"
+                style={{ color: "var(--pe-text-muted)" }}
+              >
+                {showHsv ? "Hide custom picker" : "Custom colour…"}
+              </button>
+            </Row>
+            {showHsv ? (
+              <HsvPicker
                 value={shadow.color}
-                onPick={(c) => patchShadow({ color: c })}
+                onChange={(c) => patchShadow({ color: c })}
               />
-              <Row>
-                <button
-                  type="button"
-                  onClick={() => setShowHsv((s) => !s)}
-                  className="text-xs underline self-start"
-                  style={{ color: "var(--pe-text-muted)" }}
-                >
-                  {showHsv ? "Hide custom picker" : "Custom colour…"}
-                </button>
-              </Row>
-              {showHsv ? (
-                <HsvPicker
-                  value={shadow.color}
-                  onChange={(c) => patchShadow({ color: c })}
-                />
-              ) : null}
-            </Section>
+            ) : null}
+          </Section>
 
-            <SectionDivider />
+          <SectionDivider />
 
-            <Section title="Strength">
-              <Row label="Opacity">
-                <Slider
-                  ariaLabel="Shadow opacity"
-                  value={shadow.opacity}
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  onChange={(v) => patchShadow({ opacity: v })}
-                  format={(n) => `${Math.round(n * 100)}%`}
-                />
-              </Row>
-              <Row label="Blur">
-                <Slider
-                  ariaLabel="Shadow blur"
-                  value={shadow.blur}
-                  min={0}
-                  max={40}
-                  step={0.5}
-                  onChange={(v) => patchShadow({ blur: v })}
-                  format={(n) => `${n.toFixed(1)} px`}
-                />
-              </Row>
-            </Section>
+          <Section title="Strength">
+            <Row label="Blur">
+              <Slider
+                ariaLabel="Shadow blur"
+                value={shadow.blur}
+                min={0}
+                max={40}
+                step={0.5}
+                onChange={(v) => patchShadow({ blur: v })}
+                format={(n) => `${n.toFixed(1)} px`}
+              />
+            </Row>
+          </Section>
 
-            <SectionDivider />
+          <SectionDivider />
 
-            <Section title="Offset">
-              <Row label="Horizontal">
-                <Slider
-                  ariaLabel="Shadow horizontal offset"
-                  value={shadow.offsetX}
-                  min={-40}
-                  max={40}
-                  step={0.5}
-                  onChange={(v) => patchShadow({ offsetX: v })}
-                  format={(n) => `${n.toFixed(1)} px`}
-                />
-              </Row>
-              <Row label="Vertical">
-                <Slider
-                  ariaLabel="Shadow vertical offset"
-                  value={shadow.offsetY}
-                  min={-40}
-                  max={40}
-                  step={0.5}
-                  onChange={(v) => patchShadow({ offsetY: v })}
-                  format={(n) => `${n.toFixed(1)} px`}
-                />
-              </Row>
-            </Section>
-          </DimmedWhen>
+          <Section title="Offset">
+            <Row label="Horizontal">
+              <Slider
+                ariaLabel="Shadow horizontal offset"
+                value={shadow.offsetX}
+                min={-40}
+                max={40}
+                step={0.5}
+                onChange={(v) => patchShadow({ offsetX: v })}
+                format={(n) => `${n.toFixed(1)} px`}
+              />
+            </Row>
+            <Row label="Vertical">
+              <Slider
+                ariaLabel="Shadow vertical offset"
+                value={shadow.offsetY}
+                min={-40}
+                max={40}
+                step={0.5}
+                onChange={(v) => patchShadow({ offsetY: v })}
+                format={(n) => `${n.toFixed(1)} px`}
+              />
+            </Row>
+          </Section>
         </>
       )}
     </div>
