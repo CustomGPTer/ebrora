@@ -129,11 +129,26 @@ export function MobileEditProvider({ children }: { children: ReactNode }) {
     (layerId: Id, opts?: { isFresh?: boolean }) => {
       const project = editorState.project;
       const targetLayer = project.layers.find((l) => l.id === layerId);
-      if (!targetLayer || targetLayer.kind !== "text") {
-        // Defensive — shouldn't happen, but better to ignore than blow
-        // up the editor if a stale id is passed in (e.g. a tap fires
-        // after the layer was removed by another path).
-        return;
+
+      // For NON-FRESH sessions (tap on existing text layer), the
+      // target layer must already exist in the closure-captured
+      // project — that's the layer the user just tapped, so it
+      // really should be there. If it isn't, bail defensively.
+      //
+      // For FRESH sessions (Add Text path), the caller has just
+      // dispatched ADD_LAYER for `layerId` in the same React event
+      // handler. State updates are batched and applied AFTER the
+      // handler returns, so the closure-captured `project` here
+      // does NOT yet contain the new layer. Looking it up would
+      // wrongly bail out, leaving editingLayerId=null, which would
+      // prevent the BottomEditDrawer from ever opening — and that
+      // was the real reason "Add Text" appeared to add a layer but
+      // never popped the keyboard or showed the text input strip.
+      // We trust the caller's layerId and skip the existence check.
+      if (!opts?.isFresh) {
+        if (!targetLayer || targetLayer.kind !== "text") {
+          return;
+        }
       }
 
       // Auto-tidy if we're transitioning away from a fresh-empty layer.
@@ -158,9 +173,11 @@ export function MobileEditProvider({ children }: { children: ReactNode }) {
           editingLayerId: layerId,
           isFresh: opts?.isFresh ?? false,
           // Clone the runs so future UPDATE_LAYER patches don't
-          // mutate our snapshot.
+          // mutate our snapshot. For fresh sessions there's nothing
+          // to roll back to (the layer was just created), so leave
+          // originalRuns null.
           originalRuns:
-            opts?.isFresh
+            opts?.isFresh || !targetLayer
               ? null
               : (targetLayer as TextLayer).runs.map((r) => ({ ...r })),
         };
