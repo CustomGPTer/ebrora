@@ -43,7 +43,7 @@
 //   shape — per-tab reset, not whole-layer reset. So:
 //     Adjust  → zero brightness/contrast/saturation/exposure
 //     Filters → set filterEffect to null (Original)
-//     Blur    → enabled=false, radius=0
+//     Blur    → radius=0 (no-op)
 
 "use client";
 
@@ -69,7 +69,7 @@ interface EffectsDraft {
 const DEFAULT_DRAFT: EffectsDraft = {
   adjust: { brightness: 0, contrast: 0, saturation: 0, exposure: 0 },
   filterEffect: null,
-  blur: { enabled: false, radius: 0, kind: "gaussian" },
+  blur: { radius: 0, kind: "gaussian" },
 };
 
 export function LayerEffectsTool({ open, onClose }: LayerEffectsToolProps) {
@@ -311,22 +311,11 @@ export function LayerEffectsTool({ open, onClose }: LayerEffectsToolProps) {
 
           {tab === "blur" && (
             <>
-              <ToggleRow
-                label="Enable blur"
-                checked={draft.blur.enabled}
-                onChange={(next) =>
-                  setDraft((d) => ({
-                    ...d,
-                    blur: { ...d.blur, enabled: next },
-                  }))
-                }
-              />
               <Slider
                 label="Radius"
                 value={draft.blur.radius}
                 min={0}
                 max={50}
-                disabled={!draft.blur.enabled}
                 onChange={(v) =>
                   setDraft((d) => ({
                     ...d,
@@ -515,58 +504,6 @@ function Slider({
   );
 }
 
-// ─── Toggle row ─────────────────────────────────────────────────
-
-function ToggleRow({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (next: boolean) => void;
-}) {
-  return (
-    <label className="flex items-center justify-between cursor-pointer">
-      <span
-        className="text-[12px] font-medium"
-        style={{ color: "rgba(255,255,255,0.85)" }}
-      >
-        {label}
-      </span>
-      <span
-        role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
-        onKeyDown={(e) => {
-          if (e.key === " " || e.key === "Enter") {
-            e.preventDefault();
-            onChange(!checked);
-          }
-        }}
-        tabIndex={0}
-        className="relative inline-block transition-colors rounded-full"
-        style={{
-          width: 38,
-          height: 22,
-          background: checked ? "#4FB89E" : "rgba(255,255,255,0.18)",
-        }}
-      >
-        <span
-          aria-hidden
-          className="absolute top-[2px] rounded-full transition-transform"
-          style={{
-            width: 18,
-            height: 18,
-            background: "#FFFFFF",
-            transform: checked ? "translateX(18px)" : "translateX(2px)",
-          }}
-        />
-      </span>
-    </label>
-  );
-}
-
 // ─── CSS filter approximation ───────────────────────────────────
 //
 // Same idea as tools/EffectsTool.tsx::filtersToCss but operates on the
@@ -594,7 +531,7 @@ function draftToCss(d: EffectsDraft): string {
   if (d.filterEffect === "mono") parts.push("grayscale(1)");
   else if (d.filterEffect === "sepia") parts.push("sepia(1)");
   else if (d.filterEffect === "invert") parts.push("invert(1)");
-  if (d.blur.enabled && d.blur.radius > 0) {
+  if (d.blur.radius > 0) {
     parts.push(`blur(${d.blur.radius}px)`);
   }
   return parts.length > 0 ? parts.join(" ") : "none";
@@ -623,5 +560,5 @@ function isFilterEdited(d: EffectsDraft): boolean {
 }
 
 function isBlurEdited(d: EffectsDraft): boolean {
-  return d.blur.enabled || d.blur.radius > 0;
+  return d.blur.radius > 0;
 }

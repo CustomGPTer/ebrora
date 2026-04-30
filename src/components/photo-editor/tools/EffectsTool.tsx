@@ -76,7 +76,7 @@ const PRESETS: PresetDef[] = [
     filters: {
       adjust: { brightness: 0, contrast: 10, saturation: 0, exposure: 0 },
       effect: "mono",
-      blur: { enabled: false, radius: 0, kind: "gaussian" },
+      blur: { radius: 0, kind: "gaussian" },
     },
   },
   {
@@ -85,7 +85,7 @@ const PRESETS: PresetDef[] = [
     filters: {
       adjust: { brightness: 0, contrast: 0, saturation: 0, exposure: 0 },
       effect: "sepia",
-      blur: { enabled: false, radius: 0, kind: "gaussian" },
+      blur: { radius: 0, kind: "gaussian" },
     },
   },
   {
@@ -94,7 +94,7 @@ const PRESETS: PresetDef[] = [
     filters: {
       adjust: { brightness: 0, contrast: 20, saturation: 40, exposure: 0 },
       effect: null,
-      blur: { enabled: false, radius: 0, kind: "gaussian" },
+      blur: { radius: 0, kind: "gaussian" },
     },
   },
   {
@@ -103,7 +103,7 @@ const PRESETS: PresetDef[] = [
     filters: {
       adjust: { brightness: 5, contrast: -25, saturation: -30, exposure: 0 },
       effect: null,
-      blur: { enabled: false, radius: 0, kind: "gaussian" },
+      blur: { radius: 0, kind: "gaussian" },
     },
   },
   {
@@ -112,7 +112,7 @@ const PRESETS: PresetDef[] = [
     filters: {
       adjust: { brightness: 20, contrast: 5, saturation: 10, exposure: 10 },
       effect: null,
-      blur: { enabled: false, radius: 0, kind: "gaussian" },
+      blur: { radius: 0, kind: "gaussian" },
     },
   },
   {
@@ -121,7 +121,7 @@ const PRESETS: PresetDef[] = [
     filters: {
       adjust: { brightness: -15, contrast: 20, saturation: -10, exposure: -10 },
       effect: null,
-      blur: { enabled: false, radius: 0, kind: "gaussian" },
+      blur: { radius: 0, kind: "gaussian" },
     },
   },
   {
@@ -130,7 +130,7 @@ const PRESETS: PresetDef[] = [
     filters: {
       adjust: { brightness: -5, contrast: 35, saturation: -10, exposure: 0 },
       effect: null,
-      blur: { enabled: false, radius: 0, kind: "gaussian" },
+      blur: { radius: 0, kind: "gaussian" },
     },
   },
 ];
@@ -431,7 +431,7 @@ function filtersToCss(f: BackgroundFilters): string {
   if (f.effect === "mono") parts.push("grayscale(1)");
   else if (f.effect === "sepia") parts.push("sepia(1)");
   else if (f.effect === "invert") parts.push("invert(1)");
-  if (f.blur.enabled && f.blur.radius > 0) {
+  if (f.blur.radius > 0) {
     parts.push(`blur(${f.blur.radius}px)`);
   }
   return parts.length > 0 ? parts.join(" ") : "none";
@@ -454,7 +454,6 @@ function filtersEqual(a: BackgroundFilters, b: BackgroundFilters): boolean {
     a.adjust.saturation === b.adjust.saturation &&
     a.adjust.exposure === b.adjust.exposure &&
     a.effect === b.effect &&
-    a.blur.enabled === b.blur.enabled &&
     a.blur.radius === b.blur.radius &&
     a.blur.kind === b.blur.kind
   );
