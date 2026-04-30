@@ -40,6 +40,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import {
   Box,
   Blend,
@@ -155,17 +156,20 @@ export function BottomDock({
 
   function handleAddText() {
     const project = state.project;
-    // ── Phase 1 keyboard-pop fix ─────────────────────────────────
-    // Focus the always-mounted BottomEditDrawer textarea SYNCHRONOUSLY
-    // inside this click handler, before any state dispatch. iOS Safari
-    // and Android Chrome only honour the focus request when it sits
-    // inside a user-gesture event handler — the previous implementation
-    // focused inside a useEffect after the drawer mounted, which fires
-    // after the gesture has completed and the keyboard refused to open.
-    focusForKeyboardPop();
-    // Size to ~40% of canvas width (soft default — user can drag-
-    // scale beyond after). Empty text content; the BottomEditDrawer
-    // shows "your text here" as a placeholder until the user types.
+    // ── Apr 2026 keyboard-pop fix (revision 3) ────────────────────
+    // Build the layer first, then flushSync the dispatches so the
+    // BottomEditDrawer mounts SYNCHRONOUSLY inside this user-gesture
+    // handler. After flushSync returns, the drawer's textarea is in
+    // the DOM in its final layout AND has registered itself with
+    // MobileEditContext via registerEditTextarea. We then call
+    // focusForKeyboardPop, which targets that real, fully-rendered
+    // textarea — still inside the same user gesture — and the OS
+    // keyboard pops with the IME bound to the correct layout.
+    //
+    // Why flushSync: React 18 batches state updates inside event
+    // handlers, so without it the drawer wouldn't mount until after
+    // the handler returns, by which point the keyboard's user-
+    // gesture window has closed.
     const baseLayer = createDefaultTextForCanvas(
       project.width,
       project.height,
@@ -176,9 +180,12 @@ export function BottomDock({
       project.width,
       project.height,
     );
-    dispatch({ type: "ADD_LAYER", layer: positioned });
-    dispatch({ type: "SET_SELECTION", ids: [positioned.id] });
-    beginEditing(positioned.id, { isFresh: true });
+    flushSync(() => {
+      dispatch({ type: "ADD_LAYER", layer: positioned });
+      dispatch({ type: "SET_SELECTION", ids: [positioned.id] });
+      beginEditing(positioned.id, { isFresh: true });
+    });
+    focusForKeyboardPop();
   }
 
   async function handleAddImageLayer(file: File) {

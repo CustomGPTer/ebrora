@@ -42,6 +42,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { flushSync } from "react-dom";
 import {
   Image as ImageIcon,
   ImagePlus,
@@ -133,10 +134,11 @@ export function AddLayerSheet({
 
   function handleAddText() {
     const project = state.project;
-    // Phase 1 keyboard-pop fix — see MobileEditContext.focusForKeyboardPop.
-    // Must run synchronously inside the user-gesture handler before
-    // the dispatch so iOS / Android pop the keyboard.
-    focusForKeyboardPop();
+    // Apr 2026 keyboard-pop fix (revision 3) — see BottomDock /
+    // BottomEditDrawer for the full explanation. flushSync mounts
+    // the drawer synchronously inside this user gesture so the
+    // textarea is in its final layout before focusForKeyboardPop
+    // runs.
     const baseLayer = createDefaultTextForCanvas(
       project.width,
       project.height,
@@ -147,9 +149,12 @@ export function AddLayerSheet({
       project.width,
       project.height,
     );
-    dispatch({ type: "ADD_LAYER", layer: positioned });
-    dispatch({ type: "SET_SELECTION", ids: [positioned.id] });
-    beginEditing(positioned.id, { isFresh: true });
+    flushSync(() => {
+      dispatch({ type: "ADD_LAYER", layer: positioned });
+      dispatch({ type: "SET_SELECTION", ids: [positioned.id] });
+      beginEditing(positioned.id, { isFresh: true });
+    });
+    focusForKeyboardPop();
     onClose();
   }
 
