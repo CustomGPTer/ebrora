@@ -78,15 +78,19 @@ interface MobileEditApi {
    *  commit=false rolls back: either restore originalRuns (existing
    *  layer) or REMOVE_LAYER (fresh layer). */
   endEditing: (commit: boolean) => void;
-  /** Phase 1 keyboard-pop fix:
-   *  Focuses a permanently-mounted off-screen shadow textarea so iOS /
-   *  Android pop the keyboard. Must be called synchronously inside a
-   *  user-gesture handler (e.g. the Add Text button's onClick) BEFORE
-   *  any state dispatch that would mount the real drawer. The drawer's
-   *  own useEffect then transfers focus to its real textarea on the
-   *  next render — focus moves between two inputs in the same task,
-   *  so the OS keyboard stays open through the handover. */
+  /** Apr 2026 keyboard-pop fix:
+   *  Focuses the BottomEditDrawer's permanently-mounted textarea so
+   *  iOS / Android pop the on-screen keyboard. Must be called
+   *  synchronously inside a user-gesture handler (e.g. the Add Text
+   *  button's onClick) BEFORE any state dispatch. The same element is
+   *  later used to receive the user's typed input — there is no
+   *  focus handover, no shadow shim, no setTimeout race. */
   focusForKeyboardPop: () => void;
+  /** Called by BottomEditDrawer on mount to register its textarea
+   *  element with the provider. focusForKeyboardPop targets whatever
+   *  is registered here. There is exactly one drawer instance in the
+   *  editor tree, so this is effectively a singleton ref. */
+  registerEditTextarea: (el: HTMLTextAreaElement | null) => void;
 }
 
 const MobileEditContext = createContext<MobileEditApi | null>(null);
@@ -98,13 +102,22 @@ export function MobileEditProvider({ children }: { children: ReactNode }) {
     isFresh: false,
     originalRuns: null,
   });
-  // Permanent shadow textarea ref — only the shim binds to this. The
-  // real BottomEditDrawer textarea uses its own local ref so unmounting
-  // the drawer doesn't null this one out.
-  const shadowRef = useRef<HTMLTextAreaElement | null>(null);
+  // The BottomEditDrawer's permanently-mounted textarea registers
+  // itself here on mount. focusForKeyboardPop targets this element
+  // directly — same element used for keyboard-pop AND user typing,
+  // so there is no focus handover that the OS keyboard could fail
+  // to follow.
+  const editTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const registerEditTextarea = useCallback(
+    (el: HTMLTextAreaElement | null) => {
+      editTextareaRef.current = el;
+    },
+    [],
+  );
 
   const focusForKeyboardPop = useCallback(() => {
-    const el = shadowRef.current;
+    const el = editTextareaRef.current;
     if (!el) return;
     // Synchronous focus inside a user gesture — pops the OS keyboard
     // on iOS Safari and Android Chrome. Async focus (setTimeout, ref
@@ -195,40 +208,27 @@ export function MobileEditProvider({ children }: { children: ReactNode }) {
       beginEditing,
       endEditing,
       focusForKeyboardPop,
+      registerEditTextarea,
     }),
-    [state, beginEditing, endEditing, focusForKeyboardPop],
+    [
+      state,
+      beginEditing,
+      endEditing,
+      focusForKeyboardPop,
+      registerEditTextarea,
+    ],
   );
 
   return (
     <MobileEditContext.Provider value={value}>
-      {/*
-        Phase 1 keyboard-pop shim:
-        A permanently-mounted, off-screen <textarea>. focusForKeyboardPop
-        focuses this when the user taps "Add Text", popping the OS
-        keyboard. The real BottomEditDrawer textarea isn't in the DOM at
-        that moment (drawer is conditionally rendered). When the drawer
-        mounts a tick later, its existing useEffect focuses its real
-        textarea — focus transfers between two inputs in the same task,
-        so the keyboard stays open through the handover.
-      */}
-      <textarea
-        ref={shadowRef}
-        aria-hidden="true"
-        tabIndex={-1}
-        // No readOnly — iOS may suppress the on-screen keyboard for
-        // read-only inputs, which would defeat the whole shim. The
-        // pointer-events: none + off-screen positioning prevent the
-        // user from typing into it accidentally.
-        style={{
-          position: "fixed",
-          left: -10000,
-          top: -10000,
-          width: 1,
-          height: 1,
-          opacity: 0,
-          pointerEvents: "none",
-        }}
-      />
+      {/* Apr 2026 — the focus-pop "shim" textarea has been removed.
+          The BottomEditDrawer's own textarea is now permanently
+          mounted (offscreen until the user starts editing) and
+          registers itself with this provider via registerEditTextarea.
+          focusForKeyboardPop targets that real textarea directly, so
+          there is no fragile focus handover after the keyboard is
+          already open — same element pops the keyboard and receives
+          the typed input. */}
       {children}
     </MobileEditContext.Provider>
   );
