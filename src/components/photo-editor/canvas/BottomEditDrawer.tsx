@@ -44,31 +44,30 @@
 // the keyboard most of the time. If we need pixel-perfect placement
 // we can switch to the visualViewport API in a polish pass.
 //
-// Apr 2026 keyboard-pop fix:
-// The textarea is now PERMANENTLY MOUNTED (positioned offscreen as a
-// 1×1 transparent box when no edit session is active) and registers
-// itself with MobileEditContext via registerEditTextarea. The Add Text
-// click handler calls focusForKeyboardPop SYNCHRONOUSLY inside the
-// gesture, which focuses this same textarea — same DOM element pops
-// the keyboard and receives the user's typed input. There is no
-// shadow-shim element and no setTimeout-based focus handover, so the
-// OS keyboard's IME stays bound to the right input and keystrokes
-// can't get lost into a void. The drawer chrome (controls row,
-// backdrop, visible padding) is still rendered conditionally.
+// Apr 2026 keyboard-pop fix (revision 2):
+// The textarea is PERMANENTLY MOUNTED in a CONSISTENT LAYOUT. It has
+// the same className, the same inline style, the same dimensions, the
+// same DOM position whether or not an edit session is active. The
+// drawer chrome around it (background colour, border, controls row)
+// is what changes — we hide the drawer visually with opacity:0 and
+// disable interaction with pointer-events:none when not editing,
+// instead of repositioning or resizing the textarea itself.
 //
-// CRITICAL: the outer drawer container MUST NOT use `visibility:
-// hidden` when not editing. iOS Safari and Android Chrome silently
-// refuse to pop the on-screen keyboard for inputs whose computed
-// `visibility` is `hidden` — even when focus() is called inside a
-// user gesture. Because focusForKeyboardPop runs BEFORE the
-// `editing` state flips (React batches the dispatch asynchronously),
-// the textarea would still be in the offscreen state at the moment
-// of focus, and any visibility:hidden ancestor would suppress the
-// keyboard. We hide the chrome with conditional `background` /
-// `borderTop` / `boxShadow` (so nothing is visually drawn) and
-// disable interaction with `pointerEvents: none`. The 1×1 inner
-// wrapper around the textarea handles invisibility — the textarea
-// itself stays a real, focusable, in-viewport element at all times.
+// Why: the previous revision swapped the textarea between two very
+// different layouts — full-size in editing mode, 1×1 invisible inside
+// a position:absolute 1×1 overflow:hidden box in non-editing mode.
+// Even though the DOM node was preserved, iOS Safari's IME would
+// stay bound to the layout snapshot it took at focus() time. The
+// keyboard popped correctly (the focus() call landed), but the
+// keystrokes that followed never reached the React-controlled
+// `value` because by then the textarea's layout had changed
+// drastically. The OS thought it was still typing into a 1×1 ghost.
+//
+// With identical layout in both states, focus() runs against the
+// same element the user will actually see and type into. There is
+// no layout transition between focus and first keystroke, and no
+// IME confusion. The drawer just fades in around the already-focused
+// textarea.
 //
 // We deliberately do NOT trigger the existing TextEditOverlay
 // (caret + selection rectangles in canvas-local coords). That UI was
@@ -119,11 +118,12 @@ export function BottomEditDrawer() {
   // We sync from layer.runs whenever the editing layer changes.
   const [draft, setDraft] = useState<string>("");
   const lastLayerIdRef = useRef<string | null>(null);
-  // Local ref to the textarea. Apr 2026 — the textarea is now
-  // permanently mounted (positioned offscreen when no layer is
-  // being edited) and registers itself with MobileEditContext via
-  // registerEditTextarea so focusForKeyboardPop targets the SAME
-  // element the user will actually type into. No focus handover.
+  // Local ref to the textarea. The textarea is permanently mounted in
+  // the same layout regardless of editing state, and registers itself
+  // with MobileEditContext via registerEditTextarea so
+  // focusForKeyboardPop targets the SAME element the user will
+  // actually type into. No focus handover, no layout transition
+  // between focus() and the first keystroke.
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Register / deregister with the provider on mount / unmount.
@@ -208,6 +208,11 @@ export function BottomEditDrawer() {
   }
 
   const editing = layer !== null;
+  // Active alignment to show in the controls row. When not editing
+  // (drawer hidden), default to "left" so we don't crash dereferencing
+  // a null layer — the buttons are non-interactive anyway because the
+  // drawer is opacity:0 + pointerEvents:none.
+  const activeAlign: Align = layer ? layer.styling.align : "left";
 
   return (
     <>
@@ -225,11 +230,15 @@ export function BottomEditDrawer() {
         />
       )}
 
-      {/* Drawer container — ALWAYS mounted so the textarea inside
-          retains its DOM identity across edit sessions. When no
-          layer is being edited the container is positioned offscreen
-          and made non-interactive; the textarea inside still
-          accepts focus() calls from focusForKeyboardPop. */}
+      {/* Drawer container — ALWAYS mounted in a CONSISTENT layout
+          (same DOM tree, same className, same style structure) so the
+          textarea inside never undergoes a layout transition between
+          focus() and first keystroke. When no layer is being edited
+          we hide the drawer with opacity:0 and disable interaction
+          with pointerEvents:none — the textarea inside is still a
+          real, focusable, in-viewport element so focusForKeyboardPop
+          (called synchronously from the Add Text user gesture) can
+          pop the OS keyboard reliably. */}
       <div
         role={editing ? "dialog" : undefined}
         aria-modal={editing ? "true" : undefined}
@@ -237,140 +246,99 @@ export function BottomEditDrawer() {
         aria-hidden={!editing}
         className="fixed left-0 right-0 z-[231] flex flex-col"
         style={{
-          // Offscreen until editing starts. We still position the
-          // drawer at bottom: 0 (rather than off-page) so the
-          // browser counts the textarea as "in viewport" — some
-          // Android browsers refuse to show the keyboard for inputs
-          // that are wholly outside the visual viewport.
           bottom: 0,
-          background: editing ? "var(--pe-toolbar-bg)" : "transparent",
-          borderTop: editing
-            ? "1px solid var(--pe-toolbar-border)"
-            : "none",
-          boxShadow: editing ? "var(--pe-shadow-lg)" : "none",
-          paddingBottom: editing
-            ? "env(safe-area-inset-bottom, 0px)"
-            : "0px",
-          // When not editing we hide the chrome via transparent
-          // background / no border / no shadow above, but we DO NOT
-          // set `visibility: hidden` here. iOS Safari and Android
-          // Chrome refuse to pop the on-screen keyboard for inputs
-          // whose computed visibility is `hidden`, and the outer
-          // container's visibility is inherited by the textarea.
-          // The 1×1 inner wrapper below collapses the textarea to
-          // an invisible focusable target. pointerEvents: none means
-          // the (now visually empty) drawer doesn't block taps on
-          // the canvas / dock when no edit session is active.
+          background: "var(--pe-toolbar-bg)",
+          borderTop: "1px solid var(--pe-toolbar-border)",
+          boxShadow: "var(--pe-shadow-lg)",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          // Hide the drawer when not editing without removing the
+          // textarea from the layout. opacity:0 keeps the element
+          // fully focusable and IME-bindable; pointerEvents:none
+          // lets taps fall through to the dock / canvas underneath.
+          opacity: editing ? 1 : 0,
           pointerEvents: editing ? "auto" : "none",
+          transition: "opacity 120ms ease-out",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Textarea — ALWAYS mounted. Size and visible chrome are
-            toggled via the inner wrapper below and the textarea's
-            own style. The textarea remains a real, focusable, in-
-            viewport element at all times so focusForKeyboardPop
-            (called synchronously inside the Add Text user gesture)
-            can pop the OS keyboard before the drawer chrome
-            renders. */}
-        <div
-          className={editing ? "px-4 pt-3 pb-2" : ""}
-          style={
-            editing
-              ? undefined
-              : {
-                  // Collapse to a 1×1 transparent box when no edit
-                  // session is active. The textarea inside stays
-                  // focusable (and keyboard-poppable on mobile)
-                  // because no ancestor sets visibility: hidden or
-                  // display: none.
-                  position: "absolute",
-                  left: 0,
-                  bottom: 0,
-                  width: 1,
-                  height: 1,
-                  overflow: "hidden",
-                }
-          }
-        >
+        {/* Textarea — ALWAYS in the same layout (full width, normal
+            padding, normal font size). Same className, same style.
+            iOS Safari and Android Chrome bind the IME to the focused
+            element's layout at the moment of focus(); keeping that
+            layout stable across the editing-state flip is what makes
+            the keystrokes actually reach the React-controlled
+            `value` after the keyboard pops. */}
+        <div className="px-4 pt-3 pb-2">
           <textarea
             ref={textareaRef}
             value={draft}
             onChange={(e) => handleChange(e.target.value)}
             placeholder="your text here"
             rows={1}
-            aria-hidden={!editing}
-            tabIndex={editing ? 0 : -1}
-            className={
-              editing
-                ? "w-full resize-none outline-none bg-transparent text-base leading-snug"
-                : "resize-none outline-none bg-transparent"
-            }
-            style={
-              editing
-                ? {
-                    color: "var(--pe-text)",
-                    maxHeight: 200,
-                  }
-                : {
-                    width: 1,
-                    height: 1,
-                    opacity: 0,
-                    color: "transparent",
-                    caretColor: "transparent",
-                    border: "none",
-                    padding: 0,
-                  }
-            }
+            // Always tab-reachable / accessible. We do not toggle
+            // aria-hidden or tabIndex based on editing state because
+            // changing those on a focused input can confuse iOS
+            // Safari into dropping IME bindings.
+            className="w-full resize-none outline-none bg-transparent text-base leading-snug"
+            style={{
+              color: "var(--pe-text)",
+              maxHeight: 200,
+              // Block taps when the drawer is hidden so the dock /
+              // canvas underneath stays interactive. Doesn't affect
+              // focus() or keyboard input.
+              pointerEvents: editing ? "auto" : "none",
+            }}
           />
         </div>
 
-        {/* Controls row — only renders during an edit session. */}
-        {editing && (
-          <div
-            className="flex-none flex items-center justify-between px-2 py-1.5"
-            style={{
-              borderTop: "1px solid var(--pe-toolbar-border)",
-            }}
-          >
-            {/* Cancel ─────────────────────────────────────────── */}
+        {/* Controls row — always rendered to keep the drawer's height
+            and layout stable across edit-state flips. Buttons are
+            non-interactive when not editing because the drawer is
+            opacity:0 + pointerEvents:none. */}
+        <div
+          className="flex-none flex items-center justify-between px-2 py-1.5"
+          style={{
+            borderTop: "1px solid var(--pe-toolbar-border)",
+          }}
+        >
+          {/* Cancel ─────────────────────────────────────────── */}
+          <DrawerIconButton
+            ariaLabel="Cancel and discard changes"
+            onClick={() => editing && endEditing(false)}
+            icon={<X className="w-5 h-5" strokeWidth={1.75} />}
+          />
+
+          {/* Align cluster ──────────────────────────────────── */}
+          <div className="flex items-center gap-0.5">
             <DrawerIconButton
-              ariaLabel="Cancel and discard changes"
-              onClick={() => endEditing(false)}
-              icon={<X className="w-5 h-5" strokeWidth={1.75} />}
+              ariaLabel="Align left"
+              active={activeAlign === "left"}
+              onClick={() => editing && handleSetAlign("left")}
+              icon={<AlignLeft className="w-5 h-5" strokeWidth={1.75} />}
             />
-
-            {/* Align cluster ──────────────────────────────────── */}
-            <div className="flex items-center gap-0.5">
-              <DrawerIconButton
-                ariaLabel="Align left"
-                active={layer!.styling.align === "left"}
-                onClick={() => handleSetAlign("left")}
-                icon={<AlignLeft className="w-5 h-5" strokeWidth={1.75} />}
-              />
-              <DrawerIconButton
-                ariaLabel="Align centre"
-                active={layer!.styling.align === "center"}
-                onClick={() => handleSetAlign("center")}
-                icon={<AlignCenter className="w-5 h-5" strokeWidth={1.75} />}
-              />
-              <DrawerIconButton
-                ariaLabel="Align right"
-                active={layer!.styling.align === "right"}
-                onClick={() => handleSetAlign("right")}
-                icon={<AlignRight className="w-5 h-5" strokeWidth={1.75} />}
-              />
-              <DrawerIconButton
-                ariaLabel="Justify"
-                active={layer!.styling.align === "justify"}
-                onClick={() => handleSetAlign("justify")}
-                icon={<AlignJustify className="w-5 h-5" strokeWidth={1.75} />}
-              />
-            </div>
-
-            {/* Commit ─────────────────────────────────────────── */}
-            <CommitButton onClick={() => endEditing(true)} />
+            <DrawerIconButton
+              ariaLabel="Align centre"
+              active={activeAlign === "center"}
+              onClick={() => editing && handleSetAlign("center")}
+              icon={<AlignCenter className="w-5 h-5" strokeWidth={1.75} />}
+            />
+            <DrawerIconButton
+              ariaLabel="Align right"
+              active={activeAlign === "right"}
+              onClick={() => editing && handleSetAlign("right")}
+              icon={<AlignRight className="w-5 h-5" strokeWidth={1.75} />}
+            />
+            <DrawerIconButton
+              ariaLabel="Justify"
+              active={activeAlign === "justify"}
+              onClick={() => editing && handleSetAlign("justify")}
+              icon={<AlignJustify className="w-5 h-5" strokeWidth={1.75} />}
+            />
           </div>
-        )}
+
+          {/* Commit ─────────────────────────────────────────── */}
+          <CommitButton onClick={() => editing && endEditing(true)} />
+        </div>
       </div>
     </>
   );
