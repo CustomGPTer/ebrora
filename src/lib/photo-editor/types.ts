@@ -78,18 +78,16 @@ export const IDENTITY_TRANSFORM: Transform = {
 export type ColorString = string;
 
 export interface Stroke {
-  enabled: boolean;
   color: ColorString;
-  /** Width in canvas pixels. */
+  /** Width in canvas pixels. 0 = no stroke (renderer short-circuits). */
   width: number;
   /** 0–1. */
   opacity: number;
 }
 
 export interface Shadow {
-  enabled: boolean;
   color: ColorString;
-  /** 0–1. */
+  /** 0–1. 0 = no shadow (renderer short-circuits). */
   opacity: number;
   /** Gaussian blur radius in canvas pixels. */
   blur: number;
@@ -98,10 +96,9 @@ export interface Shadow {
 }
 
 export interface Highlight {
-  enabled: boolean;
   /** Background fill behind the affected glyphs. */
   color: ColorString;
-  /** 0–1. */
+  /** 0–1. 0 = no highlight (renderer short-circuits). */
   opacity: number;
 }
 
@@ -240,8 +237,8 @@ export interface TextLayer extends BaseLayer {
  *  off-screen canvas as the glyphs (before them in z-order), so the
  *  layer's transform applies uniformly to both. */
 export interface TextBackground {
-  enabled: boolean;
   color: ColorString;
+  /** 0–1. 0 = no background (renderer short-circuits). */
   opacity: number;
   /** Corner radius in canvas pixels. */
   roundCorner: number;
@@ -275,9 +272,8 @@ export interface ImageLayer extends BaseLayer {
   };
   /** Per-layer preset filter id (vintage, mono, etc.) — null = none. */
   filterEffect: string | null;
-  /** Per-layer blur. */
+  /** Per-layer blur. radius 0 = no blur (renderer short-circuits). */
   blur: {
-    enabled: boolean;
     radius: number; // 0..50
     kind: "gaussian" | "radial";
   };
@@ -348,7 +344,6 @@ export interface BackgroundFilters {
   /** Preset filter id (vintage, mono, etc.) — null = no filter. */
   effect: string | null;
   blur: {
-    enabled: boolean;
     radius: number; // 0..50
     kind: "gaussian" | "radial";
   };
@@ -357,7 +352,7 @@ export interface BackgroundFilters {
 export const DEFAULT_BACKGROUND_FILTERS: BackgroundFilters = {
   adjust: { brightness: 0, contrast: 0, saturation: 0, exposure: 0 },
   effect: null,
-  blur: { enabled: false, radius: 0, kind: "gaussian" },
+  blur: { radius: 0, kind: "gaussian" },
 };
 
 // ─── Saved styles ───────────────────────────────────────────────
