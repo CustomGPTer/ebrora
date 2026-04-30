@@ -44,6 +44,18 @@
 // the keyboard most of the time. If we need pixel-perfect placement
 // we can switch to the visualViewport API in a polish pass.
 //
+// Apr 2026 keyboard-pop fix:
+// The textarea is now PERMANENTLY MOUNTED (positioned offscreen as a
+// 1×1 transparent box when no edit session is active) and registers
+// itself with MobileEditContext via registerEditTextarea. The Add Text
+// click handler calls focusForKeyboardPop SYNCHRONOUSLY inside the
+// gesture, which focuses this same textarea — same DOM element pops
+// the keyboard and receives the user's typed input. There is no
+// shadow-shim element and no setTimeout-based focus handover, so the
+// OS keyboard's IME stays bound to the right input and keystrokes
+// can't get lost into a void. The drawer chrome (controls row,
+// backdrop, visible padding) is still rendered conditionally.
+//
 // We deliberately do NOT trigger the existing TextEditOverlay
 // (caret + selection rectangles in canvas-local coords). That UI was
 // the previous double-tap inline-editing path and clashes visually
@@ -76,9 +88,10 @@ type Align = TextLayerStyling["align"];
 
 export function BottomEditDrawer() {
   const { state, dispatch } = useEditor();
-  const { state: mobileEdit, endEditing } = useMobileEdit();
+  const { state: mobileEdit, endEditing, registerEditTextarea } =
+    useMobileEdit();
 
-  // Only render when a layer is actively being edited.
+  // Only render chrome when a layer is actively being edited.
   const layerId = mobileEdit.editingLayerId;
   const layer = useMemo<TextLayer | null>(() => {
     if (layerId === null) return null;
@@ -92,15 +105,28 @@ export function BottomEditDrawer() {
   // We sync from layer.runs whenever the editing layer changes.
   const [draft, setDraft] = useState<string>("");
   const lastLayerIdRef = useRef<string | null>(null);
-  // Local ref. The "keyboard pop on Add Text" path uses a separate
-  // permanent shim in MobileEditProvider — once this drawer mounts and
-  // its useEffect fires, focus transfers from the shim to here in the
-  // same task and the OS keyboard stays open through the handover.
+  // Local ref to the textarea. Apr 2026 — the textarea is now
+  // permanently mounted (positioned offscreen when no layer is
+  // being edited) and registers itself with MobileEditContext via
+  // registerEditTextarea so focusForKeyboardPop targets the SAME
+  // element the user will actually type into. No focus handover.
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Register / deregister with the provider on mount / unmount.
+  // Drawer is mounted exactly once in EditorShell so this fires
+  // once at startup and keeps the registration for the lifetime of
+  // the editor session.
+  useEffect(() => {
+    registerEditTextarea(textareaRef.current);
+    return () => registerEditTextarea(null);
+  }, [registerEditTextarea]);
 
   useEffect(() => {
     if (!layer) {
       lastLayerIdRef.current = null;
+      // Reset draft when leaving an edit session so the next
+      // edit-session sync isn't pre-populated with stale text.
+      setDraft("");
       return;
     }
     if (lastLayerIdRef.current !== layer.id) {
@@ -108,12 +134,23 @@ export function BottomEditDrawer() {
       // sync the draft from the layer's current text once.
       setDraft(fullTextOf(layer));
       lastLayerIdRef.current = layer.id;
-      // Focus the textarea so the OS keyboard pops up on mobile.
-      // setTimeout ensures the element is in the DOM before .focus().
+      // The textarea is already mounted and (in the Add Text path)
+      // already focused from the click handler's synchronous
+      // focusForKeyboardPop call. We still re-focus and place the
+      // caret at the end here to cover the "tap existing text
+      // layer" path, which doesn't go through focusForKeyboardPop.
+      // setTimeout(0) ensures the chrome around the textarea has
+      // committed so the textarea is visibly on-screen before we
+      // place the caret.
       window.setTimeout(() => {
         const el = textareaRef.current;
         if (!el) return;
-        el.focus();
+        // Skip the focus call if we already have it — avoids a
+        // redundant focus event that some Android keyboards treat
+        // as a reason to dismiss.
+        if (document.activeElement !== el) {
+          el.focus();
+        }
         // Move cursor to the end of any existing text — feels right
         // for "tap to edit" because users typically want to append.
         const end = el.value.length;
@@ -131,8 +168,6 @@ export function BottomEditDrawer() {
     const max = 200; // ~6 lines at 20px line-height
     el.style.height = Math.min(el.scrollHeight, max) + "px";
   }, [draft]);
-
-  if (layer === null) return null;
 
   function handleChange(next: string) {
     setDraft(next);
@@ -158,95 +193,158 @@ export function BottomEditDrawer() {
     });
   }
 
+  const editing = layer !== null;
+
   return (
     <>
       {/* Backdrop — tap to commit (iOS keyboard convention). Only
-          covers the area above the drawer so the drawer itself stays
-          tappable. */}
-      <div
-        className="fixed inset-0 z-[230]"
-        style={{
-          background: "transparent",
-          pointerEvents: "auto",
-        }}
-        onClick={() => endEditing(true)}
-        aria-hidden
-      />
+          renders during an edit session. */}
+      {editing && (
+        <div
+          className="fixed inset-0 z-[230]"
+          style={{
+            background: "transparent",
+            pointerEvents: "auto",
+          }}
+          onClick={() => endEditing(true)}
+          aria-hidden
+        />
+      )}
 
+      {/* Drawer container — ALWAYS mounted so the textarea inside
+          retains its DOM identity across edit sessions. When no
+          layer is being edited the container is positioned offscreen
+          and made non-interactive; the textarea inside still
+          accepts focus() calls from focusForKeyboardPop. */}
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Edit text"
-        className="fixed left-0 right-0 bottom-0 z-[231] flex flex-col"
+        role={editing ? "dialog" : undefined}
+        aria-modal={editing ? "true" : undefined}
+        aria-label={editing ? "Edit text" : undefined}
+        aria-hidden={!editing}
+        className="fixed left-0 right-0 z-[231] flex flex-col"
         style={{
-          background: "var(--pe-toolbar-bg)",
-          borderTop: "1px solid var(--pe-toolbar-border)",
-          boxShadow: "var(--pe-shadow-lg)",
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          // Offscreen until editing starts. We still position the
+          // drawer at bottom: 0 (rather than off-page) so the
+          // browser counts the textarea as "in viewport" — some
+          // Android browsers refuse to show the keyboard for inputs
+          // that are wholly outside the visual viewport.
+          bottom: 0,
+          background: editing ? "var(--pe-toolbar-bg)" : "transparent",
+          borderTop: editing
+            ? "1px solid var(--pe-toolbar-border)"
+            : "none",
+          boxShadow: editing ? "var(--pe-shadow-lg)" : "none",
+          paddingBottom: editing
+            ? "env(safe-area-inset-bottom, 0px)"
+            : "0px",
+          // When not editing, slide the visual chrome out of view but
+          // leave the textarea reachable as a 1×1 transparent target.
+          visibility: editing ? "visible" : "hidden",
+          pointerEvents: editing ? "auto" : "none",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Textarea ─────────────────────────────────────────────── */}
-        <div className="px-4 pt-3 pb-2">
+        {/* Textarea — ALWAYS mounted. Visibility/size are toggled
+            via the parent container's `visibility`. When the parent
+            is hidden the textarea is still in the DOM so focus()
+            works. */}
+        <div
+          className={editing ? "px-4 pt-3 pb-2" : ""}
+          style={
+            editing
+              ? undefined
+              : {
+                  // Collapse to a 1×1 transparent box when no edit
+                  // session is active. visibility: hidden on the
+                  // parent already hides it; this keeps it focusable.
+                  position: "absolute",
+                  left: 0,
+                  bottom: 0,
+                  width: 1,
+                  height: 1,
+                  overflow: "hidden",
+                }
+          }
+        >
           <textarea
             ref={textareaRef}
             value={draft}
             onChange={(e) => handleChange(e.target.value)}
             placeholder="your text here"
             rows={1}
-            className="w-full resize-none outline-none bg-transparent text-base leading-snug"
+            aria-hidden={!editing}
+            tabIndex={editing ? 0 : -1}
+            className={
+              editing
+                ? "w-full resize-none outline-none bg-transparent text-base leading-snug"
+                : "resize-none outline-none bg-transparent"
+            }
+            style={
+              editing
+                ? {
+                    color: "var(--pe-text)",
+                    maxHeight: 200,
+                  }
+                : {
+                    width: 1,
+                    height: 1,
+                    opacity: 0,
+                    color: "transparent",
+                    caretColor: "transparent",
+                    border: "none",
+                    padding: 0,
+                  }
+            }
+          />
+        </div>
+
+        {/* Controls row — only renders during an edit session. */}
+        {editing && (
+          <div
+            className="flex-none flex items-center justify-between px-2 py-1.5"
             style={{
-              color: "var(--pe-text)",
-              maxHeight: 200,
+              borderTop: "1px solid var(--pe-toolbar-border)",
             }}
-          />
-        </div>
+          >
+            {/* Cancel ─────────────────────────────────────────── */}
+            <DrawerIconButton
+              ariaLabel="Cancel and discard changes"
+              onClick={() => endEditing(false)}
+              icon={<X className="w-5 h-5" strokeWidth={1.75} />}
+            />
 
-        {/* Controls row ─────────────────────────────────────────── */}
-        <div
-          className="flex-none flex items-center justify-between px-2 py-1.5"
-          style={{
-            borderTop: "1px solid var(--pe-toolbar-border)",
-          }}
-        >
-          {/* Cancel ─────────────────────────────────────────── */}
-          <DrawerIconButton
-            ariaLabel="Cancel and discard changes"
-            onClick={() => endEditing(false)}
-            icon={<X className="w-5 h-5" strokeWidth={1.75} />}
-          />
+            {/* Align cluster ──────────────────────────────────── */}
+            <div className="flex items-center gap-0.5">
+              <DrawerIconButton
+                ariaLabel="Align left"
+                active={layer!.styling.align === "left"}
+                onClick={() => handleSetAlign("left")}
+                icon={<AlignLeft className="w-5 h-5" strokeWidth={1.75} />}
+              />
+              <DrawerIconButton
+                ariaLabel="Align centre"
+                active={layer!.styling.align === "center"}
+                onClick={() => handleSetAlign("center")}
+                icon={<AlignCenter className="w-5 h-5" strokeWidth={1.75} />}
+              />
+              <DrawerIconButton
+                ariaLabel="Align right"
+                active={layer!.styling.align === "right"}
+                onClick={() => handleSetAlign("right")}
+                icon={<AlignRight className="w-5 h-5" strokeWidth={1.75} />}
+              />
+              <DrawerIconButton
+                ariaLabel="Justify"
+                active={layer!.styling.align === "justify"}
+                onClick={() => handleSetAlign("justify")}
+                icon={<AlignJustify className="w-5 h-5" strokeWidth={1.75} />}
+              />
+            </div>
 
-          {/* Align cluster ──────────────────────────────────── */}
-          <div className="flex items-center gap-0.5">
-            <DrawerIconButton
-              ariaLabel="Align left"
-              active={layer.styling.align === "left"}
-              onClick={() => handleSetAlign("left")}
-              icon={<AlignLeft className="w-5 h-5" strokeWidth={1.75} />}
-            />
-            <DrawerIconButton
-              ariaLabel="Align centre"
-              active={layer.styling.align === "center"}
-              onClick={() => handleSetAlign("center")}
-              icon={<AlignCenter className="w-5 h-5" strokeWidth={1.75} />}
-            />
-            <DrawerIconButton
-              ariaLabel="Align right"
-              active={layer.styling.align === "right"}
-              onClick={() => handleSetAlign("right")}
-              icon={<AlignRight className="w-5 h-5" strokeWidth={1.75} />}
-            />
-            <DrawerIconButton
-              ariaLabel="Justify"
-              active={layer.styling.align === "justify"}
-              onClick={() => handleSetAlign("justify")}
-              icon={<AlignJustify className="w-5 h-5" strokeWidth={1.75} />}
-            />
+            {/* Commit ─────────────────────────────────────────── */}
+            <CommitButton onClick={() => endEditing(true)} />
           </div>
-
-          {/* Commit ─────────────────────────────────────────── */}
-          <CommitButton onClick={() => endEditing(true)} />
-        </div>
+        )}
       </div>
     </>
   );
