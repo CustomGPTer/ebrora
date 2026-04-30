@@ -219,11 +219,48 @@ export function layoutTextLayer(layer: TextLayer): LayoutResult {
           return last.baselineY + last.descent;
         })();
 
+  // Compute the rendered glyph extent on the X axis. `width` above is the
+  // max ink-line width (sum of advances), with no idea that the alignment
+  // offset shifts glyphs to the right under center / right, or that
+  // justify stretches non-last lines out to maxWidth. Without `bounds`
+  // reflecting that, callers (RichTextNode, TextEditOverlay, export
+  // renderer) that size off-screen bitmaps from `width` end up clipping
+  // every centred / right-aligned / justify-multi-line glyph that lands
+  // past the bitmap right edge. Keep `width` unchanged for back-compat
+  // with PerspectivePanel + the engine-debug overlay; new code should
+  // prefer `bounds`.
+  let alignedMinX = 0;
+  let alignedMaxX = 0;
+  if (lines.length > 0) {
+    const align = layer.styling.align;
+    const isMultilineJustify = align === "justify" && lines.length > 1;
+    let minOffset = Infinity;
+    let maxRight = -Infinity;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const offset = alignmentOffset(maxWidth, line.width, align);
+      const isLastLine = i === lines.length - 1;
+      // Justify pads non-last lines out to maxWidth (last line stays
+      // at its natural width per the layout pass above).
+      const lineRight =
+        isMultilineJustify && !isLastLine ? maxWidth : offset + line.width;
+      if (offset < minOffset) minOffset = offset;
+      if (lineRight > maxRight) maxRight = lineRight;
+    }
+    if (Number.isFinite(minOffset)) alignedMinX = minOffset;
+    if (Number.isFinite(maxRight)) alignedMaxX = maxRight;
+  }
+
   return {
     lines,
     width: maxLineWidth,
     height: totalHeight,
-    bounds: { x: 0, y: 0, width: maxLineWidth, height: totalHeight },
+    bounds: {
+      x: alignedMinX,
+      y: 0,
+      width: Math.max(0, alignedMaxX - alignedMinX),
+      height: totalHeight,
+    },
   };
 }
 
