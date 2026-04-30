@@ -547,7 +547,7 @@ interface ResolvedStroke {
 }
 
 function resolveShapeStroke(layer: ShapeLayer): ResolvedStroke | null {
-  if (layer.stroke.enabled) {
+  if (layer.stroke.width > 0 && layer.stroke.opacity > 0) {
     return {
       color: layer.stroke.color,
       width: layer.stroke.width,
