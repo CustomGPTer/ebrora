@@ -16,66 +16,59 @@
 //     reads `editingLayerId` and `originalRuns` from useMobileEdit()
 //     and renders only when editingLayerId is set.
 //   • Live updates: typing dispatches UPDATE_LAYER on every keystroke
-//     so the canvas reflects the new text immediately. The reducer's
-//     existing coalescing behaviour (history-coalesce.ts) collapses
-//     consecutive run-edits within COALESCE_WINDOW_MS into one
-//     undo step, so the user gets one history entry per editing
-//     session rather than one per character.
+//     so the canvas reflects the new text immediately.
 //   • Per-letter styling collapse: every keystroke replaces all runs
 //     with a single run that carries the FIRST original run's style
-//     fields (font / colour / stroke / shadow / etc). This is a
-//     conscious trade-off — typed mobile users overwhelmingly want
-//     "tap, type, done" rather than per-letter styling preservation.
-//     The desktop FormatPanel + ColorPanel + selection-range path
-//     remains intact for users who want per-letter control.
-//   • Backdrop tap commits (matches iOS keyboard convention).
-//   • Tapping a different text layer on the canvas auto-commits
-//     this layer and switches the drawer to the other (handled by
-//     MobileEditContext's beginEditing transition logic).
-//   • Cancel (X) rolls back via MobileEditContext.endEditing(false):
-//     fresh layers are removed, existing layers are restored to
-//     originalRuns.
+//     fields. The desktop FormatPanel + selection-range path remains
+//     intact for users who want per-letter control.
+//   • Backdrop tap commits (matches iOS / Android keyboard convention).
+//   • Cancel (X) rolls back via MobileEditContext.endEditing(false).
 //
-// Keyboard handling note: on iOS Safari the on-screen keyboard
-// overlays the viewport rather than resizing it. We use position:fixed
-// + bottom: 0 + env(safe-area-inset-bottom) so the drawer pins to the
-// physical bottom edge. iOS automatically scrolls the focused textarea
-// into view above the keyboard, so the drawer ends up visually above
-// the keyboard most of the time. If we need pixel-perfect placement
-// we can switch to the visualViewport API in a polish pass.
+// Apr 2026 keyboard-pop fix (revision 3):
 //
-// Apr 2026 keyboard-pop fix (revision 2):
-// The textarea is PERMANENTLY MOUNTED in a CONSISTENT LAYOUT. It has
-// the same className, the same inline style, the same dimensions, the
-// same DOM position whether or not an edit session is active. The
-// drawer chrome around it (background colour, border, controls row)
-// is what changes — we hide the drawer visually with opacity:0 and
-// disable interaction with pointer-events:none when not editing,
-// instead of repositioning or resizing the textarea itself.
+// The drawer is CONDITIONALLY RENDERED — mounted only when an edit
+// session is active. The Add Text click handler (BottomDock,
+// AddLayerSheet) wraps its state dispatches in `flushSync` so the
+// drawer mounts SYNCHRONOUSLY inside the user-gesture handler. After
+// flushSync returns, the textarea is in the DOM in its FINAL layout.
+// The handler then calls focusForKeyboardPop, which focuses that
+// textarea — still inside the same user gesture — and the OS pops
+// the keyboard.
 //
-// Why: the previous revision swapped the textarea between two very
-// different layouts — full-size in editing mode, 1×1 invisible inside
-// a position:absolute 1×1 overflow:hidden box in non-editing mode.
-// Even though the DOM node was preserved, iOS Safari's IME would
-// stay bound to the layout snapshot it took at focus() time. The
-// keyboard popped correctly (the focus() call landed), but the
-// keystrokes that followed never reached the React-controlled
-// `value` because by then the textarea's layout had changed
-// drastically. The OS thought it was still typing into a 1×1 ghost.
+// Why this is better than the previous always-mounted-textarea +
+// opacity:0 approach:
+//   1. The textarea is in its final layout the moment focus() runs.
+//      Both iOS Safari and Android Chrome bind the IME to the
+//      element's layout snapshot at focus time; with no subsequent
+//      layout transition, keystrokes reach the React-controlled
+//      `value` reliably.
+//   2. There's no offscreen 1×1 ghost element for taps to fall into
+//      when not editing.
+//   3. The drawer is unmounted between sessions, so no stale state
+//      can leak across sessions.
 //
-// With identical layout in both states, focus() runs against the
-// same element the user will actually see and type into. There is
-// no layout transition between focus and first keystroke, and no
-// IME confusion. The drawer just fades in around the already-focused
-// textarea.
+// Android keyboard overlay handling (the "drawer disappears behind
+// the keyboard" symptom):
 //
-// We deliberately do NOT trigger the existing TextEditOverlay
-// (caret + selection rectangles in canvas-local coords). That UI was
-// the previous double-tap inline-editing path and clashes visually
-// with the keyboard-first drawer flow. TextEditOverlay still mounts
-// when state.runSelection is set, but no UI dispatches that on mobile
-// in this batch — the inline path remains as engine plumbing for any
-// future desktop power-mode (e.g. selection-range text styling).
+// On modern Android Chrome (Android 13+), the on-screen keyboard
+// defaults to OVERLAYS-CONTENT mode — it sits on top of the page
+// without resizing the layout viewport. A naive `bottom: 0` puts
+// the drawer behind the keyboard. We use `window.visualViewport`
+// to compute the keyboard's height (layout viewport height minus
+// visual viewport height) and offset the drawer's `bottom` by that
+// amount, so it pins to the top edge of the keyboard regardless of
+// which keyboard mode the OS / browser is in:
+//
+//   • Resizes mode (older Android, default iOS in some configs):
+//     visualViewport.height ≈ window.innerHeight, offset = 0,
+//     bottom = 0. Drawer sits at the resized viewport's bottom edge,
+//     which is already above the keyboard. Correct.
+//   • Overlays mode (modern Android Chrome): visualViewport.height
+//     < window.innerHeight by the keyboard's height, offset > 0,
+//     drawer pinned above the keyboard. Correct.
+//
+// We listen on visualViewport `resize` and `scroll` events to track
+// the keyboard's animation in/out, so the drawer follows it smoothly.
 
 "use client";
 
@@ -104,7 +97,6 @@ export function BottomEditDrawer() {
   const { state: mobileEdit, endEditing, registerEditTextarea } =
     useMobileEdit();
 
-  // Only render chrome when a layer is actively being edited.
   const layerId = mobileEdit.editingLayerId;
   const layer = useMemo<TextLayer | null>(() => {
     if (layerId === null) return null;
@@ -115,21 +107,57 @@ export function BottomEditDrawer() {
 
   // Local draft of the textarea — separate from layer.runs so we
   // don't fight controlled-input semantics with reducer dispatches.
-  // We sync from layer.runs whenever the editing layer changes.
-  const [draft, setDraft] = useState<string>("");
-  const lastLayerIdRef = useRef<string | null>(null);
-  // Local ref to the textarea. The textarea is permanently mounted in
-  // the same layout regardless of editing state, and registers itself
-  // with MobileEditContext via registerEditTextarea so
-  // focusForKeyboardPop targets the SAME element the user will
-  // actually type into. No focus handover, no layout transition
-  // between focus() and the first keystroke.
+  const [draft, setDraft] = useState<string>(() =>
+    layer ? fullTextOf(layer) : "",
+  );
+  const lastLayerIdRef = useRef<string | null>(layer?.id ?? null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Register / deregister with the provider on mount / unmount.
-  // Drawer is mounted exactly once in EditorShell so this fires
-  // once at startup and keeps the registration for the lifetime of
-  // the editor session.
+  // ── Keyboard offset (visualViewport tracking) ───────────────────
+  // On Android Chrome 13+ the keyboard overlays the page rather than
+  // resizing the layout viewport, so a naive `bottom: 0` puts the
+  // drawer *behind* the keyboard. We track the visual viewport's
+  // bottom edge and offset the drawer by however far it sits above
+  // the layout viewport's bottom — that's the keyboard height.
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    function compute() {
+      // window.innerHeight is the LAYOUT viewport height (full page).
+      // visualViewport.height is the VISUAL viewport height (the
+      // portion the user actually sees, minus the keyboard if it's
+      // overlaying). The difference is the keyboard's height in
+      // overlays mode; in resizes mode it's roughly 0 because
+      // window.innerHeight already shrank with the keyboard.
+      const layoutH = window.innerHeight;
+      const visualH = vv!.height;
+      // visualViewport.offsetTop catches some edge cases (e.g. when
+      // the user pinch-zooms and scrolls the visual viewport); we
+      // subtract it so the drawer doesn't drift away from the
+      // keyboard's top edge.
+      const offsetTop = vv!.offsetTop ?? 0;
+      const next = Math.max(0, layoutH - visualH - offsetTop);
+      setKeyboardOffset(next);
+    }
+
+    compute();
+    vv.addEventListener("resize", compute);
+    vv.addEventListener("scroll", compute);
+    return () => {
+      vv.removeEventListener("resize", compute);
+      vv.removeEventListener("scroll", compute);
+    };
+  }, []);
+
+  // Register the textarea with MobileEditContext so the Add Text
+  // user-gesture handler (in BottomDock / AddLayerSheet) can call
+  // focusForKeyboardPop on it after flushSync mounts the drawer.
+  // The drawer is conditionally rendered, so this registration runs
+  // each time an edit session begins.
   useEffect(() => {
     registerEditTextarea(textareaRef.current);
     return () => registerEditTextarea(null);
@@ -138,8 +166,6 @@ export function BottomEditDrawer() {
   useEffect(() => {
     if (!layer) {
       lastLayerIdRef.current = null;
-      // Reset draft when leaving an edit session so the next
-      // edit-session sync isn't pre-populated with stale text.
       setDraft("");
       return;
     }
@@ -148,25 +174,20 @@ export function BottomEditDrawer() {
       // sync the draft from the layer's current text once.
       setDraft(fullTextOf(layer));
       lastLayerIdRef.current = layer.id;
-      // The textarea is already mounted and (in the Add Text path)
-      // already focused from the click handler's synchronous
-      // focusForKeyboardPop call. We still re-focus and place the
-      // caret at the end here to cover the "tap existing text
-      // layer" path, which doesn't go through focusForKeyboardPop.
-      // setTimeout(0) ensures the chrome around the textarea has
-      // committed so the textarea is visibly on-screen before we
-      // place the caret.
+      // The textarea is mounted (we're rendering) and (in the
+      // Add Text path) already focused from the click handler's
+      // synchronous focusForKeyboardPop call. We still re-focus and
+      // place the caret at the end here to cover the "tap existing
+      // text layer" path, which doesn't go through
+      // focusForKeyboardPop. setTimeout(0) ensures the layout has
+      // committed so the textarea is on-screen before we place the
+      // caret.
       window.setTimeout(() => {
         const el = textareaRef.current;
         if (!el) return;
-        // Skip the focus call if we already have it — avoids a
-        // redundant focus event that some Android keyboards treat
-        // as a reason to dismiss.
         if (document.activeElement !== el) {
           el.focus();
         }
-        // Move cursor to the end of any existing text — feels right
-        // for "tap to edit" because users typically want to append.
         const end = el.value.length;
         el.setSelectionRange(end, end);
       }, 0);
@@ -185,8 +206,6 @@ export function BottomEditDrawer() {
 
   function handleChange(next: string) {
     setDraft(next);
-    // Live-update the canvas. Single-run collapse keeps this O(1)
-    // per keystroke regardless of original run count.
     if (!layer) return;
     const baseRun: GlyphRun = layer.runs[0]
       ? { ...layer.runs[0], text: next }
@@ -207,67 +226,47 @@ export function BottomEditDrawer() {
     });
   }
 
-  const editing = layer !== null;
-  // Active alignment to show in the controls row. When not editing
-  // (drawer hidden), default to "left" so we don't crash dereferencing
-  // a null layer — the buttons are non-interactive anyway because the
-  // drawer is opacity:0 + pointerEvents:none.
-  const activeAlign: Align = layer ? layer.styling.align : "left";
+  // Conditionally render — drawer is only mounted while a layer is
+  // being edited. The Add Text click handler uses flushSync to
+  // mount this synchronously inside the user gesture so the
+  // textarea is available for focusForKeyboardPop in the same tick.
+  if (!layer) return null;
 
   return (
     <>
-      {/* Backdrop — tap to commit (iOS keyboard convention). Only
-          renders during an edit session. */}
-      {editing && (
-        <div
-          className="fixed inset-0 z-[230]"
-          style={{
-            background: "transparent",
-            pointerEvents: "auto",
-          }}
-          onClick={() => endEditing(true)}
-          aria-hidden
-        />
-      )}
-
-      {/* Drawer container — ALWAYS mounted in a CONSISTENT layout
-          (same DOM tree, same className, same style structure) so the
-          textarea inside never undergoes a layout transition between
-          focus() and first keystroke. When no layer is being edited
-          we hide the drawer with opacity:0 and disable interaction
-          with pointerEvents:none — the textarea inside is still a
-          real, focusable, in-viewport element so focusForKeyboardPop
-          (called synchronously from the Add Text user gesture) can
-          pop the OS keyboard reliably. */}
+      {/* Backdrop — tap to commit (mobile keyboard convention). */}
       <div
-        role={editing ? "dialog" : undefined}
-        aria-modal={editing ? "true" : undefined}
-        aria-label={editing ? "Edit text" : undefined}
-        aria-hidden={!editing}
+        className="fixed inset-0 z-[230]"
+        style={{
+          background: "transparent",
+          pointerEvents: "auto",
+        }}
+        onClick={() => endEditing(true)}
+        aria-hidden
+      />
+
+      {/* Drawer chrome — pinned to the top edge of the keyboard via
+          visualViewport-derived `bottom` offset, NOT just bottom: 0.
+          On Android Chrome's overlays-content mode this is the
+          difference between visible drawer and drawer-behind-the-
+          keyboard. */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Edit text"
         className="fixed left-0 right-0 z-[231] flex flex-col"
         style={{
-          bottom: 0,
+          bottom: keyboardOffset,
           background: "var(--pe-toolbar-bg)",
           borderTop: "1px solid var(--pe-toolbar-border)",
           boxShadow: "var(--pe-shadow-lg)",
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
-          // Hide the drawer when not editing without removing the
-          // textarea from the layout. opacity:0 keeps the element
-          // fully focusable and IME-bindable; pointerEvents:none
-          // lets taps fall through to the dock / canvas underneath.
-          opacity: editing ? 1 : 0,
-          pointerEvents: editing ? "auto" : "none",
-          transition: "opacity 120ms ease-out",
+          paddingBottom:
+            keyboardOffset > 0
+              ? "0px"
+              : "env(safe-area-inset-bottom, 0px)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Textarea — ALWAYS in the same layout (full width, normal
-            padding, normal font size). Same className, same style.
-            iOS Safari and Android Chrome bind the IME to the focused
-            element's layout at the moment of focus(); keeping that
-            layout stable across the editing-state flip is what makes
-            the keystrokes actually reach the React-controlled
-            `value` after the keyboard pops. */}
         <div className="px-4 pt-3 pb-2">
           <textarea
             ref={textareaRef}
@@ -275,69 +274,58 @@ export function BottomEditDrawer() {
             onChange={(e) => handleChange(e.target.value)}
             placeholder="your text here"
             rows={1}
-            // Always tab-reachable / accessible. We do not toggle
-            // aria-hidden or tabIndex based on editing state because
-            // changing those on a focused input can confuse iOS
-            // Safari into dropping IME bindings.
             className="w-full resize-none outline-none bg-transparent text-base leading-snug"
             style={{
               color: "var(--pe-text)",
               maxHeight: 200,
-              // Block taps when the drawer is hidden so the dock /
-              // canvas underneath stays interactive. Doesn't affect
-              // focus() or keyboard input.
-              pointerEvents: editing ? "auto" : "none",
             }}
           />
         </div>
 
-        {/* Controls row — always rendered to keep the drawer's height
-            and layout stable across edit-state flips. Buttons are
-            non-interactive when not editing because the drawer is
-            opacity:0 + pointerEvents:none. */}
+        {/* Controls row */}
         <div
           className="flex-none flex items-center justify-between px-2 py-1.5"
           style={{
             borderTop: "1px solid var(--pe-toolbar-border)",
           }}
         >
-          {/* Cancel ─────────────────────────────────────────── */}
+          {/* Cancel */}
           <DrawerIconButton
             ariaLabel="Cancel and discard changes"
-            onClick={() => editing && endEditing(false)}
+            onClick={() => endEditing(false)}
             icon={<X className="w-5 h-5" strokeWidth={1.75} />}
           />
 
-          {/* Align cluster ──────────────────────────────────── */}
+          {/* Align cluster */}
           <div className="flex items-center gap-0.5">
             <DrawerIconButton
               ariaLabel="Align left"
-              active={activeAlign === "left"}
-              onClick={() => editing && handleSetAlign("left")}
+              active={layer.styling.align === "left"}
+              onClick={() => handleSetAlign("left")}
               icon={<AlignLeft className="w-5 h-5" strokeWidth={1.75} />}
             />
             <DrawerIconButton
               ariaLabel="Align centre"
-              active={activeAlign === "center"}
-              onClick={() => editing && handleSetAlign("center")}
+              active={layer.styling.align === "center"}
+              onClick={() => handleSetAlign("center")}
               icon={<AlignCenter className="w-5 h-5" strokeWidth={1.75} />}
             />
             <DrawerIconButton
               ariaLabel="Align right"
-              active={activeAlign === "right"}
-              onClick={() => editing && handleSetAlign("right")}
+              active={layer.styling.align === "right"}
+              onClick={() => handleSetAlign("right")}
               icon={<AlignRight className="w-5 h-5" strokeWidth={1.75} />}
             />
             <DrawerIconButton
               ariaLabel="Justify"
-              active={activeAlign === "justify"}
-              onClick={() => editing && handleSetAlign("justify")}
+              active={layer.styling.align === "justify"}
+              onClick={() => handleSetAlign("justify")}
               icon={<AlignJustify className="w-5 h-5" strokeWidth={1.75} />}
             />
           </div>
 
-          {/* Commit ─────────────────────────────────────────── */}
-          <CommitButton onClick={() => editing && endEditing(true)} />
+          {/* Commit */}
+          <CommitButton onClick={() => endEditing(true)} />
         </div>
       </div>
     </>
