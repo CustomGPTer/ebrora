@@ -4,7 +4,7 @@
 //
 //   • Reset (↻) button at top-left, scoped to the active tab only —
 //     the caller's `onReset` fires whatever per-tab reset semantics
-//     make sense (e.g. set stroke.enabled=false, set opacity=1).
+//     make sense (e.g. zero out stroke width, set opacity=1).
 //     Per Batch C kickoff Q2: scope is just the active tab, never
 //     the whole layer.
 //   • Children render inline beneath the reset button as the active

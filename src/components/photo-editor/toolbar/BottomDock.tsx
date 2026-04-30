@@ -520,21 +520,20 @@ function SelectedLayerSection({
 //
 // "Edited" red-dot semantics (per Q1A — any non-default value):
 //   • Color    → never (shapes always have a fill colour)
-//   • Stroke   → when stroke.enabled is true
+//   • Stroke   → when stroke.width > 0 (a visible stroke is configured)
 //   • Position → never (shapes always have a position)
 //   • Opacity  → when opacity < 1
 //
 // Reset semantics (per Q2 — scope is just the active tab):
 //   • Color    → no reset (no canonical default — would be arbitrary)
-//   • Stroke   → stroke.enabled = false (back to no-stroke)
+//   • Stroke   → stroke width = 0 (back to no-stroke)
 //   • Position → translate / rotate / scale to identity-ish (Z-order
 //                stays — re-stacking on reset would be surprising)
 //   • Opacity  → opacity = 1
 
 const SHAPE_DEFAULT_STROKE: Stroke = {
-  enabled: false,
   color: "#000000",
-  width: 2,
+  width: 0,
   opacity: 1,
 };
 
@@ -568,7 +567,7 @@ function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
   const [activeTab, setActiveTab] = useState<ShapeTabId>("color");
 
   const editedIds = new Set<string>();
-  if (layer.stroke?.enabled) editedIds.add("stroke");
+  if (layer.stroke && layer.stroke.width > 0) editedIds.add("stroke");
   if (layer.opacity < 1) editedIds.add("opacity");
 
   function resetActiveTab() {
@@ -673,11 +672,11 @@ function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
 //                doesn't matter)
 //   • Format  → bold/italic/underline/strike OR align != "left"
 //   • Color   → never (always has fill)
-//   • Stroke  → stroke.enabled === true
-//   • Highlight → highlight.enabled === true
+//   • Stroke  → stroke.width > 0
+//   • Highlight → highlight.opacity > 0
 //   • Spacing → letterSpacing != 0 OR lineHeight != 1.2
 //   • Position → never (always has a position)
-//   • Shadow  → shadow.enabled === true
+//   • Shadow  → shadow.opacity > 0
 //   • Opacity → opacity < 1
 //   • Erase   → never (it's a tool launcher)
 //
@@ -690,24 +689,22 @@ function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
 //   • Format  → align "left" + fontWeight 400 + fontStyle normal +
 //                decoration none
 //   • Color   → no reset
-//   • Stroke  → stroke object back to default (enabled false)
-//   • Highlight → highlight back to default (enabled false)
+//   • Stroke  → width 0 (no-op)
+//   • Highlight → opacity 0 (no-op)
 //   • Spacing → letterSpacing 0 + lineHeight 1.2
 //   • Position → translate/rotate/scale to identity (Z-order kept)
-//   • Shadow  → shadow back to default (enabled false)
+//   • Shadow  → opacity 0 (no-op)
 //   • Opacity → 1
 //   • Erase   → no reset
 
 const TEXT_DEFAULT_HIGHLIGHT: Highlight = {
-  enabled: false,
   color: "#FFEB3B",
-  opacity: 0.5,
+  opacity: 0,
 };
 
 const TEXT_DEFAULT_SHADOW: Shadow = {
-  enabled: false,
   color: "#000000",
-  opacity: 0.5,
+  opacity: 0,
   blur: 8,
   offsetX: 4,
   offsetY: 4,
@@ -862,12 +859,12 @@ function TextEditPanel({
   const decoration = tool.runValue("decoration");
 
   const editedIds = new Set<string>();
-  if (stroke?.enabled === true) editedIds.add("stroke");
-  if (shadow?.enabled === true) editedIds.add("shadow");
-  if (highlight?.enabled === true) editedIds.add("highlight");
+  if (stroke && stroke.width > 0) editedIds.add("stroke");
+  if (shadow && shadow.opacity > 0) editedIds.add("shadow");
+  if (highlight && highlight.opacity > 0) editedIds.add("highlight");
   if (gradient?.enabled === true) editedIds.add("gradient");
   if (texture?.enabled === true) editedIds.add("texture");
-  if (layer.background?.enabled === true) editedIds.add("background");
+  if (layer.background && layer.background.opacity > 0) editedIds.add("background");
   if (
     fontWeight === 700 ||
     fontStyle === "italic" ||
@@ -1038,8 +1035,8 @@ function TextEditPanel({
 // Edited red-dot semantics:
 //   • Crop        → layer.crop !== null
 //   • Effects     → adjust != zero || filterEffect != null ||
-//                   blur.enabled || blur.radius > 0
-//   • Stroke      → layer.stroke.enabled === true
+//                   blur.radius > 0
+//   • Stroke      → layer.stroke.width > 0
 //   • Position    → never (no canonical default)
 //   • Perspective → layer.perspective !== null
 //   • Opacity     → layer.opacity < 1
@@ -1107,9 +1104,8 @@ const IMAGE_TABS: TabStripItem[] = [
 ];
 
 const IMAGE_DEFAULT_STROKE: Stroke = {
-  enabled: false,
   color: "#000000",
-  width: 4,
+  width: 0,
   opacity: 1,
 };
 
@@ -1135,12 +1131,11 @@ function ImageEditPanel({
     layer.adjust.saturation !== 0 ||
     layer.adjust.exposure !== 0 ||
     layer.filterEffect !== null ||
-    layer.blur.enabled ||
     layer.blur.radius > 0
   ) {
     editedIds.add("effects");
   }
-  if (layer.stroke?.enabled === true) editedIds.add("stroke");
+  if (layer.stroke && layer.stroke.width > 0) editedIds.add("stroke");
   if (layer.perspective !== null) editedIds.add("perspective");
   if (layer.opacity < 1) editedIds.add("opacity");
 
