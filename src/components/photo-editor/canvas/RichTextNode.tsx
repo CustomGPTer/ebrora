@@ -118,12 +118,14 @@ export function RichTextNode({
   }, [layer]);
 
   // Extent of the painted area in layer-local coords. Starts from the
-  // layout's *aligned* glyph rect (layout.bounds — accounts for the
-  // alignment offset under center / right and for justify's stretch on
-  // non-last lines), then unions in bend's bent-bounds and the
-  // background's padding. Without using bounds, centred / right-aligned
-  // glyphs land at layer-local x past `layout.width` and get clipped at
-  // the off-screen bitmap edge.
+  // wrap-box width (layer.width) so the selection frame represents the
+  // wrap region — under center / right alignment the user expects the
+  // text to sit in the middle / right of the dotted box, which only
+  // works if the box covers the full wrap width. We then union in the
+  // layout's aligned glyph rect (handles the justify-multi-line stretch
+  // case where lines extend out to maxWidth, plus catches the no-wrap
+  // case where layer.width is 0), bend's bent-bounds, and the
+  // background's padding.
   //
   // We clamp minX to ≤ 0 so layer-local (0, 0) — the layer's logical
   // anchor for transform.x / .y — always falls within (or to the right
@@ -136,7 +138,7 @@ export function RichTextNode({
 
     let minX = Math.min(0, alignedMinX);
     let minY = 0;
-    let maxX = Math.max(layout.width, alignedMaxX);
+    let maxX = Math.max(layout.width, alignedMaxX, layer.width);
     let maxY = layout.height;
 
     const bend = createBendContext(

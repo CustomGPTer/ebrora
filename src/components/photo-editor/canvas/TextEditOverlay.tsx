@@ -431,7 +431,11 @@ export function TextEditOverlay({ layer }: TextEditOverlayProps) {
   const fs = layer.runs[0]?.fontSize ?? 16;
   const minHitW = Math.max(fs * 2, 80);
   const minHitH = Math.max(fs * 1.4, 40);
-  const contentW = Math.max(layout.width, layout.bounds.x + layout.bounds.width);
+  const contentW = Math.max(
+    layout.width,
+    layout.bounds.x + layout.bounds.width,
+    layer.width,
+  );
   const contentH = Math.max(layout.height, layout.bounds.height);
   const bgWidth = Math.max(
     minHitW + RENDER_PADDING * 2,
