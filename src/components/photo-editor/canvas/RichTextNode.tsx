@@ -117,18 +117,26 @@ export function RichTextNode({
     // editorReducer creates a new layer object on every UPDATE_LAYER.
   }, [layer]);
 
-  // Extent of the painted area in layer-local coords. Without bend or
-  // background this is just (0, 0)→(layout.width, layout.height). With
-  // bend, the text arcs above the baseline (∩) or below it (∪) and its
-  // chord narrows from the wrap width. With background enabled, the
-  // underlay rectangle extends padding beyond the text bbox. We union
-  // every contributing region so the bitmap always fits everything,
-  // while still including layer-local (0, 0) so the transform anchor
-  // stays correct (offsetX/offsetY below depend on this).
+  // Extent of the painted area in layer-local coords. Starts from the
+  // layout's *aligned* glyph rect (layout.bounds — accounts for the
+  // alignment offset under center / right and for justify's stretch on
+  // non-last lines), then unions in bend's bent-bounds and the
+  // background's padding. Without using bounds, centred / right-aligned
+  // glyphs land at layer-local x past `layout.width` and get clipped at
+  // the off-screen bitmap edge.
+  //
+  // We clamp minX to ≤ 0 so layer-local (0, 0) — the layer's logical
+  // anchor for transform.x / .y — always falls within (or to the right
+  // of) the bitmap left edge. Otherwise anchorX below would go negative
+  // and downstream coords (perspective sampling, erase-stroke positions
+  // stored in layer-local coords) would silently misalign.
   const extent = useMemo(() => {
-    let minX = 0;
+    const alignedMinX = layout.bounds.x;
+    const alignedMaxX = layout.bounds.x + layout.bounds.width;
+
+    let minX = Math.min(0, alignedMinX);
     let minY = 0;
-    let maxX = layout.width;
+    let maxX = Math.max(layout.width, alignedMaxX);
     let maxY = layout.height;
 
     const bend = createBendContext(

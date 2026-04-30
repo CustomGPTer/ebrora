@@ -421,16 +421,25 @@ export function TextEditOverlay({ layer }: TextEditOverlayProps) {
   // smaller than something tappable when the layer's text is empty
   // (otherwise the user can never re-enter text on a fully-deleted
   // layer).
+  //
+  // Use the aligned glyph rect (layout.bounds) — same calc as
+  // RichTextNode's `extent` — so the overlay covers the same area as
+  // the rendered bitmap underneath under center / right / justify
+  // alignment. Without this the hit-rect lags behind the visible
+  // glyphs whenever the alignment offset shifts text past
+  // layout.width.
   const fs = layer.runs[0]?.fontSize ?? 16;
   const minHitW = Math.max(fs * 2, 80);
   const minHitH = Math.max(fs * 1.4, 40);
+  const contentW = Math.max(layout.width, layout.bounds.x + layout.bounds.width);
+  const contentH = Math.max(layout.height, layout.bounds.height);
   const bgWidth = Math.max(
     minHitW + RENDER_PADDING * 2,
-    layout.width + RENDER_PADDING * 2,
+    contentW + RENDER_PADDING * 2,
   );
   const bgHeight = Math.max(
     minHitH + RENDER_PADDING * 2,
-    layout.height + RENDER_PADDING * 2,
+    contentH + RENDER_PADDING * 2,
   );
 
   return (
