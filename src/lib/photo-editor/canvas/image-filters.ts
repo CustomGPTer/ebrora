@@ -17,7 +17,7 @@ export interface ImageFilterSpec {
     exposure: number;
   };
   effect: string | null;
-  blur: { enabled: boolean; radius: number; kind: "gaussian" | "radial" };
+  blur: { radius: number; kind: "gaussian" | "radial" };
 }
 
 /** Resolve a filter spec to an ordered Konva filter chain. Empty array
@@ -38,7 +38,7 @@ export function resolveImageFilterChain(f: ImageFilterSpec): KonvaFilter[] {
   if (f.effect === "mono") chain.push(Konva.Filters.Grayscale);
   else if (f.effect === "sepia") chain.push(Konva.Filters.Sepia);
   else if (f.effect === "invert") chain.push(Konva.Filters.Invert);
-  if (f.blur.enabled && f.blur.radius > 0) {
+  if (f.blur.radius > 0) {
     chain.push(Konva.Filters.Blur);
   }
   return chain;
@@ -56,7 +56,7 @@ export function applyImageFilterAttrs(
   node.saturation(f.adjust.saturation / 100);
   node.hue(0);
   node.luminance(0);
-  if (f.blur.enabled && f.blur.radius > 0) {
+  if (f.blur.radius > 0) {
     node.blurRadius(f.blur.radius);
   } else {
     node.blurRadius(0);

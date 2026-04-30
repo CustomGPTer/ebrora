@@ -59,10 +59,10 @@ export function createImageLayer(opts: CreateImageLayerOptions): ImageLayer {
     naturalHeight: opts.naturalHeight,
     crop: null,
     perspective: null,
-    stroke: { enabled: false, color: "#000000", width: 4, opacity: 1 },
+    stroke: { color: "#000000", width: 0, opacity: 1 },
     adjust: { brightness: 0, contrast: 0, saturation: 0, exposure: 0 },
     filterEffect: null,
-    blur: { enabled: false, radius: 0, kind: "gaussian" },
+    blur: { radius: 0, kind: "gaussian" },
   };
 }
 
@@ -128,9 +128,8 @@ export interface CreateShapeLayerOptions {
 }
 
 const DEFAULT_STROKE: Stroke = {
-  enabled: false,
   color: "#000000",
-  width: 4,
+  width: 0,
   opacity: 1,
 };
 
