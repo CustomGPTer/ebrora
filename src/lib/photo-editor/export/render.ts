@@ -278,8 +278,21 @@ function paintTextLayer(
   layer: TextLayer,
 ): void {
   const layout = layoutText(layer);
-  const w = Math.max(1, Math.ceil(layout.width + RENDER_PADDING * 2));
-  const h = Math.max(1, Math.ceil(layout.height + RENDER_PADDING * 2));
+  // Mirror the on-stage extent calc in RichTextNode: take the max of
+  // `layout.width` and the aligned glyph rect (`layout.bounds`) so
+  // centred / right-aligned / justify-multi-line glyphs that sit past
+  // `layout.width` are not clipped on export. Bend / text-background
+  // padding are handled in the on-stage path; the export pipeline
+  // doesn't render those underlays, so we only need the alignment fix
+  // here. Layer-local minX stays at 0 — the bctx.translate(PAD, PAD)
+  // and the ctx.drawImage offset below both rely on it.
+  const contentMaxX = Math.max(
+    layout.width,
+    layout.bounds.x + layout.bounds.width,
+  );
+  const contentMaxY = Math.max(layout.height, layout.bounds.height);
+  const w = Math.max(1, Math.ceil(contentMaxX + RENDER_PADDING * 2));
+  const h = Math.max(1, Math.ceil(contentMaxY + RENDER_PADDING * 2));
 
   // Render into a per-layer off-screen so the destination-out erase
   // pass only affects this layer's pixels and not anything painted
