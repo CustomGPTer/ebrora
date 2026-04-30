@@ -213,7 +213,7 @@ function PhotoRect({
     node.saturation(filters.adjust.saturation / 100);
     node.hue(0);
     node.luminance(0);
-    if (filters.blur.enabled && filters.blur.radius > 0) {
+    if (filters.blur.radius > 0) {
       node.blurRadius(filters.blur.radius);
     } else {
       node.blurRadius(0);
@@ -304,7 +304,7 @@ function resolveFilterChain(f: BackgroundFilters): Array<KonvaFilter> {
   if (f.effect === "mono") chain.push(Konva.Filters.Grayscale);
   else if (f.effect === "sepia") chain.push(Konva.Filters.Sepia);
   else if (f.effect === "invert") chain.push(Konva.Filters.Invert);
-  if (f.blur.enabled && f.blur.radius > 0) {
+  if (f.blur.radius > 0) {
     chain.push(Konva.Filters.Blur);
   }
   return chain;

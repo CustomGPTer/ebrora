@@ -103,7 +103,7 @@ function parseHexLuminance(color: string): number | null {
  */
 function pickLayerColor(layer: AnyLayer): string | null {
   if (layer.kind === "shape") {
-    if (layer.variant === "outlined" && layer.stroke?.enabled) {
+    if (layer.variant === "outlined" && layer.stroke && layer.stroke.width > 0) {
       return layer.stroke.color;
     }
     return layer.fill;

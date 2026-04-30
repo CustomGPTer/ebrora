@@ -154,7 +154,7 @@ export function RichTextNode({
     }
 
     const bg = layer.background;
-    if (bg?.enabled) {
+    if (bg && bg.opacity > 0) {
       minX = Math.min(minX, -bg.widthDelta);
       minY = Math.min(minY, -bg.heightDelta);
       maxX = Math.max(maxX, layout.width + bg.widthDelta);
@@ -208,7 +208,7 @@ export function RichTextNode({
     // D2a notes). When bend is active, this rect is around the FLAT
     // layout — bent glyphs may extend outside the rect at the apex.
     const bg = layer.background;
-    if (bg?.enabled) {
+    if (bg && bg.opacity > 0) {
       const x = -bg.widthDelta;
       const y = -bg.heightDelta;
       const w = layout.width + bg.widthDelta * 2;

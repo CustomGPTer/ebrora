@@ -57,19 +57,20 @@ export function ShapeNode({
 }: ShapeNodeProps) {
   const groupRef = useRef<Konva.Group>(null);
   const fill = layer.variant === "filled" ? layer.fill : "transparent";
-  const strokeProps = layer.stroke.enabled
-    ? {
-        stroke: layer.stroke.color,
-        strokeWidth: layer.stroke.width,
-        strokeOpacity: layer.stroke.opacity,
-      }
-    : layer.variant === "outlined"
-    ? {
-        // Outlined variant always draws an outline even if explicit stroke is off.
-        stroke: layer.fill,
-        strokeWidth: 4,
-      }
-    : {};
+  const strokeProps =
+    layer.stroke.width > 0 && layer.stroke.opacity > 0
+      ? {
+          stroke: layer.stroke.color,
+          strokeWidth: layer.stroke.width,
+          strokeOpacity: layer.stroke.opacity,
+        }
+      : layer.variant === "outlined"
+      ? {
+          // Outlined variant always draws an outline even if explicit stroke is off.
+          stroke: layer.fill,
+          strokeWidth: 4,
+        }
+      : {};
 
   return (
     <Group

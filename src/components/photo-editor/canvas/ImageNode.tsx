@@ -138,7 +138,7 @@ export function ImageNode({
     if (layer.filterEffect === "mono") filterParts.push("grayscale(1)");
     else if (layer.filterEffect === "sepia") filterParts.push("sepia(1)");
     else if (layer.filterEffect === "invert") filterParts.push("invert(1)");
-    if (layer.blur.enabled && layer.blur.radius > 0) {
+    if (layer.blur.radius > 0) {
       filterParts.push(`blur(${layer.blur.radius}px)`);
     }
     if (filterParts.length > 0) {
@@ -203,7 +203,7 @@ export function ImageNode({
       : {};
 
     const strokeProps =
-      layer.stroke && layer.stroke.enabled
+      layer.stroke && layer.stroke.width > 0 && layer.stroke.opacity > 0
         ? {
             stroke: layer.stroke.color,
             strokeWidth: layer.stroke.width,
@@ -304,7 +304,11 @@ export function ImageNode({
           corners,
         );
         // Stroke: paint along the warped quad's edges (TL → TR → BR → BL).
-        if (layer.stroke && layer.stroke.enabled && layer.stroke.width > 0) {
+        if (
+          layer.stroke &&
+          layer.stroke.width > 0 &&
+          layer.stroke.opacity > 0
+        ) {
           ctx.save();
           ctx.beginPath();
           ctx.moveTo(corners[0].x, corners[0].y);
