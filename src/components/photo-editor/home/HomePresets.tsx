@@ -138,7 +138,6 @@ const HOME_PRESETS: HomePreset[] = [
         ...base,
         fill: "#1B5B50",
         shadow: {
-          enabled: true,
           color: "#1B5B50",
           opacity: 0.85,
           blur: 16,
@@ -174,7 +173,6 @@ const HOME_PRESETS: HomePreset[] = [
           ],
         },
         shadow: {
-          enabled: true,
           color: "#00e5ff",
           opacity: 0.85,
           blur: 18,
@@ -216,7 +214,6 @@ const HOME_PRESETS: HomePreset[] = [
           rotation: 0,
         },
         shadow: {
-          enabled: true,
           color: "#3a2a10",
           opacity: 0.4,
           blur: 4,
