@@ -22,7 +22,7 @@ export interface CategoryMeta {
 }
 
 export const CATEGORIES: CategoryMeta[] = [
-  { id: "prohibition", label: "Prohibition", desc: "Actions you must NOT do", bg: "#FFFFFF", border: "#A1262D", shape: "circle-bar" },
+  { id: "prohibition", label: "Prohibition", desc: "Actions you must NOT do", bg: "#A1262D", border: "#A1262D", shape: "circle-bar" },
   { id: "warning", label: "Warning", desc: "Hazards and dangers", bg: "#F5CA2B", border: "#21251E", shape: "triangle" },
   { id: "mandatory", label: "Mandatory", desc: "Actions you MUST do", bg: "#004873", border: "#FFFFFF", shape: "circle" },
   { id: "safe", label: "Safe Condition", desc: "Emergency & safety info", bg: "#008E5E", border: "#FFFFFF", shape: "rectangle" },
