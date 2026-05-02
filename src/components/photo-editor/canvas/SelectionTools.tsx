@@ -43,6 +43,12 @@
 // within ±5° (sticky cardinal snap). Label disappears on pointer
 // up. Matches the reference Add Text app's rotate UX.
 //
+// Rotate-around-centre (May 2026): the rotation pivot is the
+// layer's bounding-box centre, not its local origin. transform.x/y
+// is solved on each pointermove so the captured stage-coord centre
+// stays put — the box rotates in place rather than swinging
+// outward from a corner. Applies to all layer kinds.
+//
 // Drag math runs in DOM-pixel space because we receive pointer client
 // coords directly. The layer's geometric centre (in DOM coords) is the
 // pivot for both rotate and resize. Konva.Transformer is reduced to a
@@ -324,9 +330,25 @@ export function SelectionTools({
     stageHeight,
   ]);
 
+  // Rotate-around-centre (May 2026): the rotate handle now pivots
+  // the layer around its bounding-box centre rather than its local
+  // origin. Captures the local-coord centre + its stage-coord
+  // position once at pointerdown; each pointermove re-solves
+  // transform.x/y so that pivotStage stays fixed under the new
+  // rotation. Mirrors the stretch handler's anchor pattern.
   const rotateRef = useRef<{
     startAngle: number;
-    layerStartRotation: number;
+    layerStart: AnyLayer["transform"];
+    /** Local-coord pivot — bounding-box centre via the Konva node's
+     *  selfRect (skipTransform). Selfrect is layer-local but accounts
+     *  for selfRect.x/y offsets that some primitives use. */
+    localPivot: { x: number; y: number };
+    /** Stage-coord position where the pivot lives, captured once. */
+    pivotStage: { x: number; y: number };
+    /** Bounding-box centre in DOM coords at drag start — used for
+     *  the pointer-to-angle calculation. Does not change during the
+     *  drag (we keep the centre fixed in stage space, and stage→DOM
+     *  is also unchanged for the duration of a single gesture). */
     centreX: number;
     centreY: number;
     pointerId: number;
@@ -850,13 +872,57 @@ export function SelectionTools({
     e.preventDefault();
     e.stopPropagation();
     if (!selectedLayer) return;
+    const stage = stageRef.current;
+    if (!stage) return;
+    const node = stage.findOne(`#${selectedLayer.id}`);
+    if (!node) return;
+
+    // selfRect — layer-local bbox of the rendered content. Used to
+    // find the local-coord centre we want to keep fixed during the
+    // rotation. skipTransform so the rect is in pre-transform local
+    // coords (we apply transform manually below).
+    const selfRect = node.getClientRect({
+      skipTransform: true,
+      skipShadow: true,
+      skipStroke: true,
+    });
+    if (
+      !selfRect ||
+      !Number.isFinite(selfRect.width) ||
+      !Number.isFinite(selfRect.height) ||
+      selfRect.width <= 0 ||
+      selfRect.height <= 0
+    ) {
+      return;
+    }
+
+    const localPivot = {
+      x: selfRect.x + selfRect.width / 2,
+      y: selfRect.y + selfRect.height / 2,
+    };
+
+    // Pivot's stage-coord position via the start transform:
+    //   pivotStage = (transform.x, transform.y) + R(rotation) ∘ S(scaleX, scaleY) (localPivot)
+    const layerStart = { ...selectedLayer.transform };
+    const radStart = (layerStart.rotation * Math.PI) / 180;
+    const cosS = Math.cos(radStart);
+    const sinS = Math.sin(radStart);
+    const sx = localPivot.x * layerStart.scaleX;
+    const sy = localPivot.y * layerStart.scaleY;
+    const pivotStage = {
+      x: layerStart.x + sx * cosS - sy * sinS,
+      y: layerStart.y + sx * sinS + sy * cosS,
+    };
+
     const startAngle = Math.atan2(
       e.clientY - centreYDom,
       e.clientX - centreXDom,
     );
     rotateRef.current = {
       startAngle,
-      layerStartRotation: selectedLayer.transform.rotation,
+      layerStart,
+      localPivot,
+      pivotStage,
       centreX: centreXDom,
       centreY: centreYDom,
       pointerId: e.pointerId,
@@ -870,13 +936,31 @@ export function SelectionTools({
     if (!r || r.pointerId !== e.pointerId) return;
     const angle = Math.atan2(e.clientY - r.centreY, e.clientX - r.centreX);
     const deltaDeg = ((angle - r.startAngle) * 180) / Math.PI;
-    const rawRotation = r.layerStartRotation + deltaDeg;
+    const rawRotation = r.layerStart.rotation + deltaDeg;
     const newRotation = snapAngle(rawRotation);
+
+    // Solve for transform.x/y such that pivotStage stays fixed under
+    // the new rotation:
+    //   pivotStage = (transform.x, transform.y) + R(newRot) ∘ S(scaleX, scaleY) (localPivot)
+    //   transform.xy = pivotStage − R(newRot) ∘ S(scaleX, scaleY) (localPivot)
+    const rad = (newRotation * Math.PI) / 180;
+    const cosR = Math.cos(rad);
+    const sinR = Math.sin(rad);
+    const sxNew = r.localPivot.x * r.layerStart.scaleX;
+    const syNew = r.localPivot.y * r.layerStart.scaleY;
+    const newX = r.pivotStage.x - (sxNew * cosR - syNew * sinR);
+    const newY = r.pivotStage.y - (sxNew * sinR + syNew * cosR);
+
     dispatch({
       type: "UPDATE_LAYER",
       id: selectedLayer.id,
       patch: {
-        transform: { ...selectedLayer.transform, rotation: newRotation },
+        transform: {
+          ...r.layerStart,
+          rotation: newRotation,
+          x: newX,
+          y: newY,
+        },
       },
     });
   };
