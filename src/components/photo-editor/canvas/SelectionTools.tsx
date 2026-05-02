@@ -7,7 +7,7 @@
 //     [✕]            [↕]            [⟳]
 //      ┌─────────────────────────────┐
 //      │                             │
-//     [⇄]            ‹bbox›
+//     [⇄]                           [↻]*
 //      │                             │
 //      └─────────────────────────────┘
 //     [⌨ ]*          [⧉]            [⤡]
@@ -15,7 +15,12 @@
 //   • ✕   top-left      Delete            (tap)
 //   • ↕   top-centre    Flip vertical     (tap)
 //   • ⟳   top-right     Rotate            (drag — pointer rotates the layer)
-//   • ⇄   middle-left   Flip horizontal   (tap)
+//   • ⇄   middle-left   Stretch X         (drag — scaleX, drag past flips)
+//   • ↻   middle-right  Wrap width        (drag — text layers only;
+//                                         changes layer.width without
+//                                         scaling so font size stays
+//                                         put. Double-tap re-engages
+//                                         auto-fit on next edit-end.)
 //   • ⌨   bottom-left   Edit text         (tap — text layers only)
 //   • ⧉   bottom-centre Duplicate         (tap)
 //   • ⤡   bottom-right  Resize            (drag — locked aspect ratio)
@@ -24,6 +29,12 @@
 // BottomEditDrawer for the selected layer in non-fresh mode (existing
 // runs preserved). Added in Batch A — Apr 2026 — to match the
 // reference Add-Text-on-Photo app's selection chrome.
+//
+// The wrap-width handle (middle-right) is text-only and changes the
+// layer's wrap width directly. It's distinct from the corner-resize
+// (which scales the whole layer including font) and from the
+// stretch-x handle (which also scales). New for May 2026 paragraph-
+// width dragger build.
 //
 // Drag math runs in DOM-pixel space because we receive pointer client
 // coords directly. The layer's geometric centre (in DOM coords) is the
@@ -41,11 +52,13 @@ import {
   MoveHorizontal,
   MoveVertical,
   RotateCw,
+  WrapText,
   X,
 } from "lucide-react";
 import { useEditor } from "../context/EditorContext";
 import { useMobileEdit } from "../context/MobileEditContext";
-import type { AnyLayer } from "@/lib/photo-editor/types";
+import { longestWordWidth, tightLayerWidth } from "@/lib/photo-editor/rich-text/layout";
+import type { AnyLayer, TextLayer } from "@/lib/photo-editor/types";
 
 interface SelectionToolsProps {
   stageLeft: number;
@@ -345,6 +358,46 @@ export function SelectionTools({
     pointerId: number;
   } | null>(null);
 
+  // ── Wrap-width drag (May 2026) ──────────────────────────────
+  // Text-only middle-right handle. Drags layer.width directly without
+  // scaling the layer's transform, so the font size stays put as the
+  // box widens / narrows and the text re-flows live. Anchor follows
+  // the layer's text alignment so the visible content stays put under
+  // the user's eye while the box edge they're not touching moves.
+  const wrapWidthRef = useRef<{
+    /** Layer width at drag start (layer-local pixels). */
+    startWidth: number;
+    /** Layer transform at drag start — we re-compute transform.x/y
+     *  on each move to keep the alignment-based anchor in place. */
+    startTransform: AnyLayer["transform"];
+    /** Layer's text alignment at drag start. Captured once so a mid-
+     *  drag alignment change (unlikely but possible if the user pokes
+     *  the toolbar with another finger) doesn't mess up the anchor. */
+    startAlign: TextLayer["styling"]["align"];
+    /** Pointer's start position in DOM coords. */
+    startPointer: { x: number; y: number };
+    /** Unit vector in DOM coords pointing along the layer's local +x
+     *  axis (left-mid → right-mid). Used to project pointer movement
+     *  onto the axis so rotated layers behave correctly. */
+    axisDirDom: { x: number; y: number };
+    /** DOM-space length of the layer's full local-x axis at start.
+     *  axisLengthDom / startWidth = DOM-units-per-layer-local-unit
+     *  = the effective scaleX × stageScale. */
+    axisLengthDom: number;
+    /** Floor (longest single word width, layer-local px) below which
+     *  we don't let the user drag — words would overflow the box. */
+    minWidth: number;
+    pointerId: number;
+    /** Whether the pointer has moved past the click threshold. If
+     *  not, treat pointerup as a tap (candidate for double-tap). */
+    movedPastThreshold: boolean;
+  } | null>(null);
+
+  // Double-tap detection on the wrap-width handle. Stores the time
+  // of the most-recent qualifying tap (pointerup without a drag). A
+  // second tap within DOUBLE_TAP_MS fires the reset action.
+  const wrapWidthLastTapRef = useRef<number>(0);
+
   if (!geom || !selectedLayer) return null;
 
   // Geometric centre = average of the four corners. Works for any
@@ -524,6 +577,214 @@ export function SelectionTools({
     }
   }
 
+  // ── Wrap-width drag (text-only middle-right handle, May 2026) ──
+  //
+  // Drag right widens layer.width, drag left narrows it. Text re-flows
+  // live (every pointermove dispatches UPDATE_LAYER). The font size
+  // stays put — only the wrap width changes. Anchor follows alignment:
+  //
+  //   left   → left edge fixed (transform.x unchanged)
+  //   center → centre fixed (transform.x shifts by half the delta)
+  //   right  → right edge fixed (transform.x shifts by full delta)
+  //   justify → treated as left for anchoring
+  //
+  // For rotated layers the anchor shift happens along the layer's
+  // LOCAL +x axis (rotated to stage / DOM). cos / sin of the rotation
+  // are applied to project the layer-local x-shift back into stage-
+  // coord transform.x/y deltas.
+  //
+  // Floor: longestWordWidth(layer) — words can't be broken so the
+  // box can't be narrower than its widest single word. Captured
+  // once at drag start; new words can't appear during a drag (no
+  // keyboard up).
+  //
+  // Tap (no movement past threshold) is captured for double-tap
+  // detection: two taps within DOUBLE_TAP_MS sets autoFitWidth=true
+  // and immediately tightens to current content.
+  const DOUBLE_TAP_MS = 300;
+  const TAP_MOVE_THRESHOLD_PX = 5;
+
+  function onWrapWidthPointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!selectedLayer || selectedLayer.kind !== "text") return;
+    const layer = selectedLayer as TextLayer;
+    if (!geom) return;
+
+    // Build the layer-local +x axis direction in DOM coords from the
+    // existing geom corners (TL → TR is the local +x direction at the
+    // layer's top edge; bisecting to the layer-local x-axis is the
+    // same direction). Unit vector + total DOM length captured.
+    const axisDx = geom.tr.x - geom.tl.x;
+    const axisDy = geom.tr.y - geom.tl.y;
+    const axisLengthDom = Math.max(1, Math.hypot(axisDx, axisDy));
+    const axisDirDom = {
+      x: axisDx / axisLengthDom,
+      y: axisDy / axisLengthDom,
+    };
+
+    wrapWidthRef.current = {
+      startWidth: layer.width,
+      startTransform: { ...layer.transform },
+      startAlign: layer.styling.align,
+      startPointer: { x: e.clientX, y: e.clientY },
+      axisDirDom,
+      axisLengthDom,
+      minWidth: Math.max(40, longestWordWidth(layer)),
+      pointerId: e.pointerId,
+      movedPastThreshold: false,
+    };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onWrapWidthPointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+    const w = wrapWidthRef.current;
+    if (!w || w.pointerId !== e.pointerId) return;
+    if (!selectedLayer || selectedLayer.kind !== "text") return;
+
+    // Pointer delta from drag start, in DOM space.
+    const dxDom = e.clientX - w.startPointer.x;
+    const dyDom = e.clientY - w.startPointer.y;
+
+    // Tap-vs-drag: once we've moved past the threshold, this gesture
+    // is a drag, no longer a tap.
+    if (
+      !w.movedPastThreshold &&
+      Math.hypot(dxDom, dyDom) > TAP_MOVE_THRESHOLD_PX
+    ) {
+      w.movedPastThreshold = true;
+    }
+    if (!w.movedPastThreshold) return;
+
+    // Project the pointer delta onto the layer's local +x axis (in
+    // DOM space). Result is a signed DOM-pixel delta along that axis.
+    const tDom = dxDom * w.axisDirDom.x + dyDom * w.axisDirDom.y;
+    // Convert DOM-pixel delta back to layer-local units.
+    const dWidthLocal = (tDom * w.startWidth) / w.axisLengthDom;
+    let newWidth = w.startWidth + dWidthLocal;
+    if (newWidth < w.minWidth) newWidth = w.minWidth;
+
+    // Alignment-anchor: the local-x point that should stay put while
+    // the box width changes. 0 for left, oldWidth/2 for centre,
+    // oldWidth for right.
+    const anchorRatio =
+      w.startAlign === "left" || w.startAlign === "justify"
+        ? 0
+        : w.startAlign === "center"
+          ? 0.5
+          : 1;
+    const anchorXOldLocal = w.startWidth * anchorRatio;
+    const anchorXNewLocal = newWidth * anchorRatio;
+    const anchorDeltaLocal = anchorXNewLocal - anchorXOldLocal;
+
+    // Project the layer-local anchor delta onto stage-coord deltas.
+    // The layer's local +x axis in stage coords (after applying its
+    // own scaleX and rotation): R(rotation) ∘ S(scaleX, 1) (1, 0).
+    const rad = (w.startTransform.rotation * Math.PI) / 180;
+    const cosR = Math.cos(rad);
+    const sinR = Math.sin(rad);
+    // Stage-space delta of the anchor point if transform.xy stayed:
+    //   dx_stage = anchorDeltaLocal × scaleX × cos(rad)
+    //   dy_stage = anchorDeltaLocal × scaleX × sin(rad)
+    // To keep the anchor point fixed in stage coords we shift
+    // transform by the negative of that.
+    const sx = w.startTransform.scaleX;
+    const newTransformX =
+      w.startTransform.x - anchorDeltaLocal * sx * cosR;
+    const newTransformY =
+      w.startTransform.y - anchorDeltaLocal * sx * sinR;
+
+    dispatch({
+      type: "UPDATE_LAYER",
+      id: selectedLayer.id,
+      patch: {
+        width: newWidth,
+        // Manual width set by the user — turn off auto-fit so the
+        // next endEditing doesn't override their choice. (No-op if
+        // already false.)
+        autoFitWidth: false,
+        transform: {
+          ...w.startTransform,
+          x: newTransformX,
+          y: newTransformY,
+        },
+      },
+    });
+  }
+
+  function onWrapWidthPointerUp(e: React.PointerEvent<HTMLButtonElement>) {
+    const w = wrapWidthRef.current;
+    if (!w || w.pointerId !== e.pointerId) return;
+    const wasTap = !w.movedPastThreshold;
+    wrapWidthRef.current = null;
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* already released */
+    }
+    if (!wasTap) return;
+
+    // Tap path — candidate for double-tap. If the previous tap was
+    // recent enough, fire the reset action.
+    const now = performance.now();
+    const last = wrapWidthLastTapRef.current;
+    if (last !== 0 && now - last <= DOUBLE_TAP_MS) {
+      wrapWidthLastTapRef.current = 0;
+      onWrapWidthDoubleTap();
+      return;
+    }
+    wrapWidthLastTapRef.current = now;
+  }
+
+  function onWrapWidthDoubleTap() {
+    if (!selectedLayer || selectedLayer.kind !== "text") return;
+    const layer = selectedLayer as TextLayer;
+
+    // Immediately tighten to current content + flag autoFitWidth=true
+    // so subsequent edit-end also re-tightens. Mirrors the snap logic
+    // in MobileEditContext.endEditing — kept inline rather than
+    // factored because the editor reducer doesn't take auto-fit
+    // commands and circular-importing the helper would be awkward.
+    const tight = tightLayerWidth(layer);
+    const minWord = longestWordWidth(layer);
+    const newWidth = Math.max(tight, minWord, 40);
+    if (newWidth === layer.width) {
+      // Already tight — just re-arm the flag, no transform change.
+      dispatch({
+        type: "UPDATE_LAYER",
+        id: layer.id,
+        patch: { autoFitWidth: true },
+      });
+      return;
+    }
+    const oldWidth = layer.width;
+    const align = layer.styling.align;
+    const anchorRatio =
+      align === "left" || align === "justify"
+        ? 0
+        : align === "center"
+          ? 0.5
+          : 1;
+    const anchorDeltaLocal = (newWidth - oldWidth) * anchorRatio;
+    const rad = (layer.transform.rotation * Math.PI) / 180;
+    const cosR = Math.cos(rad);
+    const sinR = Math.sin(rad);
+    const sx = layer.transform.scaleX;
+    dispatch({
+      type: "UPDATE_LAYER",
+      id: layer.id,
+      patch: {
+        width: newWidth,
+        autoFitWidth: true,
+        transform: {
+          ...layer.transform,
+          x: layer.transform.x - anchorDeltaLocal * sx * cosR,
+          y: layer.transform.y - anchorDeltaLocal * sx * sinR,
+        },
+      },
+    });
+  }
+
   // ── Rotate drag ──────────────────────────────────────────────
   const onRotatePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -645,6 +906,9 @@ export function SelectionTools({
   const leftMidY = (geom.tl.y + geom.bl.y) / 2;
   const bottomMidX = (geom.bl.x + geom.br.x) / 2;
   const bottomMidY = (geom.bl.y + geom.br.y) / 2;
+  // Wrap-width handle (text-only, May 2026).
+  const rightMidX = (geom.tr.x + geom.br.x) / 2;
+  const rightMidY = (geom.tr.y + geom.br.y) / 2;
 
   // Adaptive icon colour — sample the selected layer's primary visible
   // colour and decide on dark vs light icons based on its relative
@@ -720,6 +984,22 @@ export function SelectionTools({
       >
         <MoveHorizontal className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
+
+      {isText && (
+        <CornerBtn
+          x={rightMidX}
+          y={rightMidY}
+          ariaLabel="Wrap width — drag to set, double-tap to auto-fit"
+          drag
+          onPointerDown={onWrapWidthPointerDown}
+          onPointerMove={onWrapWidthPointerMove}
+          onPointerUp={onWrapWidthPointerUp}
+          onPointerCancel={onWrapWidthPointerUp}
+          color={iconColor}
+        >
+          <WrapText className="w-5 h-5" strokeWidth={2.25} />
+        </CornerBtn>
+      )}
 
       {isText && (
         <CornerBtn
