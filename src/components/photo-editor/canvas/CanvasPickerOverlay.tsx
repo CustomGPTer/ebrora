@@ -52,7 +52,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Pipette, X } from "lucide-react";
+// Pipette / X icons removed alongside the cancel banner (May 2026
+// — new colour system). The loupe + icon active state are sufficient.
 import { useCanvasPicker } from "../context/CanvasPickerContext";
 import { useEditor } from "../context/EditorContext";
 
@@ -306,42 +307,11 @@ export function CanvasPickerOverlay() {
         }}
       />
 
-      {/* Cancel banner */}
-      <div
-        role="status"
-        aria-live="polite"
-        className="fixed left-1/2 -translate-x-1/2 z-[400] px-4 py-2 rounded-full text-sm flex items-center gap-3 pointer-events-none"
-        style={{
-          top: "calc(env(safe-area-inset-top, 0px) + 64px)",
-          background: "rgba(17, 24, 39, 0.92)",
-          color: "#FFFFFF",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
-        }}
-      >
-        <Pipette
-          className="w-4 h-4 flex-none"
-          strokeWidth={2}
-          aria-hidden
-        />
-        <span>Drag to pick — release to apply</span>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            cancelPick();
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          aria-label="Cancel colour pick"
-          className="inline-flex items-center justify-center rounded-full pointer-events-auto"
-          style={{
-            width: 24,
-            height: 24,
-            background: "rgba(255,255,255,0.16)",
-          }}
-        >
-          <X className="w-3.5 h-3.5" strokeWidth={2} />
-        </button>
-      </div>
+      {/* Cancel banner removed (May 2026 — new colour system).
+          Q15: the eyedropper icon's active state + the loupe itself
+          tell the user they're in pick mode. To cancel without
+          sampling, the user taps the eyedropper icon a second time
+          (handled by ColorPicker.onEyedropperTap). */}
 
       {/* Loupe — pointer-events: none so taps fall through to the
           drag overlay underneath. */}
