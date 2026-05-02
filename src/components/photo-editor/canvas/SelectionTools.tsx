@@ -36,6 +36,13 @@
 // stretch-x handle (which also scales). New for May 2026 paragraph-
 // width dragger build.
 //
+// Rotate behaviour (May 2026): while the rotate handle is being
+// dragged, a live angle label appears above the box's top edge,
+// rotates with the box, and shows the current rotation in degrees
+// (range -180° to 180°). Rotation snaps to {0°, 90°, 180°, -90°}
+// within ±5° (sticky cardinal snap). Label disappears on pointer
+// up. Matches the reference Add Text app's rotate UX.
+//
 // Drag math runs in DOM-pixel space because we receive pointer client
 // coords directly. The layer's geometric centre (in DOM coords) is the
 // pivot for both rotate and resize. Konva.Transformer is reduced to a
@@ -57,7 +64,7 @@ import {
 } from "lucide-react";
 import { useEditor } from "../context/EditorContext";
 import { useMobileEdit } from "../context/MobileEditContext";
-import { longestWordWidth, tightLayerWidth } from "@/lib/photo-editor/rich-text/layout";
+import { tightLayerWidth, widestGlyphWidth } from "@/lib/photo-editor/rich-text/layout";
 import type { AnyLayer, TextLayer } from "@/lib/photo-editor/types";
 
 interface SelectionToolsProps {
@@ -142,6 +149,11 @@ export function SelectionTools({
     useMobileEdit();
 
   const [tick, setTick] = useState(0);
+  // Whether the rotate handle is currently being dragged. Drives the
+  // visibility of the live angle label that appears next to the box's
+  // top edge while rotating. (May 2026 — rotate behaviour from the
+  // reference Add Text app screen recording.)
+  const [isRotating, setIsRotating] = useState(false);
 
   const selectedLayer = useMemo<AnyLayer | null>(() => {
     if (state.selection.length !== 1) return null;
@@ -593,10 +605,11 @@ export function SelectionTools({
   // are applied to project the layer-local x-shift back into stage-
   // coord transform.x/y deltas.
   //
-  // Floor: longestWordWidth(layer) — words can't be broken so the
-  // box can't be narrower than its widest single word. Captured
-  // once at drag start; new words can't appear during a drag (no
-  // keyboard up).
+  // Floor: widestGlyphWidth(layer) — words can break per-character
+  // once the box is narrower than the word, but a glyph itself can't
+  // be split, so the box can't be narrower than the widest single
+  // glyph without forcing overflow. 20px hard floor for empty layers
+  // so the box doesn't disappear.
   //
   // Tap (no movement past threshold) is captured for double-tap
   // detection: two taps within DOUBLE_TAP_MS sets autoFitWidth=true
@@ -630,7 +643,14 @@ export function SelectionTools({
       startPointer: { x: e.clientX, y: e.clientY },
       axisDirDom,
       axisLengthDom,
-      minWidth: Math.max(40, longestWordWidth(layer)),
+      // Floor at the widest single glyph — narrower than that would
+      // force a glyph to overflow the box, which is uglier than per-
+      // character wrapping. Above this floor, the user can drag to
+      // any width; words will break per-character once the box is
+      // narrower than they are. 20px hard floor for empty layers
+      // (widestGlyphWidth returns 0 with no content) so the box
+      // doesn't disappear.
+      minWidth: Math.max(20, widestGlyphWidth(layer)),
       pointerId: e.pointerId,
       movedPastThreshold: false,
     };
@@ -745,9 +765,10 @@ export function SelectionTools({
     // in MobileEditContext.endEditing — kept inline rather than
     // factored because the editor reducer doesn't take auto-fit
     // commands and circular-importing the helper would be awkward.
+    // 40px hard floor for empty / whitespace-only content (tight = 0
+    // there) so the layer doesn't disappear.
     const tight = tightLayerWidth(layer);
-    const minWord = longestWordWidth(layer);
-    const newWidth = Math.max(tight, minWord, 40);
+    const newWidth = Math.max(tight, 40);
     if (newWidth === layer.width) {
       // Already tight — just re-arm the flag, no transform change.
       dispatch({
@@ -786,6 +807,45 @@ export function SelectionTools({
   }
 
   // ── Rotate drag ──────────────────────────────────────────────
+  //
+  // Sticky snap (May 2026): when the rotated angle (normalised to
+  // (-180, 180]) falls within ±5° of a cardinal {0, 90, 180, -90},
+  // it snaps to that exact value. Inside the snap zone the angle
+  // sticks; the user has to drag past 5° to release. Implementation
+  // is "simple snap" — the same ±5° threshold governs entry and
+  // exit, which behaves identically to true sticky-with-hysteresis
+  // for a 5° zone.
+  //
+  // Angle label is shown via isRotating state — set true on
+  // pointerdown so the label flashes up the moment the user touches
+  // the handle (per spec, even before any movement).
+  const SNAP_ZONE_DEG = 5;
+  const SNAP_TARGETS_DEG = [0, 90, 180, -90];
+
+  /** Normalise an angle in degrees to the (-180, 180] range. */
+  function normaliseAngle(deg: number): number {
+    let a = deg % 360;
+    if (a > 180) a -= 360;
+    if (a <= -180) a += 360;
+    return a;
+  }
+
+  /** Apply cardinal-angle snapping within the snap zone. */
+  function snapAngle(deg: number): number {
+    const norm = normaliseAngle(deg);
+    for (const target of SNAP_TARGETS_DEG) {
+      if (Math.abs(norm - target) <= SNAP_ZONE_DEG) {
+        return target;
+      }
+    }
+    // Also handle the wrap-around at 180 / -180 (treated as the same
+    // angle but different signs after normalisation).
+    if (Math.abs(norm - 180) <= SNAP_ZONE_DEG || Math.abs(norm + 180) <= SNAP_ZONE_DEG) {
+      return 180;
+    }
+    return norm;
+  }
+
   const onRotatePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -802,6 +862,7 @@ export function SelectionTools({
       pointerId: e.pointerId,
     };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setIsRotating(true);
   };
 
   const onRotatePointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -809,7 +870,8 @@ export function SelectionTools({
     if (!r || r.pointerId !== e.pointerId) return;
     const angle = Math.atan2(e.clientY - r.centreY, e.clientX - r.centreX);
     const deltaDeg = ((angle - r.startAngle) * 180) / Math.PI;
-    const newRotation = r.layerStartRotation + deltaDeg;
+    const rawRotation = r.layerStartRotation + deltaDeg;
+    const newRotation = snapAngle(rawRotation);
     dispatch({
       type: "UPDATE_LAYER",
       id: selectedLayer.id,
@@ -823,6 +885,7 @@ export function SelectionTools({
     const r = rotateRef.current;
     if (!r || r.pointerId !== e.pointerId) return;
     rotateRef.current = null;
+    setIsRotating(false);
     try {
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {
@@ -909,6 +972,25 @@ export function SelectionTools({
   // Wrap-width handle (text-only, May 2026).
   const rightMidX = (geom.tr.x + geom.br.x) / 2;
   const rightMidY = (geom.tr.y + geom.br.y) / 2;
+
+  // Angle-label position (May 2026 rotate behaviour). Sits a fixed
+  // distance "above" the top-edge midpoint in the layer's LOCAL
+  // frame. We compute the unit vector pointing from the box centre
+  // outward along (top-mid → outside) by negating the (top-mid →
+  // bottom-mid) direction; then offset by ANGLE_LABEL_OFFSET_PX in
+  // DOM space. The label's own rotation matches the layer's so it
+  // reads naturally regardless of orientation.
+  const ANGLE_LABEL_OFFSET_PX = 36;
+  const tmToBmX = bottomMidX - topMidX;
+  const tmToBmY = bottomMidY - topMidY;
+  const tmToBmLen = Math.max(1, Math.hypot(tmToBmX, tmToBmY));
+  const outwardX = -tmToBmX / tmToBmLen;
+  const outwardY = -tmToBmY / tmToBmLen;
+  const angleLabelX = topMidX + outwardX * ANGLE_LABEL_OFFSET_PX;
+  const angleLabelY = topMidY + outwardY * ANGLE_LABEL_OFFSET_PX;
+  const angleLabelText = `${Math.round(
+    normaliseAngle(selectedLayer.transform.rotation),
+  )}°`;
 
   // Adaptive icon colour — sample the selected layer's primary visible
   // colour and decide on dark vs light icons based on its relative
@@ -1036,6 +1118,40 @@ export function SelectionTools({
       >
         <ResizeIcon className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
+
+      {/* Live angle label — visible only during an active rotation
+          drag. Positioned above the top-edge midpoint in the layer's
+          local frame and rotated with the layer so the digits read
+          naturally. Pointer-events disabled so it never intercepts
+          taps on the box behind it. (May 2026 — rotate behaviour from
+          the reference Add Text app.) */}
+      {isRotating && (
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: angleLabelX,
+            top: angleLabelY,
+            transform: `translate(-50%, -50%) rotate(${selectedLayer.transform.rotation}deg)`,
+            transformOrigin: "center",
+            pointerEvents: "none",
+            color: iconColor,
+            fontSize: 14,
+            fontWeight: 500,
+            fontFamily:
+              "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+            // Subtle shadow so the digits stay legible against any
+            // canvas content (matches the reference app's look).
+            textShadow: isLightLayer
+              ? "0 1px 2px rgba(255,255,255,0.6)"
+              : "0 1px 2px rgba(0,0,0,0.6)",
+            whiteSpace: "nowrap",
+            userSelect: "none",
+          }}
+        >
+          {angleLabelText}
+        </div>
+      )}
     </>
   );
 }
