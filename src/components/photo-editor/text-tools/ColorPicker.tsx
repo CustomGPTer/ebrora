@@ -1,41 +1,61 @@
 // src/components/photo-editor/text-tools/ColorPicker.tsx
 //
-// The new colour-picking surface. Replaces the old segmented-control
-// (Swatches / Picker / Pick) ColorPanel. Drop-in: takes `value` and
-// `onChange`, used by every panel that needs a colour.
+// The colour-picking surface. Drop-in: takes `value` and `onChange`,
+// used by every panel that needs a colour.
 //
 // Layout (one horizontal scrollable strip):
 //
-//   [current] [⊘ eyedropper] [🎨 palette] [favs ≤12] [200 standard]
-//      ↑                                              ↑
-//   pinned far-left (Q21 = A) — does NOT scroll       scroll past
+//   ┌─ pinned (sticky, doesn't scroll) ─┐ ┌─ scrolls ──────────────────────────────┐
+//   [⊘ eyedropper]  [🎨 palette]       [current chip?] [favs ≤5] [200 standard]
 //
-// Behaviours:
+// May 2026 — chip-into-scroll + tighter icon gap + cap=5 + long-press.
 //
-//   • Tap a swatch / favourite — applies instantly (Q6 = A).
-//     Selection ring (accent green) is drawn around any swatch
-//     whose hex matches `value`.
+// Behaviour notes:
+//
+//   • Current colour chip is the first item in the SCROLL region (it
+//     used to be pinned far-left). It scrolls with favourites and
+//     standard swatches. It's hidden when the active value matches
+//     a favourite or a standard swatch — the matching swatch shows
+//     the selection ring instead, so there's never a "double ring".
+//   • When the active value matches BOTH a favourite AND a standard
+//     swatch, the standard swatch wins the selection ring; the
+//     favourite renders unselected. (Possible if the user added a
+//     hex from the standard palette to favourites.)
+//   • The gap between the eyedropper icon and the palette icon is
+//     20% narrower than before (6px → 4.8px). Every other gap in
+//     the strip is unchanged.
+//   • Long-press (500ms) on a favourite swatch opens an in-app
+//     "Remove favourite?" confirm dialog. Standard swatches and the
+//     current chip do NOT respond to long-press. No haptic feedback
+//     and no animation — instant reflow on confirm (per spec).
 //   • Tap eyedropper — engages CanvasPickerContext. The existing
-//     CanvasPickerOverlay shows the loupe (Q15 / 20). Icon shows
-//     active state while picking. Tap again to cancel.
-//   • Tap palette — opens ColorPickerModal (Image 1 layout). Live
-//     preview, hex editable, favourites button.
-//   • Current chip — at the very start (Q21 = A). Always visible,
-//     reflects the active colour even if not in the palette.
-//     Tapping it opens the palette modal as a shortcut.
+//     CanvasPickerOverlay shows the loupe. Icon shows active state
+//     while picking. Tap again to cancel.
+//   • Tap palette — opens ColorPickerModal. Live preview, hex
+//     editable, "Add to Favourites" button.
+//   • Tap a swatch / favourite / current chip — applies instantly.
 //
-// May 2026 — new colour system build.
+// Long-press implementation note. We use pointer events (not touch)
+// so the same code path handles mouse, pen, and touch. The timer is
+// cancelled by pointerup, pointercancel, pointerleave, AND by a
+// pointermove past a small distance threshold — the latter is so
+// that dragging horizontally to scroll the strip never accidentally
+// triggers the remove dialog. After the timer fires, a ref flag
+// suppresses the click that would otherwise follow pointerup, so
+// the colour isn't ALSO applied behind the dialog.
 
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Palette, Pipette } from "lucide-react";
 import { useCanvasPicker } from "../context/CanvasPickerContext";
 import { ColorPickerModal } from "./ColorPickerModal";
+import { Dialog, DialogCancelButton, DialogApplyButton } from "../tools/Dialog";
+import { STANDARD_PALETTE } from "@/lib/photo-editor/colour/swatch-palette";
 import {
-  STANDARD_PALETTE,
-} from "@/lib/photo-editor/colour/swatch-palette";
-import { useFavourites } from "@/lib/photo-editor/colour/favourites";
+  removeFavourite,
+  useFavourites,
+} from "@/lib/photo-editor/colour/favourites";
 
 interface ColorPickerProps {
   /** Current hex (#RRGGBB). Empty string is allowed and treated as
@@ -50,6 +70,15 @@ interface ColorPickerProps {
 const ICON_SIZE = 44;
 const SWATCH_SIZE = 40;
 const SWATCH_GAP = 8;
+// 6px × 0.8 = 4.8px — 20% tighter than the previous cluster gap.
+// Applied only between the eyedropper and the palette icons; every
+// other inter-item spacing in the strip is unchanged.
+const ICON_TO_ICON_GAP = 4.8;
+const LONG_PRESS_MS = 500;
+// 10px-squared distance threshold — pointermove past this cancels
+// the long-press timer (lets the user scroll the strip without
+// accidentally triggering the remove dialog).
+const LONG_PRESS_MOVE_THRESHOLD_SQ = 100;
 const ACCENT = "#1B5B50";
 
 export function ColorPicker({
@@ -60,8 +89,21 @@ export function ColorPicker({
   const picker = useCanvasPicker();
   const favs = useFavourites();
   const [modalOpen, setModalOpen] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null);
 
   const valueNorm = value ? value.toUpperCase() : null;
+
+  // Pre-compute membership so each swatch's `selected` is O(1) and
+  // the chip-visibility rule is single-source.
+  const isInStandard =
+    !!valueNorm &&
+    STANDARD_PALETTE.some((sw) => sw.hex.toUpperCase() === valueNorm);
+  const isInFavs =
+    !!valueNorm && favs.some((f) => f.toUpperCase() === valueNorm);
+  // Current chip renders only for hexes that aren't already a swatch
+  // somewhere in the strip — i.e. custom colours from the picker
+  // modal or from the eyedropper.
+  const showChip = !!valueNorm && !isInStandard && !isInFavs;
 
   // ── Eyedropper ────────────────────────────────────────────────
   function onEyedropperTap() {
@@ -82,16 +124,21 @@ export function ColorPicker({
     setModalOpen(false);
   }
 
+  // ── Long-press → remove favourite ─────────────────────────────
+  function onFavLongPress(hex: string) {
+    setRemoveTarget(hex.toUpperCase());
+  }
+  function confirmRemoveFavourite() {
+    if (removeTarget) removeFavourite(removeTarget);
+    setRemoveTarget(null);
+  }
+  function cancelRemoveFavourite() {
+    setRemoveTarget(null);
+  }
+
   return (
     <>
-      <div
-        className="relative w-full"
-        style={{
-          // Outer strip wrapper. The current-chip + icons section is
-          // pinned via position: sticky so it stays put as the user
-          // scrolls the swatches.
-        }}
-      >
+      <div className="relative w-full">
         <div
           className="flex items-center"
           style={{
@@ -103,8 +150,9 @@ export function ColorPicker({
             paddingBottom: 6,
           }}
         >
-          {/* Pinned left cluster: current chip + eyedropper + palette.
-              Sticky so it floats over the scrolling swatches. */}
+          {/* Pinned cluster: eyedropper + palette only. The current
+              chip used to live here; it now sits in the scroll
+              region as the first swatch. */}
           <div
             className="flex items-center flex-none"
             style={{
@@ -113,43 +161,10 @@ export function ColorPicker({
               background:
                 "linear-gradient(to right, var(--pe-toolbar-bg) 0%, var(--pe-toolbar-bg) 80%, transparent 100%)",
               paddingRight: 8,
-              gap: 6,
+              gap: ICON_TO_ICON_GAP,
               zIndex: 2,
             }}
           >
-            {/* Current colour chip (Q21 = A: far left, before icons).
-                Tapping opens the palette modal. */}
-            {valueNorm ? (
-              <button
-                type="button"
-                onClick={openModal}
-                aria-label={`${ariaLabel}: current ${valueNorm}. Open colour picker.`}
-                className="flex-none inline-flex items-center justify-center"
-                style={{
-                  width: ICON_SIZE,
-                  height: ICON_SIZE,
-                  background: "transparent",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                }}
-              >
-                <span
-                  aria-hidden
-                  style={{
-                    display: "inline-block",
-                    width: SWATCH_SIZE - 4,
-                    height: SWATCH_SIZE - 4,
-                    borderRadius: "50%",
-                    background: valueNorm,
-                    boxShadow:
-                      "inset 0 0 0 1px rgba(0,0,0,0.18), 0 1px 3px rgba(0,0,0,0.12)",
-                  }}
-                />
-              </button>
-            ) : null}
-
-            {/* Eyedropper icon */}
             <IconButton
               ariaLabel={
                 picker.isPicking ? "Cancel colour pick" : "Pick colour from canvas"
@@ -160,7 +175,6 @@ export function ColorPicker({
               <Pipette className="w-5 h-5" strokeWidth={1.75} />
             </IconButton>
 
-            {/* Palette icon */}
             <IconButton
               ariaLabel="Open custom colour picker"
               active={modalOpen}
@@ -170,18 +184,38 @@ export function ColorPicker({
             </IconButton>
           </div>
 
-          {/* Favourites strip */}
+          {/* Current colour chip — first item in scroll region.
+              Hidden when the value duplicates a fav / standard
+              swatch (selection ring lives on the matching swatch
+              instead). Tap-to-reapply behaves like any other
+              swatch (no modal shortcut). */}
+          {showChip ? (
+            <Swatch
+              hex={valueNorm!}
+              selected
+              onTap={() => onChange(valueNorm!)}
+              ariaLabel={`${ariaLabel}: current ${valueNorm}`}
+            />
+          ) : null}
+
+          {/* Favourites (newest at end — order from store). When the
+              active value matches both a favourite AND a standard
+              swatch, standard wins the ring (per spec). */}
           {favs.length > 0 ? (
             <>
-              {favs.map((hex) => (
-                <Swatch
-                  key={`fav-${hex}`}
-                  hex={hex}
-                  selected={valueNorm === hex.toUpperCase()}
-                  onTap={() => onChange(hex.toUpperCase())}
-                  isFavourite
-                />
-              ))}
+              {favs.map((hex) => {
+                const matches = valueNorm === hex.toUpperCase();
+                return (
+                  <Swatch
+                    key={`fav-${hex}`}
+                    hex={hex}
+                    selected={matches && !isInStandard}
+                    onTap={() => onChange(hex.toUpperCase())}
+                    onLongPress={() => onFavLongPress(hex)}
+                    isFavourite
+                  />
+                );
+              })}
               {/* Subtle divider between favs and the standard set. */}
               <div
                 aria-hidden
@@ -218,6 +252,43 @@ export function ColorPicker({
         }}
         onCancel={closeModal}
       />
+
+      {/* Remove-favourite confirm dialog (long-press → here). Uses
+          the editor's standard Dialog primitive for consistency
+          with other in-editor confirmations (z-1100, sits above the
+          panel drawer). */}
+      <Dialog
+        open={removeTarget !== null}
+        title="Remove favourite?"
+        onCancel={cancelRemoveFavourite}
+        ariaLabel="Remove favourite colour"
+        footer={
+          <>
+            <DialogCancelButton onClick={cancelRemoveFavourite} />
+            <DialogApplyButton onClick={confirmRemoveFavourite}>
+              Remove
+            </DialogApplyButton>
+          </>
+        }
+      >
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden
+            style={{
+              display: "inline-block",
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              background: removeTarget ?? "#000",
+              boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.18)",
+              flex: "0 0 auto",
+            }}
+          />
+          <span style={{ color: "var(--pe-text)", fontSize: 14 }}>
+            Remove <strong>{removeTarget}</strong> from your favourites?
+          </span>
+        </div>
+      </Dialog>
     </>
   );
 }
@@ -262,18 +333,87 @@ function Swatch({
   hex,
   selected,
   onTap,
+  onLongPress,
   isFavourite = false,
+  ariaLabel,
 }: {
   hex: string;
   selected: boolean;
   onTap: () => void;
+  /** When provided, a 500ms hold fires this callback. Tap-vs-long-
+   *  press disambiguation: on long-press fire we set a ref flag that
+   *  suppresses the click which would otherwise follow pointerup. */
+  onLongPress?: () => void;
   isFavourite?: boolean;
+  ariaLabel?: string;
 }) {
+  const timerRef = useRef<number | null>(null);
+  const longPressFiredRef = useRef(false);
+  const startPosRef = useRef<{ x: number; y: number } | null>(null);
+
+  const cancelTimer = useCallback(() => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const onPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!onLongPress) return;
+      longPressFiredRef.current = false;
+      startPosRef.current = { x: e.clientX, y: e.clientY };
+      cancelTimer();
+      timerRef.current = window.setTimeout(() => {
+        longPressFiredRef.current = true;
+        timerRef.current = null;
+        onLongPress();
+      }, LONG_PRESS_MS);
+    },
+    [onLongPress, cancelTimer],
+  );
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (timerRef.current === null || startPosRef.current === null) return;
+      const dx = e.clientX - startPosRef.current.x;
+      const dy = e.clientY - startPosRef.current.y;
+      if (dx * dx + dy * dy > LONG_PRESS_MOVE_THRESHOLD_SQ) {
+        cancelTimer();
+      }
+    },
+    [cancelTimer],
+  );
+
+  // Cleanup if the component unmounts mid-press.
+  useEffect(() => cancelTimer, [cancelTimer]);
+
+  function onClickButton(e: React.MouseEvent) {
+    if (longPressFiredRef.current) {
+      // Long-press already opened the confirm dialog; suppress the
+      // tap action so the colour doesn't ALSO get applied.
+      e.preventDefault();
+      e.stopPropagation();
+      longPressFiredRef.current = false;
+      return;
+    }
+    onTap();
+  }
+
+  const a11yLabel =
+    ariaLabel ?? `${isFavourite ? "Favourite " : ""}colour ${hex}`;
+
   return (
     <button
       type="button"
-      onClick={onTap}
-      aria-label={`${isFavourite ? "Favourite " : ""}colour ${hex}`}
+      onClick={onClickButton}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={cancelTimer}
+      onPointerCancel={cancelTimer}
+      onPointerLeave={cancelTimer}
+      onContextMenu={onLongPress ? (e) => e.preventDefault() : undefined}
+      aria-label={a11yLabel}
       aria-pressed={selected}
       className="flex-none inline-flex items-center justify-center"
       style={{
@@ -283,6 +423,10 @@ function Swatch({
         border: "none",
         padding: 0,
         cursor: "pointer",
+        // Suppresses iOS's text-select callout during long-press so
+        // our custom dialog isn't fighting the share/copy popup.
+        WebkitUserSelect: "none",
+        WebkitTouchCallout: "none",
       }}
     >
       <span
