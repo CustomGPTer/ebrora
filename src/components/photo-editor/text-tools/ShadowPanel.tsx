@@ -7,7 +7,7 @@
 
 "use client";
 
-import { useState } from "react";
+// useState import removed (May 2026) — showHsv state is gone.
 import { Cloud } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useTextTool } from "./use-text-tool";

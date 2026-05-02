@@ -104,7 +104,6 @@ export function GradientPanel(_props: GradientPanelProps = {}) {
                 type="button"
                 onClick={() => {
                   setActiveStop(i as 0 | 1);
-                  setShowHsv(false);
                 }}
                 className="flex-1 rounded-md py-2 text-xs font-medium transition"
                 style={{
