@@ -549,7 +549,8 @@ interface ResolvedStroke {
 function resolveShapeStroke(layer: ShapeLayer): ResolvedStroke | null {
   if (layer.stroke.width > 0 && layer.stroke.opacity > 0) {
     return {
-      color: layer.stroke.color,
+      // null colour = inherit from fill (May 2026). Mirrors ShapeNode.
+      color: layer.stroke.color ?? layer.fill,
       width: layer.stroke.width,
       opacity: layer.stroke.opacity,
     };
