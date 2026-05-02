@@ -52,6 +52,10 @@ import {
   type ReactNode,
 } from "react";
 import { useEditor } from "./EditorContext";
+import {
+  longestWordWidth,
+  tightLayerWidth,
+} from "@/lib/photo-editor/rich-text/layout";
 import type { GlyphRun, Id, TextLayer } from "@/lib/photo-editor/types";
 
 interface MobileEditState {
@@ -208,6 +212,49 @@ export function MobileEditProvider({ children }: { children: ReactNode }) {
               patch: { runs: prev.originalRuns },
             });
           }
+        } else {
+          // Commit path. Auto-fit-width support (May 2026): if the
+          // layer was created with autoFitWidth=true and has actual
+          // text content, snap its width to the longest natural line
+          // and flip the flag off. Subsequent edits leave the width
+          // alone unless the user double-taps the wrap-width handle
+          // on the selection toolbar to re-engage auto-fit.
+          //
+          // Anchor the snap to the layer's text alignment so the
+          // visible text stays where the user was looking at it:
+          //   left   → left edge fixed (x unchanged)
+          //   center → centre fixed (x shifts by half the delta)
+          //   right  → right edge fixed (x shifts by the full delta)
+          const layer = editorState.project.layers.find(
+            (l) => l.id === prev.editingLayerId,
+          );
+          if (
+            layer &&
+            layer.kind === "text" &&
+            layer.autoFitWidth &&
+            fullTextOf(layer).trim() !== ""
+          ) {
+            const tight = tightLayerWidth(layer);
+            const minWord = longestWordWidth(layer);
+            // Math.max with a 40px hard floor handles weird edge
+            // cases (all-whitespace, single zero-width glyph, etc.)
+            // without producing a 0px-wide, invisible layer.
+            const newWidth = Math.max(tight, minWord, 40);
+            const oldWidth = layer.width;
+            const dx = anchorShift(layer.styling.align, oldWidth, newWidth);
+            dispatch({
+              type: "UPDATE_LAYER",
+              id: layer.id,
+              patch: {
+                width: newWidth,
+                autoFitWidth: false,
+                transform: {
+                  ...layer.transform,
+                  x: layer.transform.x + dx,
+                },
+              },
+            });
+          }
         }
         return {
           editingLayerId: null,
@@ -216,7 +263,7 @@ export function MobileEditProvider({ children }: { children: ReactNode }) {
         };
       });
     },
-    [dispatch],
+    [dispatch, editorState.project],
   );
 
   const value = useMemo<MobileEditApi>(
@@ -265,4 +312,32 @@ export function useMobileEdit(): MobileEditApi {
  *  `text` field. Used for the drawer's pre-fill and for empty checks. */
 export function fullTextOf(layer: TextLayer): string {
   return layer.runs.map((r) => r.text).join("");
+}
+
+/** Compute the layer-x shift needed to keep the visible text anchored
+ *  in place when the layer's width changes from oldWidth to newWidth.
+ *  The anchor follows the alignment so that what the user was looking
+ *  at stays where they were looking:
+ *
+ *    left      → left edge fixed (no shift)
+ *    center    → centre fixed (shift = half the delta)
+ *    right     → right edge fixed (shift = full delta)
+ *    justify   → treated as left-aligned for anchoring (justified text
+ *                's edges are still left + right of the box; the left
+ *                edge is the natural anchor on width change). */
+export function anchorShift(
+  align: TextLayer["styling"]["align"],
+  oldWidth: number,
+  newWidth: number,
+): number {
+  const delta = oldWidth - newWidth;
+  switch (align) {
+    case "left":
+    case "justify":
+      return 0;
+    case "center":
+      return delta / 2;
+    case "right":
+      return delta;
+  }
 }
