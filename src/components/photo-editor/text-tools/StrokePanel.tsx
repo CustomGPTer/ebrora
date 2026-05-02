@@ -149,7 +149,18 @@ export function StrokePanel({
 
           <Section title="Colour">
             <ColorPicker
-              value={stroke.color}
+              // For shape strokes, stroke.color may be null
+              // ("inherit from fill"). Show the effective colour
+              // in the picker so the ring lands on a meaningful
+              // swatch — when the user picks a swatch, that flips
+              // null to a concrete hex via patchStroke and the
+              // stroke gains its own life from then on.
+              value={
+                stroke.color ??
+                (isShape
+                  ? (selectedLayer as ShapeLayer).fill
+                  : "#000000")
+              }
               onChange={(c) => patchStroke({ color: c })}
               ariaLabel="Stroke colour"
             />

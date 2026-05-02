@@ -109,7 +109,12 @@ export function ImageStrokePanel({
 
           <Section title="Colour">
             <ColorPicker
-              value={stroke.color}
+              // Image strokes always carry a concrete colour from
+              // their factory, but the Stroke type now permits null
+              // (shape-stroke semantics). Defensive fallback for
+              // type safety and to avoid a hidden ring on the
+              // picker if a null ever leaks in.
+              value={stroke.color ?? "#000000"}
               onChange={(c) => patchStroke({ color: c })}
               ariaLabel="Image stroke colour"
             />
