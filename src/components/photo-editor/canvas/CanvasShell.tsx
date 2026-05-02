@@ -20,6 +20,8 @@ import { useEffect, useRef, useState } from "react";
 import { CanvasStage } from "./CanvasStage";
 import { SelectionTools } from "./SelectionTools";
 import { GridOverlay } from "./GridOverlay";
+import { BezierControlHandles } from "./BezierControlHandles";
+import { FreehandDrawOverlay } from "./FreehandDrawOverlay";
 import { useEditor } from "../context/EditorContext";
 import {
   VIEWPORT_MIN_ZOOM,
@@ -114,6 +116,22 @@ export function CanvasShell() {
           />
 
           <SelectionTools
+            stageLeft={stageLeft}
+            stageTop={stageTop}
+            stageWidth={stageW}
+            stageHeight={stageH}
+            stageScale={effectiveScale}
+          />
+
+          <BezierControlHandles
+            stageLeft={stageLeft}
+            stageTop={stageTop}
+            stageWidth={stageW}
+            stageHeight={stageH}
+            stageScale={effectiveScale}
+          />
+
+          <FreehandDrawOverlay
             stageLeft={stageLeft}
             stageTop={stageTop}
             stageWidth={stageW}

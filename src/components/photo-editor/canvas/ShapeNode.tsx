@@ -300,6 +300,38 @@ function renderLineShape(layer: ShapeLayer): JSX.Element {
 
   // ── Curved line ─────────────────────────────────────────────
   if (shapeId === "line-curved") {
+    // If the user has authored bezier control points (via the new
+    // BezierControlHandles overlay), use them. Otherwise fall back
+    // to the default S-curve so existing layers still render.
+    if (props.bezier) {
+      const c1 = {
+        x: props.bezier.c1.u * width,
+        y: props.bezier.c1.v * height,
+      };
+      const c2 = {
+        x: props.bezier.c2.u * width,
+        y: props.bezier.c2.v * height,
+      };
+      // Konva's Line in bezier mode uses cubic segments where
+      // every 4 points = (anchor, control1, control2, anchor).
+      // For a single cubic curve from (0,h/2) to (width,h/2):
+      return (
+        <Line
+          points={[
+            0, height / 2,
+            c1.x, c1.y,
+            c2.x, c2.y,
+            width, height / 2,
+          ]}
+          stroke={colour}
+          strokeWidth={thickness}
+          lineCap="round"
+          lineJoin="round"
+          bezier
+        />
+      );
+    }
+    // Default S-curve fallback (unchanged from initial build).
     return (
       <Line
         points={[
@@ -318,9 +350,29 @@ function renderLineShape(layer: ShapeLayer): JSX.Element {
     );
   }
 
-  // ── Freehand placeholder ────────────────────────────────────
+  // ── Freehand ────────────────────────────────────────────────
   if (shapeId === "line-freehand") {
-    // Sampled wave; matches the catalogue's static fallback path.
+    // If the user has captured their own path via Redraw, render
+    // it. Otherwise fall back to the default wave so the shape
+    // is still visible after first drop.
+    if (props.freehandPoints && props.freehandPoints.length >= 2) {
+      const pts: number[] = [];
+      for (const p of props.freehandPoints) {
+        pts.push(p.u * width, p.v * height);
+      }
+      return (
+        <Line
+          points={pts}
+          stroke={colour}
+          strokeWidth={thickness}
+          lineCap="round"
+          lineJoin="round"
+          tension={0.4}
+        />
+      );
+    }
+    // Default wave fallback — sampled sine, matches the catalogue's
+    // static SVG path.
     const points: number[] = [];
     const steps = 32;
     for (let i = 0; i <= steps; i++) {
