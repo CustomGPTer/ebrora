@@ -310,6 +310,29 @@ export interface LineProps {
   /** Visual style of the arrowheads. "triangle" = filled solid wedge.
    *  "chevron" = open angle bracket (`>` / `<`). */
   arrowStyle: "triangle" | "chevron";
+  /** Cubic bezier control points for the `line-curved` shape. Stored
+   *  in normalised bbox coords (0..1). When unset, ShapeNode renders
+   *  the default S-curve fallback. The endpoints (P0 / P3) are fixed
+   *  at the bbox top-left and bottom-right; only c1 and c2 are
+   *  user-editable via the BezierControlHandles overlay.
+   *  May 2026 — Carve-out 2 build. */
+  bezier?: { c1: NormPoint; c2: NormPoint };
+  /** Point sequence for the `line-freehand` shape, captured by the
+   *  user dragging across the canvas. Stored in normalised bbox
+   *  coords (0..1). When unset, ShapeNode renders the default wave
+   *  fallback. The user enters draw mode via the LineStylePanel's
+   *  "Redraw" button, which sets state.freehandDrawingFor. On
+   *  release, the FreehandDrawOverlay normalises the captured points
+   *  against the new bbox and writes them here. May 2026. */
+  freehandPoints?: NormPoint[];
+}
+
+/** A point in normalised bounding-box coords. (0,0) is top-left,
+ *  (1,1) is bottom-right. Lets bezier / freehand paths re-flow
+ *  cleanly when the user resizes the layer. */
+export interface NormPoint {
+  u: number;
+  v: number;
 }
 
 export interface StickerLayer extends BaseLayer {
@@ -575,6 +598,12 @@ export interface EditorState {
   gridSize: number;
   /** True when snap-to-grid / snap-to-edge is on. */
   snapEnabled: boolean;
+  /** When non-null, the freehand-line layer currently in re-draw
+   *  mode. The FreehandDrawOverlay reads this and intercepts pointer
+   *  events on the canvas; on pointer-up, it normalises the captured
+   *  path into the layer's lineProps.freehandPoints and clears this
+   *  back to null via SET_FREEHAND_DRAWING. May 2026 — Carve-out 2. */
+  freehandDrawingFor: Id | null;
 }
 
 // ─── History (undo/redo) ────────────────────────────────────────
