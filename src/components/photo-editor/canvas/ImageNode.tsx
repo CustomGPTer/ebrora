@@ -205,7 +205,10 @@ export function ImageNode({
     const strokeProps =
       layer.stroke && layer.stroke.width > 0 && layer.stroke.opacity > 0
         ? {
-            stroke: layer.stroke.color,
+            // Image strokes never carry null colour from their factory,
+            // but the Stroke type now permits null (shape-stroke
+            // semantics). Defensive fallback for type safety.
+            stroke: layer.stroke.color ?? "#000000",
             strokeWidth: layer.stroke.width,
             strokeEnabled: true as const,
           }
@@ -316,7 +319,7 @@ export function ImageNode({
           ctx.lineTo(corners[2].x, corners[2].y);
           ctx.lineTo(corners[3].x, corners[3].y);
           ctx.closePath();
-          ctx.strokeStyle = layer.stroke.color;
+          ctx.strokeStyle = layer.stroke.color ?? "#000000";
           ctx.lineWidth = layer.stroke.width;
           ctx.globalAlpha = layer.stroke.opacity;
           ctx.stroke();

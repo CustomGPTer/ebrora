@@ -25,6 +25,25 @@
 // fill colour for filled variants, transparent for outlined; the
 // outlined variant always draws an outline using the same fill colour
 // when no explicit stroke is enabled.
+//
+// Stroke colour inheritance (May 2026):
+//   layer.stroke.color may be null. null means "inherit from fill" —
+//   the stroke paints in layer.fill. Once the user picks an explicit
+//   colour in the Stroke tab, color flips from null to a hex string
+//   and from then on the stroke has its own colour, independent of
+//   any subsequent fill changes. This is why dragging the Width
+//   slider on a green hexagon thickens it in green rather than
+//   surprising the user with a default-black outline.
+//
+// strokeScaleEnabled={false} on every primitive (May 2026):
+//   Konva's default is to scale stroke widths with the node's
+//   cumulative transform. For catalogue shapes that's a triple
+//   stack (viewBox→layer scale × user resize × DPR), which made a
+//   slider value of "10" paint as a 24+ px stroke. With stroke
+//   scaling disabled, the slider value matches the rendered pixel
+//   width exactly. Trade-off: resizing a shape no longer thickens
+//   its stroke proportionally — the stroke stays at its slider
+//   value. This matches the slider being honest about pixels.
 
 "use client";
 
@@ -91,15 +110,20 @@ export function ShapeNode({
   const strokeProps =
     layer.stroke.width > 0 && layer.stroke.opacity > 0
       ? {
-          stroke: layer.stroke.color,
+          // null colour = inherit from fill (May 2026). Lets a Width
+          // drag thicken the shape in its own colour rather than
+          // springing a default-black outline.
+          stroke: layer.stroke.color ?? layer.fill,
           strokeWidth: layer.stroke.width,
           strokeOpacity: layer.stroke.opacity,
+          strokeScaleEnabled: false,
         }
       : layer.variant === "outlined"
       ? {
           // Outlined variant always draws an outline even if explicit stroke is off.
           stroke: layer.fill,
           strokeWidth: 4,
+          strokeScaleEnabled: false,
         }
       : {};
 

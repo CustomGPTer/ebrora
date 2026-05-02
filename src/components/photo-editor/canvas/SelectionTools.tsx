@@ -104,7 +104,10 @@ function parseHexLuminance(color: string): number | null {
 function pickLayerColor(layer: AnyLayer): string | null {
   if (layer.kind === "shape") {
     if (layer.variant === "outlined" && layer.stroke && layer.stroke.width > 0) {
-      return layer.stroke.color;
+      // null stroke colour = inherit from fill (May 2026 stroke
+      // semantics). Falls through to layer.fill below either way,
+      // but the explicit ?? makes the intent obvious.
+      return layer.stroke.color ?? layer.fill;
     }
     return layer.fill;
   }
