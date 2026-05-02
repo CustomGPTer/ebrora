@@ -592,8 +592,16 @@ export type Theme = "light" | "dark";
 
 // ─── Defaults ───────────────────────────────────────────────────
 
-/** Default canvas size when starting from blank (1080×1080 — Instagram square). */
-export const DEFAULT_CANVAS_SIZE: Size = { width: 1080, height: 1080 };
+/** Default canvas size for new blank projects (no source photo).
+ *  2000×2000 — large enough that text rendered at typical sizes stays
+ *  crisp when the result is viewed at full screen, exported for print
+ *  on a site noticeboard, or scaled up for a presentation. Replaces
+ *  the original 1080×1080 (Instagram square) value, which was fine for
+ *  social media but soft for print at any A-size page. Existing saved
+ *  projects keep their stored dimensions; this only governs cold-start
+ *  blank canvases (Background colour / gradient picker on the home
+ *  screen and the Style preset entry tiles). */
+export const DEFAULT_CANVAS_SIZE: Size = { width: 2000, height: 2000 };
 
 /** Maximum canvas dimension. Prevents OOM on very large uploads. */
 export const MAX_CANVAS_DIMENSION = 8000;
