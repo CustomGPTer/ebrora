@@ -7,12 +7,19 @@
 // be drawn.
 //
 // Snap targets: canvas centres + canvas edges + every other visible
-// layer's centres + edges. 5 px threshold in canvas pixels.
+// layer's centres + edges. Threshold in canvas pixels.
 //
 // Guide visibility: a guide is rendered ONLY when an actual snap is in
 // effect on that axis. Phase 1 — Apr 2026.
+//
+// May 2026 — threshold widened from 5px to 10px. Earlier value made the
+// snap very weak — users had to land within a 5px window of a target
+// to trigger it, which on a phone with finger-size touch points is
+// almost imperceptible. 10px makes the magnetic zone large enough that
+// the snap actually grabs as you approach a centre / edge, without
+// being so strong it interferes with deliberate near-centre placement.
 
-export const SNAP_THRESHOLD = 5;
+export const SNAP_THRESHOLD = 10;
 
 export interface Box {
   x: number;
