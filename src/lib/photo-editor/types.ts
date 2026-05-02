@@ -290,6 +290,26 @@ export interface ShapeLayer extends BaseLayer {
   /** Width and height in canvas pixels. */
   width: number;
   height: number;
+  /** Line-specific configuration. Only present (and only honoured) when
+   *  the shape's catalogue category is "lines" — straight line, dashed,
+   *  dotted, double, curved, freehand. ShapeNode's render path branches
+   *  on this. May 2026 — Line + Width build. */
+  lineProps?: LineProps;
+}
+
+/** Line-shape configuration. Used only for shapes in the "lines"
+ *  catalogue category. The line is drawn from the layer's bounding-box
+ *  top-left to its bottom-right at thickness `stroke.width` (read from
+ *  the new Width tab). Arrowheads sit at the endpoints, oriented along
+ *  the line's vector. */
+export interface LineProps {
+  /** Arrowhead at the line's start (top-left of bbox). */
+  arrowStart: boolean;
+  /** Arrowhead at the line's end (bottom-right of bbox). */
+  arrowEnd: boolean;
+  /** Visual style of the arrowheads. "triangle" = filled solid wedge.
+   *  "chevron" = open angle bracket (`>` / `<`). */
+  arrowStyle: "triangle" | "chevron";
 }
 
 export interface StickerLayer extends BaseLayer {
@@ -550,6 +570,9 @@ export interface EditorState {
   panMode: boolean;
   /** True when grid is shown. */
   gridVisible: boolean;
+  /** Grid spacing in canvas pixels at 1:1 zoom. Cycled by TOGGLE_GRID
+   *  through 16 / 32 / 64 (May 2026 — Grid Cycle build). */
+  gridSize: number;
   /** True when snap-to-grid / snap-to-edge is on. */
   snapEnabled: boolean;
 }
