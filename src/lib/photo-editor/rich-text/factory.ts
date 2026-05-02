@@ -134,6 +134,9 @@ export function createTextLayer(opts: CreateTextLayerOptions = {}): TextLayer {
     blendMode: "normal",
     transform: { ...IDENTITY_TRANSFORM, ...opts.transform },
     width: opts.width ?? 800,
+    // Auto-fit on next endEditing — flips to false after the first
+    // snap-tight (May 2026 paragraph-width dragger).
+    autoFitWidth: true,
     styling,
     runs,
     erase: [],

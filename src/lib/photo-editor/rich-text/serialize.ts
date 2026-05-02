@@ -88,6 +88,14 @@ export function validateLayer(raw: unknown): TextLayer | null {
     background,
     perspective,
     erase: Array.isArray(raw.erase) ? raw.erase : [],
+    // autoFitWidth (May 2026): default false for legacy payloads —
+    // saved layers already have a width the user shaped manually,
+    // so we don't want to auto-tighten on the next endEditing and
+    // surprise them. New layers from createTextLayer get true.
+    autoFitWidth:
+      typeof (raw as { autoFitWidth?: unknown }).autoFitWidth === "boolean"
+        ? (raw as { autoFitWidth: boolean }).autoFitWidth
+        : false,
   } as TextLayer;
 }
 

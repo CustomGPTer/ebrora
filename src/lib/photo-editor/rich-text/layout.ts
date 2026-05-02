@@ -280,3 +280,58 @@ function alignmentOffset(
       return Math.max(0, maxWidth - lineWidth);
   }
 }
+
+// ─── Tight-fit helpers (May 2026 — paragraph-width dragger) ──────
+
+/** The natural width of a text layer's content if it were laid out
+ *  without any wrapping — i.e. the width of the longest line that
+ *  would result purely from explicit `\n` characters in the runs.
+ *
+ *  Used by the auto-fit-on-edit-end behaviour: when a TextLayer's
+ *  `autoFitWidth` flag is true, the editor flips the layer's width
+ *  to this value on the next `endEditing` so the box hugs its
+ *  content.
+ *
+ *  Implementation: lay out with width=Infinity. The layout engine's
+ *  greedy line-break only fires when adding a glyph would overflow
+ *  the layer width, so an infinite width means no wrap-induced
+ *  breaks. The returned `LayoutResult.width` is the longest such
+ *  natural line. */
+export function tightLayerWidth(layer: TextLayer): number {
+  const noWrap: TextLayer = {
+    ...layer,
+    width: Number.POSITIVE_INFINITY,
+  };
+  return layoutTextLayer(noWrap).width;
+}
+
+/** The width of the widest single non-whitespace word in a text
+ *  layer's content. Used as the minimum draggable width for the
+ *  paragraph-width handle so the user can't narrow the box past
+ *  the point where a word would be forced to overflow.
+ *
+ *  Implementation: walks the per-glyph measurements, accumulating
+ *  width across runs of non-whitespace, resetting at every
+ *  whitespace boundary, tracking the running max. */
+export function longestWordWidth(layer: TextLayer): number {
+  let max = 0;
+  let current = 0;
+  const spacing = layer.styling.letterSpacing ?? 0;
+  for (const run of layer.runs) {
+    const measured = measureRun(run);
+    for (const m of measured) {
+      // Treat ASCII whitespace + common Unicode separators as breaks.
+      const isSpace = /^\s$/.test(m.char);
+      if (isSpace) {
+        if (current > max) max = current;
+        current = 0;
+      } else {
+        current += m.width + spacing;
+      }
+    }
+    // End of run isn't a word break by itself — words can span runs
+    // (formatting changes mid-word). We only reset on whitespace.
+  }
+  if (current > max) max = current;
+  return max;
+}
