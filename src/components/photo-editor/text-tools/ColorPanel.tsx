@@ -18,9 +18,14 @@
 // Three sub-views toggled by a segmented control:
 //   • Swatches — 24 curated colours.
 //   • Picker   — custom HSV picker.
-//   • Eyedropper — only mounted when `EyeDropper` is in the global
-//     scope (Chromium + recent Edge). Other browsers see "Not supported
-//     in this browser." — we don't pretend.
+//   • Eyedropper — two implementations switched by capability:
+//       – `window.EyeDropper` present (Chromium + recent Edge desktop)
+//         → system eyedropper; samples anywhere on the screen.
+//       – Anywhere else (every mobile browser, Safari + Firefox
+//         desktop) → in-app canvas picker. Tapping the button engages
+//         CanvasPickerContext; the next tap on the canvas samples a
+//         pixel under the pointer and applies it. Limited to colours
+//         already on the canvas, but works in every browser.
 //
 // Run-shape gotcha (text branch): the fill field on GlyphRun is `fill`
 // (a ColorString), NOT `color` — this caught me once and is documented
@@ -32,6 +37,7 @@ import { useMemo, useState } from "react";
 import { Palette, Pipette } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useEditor } from "../context/EditorContext";
+import { useCanvasPicker } from "../context/CanvasPickerContext";
 import { useTextTool } from "./use-text-tool";
 import {
   Row,
@@ -225,15 +231,26 @@ function EyedropperRow({ onPick }: { onPick: (hex: string) => void }) {
   const supported =
     typeof window !== "undefined" && "EyeDropper" in window;
 
+  const picker = useCanvasPicker();
+
+  // Fallback for every non-Chromium browser (all mobile, plus Safari
+  // and Firefox desktop): the in-app canvas picker. The user taps a
+  // button here to engage pick mode, then taps anywhere on the
+  // editor's canvas to sample a pixel — limited to colours already on
+  // the canvas, but works everywhere.
   if (!supported) {
     return (
       <Row label="Pick a colour from the screen">
-        <p
-          className="text-xs"
-          style={{ color: "var(--pe-text-subtle)" }}
+        <ActionButton
+          onClick={() => picker.requestPick(onPick)}
+          ariaLabel="Tap canvas to sample a colour"
+          fullWidth
         >
-          Not supported in this browser. Use Swatches or Picker instead.
-        </p>
+          <Pipette className="w-4 h-4" />
+          <span>
+            {picker.isPicking ? "Tap canvas to sample…" : "Tap canvas to sample"}
+          </span>
+        </ActionButton>
       </Row>
     );
   }
