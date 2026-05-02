@@ -111,7 +111,15 @@ export function EditorTopBar({
       />
       <ChromeIconButton
         onClick={() => dispatch({ type: "TOGGLE_GRID" })}
-        ariaLabel={state.gridVisible ? "Hide grid" : "Show grid"}
+        ariaLabel={
+          !state.gridVisible
+            ? "Show small grid (16 px)"
+            : state.gridSize === 16
+            ? "Switch to medium grid (32 px)"
+            : state.gridSize === 32
+            ? "Switch to large grid (64 px)"
+            : "Hide grid"
+        }
         icon={<Grid3x3 className="w-5 h-5" strokeWidth={1.75} />}
         active={state.gridVisible}
       />

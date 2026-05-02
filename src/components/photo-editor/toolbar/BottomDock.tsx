@@ -54,6 +54,7 @@ import {
   Image as ImageIcon,
   LayoutTemplate,
   Maximize as ResizeIcon,
+  Minus,
   Move,
   MoveHorizontal,
   Palette,
@@ -76,6 +77,8 @@ import { ColorPanel } from "../text-tools/ColorPanel";
 import { StrokePanel } from "../text-tools/StrokePanel";
 import { PositionPanel } from "../text-tools/PositionPanel";
 import { OpacityPanel } from "../text-tools/OpacityPanel";
+import { WidthPanel } from "../text-tools/WidthPanel";
+import { LineStylePanel } from "../text-tools/LineStylePanel";
 import { FormatPanel } from "../text-tools/FormatPanel";
 import { HighlightPanel } from "../text-tools/HighlightPanel";
 import { ShadowPanel } from "../text-tools/ShadowPanel";
@@ -537,7 +540,7 @@ const SHAPE_DEFAULT_STROKE: Stroke = {
   opacity: 1,
 };
 
-type ShapeTabId = "color" | "stroke" | "position" | "opacity";
+type ShapeTabId = "color" | "stroke" | "position" | "opacity" | "width" | "line";
 
 const SHAPE_TABS: TabStripItem[] = [
   {
@@ -560,23 +563,73 @@ const SHAPE_TABS: TabStripItem[] = [
     label: "Opacity",
     icon: <Droplet className="w-6 h-6" strokeWidth={1.75} />,
   },
+  {
+    id: "width",
+    label: "Width",
+    icon: <Minus className="w-6 h-6" strokeWidth={2.5} />,
+  },
+];
+
+// Line-shape tab strip — adds a 6th "Line" tab for arrowhead presets.
+// Surfaced only when the selected shape is a line-* catalogue id.
+// May 2026 — Width + Lines build.
+const SHAPE_TABS_WITH_LINE: TabStripItem[] = [
+  ...SHAPE_TABS,
+  {
+    id: "line",
+    label: "Line",
+    icon: <Spline className="w-6 h-6" strokeWidth={1.75} />,
+  },
 ];
 
 function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
   const { dispatch } = useEditor();
   const [activeTab, setActiveTab] = useState<ShapeTabId>("color");
 
+  const isLine = layer.shapeId.startsWith("line-");
+  const tabs = isLine ? SHAPE_TABS_WITH_LINE : SHAPE_TABS;
+
   const editedIds = new Set<string>();
-  if (layer.stroke && layer.stroke.width > 0) editedIds.add("stroke");
+  if (layer.stroke && layer.stroke.width > 0) {
+    // Both Stroke and Width edit the same field — light both dots
+    // when a non-zero thickness is set so the indicator stays in
+    // sync no matter which tab the user used.
+    editedIds.add("stroke");
+    editedIds.add("width");
+  }
   if (layer.opacity < 1) editedIds.add("opacity");
+  if (
+    isLine &&
+    layer.lineProps &&
+    (layer.lineProps.arrowStart || layer.lineProps.arrowEnd)
+  ) {
+    editedIds.add("line");
+  }
+
+  // Guard: if the user clicked the line tab on a non-line shape (can
+  // happen if selection changes mid-tab), fall back to color.
+  const safeActive: ShapeTabId =
+    activeTab === "line" && !isLine ? "color" : activeTab;
 
   function resetActiveTab() {
-    switch (activeTab) {
+    switch (safeActive) {
       case "stroke":
         dispatch({
           type: "UPDATE_LAYER",
           id: layer.id,
           patch: { stroke: SHAPE_DEFAULT_STROKE } as Partial<AnyLayer>,
+        });
+        return;
+      case "width":
+        // Reset to no outline / no extra thickness. Lines fall back
+        // to their built-in 4 px when stroke.width is 0, so this is
+        // safe for them too.
+        dispatch({
+          type: "UPDATE_LAYER",
+          id: layer.id,
+          patch: {
+            stroke: { ...layer.stroke, width: 0 },
+          } as Partial<AnyLayer>,
         });
         return;
       case "position":
@@ -604,11 +657,24 @@ function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
           patch: { opacity: 1 } as Partial<AnyLayer>,
         });
         return;
+      case "line":
+        dispatch({
+          type: "UPDATE_LAYER",
+          id: layer.id,
+          patch: {
+            lineProps: {
+              arrowStart: false,
+              arrowEnd: false,
+              arrowStyle: "triangle",
+            },
+          } as Partial<AnyLayer>,
+        });
+        return;
       // "color" has no canonical reset target — fall through.
     }
   }
 
-  const tabHasReset = activeTab !== "color";
+  const tabHasReset = safeActive !== "color";
 
   return (
     <>
@@ -617,15 +683,17 @@ function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
         onReset={tabHasReset ? resetActiveTab : undefined}
       >
         <div className="px-1 pb-3">
-          {activeTab === "color" && <ColorPanel inline />}
-          {activeTab === "stroke" && <StrokePanel inline />}
-          {activeTab === "position" && <PositionPanel inline />}
-          {activeTab === "opacity" && <OpacityPanel inline />}
+          {safeActive === "color" && <ColorPanel inline />}
+          {safeActive === "stroke" && <StrokePanel inline />}
+          {safeActive === "position" && <PositionPanel inline />}
+          {safeActive === "opacity" && <OpacityPanel inline />}
+          {safeActive === "width" && <WidthPanel inline />}
+          {safeActive === "line" && <LineStylePanel inline />}
         </div>
       </PropertyPanelHost>
       <TabStrip
-        tabs={SHAPE_TABS}
-        activeId={activeTab}
+        tabs={tabs}
+        activeId={safeActive}
         onSelect={(id) => setActiveTab(id as ShapeTabId)}
         editedIds={editedIds}
       />
