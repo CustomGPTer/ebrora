@@ -335,3 +335,29 @@ export function longestWordWidth(layer: TextLayer): number {
   if (current > max) max = current;
   return max;
 }
+
+/** The width of the WIDEST single glyph in a text layer's content.
+ *  Used as the minimum draggable width for the paragraph-width
+ *  handle when the user wants to force per-character wrapping —
+ *  letting the box go below this would force a glyph to overflow,
+ *  which is uglier than wrapping.
+ *
+ *  Distinct from longestWordWidth: a word "Hello" has a longest-
+ *  word-width that's the sum of all five glyph widths, but a
+ *  widest-glyph-width that's just the width of "H" or "l" or
+ *  whichever is widest. So at the widest-glyph floor, every glyph
+ *  fits on its own line (one character per line) without overflow. */
+export function widestGlyphWidth(layer: TextLayer): number {
+  let max = 0;
+  for (const run of layer.runs) {
+    const measured = measureRun(run);
+    for (const m of measured) {
+      // Skip whitespace — it has zero advance for floor purposes
+      // (a "space-only" line is degenerate; the user wants the
+      // floor to fit visible glyphs).
+      if (/^\s$/.test(m.char)) continue;
+      if (m.width > max) max = m.width;
+    }
+  }
+  return max;
+}
