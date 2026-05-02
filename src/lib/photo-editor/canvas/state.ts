@@ -78,6 +78,10 @@ export function createInitialEditorState(project?: Project): EditorState {
     viewport: { ...DEFAULT_VIEWPORT },
     panMode: false,
     gridVisible: false,
+    // Grid spacing in canvas pixels at 1:1 zoom. 0 = off (gridVisible
+    // remains the on/off switch for legacy callers; gridSize stores
+    // the active preset across cycles). May 2026 — Width/Grid build.
+    gridSize: 24,
     snapEnabled: false,
   };
 }
@@ -220,8 +224,22 @@ export function editorReducer(
     case "TOGGLE_PAN_MODE":
       return { ...state, panMode: !state.panMode };
 
-    case "TOGGLE_GRID":
-      return { ...state, gridVisible: !state.gridVisible };
+    case "TOGGLE_GRID": {
+      // 4-state cycle (May 2026): off → 16 → 32 → 64 → off.
+      // gridSize stores the active preset; gridVisible is the visible
+      // boolean read by the overlay. The cycle order matches the size
+      // labels in EditorTopBar's a11y label.
+      const cycle = [16, 32, 64];
+      if (!state.gridVisible) {
+        return { ...state, gridVisible: true, gridSize: cycle[0] };
+      }
+      const currentIdx = cycle.indexOf(state.gridSize ?? 24);
+      const nextIdx = currentIdx + 1;
+      if (nextIdx >= cycle.length) {
+        return { ...state, gridVisible: false, gridSize: cycle[0] };
+      }
+      return { ...state, gridVisible: true, gridSize: cycle[nextIdx] };
+    }
 
     case "TOGGLE_SNAP":
       return { ...state, snapEnabled: !state.snapEnabled };
