@@ -128,7 +128,12 @@ export interface CreateShapeLayerOptions {
 }
 
 const DEFAULT_STROKE: Stroke = {
-  color: "#000000",
+  // null = "inherit from fill". The user can pick a concrete colour
+  // in the Stroke tab; that flips this to a hex string from then on.
+  // Until then, any non-zero stroke width paints in the fill colour
+  // (so dragging Width on a green hexagon thickens it in green, not
+  // a surprise default-black).
+  color: null,
   width: 0,
   opacity: 1,
 };
