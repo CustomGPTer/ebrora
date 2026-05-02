@@ -54,6 +54,8 @@ import {
   useMobileEdit,
 } from "./context/MobileEditContext";
 import { SmartGuidesProvider } from "./canvas/SmartGuidesContext";
+import { CanvasPickerProvider } from "./context/CanvasPickerContext";
+import { CanvasPickerOverlay } from "./canvas/CanvasPickerOverlay";
 import { LayerEffectsTool } from "./tools/LayerEffectsTool";
 import { loadAllCustomFonts } from "@/lib/photo-editor/fonts/custom-fonts-db";
 import {
@@ -121,7 +123,9 @@ export function EditorShell(props: EditorShellProps) {
   return (
     <MobileEditProvider>
       <SmartGuidesProvider>
-        <EditorShellInner {...props} />
+        <CanvasPickerProvider>
+          <EditorShellInner {...props} />
+        </CanvasPickerProvider>
       </SmartGuidesProvider>
     </MobileEditProvider>
   );
@@ -506,6 +510,8 @@ function EditorShellInner({
       )}
 
       <CanvasShell />
+
+      <CanvasPickerOverlay />
 
       <BottomDock
         activePanel={activePanel}
