@@ -1,20 +1,22 @@
 // src/components/photo-editor/context/CanvasPickerContext.tsx
 //
-// Coordinates a one-shot "tap a pixel on the canvas to sample its
-// colour" mode. Used as the fallback path in ColorPanel's
+// Coordinates a one-shot "drag a magnifier loupe and release to
+// pick a colour" mode. Used as the fallback path in ColorPanel's
 // EyedropperRow for browsers that don't expose the system
 // `window.EyeDropper` API — every mobile browser, plus Safari and
 // Firefox on desktop.
 //
 // Flow:
 //   1. EyedropperRow calls `requestPick(callback)`. `isPicking`
-//      becomes true; CanvasPickerOverlay mounts a banner over the
-//      canvas with a Cancel button.
-//   2. CanvasStage's click handler reads `isPicking` via the hook.
-//      When true, it samples the pixel under the pointer, calls
-//      `completePick("#RRGGBB")` which fires the stored callback
-//      and exits pick mode.
-//   3. The user may cancel at any time via the banner — `cancelPick`
+//      becomes true.
+//   2. CanvasPickerOverlay (mounted in EditorShell) sees `isPicking`
+//      flip and rasterises the stage, spawns a draggable magnifier
+//      loupe at the canvas centre, and captures all viewport pointer
+//      events. The overlay drives the entire UX from here — drag to
+//      reposition the sample point, release to commit.
+//   3. On release the overlay calls `completePick("#RRGGBB")` which
+//      fires the stored callback and exits pick mode.
+//   4. The user may cancel at any time via the banner — `cancelPick`
 //      clears the pending callback without firing it.
 //
 // Only one pick is in flight at a time. `requestPick` replaces any
