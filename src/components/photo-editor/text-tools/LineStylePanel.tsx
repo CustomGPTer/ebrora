@@ -26,6 +26,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { Pencil, Undo2 } from "lucide-react";
 import { useEditor } from "../context/EditorContext";
 import { Row, Section, SectionDivider } from "./controls";
 import type {
@@ -91,6 +92,8 @@ export function LineStylePanel({ inline = false }: LineStylePanelProps) {
 
   const props = layer.lineProps ?? DEFAULT_LINE_PROPS;
   const preset = presetOf(props);
+  const isFreehand = layer.shapeId === "line-freehand";
+  const isCurved = layer.shapeId === "line-curved";
 
   function patchLine(next: Partial<LineProps>) {
     if (!layer) return;
@@ -99,6 +102,33 @@ export function LineStylePanel({ inline = false }: LineStylePanelProps) {
       type: "UPDATE_LAYER",
       id: layer.id,
       patch: { lineProps: merged } as Partial<AnyLayer>,
+    });
+  }
+
+  function startFreehandRedraw() {
+    if (!layer) return;
+    dispatch({ type: "SET_FREEHAND_DRAWING", layerId: layer.id });
+  }
+
+  function resetBezier() {
+    if (!layer) return;
+    const next: LineProps = { ...props };
+    delete next.bezier;
+    dispatch({
+      type: "UPDATE_LAYER",
+      id: layer.id,
+      patch: { lineProps: next } as Partial<AnyLayer>,
+    });
+  }
+
+  function resetFreehand() {
+    if (!layer) return;
+    const next: LineProps = { ...props };
+    delete next.freehandPoints;
+    dispatch({
+      type: "UPDATE_LAYER",
+      id: layer.id,
+      patch: { lineProps: next } as Partial<AnyLayer>,
     });
   }
 
@@ -155,6 +185,72 @@ export function LineStylePanel({ inline = false }: LineStylePanelProps) {
           </div>
         </Row>
       </Section>
+
+      {isFreehand ? (
+        <>
+          <SectionDivider />
+          <Section title="Freehand path">
+            <Row label="Path">
+              <div className="flex flex-wrap gap-2">
+                <ActionButton
+                  primary
+                  ariaLabel="Redraw the freehand line"
+                  onClick={startFreehandRedraw}
+                  icon={<Pencil className="w-4 h-4" strokeWidth={2} />}
+                  text="Redraw"
+                />
+                {props.freehandPoints && props.freehandPoints.length > 0 ? (
+                  <ActionButton
+                    ariaLabel="Reset to default wave"
+                    onClick={resetFreehand}
+                    icon={<Undo2 className="w-4 h-4" strokeWidth={2} />}
+                    text="Reset"
+                  />
+                ) : null}
+              </div>
+            </Row>
+            <Row>
+              <span
+                className="text-[11px]"
+                style={{ color: "var(--pe-text-muted)" }}
+              >
+                Tap Redraw, then drag across the canvas to lay down a
+                new path. The bounding box snaps to fit your drawing.
+              </span>
+            </Row>
+          </Section>
+        </>
+      ) : null}
+
+      {isCurved ? (
+        <>
+          <SectionDivider />
+          <Section title="Curve shape">
+            <Row label="Curve">
+              <div className="flex flex-wrap gap-2">
+                {props.bezier ? (
+                  <ActionButton
+                    ariaLabel="Reset curve to default S"
+                    onClick={resetBezier}
+                    icon={<Undo2 className="w-4 h-4" strokeWidth={2} />}
+                    text="Reset curve"
+                  />
+                ) : null}
+              </div>
+            </Row>
+            <Row>
+              <span
+                className="text-[11px]"
+                style={{ color: "var(--pe-text-muted)" }}
+              >
+                Drag the two square handles on the canvas to reshape
+                the curve. The endpoints stay at the bbox corners; the
+                control points pull the curve toward them.
+              </span>
+            </Row>
+          </Section>
+        </>
+      ) : null}
     </div>
   );
 
@@ -253,6 +349,46 @@ function LineGlyph({
         />
       ) : null}
     </svg>
+  );
+}
+
+// ─── Action button (Redraw / Reset) ─────────────────────────────
+
+function ActionButton({
+  ariaLabel,
+  onClick,
+  icon,
+  text,
+  primary = false,
+}: {
+  ariaLabel: string;
+  onClick: () => void;
+  icon: React.ReactNode;
+  text: string;
+  primary?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className="inline-flex items-center gap-1.5 transition-colors"
+      style={{
+        height: 36,
+        padding: "0 14px",
+        borderRadius: 999,
+        background: primary ? "var(--pe-accent)" : "transparent",
+        color: primary ? "#FFFFFF" : "var(--pe-text)",
+        border: primary
+          ? "1.5px solid var(--pe-accent)"
+          : "1px solid var(--pe-border)",
+        fontSize: 13,
+        fontWeight: primary ? 600 : 500,
+      }}
+    >
+      {icon}
+      <span>{text}</span>
+    </button>
   );
 }
 
