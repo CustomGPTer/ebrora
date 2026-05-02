@@ -218,7 +218,10 @@ function drawGlyph(
     ctx.lineWidth = run.stroke.width * 2;
     ctx.lineJoin = "round";
     ctx.miterLimit = 2;
-    ctx.strokeStyle = withAlpha(run.stroke.color, run.stroke.opacity);
+    // Text strokes always carry a concrete colour from their factory,
+    // but the Stroke type now permits null (shape-stroke semantics).
+    // Defensive fallback for type safety.
+    ctx.strokeStyle = withAlpha(run.stroke.color ?? "#000000", run.stroke.opacity);
     ctx.strokeText(glyph.char, localX, localY);
     ctx.restore();
   }
