@@ -30,14 +30,24 @@
 // stays at (200, 200) after resizing to 1080×1920 (now closer to the
 // top of the canvas instead of centred).
 //
-// Aspect ratio presets (matching common Instagram / TikTok / story
-// formats most Ebrora users will recognise):
-//   • Square        1080 × 1080
-//   • Portrait      1080 × 1350   (Instagram portrait, 4:5)
-//   • Story         1080 × 1920   (Instagram story, 9:16)
-//   • Landscape     1920 × 1080   (16:9)
-//   • Post 4:3      1200 × 900
-//   • Wide 16:9     1600 × 900
+// Aspect ratio presets:
+//   • Square          1080 × 1080   (Instagram square)
+//   • Portrait        1080 × 1350   (Instagram portrait, 4:5)
+//   • Story           1080 × 1920   (Instagram story, 9:16)
+//   • Landscape       1920 × 1080   (16:9)
+//   • Post 4:3        1200 × 900
+//   • Wide 16:9       1600 × 900
+//   • A4 Portrait     2480 × 3508   (ISO 216 A4 at 300 DPI)
+//   • A4 Landscape    3508 × 2480
+//   • A3 Portrait     3508 × 4961   (ISO 216 A3 at 300 DPI)
+//   • A3 Landscape    4961 × 3508
+//
+// The A-size presets target a print-grade 300 DPI so the exported PNG
+// or JPEG hits a sharp page on a real printer / large-format site
+// signage. Pixel dimensions are derived from the ISO 216 mm sizes
+// (A4 = 210 × 297 mm, A3 = 297 × 420 mm) at 300 dots per inch — i.e.
+// `mm × (300 / 25.4)` rounded to the nearest pixel. A3 landscape lands
+// at 4961 × 3508 — large but well under MAX_CANVAS_DIMENSION (8000).
 //
 // Custom W×H inputs are clamped to MAX_CANVAS_DIMENSION (8000) and
 // minimum 100 px to keep history snapshots sane.
@@ -69,6 +79,13 @@ const PRESETS: Preset[] = [
   { id: "landscape", label: "Landscape", width: 1920, height: 1080 },
   { id: "post-4-3", label: "Post 4:3", width: 1200, height: 900 },
   { id: "wide", label: "Wide 16:9", width: 1600, height: 900 },
+  // ISO 216 paper sizes at 300 DPI for print-quality export. Pairs
+  // appear consecutively so the 2-column preset grid renders portrait
+  // and landscape variants on the same row.
+  { id: "a4-portrait", label: "A4 Portrait", width: 2480, height: 3508 },
+  { id: "a4-landscape", label: "A4 Landscape", width: 3508, height: 2480 },
+  { id: "a3-portrait", label: "A3 Portrait", width: 3508, height: 4961 },
+  { id: "a3-landscape", label: "A3 Landscape", width: 4961, height: 3508 },
 ];
 
 const MIN_DIM = 100;
