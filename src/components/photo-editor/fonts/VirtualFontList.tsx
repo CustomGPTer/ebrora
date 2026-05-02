@@ -5,20 +5,39 @@
 // listener — too much. Windowing keeps the mounted set in the low tens.
 //
 // Implementation: an outer scroll container whose total inner height
-// equals `items.length * ROW_HEIGHT`. We track scrollTop, compute the
+// equals `items.length * rowHeight`. We track scrollTop, compute the
 // first / last visible index, and render an absolutely-positioned slice
 // (plus a small buffer above / below). FontRow itself is told its `top`
 // in pixels and renders at that offset.
+//
+// Row height is mobile-aware: 44px on the editor's mobile breakpoint
+// (the iOS Human Interface Guidelines / WCAG 2.5.5 tap-target floor),
+// 56px on tablet/desktop. Switching is driven by `useIsMobile`, which
+// updates on viewport resize so a phone rotated to landscape past the
+// breakpoint snaps to the desktop height in a single render — totalHeight,
+// scroll-window math, and per-row positioning all recompute together
+// because every consumer reads the same `rowHeight` value.
 
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FontRow } from "./FontRow";
 import type { GoogleFontFamily } from "@/lib/photo-editor/fonts/catalogue";
+import { useIsMobile } from "@/lib/photo-editor/util/use-is-mobile";
 
-/** Single source of truth for row height. The panel's footer count math
- *  and the scroll-into-view computation both reference this. */
+/** Desktop / drawer-mode row height. Footer count math and scroll-into-
+ *  view computation reference this when the viewport is wider than the
+ *  editor's mobile breakpoint. Exported for any downstream caller that
+ *  wants the canonical desktop value (e.g. for a scroll-restoration
+ *  calculation). */
 export const ROW_HEIGHT = 56;
+
+/** Mobile row height — 44px sits at the iOS Human Interface Guidelines
+ *  / WCAG 2.5.5 (Level AA) tap-target floor. Picked over a literal halve
+ *  of the desktop value (28px) to preserve thumb accuracy on the inline
+ *  font picker, where a single mis-tap re-applies the wrong font and
+ *  forces the user to scroll-and-correct. */
+export const ROW_HEIGHT_MOBILE = 44;
 
 /** Extra rows rendered above / below the visible range so a fast flick
  *  doesn't show blanks before our scroll handler catches up. */
@@ -40,6 +59,14 @@ export function VirtualFontList({
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
+
+  // Pick the row height for the current viewport. `useIsMobile` returns
+  // false during SSR / first paint, so the very first frame on a real
+  // phone uses the desktop height (56px) — it then snaps to 44px once
+  // the matchMedia effect runs. Acceptable for a single frame; avoids
+  // hydration mismatches.
+  const isMobile = useIsMobile();
+  const rowHeight = isMobile ? ROW_HEIGHT_MOBILE : ROW_HEIGHT;
 
   // Track the scroll viewport height so the visible-range calculation
   // shrinks gracefully on short panels.
@@ -95,7 +122,7 @@ export function VirtualFontList({
     setScrollTop(0);
   }, [items]);
 
-  const totalHeight = items.length * ROW_HEIGHT;
+  const totalHeight = items.length * rowHeight;
 
   const { firstIndex, lastIndex } = useMemo(() => {
     if (items.length === 0) {
@@ -107,13 +134,13 @@ export function VirtualFontList({
     // headroom, so we render a generous initial slice rather than
     // showing a blank list until the next frame.
     const effectiveHeight = viewportHeight > 0 ? viewportHeight : 1024;
-    const first = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - BUFFER);
+    const first = Math.max(0, Math.floor(scrollTop / rowHeight) - BUFFER);
     const last = Math.min(
       items.length - 1,
-      Math.ceil((scrollTop + effectiveHeight) / ROW_HEIGHT) + BUFFER,
+      Math.ceil((scrollTop + effectiveHeight) / rowHeight) + BUFFER,
     );
     return { firstIndex: first, lastIndex: last };
-  }, [scrollTop, viewportHeight, items.length]);
+  }, [scrollTop, viewportHeight, items.length, rowHeight]);
 
   return (
     <div
@@ -140,8 +167,8 @@ export function VirtualFontList({
                   <FontRow
                     key={family.family}
                     family={family}
-                    top={idx * ROW_HEIGHT}
-                    height={ROW_HEIGHT}
+                    top={idx * rowHeight}
+                    height={rowHeight}
                     active={family.family === activeFamily}
                     loading={family.family === loadingFamily}
                     onSelect={onSelect}

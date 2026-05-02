@@ -72,6 +72,7 @@ import {
   codePointLength,
   replaceTextRange,
 } from "@/lib/photo-editor/rich-text/edit-ops";
+import { useIsMobile } from "@/lib/photo-editor/util/use-is-mobile";
 import type { AnyLayer, TextLayer } from "@/lib/photo-editor/types";
 
 interface FontPanelProps {
@@ -90,6 +91,7 @@ export function FontPanel({
   inline = false,
 }: FontPanelProps) {
   const { state, dispatch } = useEditor();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<FontPanelTab>("all");
   const [query, setQuery] = useState("");
   const [catalogue, setCatalogue] = useState<GoogleFontFamily[] | null>(null);
@@ -413,14 +415,21 @@ export function FontPanel({
   // ─── Inline mode ─────────────────────────────────────────────────
   // Renders the inner stack inside a bounded flex-col container so
   // VirtualFontList's `flex-1 overflow-y-auto` has a height reference.
-  // 55vh is enough for ~8 font rows with comfortable scroll headroom
-  // while leaving the canvas visible above the dock.
+  //
+  // Height is mobile-aware:
+  //   • Mobile (≤1023px): 44vh — a 20% reduction from the original
+  //     55vh that gives the canvas more breathing room above the dock
+  //     while still leaving ~5 font rows visible at the 44px mobile
+  //     row height.
+  //   • Tablet / desktop: 55vh — original value, ~8 font rows with
+  //     comfortable scroll headroom while leaving the canvas visible
+  //     above the dock.
   if (inline) {
     return (
       <div
         className="flex flex-col rounded-lg overflow-hidden"
         style={{
-          height: "55vh",
+          height: isMobile ? "44vh" : "55vh",
           background: "var(--pe-surface)",
           border: "1px solid var(--pe-border)",
         }}
