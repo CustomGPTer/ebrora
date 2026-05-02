@@ -83,6 +83,7 @@ export function createInitialEditorState(project?: Project): EditorState {
     // the active preset across cycles). May 2026 — Width/Grid build.
     gridSize: 24,
     snapEnabled: false,
+    freehandDrawingFor: null,
   };
 }
 
@@ -109,6 +110,7 @@ export type EditorAction =
   | { type: "TOGGLE_PAN_MODE" }
   | { type: "TOGGLE_GRID" }
   | { type: "TOGGLE_SNAP" }
+  | { type: "SET_FREEHAND_DRAWING"; layerId: Id | null }
   | { type: "RENAME_PROJECT"; name: string }
   | { type: "RESIZE_CANVAS"; width: number; height: number }
   // True-crop apply: atomically updates the photo background's crop
@@ -244,6 +246,9 @@ export function editorReducer(
     case "TOGGLE_SNAP":
       return { ...state, snapEnabled: !state.snapEnabled };
 
+    case "SET_FREEHAND_DRAWING":
+      return { ...state, freehandDrawingFor: action.layerId };
+
     case "RENAME_PROJECT":
       return withProjectPatch(state, { name: action.name });
 
@@ -327,6 +332,7 @@ export function describeAction(action: EditorAction): string {
     case "TOGGLE_PAN_MODE":
     case "TOGGLE_GRID":
     case "TOGGLE_SNAP":
+    case "SET_FREEHAND_DRAWING":
       return "";
   }
 }
