@@ -78,7 +78,14 @@ export const IDENTITY_TRANSFORM: Transform = {
 export type ColorString = string;
 
 export interface Stroke {
-  color: ColorString;
+  /** Stroke colour. `null` means "inherit from fill" — the renderer
+   *  paints the stroke using the layer's fill colour. Used by shape
+   *  strokes so dragging the Width slider doesn't surprise the user
+   *  with a default-black outline against a coloured fill. Text and
+   *  image strokes always store a concrete hex (their factories
+   *  never produce null) and treat null defensively as black if it
+   *  ever shows up. */
+  color: ColorString | null;
   /** Width in canvas pixels. 0 = no stroke (renderer short-circuits). */
   width: number;
   /** 0–1. */
