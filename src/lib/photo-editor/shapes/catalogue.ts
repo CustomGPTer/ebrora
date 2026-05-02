@@ -25,7 +25,10 @@
 
 export type ShapeCategoryId =
   | "geometric"
+  | "lines"
   | "arrows"
+  | "callouts"
+  | "symbols"
   | "badges"
   | "frames"
   | "decorative";
@@ -583,11 +586,223 @@ const DECORATIVE: readonly ShapeEntry[] = [
   },
 ];
 
+// ─── Lines (May 2026 — Width + Lines build) ─────────────────────
+//
+// Line-type shapes. Rendered at thickness = stroke.width (read from the
+// new Width tab) when ShapeNode's line branch fires. The catalogue
+// entries below provide *fallback* SVG paths for non-line use, but the
+// free-line / dashed / dotted / double / curved / freehand ids are
+// detected by ShapeNode and drawn through Konva.Line / Konva.Path with
+// the layer's lineProps applied (arrowheads, dash pattern, etc.).
+//
+// Notes on aspect:
+//   • Most lines default to a wide bbox (480 × 4) so they appear
+//     immediately as a thin horizontal line and the user resizes /
+//     rotates from there. The bbox height *only* affects layout — the
+//     visible thickness is governed by stroke.width.
+//   • The "freehand" entry is intentionally a placeholder squiggle —
+//     editing the freehand path is a follow-up feature.
+
+const LINES: readonly ShapeEntry[] = [
+  {
+    id: "line-straight",
+    label: "Line",
+    category: "lines",
+    viewBox: "0 0 200 4",
+    path: "M0 2 L200 2",
+    defaultSize: { width: 320, height: 4 },
+  },
+  {
+    id: "line-dashed",
+    label: "Dashed line",
+    category: "lines",
+    viewBox: "0 0 200 4",
+    // Static dashed-fallback path. ShapeNode's line branch overrides
+    // with a Konva.Line dash pattern so the dash scales correctly.
+    path: "M0 2 L20 2 M30 2 L50 2 M60 2 L80 2 M90 2 L110 2 M120 2 L140 2 M150 2 L170 2 M180 2 L200 2",
+    defaultSize: { width: 320, height: 4 },
+  },
+  {
+    id: "line-dotted",
+    label: "Dotted line",
+    category: "lines",
+    viewBox: "0 0 200 4",
+    path: "M0 2 L4 2 M14 2 L18 2 M28 2 L32 2 M42 2 L46 2 M56 2 L60 2 M70 2 L74 2 M84 2 L88 2 M98 2 L102 2 M112 2 L116 2 M126 2 L130 2 M140 2 L144 2 M154 2 L158 2 M168 2 L172 2 M182 2 L186 2 M196 2 L200 2",
+    defaultSize: { width: 320, height: 4 },
+  },
+  {
+    id: "line-double",
+    label: "Double line",
+    category: "lines",
+    viewBox: "0 0 200 12",
+    path: "M0 2 L200 2 M0 10 L200 10",
+    defaultSize: { width: 320, height: 12 },
+  },
+  {
+    id: "line-curved",
+    label: "Curved line",
+    category: "lines",
+    viewBox: "0 0 200 60",
+    path: "M0 30 C40 0 80 60 100 30 C120 0 160 60 200 30",
+    defaultSize: { width: 320, height: 100 },
+  },
+  {
+    id: "line-freehand",
+    label: "Freehand",
+    category: "lines",
+    viewBox: "0 0 200 60",
+    path: "M0 30 Q14 8 26 22 Q36 36 46 24 Q60 6 78 30 Q92 50 108 32 Q126 12 142 30 Q156 46 174 28 Q188 14 200 30",
+    defaultSize: { width: 320, height: 100 },
+  },
+];
+
+// ─── Callouts ───────────────────────────────────────────────────
+//
+// Speech / thought bubbles, callouts, ribbons. Tail / leader lines
+// point bottom-left in the canonical orientation; the user rotates
+// the layer if they want the tail elsewhere.
+
+const CALLOUTS: readonly ShapeEntry[] = [
+  {
+    id: "speech-bubble",
+    label: "Speech bubble",
+    category: "callouts",
+    viewBox: "0 0 100 100",
+    // Rounded rectangle with a tail emerging from the bottom-left.
+    path: "M14 10 L86 10 Q98 10 98 22 L98 64 Q98 76 86 76 L40 76 L20 92 L26 76 L14 76 Q2 76 2 64 L2 22 Q2 10 14 10 Z",
+    defaultSize: { width: 280, height: 220 },
+  },
+  {
+    id: "thought-bubble",
+    label: "Thought bubble",
+    category: "callouts",
+    viewBox: "0 0 120 100",
+    // Cloud-like main bubble with two trailing droplets toward the
+    // bottom-left (the "thinking" indicator).
+    path: "M30 16 Q40 4 56 8 Q66 0 78 6 Q92 4 96 18 Q110 22 108 36 Q116 48 104 56 Q102 70 86 70 L40 70 Q24 72 22 60 Q12 56 14 44 Q4 38 12 26 Q14 16 30 16 Z M28 80 A6 6 0 1 1 28 80.01 Z M18 92 A4 4 0 1 1 18 92.01 Z",
+    defaultSize: { width: 280, height: 220 },
+  },
+  {
+    id: "callout-banner",
+    label: "Callout banner",
+    category: "callouts",
+    viewBox: "0 0 200 60",
+    // Long horizontal banner with notched ends — newsstrip style.
+    path: "M10 6 L190 6 L200 30 L190 54 L10 54 L0 30 Z",
+    defaultSize: { width: 360, height: 100 },
+  },
+  {
+    id: "ribbon",
+    label: "Ribbon",
+    category: "callouts",
+    viewBox: "0 0 200 80",
+    // Forked ribbon with two dovetail tails on the left + flat right edge.
+    path: "M0 20 L20 0 L200 0 L200 80 L20 80 L0 60 L18 40 Z",
+    defaultSize: { width: 360, height: 140 },
+  },
+  {
+    id: "ribbon-fork",
+    label: "Award ribbon",
+    category: "callouts",
+    viewBox: "0 0 200 80",
+    // Centred banner with both ends forked.
+    path: "M0 0 L20 40 L0 80 L40 60 L160 60 L200 80 L180 40 L200 0 L160 20 L40 20 Z",
+    defaultSize: { width: 400, height: 160 },
+  },
+];
+
+// ─── Symbols ────────────────────────────────────────────────────
+//
+// Iconic symbols at common construction-site recognition. Hazard
+// triangle and traffic cone are deliberately simplified — Ebrora's
+// site-photo workflow needs them readable at thumbnail sizes, not
+// pixel-faithful to BS EN versions.
+
+const SYMBOLS: readonly ShapeEntry[] = [
+  {
+    id: "lightning-bolt",
+    label: "Lightning",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    path: "M58 4 L18 56 L44 56 L34 96 L82 38 L52 38 L60 4 Z",
+  },
+  {
+    id: "sun-burst",
+    label: "Sun",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    // Central disc + 12 rays.
+    path: "M50 30 A20 20 0 1 1 50 30.01 Z M50 0 L54 14 L46 14 Z M50 100 L54 86 L46 86 Z M0 50 L14 46 L14 54 Z M100 50 L86 46 L86 54 Z M14 14 L26 22 L22 26 Z M86 86 L74 78 L78 74 Z M14 86 L22 74 L26 78 Z M86 14 L78 26 L74 22 Z",
+  },
+  {
+    id: "gear",
+    label: "Gear",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    // 8-tooth gear with central hole (even-odd fill).
+    path: "M50 4 L58 4 L60 18 Q66 20 71 23 L82 15 L88 21 L80 32 Q83 37 85 43 L99 45 L99 53 L85 55 Q83 61 80 66 L88 77 L82 83 L71 75 Q66 78 60 80 L58 96 L50 96 L42 96 L40 80 Q34 78 29 75 L18 83 L12 77 L20 66 Q17 61 15 55 L1 53 L1 45 L15 43 Q17 37 20 32 L12 21 L18 15 L29 23 Q34 20 40 18 L42 4 Z M50 36 A14 14 0 1 0 50 64 A14 14 0 1 0 50 36 Z",
+  },
+  {
+    id: "shield",
+    label: "Shield",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    path: "M50 4 L92 16 L92 50 Q92 80 50 96 Q8 80 8 50 L8 16 Z",
+  },
+  {
+    id: "badge-rosette",
+    label: "Badge",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    // 12-point star with rounded tips, rosette feel.
+    path: "M50 2 L57 18 L73 10 L70 28 L88 30 L77 44 L94 52 L77 60 L88 74 L70 76 L73 94 L57 86 L50 102 L43 86 L27 94 L30 76 L12 74 L23 60 L6 52 L23 44 L12 30 L30 28 L27 10 L43 18 Z",
+  },
+  {
+    id: "hazard-triangle",
+    label: "Hazard",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    // Yellow-triangle warning sign shape (filled outline triangle with
+    // an inset triangle creating a thick border, plus an exclamation
+    // mark area knocked out via even-odd).
+    path: "M50 4 L96 92 L4 92 Z M50 22 L82 84 L18 84 Z M48 38 L52 38 L51 64 L49 64 Z M48 70 L52 70 L52 76 L48 76 Z",
+  },
+  {
+    id: "traffic-cone",
+    label: "Traffic cone",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    // Cone (trapezoid) on a base.
+    path: "M40 14 L60 14 L74 86 L26 86 Z M20 86 L80 86 L84 96 L16 96 Z",
+  },
+  {
+    id: "asterisk",
+    label: "Asterisk",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    // 6-arm asterisk via overlapping rectangles.
+    path: "M44 4 L56 4 L56 96 L44 96 Z M4 50 L96 50 L96 50 L96 50 L4 50 Z M14 14 L86 86 L78 94 L6 22 Z M86 14 L94 22 L22 94 L14 86 Z",
+  },
+  {
+    id: "plus-cross",
+    label: "Plus / cross",
+    category: "symbols",
+    viewBox: "0 0 100 100",
+    path: "M40 4 L60 4 L60 40 L96 40 L96 60 L60 60 L60 96 L40 96 L40 60 L4 60 L4 40 L40 40 Z",
+  },
+];
+
+// Append a generic frame/border to the existing decorative export below
+// is the cleanest place to leave it — kept inline above.
+
 // ─── Public exports ─────────────────────────────────────────────
 
 export const SHAPE_CATEGORIES: readonly ShapeCategory[] = [
   { id: "geometric",  label: "Geometric",  count: GEOMETRIC.length },
+  { id: "lines",      label: "Lines",      count: LINES.length },
   { id: "arrows",     label: "Arrows",     count: ARROWS.length },
+  { id: "callouts",   label: "Callouts",   count: CALLOUTS.length },
+  { id: "symbols",    label: "Symbols",    count: SYMBOLS.length },
   { id: "badges",     label: "Badges",     count: BADGES.length },
   { id: "frames",     label: "Frames",     count: FRAMES.length },
   { id: "decorative", label: "Decorative", count: DECORATIVE.length },
@@ -595,7 +810,10 @@ export const SHAPE_CATEGORIES: readonly ShapeCategory[] = [
 
 export const SHAPES_BY_CATEGORY: Readonly<Record<ShapeCategoryId, readonly ShapeEntry[]>> = {
   geometric:  GEOMETRIC,
+  lines:      LINES,
   arrows:     ARROWS,
+  callouts:   CALLOUTS,
+  symbols:    SYMBOLS,
   badges:     BADGES,
   frames:     FRAMES,
   decorative: DECORATIVE,
@@ -603,7 +821,10 @@ export const SHAPES_BY_CATEGORY: Readonly<Record<ShapeCategoryId, readonly Shape
 
 export const ALL_SHAPES: readonly ShapeEntry[] = [
   ...GEOMETRIC,
+  ...LINES,
   ...ARROWS,
+  ...CALLOUTS,
+  ...SYMBOLS,
   ...BADGES,
   ...FRAMES,
   ...DECORATIVE,
