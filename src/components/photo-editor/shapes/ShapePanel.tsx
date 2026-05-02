@@ -28,11 +28,10 @@
 "use client";
 
 import { useState } from "react";
-import { Square, ChevronDown } from "lucide-react";
+import { Square } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useEditor } from "../context/EditorContext";
-import { ColorSwatches } from "../text-tools/ColorSwatches";
-import { HsvPicker } from "../text-tools/HsvPicker";
+import { ColorPicker } from "../text-tools/ColorPicker";
 import { createShapeLayer } from "@/lib/photo-editor/canvas/factories";
 import { centreLayerOnCanvas } from "@/lib/photo-editor/canvas/selection";
 import {
@@ -60,7 +59,7 @@ export function ShapePanel({ open, onClose }: ShapePanelProps) {
   const [fill, setFill] = useState<string>(DEFAULT_FILL);
   const [activeCategory, setActiveCategory] =
     useState<ShapeCategoryId>("geometric");
-  const [showHsv, setShowHsv] = useState(false);
+  // showHsv state removed (May 2026) — ColorPicker handles its own modal.
 
   // ─── Tap handler ─────────────────────────────────────────────
   function handlePick(entry: ShapeEntry) {
@@ -108,29 +107,11 @@ export function ShapePanel({ open, onClose }: ShapePanelProps) {
             >
               Colour
             </div>
-            <ColorSwatches value={fill} onPick={setFill} />
-            <button
-              type="button"
-              onClick={() => setShowHsv((v) => !v)}
-              aria-expanded={showHsv}
-              className="mt-2 inline-flex items-center gap-1 text-xs transition-colors"
-              style={{ color: "var(--pe-text-muted)" }}
-            >
-              <ChevronDown
-                className="w-3.5 h-3.5"
-                strokeWidth={2}
-                style={{
-                  transform: showHsv ? "rotate(180deg)" : "rotate(0deg)",
-                  transition: "transform 150ms",
-                }}
-              />
-              <span>{showHsv ? "Hide" : "Custom colour"}</span>
-            </button>
-            {showHsv ? (
-              <div className="mt-2">
-                <HsvPicker value={fill} onChange={setFill} />
-              </div>
-            ) : null}
+            <ColorPicker
+              value={fill}
+              onChange={setFill}
+              ariaLabel="New shape fill colour"
+            />
           </div>
         </div>
 
