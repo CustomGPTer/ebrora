@@ -31,6 +31,7 @@ import useImage from "use-image";
 import Konva from "konva";
 import type { Filter as KonvaFilter, KonvaEventObject } from "konva/lib/Node";
 import { useEditor } from "../context/EditorContext";
+import { useCanvasPicker } from "../context/CanvasPickerContext";
 import { LayerRenderer } from "./LayerRenderer";
 import { SelectionFrame } from "./SelectionFrame";
 import { GestureLayer } from "./GestureLayer";
@@ -56,6 +57,7 @@ export function CanvasStage({
 }: CanvasStageProps) {
   const stageRef = useRef<Konva.Stage>(null);
   const { state, dispatch, stageRef: contextStageRef } = useEditor();
+  const picker = useCanvasPicker();
 
   useEffect(() => {
     contextStageRef.current = stageRef.current;
@@ -69,6 +71,26 @@ export function CanvasStage({
   function handleStageClick(e: KonvaEventObject<MouseEvent | TouchEvent>) {
     const stage = stageRef.current;
     if (!stage) return;
+
+    // ── Colour-pick interception ────────────────────────────────
+    // When the canvas picker is active (the in-app eyedropper
+    // fallback used on browsers without window.EyeDropper), any tap
+    // anywhere on the stage — empty area OR a layer — samples the
+    // pixel under the pointer and exits pick mode. We stop the
+    // event from bubbling so the layer's own onSelect doesn't fire,
+    // since the user's intent is "sample this pixel", not "select
+    // this layer".
+    if (picker.isPicking) {
+      e.cancelBubble = true;
+      const hex = sampleStagePixel(stage);
+      if (hex) {
+        picker.completePick(hex);
+      } else {
+        picker.cancelPick();
+      }
+      return;
+    }
+
     if (e.target === stage) {
       if (state.selection.length > 0) {
         dispatch({ type: "SET_SELECTION", ids: [] });
@@ -387,4 +409,63 @@ function CheckerboardRect({
     }
   }
   return <>{tiles}</>;
+}
+
+// ─── Pixel sampling for the in-app eyedropper ──────────────────
+//
+// Rasterises the stage to an HTMLCanvasElement and reads the pixel
+// directly under the pointer position. Returns `#RRGGBB` (uppercase)
+// or null on any failure (no pointer, toCanvas threw, CORS-tainted
+// canvas, out-of-bounds — all of which the caller should treat as
+// "cancel the pick" rather than fire it with bogus data).
+//
+// Why direct sampling without coordinate transforms: Konva's
+// stage.getPointerPosition() returns coords in display space (CSS
+// pixels relative to the stage's top-left), and stage.toCanvas()
+// rasterises the stage at its display size. Both share the same
+// coordinate frame so we can sample at (round(pos.x), round(pos.y))
+// directly.
+//
+// Every image source in the editor (photo backgrounds, image
+// layers, stickers) loads with crossOrigin="anonymous", so the
+// rasterised canvas should not be CORS-tainted in practice. The
+// try/catch around getImageData is defence-in-depth for any
+// future asset loaded without that flag.
+
+function sampleStagePixel(stage: Konva.Stage): string | null {
+  const pos = stage.getPointerPosition();
+  if (!pos) return null;
+
+  let off: HTMLCanvasElement;
+  try {
+    off = stage.toCanvas({ pixelRatio: 1 });
+  } catch {
+    return null;
+  }
+
+  const ctx = off.getContext("2d");
+  if (!ctx) return null;
+
+  const x = Math.max(0, Math.min(off.width - 1, Math.round(pos.x)));
+  const y = Math.max(0, Math.min(off.height - 1, Math.round(pos.y)));
+
+  let pixel: Uint8ClampedArray;
+  try {
+    pixel = ctx.getImageData(x, y, 1, 1).data;
+  } catch {
+    return null;
+  }
+
+  // If the user tapped on a fully-transparent area (e.g. transparent
+  // background's checkerboard renders as opaque white/grey, but a
+  // hypothetical empty-stage tap would land here), fall back to
+  // null so the picker cancels rather than committing to black.
+  if (pixel[3] === 0) return null;
+
+  return rgbToHex(pixel[0], pixel[1], pixel[2]);
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  const h = (n: number) => n.toString(16).padStart(2, "0");
+  return ("#" + h(r) + h(g) + h(b)).toUpperCase();
 }
