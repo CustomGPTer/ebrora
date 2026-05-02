@@ -221,6 +221,13 @@ export interface TextLayer extends BaseLayer {
   kind: "text";
   /** Width of the text box in canvas pixels (text wraps within this). */
   width: number;
+  /** When true, the next `endEditing` call will snap the layer's width
+   *  to its content (longest natural line) and flip this back to false.
+   *  New text layers start with this true so the first edit-end after
+   *  creation hugs the typed content. The user can re-engage auto-fit
+   *  by double-tapping the wrap-width handle on the selection toolbar.
+   *  May 2026 — paragraph-width dragger build. */
+  autoFitWidth: boolean;
   styling: TextLayerStyling;
   runs: GlyphRun[];
   /** Erase brush strokes applied to this text layer (Q4 — Text Behind). */
