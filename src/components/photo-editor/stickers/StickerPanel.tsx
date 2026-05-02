@@ -58,7 +58,7 @@ export function StickerPanel({ open, onClose }: StickerPanelProps) {
   // ─── Local state ─────────────────────────────────────────────
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] =
-    useState<StickerCategoryId>("smileys");
+    useState<StickerCategoryId>("construction");
   const [recents, setRecents] = useState<string[]>(() => loadRecents());
 
   // Recents are loaded from localStorage on mount; refresh whenever the
