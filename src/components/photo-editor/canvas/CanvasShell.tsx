@@ -19,6 +19,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CanvasStage } from "./CanvasStage";
 import { SelectionTools } from "./SelectionTools";
+import { GridOverlay } from "./GridOverlay";
 import { useEditor } from "../context/EditorContext";
 import {
   VIEWPORT_MIN_ZOOM,
@@ -103,6 +104,14 @@ export function CanvasShell() {
               canvasAreaRef={containerRef}
             />
           </div>
+
+          <GridOverlay
+            stageLeft={stageLeft}
+            stageTop={stageTop}
+            stageWidth={stageW}
+            stageHeight={stageH}
+            stageScale={effectiveScale}
+          />
 
           <SelectionTools
             stageLeft={stageLeft}

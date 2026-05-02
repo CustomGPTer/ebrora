@@ -36,10 +36,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Copy,
-  FlipHorizontal,
-  FlipVertical,
   Keyboard,
   Maximize2 as ResizeIcon,
+  MoveHorizontal,
+  MoveVertical,
   RotateCw,
   X,
 } from "lucide-react";
@@ -312,6 +312,36 @@ export function SelectionTools({
     pointerId: number;
   } | null>(null);
 
+  // ── Stretch drag (May 2026 — replaces flip H / V) ─────────────
+  //
+  // Edge-midpoint handles drive a free, per-axis stretch. Pivot is
+  // the OPPOSITE edge midpoint, captured at drag-start. Pointer
+  // moves along the layer's local axis; signed projection drives
+  // newScale (allowed to cross zero, which flips the layer and
+  // continues mirroring). The OPPOSITE edge stays pinned in stage-
+  // coord space.
+  //
+  // Math: see comments inline. Works at any rotation because we
+  // capture both the pivot's stage-coord position AND the layer's
+  // start transform once at drag-start, then solve for the new
+  // transform.x/y that keeps the pivot in place under the new
+  // scaleX / scaleY.
+  const stretchRef = useRef<{
+    axis: "x" | "y";
+    /** Local-coords pivot = opposite edge's midpoint (selfRect-aware). */
+    localPivot: { x: number; y: number };
+    /** Stage-coord position where the pivot lives, captured once. */
+    pivotStage: { x: number; y: number };
+    /** Layer's transform at drag start. */
+    layerStart: AnyLayer["transform"];
+    /** DOM-space pivot and dragged-edge midpoints captured at start
+     *  — used to define the projection axis for the pointer. */
+    pivotDom: { x: number; y: number };
+    axisDirDom: { x: number; y: number };
+    axisLengthDom: number;
+    pointerId: number;
+  } | null>(null);
+
   if (!geom || !selectedLayer) return null;
 
   // Geometric centre = average of the four corners. Works for any
@@ -323,24 +353,173 @@ export function SelectionTools({
     dispatch({ type: "REMOVE_LAYER", id: selectedLayer.id });
   const onDuplicate = () =>
     dispatch({ type: "DUPLICATE_LAYER", id: selectedLayer.id });
-  const onFlipH = () => {
-    const next = { ...selectedLayer.transform };
-    next.scaleX = -next.scaleX;
+
+  // ── Stretch start: capture pivot + axis ─────────────────────
+  //
+  // axis = 'x' → user dragged the LEFT-mid handle, X stretch, pivot
+  //              is the RIGHT-mid edge (stays pinned).
+  // axis = 'y' → user dragged the TOP-mid handle, Y stretch, pivot
+  //              is the BOTTOM-mid edge.
+  function onStretchPointerDown(
+    axis: "x" | "y",
+    e: React.PointerEvent<HTMLButtonElement>,
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!selectedLayer) return;
+    const stage = stageRef.current;
+    if (!stage) return;
+    const node = stage.findOne(`#${selectedLayer.id}`);
+    if (!node) return;
+
+    // selfRect — layer's local-coord bounding box.
+    const selfRect = node.getClientRect({
+      skipTransform: true,
+      skipShadow: true,
+      skipStroke: true,
+    });
+    if (
+      !selfRect ||
+      !Number.isFinite(selfRect.width) ||
+      !Number.isFinite(selfRect.height) ||
+      selfRect.width <= 0 ||
+      selfRect.height <= 0
+    ) {
+      return;
+    }
+
+    // Local pivot (opposite edge midpoint) in selfRect-aware coords.
+    const localPivot =
+      axis === "y"
+        ? {
+            x: selfRect.x + selfRect.width / 2,
+            y: selfRect.y + selfRect.height,
+          }
+        : {
+            x: selfRect.x + selfRect.width,
+            y: selfRect.y + selfRect.height / 2,
+          };
+
+    // Pivot's stage-coord position = transform applied to localPivot.
+    // T(p) = (transform.x, transform.y) + R(rotation) ∘ S(scaleX, scaleY) (p)
+    const layerStart = { ...selectedLayer.transform };
+    const radStart = (layerStart.rotation * Math.PI) / 180;
+    const cosS = Math.cos(radStart);
+    const sinS = Math.sin(radStart);
+    const sx = localPivot.x * layerStart.scaleX;
+    const sy = localPivot.y * layerStart.scaleY;
+    const pivotStage = {
+      x: layerStart.x + (sx * cosS - sy * sinS),
+      y: layerStart.y + (sx * sinS + sy * cosS),
+    };
+
+    // DOM-space pivot + dragged-edge midpoints, derived from geom
+    // (already in DOM coords). axisDir = unit vector from pivot to
+    // dragged edge in DOM space.
+    const pivotDom =
+      axis === "y"
+        ? {
+            x: (geom!.bl.x + geom!.br.x) / 2,
+            y: (geom!.bl.y + geom!.br.y) / 2,
+          }
+        : {
+            x: (geom!.tr.x + geom!.br.x) / 2,
+            y: (geom!.tr.y + geom!.br.y) / 2,
+          };
+    const draggedEdgeDom =
+      axis === "y"
+        ? {
+            x: (geom!.tl.x + geom!.tr.x) / 2,
+            y: (geom!.tl.y + geom!.tr.y) / 2,
+          }
+        : {
+            x: (geom!.tl.x + geom!.bl.x) / 2,
+            y: (geom!.tl.y + geom!.bl.y) / 2,
+          };
+    const dx = draggedEdgeDom.x - pivotDom.x;
+    const dy = draggedEdgeDom.y - pivotDom.y;
+    const axisLengthDom = Math.max(1, Math.hypot(dx, dy));
+    const axisDirDom = {
+      x: dx / axisLengthDom,
+      y: dy / axisLengthDom,
+    };
+
+    stretchRef.current = {
+      axis,
+      localPivot,
+      pivotStage,
+      layerStart,
+      pivotDom,
+      axisDirDom,
+      axisLengthDom,
+      pointerId: e.pointerId,
+    };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onStretchPointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+    const s = stretchRef.current;
+    if (!s || s.pointerId !== e.pointerId) return;
+    if (!selectedLayer) return;
+
+    // Signed projection of (pointer − pivot) onto the start-axis.
+    const vx = e.clientX - s.pivotDom.x;
+    const vy = e.clientY - s.pivotDom.y;
+    const t = vx * s.axisDirDom.x + vy * s.axisDirDom.y;
+    const ratio = t / s.axisLengthDom;
+
+    // newScale = startScale × ratio (allowed to be 0 / negative).
+    const initialScale =
+      s.axis === "y" ? s.layerStart.scaleY : s.layerStart.scaleX;
+    let newScale = initialScale * ratio;
+    const MIN = 0.05;
+    if (Math.abs(newScale) < MIN) {
+      newScale = Math.sign(newScale || 1) * MIN;
+    }
+
+    const newScaleX =
+      s.axis === "x" ? newScale : s.layerStart.scaleX;
+    const newScaleY =
+      s.axis === "y" ? newScale : s.layerStart.scaleY;
+
+    // Solve for transform.x/y such that pivotStage is unchanged:
+    //   pivotStage = (transform.x, transform.y) + R ∘ S_new (localPivot)
+    //   transform.xy = pivotStage − R ∘ S_new (localPivot)
+    const rad = (s.layerStart.rotation * Math.PI) / 180;
+    const cosR = Math.cos(rad);
+    const sinR = Math.sin(rad);
+    const sx2 = s.localPivot.x * newScaleX;
+    const sy2 = s.localPivot.y * newScaleY;
+    const rotatedX = sx2 * cosR - sy2 * sinR;
+    const rotatedY = sx2 * sinR + sy2 * cosR;
+    const newX = s.pivotStage.x - rotatedX;
+    const newY = s.pivotStage.y - rotatedY;
+
     dispatch({
       type: "UPDATE_LAYER",
       id: selectedLayer.id,
-      patch: { transform: next },
+      patch: {
+        transform: {
+          ...s.layerStart,
+          scaleX: newScaleX,
+          scaleY: newScaleY,
+          x: newX,
+          y: newY,
+        },
+      },
     });
-  };
-  const onFlipV = () => {
-    const next = { ...selectedLayer.transform };
-    next.scaleY = -next.scaleY;
-    dispatch({
-      type: "UPDATE_LAYER",
-      id: selectedLayer.id,
-      patch: { transform: next },
-    });
-  };
+  }
+
+  function onStretchPointerUp(e: React.PointerEvent<HTMLButtonElement>) {
+    const s = stretchRef.current;
+    if (!s || s.pointerId !== e.pointerId) return;
+    stretchRef.current = null;
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* already released */
+    }
+  }
 
   // ── Rotate drag ──────────────────────────────────────────────
   const onRotatePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -500,11 +679,15 @@ export function SelectionTools({
       <CornerBtn
         x={topMidX}
         y={topMidY}
-        ariaLabel="Flip vertically"
-        onClick={onFlipV}
+        ariaLabel="Stretch vertically — drag past opposite edge to flip"
+        drag
+        onPointerDown={(e) => onStretchPointerDown("y", e)}
+        onPointerMove={onStretchPointerMove}
+        onPointerUp={onStretchPointerUp}
+        onPointerCancel={onStretchPointerUp}
         color={iconColor}
       >
-        <FlipVertical className="w-5 h-5" strokeWidth={2.25} />
+        <MoveVertical className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
 
       <CornerBtn
@@ -524,11 +707,15 @@ export function SelectionTools({
       <CornerBtn
         x={leftMidX}
         y={leftMidY}
-        ariaLabel="Flip horizontally"
-        onClick={onFlipH}
+        ariaLabel="Stretch horizontally — drag past opposite edge to flip"
+        drag
+        onPointerDown={(e) => onStretchPointerDown("x", e)}
+        onPointerMove={onStretchPointerMove}
+        onPointerUp={onStretchPointerUp}
+        onPointerCancel={onStretchPointerUp}
         color={iconColor}
       >
-        <FlipHorizontal className="w-5 h-5" strokeWidth={2.25} />
+        <MoveHorizontal className="w-5 h-5" strokeWidth={2.25} />
       </CornerBtn>
 
       {isText && (

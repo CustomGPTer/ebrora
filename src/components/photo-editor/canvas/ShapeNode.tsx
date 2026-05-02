@@ -28,11 +28,11 @@
 
 "use client";
 
-import { Ellipse, Line, Path, Rect, Star, Group, Text } from "react-konva";
+import { Ellipse, Line, Path, Rect, Star, Group, Text, Arrow } from "react-konva";
 import type Konva from "konva";
 import { useRef } from "react";
 import type { KonvaEventObject } from "konva/lib/Node";
-import type { ShapeLayer, Transform } from "@/lib/photo-editor/types";
+import type { LineProps, ShapeLayer, Transform } from "@/lib/photo-editor/types";
 import {
   findShape,
   isBuiltInShape,
@@ -46,6 +46,37 @@ interface ShapeNodeProps {
   onDragEnd: (x: number, y: number) => void;
   onTransformEnd: (next: Partial<Transform>) => void;
 }
+
+// ─── Line-shape detection (May 2026 — Width + Lines build) ─────
+//
+// A shape id starting with "line-" (catalogue category "lines") is
+// rendered through the custom line branch — Konva.Line / Konva.Arrow
+// with stroke.width as thickness and the layer's lineProps for arrow-
+// heads / dash pattern. The legacy "line" primitive id keeps its old
+// behaviour (thickness = bbox height) so existing projects don't break.
+
+const LINE_PREFIX = "line-";
+
+/** True when this shape should be rendered through the line branch.
+ *  We branch on id prefix so existing catalogue lookup still works. */
+function isLineShape(shapeId: string): boolean {
+  return shapeId.startsWith(LINE_PREFIX);
+}
+
+/** Konva dash pattern in canvas pixels. Scaled to thickness so the
+ *  pattern reads consistently as the line gets thicker. */
+function dashFor(shapeId: string, thickness: number): number[] | undefined {
+  const t = Math.max(1, thickness);
+  if (shapeId === "line-dashed") return [t * 4, t * 2];
+  if (shapeId === "line-dotted") return [t * 0.5, t * 1.5];
+  return undefined;
+}
+
+const DEFAULT_LINE_PROPS: LineProps = {
+  arrowStart: false,
+  arrowEnd: false,
+  arrowStyle: "triangle",
+};
 
 export function ShapeNode({
   layer,
@@ -119,6 +150,13 @@ function renderPrimitive(
   strokeProps: Record<string, unknown>
 ): JSX.Element {
   const { width, height, shapeId } = layer;
+
+  // ── Catalogue line-type shapes (May 2026) ──────────────────
+  // Branch BEFORE built-in / catalogue lookup so the dash + arrow
+  // logic always wins for these ids.
+  if (isLineShape(shapeId)) {
+    return renderLineShape(layer);
+  }
 
   // ── Built-in primitives ────────────────────────────────────
   if (isBuiltInShape(shapeId)) {
@@ -221,6 +259,146 @@ function renderPrimitive(
         fill="#9CA3AF"
       />
     </>
+  );
+}
+
+// ─── Line rendering (May 2026 — Width + Lines build) ───────────
+//
+// Lines are drawn diagonally from the bbox top-left to bottom-right by
+// default — this gives the user "free angle" via stretching the bbox
+// horizontally + vertically. Thickness is governed by stroke.width
+// (the new Width tab) with a 4-px fallback when width is 0 so the line
+// is always visible.
+//
+// Curved line: rendered as a smooth bezier using Konva.Line tension.
+// Freehand: a fixed wave path scaled to bbox (placeholder until full
+// freehand authoring lands).
+// Double line: two parallel strokes.
+// Dashed / dotted: dash pattern derived from thickness.
+//
+// Arrowheads: rendered via a separate Konva.Arrow when the line's
+// lineProps say so. The arrowhead size scales with the line's
+// thickness so it always reads.
+
+function renderLineShape(layer: ShapeLayer): JSX.Element {
+  const { width, height, shapeId } = layer;
+  const props: LineProps = layer.lineProps ?? DEFAULT_LINE_PROPS;
+  const thickness =
+    layer.stroke.width > 0 ? layer.stroke.width : 4;
+  const colour =
+    layer.stroke.opacity > 0 && layer.stroke.color
+      ? layer.stroke.color
+      : layer.fill;
+
+  // Line goes from (0, height/2) → (width, height/2) for a horizontal
+  // default. The user rotates / stretches the bbox to angle and length
+  // it. Endpoints in layer-local coords:
+  const x1 = 0;
+  const y1 = height / 2;
+  const x2 = width;
+  const y2 = height / 2;
+
+  // ── Curved line ─────────────────────────────────────────────
+  if (shapeId === "line-curved") {
+    return (
+      <Line
+        points={[
+          0, height / 2,
+          width * 0.25, height * 0.05,
+          width * 0.5, height / 2,
+          width * 0.75, height * 0.95,
+          width, height / 2,
+        ]}
+        stroke={colour}
+        strokeWidth={thickness}
+        lineCap="round"
+        lineJoin="round"
+        bezier
+      />
+    );
+  }
+
+  // ── Freehand placeholder ────────────────────────────────────
+  if (shapeId === "line-freehand") {
+    // Sampled wave; matches the catalogue's static fallback path.
+    const points: number[] = [];
+    const steps = 32;
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const x = t * width;
+      const y = height / 2 + Math.sin(t * Math.PI * 4) * (height / 2 - 4);
+      points.push(x, y);
+    }
+    return (
+      <Line
+        points={points}
+        stroke={colour}
+        strokeWidth={thickness}
+        lineCap="round"
+        lineJoin="round"
+        tension={0.3}
+      />
+    );
+  }
+
+  // ── Double line ─────────────────────────────────────────────
+  if (shapeId === "line-double") {
+    const offset = Math.max(thickness * 1.5, 4);
+    return (
+      <>
+        <Line
+          points={[x1, y1 - offset, x2, y2 - offset]}
+          stroke={colour}
+          strokeWidth={thickness}
+          lineCap="round"
+        />
+        <Line
+          points={[x1, y1 + offset, x2, y2 + offset]}
+          stroke={colour}
+          strokeWidth={thickness}
+          lineCap="round"
+        />
+      </>
+    );
+  }
+
+  // ── Straight, dashed, dotted ────────────────────────────────
+  const dash = dashFor(shapeId, thickness);
+
+  // Arrowhead size scales with thickness so it always reads.
+  const arrowLen = Math.max(thickness * 3, 12);
+  const arrowWidth = Math.max(thickness * 2.5, 10);
+  const arrowFilled = props.arrowStyle === "triangle";
+
+  // When arrows are configured, render via Konva.Arrow — it draws the
+  // line AND the arrowhead(s) consistently. Otherwise plain Line.
+  const hasArrow = props.arrowEnd || props.arrowStart;
+  if (hasArrow) {
+    return (
+      <Arrow
+        points={[x1, y1, x2, y2]}
+        stroke={colour}
+        strokeWidth={thickness}
+        fill={arrowFilled ? colour : "transparent"}
+        pointerLength={arrowLen}
+        pointerWidth={arrowWidth}
+        pointerAtBeginning={props.arrowStart}
+        pointerAtEnding={props.arrowEnd}
+        lineCap="round"
+        lineJoin="round"
+        dash={dash}
+      />
+    );
+  }
+
+  return (
+    <Line
+      points={[x1, y1, x2, y2]}
+      stroke={colour}
+      strokeWidth={thickness}
+      lineCap="round"
+      dash={dash}
+    />
   );
 }
 
