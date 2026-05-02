@@ -19,7 +19,7 @@
 
 "use client";
 
-import { useState } from "react";
+// React imports trimmed alongside the showHsv removal (May 2026).
 import { useTextTool } from "./use-text-tool";
 import {
   Row,
@@ -27,8 +27,7 @@ import {
   SectionDivider,
   Slider,
 } from "./controls";
-import { ColorSwatches } from "./ColorSwatches";
-import { HsvPicker } from "./HsvPicker";
+import { ColorPicker } from "./ColorPicker";
 import { defaultTextBackground } from "@/lib/photo-editor/rich-text/factory";
 import type { TextBackground } from "@/lib/photo-editor/types";
 
@@ -39,7 +38,6 @@ interface BackgroundPanelProps {
 
 export function BackgroundPanel(_props: BackgroundPanelProps = {}) {
   const tool = useTextTool();
-  const [showHsv, setShowHsv] = useState(false);
 
   const layer = tool.layer;
   const background: TextBackground = layer?.background ?? defaultTextBackground();
@@ -80,26 +78,11 @@ export function BackgroundPanel(_props: BackgroundPanelProps = {}) {
       <SectionDivider />
 
       <Section title="Colour">
-        <ColorSwatches
+        <ColorPicker
           value={background.color}
-          onPick={(c) => patchBackground({ color: c })}
+          onChange={(c) => patchBackground({ color: c })}
+          ariaLabel="Background colour"
         />
-        <Row>
-          <button
-            type="button"
-            onClick={() => setShowHsv((s) => !s)}
-            className="text-xs underline self-start"
-            style={{ color: "var(--pe-text-muted)" }}
-          >
-            {showHsv ? "Hide custom picker" : "Custom colour…"}
-          </button>
-        </Row>
-        {showHsv ? (
-          <HsvPicker
-            value={background.color}
-            onChange={(c) => patchBackground({ color: c })}
-          />
-        ) : null}
       </Section>
 
       <SectionDivider />

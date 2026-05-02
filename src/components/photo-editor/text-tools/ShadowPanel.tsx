@@ -18,8 +18,7 @@ import {
   SectionDivider,
   Slider,
 } from "./controls";
-import { ColorSwatches } from "./ColorSwatches";
-import { HsvPicker } from "./HsvPicker";
+import { ColorPicker } from "./ColorPicker";
 import type { Shadow } from "@/lib/photo-editor/types";
 
 interface ShadowPanelProps {
@@ -46,7 +45,7 @@ export function ShadowPanel({
   inline = false,
 }: ShadowPanelProps) {
   const tool = useTextTool();
-  const [showHsv, setShowHsv] = useState(false);
+  // showHsv state removed (May 2026) — ColorPicker handles its own modal.
 
   const current = tool.runValue("shadow");
   const mixed = current === null;
@@ -82,26 +81,11 @@ export function ShadowPanel({
           <SectionDivider />
 
           <Section title="Colour">
-            <ColorSwatches
+            <ColorPicker
               value={shadow.color}
-              onPick={(c) => patchShadow({ color: c })}
+              onChange={(c) => patchShadow({ color: c })}
+              ariaLabel="Shadow colour"
             />
-            <Row>
-              <button
-                type="button"
-                onClick={() => setShowHsv((s) => !s)}
-                className="text-xs underline self-start"
-                style={{ color: "var(--pe-text-muted)" }}
-              >
-                {showHsv ? "Hide custom picker" : "Custom colour…"}
-              </button>
-            </Row>
-            {showHsv ? (
-              <HsvPicker
-                value={shadow.color}
-                onChange={(c) => patchShadow({ color: c })}
-              />
-            ) : null}
           </Section>
 
           <SectionDivider />

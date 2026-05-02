@@ -17,7 +17,7 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Pencil } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useEditor } from "../context/EditorContext";
@@ -27,8 +27,7 @@ import {
   SectionDivider,
   Slider,
 } from "./controls";
-import { ColorSwatches } from "./ColorSwatches";
-import { HsvPicker } from "./HsvPicker";
+import { ColorPicker } from "./ColorPicker";
 import type { AnyLayer, ImageLayer, Stroke } from "@/lib/photo-editor/types";
 
 interface ImageStrokePanelProps {
@@ -53,7 +52,7 @@ export function ImageStrokePanel({
   inline = false,
 }: ImageStrokePanelProps) {
   const { state, dispatch } = useEditor();
-  const [showHsv, setShowHsv] = useState(false);
+  // showHsv state removed (May 2026) — ColorPicker handles its own modal.
 
   const layer = useMemo<ImageLayer | null>(() => {
     if (state.selection.length !== 1) return null;
@@ -109,26 +108,11 @@ export function ImageStrokePanel({
           <SectionDivider />
 
           <Section title="Colour">
-            <ColorSwatches
+            <ColorPicker
               value={stroke.color}
-              onPick={(c) => patchStroke({ color: c })}
+              onChange={(c) => patchStroke({ color: c })}
+              ariaLabel="Image stroke colour"
             />
-            <Row>
-              <button
-                type="button"
-                onClick={() => setShowHsv((s) => !s)}
-                className="text-xs underline self-start"
-                style={{ color: "var(--pe-text-muted)" }}
-              >
-                {showHsv ? "Hide custom picker" : "Custom colour…"}
-              </button>
-            </Row>
-            {showHsv ? (
-              <HsvPicker
-                value={stroke.color}
-                onChange={(c) => patchStroke({ color: c })}
-              />
-            ) : null}
           </Section>
         </>
       )}

@@ -25,8 +25,7 @@ import {
   Slider,
   Toggle,
 } from "./controls";
-import { ColorSwatches } from "./ColorSwatches";
-import { HsvPicker } from "./HsvPicker";
+import { ColorPicker } from "./ColorPicker";
 import type { GradientFill, GradientStop } from "@/lib/photo-editor/types";
 
 interface GradientPanelProps {
@@ -46,7 +45,7 @@ const DEFAULT_GRADIENT: GradientFill = {
 export function GradientPanel(_props: GradientPanelProps = {}) {
   const tool = useTextTool();
   const [activeStop, setActiveStop] = useState<0 | 1>(0);
-  const [showHsv, setShowHsv] = useState(false);
+  // showHsv state removed (May 2026) — ColorPicker handles its own modal.
 
   const current = tool.runValue("gradient");
   const mixed = current === null;
@@ -143,26 +142,11 @@ export function GradientPanel(_props: GradientPanelProps = {}) {
         <SectionDivider />
 
         <Section title="Colour">
-          <ColorSwatches
+          <ColorPicker
             value={activeColor}
-            onPick={(c) => patchStop(activeStop, c)}
+            onChange={(c) => patchStop(activeStop, c)}
+            ariaLabel="Gradient stop colour"
           />
-          <Row>
-            <button
-              type="button"
-              onClick={() => setShowHsv((s) => !s)}
-              className="text-xs underline self-start"
-              style={{ color: "var(--pe-text-muted)" }}
-            >
-              {showHsv ? "Hide custom picker" : "Custom colour…"}
-            </button>
-          </Row>
-          {showHsv ? (
-            <HsvPicker
-              value={activeColor}
-              onChange={(c) => patchStop(activeStop, c)}
-            />
-          ) : null}
         </Section>
 
         <SectionDivider />

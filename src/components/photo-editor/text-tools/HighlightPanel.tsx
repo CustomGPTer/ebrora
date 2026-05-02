@@ -7,7 +7,6 @@
 
 "use client";
 
-import { useState } from "react";
 import { Highlighter } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useTextTool } from "./use-text-tool";
@@ -18,8 +17,7 @@ import {
   SectionDivider,
   Slider,
 } from "./controls";
-import { ColorSwatches } from "./ColorSwatches";
-import { HsvPicker } from "./HsvPicker";
+import { ColorPicker } from "./ColorPicker";
 import type { Highlight } from "@/lib/photo-editor/types";
 
 interface HighlightPanelProps {
@@ -43,7 +41,7 @@ export function HighlightPanel({
   inline = false,
 }: HighlightPanelProps) {
   const tool = useTextTool();
-  const [showHsv, setShowHsv] = useState(false);
+  // showHsv state removed (May 2026) — ColorPicker handles its own modal.
 
   const current = tool.runValue("highlight");
   const mixed = current === null;
@@ -79,26 +77,11 @@ export function HighlightPanel({
           <SectionDivider />
 
           <Section title="Colour">
-            <ColorSwatches
+            <ColorPicker
               value={highlight.color}
-              onPick={(c) => patchHighlight({ color: c })}
+              onChange={(c) => patchHighlight({ color: c })}
+              ariaLabel="Highlight colour"
             />
-            <Row>
-              <button
-                type="button"
-                onClick={() => setShowHsv((s) => !s)}
-                className="text-xs underline self-start"
-                style={{ color: "var(--pe-text-muted)" }}
-              >
-                {showHsv ? "Hide custom picker" : "Custom colour…"}
-              </button>
-            </Row>
-            {showHsv ? (
-              <HsvPicker
-                value={highlight.color}
-                onChange={(c) => patchHighlight({ color: c })}
-              />
-            ) : null}
           </Section>
         </>
       )}
