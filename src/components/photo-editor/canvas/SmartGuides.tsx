@@ -1,16 +1,21 @@
 // src/components/photo-editor/canvas/SmartGuides.tsx
 //
 // Renders the active smart-guide lines on the canvas as Konva.Line
-// nodes. Solid Ebrora teal at 1px, full canvas extent, listening=false
-// so taps pass through. Phase 1 — Apr 2026.
+// nodes. Full canvas extent, listening=false so taps pass through.
+// Phase 1 — Apr 2026.
+//
+// May 2026 — colour changed from Ebrora teal to white, thickness
+// from 1px to 1.15px (15% thicker). Teal blended into mid-tone
+// canvas content; white reads cleanly on any background, helped by
+// the slight thickness bump.
 
 "use client";
 
 import { Line } from "react-konva";
 import { useSmartGuides } from "./SmartGuidesContext";
 
-const GUIDE_COLOR = "#1B5B50";
-const GUIDE_WIDTH = 1;
+const GUIDE_COLOR = "#FFFFFF";
+const GUIDE_WIDTH = 1.15;
 
 interface SmartGuidesProps {
   canvasWidth: number;
