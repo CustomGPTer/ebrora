@@ -28,7 +28,20 @@
 //         Handwriting / Monospace) → VirtualFontList
 //       – Custom → CustomFontUpload (paid-tier-gated)
 //       – Glyph → GlyphPicker
-//   • Footer: row count
+//   • Footer: tab-label only ("Custom fonts", "Glyph picker",
+//     "Loading…"). The "X fonts" count footer was removed (May 2026)
+//     because it was a sticky flex-none element pinned below the
+//     virtualised list, which ate vertical space and obscured the
+//     bottom rows on the height-locked mobile dock. The other footer
+//     labels render above static (non-scrolling) content so they
+//     don't block anything.
+//
+// First-run hint:
+//   The "Select a text layer to apply a font" hint above the list
+//   now shows ONCE per browser, gated by a localStorage flag
+//   (`ebrora-pe-font-hint-seen`). The flag is set the first time
+//   the hint is rendered; subsequent visits with no text layer
+//   selected get the extra vertical space back.
 //
 // Selecting a font: pick the variant most closely matching the current
 // run's weight + style, await its load, then dispatch UPDATE_LAYER with
@@ -85,6 +98,12 @@ interface FontPanelProps {
   inline?: boolean;
 }
 
+// localStorage key for the "Select a text layer to apply a font"
+// first-run hint. Once flipped to "true" the hint never shows again
+// on this browser. Namespaced with "ebrora-pe-" to keep the photo
+// editor's keys grouped under one prefix.
+const FONT_HINT_FLAG_KEY = "ebrora-pe-font-hint-seen";
+
 export function FontPanel({
   open = false,
   onClose,
@@ -97,6 +116,32 @@ export function FontPanel({
   const [catalogue, setCatalogue] = useState<GoogleFontFamily[] | null>(null);
   const [catalogueError, setCatalogueError] = useState<string | null>(null);
   const [loadingFamily, setLoadingFamily] = useState<string | null>(null);
+
+  // First-run flag for the "Select a text layer to apply a font" hint.
+  // Read from localStorage on mount; write the seen flag on first
+  // render to suppress subsequent visits. Per-browser, persists
+  // forever (until the user clears site data). SSR-safe: the initial
+  // state is `false` server-side, then useEffect flips it to the
+  // accurate value on the client.
+  const [showFontHint, setShowFontHint] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const seen = window.localStorage.getItem(FONT_HINT_FLAG_KEY);
+      if (seen === "true") {
+        setShowFontHint(false);
+        return;
+      }
+      // First run: show the hint AND mark seen so it never returns.
+      setShowFontHint(true);
+      window.localStorage.setItem(FONT_HINT_FLAG_KEY, "true");
+    } catch {
+      // localStorage unavailable (private mode, quota, etc.) — fall
+      // back to never showing the hint rather than showing it every
+      // time. Conservative; the hint is non-essential.
+      setShowFontHint(false);
+    }
+  }, []);
 
   // In inline mode the panel renders unconditionally inside the dock,
   // so the catalogue should fetch on mount. In drawer mode it should
@@ -323,8 +368,14 @@ export function FontPanel({
     );
   }
 
-  // Footer text differs by tab.
-  let footerText: string;
+  // Footer text differs by tab. On Google catalogue tabs with the
+  // catalogue loaded we deliberately return null — the "X fonts"
+  // count was a sticky flex-none element that ate vertical space
+  // and obscured the bottom rows of the virtualised list on the
+  // height-locked mobile dock. The other footer states render
+  // above static (non-scrolling) bodies, so they don't block
+  // anything and stay.
+  let footerText: string | null;
   if (activeTab === "glyph") {
     footerText = "Glyph picker";
   } else if (activeTab === "custom") {
@@ -332,9 +383,7 @@ export function FontPanel({
   } else if (catalogue === null) {
     footerText = "Loading…";
   } else {
-    footerText = `${visibleItems.length.toLocaleString()} font${
-      visibleItems.length === 1 ? "" : "s"
-    }`;
+    footerText = null;
   }
 
   // Inner content stack shared by both modes — search input (Google
@@ -382,8 +431,11 @@ export function FontPanel({
         catalogue={catalogue}
       />
 
-      {/* Hint when no text layer is selected */}
-      {selectedTextLayer === null && isGoogleTab ? (
+      {/* Hint when no text layer is selected — first-run only.
+          After the user has seen it once on this browser, the
+          flag in localStorage suppresses it permanently so the
+          font list gets the extra vertical space back. */}
+      {selectedTextLayer === null && isGoogleTab && showFontHint ? (
         <div
           className="flex-none px-4 py-2 text-xs text-center"
           style={{
@@ -399,16 +451,20 @@ export function FontPanel({
       {/* Body */}
       {body}
 
-      {/* Footer */}
-      <div
-        className="flex-none px-4 py-3 text-xs"
-        style={{
-          borderTop: "1px solid var(--pe-border)",
-          color: "var(--pe-text-subtle)",
-        }}
-      >
-        {footerText}
-      </div>
+      {/* Footer — only when there's a label to show. On Google
+          catalogue tabs with results loaded, no footer renders so
+          the virtualised list owns the full body height. */}
+      {footerText !== null ? (
+        <div
+          className="flex-none px-4 py-3 text-xs"
+          style={{
+            borderTop: "1px solid var(--pe-border)",
+            color: "var(--pe-text-subtle)",
+          }}
+        >
+          {footerText}
+        </div>
+      ) : null}
     </>
   );
 
