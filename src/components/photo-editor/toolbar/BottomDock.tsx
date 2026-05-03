@@ -119,23 +119,20 @@ import { PerspectivePanel } from "../text-tools/PerspectivePanel";
 import { ImageStrokePanel } from "../text-tools/ImageStrokePanel";
 import { FontPanel } from "../fonts/FontPanel";
 import { useTextTool } from "../text-tools/use-text-tool";
-import { createDefaultTextForCanvas, defaultTextBackground } from "@/lib/photo-editor/rich-text/factory";
+import { createDefaultTextForCanvas } from "@/lib/photo-editor/rich-text/factory";
 import { createImageLayer } from "@/lib/photo-editor/canvas/factories";
 import { centreLayerOnCanvas } from "@/lib/photo-editor/canvas/selection";
 import { MAX_CANVAS_DIMENSION } from "@/lib/photo-editor/types";
 import type {
   AnyLayer,
   Background,
-  GradientFill,
   Highlight,
   ImageLayer,
   Shadow,
   ShapeLayer,
   StickerLayer,
   Stroke,
-  TextBackground,
   TextLayer,
-  TextureFill,
 } from "@/lib/photo-editor/types";
 import type { ActivePanel } from "../EditorShell";
 
@@ -570,18 +567,9 @@ function SelectedLayerSection({
 //   • Position → never (shapes always have a position)
 //   • Opacity  → when opacity < 1
 //
-// Reset semantics (per Q2 — scope is just the active tab):
-//   • Color    → no reset (no canonical default — would be arbitrary)
-//   • Stroke   → stroke width = 0 (back to no-stroke)
-//   • Position → translate / rotate / scale to identity-ish (Z-order
-//                stays — re-stacking on reset would be surprising)
-//   • Opacity  → opacity = 1
-
-const SHAPE_DEFAULT_STROKE: Stroke = {
-  color: "#000000",
-  width: 0,
-  opacity: 1,
-};
+// (The per-tab ↻ Reset button was removed in May 2026; universal
+// Undo/Redo from EditorTopBar covers this — no dedicated reset
+// targets per tab anymore.)
 
 type ShapeTabId = "color" | "stroke" | "position" | "opacity" | "width" | "line";
 
@@ -626,7 +614,6 @@ const SHAPE_TABS_WITH_LINE: TabStripItem[] = [
 ];
 
 function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
-  const { dispatch } = useEditor();
   const [activeTab, setActiveTab] = useState<ShapeTabId>("color");
 
   const isLine = layer.shapeId.startsWith("line-");
@@ -654,77 +641,10 @@ function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
   const safeActive: ShapeTabId =
     activeTab === "line" && !isLine ? "color" : activeTab;
 
-  function resetActiveTab() {
-    switch (safeActive) {
-      case "stroke":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { stroke: SHAPE_DEFAULT_STROKE } as Partial<AnyLayer>,
-        });
-        return;
-      case "width":
-        // Reset to no outline / no extra thickness. Lines fall back
-        // to their built-in 4 px when stroke.width is 0, so this is
-        // safe for them too.
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: {
-            stroke: { ...layer.stroke, width: 0 },
-          } as Partial<AnyLayer>,
-        });
-        return;
-      case "position":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: {
-            transform: {
-              ...layer.transform,
-              x: 0,
-              y: 0,
-              scaleX: 1,
-              scaleY: 1,
-              rotation: 0,
-              skewX: 0,
-              skewY: 0,
-            },
-          } as Partial<AnyLayer>,
-        });
-        return;
-      case "opacity":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { opacity: 1 } as Partial<AnyLayer>,
-        });
-        return;
-      case "line":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: {
-            lineProps: {
-              arrowStart: false,
-              arrowEnd: false,
-              arrowStyle: "triangle",
-            },
-          } as Partial<AnyLayer>,
-        });
-        return;
-      // "color" has no canonical reset target — fall through.
-    }
-  }
-
-  const tabHasReset = safeActive !== "color";
-
   return (
     <>
       <EditableLayerName layer={layer} />
-      <PropertyPanelHost
-        onReset={tabHasReset ? resetActiveTab : undefined}
-      >
+      <PropertyPanelHost>
         <div className="px-1 pb-3">
           {safeActive === "color" && <ColorPanel inline />}
           {safeActive === "stroke" && <StrokePanel inline />}
@@ -794,50 +714,9 @@ function ShapeEditPanel({ layer }: { layer: ShapeLayer }) {
 // Mixed values (runValue returns null) don't show the dot — keeps
 // the signal clean. Documented as a known limitation.
 //
-// Reset semantics (per Q2 — just-this-tab scope, never the layer):
-//   • Style   → no reset (no canonical state)
-//   • Font    → no reset (tab routes to drawer)
-//   • Format  → align "left" + fontWeight 400 + fontStyle normal +
-//                decoration none
-//   • Color   → no reset
-//   • Stroke  → width 0 (no-op)
-//   • Highlight → opacity 0 (no-op)
-//   • Spacing → letterSpacing 0 + lineHeight 1.2
-//   • Position → translate/rotate/scale to identity (Z-order kept)
-//   • Shadow  → opacity 0 (no-op)
-//   • Opacity → 1
-//   • Erase   → no reset
-
-const TEXT_DEFAULT_HIGHLIGHT: Highlight = {
-  color: "#FFEB3B",
-  opacity: 0,
-};
-
-const TEXT_DEFAULT_SHADOW: Shadow = {
-  color: "#000000",
-  opacity: 0,
-  blur: 8,
-  offsetX: 4,
-  offsetY: 4,
-};
-
-const TEXT_DEFAULT_GRADIENT: GradientFill = {
-  enabled: false,
-  angle: 0,
-  stops: [
-    { position: 0, color: "#FFFFFF" },
-    { position: 1, color: "#1B5B50" },
-  ],
-};
-
-const TEXT_DEFAULT_TEXTURE: TextureFill = {
-  enabled: false,
-  src: "",
-  scale: 1,
-  offsetX: 0,
-  offsetY: 0,
-  rotation: 0,
-};
+// (The per-tab ↻ Reset button was removed in May 2026; universal
+// Undo/Redo from EditorTopBar covers this — no dedicated reset
+// targets per tab anymore.)
 
 // IDs of tabs whose body actually mounts inline. Font and Erase
 // route to the legacy drawer/takeover so they don't appear here.
@@ -952,7 +831,6 @@ function TextEditPanel({
   layer: TextLayer;
   onOpenPanel: (panel: Exclude<ActivePanel, null>) => void;
 }) {
-  const { dispatch } = useEditor();
   const tool = useTextTool();
   const [activeTab, setActiveTab] = useState<TextTabId>("style");
 
@@ -998,87 +876,10 @@ function TextEditPanel({
   }
   if (layer.opacity < 1) editedIds.add("opacity");
 
-  function resetActiveTab() {
-    switch (activeTab) {
-      case "format":
-        tool.patchStyling({ align: "left" });
-        tool.patchRuns({
-          fontWeight: 400,
-          fontStyle: "normal",
-          decoration: "none",
-        });
-        return;
-      case "stroke":
-        tool.patchRuns({ stroke: SHAPE_DEFAULT_STROKE });
-        return;
-      case "highlight":
-        tool.patchRuns({ highlight: TEXT_DEFAULT_HIGHLIGHT });
-        return;
-      case "background":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { background: defaultTextBackground() } as Partial<AnyLayer>,
-        });
-        return;
-      case "shadow":
-        tool.patchRuns({ shadow: TEXT_DEFAULT_SHADOW });
-        return;
-      case "gradient":
-        tool.patchRuns({ gradient: TEXT_DEFAULT_GRADIENT });
-        return;
-      case "texture":
-        tool.patchRuns({ texture: TEXT_DEFAULT_TEXTURE });
-        return;
-      case "spacing":
-        tool.patchStyling({ letterSpacing: 0, lineHeight: 1.2 });
-        return;
-      case "bend":
-        tool.patchStyling({ bend: { amount: 0 } });
-        return;
-      case "perspective":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { perspective: null } as Partial<AnyLayer>,
-        });
-        return;
-      case "position":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: {
-            transform: {
-              ...layer.transform,
-              x: 0,
-              y: 0,
-              scaleX: 1,
-              scaleY: 1,
-              rotation: 0,
-              skewX: 0,
-              skewY: 0,
-            },
-          } as Partial<AnyLayer>,
-        });
-        return;
-      case "opacity":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { opacity: 1 } as Partial<AnyLayer>,
-        });
-        return;
-      // "style" and "color" have no canonical reset target.
-    }
-  }
-
-  const tabsWithoutReset: TextTabId[] = ["style", "color"];
-  const showReset = !tabsWithoutReset.includes(activeTab);
-
   return (
     <>
       <EditableLayerName layer={layer} />
-      <PropertyPanelHost onReset={showReset ? resetActiveTab : undefined}>
+      <PropertyPanelHost>
         <div className="px-1 pb-3">
           {activeTab === "style" && <StylePanel />}
           {activeTab === "font" && <FontPanel inline />}
@@ -1153,14 +954,9 @@ function TextEditPanel({
 //   • Opacity     → layer.opacity < 1
 //   • Replace     → never (action, not state)
 //
-// Reset semantics — only the four inline tabs have reset. Launcher
-// tabs (Crop / Effects / Replace) hide the reset button because their
-// bodies live inside the takeover and have their own reset UI there.
-//   • Stroke      → set to IMAGE_DEFAULT_STROKE (matches the stroke
-//                   panel's own DEFAULT_STROKE)
-//   • Position    → reset transform to identity (mirrors text/shape)
-//   • Perspective → set to null
-//   • Opacity     → set to 1
+// (The per-tab ↻ Reset button was removed in May 2026; universal
+// Undo/Redo from EditorTopBar covers this — no dedicated reset
+// targets per tab anymore.)
 //
 // activeTab default is "stroke" — the first inline tab. When the user
 // taps a launcher tab, activeTab is NOT updated (matches the text
@@ -1214,12 +1010,6 @@ const IMAGE_TABS: TabStripItem[] = [
   },
 ];
 
-const IMAGE_DEFAULT_STROKE: Stroke = {
-  color: "#000000",
-  width: 0,
-  opacity: 1,
-};
-
 function ImageEditPanel({
   layer,
   onOpenPanel,
@@ -1231,7 +1021,6 @@ function ImageEditPanel({
   onOpenLayerCrop: () => void;
   onStub: (label: string) => void;
 }) {
-  const { dispatch } = useEditor();
   const [activeTab, setActiveTab] = useState<ImageTabId>("stroke");
 
   const editedIds = new Set<string>();
@@ -1250,60 +1039,10 @@ function ImageEditPanel({
   if (layer.perspective !== null) editedIds.add("perspective");
   if (layer.opacity < 1) editedIds.add("opacity");
 
-  function resetActiveTab() {
-    switch (activeTab) {
-      case "stroke":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { stroke: IMAGE_DEFAULT_STROKE } as Partial<AnyLayer>,
-        });
-        return;
-      case "position":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: {
-            transform: {
-              ...layer.transform,
-              x: 0,
-              y: 0,
-              scaleX: 1,
-              scaleY: 1,
-              rotation: 0,
-              skewX: 0,
-              skewY: 0,
-            },
-          } as Partial<AnyLayer>,
-        });
-        return;
-      case "perspective":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { perspective: null } as Partial<AnyLayer>,
-        });
-        return;
-      case "opacity":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { opacity: 1 } as Partial<AnyLayer>,
-        });
-        return;
-      // crop / effects / replace are launcher tabs — never have
-      // an inline body, so this reset path is never reached for
-      // them (showReset gates on the active tab's kind).
-    }
-  }
-
-  const launcherTabs: ImageTabId[] = ["crop", "effects", "replace"];
-  const showReset = !launcherTabs.includes(activeTab);
-
   return (
     <>
       <EditableLayerName layer={layer} />
-      <PropertyPanelHost onReset={showReset ? resetActiveTab : undefined}>
+      <PropertyPanelHost>
         <div className="px-1 pb-3">
           {activeTab === "stroke" && <ImageStrokePanel inline />}
           {activeTab === "position" && <PositionPanel inline />}
@@ -1379,46 +1118,15 @@ const STICKER_TABS: TabStripItem[] = [
 ];
 
 function StickerEditPanel({ layer }: { layer: StickerLayer }) {
-  const { dispatch } = useEditor();
   const [activeTab, setActiveTab] = useState<StickerTabId>("position");
 
   const editedIds = new Set<string>();
   if (layer.opacity < 1) editedIds.add("opacity");
 
-  function resetActiveTab() {
-    switch (activeTab) {
-      case "position":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: {
-            transform: {
-              ...layer.transform,
-              x: 0,
-              y: 0,
-              scaleX: 1,
-              scaleY: 1,
-              rotation: 0,
-              skewX: 0,
-              skewY: 0,
-            },
-          } as Partial<AnyLayer>,
-        });
-        return;
-      case "opacity":
-        dispatch({
-          type: "UPDATE_LAYER",
-          id: layer.id,
-          patch: { opacity: 1 } as Partial<AnyLayer>,
-        });
-        return;
-    }
-  }
-
   return (
     <>
       <EditableLayerName layer={layer} />
-      <PropertyPanelHost onReset={resetActiveTab}>
+      <PropertyPanelHost>
         <div className="px-1 pb-3">
           {activeTab === "position" && <PositionPanel inline />}
           {activeTab === "opacity" && <OpacityPanel inline />}
