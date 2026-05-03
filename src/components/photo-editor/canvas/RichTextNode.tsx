@@ -52,6 +52,7 @@ import { getTextureMap } from "@/lib/photo-editor/rich-text/textures";
 import {
   isIdentityPerspective,
   renderPerspectiveImage,
+  expandPerspectiveCorners,
 } from "@/lib/photo-editor/canvas/perspective-render";
 import type { Transform } from "@/lib/photo-editor/types";
 import type { TextLayer } from "@/lib/photo-editor/types";
@@ -318,10 +319,20 @@ export function RichTextNode({
   // anchors where the layer top-left sits on the stage — no offsetX /
   // offsetY needed on the shape.
   //
-  // KNOWN LIMITATION: bend's apex outside the layer-local bbox + the
-  // background rect's padding outside that bbox both clip during the
-  // perspective phase. We pull from (anchorX, anchorY, W, H) — anything
-  // beyond is not warped. Documented in BATCH-D2C-NOTES.md gotchas.
+  // The expanded extent (bend apex above the baseline, bg padding
+  // outside the aligned glyph rect) is included in the warp by:
+  //   • Sampling from the full painted sub-region of the bitmap
+  //     ((anchorX + extent.minX, anchorY + extent.minY) → (..maxX, ..maxY))
+  //     instead of the flat (anchorX, anchorY, W, H) sub-region.
+  //   • Extrapolating the destination corners via expandPerspectiveCorners,
+  //     which evaluates the bilinear corner mapping at u/v outside
+  //     [0,1] to find where the expanded source rect's corners land in
+  //     destination space.
+  //
+  // This previously caused a clipping bug at the warp boundary: bent
+  // glyphs and bg padding outside (0,0)→(W,H) were dropped during the
+  // perspective phase. Fixed May 2026 alongside the matching export
+  // pipeline change in src/lib/photo-editor/export/render.ts.
   const corners = layer.perspective!;
   return (
     <KonvaShape
@@ -343,15 +354,16 @@ export function RichTextNode({
       sceneFunc={(konvaCtx) => {
         const ctx = (konvaCtx as unknown as { _context: CanvasRenderingContext2D })
           ._context;
+        const expanded = expandPerspectiveCorners(corners, W, H, extent);
         renderPerspectiveImage(
           ctx,
           offscreen,
-          W,
-          H,
-          corners,
+          extent.maxX - extent.minX,
+          extent.maxY - extent.minY,
+          expanded,
           undefined,
-          anchorX,
-          anchorY,
+          anchorX + extent.minX,
+          anchorY + extent.minY,
         );
       }}
       {...sharedHandlers}
