@@ -33,7 +33,7 @@ import type {
   StickerLayer,
   TextLayer,
 } from "../types";
-import { layoutText, renderTextToCanvas } from "../rich-text/engine";
+import { layoutText, paintTextBackground, renderTextToCanvas } from "../rich-text/engine";
 import { applyEraseStrokes } from "../canvas/erase-render";
 import {
   findShape,
@@ -278,21 +278,48 @@ function paintTextLayer(
   layer: TextLayer,
 ): void {
   const layout = layoutText(layer);
-  // Mirror the on-stage extent calc in RichTextNode: take the max of
-  // `layout.width` and the aligned glyph rect (`layout.bounds`) so
-  // centred / right-aligned / justify-multi-line glyphs that sit past
-  // `layout.width` are not clipped on export. Bend / text-background
-  // padding are handled in the on-stage path; the export pipeline
-  // doesn't render those underlays, so we only need the alignment fix
-  // here. Layer-local minX stays at 0 — the bctx.translate(PAD, PAD)
-  // and the ctx.drawImage offset below both rely on it.
-  const contentMaxX = Math.max(
+
+  // Mirror the on-stage extent calc in RichTextNode so the off-screen
+  // bitmap covers everything that paints into it:
+  //   • Wrap-box width (layer.width) → represents the dotted selection
+  //     frame area; left at 0 so layer-local origin stays positive when
+  //     no other element pushes it negative.
+  //   • Aligned glyph rect (layout.bounds) → catches centred / right /
+  //     justify-multi-line glyphs that sit past layout.width.
+  //   • Text background → can pull minX/minY negative under any
+  //     alignment (because the rect is at layout.bounds.x − widthDelta,
+  //     and bounds.x is already 0 under left alignment so the padding
+  //     pulls it left of layer-local 0).
+  //
+  // The bitmap is sized to fit the union of those extents plus
+  // RENDER_PADDING on every side. anchorX / anchorY shift painting so
+  // layer-local (0, 0) lands inside the bitmap regardless of how far
+  // negative minX / minY went. The drawImage offset below uses the
+  // same anchors so the visible content still lines up with the
+  // layer's transform.x / transform.y on the export canvas.
+  let minX = 0;
+  let minY = 0;
+  let maxX = Math.max(
     layout.width,
     layout.bounds.x + layout.bounds.width,
   );
-  const contentMaxY = Math.max(layout.height, layout.bounds.height);
-  const w = Math.max(1, Math.ceil(contentMaxX + RENDER_PADDING * 2));
-  const h = Math.max(1, Math.ceil(contentMaxY + RENDER_PADDING * 2));
+  let maxY = Math.max(layout.height, layout.bounds.height);
+
+  const bg = layer.background;
+  if (bg && bg.opacity > 0) {
+    minX = Math.min(minX, layout.bounds.x - bg.widthDelta);
+    minY = Math.min(minY, -bg.heightDelta);
+    maxX = Math.max(
+      maxX,
+      layout.bounds.x + layout.bounds.width + bg.widthDelta,
+    );
+    maxY = Math.max(maxY, layout.height + bg.heightDelta);
+  }
+
+  const w = Math.max(1, Math.ceil(maxX - minX + RENDER_PADDING * 2));
+  const h = Math.max(1, Math.ceil(maxY - minY + RENDER_PADDING * 2));
+  const anchorX = RENDER_PADDING - minX;
+  const anchorY = RENDER_PADDING - minY;
 
   // Render into a per-layer off-screen so the destination-out erase
   // pass only affects this layer's pixels and not anything painted
@@ -307,18 +334,24 @@ function paintTextLayer(
   if (!bctx) return;
 
   bctx.save();
-  bctx.translate(RENDER_PADDING, RENDER_PADDING);
+  bctx.translate(anchorX, anchorY);
+  // Background underlay first so glyphs sit on top. Mirrors the
+  // on-stage RichTextNode paint order. Was previously skipped on
+  // export (May 2026 fix) which meant any text-layer background was
+  // invisible in PNG / JPEG / PDF output.
+  paintTextBackground(bctx, layer, layout);
   renderTextToCanvas(bctx, layer, layout);
   if (layer.erase.length > 0) {
     applyEraseStrokes(bctx, layer.erase);
   }
   bctx.restore();
 
-  // Draw the bitmap onto the export canvas at the layer's local origin.
-  // Subtract RENDER_PADDING so the visible text aligns with the layer's
-  // transform.x / transform.y (matching RichTextNode's offsetX/offsetY
-  // behaviour).
-  ctx.drawImage(bitmap, -RENDER_PADDING, -RENDER_PADDING);
+  // Draw the bitmap onto the export canvas so layer-local (0, 0)
+  // lands at the export canvas's current origin (which the caller
+  // has already translated to the layer's transform.x / .y). The
+  // anchor offsets shift the bitmap left/up by however much the
+  // background / alignment pushed minX / minY into negative space.
+  ctx.drawImage(bitmap, -anchorX, -anchorY);
 }
 
 // ─── Image ──────────────────────────────────────────────────────
