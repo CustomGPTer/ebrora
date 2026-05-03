@@ -42,7 +42,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Image as KonvaImage, Shape as KonvaShape } from "react-konva";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
-import { layoutText, renderTextToCanvas } from "@/lib/photo-editor/rich-text/engine";
+import { layoutText, paintTextBackground, renderTextToCanvas } from "@/lib/photo-editor/rich-text/engine";
 import { applyEraseStrokes } from "@/lib/photo-editor/canvas/erase-render";
 import {
   computeBentBounds,
@@ -155,9 +155,16 @@ export function RichTextNode({
 
     const bg = layer.background;
     if (bg && bg.opacity > 0) {
-      minX = Math.min(minX, -bg.widthDelta);
+      // Track alignment: bounds.x is the leftmost glyph offset under
+      // center / right / justify, bounds.width is the rendered glyph
+      // width. The rect must include both edges with padding so the
+      // off-screen bitmap is sized to fit the full background extent.
+      minX = Math.min(minX, layout.bounds.x - bg.widthDelta);
       minY = Math.min(minY, -bg.heightDelta);
-      maxX = Math.max(maxX, layout.width + bg.widthDelta);
+      maxX = Math.max(
+        maxX,
+        layout.bounds.x + layout.bounds.width + bg.widthDelta,
+      );
       maxY = Math.max(maxY, layout.height + bg.heightDelta);
     }
 
@@ -202,28 +209,12 @@ export function RichTextNode({
     ctx.translate(anchorX, anchorY);
 
     // Background rect underlay — paints first so glyphs sit on top.
-    // Sized to (layout.width × layout.height) expanded by the deltas
-    // on each side. Round corners are layer-level (one rounded rect
-    // around the whole text), not glyph-accurate (decision per Q3 in
-    // D2a notes). When bend is active, this rect is around the FLAT
-    // layout — bent glyphs may extend outside the rect at the apex.
-    const bg = layer.background;
-    if (bg && bg.opacity > 0) {
-      const x = -bg.widthDelta;
-      const y = -bg.heightDelta;
-      const w = layout.width + bg.widthDelta * 2;
-      const h = layout.height + bg.heightDelta * 2;
-      const rad = Math.max(
-        0,
-        Math.min(bg.roundCorner, Math.min(w, h) / 2)
-      );
-      ctx.save();
-      ctx.globalAlpha = clamp01Local(bg.opacity);
-      ctx.fillStyle = bg.color;
-      paintRoundedRect(ctx, x, y, w, h, rad);
-      ctx.fill();
-      ctx.restore();
-    }
+    // Sized to the aligned glyph rect (layout.bounds) expanded by the
+    // padding deltas, so the rect tracks center / right / justify
+    // alignment instead of staying glued to the left of the wrap box.
+    // When bend is active, this rect is around the FLAT layout — bent
+    // glyphs may extend outside the rect at the apex (Q3 decision).
+    paintTextBackground(ctx, layer, layout);
 
     renderTextToCanvas(ctx, layer, layout, { textures: getTextureMap() });
     // Erase pass — destination-out paint of every stroke in the layer's
@@ -376,42 +367,4 @@ function isAdditive(e: KonvaEventObject<MouseEvent | TouchEvent>): boolean {
   // long-press for context menu.
   if ("touches" in evt) return false;
   return evt.metaKey || evt.ctrlKey || evt.shiftKey;
-}
-
-/** Path a rounded rectangle. Falls back to ctx.roundRect when available
- *  (Chromium / iOS 16+); otherwise hand-paths arc corners. Doesn't fill
- *  or stroke — caller picks the paint operation. */
-function paintRoundedRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number
-): void {
-  if (typeof (ctx as unknown as { roundRect?: unknown }).roundRect === "function") {
-    ctx.beginPath();
-    (ctx as CanvasRenderingContext2D & {
-      roundRect(x: number, y: number, w: number, h: number, r: number): void;
-    }).roundRect(x, y, w, h, r);
-    return;
-  }
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.arcTo(x + w, y, x + w, y + r, r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-  ctx.lineTo(x + r, y + h);
-  ctx.arcTo(x, y + h, x, y + h - r, r);
-  ctx.lineTo(x, y + r);
-  ctx.arcTo(x, y, x + r, y, r);
-  ctx.closePath();
-}
-
-function clamp01Local(n: number): number {
-  if (!Number.isFinite(n)) return 0;
-  if (n < 0) return 0;
-  if (n > 1) return 1;
-  return n;
 }
