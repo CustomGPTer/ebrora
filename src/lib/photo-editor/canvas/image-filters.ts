@@ -74,3 +74,38 @@ export const FILTER_EFFECT_PRESETS: ReadonlyArray<{
   { id: "sepia", label: "Sepia" },
   { id: "invert", label: "Invert" },
 ];
+
+/** Build a CSS filter-chain string from a filter spec, suitable for
+ *  assignment to a `CanvasRenderingContext2D.filter`. Returns `null`
+ *  when the spec produces no filters — caller can skip the offscreen
+ *  bake entirely.
+ *
+ *  The math mirrors how `ImageNode`'s perspective source canvas builds
+ *  its filter (and used to inline this same chain). CSS filters are a
+ *  close-enough approximation of Konva's flat-path filter chain — the
+ *  two aren't pixel-identical (CSS `brightness(...)` is multiplicative,
+ *  Konva's `Brighten` is additive, etc.), but they match well enough
+ *  for typical use, which is the same trade-off the on-stage perspective
+ *  path already accepts.
+ *
+ *  Used by:
+ *    • `ImageNode` perspective source canvas (on-stage, was inlined
+ *      pre-May-2026; refactored to call this helper).
+ *    • Export pipeline (`paintBackground` photo case + `paintImageLayer`)
+ *      so background and image filters survive PNG / JPEG / PDF export
+ *      and the Save & Share preview matches the canvas. */
+export function buildCssFilterString(spec: ImageFilterSpec): string | null {
+  const parts: string[] = [];
+  const a = spec.adjust;
+  // Brightness folds in exposure at half-weight, mirroring the Konva
+  // attribute mapping in `applyImageFilterAttrs` above.
+  const bri = (a.brightness + a.exposure / 2) / 100;
+  if (bri !== 0) parts.push(`brightness(${1 + bri})`);
+  if (a.contrast !== 0) parts.push(`contrast(${1 + a.contrast / 100})`);
+  if (a.saturation !== 0) parts.push(`saturate(${1 + a.saturation / 100})`);
+  if (spec.effect === "mono") parts.push("grayscale(1)");
+  else if (spec.effect === "sepia") parts.push("sepia(1)");
+  else if (spec.effect === "invert") parts.push("invert(1)");
+  if (spec.blur.radius > 0) parts.push(`blur(${spec.blur.radius}px)`);
+  return parts.length > 0 ? parts.join(" ") : null;
+}
