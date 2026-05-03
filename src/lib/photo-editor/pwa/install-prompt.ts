@@ -106,3 +106,61 @@ export function useInstallPrompt(): {
 
   return { canInstall, install };
 }
+
+/** React hook — returns true when the page is running as an installed
+ *  PWA (standalone display mode). Used to hide install CTAs once the
+ *  user is already in the app.
+ *
+ *  Detection paths:
+ *    1. `matchMedia('(display-mode: standalone)')` — modern Chromium /
+ *       Firefox / Safari 17+. The matchMedia object also fires change
+ *       events when the display mode flips (e.g. user installs while
+ *       the page is open), which we listen to so the banner disappears
+ *       without a refresh.
+ *    2. `navigator.standalone` — legacy iOS Safari. Read once on mount;
+ *       iOS doesn't change this value during a page session.
+ *
+ *  Mobile-fixes batch 2 (May 2026) — issue 5. The PWA install banner
+ *  on the EmptyState home view shows whenever `canInstall` is true AND
+ *  this hook returns false.
+ */
+export function useIsStandaloneMode(): boolean {
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const checkStandalone = () => {
+      const mq = window.matchMedia?.("(display-mode: standalone)");
+      const matches = mq?.matches === true;
+      // iOS Safari legacy property.
+      const iosStandalone =
+        typeof (navigator as { standalone?: boolean }).standalone ===
+          "boolean" &&
+        (navigator as { standalone?: boolean }).standalone === true;
+      setIsStandalone(matches || iosStandalone);
+    };
+
+    checkStandalone();
+
+    const mq = window.matchMedia?.("(display-mode: standalone)");
+    if (!mq) return;
+    const handler = () => checkStandalone();
+    // addEventListener is the modern API; older Safari needs addListener.
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", handler);
+      return () => mq.removeEventListener("change", handler);
+    }
+    // Legacy fallback for older browsers — addListener / removeListener
+    // were deprecated in 2019 but still need to be supported on iOS 13.
+    type LegacyMQL = MediaQueryList & {
+      addListener: (cb: (ev: MediaQueryListEvent) => void) => void;
+      removeListener: (cb: (ev: MediaQueryListEvent) => void) => void;
+    };
+    const legacyMq = mq as LegacyMQL;
+    legacyMq.addListener(handler);
+    return () => legacyMq.removeListener(handler);
+  }, []);
+
+  return isStandalone;
+}
