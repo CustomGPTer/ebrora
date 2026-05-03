@@ -49,7 +49,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Palette, Pipette } from "lucide-react";
 import { useCanvasPicker } from "../context/CanvasPickerContext";
-import { ColorPickerModal } from "./ColorPickerModal";
+import { ColorPickerModal } from "@/components/photo-editor/colour/ColorPickerModal";
 import { Dialog, DialogCancelButton, DialogApplyButton } from "../tools/Dialog";
 import { STANDARD_PALETTE } from "@/lib/photo-editor/colour/swatch-palette";
 import {
