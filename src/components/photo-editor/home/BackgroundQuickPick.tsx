@@ -37,9 +37,10 @@
 
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { ChevronDown, Palette } from "lucide-react";
 import { createBlankProject } from "@/lib/photo-editor/canvas/state";
+import { ColorPickerModal } from "@/components/photo-editor/colour/ColorPickerModal";
 import type {
   Background,
   GradientFill,
@@ -105,9 +106,18 @@ interface BackgroundQuickPickProps {
 export function BackgroundQuickPick({
   onBackgroundChosen,
 }: BackgroundQuickPickProps) {
-  const colorInputRef = useRef<HTMLInputElement>(null);
   const patternId = useId();
   const [expanded, setExpanded] = useState(false);
+  // ── Custom-colour picker state ──────────────────────────────────
+  // The home screen has no canvas behind the picker yet (the user
+  // hasn't started a project), so onPreview is a no-op — we just
+  // remember the dragged colour and start the project on commit. The
+  // initial colour seeds the picker the first time it opens; on
+  // subsequent opens we re-seed from whatever the user last chose so
+  // the dialog feels stateful within a session.
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerInitial, setPickerInitial] = useState("#3B82F6");
+  const [pickerCurrent, setPickerCurrent] = useState("#3B82F6");
 
   function startWith(background: Background, name: string) {
     const project = createBlankProject({
@@ -139,10 +149,13 @@ export function BackgroundQuickPick({
           WebkitOverflowScrolling: "touch",
         }}
       >
-        {/* Custom colour — opens OS-native colour picker ──────── */}
+        {/* Custom colour — opens the app's ColorPickerModal ──── */}
         <button
           type="button"
-          onClick={() => colorInputRef.current?.click()}
+          onClick={() => {
+            setPickerInitial(pickerCurrent);
+            setPickerOpen(true);
+          }}
           aria-label="Pick a custom colour"
           className="flex-none rounded-full inline-flex items-center justify-center transition-shadow"
           style={{
@@ -319,19 +332,21 @@ export function BackgroundQuickPick({
         </div>
       )}
 
-      {/* Hidden colour input — fires on `change` after the OS picker
-          confirms. Resetting `.value = ""` is unnecessary because the
-          user can re-pick the same colour without retrigger needs. */}
-      <input
-        ref={colorInputRef}
-        type="color"
-        className="hidden"
-        aria-hidden
-        onChange={(e) => {
-          const color = e.target.value;
-          if (!color) return;
-          startWith({ kind: "solid", color }, "Custom colour canvas");
+      {/* App's full-screen colour picker — replaces the previous
+          hidden <input type="color"> that opened the OS-native picker.
+          Live preview is a no-op here because the home screen has no
+          canvas behind the modal yet; commit starts the project with
+          the chosen colour. */}
+      <ColorPickerModal
+        open={pickerOpen}
+        initial={pickerInitial}
+        onPreview={(hex) => setPickerCurrent(hex)}
+        onCommit={(hex) => {
+          setPickerCurrent(hex);
+          setPickerOpen(false);
+          startWith({ kind: "solid", color: hex }, "Custom colour canvas");
         }}
+        onCancel={() => setPickerOpen(false)}
       />
     </section>
   );
