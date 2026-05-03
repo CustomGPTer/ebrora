@@ -34,6 +34,15 @@ import type {
   TextLayer,
 } from "../types";
 import { layoutText, paintTextBackground, renderTextToCanvas } from "../rich-text/engine";
+import {
+  computeBentBounds,
+  createBendContext,
+} from "../rich-text/bend";
+import {
+  expandPerspectiveCorners,
+  isIdentityPerspective,
+  renderPerspectiveImage,
+} from "../canvas/perspective-render";
 import { applyEraseStrokes } from "../canvas/erase-render";
 import {
   findShape,
@@ -279,31 +288,48 @@ function paintTextLayer(
 ): void {
   const layout = layoutText(layer);
 
-  // Mirror the on-stage extent calc in RichTextNode so the off-screen
-  // bitmap covers everything that paints into it:
-  //   • Wrap-box width (layer.width) → represents the dotted selection
-  //     frame area; left at 0 so layer-local origin stays positive when
-  //     no other element pushes it negative.
-  //   • Aligned glyph rect (layout.bounds) → catches centred / right /
-  //     justify-multi-line glyphs that sit past layout.width.
-  //   • Text background → can pull minX/minY negative under any
-  //     alignment (because the rect is at layout.bounds.x − widthDelta,
-  //     and bounds.x is already 0 under left alignment so the padding
-  //     pulls it left of layer-local 0).
+  // Mirror RichTextNode's extent calc so the off-screen bitmap covers
+  // everything that paints into it. Three sources of overflow past the
+  // flat (0, 0)→(layout.width, layout.height) bbox:
+  //   • Wrap-box width (layer.width) — represents the dotted selection
+  //     frame area. Centre / right alignment puts glyphs inside this box.
+  //   • Aligned glyph rect (layout.bounds) — under center / right /
+  //     justify alignment the leftmost glyph offset (bounds.x) can be
+  //     negative; under justify-multi-line the rendered width can exceed
+  //     layout.width.
+  //   • Bend's bent-bounds — bent glyphs swing above (∩-shaped) or
+  //     below (∪-shaped) the flat baseline, ending well outside the flat
+  //     bbox at strong bend amounts. Without including this, bent text
+  //     clips on export — visible as missing or fragmented glyphs in PNG
+  //     / JPEG / PDF output (May 2026 bug fix).
+  //   • Text-background rect — sized to the aligned glyph rect plus
+  //     widthDelta / heightDelta padding; can pull edges past the flat
+  //     bbox on every side.
   //
-  // The bitmap is sized to fit the union of those extents plus
-  // RENDER_PADDING on every side. anchorX / anchorY shift painting so
-  // layer-local (0, 0) lands inside the bitmap regardless of how far
-  // negative minX / minY went. The drawImage offset below uses the
-  // same anchors so the visible content still lines up with the
-  // layer's transform.x / transform.y on the export canvas.
-  let minX = 0;
+  // We clamp minX to ≤ 0 so layer-local (0, 0) — the layer's anchor for
+  // transform.x / .y — always falls within (or to the right of) the
+  // bitmap left edge. anchorX / anchorY shift painting so that origin
+  // lands inside the bitmap regardless of how far negative the extent
+  // pushes it.
+  const alignedMinX = layout.bounds.x;
+  const alignedMaxX = layout.bounds.x + layout.bounds.width;
+
+  let minX = Math.min(0, alignedMinX);
   let minY = 0;
-  let maxX = Math.max(
-    layout.width,
-    layout.bounds.x + layout.bounds.width,
+  let maxX = Math.max(layout.width, alignedMaxX, layer.width);
+  let maxY = layout.height;
+
+  const bend = createBendContext(
+    layer.styling.bend?.amount ?? 0,
+    layer.width,
   );
-  let maxY = Math.max(layout.height, layout.bounds.height);
+  if (bend) {
+    const b = computeBentBounds(bend, layout);
+    minX = Math.min(minX, b.minX);
+    minY = Math.min(minY, b.minY);
+    maxX = Math.max(maxX, b.maxX);
+    maxY = Math.max(maxY, b.maxY);
+  }
 
   const bg = layer.background;
   if (bg && bg.opacity > 0) {
@@ -316,8 +342,14 @@ function paintTextLayer(
     maxY = Math.max(maxY, layout.height + bg.heightDelta);
   }
 
-  const w = Math.max(1, Math.ceil(maxX - minX + RENDER_PADDING * 2));
-  const h = Math.max(1, Math.ceil(maxY - minY + RENDER_PADDING * 2));
+  const logicalW = Math.max(
+    1,
+    Math.ceil(maxX - minX + RENDER_PADDING * 2),
+  );
+  const logicalH = Math.max(
+    1,
+    Math.ceil(maxY - minY + RENDER_PADDING * 2),
+  );
   const anchorX = RENDER_PADDING - minX;
   const anchorY = RENDER_PADDING - minY;
 
@@ -328,17 +360,15 @@ function paintTextLayer(
   // layers — the on-stage code avoids this by rendering text into its
   // own RichTextNode bitmap, and we mirror that.)
   const bitmap = document.createElement("canvas");
-  bitmap.width = w;
-  bitmap.height = h;
+  bitmap.width = logicalW;
+  bitmap.height = logicalH;
   const bctx = bitmap.getContext("2d");
   if (!bctx) return;
 
   bctx.save();
   bctx.translate(anchorX, anchorY);
   // Background underlay first so glyphs sit on top. Mirrors the
-  // on-stage RichTextNode paint order. Was previously skipped on
-  // export (May 2026 fix) which meant any text-layer background was
-  // invisible in PNG / JPEG / PDF output.
+  // on-stage RichTextNode paint order.
   paintTextBackground(bctx, layer, layout);
   renderTextToCanvas(bctx, layer, layout);
   if (layer.erase.length > 0) {
@@ -346,12 +376,46 @@ function paintTextLayer(
   }
   bctx.restore();
 
-  // Draw the bitmap onto the export canvas so layer-local (0, 0)
-  // lands at the export canvas's current origin (which the caller
-  // has already translated to the layer's transform.x / .y). The
-  // anchor offsets shift the bitmap left/up by however much the
-  // background / alignment pushed minX / minY into negative space.
-  ctx.drawImage(bitmap, -anchorX, -anchorY);
+  // Decide whether to draw flat or warp through perspective. Identity
+  // perspective short-circuits to the flat path so we don't pay the
+  // mesh-warp cost for a no-op. The flat path also covers the bend-
+  // only case: bend is already baked into the bitmap, so drawImage
+  // alone produces the right result.
+  const W = layout.width;
+  const H = layout.height;
+  const usePerspective =
+    layer.perspective !== null &&
+    !isIdentityPerspective(layer.perspective, W, H);
+
+  if (!usePerspective) {
+    // Flat path — draw the bitmap so layer-local (0, 0) lands at the
+    // export canvas's current origin (which the caller has already
+    // translated to the layer's transform.x / .y). The anchor offsets
+    // shift the bitmap left / up by however much the extent pushed
+    // minX / minY into negative space.
+    ctx.drawImage(bitmap, -anchorX, -anchorY);
+    return;
+  }
+
+  // Perspective path — expand the source rect AND the destination
+  // corners so the warp covers the full painted extent (bent apex,
+  // bg padding, alignment overflow) instead of clipping at (0,0)→(W,H).
+  // Mirrors the on-stage RichTextNode perspective branch byte-for-byte
+  // so editor preview and export are pixel-identical (modulo native
+  // canvas vs Konva's filter chain rounding).
+  const corners = layer.perspective!;
+  const extent = { minX, minY, maxX, maxY };
+  const expanded = expandPerspectiveCorners(corners, W, H, extent);
+  renderPerspectiveImage(
+    ctx,
+    bitmap,
+    maxX - minX,
+    maxY - minY,
+    expanded,
+    undefined,
+    anchorX + minX,
+    anchorY + minY,
+  );
 }
 
 // ─── Image ──────────────────────────────────────────────────────
@@ -364,26 +428,61 @@ function paintImageLayer(
   const img = images.get(layer.src);
   if (!img) return; // Missing image — silent skip, same as on-stage.
 
-  if (layer.crop) {
-    // 9-arg drawImage variant — sub-region of the source rendered into
-    // the layer's display rect.
-    ctx.drawImage(
-      img,
-      layer.crop.x,
-      layer.crop.y,
-      layer.crop.width,
-      layer.crop.height,
-      0,
-      0,
-      layer.crop.width,
-      layer.crop.height,
-    );
-  } else {
-    ctx.drawImage(img, 0, 0, layer.naturalWidth, layer.naturalHeight);
+  // Display dimensions of the (possibly cropped) image. Used both as
+  // the un-warped paint rect and as the (W, H) input to the identity-
+  // perspective check.
+  const displayW = layer.crop ? layer.crop.width : layer.naturalWidth;
+  const displayH = layer.crop ? layer.crop.height : layer.naturalHeight;
+  const sourceX = layer.crop ? layer.crop.x : 0;
+  const sourceY = layer.crop ? layer.crop.y : 0;
+
+  const usePerspective =
+    layer.perspective !== null &&
+    !isIdentityPerspective(layer.perspective, displayW, displayH);
+
+  if (!usePerspective) {
+    if (layer.crop) {
+      // 9-arg drawImage variant — sub-region of the source rendered into
+      // the layer's display rect.
+      ctx.drawImage(
+        img,
+        layer.crop.x,
+        layer.crop.y,
+        layer.crop.width,
+        layer.crop.height,
+        0,
+        0,
+        layer.crop.width,
+        layer.crop.height,
+      );
+    } else {
+      ctx.drawImage(img, 0, 0, layer.naturalWidth, layer.naturalHeight);
+    }
+    return;
   }
-  // Perspective warp is documented as v1.1 — mirrors ImageNode.tsx
-  // which renders flat when layer.perspective is non-null. Skipped here
-  // intentionally.
+
+  // Perspective path — warp the (cropped) source rectangle onto the
+  // four destination corners. Mirrors ImageNode's KonvaShape sceneFunc
+  // call; the renderer's srcX / srcY / srcWidth / srcHeight params
+  // sample the crop sub-region directly so we don't need a pre-baked
+  // intermediate canvas for the crop case.
+  //
+  // KNOWN: per-layer image filters (adjust / filterEffect / blur) are
+  // baked into the source canvas on-stage but NOT here, because the
+  // export's flat path doesn't apply those filters either. Fixing
+  // filter parity is a separate scope — when it lands, the same
+  // CSS-filter-baked source canvas should feed BOTH the flat drawImage
+  // and this perspective renderPerspectiveImage call.
+  renderPerspectiveImage(
+    ctx,
+    img,
+    displayW,
+    displayH,
+    layer.perspective!,
+    undefined,
+    sourceX,
+    sourceY,
+  );
 }
 
 // ─── Sticker ────────────────────────────────────────────────────
