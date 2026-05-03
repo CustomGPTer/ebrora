@@ -54,17 +54,99 @@ export interface ShapeEntry {
 
 // ─── Geometric ──────────────────────────────────────────────────
 //
-// 18 entries. The handover lists rectangle / square / ellipse / circle
-// among them — those overlap with ShapeNode's built-in primitives, so we
-// don't ship them again here (they're available via the legacy stub
-// shape ids `rect`, `ellipse`, etc., and the panel can surface them
-// alongside the catalogue).
+// What's here: the six built-in primitives (square, rectangle, circle,
+// ellipse, triangle, line) leading the grid as they're the most-used
+// shapes; followed by a new right-angle triangle catalogue entry; then
+// the original 18 hand-authored entries (pentagon, hexagon, etc).
 //
-// What's here: pentagon / hexagon / octagon, the three star variants,
-// heart, diamond, parallelogram, trapezoid, ring, arc, half-circle,
-// pill, plus, cross, chevron-block, and rounded-rect.
+// The built-in primitive ids (`square`, `rect`, `circle`, `ellipse`,
+// `triangle`, `line`) appear here so they show up in the picker grid,
+// but ShapeNode still routes them through its primitive switch — the
+// `path` here is used only for the picker tile preview, not the
+// rendered layer. Right-triangle is catalogue-only (no primitive
+// equivalent), so its path is rendered for both preview and layer.
+//
+// Mobile-fixes batch 1 (May 2026): Jon noted these basics were
+// missing from the geometric tab. The earlier comment intentionally
+// excluded them in favour of "available via the legacy stub shape
+// ids" — that turned out to be a usability gap because the picker
+// is the discovery surface; nothing else in the editor exposes the
+// primitive ids.
 
 const GEOMETRIC: readonly ShapeEntry[] = [
+  // ── Basic primitives ──────────────────────────────────────────
+  {
+    id: "square",
+    label: "Square",
+    category: "geometric",
+    viewBox: "0 0 100 100",
+    // 96-pixel square, centred. Slight inset so the outline variant
+    // doesn't get clipped by the SVG bounding box.
+    path: "M2 2 L98 2 L98 98 L2 98 Z",
+    defaultSize: { width: 240, height: 240 },
+  },
+  {
+    id: "rect",
+    label: "Rectangle",
+    category: "geometric",
+    viewBox: "0 0 160 100",
+    // 1.6:1 rectangle for the preview; the runtime size honours
+    // defaultSize (320 × 200) so it lands on canvas as a wide rectangle
+    // rather than a square.
+    path: "M2 2 L158 2 L158 98 L2 98 Z",
+    defaultSize: { width: 320, height: 200 },
+  },
+  {
+    id: "circle",
+    label: "Circle",
+    category: "geometric",
+    viewBox: "0 0 100 100",
+    // Two-arc circle (standard SVG idiom — single-arc paths with start
+    // ≈ end can render as a hairline gap on some engines).
+    path: "M2 50 A48 48 0 1 1 98 50 A48 48 0 1 1 2 50 Z",
+    defaultSize: { width: 240, height: 240 },
+  },
+  {
+    id: "ellipse",
+    label: "Ellipse",
+    category: "geometric",
+    viewBox: "0 0 160 100",
+    path: "M2 50 A78 48 0 1 1 158 50 A78 48 0 1 1 2 50 Z",
+    defaultSize: { width: 320, height: 200 },
+  },
+  {
+    id: "triangle",
+    label: "Triangle",
+    category: "geometric",
+    viewBox: "0 0 100 100",
+    // Equilateral-looking isoceles, apex at top centre.
+    path: "M50 4 L96 92 L4 92 Z",
+    defaultSize: { width: 240, height: 240 },
+  },
+  {
+    id: "right-triangle",
+    label: "Right triangle",
+    category: "geometric",
+    viewBox: "0 0 100 100",
+    // Right angle at bottom-left, hypotenuse from top-left → bottom-right.
+    // No primitive equivalent; ShapeNode falls through to catalogue-svg
+    // rendering for this id.
+    path: "M4 4 L4 96 L96 96 Z",
+    defaultSize: { width: 240, height: 240 },
+  },
+  {
+    id: "line",
+    label: "Line",
+    category: "geometric",
+    viewBox: "0 0 100 12",
+    // Wide, short rectangle as the picker preview — matches how the
+    // primitive renderer paints a line layer (Konva.Line stroke at
+    // bbox-height thickness).
+    path: "M2 2 L98 2 L98 10 L2 10 Z",
+    defaultSize: { width: 320, height: 8 },
+  },
+
+  // ── Hand-authored geometric shapes (originals) ────────────────
   {
     id: "pentagon",
     label: "Pentagon",
