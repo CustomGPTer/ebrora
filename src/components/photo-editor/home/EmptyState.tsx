@@ -9,6 +9,7 @@
 //   │ Background (solid swatches + gradients)    │
 //   │ Gallery (large upload card)                │
 //   │ Style presets (4-card row — Batch F)       │
+//   │ Install app card (May 2026)                │
 //   │ Projects (3-col grid — Batch F)            │
 //   └────────────────────────────────────────────┘
 //
@@ -53,7 +54,7 @@ import {
   deleteDraft,
 } from "@/lib/photo-editor/saved-projects/draft";
 import { useInstallPrompt, useIsStandaloneMode } from "@/lib/photo-editor/pwa/install-prompt";
-import { PwaInstallBanner } from "./PwaInstallBanner";
+import { InstallAppCard } from "./InstallAppCard";
 import type { Project } from "@/lib/photo-editor/types";
 
 interface EmptyStateProps {
@@ -148,23 +149,26 @@ export function EmptyState({ onProjectLoaded }: EmptyStateProps) {
           onProjectReady={(project) => onProjectLoaded(project, null)}
         />
 
+        {/* ── Install-as-app card (May 2026) ──────────────────────
+            Replaces the prior sticky-bottom PwaInstallBanner. The
+            card is always visible (unless the page is running as a
+            standalone PWA) so users on browsers that don't fire
+            beforeinstallprompt — iOS Safari, Firefox, throttled
+            Chrome — still see a path to install. Tap fires the
+            captured browser prompt when available, otherwise opens
+            a modal with OS-tailored Add-to-Home-Screen steps. */}
+        <InstallAppCard
+          canInstall={canInstall}
+          isStandalone={isStandalone}
+          onInstall={install}
+        />
+
         <ProjectsGrid
           onProjectLoaded={(project, savedProjectId) =>
             onProjectLoaded(project, savedProjectId)
           }
         />
       </main>
-
-      {/* ── PWA install banner — issue 5 (mobile-fixes batch 2) ─────
-          Sticky-bottom CTA shown only when canInstall === true and the
-          page is not already running as an installed PWA. Tapping
-          fires the browser's captured install prompt in a single
-          gesture. */}
-      <PwaInstallBanner
-        canInstall={canInstall}
-        isStandalone={isStandalone}
-        onInstall={() => void install()}
-      />
 
       {/* ── Settings sheet (cog) ───────────────────────────────── */}
       <SettingsMenu
