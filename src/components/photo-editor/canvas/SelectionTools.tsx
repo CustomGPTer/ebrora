@@ -617,16 +617,34 @@ export function SelectionTools({
 
     // Drag deadzone — until the pointer has moved DRAG_DEADZONE_PX
     // from pointerdown, the layer holds still. On crossing we capture
-    // the offset so subsequent moves use a "hot started" pointer
-    // position (effective pointer at crossover == startClientX/Y →
-    // ratio = 1 → no perceived jump).
+    // an offset so subsequent moves use a "hot started" pointer
+    // position (effective pointer at crossover sits at the layer's
+    // actual dragged edge → ratio = 1 → no perceived jump).
+    //
+    // Important nuance for stretch (vs rotate / resize / wrap-width):
+    //   the stretch math computes
+    //     ratio = (effectivePointer − pivot) ⋅ axisDir / axisLength
+    //   where pivot is the OPPOSITE edge midpoint and axisLength is
+    //   |draggedEdge − pivot|. To get ratio = 1 at crossover, the
+    //   effective pointer at crossover must equal the DRAGGED EDGE
+    //   position, NOT the original startClient position. After Issue 6
+    //   pushed buttons outside the bbox for thin layers (line shapes
+    //   especially), startClient sits well past the dragged edge —
+    //   anchoring to startClient there causes ratio ≫ 1 immediately
+    //   when the deadzone clears, blowing up thin layers by a factor
+    //   of 10× or more. Anchoring to the dragged edge instead gives
+    //   ratio = 1 at crossover for any button position; subsequent
+    //   finger movement still tracks 1:1 because offset is constant
+    //   for the rest of the gesture.
     if (!s.active) {
       if (!pastDeadzone(e.clientX, e.clientY, s.startClientX, s.startClientY)) {
         return;
       }
       s.active = true;
-      s.offsetX = e.clientX - s.startClientX;
-      s.offsetY = e.clientY - s.startClientY;
+      const draggedEdgeX = s.pivotDom.x + s.axisDirDom.x * s.axisLengthDom;
+      const draggedEdgeY = s.pivotDom.y + s.axisDirDom.y * s.axisLengthDom;
+      s.offsetX = e.clientX - draggedEdgeX;
+      s.offsetY = e.clientY - draggedEdgeY;
     }
     const effectiveX = e.clientX - s.offsetX;
     const effectiveY = e.clientY - s.offsetY;
