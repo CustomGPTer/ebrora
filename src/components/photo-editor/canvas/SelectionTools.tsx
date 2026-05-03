@@ -521,7 +521,7 @@ export function SelectionTools({
     if (!node) return;
 
     // selfRect — layer's local-coord bounding box.
-    const selfRect = node.getClientRect({
+    let selfRect = node.getClientRect({
       skipTransform: true,
       skipShadow: true,
       skipStroke: true,
@@ -533,7 +533,30 @@ export function SelectionTools({
       selfRect.width <= 0 ||
       selfRect.height <= 0
     ) {
-      return;
+      // Fallback for layers whose underlying Konva node reports a
+      // zero-extent rect with skipStroke=true. The line shape is the
+      // archetype — Konva.Line with points={[0, h/2, w, h/2]} has
+      // selfRect.height = 0 because all geometry sits on a single
+      // Y line; the visible thickness comes from the stroke we
+      // explicitly skipped. The layer's own width / height fields
+      // describe the same bbox the user perceives, so use those.
+      // (Mirrors the same fallback in the `geom` useMemo above —
+      // without it the stretch / rotate handlers used to bail out
+      // entirely for line shapes after Issue 6 added their handles.)
+      const lw = (selectedLayer as { width?: number }).width;
+      const lh = (selectedLayer as { height?: number }).height;
+      if (
+        typeof lw === "number" &&
+        typeof lh === "number" &&
+        Number.isFinite(lw) &&
+        Number.isFinite(lh) &&
+        lw > 0 &&
+        lh > 0
+      ) {
+        selfRect = { x: 0, y: 0, width: lw, height: lh };
+      } else {
+        return;
+      }
     }
 
     // Local pivot (opposite edge midpoint) in selfRect-aware coords.
@@ -988,7 +1011,7 @@ export function SelectionTools({
     // find the local-coord centre we want to keep fixed during the
     // rotation. skipTransform so the rect is in pre-transform local
     // coords (we apply transform manually below).
-    const selfRect = node.getClientRect({
+    let selfRect = node.getClientRect({
       skipTransform: true,
       skipShadow: true,
       skipStroke: true,
@@ -1000,7 +1023,25 @@ export function SelectionTools({
       selfRect.width <= 0 ||
       selfRect.height <= 0
     ) {
-      return;
+      // Same fallback as onStretchPointerDown — see the long comment
+      // there. Konva.Line layers with horizontal points report
+      // zero-height selfRect when skipStroke is true; we use the
+      // layer's stored width / height instead so rotate works for
+      // line shapes too.
+      const lw = (selectedLayer as { width?: number }).width;
+      const lh = (selectedLayer as { height?: number }).height;
+      if (
+        typeof lw === "number" &&
+        typeof lh === "number" &&
+        Number.isFinite(lw) &&
+        Number.isFinite(lh) &&
+        lw > 0 &&
+        lh > 0
+      ) {
+        selfRect = { x: 0, y: 0, width: lw, height: lh };
+      } else {
+        return;
+      }
     }
 
     const localPivot = {
