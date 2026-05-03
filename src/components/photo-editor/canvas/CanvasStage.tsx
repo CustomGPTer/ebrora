@@ -1,11 +1,45 @@
 // src/components/photo-editor/canvas/CanvasStage.tsx
 //
-// The Konva Stage. Background sits in its own non-listening Layer; all
-// overlay layers (text / image / shape / sticker) plus the selection
-// transformer sit in a second Layer that *does* listen for hit-testing
-// so taps on layers select them.
+// The Konva Stage. Covers the entire grey "canvas area" container at
+// scale 1; viewport scale + rotation + translate live on a Konva.Group
+// inside instead of on the Stage itself. This lets layers extend past
+// the visible canvas frame and render in the surrounding grey area.
 //
-// Background rendering:
+// Architecture (mobile-fixes batch 2 — issue 7):
+//
+//   <Stage width=containerWidth height=containerHeight>           ← scale 1
+//     <Layer> background canvas (clipped to canvas rect) </Layer>
+//     <Layer ref=layerGroupLayerRef>                              ← interactive
+//       <Group ref=layerGroupRef>                                 ← viewport tx
+//         <LayerRenderer />     ← unclipped, full opacity
+//         <SelectionFrame />    ← konva selection ring
+//       </Group>
+//     </Layer>
+//     <Layer listening={false}> overhang dimmer (clipped to OUTSIDE canvas) </Layer>
+//     <Layer listening={false}> smart guides on top </Layer>
+//   </Stage>
+//
+// Why the layer-group ref: snap math (LayerRenderer.tsx) and selection
+// math (SelectionTools.tsx) both need project-pixel coordinates of the
+// dragged layer. With the Stage now at scale 1 we use
+// `relativeTo: layerGroup` and `getAbsoluteTransform(layerGroup)` to
+// strip the viewport transform — same project-pixel coords as before.
+//
+// Overhang dimming trick:
+//   Each layer renders ONCE, unclipped, at full opacity, fully
+//   interactive. To make the overhang appear at "50% opacity", we
+//   paint a 50%-opaque rectangle of canvas-bg colour on top of every
+//   pixel OUTSIDE the canvas frame. Mathematically that's identical
+//   to actually setting the layer to 50% opacity (when the underlying
+//   "background" is a solid colour, which the grey canvas-bg is):
+//     visible = 0.5 * layer + 0.5 * canvasBg     (true 50% opacity)
+//     visible = 0.5 * canvasBg + 0.5 * layer     (overlay trick)
+//   Same result. The overlay is `listening={false}` so it doesn't
+//   block hit testing — users can grab the dimmed overhang and drag
+//   it back onto the canvas. Smart guides + selection chrome render
+//   on top of the overlay so they stay full-opacity in the overhang.
+//
+// Background rendering (preserved from before):
 //   • "transparent" → soft checkerboard
 //   • "solid"       → filled Rect
 //   • "gradient"    → linear gradient Rect
@@ -21,16 +55,25 @@
 //   = false`, so the next batchDraw re-runs filters from the cached
 //   pixels. We don't need to re-cache on every slider tick.
 //
-// Tapping the stage *outside* any layer clears the selection.
+// Tapping the stage *outside* any layer clears the selection — same
+// behaviour as before; the hit-test simply runs against the layer-group
+// Layer now, with everything outside it counting as a stage tap.
 
 "use client";
 
 import { useEffect, useRef, type RefObject } from "react";
-import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Rect,
+  Group,
+  Image as KonvaImage,
+} from "react-konva";
 import useImage from "use-image";
 import Konva from "konva";
 import type { Filter as KonvaFilter, KonvaEventObject } from "konva/lib/Node";
 import { useEditor } from "../context/EditorContext";
+import { useTheme } from "../context/ThemeContext";
 import { LayerRenderer } from "./LayerRenderer";
 import { SelectionFrame } from "./SelectionFrame";
 import { GestureLayer } from "./GestureLayer";
@@ -42,20 +85,66 @@ import type {
 } from "@/lib/photo-editor/types";
 
 interface CanvasStageProps {
-  stageWidth: number;
-  stageHeight: number;
-  scale: number;
+  /** Pixel width of the grey canvas-area container. The Stage is sized
+   *  to this so layer overhangs render past the visible canvas frame. */
+  containerWidth: number;
+  /** Pixel height of the grey canvas-area container. */
+  containerHeight: number;
+  /** DOM-pixel x of the visual canvas-frame's top-left corner inside
+   *  the container. Pre-rotation — the rotation is applied around the
+   *  frame's centre. */
+  canvasLeft: number;
+  /** DOM-pixel y of the visual canvas-frame's top-left corner. */
+  canvasTop: number;
+  /** Effective scale for the viewport — fitScale × viewportZoom. */
+  canvasScale: number;
+  /** Container ref forwarded to GestureLayer for two-finger gesture
+   *  hit-testing. */
   canvasAreaRef: RefObject<HTMLDivElement>;
 }
 
+/** Light/dark canvas-bg colour values — kept in sync with ThemeStyles.tsx
+ *  so the dimming overlay (issue 7) blends cleanly with the surrounding
+ *  grey area. The CSS variable can't be passed straight to Konva fill;
+ *  Konva needs a hex string at render time. */
+const CANVAS_BG_COLOR: Record<"light" | "dark", string> = {
+  light: "#E9ECEF",
+  dark: "#0A0B0E",
+};
+
+/** Generous outer bound for the dimming overlay's clipping rect. The
+ *  overlay covers everything outside the canvas; this number just has
+ *  to be big enough that the overlay always fills the visible Stage at
+ *  any zoom/pan. 100 000 project-pixels is plenty. */
+const DIMMER_BOUNDS = 100_000;
+
+/** Tiny outset on the dimmer's inner rect so the overlay never paints
+ *  a 1-pixel hairline along the canvas frame's exact edge during
+ *  fractional-scale rasterisation. Half a pixel in project units is
+ *  invisible to the user. */
+const DIMMER_INSET = 0.5;
+
 export function CanvasStage({
-  stageWidth,
-  stageHeight,
-  scale,
+  containerWidth,
+  containerHeight,
+  canvasLeft,
+  canvasTop,
+  canvasScale,
   canvasAreaRef,
 }: CanvasStageProps) {
   const stageRef = useRef<Konva.Stage>(null);
-  const { state, dispatch, stageRef: contextStageRef } = useEditor();
+  const layerGroupRefBg = useRef<Konva.Group>(null);
+  const layerGroupRef = useRef<Konva.Group>(null);
+  const layerGroupRefDim = useRef<Konva.Group>(null);
+  const layerGroupRefGuides = useRef<Konva.Group>(null);
+  const {
+    state,
+    dispatch,
+    stageRef: contextStageRef,
+    layerGroupRef: contextLayerGroupRef,
+  } = useEditor();
+  const { theme } = useTheme();
+  const { project, viewport } = state;
 
   useEffect(() => {
     contextStageRef.current = stageRef.current;
@@ -65,6 +154,18 @@ export function CanvasStage({
       }
     };
   }, [contextStageRef]);
+
+  // Expose the interactive layer-group through context so snap and
+  // selection math can resolve project-pixel coords via
+  // `relativeTo: layerGroup`. Mobile-fixes batch 2 — issue 7.
+  useEffect(() => {
+    contextLayerGroupRef.current = layerGroupRef.current;
+    return () => {
+      if (contextLayerGroupRef.current === layerGroupRef.current) {
+        contextLayerGroupRef.current = null;
+      }
+    };
+  }, [contextLayerGroupRef]);
 
   function handleStageClick(e: KonvaEventObject<MouseEvent | TouchEvent>) {
     const stage = stageRef.current;
@@ -76,27 +177,128 @@ export function CanvasStage({
     }
   }
 
+  // Viewport transform — applied identically to every Konva.Group in
+  // the stage so the four layers stay perfectly aligned. Group
+  // transform order (Konva): translate(x,y) ∘ rotate ∘ scale ∘ translate(-offset).
+  // Setting (x,y) to canvas centre in container coords, rotation to
+  // viewport.rotation, scale to canvasScale, and offset to canvas
+  // centre in project-pixel coords means: project (0,0) lands at
+  // (canvasLeft, canvasTop) in container coords pre-rotation.
+  const projectCentreX = project.width / 2;
+  const projectCentreY = project.height / 2;
+  const stageW = Math.round(project.width * canvasScale);
+  const stageH = Math.round(project.height * canvasScale);
+  const groupX = canvasLeft + stageW / 2;
+  const groupY = canvasTop + stageH / 2;
+  const rotationDeg = (viewport.rotation * 180) / Math.PI;
+
+  const groupTransform = {
+    x: groupX,
+    y: groupY,
+    rotation: rotationDeg,
+    scaleX: canvasScale,
+    scaleY: canvasScale,
+    offsetX: projectCentreX,
+    offsetY: projectCentreY,
+  };
+
+  // Clip to the canvas rect (project-pixel coords). Used by the
+  // background layer so the photo / gradient / checkerboard stops at
+  // the canvas edge — overhanging layers still render past it.
+  const clipToCanvas = (ctx: Konva.Context) => {
+    ctx.beginPath();
+    ctx.rect(0, 0, project.width, project.height);
+  };
+
+  // Clip to OUTSIDE the canvas rect — outer rect clockwise, inner
+  // (canvas) rect counter-clockwise, non-zero fill rule. The outer
+  // bound is large enough to cover any zoom/pan; the inner is the
+  // canvas, slightly outset by DIMMER_INSET so the dimmer doesn't
+  // paint a hairline at the frame edge during sub-pixel rasterisation.
+  const clipOutsideCanvas = (ctx: Konva.Context) => {
+    ctx.beginPath();
+    // Outer rectangle clockwise (TL → TR → BR → BL → close).
+    ctx.moveTo(-DIMMER_BOUNDS, -DIMMER_BOUNDS);
+    ctx.lineTo(DIMMER_BOUNDS, -DIMMER_BOUNDS);
+    ctx.lineTo(DIMMER_BOUNDS, DIMMER_BOUNDS);
+    ctx.lineTo(-DIMMER_BOUNDS, DIMMER_BOUNDS);
+    ctx.closePath();
+    // Inner rectangle (the canvas) counter-clockwise.
+    const innerL = -DIMMER_INSET;
+    const innerT = -DIMMER_INSET;
+    const innerR = project.width + DIMMER_INSET;
+    const innerB = project.height + DIMMER_INSET;
+    ctx.moveTo(innerL, innerT);
+    ctx.lineTo(innerL, innerB);
+    ctx.lineTo(innerR, innerB);
+    ctx.lineTo(innerR, innerT);
+    ctx.closePath();
+  };
+
   return (
     <>
       <Stage
         ref={stageRef}
-        width={stageWidth}
-        height={stageHeight}
-        scaleX={scale}
-        scaleY={scale}
+        width={containerWidth}
+        height={containerHeight}
         onMouseDown={handleStageClick}
         onTouchStart={handleStageClick}
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          zIndex: 1,
+          touchAction: "none",
+        }}
       >
+        {/* ── Background — clipped to canvas rect, non-interactive ── */}
         <Layer listening={false}>
-          <BackgroundNode />
+          <Group ref={layerGroupRefBg} {...groupTransform}>
+            <Group clipFunc={clipToCanvas}>
+              <BackgroundNode />
+            </Group>
+          </Group>
         </Layer>
+
+        {/* ── Layers + selection ring — interactive, unclipped so
+             overhangs render past the canvas frame at full opacity. */}
         <Layer>
-          <LayerRenderer />
-          <SmartGuides
-            canvasWidth={state.project.width}
-            canvasHeight={state.project.height}
-          />
-          <SelectionFrame />
+          <Group ref={layerGroupRef} {...groupTransform}>
+            <LayerRenderer />
+            <SelectionFrame />
+          </Group>
+        </Layer>
+
+        {/* ── Overhang dimmer — 50%-opacity canvas-bg painted over
+             everything OUTSIDE the canvas, simulating 50% layer opacity
+             on the overhang portion. listening={false} so it doesn't
+             block hit testing on the overhang area below. */}
+        <Layer listening={false}>
+          <Group ref={layerGroupRefDim} {...groupTransform}>
+            <Group clipFunc={clipOutsideCanvas}>
+              <Rect
+                x={-DIMMER_BOUNDS}
+                y={-DIMMER_BOUNDS}
+                width={DIMMER_BOUNDS * 2}
+                height={DIMMER_BOUNDS * 2}
+                fill={CANVAS_BG_COLOR[theme]}
+                opacity={0.5}
+                listening={false}
+                perfectDrawEnabled={false}
+              />
+            </Group>
+          </Group>
+        </Layer>
+
+        {/* ── Smart guides — on top of the dimmer so guides at the
+             canvas edge stay full-opacity even where the dimmer paints. */}
+        <Layer listening={false}>
+          <Group ref={layerGroupRefGuides} {...groupTransform}>
+            <SmartGuides
+              canvasWidth={project.width}
+              canvasHeight={project.height}
+            />
+          </Group>
         </Layer>
       </Stage>
       <GestureLayer

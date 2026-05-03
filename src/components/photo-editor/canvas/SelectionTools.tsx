@@ -150,7 +150,7 @@ export function SelectionTools({
   stageHeight,
   stageScale,
 }: SelectionToolsProps) {
-  const { state, dispatch, stageRef } = useEditor();
+  const { state, dispatch, stageRef, layerGroupRef } = useEditor();
   const { state: mobileEdit, beginEditing, focusForKeyboardPop } =
     useMobileEdit();
 
@@ -260,12 +260,21 @@ export function SelectionTools({
         return null;
       }
     }
-    // Layer's transform up to (but excluding) the stage. This gives
-    // points in PROJECT-pixel space — we then multiply by stageScale
-    // and rotate by viewport.rotation to land in DOM coords.
-    // Calling getAbsoluteTransform() WITHOUT a top arg would include
-    // the stage's scale, double-applying stageScale below.
-    const layerTr = node.getAbsoluteTransform(stage);
+    // Layer's transform up to (but excluding) the viewport-transform
+    // Group. This gives points in PROJECT-pixel space — we then
+    // multiply by stageScale and rotate by viewport.rotation to land
+    // in DOM coords.
+    //
+    // Issue 7 (mobile-fixes batch 2): previously used
+    // `getAbsoluteTransform(stage)` because the Stage's own scale was
+    // effectiveScale and rotation lived on a CSS-transformed wrapper
+    // div. The Stage now covers the entire grey container at scale 1,
+    // and viewport scale + rotation live on `layerGroup` instead — so
+    // we ask Konva for the transform stripping that group's
+    // contribution to keep the same project-pixel result.
+    const layerGroup = layerGroupRef.current;
+    if (!layerGroup) return null;
+    const layerTr = node.getAbsoluteTransform(layerGroup);
     const stageLocal = {
       tl: layerTr.point({ x: selfRect.x, y: selfRect.y }),
       tr: layerTr.point({
@@ -317,6 +326,7 @@ export function SelectionTools({
     hidden,
     selectedLayer,
     stageRef,
+    layerGroupRef,
     tick,
     stageScale,
     state.project.layers,
@@ -336,6 +346,19 @@ export function SelectionTools({
   // position once at pointerdown; each pointermove re-solves
   // transform.x/y so that pivotStage stays fixed under the new
   // rotation. Mirrors the stretch handler's anchor pattern.
+  // Mobile-fixes batch 1 (May 2026): drag deadzone + hot start.
+  //   Every selection handle (rotate, resize, stretch, wrap-width) used
+  //   to apply transforms on the first pointermove event — even sub-
+  //   pixel finger jitter during a tap caused the layer to start
+  //   moving instantly. We now hold the layer still until the pointer
+  //   has moved DRAG_DEADZONE_PX from its pointerdown position, then
+  //   "hot start" (subtract the threshold delta from each subsequent
+  //   pointer position) so there's no jump on crossover. Each
+  //   handler-ref carries `startClientX/Y` (initial pointerdown), an
+  //   `active` flag, and a constant `offsetX/Y` set on crossing —
+  //   pointermove handlers compute their math from
+  //   `(clientX - offsetX, clientY - offsetY)` when active, and return
+  //   early when not.
   const rotateRef = useRef<{
     startAngle: number;
     layerStart: AnyLayer["transform"];
@@ -352,6 +375,11 @@ export function SelectionTools({
     centreX: number;
     centreY: number;
     pointerId: number;
+    startClientX: number;
+    startClientY: number;
+    active: boolean;
+    offsetX: number;
+    offsetY: number;
   } | null>(null);
   const resizeRef = useRef<{
     startDist: number;
@@ -360,6 +388,11 @@ export function SelectionTools({
     centreX: number;
     centreY: number;
     pointerId: number;
+    startClientX: number;
+    startClientY: number;
+    active: boolean;
+    offsetX: number;
+    offsetY: number;
   } | null>(null);
 
   // ── Stretch drag (May 2026 — replaces flip H / V) ─────────────
@@ -390,6 +423,11 @@ export function SelectionTools({
     axisDirDom: { x: number; y: number };
     axisLengthDom: number;
     pointerId: number;
+    startClientX: number;
+    startClientY: number;
+    active: boolean;
+    offsetX: number;
+    offsetY: number;
   } | null>(null);
 
   // ── Wrap-width drag (May 2026) ──────────────────────────────
@@ -431,6 +469,26 @@ export function SelectionTools({
   // of the most-recent qualifying tap (pointerup without a drag). A
   // second tap within DOUBLE_TAP_MS fires the reset action.
   const wrapWidthLastTapRef = useRef<number>(0);
+
+  // Mobile-fixes batch 1 — drag deadzone for selection handles.
+  // 8px is enough to absorb finger jitter during a tap without making
+  // intentional drags feel unresponsive. The wrap-width handle's
+  // existing TAP_MOVE_THRESHOLD_PX (5px, defined further down) is used
+  // for tap-vs-drag classification on pointerup; this one governs
+  // when transforms actually start applying.
+  const DRAG_DEADZONE_PX = 8;
+
+  /** Helper: returns true if the pointer has moved at least
+   *  DRAG_DEADZONE_PX from its start position. Used by every drag
+   *  handler to gate transform application. */
+  function pastDeadzone(
+    clientX: number,
+    clientY: number,
+    startX: number,
+    startY: number,
+  ): boolean {
+    return Math.hypot(clientX - startX, clientY - startY) >= DRAG_DEADZONE_PX;
+  }
 
   if (!geom || !selectedLayer) return null;
 
@@ -543,6 +601,11 @@ export function SelectionTools({
       axisDirDom,
       axisLengthDom,
       pointerId: e.pointerId,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      active: false,
+      offsetX: 0,
+      offsetY: 0,
     };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   }
@@ -552,9 +615,25 @@ export function SelectionTools({
     if (!s || s.pointerId !== e.pointerId) return;
     if (!selectedLayer) return;
 
+    // Drag deadzone — until the pointer has moved DRAG_DEADZONE_PX
+    // from pointerdown, the layer holds still. On crossing we capture
+    // the offset so subsequent moves use a "hot started" pointer
+    // position (effective pointer at crossover == startClientX/Y →
+    // ratio = 1 → no perceived jump).
+    if (!s.active) {
+      if (!pastDeadzone(e.clientX, e.clientY, s.startClientX, s.startClientY)) {
+        return;
+      }
+      s.active = true;
+      s.offsetX = e.clientX - s.startClientX;
+      s.offsetY = e.clientY - s.startClientY;
+    }
+    const effectiveX = e.clientX - s.offsetX;
+    const effectiveY = e.clientY - s.offsetY;
+
     // Signed projection of (pointer − pivot) onto the start-axis.
-    const vx = e.clientX - s.pivotDom.x;
-    const vy = e.clientY - s.pivotDom.y;
+    const vx = effectiveX - s.pivotDom.x;
+    const vy = effectiveY - s.pivotDom.y;
     const t = vx * s.axisDirDom.x + vy * s.axisDirDom.y;
     const ratio = t / s.axisLengthDom;
 
@@ -689,18 +768,28 @@ export function SelectionTools({
     const dyDom = e.clientY - w.startPointer.y;
 
     // Tap-vs-drag: once we've moved past the threshold, this gesture
-    // is a drag, no longer a tap.
+    // is a drag, no longer a tap. Mobile-fixes batch 1 — threshold
+    // unified with the other selection handles (DRAG_DEADZONE_PX),
+    // and on first crossing we re-anchor startPointer to the current
+    // pointer position so the visible width doesn't jump (hot start).
     if (
       !w.movedPastThreshold &&
-      Math.hypot(dxDom, dyDom) > TAP_MOVE_THRESHOLD_PX
+      Math.hypot(dxDom, dyDom) > DRAG_DEADZONE_PX
     ) {
       w.movedPastThreshold = true;
+      w.startPointer = { x: e.clientX, y: e.clientY };
     }
     if (!w.movedPastThreshold) return;
 
+    // Recompute pointer delta against the (possibly re-anchored)
+    // startPointer so hot start lands cleanly.
+    const dxDomEffective = e.clientX - w.startPointer.x;
+    const dyDomEffective = e.clientY - w.startPointer.y;
+
     // Project the pointer delta onto the layer's local +x axis (in
     // DOM space). Result is a signed DOM-pixel delta along that axis.
-    const tDom = dxDom * w.axisDirDom.x + dyDom * w.axisDirDom.y;
+    const tDom =
+      dxDomEffective * w.axisDirDom.x + dyDomEffective * w.axisDirDom.y;
     // Convert DOM-pixel delta back to layer-local units.
     const dWidthLocal = (tDom * w.startWidth) / w.axisLengthDom;
     let newWidth = w.startWidth + dWidthLocal;
@@ -926,6 +1015,11 @@ export function SelectionTools({
       centreX: centreXDom,
       centreY: centreYDom,
       pointerId: e.pointerId,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      active: false,
+      offsetX: 0,
+      offsetY: 0,
     };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setIsRotating(true);
@@ -934,7 +1028,20 @@ export function SelectionTools({
   const onRotatePointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
     const r = rotateRef.current;
     if (!r || r.pointerId !== e.pointerId) return;
-    const angle = Math.atan2(e.clientY - r.centreY, e.clientX - r.centreX);
+
+    // Drag deadzone — same hot-start pattern as stretch (issue 8).
+    if (!r.active) {
+      if (!pastDeadzone(e.clientX, e.clientY, r.startClientX, r.startClientY)) {
+        return;
+      }
+      r.active = true;
+      r.offsetX = e.clientX - r.startClientX;
+      r.offsetY = e.clientY - r.startClientY;
+    }
+    const effectiveX = e.clientX - r.offsetX;
+    const effectiveY = e.clientY - r.offsetY;
+
+    const angle = Math.atan2(effectiveY - r.centreY, effectiveX - r.centreX);
     const deltaDeg = ((angle - r.startAngle) * 180) / Math.PI;
     const rawRotation = r.layerStart.rotation + deltaDeg;
     const newRotation = snapAngle(rawRotation);
@@ -992,6 +1099,11 @@ export function SelectionTools({
       centreX: centreXDom,
       centreY: centreYDom,
       pointerId: e.pointerId,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      active: false,
+      offsetX: 0,
+      offsetY: 0,
     };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   };
@@ -999,8 +1111,21 @@ export function SelectionTools({
   const onResizePointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
     const r = resizeRef.current;
     if (!r || r.pointerId !== e.pointerId) return;
-    const dx = e.clientX - r.centreX;
-    const dy = e.clientY - r.centreY;
+
+    // Drag deadzone — issue 8 hot-start pattern.
+    if (!r.active) {
+      if (!pastDeadzone(e.clientX, e.clientY, r.startClientX, r.startClientY)) {
+        return;
+      }
+      r.active = true;
+      r.offsetX = e.clientX - r.startClientX;
+      r.offsetY = e.clientY - r.startClientY;
+    }
+    const effectiveX = e.clientX - r.offsetX;
+    const effectiveY = e.clientY - r.offsetY;
+
+    const dx = effectiveX - r.centreX;
+    const dy = effectiveY - r.centreY;
     const dist = Math.max(1, Math.hypot(dx, dy));
     const factor = dist / r.startDist;
     const newScaleX =
@@ -1047,15 +1172,68 @@ export function SelectionTools({
   // Position icons at the actual rotated corner positions and edge
   // midpoints — not at AABB corners. This makes the icons sit
   // visually on the layer's edges at any rotation.
-  const topMidX = (geom.tl.x + geom.tr.x) / 2;
-  const topMidY = (geom.tl.y + geom.tr.y) / 2;
-  const leftMidX = (geom.tl.x + geom.bl.x) / 2;
-  const leftMidY = (geom.tl.y + geom.bl.y) / 2;
-  const bottomMidX = (geom.bl.x + geom.br.x) / 2;
-  const bottomMidY = (geom.bl.y + geom.br.y) / 2;
+  //
+  // Mobile-fixes batch 1 (May 2026) — issue 6 fix.
+  //   Thin layers (line shapes especially) had a bbox so flat that
+  //   delete / stretch-Y / rotate / stretch-X all collapsed into the
+  //   same point and became un-tappable. We now compute the layer's
+  //   local-axis unit vectors and half-extents in DOM space, and if
+  //   either half-dimension is below MIN_HALF_DOM_PX we push the
+  //   icons outward along those axes by the deficit. The icons end
+  //   up floating just outside the layer's actual edges on tiny
+  //   layers — which is exactly what photo apps like Procreate and
+  //   Affinity do for the same reason. At rest (bbox >= 80×80) the
+  //   numbers reduce to the original on-edge positions.
+  //
+  //   MIN_HALF_DOM_PX = 40 → 80 px minimum bbox dimension between
+  //   opposing handles. That clears Apple's 44 pt touch-target
+  //   guideline (each icon is a 36 px circle, leaving ≥ 44 px between
+  //   centres at the minimum case).
+  const MIN_HALF_DOM_PX = 40;
+
+  const localXdx = geom.tr.x - geom.tl.x;
+  const localXdy = geom.tr.y - geom.tl.y;
+  const localXLenDom = Math.max(1, Math.hypot(localXdx, localXdy));
+  const halfWidthDom = localXLenDom / 2;
+  const unitXdom = { x: localXdx / localXLenDom, y: localXdy / localXLenDom };
+
+  const localYdx = geom.bl.x - geom.tl.x;
+  const localYdy = geom.bl.y - geom.tl.y;
+  const localYLenDom = Math.max(1, Math.hypot(localYdx, localYdy));
+  const halfHeightDom = localYLenDom / 2;
+  const unitYdom = { x: localYdx / localYLenDom, y: localYdy / localYLenDom };
+
+  const padHalfWDom = Math.max(0, MIN_HALF_DOM_PX - halfWidthDom);
+  const padHalfHDom = Math.max(0, MIN_HALF_DOM_PX - halfHeightDom);
+  const halfWExpanded = halfWidthDom + padHalfWDom;
+  const halfHExpanded = halfHeightDom + padHalfHDom;
+
+  const cornerTL = {
+    x: centreXDom - halfWExpanded * unitXdom.x - halfHExpanded * unitYdom.x,
+    y: centreYDom - halfWExpanded * unitXdom.y - halfHExpanded * unitYdom.y,
+  };
+  const cornerTR = {
+    x: centreXDom + halfWExpanded * unitXdom.x - halfHExpanded * unitYdom.x,
+    y: centreYDom + halfWExpanded * unitXdom.y - halfHExpanded * unitYdom.y,
+  };
+  const cornerBR = {
+    x: centreXDom + halfWExpanded * unitXdom.x + halfHExpanded * unitYdom.x,
+    y: centreYDom + halfWExpanded * unitXdom.y + halfHExpanded * unitYdom.y,
+  };
+  const cornerBL = {
+    x: centreXDom - halfWExpanded * unitXdom.x + halfHExpanded * unitYdom.x,
+    y: centreYDom - halfWExpanded * unitXdom.y + halfHExpanded * unitYdom.y,
+  };
+
+  const topMidX = centreXDom - halfHExpanded * unitYdom.x;
+  const topMidY = centreYDom - halfHExpanded * unitYdom.y;
+  const leftMidX = centreXDom - halfWExpanded * unitXdom.x;
+  const leftMidY = centreYDom - halfWExpanded * unitXdom.y;
+  const bottomMidX = centreXDom + halfHExpanded * unitYdom.x;
+  const bottomMidY = centreYDom + halfHExpanded * unitYdom.y;
   // Wrap-width handle (text-only, May 2026).
-  const rightMidX = (geom.tr.x + geom.br.x) / 2;
-  const rightMidY = (geom.tr.y + geom.br.y) / 2;
+  const rightMidX = centreXDom + halfWExpanded * unitXdom.x;
+  const rightMidY = centreYDom + halfWExpanded * unitXdom.y;
 
   // Angle-label position (May 2026 rotate behaviour). Sits a fixed
   // distance "above" the top-edge midpoint in the layer's LOCAL
@@ -1100,8 +1278,8 @@ export function SelectionTools({
   return (
     <>
       <CornerBtn
-        x={geom.tl.x}
-        y={geom.tl.y}
+        x={cornerTL.x}
+        y={cornerTL.y}
         ariaLabel="Delete"
         onClick={onDelete}
         color={dangerColor}
@@ -1124,8 +1302,8 @@ export function SelectionTools({
       </CornerBtn>
 
       <CornerBtn
-        x={geom.tr.x}
-        y={geom.tr.y}
+        x={cornerTR.x}
+        y={cornerTR.y}
         ariaLabel="Rotate"
         drag
         color={iconColor}
@@ -1169,8 +1347,8 @@ export function SelectionTools({
 
       {isText && (
         <CornerBtn
-          x={geom.bl.x}
-          y={geom.bl.y}
+          x={cornerBL.x}
+          y={cornerBL.y}
           ariaLabel="Edit text"
           onClick={onOpenKeyboard}
           color={iconColor}
@@ -1190,8 +1368,8 @@ export function SelectionTools({
       </CornerBtn>
 
       <CornerBtn
-        x={geom.br.x}
-        y={geom.br.y}
+        x={cornerBR.x}
+        y={cornerBR.y}
         ariaLabel="Resize"
         drag
         color={iconColor}

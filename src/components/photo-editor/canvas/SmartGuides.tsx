@@ -8,6 +8,12 @@
 // from 1px to 1.15px (15% thicker). Teal blended into mid-tone
 // canvas content; white reads cleanly on any background, helped by
 // the slight thickness bump.
+//
+// Mobile-fixes batch 1 (May 2026) — thickness widened again from
+// 1.15px → 2px. Earlier value still got lost against busy photo
+// backgrounds; 2px is bold enough that the line reads at a glance
+// even on a small mobile canvas while remaining sub-pixel-aliased
+// enough not to feel chunky on desktop.
 
 "use client";
 
@@ -15,7 +21,7 @@ import { Line } from "react-konva";
 import { useSmartGuides } from "./SmartGuidesContext";
 
 const GUIDE_COLOR = "#FFFFFF";
-const GUIDE_WIDTH = 1.15;
+const GUIDE_WIDTH = 2;
 
 interface SmartGuidesProps {
   canvasWidth: number;

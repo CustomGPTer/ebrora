@@ -27,7 +27,7 @@
 
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useRef } from "react";
 import { useEditor } from "../context/EditorContext";
 import { useMobileEdit } from "../context/MobileEditContext";
 import { useSmartGuides } from "./SmartGuidesContext";
@@ -36,7 +36,12 @@ import { ImageNode } from "./ImageNode";
 import { ShapeNode } from "./ShapeNode";
 import { StickerNode } from "./StickerNode";
 import { TextEditOverlay } from "./TextEditOverlay";
-import { computeSnap, type Box } from "@/lib/photo-editor/canvas/snap";
+import {
+  computeSnap,
+  NO_CENTRE_LOCK,
+  type Box,
+  type CentreLockState,
+} from "@/lib/photo-editor/canvas/snap";
 import type {
   AnyLayer,
   Id,
@@ -45,20 +50,32 @@ import type {
 import type Konva from "konva";
 
 export function LayerRenderer() {
-  const { state, dispatch, stageRef } = useEditor();
+  const { state, dispatch, stageRef, layerGroupRef } = useEditor();
   const { beginEditing } = useMobileEdit();
   const { setGuides, clearGuides } = useSmartGuides();
   const { project } = state;
 
+  // Per-drag hysteresis state for the canvas-centre H/V snap (issue 10).
+  // computeSnap reads this on each frame to decide whether to keep the
+  // box locked to the canvas centreline (we widen the release zone vs
+  // the lock zone so the centre snap "sticks" in the rotate-handle
+  // sense). Cleared on dragend so the next drag starts fresh.
+  const centreLockRef = useRef<CentreLockState>(NO_CENTRE_LOCK);
+
   const orderedLayers = orderLayers(project.layers, project.layerOrder);
 
-  /** Resolve a layer's current bbox in canvas-pixel coords. */
+  /** Resolve a layer's current bbox in project-pixel (canvas) coords.
+   *  Issue 7 (mobile-fixes batch 2): uses `relativeTo: layerGroup`
+   *  instead of `relativeTo: stage` — the Stage now spans the entire
+   *  grey container at scale 1, so project-pixel coords live one
+   *  level deeper inside the viewport-transform Group. */
   function getBboxOnStage(id: Id): Box | null {
     const stage = stageRef.current;
-    if (!stage) return null;
+    const layerGroup = layerGroupRef.current;
+    if (!stage || !layerGroup) return null;
     const node = stage.findOne(`#${id}`);
     if (!node) return null;
-    const r = node.getClientRect({ relativeTo: stage });
+    const r = node.getClientRect({ relativeTo: layerGroup });
     if (!Number.isFinite(r.x) || !Number.isFinite(r.y)) return null;
     if (r.width <= 0 || r.height <= 0) return null;
     return { x: r.x, y: r.y, width: r.width, height: r.height };
@@ -97,11 +114,13 @@ export function LayerRenderer() {
         };
 
         const onDragMove = (x: number, y: number, node: Konva.Node) => {
-          // Build the dragged box from the Konva node's bbox in canvas
-          // coords (snap.ts works in canvas pixels).
-          const stage = stageRef.current;
-          if (!stage) return;
-          const draggedRect = node.getClientRect({ relativeTo: stage });
+          // Build the dragged box from the Konva node's bbox in
+          // project-pixel coords (snap.ts works in canvas pixels).
+          // Issue 7: relativeTo the layer-group so the viewport scale
+          // and rotation are factored out, leaving raw project pixels.
+          const layerGroup = layerGroupRef.current;
+          if (!layerGroup) return;
+          const draggedRect = node.getClientRect({ relativeTo: layerGroup });
           if (!Number.isFinite(draggedRect.x)) return;
           const draggedBox: Box = {
             x: draggedRect.x,
@@ -121,7 +140,9 @@ export function LayerRenderer() {
             otherBoxes,
             canvasWidth: project.width,
             canvasHeight: project.height,
+            prevCentreLock: centreLockRef.current,
           });
+          centreLockRef.current = result.centreLock;
           // Apply snap delta to the Konva node directly so subsequent
           // dragmove ticks build on the snapped position.
           const dx = result.x - draggedBox.x;
@@ -135,6 +156,8 @@ export function LayerRenderer() {
 
         const onDragEnd = (x: number, y: number) => {
           clearGuides();
+          // Reset hysteresis so the next drag starts unlocked.
+          centreLockRef.current = NO_CENTRE_LOCK;
           dispatch({
             type: "UPDATE_LAYER",
             id: layer.id,
