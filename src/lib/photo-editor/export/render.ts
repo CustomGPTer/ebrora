@@ -28,7 +28,9 @@ import type {
   AnyLayer,
   Background,
   ImageLayer,
+  LineProps,
   Project,
+  Rect,
   ShapeLayer,
   StickerLayer,
   TextLayer,
@@ -38,11 +40,13 @@ import {
   computeBentBounds,
   createBendContext,
 } from "../rich-text/bend";
+import { getTextureMap } from "../rich-text/textures";
 import {
   expandPerspectiveCorners,
   isIdentityPerspective,
   renderPerspectiveImage,
 } from "../canvas/perspective-render";
+import { buildCssFilterString } from "../canvas/image-filters";
 import { applyEraseStrokes } from "../canvas/erase-render";
 import {
   findShape,
@@ -191,29 +195,44 @@ function paintBackground(
     }
     case "photo": {
       const img = images.get(background.src);
-      if (img) {
-        // Photo backgrounds support flip + rotation flags. Apply via
-        // canvas transform around the centre.
-        ctx.save();
-        ctx.translate(width / 2, height / 2);
-        if (background.rotation) {
-          ctx.rotate((background.rotation * Math.PI) / 180);
+      if (!img) {
+        if (!preserveTransparency) {
+          // Image not loaded (CORS, etc) — paint white fallback so JPEG /
+          // PDF don't end up with a black void.
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, width, height);
         }
-        const sx = background.flip.horizontal ? -1 : 1;
-        const sy = background.flip.vertical ? -1 : 1;
-        ctx.scale(sx, sy);
-        // Drawn so that the image fills the canvas area regardless of
-        // its natural aspect — caller is expected to have set width /
-        // height to match the photo aspect, but we stretch to fit if
-        // not (mirrors PhotoRect's on-stage behaviour).
-        ctx.drawImage(img, -width / 2, -height / 2, width, height);
-        ctx.restore();
-      } else if (!preserveTransparency) {
-        // Image not loaded (CORS, etc) — paint white fallback so JPEG /
-        // PDF don't end up with a black void.
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0, 0, width, height);
+        return;
       }
+
+      // Bake crop + filters into an offscreen canvas. PhotoRect on stage
+      // does the same via Konva's cropX/Y/W/H attributes plus a Konva
+      // filter chain via node.cache(); we use CSS filters here as the
+      // close-enough approximation that ImageNode's perspective path
+      // already accepts. When neither crop nor filters apply, bakeImage
+      // returns null and we pass img through directly for performance.
+      const filterStr = buildCssFilterString({
+        adjust: project.filters.adjust,
+        effect: project.filters.effect,
+        blur: project.filters.blur,
+      });
+      const baked = bakeImage(img, background.crop, filterStr);
+      const source: CanvasImageSource = baked ?? img;
+
+      // Photo backgrounds support flip + rotation flags. Apply via
+      // canvas transform around the centre. The (cropped + filtered)
+      // source then stretches to fill the canvas dims, mirroring
+      // KonvaImage's natural width / height behaviour on stage.
+      ctx.save();
+      ctx.translate(width / 2, height / 2);
+      if (background.rotation) {
+        ctx.rotate((background.rotation * Math.PI) / 180);
+      }
+      const sx = background.flip.horizontal ? -1 : 1;
+      const sy = background.flip.vertical ? -1 : 1;
+      ctx.scale(sx, sy);
+      ctx.drawImage(source, -width / 2, -height / 2, width, height);
+      ctx.restore();
       return;
     }
   }
@@ -370,7 +389,12 @@ function paintTextLayer(
   // Background underlay first so glyphs sit on top. Mirrors the
   // on-stage RichTextNode paint order.
   paintTextBackground(bctx, layer, layout);
-  renderTextToCanvas(bctx, layer, layout);
+  // Pass the texture map so glyph runs styled with TextureFill render
+  // their pattern instead of silently falling back to solid `fill`.
+  // The texture map is module-cached (textures.ts builds the canvases
+  // lazily on first call), so this is essentially free after the first
+  // export.
+  renderTextToCanvas(bctx, layer, layout, { textures: getTextureMap() });
   if (layer.erase.length > 0) {
     applyEraseStrokes(bctx, layer.erase);
   }
@@ -433,56 +457,138 @@ function paintImageLayer(
   // perspective check.
   const displayW = layer.crop ? layer.crop.width : layer.naturalWidth;
   const displayH = layer.crop ? layer.crop.height : layer.naturalHeight;
-  const sourceX = layer.crop ? layer.crop.x : 0;
-  const sourceY = layer.crop ? layer.crop.y : 0;
+
+  // Resolve to a renderable source. ImageNode on stage applies filters
+  // in two different ways depending on path: the flat path uses Konva's
+  // filter chain via node.cache(); the perspective path bakes filters
+  // into a source canvas via CSS filter before warping. The export uses
+  // the CSS-filter approach for BOTH paths so the two stay consistent
+  // (and so any future filter parity work has one place to land).
+  //
+  // After baking, the source rect to sample is the entire baked canvas
+  // at (0, 0). Without baking, we either sample the crop sub-region of
+  // the raw img, or the entire raw img.
+  const filterStr = buildCssFilterString({
+    adjust: layer.adjust,
+    effect: layer.filterEffect,
+    blur: layer.blur,
+  });
+  const baked = bakeImage(img, layer.crop, filterStr);
+
+  let source: CanvasImageSource;
+  let srcX: number;
+  let srcY: number;
+  let srcW: number;
+  let srcH: number;
+  if (baked) {
+    source = baked;
+    srcX = 0;
+    srcY = 0;
+    srcW = baked.width;
+    srcH = baked.height;
+  } else if (layer.crop) {
+    source = img;
+    srcX = layer.crop.x;
+    srcY = layer.crop.y;
+    srcW = layer.crop.width;
+    srcH = layer.crop.height;
+  } else {
+    source = img;
+    srcX = 0;
+    srcY = 0;
+    srcW = layer.naturalWidth;
+    srcH = layer.naturalHeight;
+  }
 
   const usePerspective =
     layer.perspective !== null &&
     !isIdentityPerspective(layer.perspective, displayW, displayH);
 
   if (!usePerspective) {
-    if (layer.crop) {
-      // 9-arg drawImage variant — sub-region of the source rendered into
-      // the layer's display rect.
-      ctx.drawImage(
-        img,
-        layer.crop.x,
-        layer.crop.y,
-        layer.crop.width,
-        layer.crop.height,
-        0,
-        0,
-        layer.crop.width,
-        layer.crop.height,
-      );
-    } else {
-      ctx.drawImage(img, 0, 0, layer.naturalWidth, layer.naturalHeight);
-    }
+    // Flat path — paint the source rect to (0, 0, displayW, displayH).
+    // 9-arg drawImage handles both the baked-canvas and crop-sub-region
+    // cases uniformly.
+    ctx.drawImage(source, srcX, srcY, srcW, srcH, 0, 0, displayW, displayH);
+    paintImageStrokeFlat(ctx, layer, displayW, displayH);
     return;
   }
 
-  // Perspective path — warp the (cropped) source rectangle onto the
-  // four destination corners. Mirrors ImageNode's KonvaShape sceneFunc
-  // call; the renderer's srcX / srcY / srcWidth / srcHeight params
-  // sample the crop sub-region directly so we don't need a pre-baked
-  // intermediate canvas for the crop case.
-  //
-  // KNOWN: per-layer image filters (adjust / filterEffect / blur) are
-  // baked into the source canvas on-stage but NOT here, because the
-  // export's flat path doesn't apply those filters either. Fixing
-  // filter parity is a separate scope — when it lands, the same
-  // CSS-filter-baked source canvas should feed BOTH the flat drawImage
-  // and this perspective renderPerspectiveImage call.
+  // Perspective path — warp the (cropped + filtered) source rectangle
+  // onto the four destination corners. Mirrors ImageNode's KonvaShape
+  // sceneFunc call on stage. The renderer's srcX / srcY / srcWidth /
+  // srcHeight params let us point at the correct sub-region of the
+  // source without an extra intermediate canvas.
   renderPerspectiveImage(
     ctx,
-    img,
+    source,
     displayW,
     displayH,
     layer.perspective!,
     undefined,
-    sourceX,
-    sourceY,
+    srcX,
+    srcY,
   );
+  paintImageStrokePerspective(ctx, layer, layer.perspective!);
+}
+
+/** Stroke an image layer's flat rect — runs after the flat drawImage
+ *  and mirrors ImageNode's KonvaImage stroke props (lines ~205–215 of
+ *  ImageNode.tsx). The stroke scales with the layer's transform on
+ *  stage (KonvaImage doesn't set `strokeScaleEnabled={false}`) and the
+ *  export inherits that scaling because paintLayer applies
+ *  `ctx.scale(transform.scaleX, transform.scaleY)` before this is
+ *  called — so we just use `stroke.width` directly. */
+function paintImageStrokeFlat(
+  ctx: CanvasRenderingContext2D,
+  layer: ImageLayer,
+  displayW: number,
+  displayH: number,
+): void {
+  const stroke = layer.stroke;
+  if (!stroke || stroke.width <= 0 || stroke.opacity <= 0) return;
+  ctx.save();
+  ctx.strokeStyle = stroke.color ?? "#000000";
+  ctx.lineWidth = stroke.width;
+  // Compose with whatever globalAlpha paintLayer set for layer.opacity.
+  // Stage's flat KonvaImage actually ignores stroke opacity entirely
+  // (Konva doesn't have a strokeOpacity attr), so honouring it on
+  // export is strictly more correct — only visible diff between paths
+  // is when 0 < stroke.opacity < 1, which the stage UI doesn't even
+  // produce as a continuous range today.
+  ctx.globalAlpha = clamp01(stroke.opacity) * (ctx.globalAlpha || 1);
+  ctx.strokeRect(0, 0, displayW, displayH);
+  ctx.restore();
+}
+
+/** Stroke an image layer's warped quad — runs after renderPerspectiveImage
+ *  and mirrors ImageNode's perspective sceneFunc stroke pass (lines
+ *  309–327 of ImageNode.tsx). Draws a closed polyline through the four
+ *  destination corners in TL → TR → BR → BL order, the same order
+ *  layer.perspective stores them. */
+function paintImageStrokePerspective(
+  ctx: CanvasRenderingContext2D,
+  layer: ImageLayer,
+  corners: readonly [
+    { x: number; y: number },
+    { x: number; y: number },
+    { x: number; y: number },
+    { x: number; y: number },
+  ],
+): void {
+  const stroke = layer.stroke;
+  if (!stroke || stroke.width <= 0 || stroke.opacity <= 0) return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(corners[0].x, corners[0].y);
+  ctx.lineTo(corners[1].x, corners[1].y);
+  ctx.lineTo(corners[2].x, corners[2].y);
+  ctx.lineTo(corners[3].x, corners[3].y);
+  ctx.closePath();
+  ctx.strokeStyle = stroke.color ?? "#000000";
+  ctx.lineWidth = stroke.width;
+  ctx.globalAlpha = clamp01(stroke.opacity) * (ctx.globalAlpha || 1);
+  ctx.stroke();
+  ctx.restore();
 }
 
 // ─── Sticker ────────────────────────────────────────────────────
@@ -506,9 +612,45 @@ function paintShapeLayer(
   const fill = layer.variant === "filled" ? layer.fill : "transparent";
   const stroke = resolveShapeStroke(layer);
 
+  // Layer-scale compensation for strokes. ShapeNode on stage sets
+  // `strokeScaleEnabled={false}` on every primitive (rect / ellipse /
+  // path / star), so a stroke set to N pixels in the slider always
+  // renders N pixels regardless of the layer's transform scale. The
+  // export pipeline applies `ctx.scale(layer.transform.scaleX, ...)`
+  // before this function runs, so canvas strokes inherit that scaling
+  // unless we divide it out — without compensation, a 4 px stroke on a
+  // 2× corner-resized shape appears 8 px on export but 4 px on stage.
+  //
+  // Non-uniform scale (scaleX ≠ scaleY) is approximated by dividing
+  // by max(|scaleX|, |scaleY|). True per-edge widths would require
+  // un-scaling each edge's geometry independently, which neither
+  // Konva nor canvas2d gives us cheaply. The approximation matches
+  // the larger axis exactly and underweights the smaller one — same
+  // failure mode as Konva's own strokeScaleEnabled in non-uniform
+  // contexts.
+  const sxAbs = Math.abs(layer.transform.scaleX) || 1;
+  const syAbs = Math.abs(layer.transform.scaleY) || 1;
+  const layerScale = Math.max(sxAbs, syAbs);
+
+  // Line-category catalogue shapes — branch BEFORE built-in / catalogue
+  // lookup so the dash + arrow + bezier + freehand logic always wins
+  // for these ids. Mirrors ShapeNode's render order (the `isLineShape`
+  // check happens before `isBuiltInShape` and `findShape`, otherwise
+  // findShape would return the static SVG `d` from the catalogue and
+  // we'd render a placeholder instead of the user's actual line).
+  //
+  // Note: line shapes use Konva.Line / Konva.Arrow on stage WITHOUT
+  // `strokeScaleEnabled={false}` (only the rect / ellipse / path /
+  // star primitives have that prop), so line strokes scale with the
+  // layer transform on both stage and export — no layerScale division.
+  if (isLineShape(layer.shapeId)) {
+    paintLineShape(ctx, layer);
+    return;
+  }
+
   // Built-in primitives — mirror ShapeNode's per-id rendering.
   if (isBuiltInShape(layer.shapeId)) {
-    paintBuiltInShape(ctx, layer, fill, stroke);
+    paintBuiltInShape(ctx, layer, fill, stroke, layerScale);
     return;
   }
 
@@ -534,7 +676,14 @@ function paintShapeLayer(
       }
       if (stroke) {
         ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = stroke.width / Math.max(sx, sy);
+        // Compensate for both the viewBox-fit scale (sx/sy applied
+        // above to size the catalogue path to the layer) AND the
+        // outer layer transform scale (applied by paintLayer before
+        // this function runs). Both are multiplicative on the stroke
+        // — a slider value of 4 should render 4 pixels regardless of
+        // either.
+        ctx.lineWidth =
+          stroke.width / (Math.max(sx, sy) * layerScale);
         ctx.globalAlpha = clamp01(stroke.opacity) * (ctx.globalAlpha || 1);
         ctx.stroke(path);
       }
@@ -558,6 +707,7 @@ function paintBuiltInShape(
   layer: ShapeLayer,
   fill: string,
   stroke: ResolvedStroke | null,
+  layerScale: number,
 ): void {
   const w = layer.width;
   const h = layer.height;
@@ -566,7 +716,10 @@ function paintBuiltInShape(
     if (!stroke) return;
     ctx.save();
     ctx.strokeStyle = stroke.color;
-    ctx.lineWidth = stroke.width;
+    // Divide by the layer transform scale so the rendered stroke width
+    // matches the slider value, mirroring Konva's
+    // `strokeScaleEnabled={false}` on every ShapeNode primitive.
+    ctx.lineWidth = stroke.width / layerScale;
     ctx.globalAlpha = clamp01(stroke.opacity) * (ctx.globalAlpha || 1);
     if (path) path();
     ctx.restore();
@@ -672,6 +825,296 @@ function paintBuiltInShape(
   }
 }
 
+// ─── Line shapes ────────────────────────────────────────────────
+//
+// Parallel implementation of `renderLineShape` in
+// `src/components/photo-editor/canvas/ShapeNode.tsx`. Both render the
+// same six line shape ids (line-straight / line-dashed / line-dotted
+// / line-curved / line-freehand / line-double) plus optional
+// arrowheads on the straight-style ids. The on-stage version uses
+// Konva.Line / Konva.Arrow primitives; this file uses canvas-2d
+// directly so the export can produce the same visual output.
+//
+// SYNC REQUIREMENT — these two implementations must stay aligned.
+// Any change to ShapeNode's renderLineShape (thickness math, colour
+// resolution, default fallback geometry, arrowhead sizing, dash
+// pattern, double-line offset) must be replicated here, and vice
+// versa. Both files have a comment block flagging the pairing.
+//
+// What's deliberately NOT pixel-exact vs stage:
+//   • Freehand smoothing — Konva's Line(tension={0.4}) uses a
+//     Catmull-Rom-like spline; this file uses canvas-2d quadratic
+//     curves through midpoints. Visually close, especially on dense
+//     freehand-captured paths, but not pixel-identical at sparse-
+//     point peaks.
+//   • Default S-curve fallback for line-curved without user-edited
+//     bezier control points — Konva's `bezier` mode with the legacy
+//     5-point S-curve points renders one cubic ending at point[3] =
+//     (w*0.75, h*0.95) rather than reaching the right edge. We
+//     render a clean S-curve from (0, h/2) to (w, h/2) instead.
+//     Arguably more correct; the default fallback is a placeholder
+//     that the user is expected to override with the bezier handles.
+//
+// Anything else — user-edited bezier, user-captured freehand
+// points, dash patterns, double-line offset, arrowhead sizing — is
+// a verbatim port of ShapeNode's math.
+
+const LINE_PREFIX = "line-";
+
+/** Mirrors ShapeNode.isLineShape — true when this shape should render
+ *  through the line branch instead of falling through to findShape's
+ *  static catalogue path. */
+function isLineShape(shapeId: string): boolean {
+  return shapeId.startsWith(LINE_PREFIX);
+}
+
+/** Mirrors ShapeNode.dashFor. Dash pattern in canvas pixels, scaled
+ *  to thickness so the pattern reads consistently as the line gets
+ *  thicker. Returns undefined for non-dashed line ids (caller leaves
+ *  the canvas in default solid-stroke mode). */
+function dashForLine(shapeId: string, thickness: number): number[] | undefined {
+  const t = Math.max(1, thickness);
+  if (shapeId === "line-dashed") return [t * 4, t * 2];
+  if (shapeId === "line-dotted") return [t * 0.5, t * 1.5];
+  return undefined;
+}
+
+const DEFAULT_LINE_PROPS: LineProps = {
+  arrowStart: false,
+  arrowEnd: false,
+  arrowStyle: "triangle",
+};
+
+function paintLineShape(
+  ctx: CanvasRenderingContext2D,
+  layer: ShapeLayer,
+): void {
+  const { width: w, height: h, shapeId } = layer;
+  const props: LineProps = layer.lineProps ?? DEFAULT_LINE_PROPS;
+
+  // Mirrors ShapeNode's thickness / colour resolution exactly.
+  const thickness = layer.stroke.width > 0 ? layer.stroke.width : 4;
+  const colour =
+    layer.stroke.opacity > 0 && layer.stroke.color
+      ? layer.stroke.color
+      : layer.fill;
+
+  // Default endpoints — horizontal line through the bbox centre. The
+  // user rotates / stretches the bbox to angle and length the line.
+  const x1 = 0;
+  const y1 = h / 2;
+  const x2 = w;
+  const y2 = h / 2;
+
+  // ── Curved line ─────────────────────────────────────────────
+  if (shapeId === "line-curved") {
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = thickness;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    if (props.bezier) {
+      // User-authored bezier control points. Stored in normalised
+      // (u, v) ∈ [0, 1] coords so the curve reflows when the bbox
+      // resizes. Endpoints (P0 / P3) are fixed at the bbox sides;
+      // only c1 and c2 are user-editable.
+      const c1x = props.bezier.c1.u * w;
+      const c1y = props.bezier.c1.v * h;
+      const c2x = props.bezier.c2.u * w;
+      const c2y = props.bezier.c2.v * h;
+      ctx.bezierCurveTo(c1x, c1y, c2x, c2y, x2, y2);
+    } else {
+      // Default S-curve fallback — render a clean cubic from left to
+      // right edge. (See the SYNC REQUIREMENT note above for why
+      // this differs from Konva's exact 5-point output.)
+      ctx.bezierCurveTo(w * 0.25, h * 0.05, w * 0.75, h * 0.95, x2, y2);
+    }
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
+  // ── Freehand ────────────────────────────────────────────────
+  if (shapeId === "line-freehand") {
+    let pts: { x: number; y: number }[];
+    if (props.freehandPoints && props.freehandPoints.length >= 2) {
+      pts = props.freehandPoints.map((p) => ({ x: p.u * w, y: p.v * h }));
+    } else {
+      // Default wave fallback — sampled sine, matches the catalogue's
+      // static SVG path. Same parameters ShapeNode uses.
+      pts = [];
+      const steps = 32;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const x = t * w;
+        const y = h / 2 + Math.sin(t * Math.PI * 4) * (h / 2 - 4);
+        pts.push({ x, y });
+      }
+    }
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = thickness;
+    paintSmoothPolyline(ctx, pts);
+    ctx.restore();
+    return;
+  }
+
+  // ── Double line ─────────────────────────────────────────────
+  if (shapeId === "line-double") {
+    const offset = Math.max(thickness * 1.5, 4);
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = thickness;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1 - offset);
+    ctx.lineTo(x2, y2 - offset);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x1, y1 + offset);
+    ctx.lineTo(x2, y2 + offset);
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
+  // ── Straight, dashed, dotted (with optional arrowheads) ─────
+  const dash = dashForLine(shapeId, thickness);
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = thickness;
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Arrowheads — only the straight-style ids honour them on stage
+  // (renderLineShape's `hasArrow` check sits inside the straight /
+  // dashed / dotted branch and ignores curved / freehand / double).
+  // Arrowhead size scales with thickness so it always reads.
+  const arrowLen = Math.max(thickness * 3, 12);
+  const arrowWidth = Math.max(thickness * 2.5, 10);
+  const arrowFilled = props.arrowStyle === "triangle";
+  if (props.arrowEnd) {
+    paintArrowhead(ctx, x2, y2, x1, y1, arrowLen, arrowWidth, colour, arrowFilled, thickness);
+  }
+  if (props.arrowStart) {
+    paintArrowhead(ctx, x1, y1, x2, y2, arrowLen, arrowWidth, colour, arrowFilled, thickness);
+  }
+}
+
+/** Stroke a smooth path through a sequence of points using canvas-2d
+ *  quadratic curves through midpoints. Approximation of Konva's
+ *  Catmull-Rom-style tension rendering — visually close on dense
+ *  paths, slightly different on sparse-point peaks. (See SYNC
+ *  REQUIREMENT note above paintLineShape.) */
+function paintSmoothPolyline(
+  ctx: CanvasRenderingContext2D,
+  pts: readonly { x: number; y: number }[],
+): void {
+  if (pts.length === 0) return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  if (pts.length === 1) {
+    ctx.stroke();
+    return;
+  }
+  if (pts.length === 2) {
+    ctx.lineTo(pts[1].x, pts[1].y);
+    ctx.stroke();
+    return;
+  }
+  // Smooth: walk through points, using each as a quadratic control
+  // point with the midpoint between it and the next as the anchor.
+  // This produces tangent-continuous curves through the midpoints
+  // with the user's points as natural curvature peaks.
+  for (let i = 1; i < pts.length - 1; i++) {
+    const cx = pts[i].x;
+    const cy = pts[i].y;
+    const mx = (pts[i].x + pts[i + 1].x) / 2;
+    const my = (pts[i].y + pts[i + 1].y) / 2;
+    ctx.quadraticCurveTo(cx, cy, mx, my);
+  }
+  // Final segment — straight line to the last point.
+  ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+  ctx.stroke();
+}
+
+/** Draw an arrowhead at (tipX, tipY) pointing away from (fromX, fromY).
+ *  The arrowhead is a triangle with tip at the line endpoint and base
+ *  perpendicular to the line direction at distance `length` back from
+ *  the tip, base width `width`. `filled === true` paints a filled
+ *  triangle (Konva.Arrow with fill = colour); false paints the two
+ *  open chevron strokes only (Konva.Arrow with fill = "transparent").
+ *
+ *  Mirrors Konva.Arrow's pointerLength / pointerWidth / arrowStyle
+ *  geometry.
+ */
+function paintArrowhead(
+  ctx: CanvasRenderingContext2D,
+  tipX: number,
+  tipY: number,
+  fromX: number,
+  fromY: number,
+  length: number,
+  width: number,
+  colour: string,
+  filled: boolean,
+  strokeThickness: number,
+): void {
+  const dx = tipX - fromX;
+  const dy = tipY - fromY;
+  const len = Math.hypot(dx, dy);
+  if (len < 1e-6) return;
+  // Unit vector along the line, pointing toward the tip.
+  const ux = dx / len;
+  const uy = dy / len;
+  // Back-centre point: `length` units back from the tip along -u.
+  const baseCx = tipX - ux * length;
+  const baseCy = tipY - uy * length;
+  // Perpendicular vector (90° CCW from u).
+  const px = -uy;
+  const py = ux;
+  const halfW = width / 2;
+  const baseLx = baseCx + px * halfW;
+  const baseLy = baseCy + py * halfW;
+  const baseRx = baseCx - px * halfW;
+  const baseRy = baseCy - py * halfW;
+
+  ctx.save();
+  if (filled) {
+    ctx.fillStyle = colour;
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY);
+    ctx.lineTo(baseLx, baseLy);
+    ctx.lineTo(baseRx, baseRy);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    // Chevron — two open strokes from base corners to tip. Match the
+    // line's stroke thickness so the arrow reads as a continuation
+    // of the line rather than a thinner detail.
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = strokeThickness;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(baseLx, baseLy);
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(baseRx, baseRy);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 interface ResolvedStroke {
   color: string;
   width: number;
@@ -734,6 +1177,57 @@ function mapBlendMode(
   // for the modes the editor exposes. "normal" maps to "source-over".
   if (mode === "normal") return "source-over";
   return mode as GlobalCompositeOperation;
+}
+
+/** Bake an image (optionally cropped, optionally CSS-filtered) into a
+ *  fresh offscreen canvas. Returns `null` when neither crop nor filters
+ *  apply — caller uses the original image directly for performance.
+ *
+ *  The returned canvas is sized to the cropped dimensions (or the
+ *  image's natural dims when there's no crop), with the cropped +
+ *  filtered pixels drawn at (0, 0). drawImage from this canvas can
+ *  then stretch the result wherever the caller needs it.
+ *
+ *  Used by the photo-background paint path and the image-layer paint
+ *  path to apply filters that on stage are handled by Konva's filter
+ *  chain (background) or by `ImageNode`'s perspective source canvas
+ *  (image perspective). Both call sites end up using the CSS-filter
+ *  approximation rather than re-implementing Konva's filter math —
+ *  same trade-off the on-stage perspective path already accepts. */
+function bakeImage(
+  img: HTMLImageElement,
+  crop: Rect | null,
+  filterStr: string | null,
+): HTMLCanvasElement | null {
+  if (!crop && !filterStr) return null;
+  const w = crop ? crop.width : img.naturalWidth || img.width;
+  const h = crop ? crop.height : img.naturalHeight || img.height;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.floor(w));
+  canvas.height = Math.max(1, Math.floor(h));
+  const bctx = canvas.getContext("2d");
+  if (!bctx) return null;
+  if (filterStr) {
+    // CSS filters compose with drawImage — the filter applies to every
+    // pixel as it's drawn into the destination canvas.
+    bctx.filter = filterStr;
+  }
+  if (crop) {
+    bctx.drawImage(
+      img,
+      crop.x,
+      crop.y,
+      crop.width,
+      crop.height,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+  } else {
+    bctx.drawImage(img, 0, 0);
+  }
+  return canvas;
 }
 
 // Re-export for callers that want to enumerate available resolutions.
