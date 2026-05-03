@@ -84,16 +84,26 @@ export function DockButton({
   // Mobile-compact styling lives in Tailwind's max-lg utility so the
   // shrink applies on mobile only. Desktop classes remain identical
   // to the legacy non-compact button.
+  //
+  // Note: label visibility is no longer driven by mobileCompact.
+  // Earlier "Mobile-fixes batch 5" hid labels on mobile under
+  // mobileCompact to claw back vertical space inside
+  // MOBILE_DOCK_HEIGHT_PX, but labels are core wayfinding for the
+  // no-selection state ("Add Text / Photo / Shape / Sticker / Style"
+  // and "Replace / Effects / Crop / Resize / Flip-Rotate"). They fit
+  // fine in 192px once the icon-box / padding shrinks below are
+  // applied; the empty-state rows aren't tile-dense enough to need
+  // both compaction levers.
   const buttonPaddingClass = mobileCompact
     ? "px-2 py-1.5 max-lg:px-1 max-lg:py-0.5"
     : "px-2 py-1.5";
   const buttonGapClass = mobileCompact
-    ? "gap-1.5 max-lg:gap-0"
+    ? "gap-1.5 max-lg:gap-0.5"
     : "gap-1.5";
   const iconBoxClass = mobileCompact
     ? "w-11 h-11 max-lg:w-9 max-lg:h-9"
     : "w-11 h-11";
-  const labelMobileClass = mobileCompact ? "max-lg:hidden" : "";
+  const labelMobileClass = "";
 
   return (
     <button

@@ -1153,7 +1153,15 @@ function DockSectionHeader({
   trailing?: React.ReactNode;
   /** When true, the header uses tighter padding and a slightly
    *  smaller min-height on mobile (max-lg) so empty-state sections
-   *  fit within MOBILE_DOCK_HEIGHT_PX. Desktop is unchanged. */
+   *  fit within MOBILE_DOCK_HEIGHT_PX. Desktop is unchanged.
+   *
+   *  Note (May 2026): mobileCompact previously also forced an
+   *  uppercase / muted-colour / smaller-font treatment on mobile that
+   *  turned "Add Layer" / "Background" into eyebrow-style ALL-CAPS
+   *  labels. That regressed the original design — section titles are
+   *  meant to read as dark sentence-case headings on mobile too —
+   *  so the typography was reverted. Only the tighter padding /
+   *  reduced min-height survive under mobileCompact now. */
   mobileCompact?: boolean;
 }) {
   return (
@@ -1166,14 +1174,8 @@ function DockSectionHeader({
       style={{ minHeight: mobileCompact ? undefined : 32 }}
     >
       <span
-        className={
-          mobileCompact
-            ? "text-[13px] max-lg:text-[11px] font-semibold tracking-tight max-lg:uppercase max-lg:tracking-wider"
-            : "text-[13px] font-semibold tracking-tight"
-        }
-        style={{
-          color: mobileCompact ? "var(--pe-text-muted)" : "var(--pe-text)",
-        }}
+        className="text-[13px] font-semibold tracking-tight"
+        style={{ color: "var(--pe-text)" }}
       >
         {title}
       </span>
