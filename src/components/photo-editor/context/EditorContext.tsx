@@ -67,6 +67,18 @@ interface EditorContextValue {
    *  ExportPanel. Replaces the `Konva.stages[0]` global hack carried
    *  over from Session 7. */
   stageRef: React.MutableRefObject<Konva.Stage | null>;
+  /** Mutable ref to the inner viewport-transform Group that holds every
+   *  rendered layer. Used by snap math (issue 7 — overhang rendering)
+   *  to convert layer-local coordinates into project-pixel canvas
+   *  coordinates regardless of the outer Stage size / position.
+   *
+   *  Mobile-fixes batch 2 (May 2026). Before this, the Konva Stage's
+   *  scale was effectiveScale and consumers used `relativeTo: stage`
+   *  to read project-pixel coords. Now the Stage covers the entire
+   *  grey container at scale 1, and the viewport transform (scale +
+   *  rotation + translate) lives on this Group instead — so callers
+   *  must use `relativeTo: layerGroup` to get project-pixel coords. */
+  layerGroupRef: React.MutableRefObject<Konva.Group | null>;
 }
 
 const EditorContext = createContext<EditorContextValue | null>(null);
@@ -107,6 +119,13 @@ export function EditorProvider({
   // EditorShell / ExportPanel. Lives here so consumers don't have to
   // thread refs through the component tree.
   const stageRef = useRef<Konva.Stage | null>(null);
+
+  // Layer-group ref — assigned by CanvasStage when the inner viewport-
+  // transform Group mounts. Issue 7: snap / selection math uses this
+  // instead of stageRef as the project-pixel reference frame, since
+  // the Stage now covers the entire grey area while project-pixel
+  // coordinates live one level deeper inside the transform Group.
+  const layerGroupRef = useRef<Konva.Group | null>(null);
 
   const dispatch = useCallback(
     (action: EditorAction) => {
@@ -187,8 +206,17 @@ export function EditorProvider({
   }, [undo, redo]);
 
   const value = useMemo<EditorContextValue>(
-    () => ({ state, dispatch, undo, redo, canUndo, canRedo, stageRef }),
-    [state, dispatch, undo, redo, canUndo, canRedo]
+    () => ({
+      state,
+      dispatch,
+      undo,
+      redo,
+      canUndo,
+      canRedo,
+      stageRef,
+      layerGroupRef,
+    }),
+    [state, dispatch, undo, redo, canUndo, canRedo],
   );
 
   return (
