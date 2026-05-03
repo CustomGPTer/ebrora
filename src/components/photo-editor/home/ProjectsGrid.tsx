@@ -191,6 +191,11 @@ export function ProjectsGrid({ onProjectLoaded }: ProjectsGridProps) {
                 aria-label={`Project options for ${p.name}`}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
+                // Stop pointerdown so the document-level outside-click
+                // listener (in the openMenuFor useEffect) doesn't close
+                // the menu just-opened-by-this-very-tap or pre-empt the
+                // toggle. Same race as the menu items below.
+                onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpenMenuFor(menuOpen ? null : p.id);
@@ -215,6 +220,25 @@ export function ProjectsGrid({ onProjectLoaded }: ProjectsGridProps) {
                     boxShadow: "var(--pe-shadow-lg)",
                     minWidth: 140,
                   }}
+                  // BOTH handlers required (May 2026 fix). Background:
+                  // the document-level outside-click listener registered
+                  // in the openMenuFor useEffect listens for
+                  // `pointerdown`, which fires BEFORE `click`. Without
+                  // stopping pointerdown here, the sequence on tapping
+                  // a menu item is:
+                  //   1. pointerdown bubbles to window
+                  //   2. window listener flips openMenuFor → null
+                  //   3. React re-renders, menu unmounts
+                  //   4. click fires — but the menu is gone, so the
+                  //      click lands on whatever sits beneath, which
+                  //      is the card's "open project" button
+                  // Result: tapping Delete opened the project instead
+                  // of deleting it (sometimes throwing past React on
+                  // the first race, which hit the root error boundary
+                  // and showed "Something went wrong").
+                  // Stopping both events keeps the menu mounted long
+                  // enough for the menu-item onClick to fire.
+                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
