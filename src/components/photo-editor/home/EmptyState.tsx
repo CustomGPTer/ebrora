@@ -52,7 +52,8 @@ import {
   loadDraft,
   deleteDraft,
 } from "@/lib/photo-editor/saved-projects/draft";
-import { useInstallPrompt } from "@/lib/photo-editor/pwa/install-prompt";
+import { useInstallPrompt, useIsStandaloneMode } from "@/lib/photo-editor/pwa/install-prompt";
+import { PwaInstallBanner } from "./PwaInstallBanner";
 import type { Project } from "@/lib/photo-editor/types";
 
 interface EmptyStateProps {
@@ -67,6 +68,7 @@ export function EmptyState({ onProjectLoaded }: EmptyStateProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [projectsModalOpen, setProjectsModalOpen] = useState(false);
   const { canInstall, install } = useInstallPrompt();
+  const isStandalone = useIsStandaloneMode();
 
   // ── Draft-restore prompt ──────────────────────────────────────
   // On home mount, look for an autosaved draft (saved by the editor's
@@ -152,6 +154,17 @@ export function EmptyState({ onProjectLoaded }: EmptyStateProps) {
           }
         />
       </main>
+
+      {/* ── PWA install banner — issue 5 (mobile-fixes batch 2) ─────
+          Sticky-bottom CTA shown only when canInstall === true and the
+          page is not already running as an installed PWA. Tapping
+          fires the browser's captured install prompt in a single
+          gesture. */}
+      <PwaInstallBanner
+        canInstall={canInstall}
+        isStandalone={isStandalone}
+        onInstall={() => void install()}
+      />
 
       {/* ── Settings sheet (cog) ───────────────────────────────── */}
       <SettingsMenu
