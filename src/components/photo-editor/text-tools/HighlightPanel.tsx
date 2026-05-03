@@ -7,6 +7,7 @@
 
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Highlighter } from "lucide-react";
 import { PanelDrawer } from "../panels/PanelDrawer";
 import { useTextTool } from "./use-text-tool";
@@ -30,9 +31,13 @@ interface HighlightPanelProps {
   inline?: boolean;
 }
 
+// Default opacity 1 (was 0): the slider used to start invisible, so
+// users had to drag it before the highlight showed up. Visible-by-default
+// matches user expectation for a feature whose whole point is being
+// visible — they can dial it down if needed.
 const DEFAULT_HIGHLIGHT: Highlight = {
   color: "#FFEB3B",
-  opacity: 0,
+  opacity: 1,
 };
 
 export function HighlightPanel({
@@ -50,6 +55,33 @@ export function HighlightPanel({
   function patchHighlight(next: Partial<Highlight>) {
     tool.patchRuns({ highlight: { ...highlight, ...next } });
   }
+
+  // Auto-bump opacity to 100% once on mount when the current opacity is
+  // 0. Tapping into the Highlight tab is treated as "turn highlight on",
+  // so the user sees colour immediately rather than having to drag the
+  // slider before anything renders. Guarded by a ref so re-renders don't
+  // re-fire (the patch flips opacity to 1 on first run, the guard then
+  // blocks the effect from running again even if the user manually drags
+  // back to 0 inside this panel session).
+  const autoBumpedRef = useRef(false);
+  useEffect(() => {
+    if (autoBumpedRef.current) return;
+    if (!tool.layer) return;
+    // Only bump for non-mixed runs with explicit 0 opacity. Mixed runs
+    // (current === null) are left alone — the user picked a span where
+    // some glyphs already have non-zero highlight, and overwriting that
+    // would surprise them.
+    if (current !== null && current.opacity === 0) {
+      autoBumpedRef.current = true;
+      patchHighlight({ opacity: 1 });
+    } else {
+      // Mark as "handled" anyway so we don't keep checking on every
+      // re-render. If the user dials back to 0 themselves, that's their
+      // call — we won't fight them.
+      autoBumpedRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tool.layer]);
 
   const body = (
     <div className="flex-1 overflow-y-auto">
