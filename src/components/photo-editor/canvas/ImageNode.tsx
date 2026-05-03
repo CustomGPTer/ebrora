@@ -27,10 +27,12 @@ import Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import {
   isIdentityPerspective,
+  perspectiveBoundingBox,
   renderPerspectiveImage,
 } from "@/lib/photo-editor/canvas/perspective-render";
 import {
   applyImageFilterAttrs,
+  buildCssFilterString,
   resolveImageFilterChain,
 } from "@/lib/photo-editor/canvas/image-filters";
 import type { ImageLayer, Transform } from "@/lib/photo-editor/types";
@@ -94,6 +96,38 @@ export function ImageNode({
     height,
   ]);
 
+  // Override getSelfRect on the perspective KonvaShape so the selection
+  // chrome wraps the warped quad's actual bounding box, not the un-
+  // warped natural rectangle (W × H). Default getSelfRect for a Shape
+  // returns (0, 0, width, height) which under-clips on extreme corner
+  // warps that push corners outside the natural rect (the per-corner
+  // sliders' ±30% range). Fixed May 2026.
+  //
+  // The flat path doesn't need this — KonvaImage's bbox is
+  // already correct because no warping happens. We only patch the
+  // shapeRef instance, and only when perspective is meaningfully
+  // active (non-null, non-identity).
+  useEffect(() => {
+    const shape = shapeRef.current;
+    if (!shape) return;
+    if (
+      !layer.perspective ||
+      isIdentityPerspective(layer.perspective, width, height)
+    ) {
+      return;
+    }
+    const bbox = perspectiveBoundingBox(layer.perspective);
+    shape.getSelfRect = () => ({
+      x: bbox.x,
+      y: bbox.y,
+      width: bbox.width,
+      height: bbox.height,
+    });
+    // Force a redraw so any attached transformer / SelectionFrame
+    // re-reads the new self-rect.
+    shape.getLayer()?.batchDraw();
+  }, [layer.perspective, width, height]);
+
   // Pre-build a source canvas for the perspective path. When perspective
   // is active, the warp engine samples from this canvas. Two extra
   // responsibilities vs the plain path:
@@ -121,29 +155,16 @@ export function ImageNode({
     const ctx = c.getContext("2d");
     if (!ctx) return null;
     // Build a CSS filter string from the layer's adjust + effect + blur.
-    const filterParts: string[] = [];
-    const a = layer.adjust;
-    // Brightness: CSS brightness(1) = no change. Konva additive [-1, 1]
-    // → CSS multiplicative roughly via 1 + value.
-    const bri = (a.brightness + a.exposure / 2) / 100;
-    if (bri !== 0) filterParts.push(`brightness(${1 + bri})`);
-    if (a.contrast !== 0) {
-      // CSS contrast(1) = no change. Konva contrast is in [-100, 100];
-      // map to roughly [0.5, 1.5].
-      filterParts.push(`contrast(${1 + a.contrast / 100})`);
-    }
-    if (a.saturation !== 0) {
-      filterParts.push(`saturate(${1 + a.saturation / 100})`);
-    }
-    if (layer.filterEffect === "mono") filterParts.push("grayscale(1)");
-    else if (layer.filterEffect === "sepia") filterParts.push("sepia(1)");
-    else if (layer.filterEffect === "invert") filterParts.push("invert(1)");
-    if (layer.blur.radius > 0) {
-      filterParts.push(`blur(${layer.blur.radius}px)`);
-    }
-    if (filterParts.length > 0) {
+    // Shared with the export pipeline via image-filters.ts so both paths
+    // produce identical filter output for the same spec.
+    const filterStr = buildCssFilterString({
+      adjust: layer.adjust,
+      effect: layer.filterEffect,
+      blur: layer.blur,
+    });
+    if (filterStr) {
       // ctx.filter is supported in all modern browsers + Node Canvas.
-      ctx.filter = filterParts.join(" ");
+      ctx.filter = filterStr;
     }
     if (layer.crop) {
       ctx.drawImage(
@@ -265,16 +286,13 @@ export function ImageNode({
   // NO offset shift; this keeps the perspective corner positions
   // visually consistent with where the user dropped the image.
   //
-  // Konva's getClientRect for a Shape uses `width`/`height` (= bbox in
-  // shape-local), so we set them to the natural source dimensions
-  // (W × H) — which corresponds to the un-warped rectangle from (0, 0)
-  // to (W, H). When perspective corners stay inside the natural rect
-  // (the common case — every preset in PerspectivePanel does), the
-  // selection chrome wraps the warp tightly. For extreme warps that
-  // push corners outside (only reachable via the per-corner sliders'
-  // ±30% range), the dashed border under-counts the overflow but the
-  // warp itself still renders correctly. A future polish pass can
-  // override Shape.getSelfRect to track the perspective bbox exactly.
+  // The KonvaShape's `width` / `height` are still set to the natural
+  // source dimensions for hit-testing purposes (taps inside the
+  // un-warped rect select the layer). Selection-chrome bbox is handled
+  // separately via the `getSelfRect` override in the useEffect above —
+  // that returns the bbox of the four destination corners so the
+  // dashed selection border wraps the warp tightly even on extreme
+  // corner-slider values that push corners outside the natural rect.
   const corners = layer.perspective!;
   const sourceImage: CanvasImageSource = perspectiveSourceCanvas ?? img;
   const sourceWidth = layer.crop ? layer.crop.width : img.width;

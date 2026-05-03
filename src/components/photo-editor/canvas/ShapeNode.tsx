@@ -56,6 +56,7 @@ import {
   findShape,
   isBuiltInShape,
 } from "@/lib/photo-editor/shapes/catalogue";
+import { withAlpha } from "@/lib/photo-editor/rich-text/engine";
 
 interface ShapeNodeProps {
   layer: ShapeLayer;
@@ -107,15 +108,26 @@ export function ShapeNode({
 }: ShapeNodeProps) {
   const groupRef = useRef<Konva.Group>(null);
   const fill = layer.variant === "filled" ? layer.fill : "transparent";
+  // Bake stroke opacity into the colour. Konva ignores `strokeOpacity`
+  // as an attribute (verified in the May 2026 render-parity audit —
+  // the prop was being silently dropped on stage), so without this the
+  // stroke opacity slider has no visible effect on shapes in the editor
+  // even though the export pipeline composes it correctly via
+  // globalAlpha. `withAlpha` produces "rgba(r, g, b, opacity)" for hex
+  // input colours, falling through to the original string for other
+  // formats — sufficient because the stroke colour picker only emits
+  // hex.
   const strokeProps =
     layer.stroke.width > 0 && layer.stroke.opacity > 0
       ? {
           // null colour = inherit from fill (May 2026). Lets a Width
           // drag thicken the shape in its own colour rather than
           // springing a default-black outline.
-          stroke: layer.stroke.color ?? layer.fill,
+          stroke: withAlpha(
+            layer.stroke.color ?? layer.fill,
+            layer.stroke.opacity,
+          ),
           strokeWidth: layer.stroke.width,
-          strokeOpacity: layer.stroke.opacity,
           strokeScaleEnabled: false,
         }
       : layer.variant === "outlined"
@@ -303,6 +315,15 @@ function renderPrimitive(
 // Arrowheads: rendered via a separate Konva.Arrow when the line's
 // lineProps say so. The arrowhead size scales with the line's
 // thickness so it always reads.
+//
+// SYNC REQUIREMENT — paired with `paintLineShape` in
+// `src/lib/photo-editor/export/render.ts`. The two implementations
+// render the same six line shape ids so the editor canvas and the
+// PNG / JPEG / PDF export look the same. ANY change to thickness
+// math, colour resolution, default fallback geometry, dash pattern,
+// double-line offset, or arrowhead sizing here MUST be replicated on
+// the export side, and vice versa. The export file's `paintLineShape`
+// header has the same flag for the reverse direction.
 
 function renderLineShape(layer: ShapeLayer): JSX.Element {
   const { width, height, shapeId } = layer;
