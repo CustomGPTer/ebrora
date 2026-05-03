@@ -23,6 +23,14 @@
 // Layer-kind defaults are preserved at factory time; this component
 // just edits the existing `BaseLayer.name` field via the existing
 // UPDATE_LAYER reducer action.
+//
+// Mobile-fixes batch 1 (May 2026): hidden on mobile.
+//   The chip-with-pencil row was clutter on mobile — it told you the
+//   layer kind ("Woman construction worker ✏️") with no purpose for a
+//   user who's already looking at the layer they selected. We now
+//   render this row only at lg+ breakpoints; mobile users go straight
+//   into the controls. Layer renaming on mobile is unavailable; if
+//   that becomes a real ask later, surface it in the Layers panel.
 
 "use client";
 
@@ -90,7 +98,7 @@ export function EditableLayerName({
   if (editing) {
     return (
       <div
-        className="flex-none flex items-center px-4 pt-2.5 pb-1"
+        className="hidden lg:flex flex-none items-center px-4 pt-2.5 pb-1"
         style={{ minHeight: 32 }}
       >
         <input
@@ -119,7 +127,7 @@ export function EditableLayerName({
 
   return (
     <div
-      className="flex-none flex items-center justify-between px-4 pt-2.5 pb-1"
+      className="hidden lg:flex flex-none items-center justify-between px-4 pt-2.5 pb-1"
       style={{ minHeight: 32 }}
     >
       <button
