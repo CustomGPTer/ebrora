@@ -336,3 +336,57 @@ export function identityPerspective(
     { x: 0, y: height },
   ];
 }
+
+/** Compute extrapolated destination corners for an expanded source
+ *  rect that overflows the original (0,0)→(width,height) space.
+ *
+ *  The four input `corners` define a bilinear mapping over the
+ *  (0,0) → (width, height) rectangle. Evaluating that mapping at
+ *  parameters outside [0,1] gives the destination position for source
+ *  content that lies outside the flat bbox — bent-text apex above the
+ *  baseline, text-background padding past the aligned glyph rect, etc.
+ *
+ *  Combined with `srcX` / `srcY` / `srcWidth` / `srcHeight` overrides
+ *  on `renderPerspectiveImage`, this lets callers warp a bitmap whose
+ *  painted content extends beyond (0,0)→(W,H) without clipping at the
+ *  bbox edges. The original `corners` keep their meaning (they still
+ *  represent the four corners of (0,0)→(width,height)); the returned
+ *  corners represent the four corners of the expanded `extent`
+ *  rectangle in the same destination space, in TL, TR, BR, BL order.
+ *
+ *  Mathematically valid because the renderer uses bilinear interpolation
+ *  (not a true projective transform). Bilinear interpolation extends
+ *  smoothly past [0,1] — extrapolation gives the same surface that
+ *  in-range interpolation does, just outside the original quad.
+ *
+ *  Used by RichTextNode (on-stage) and the export renderer (off-screen)
+ *  to keep bent / padded text inside the warp instead of clipping at
+ *  the layout bbox. New for the May 2026 bend / perspective export fix. */
+export function expandPerspectiveCorners(
+  corners: readonly [Point, Point, Point, Point],
+  width: number,
+  height: number,
+  extent: { minX: number; minY: number; maxX: number; maxY: number },
+): [Point, Point, Point, Point] {
+  if (width <= 0 || height <= 0) {
+    // Degenerate input — return a copy of the original corners so the
+    // caller can still hand them to renderPerspectiveImage without a
+    // shared-reference surprise.
+    return [
+      { x: corners[0].x, y: corners[0].y },
+      { x: corners[1].x, y: corners[1].y },
+      { x: corners[2].x, y: corners[2].y },
+      { x: corners[3].x, y: corners[3].y },
+    ];
+  }
+  const u0 = extent.minX / width;
+  const v0 = extent.minY / height;
+  const u1 = extent.maxX / width;
+  const v1 = extent.maxY / height;
+  return [
+    bilinear(corners, u0, v0),
+    bilinear(corners, u1, v0),
+    bilinear(corners, u1, v1),
+    bilinear(corners, u0, v1),
+  ];
+}
