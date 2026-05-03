@@ -559,8 +559,13 @@ function paintRoundedRect(
 
 /** Mix `alpha` (0–1) into a CSS colour string. Crude but sufficient —
  *  handles #RRGGBB; for other formats falls back to the original colour
- *  and lets the caller apply globalAlpha. */
-function withAlpha(color: string, alpha: number): string {
+ *  and lets the caller apply globalAlpha.
+ *
+ *  Exported (May 2026) so `ShapeNode` can use the same helper to bake
+ *  stroke opacity into the Konva stroke colour. Konva ignores
+ *  `strokeOpacity` as an attribute, so passing `withAlpha(color, alpha)`
+ *  is the only way to get a semi-transparent shape stroke on stage. */
+export function withAlpha(color: string, alpha: number): string {
   if (alpha >= 1) return color;
   if (alpha <= 0) return "transparent";
   if (color.startsWith("#") && color.length === 7) {
