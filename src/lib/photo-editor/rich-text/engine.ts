@@ -1,8 +1,15 @@
 // src/lib/photo-editor/rich-text/engine.ts
 //
-// Top-level rich-text engine. Two responsibilities:
-//   • layoutText(layer)            — pure-logic layout (delegates to layout.ts)
-//   • renderTextToCanvas(ctx, …)   — paint a laid-out text layer onto a 2D canvas
+// Top-level rich-text engine. Three responsibilities:
+//   • layoutText(layer)              — pure-logic layout (delegates to layout.ts)
+//   • paintTextBackground(ctx, …)    — paint the layer-level background rect
+//                                      (TextLayer.background) underneath the
+//                                      glyphs. Tracks alignment via
+//                                      layout.bounds.x so the rect follows the
+//                                      visible text under center / right /
+//                                      justify alignment instead of staying
+//                                      glued to the left.
+//   • renderTextToCanvas(ctx, …)     — paint a laid-out text layer onto a 2D canvas
 //
 // Render pipeline per glyph:
 //   1. Highlight rectangle (drawn before glyphs so it sits behind)
@@ -10,6 +17,10 @@
 //   3. Stroke (drawn first so the fill sits on top — Add-Text-style "outlined" look)
 //   4. Fill (solid, gradient, or texture)
 //   5. Decoration lines (underline / strikethrough — drawn after glyphs so they sit on top)
+//
+// Layer background sits BEFORE step 1 in the overall paint order — call
+// paintTextBackground before renderTextToCanvas. Both on-stage
+// (RichTextNode) and export (render.ts) callers do this.
 
 import type { GlyphRun, TextLayer } from "../types";
 import { fontStringForRun } from "./measure";
@@ -26,6 +37,47 @@ export type { LaidGlyph, LaidLine, LayoutResult };
 /** Re-export for callers that just want a layout. */
 export function layoutText(layer: TextLayer): LayoutResult {
   return layoutTextLayer(layer);
+}
+
+/** Paint the layer-level background rectangle that sits behind the glyphs.
+ *
+ *  Position tracks the text's alignment via `layout.bounds.x`:
+ *    • Left-aligned         → bounds.x = 0, rect hugs the left of the wrap box.
+ *    • Center-aligned       → bounds.x = (wrap - text) / 2, rect centered.
+ *    • Right-aligned        → bounds.x = wrap - text, rect on the right.
+ *    • Justify (multi-line) → bounds.x = 0, bounds.width = wrap, rect spans
+ *                             the full wrap box.
+ *
+ *  Padded by `widthDelta` / `heightDelta` on each side. `roundCorner` is
+ *  layer-level (one rounded rect around the whole text), not glyph-accurate.
+ *  When bend is active the rect is around the FLAT layout — bent glyphs may
+ *  extend past the rect at the apex (matches the Q3 decision in D2a notes).
+ *
+ *  Caller is responsible for placing layer-local (0,0) at ctx's current
+ *  origin before invoking. ctx state is restored before return. No-op
+ *  when opacity is 0. */
+export function paintTextBackground(
+  ctx: CanvasRenderingContext2D,
+  layer: TextLayer,
+  layout: LayoutResult,
+): void {
+  const bg = layer.background;
+  if (!bg || bg.opacity <= 0) return;
+
+  const x = layout.bounds.x - bg.widthDelta;
+  const y = -bg.heightDelta;
+  const w = layout.bounds.width + bg.widthDelta * 2;
+  const h = layout.height + bg.heightDelta * 2;
+  if (w <= 0 || h <= 0) return;
+
+  const rad = Math.max(0, Math.min(bg.roundCorner, Math.min(w, h) / 2));
+
+  ctx.save();
+  ctx.globalAlpha = clamp01(bg.opacity);
+  ctx.fillStyle = bg.color;
+  paintRoundedRect(ctx, x, y, w, h, rad);
+  ctx.fill();
+  ctx.restore();
 }
 
 export interface RenderTextOptions {
@@ -469,6 +521,40 @@ function drawDebugOverlay(
 
 function clamp01(n: number): number {
   return Math.max(0, Math.min(1, n));
+}
+
+/** Path a rounded rectangle on the supplied context. Falls back to
+ *  ctx.roundRect when available (Chromium / iOS 16+); otherwise
+ *  hand-paths arc corners. Doesn't fill or stroke — caller picks the
+ *  paint operation. */
+function paintRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  if (
+    typeof (ctx as unknown as { roundRect?: unknown }).roundRect === "function"
+  ) {
+    ctx.beginPath();
+    (ctx as CanvasRenderingContext2D & {
+      roundRect(x: number, y: number, w: number, h: number, r: number): void;
+    }).roundRect(x, y, w, h, r);
+    return;
+  }
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
 }
 
 /** Mix `alpha` (0–1) into a CSS colour string. Crude but sufficient —
