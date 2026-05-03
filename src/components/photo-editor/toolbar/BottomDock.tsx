@@ -22,6 +22,16 @@
 // selection (single or multi). To reach them again, the user taps
 // empty canvas / the grey area around it to deselect.
 //
+// Mobile-fixes batch 5 (May 2026) — the dock is height-locked on
+// mobile to MOBILE_DOCK_HEIGHT_PX so that switching between empty
+// state, layer-edit, and tab transitions never causes the canvas
+// above to jump. See the matching changes in DockButton (compact
+// mode), DockSectionHeader (compact mode), and PropertyPanelHost
+// (flex-1 body so it fills the locked height). Desktop (lg+)
+// preserves the legacy natural-height behaviour because the chip
+// row above the panel changes height with content there too and
+// the wider viewport tolerates the variance.
+//
 // Why swap rather than add a third section? Vertical real estate on
 // mobile is precious — adding a section means scrolling, which hides
 // the canvas. The reference Add Text app swaps the top section.
@@ -38,6 +48,23 @@
 // fine; users discover whichever one they reach for first.
 
 "use client";
+
+/** Mobile dock height lock (px). Sized so that a content-rich
+ *  edit-panel tab (shape Color: section label + ColorPicker row,
+ *  ~135 px) plus the tab strip (~57 px) fit comfortably, AND so
+ *  that the empty state (Add Layer + Background, both compact)
+ *  fits naturally within the same envelope. Picked once, applied
+ *  everywhere — see header comment.
+ *
+ *  IMPORTANT: this constant duplicates the literal `192` in the
+ *  outer dock's `max-lg:h-[192px]` Tailwind class. Tailwind's JIT
+ *  cannot read class names from template strings, so the class has
+ *  to be a literal — keep both in sync if you change the lock
+ *  height. eslint-disable-next-line is on the constant declaration
+ *  so the unused-var lint is satisfied since the value is referenced
+ *  only from doc-comments. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const MOBILE_DOCK_HEIGHT_PX = 192;
 
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
@@ -259,7 +286,7 @@ export function BottomDock({
 
   return (
     <div
-      className="flex-none flex flex-col"
+      className="flex-none flex flex-col max-lg:overflow-hidden max-lg:h-[192px]"
       style={{
         borderTop: "1px solid var(--pe-toolbar-border)",
         background: "var(--pe-toolbar-bg)",
@@ -293,38 +320,49 @@ export function BottomDock({
           To reach Background again, the user taps empty canvas (or
           the grey area around it) to deselect.
 
+          Mobile-fixes batch 5 (May 2026): when the empty state is
+          mounted, the section uses compact mode (smaller icons, no
+          labels under each, tighter section header) so two such
+          sections fit inside MOBILE_DOCK_HEIGHT_PX without scrolling
+          or clipping.
+
           Note: the file <input> below stays mounted unconditionally
           so the React ref is stable regardless of selection state. */}
       {state.selection.length === 0 ? (
         <>
-          <DockSectionHeader title="Background" />
-          <DockRow mode="spread">
+          <DockSectionHeader title="Background" mobileCompact />
+          <DockRow mode="spread" mobileCompact>
             <DockButton
               fluid
+              mobileCompact
               icon={<FilePlus className="w-6 h-6" strokeWidth={1.75} />}
               label="Replace"
               onClick={() => replaceBgInputRef.current?.click()}
             />
             <DockButton
               fluid
+              mobileCompact
               icon={<Wand2 className="w-6 h-6" strokeWidth={1.75} />}
               label="Effects"
               onClick={onOpenEffects}
             />
             <DockButton
               fluid
+              mobileCompact
               icon={<CropIcon className="w-6 h-6" strokeWidth={1.75} />}
               label="Crop"
               onClick={onOpenCrop}
             />
             <DockButton
               fluid
+              mobileCompact
               icon={<ResizeIcon className="w-6 h-6" strokeWidth={1.75} />}
               label="Resize"
               onClick={onOpenResize}
             />
             <DockButton
               fluid
+              mobileCompact
               icon={<RotateCw className="w-6 h-6" strokeWidth={1.75} />}
               label="Flip/Rotate"
               onClick={onOpenFlipRotate}
@@ -378,10 +416,11 @@ function AddLayerSection({
 }) {
   return (
     <>
-      <DockSectionHeader title="Add Layer" />
-      <DockRow mode="spread">
+      <DockSectionHeader title="Add Layer" mobileCompact />
+      <DockRow mode="spread" mobileCompact>
         <DockButton
           fluid
+          mobileCompact
           icon={<PlusTextGlyph className="w-6 h-6" />}
           label="Add Text"
           onClick={onAddText}
@@ -393,12 +432,14 @@ function AddLayerSection({
         />
         <DockButton
           fluid
+          mobileCompact
           icon={<ImageIcon className="w-6 h-6" strokeWidth={1.75} />}
           label="Photo"
           onClick={onPickPhoto}
         />
         <DockButton
           fluid
+          mobileCompact
           icon={<Square className="w-6 h-6" strokeWidth={1.75} />}
           label="Shape"
           onClick={onTogglePanel("shapes")}
@@ -406,6 +447,7 @@ function AddLayerSection({
         />
         <DockButton
           fluid
+          mobileCompact
           icon={<Smile className="w-6 h-6" strokeWidth={1.75} />}
           label="Sticker"
           onClick={onTogglePanel("stickers")}
@@ -413,6 +455,7 @@ function AddLayerSection({
         />
         <DockButton
           fluid
+          mobileCompact
           icon={<Sparkles className="w-6 h-6" strokeWidth={1.75} />}
           label="Style"
           onClick={() => onStub("Saved Styles — coming soon")}
@@ -1396,18 +1439,33 @@ function StickerEditPanel({ layer }: { layer: StickerLayer }) {
 function DockSectionHeader({
   title,
   trailing,
+  mobileCompact = false,
 }: {
   title: string;
   trailing?: React.ReactNode;
+  /** When true, the header uses tighter padding and a slightly
+   *  smaller min-height on mobile (max-lg) so empty-state sections
+   *  fit within MOBILE_DOCK_HEIGHT_PX. Desktop is unchanged. */
+  mobileCompact?: boolean;
 }) {
   return (
     <div
-      className="flex-none flex items-center justify-between px-4 pt-2.5 pb-1"
-      style={{ minHeight: 32 }}
+      className={
+        mobileCompact
+          ? "flex-none flex items-center justify-between px-4 max-lg:px-3 pt-2.5 max-lg:pt-1.5 pb-1 max-lg:pb-0.5"
+          : "flex-none flex items-center justify-between px-4 pt-2.5 pb-1"
+      }
+      style={{ minHeight: mobileCompact ? undefined : 32 }}
     >
       <span
-        className="text-[13px] font-semibold tracking-tight"
-        style={{ color: "var(--pe-text)" }}
+        className={
+          mobileCompact
+            ? "text-[13px] max-lg:text-[11px] font-semibold tracking-tight max-lg:uppercase max-lg:tracking-wider"
+            : "text-[13px] font-semibold tracking-tight"
+        }
+        style={{
+          color: mobileCompact ? "var(--pe-text-muted)" : "var(--pe-text)",
+        }}
       >
         {title}
       </span>
@@ -1429,22 +1487,30 @@ function DockSectionHeader({
 //     no-selection 5-tile rows (Add Layer, Background) which the
 //     reference renders as a single fixed row spanning the screen.
 //     Children should be passed `fluid` so they cooperate.
+//
+// `mobileCompact` (Mobile-fixes batch 5): tightens padding on mobile
+// only so empty-state rows fit inside the locked dock height.
 
 function DockRow({
   children,
   mode = "scroll",
+  mobileCompact = false,
 }: {
   children: React.ReactNode;
   mode?: "scroll" | "spread";
+  mobileCompact?: boolean;
 }) {
+  const paddingClass = mobileCompact
+    ? "gap-1 px-3 max-lg:px-2 pb-2 max-lg:pb-1"
+    : "gap-1 px-3 pb-2";
   if (mode === "spread") {
     return (
-      <div className="flex items-stretch gap-1 px-3 pb-2">{children}</div>
+      <div className={`flex items-stretch ${paddingClass}`}>{children}</div>
     );
   }
   return (
     <div
-      className="flex items-stretch gap-1 px-3 pb-2 overflow-x-auto"
+      className={`flex items-stretch ${paddingClass} overflow-x-auto`}
       style={{
         scrollbarWidth: "none",
         msOverflowStyle: "none",
